@@ -4,6 +4,7 @@ import static com.sprint.mission.discodeit.entity.common.Status.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractUUIDEntity {
@@ -12,7 +13,7 @@ public abstract class AbstractUUIDEntity {
 
     private final Long createAt;
 
-    protected Long updateAt;
+    protected Long updateAt = null;
 
     private Status status;
 
@@ -30,8 +31,8 @@ public abstract class AbstractUUIDEntity {
         return createAt;
     }
 
-    public Long getUpdateAt() {
-        return updateAt;
+    public Optional<Long> getUpdateAt() {
+        return Optional.ofNullable(updateAt);
     }
 
     public Status getStatus() {
