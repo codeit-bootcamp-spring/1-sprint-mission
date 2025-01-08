@@ -1,10 +1,11 @@
-package discodeit.service.jcf;
+package sprint.mission.discodeit.service.jcf;
 
-import discodeit.entity.User;
-import discodeit.service.UserService;
+import sprint.mission.discodeit.entity.User;
+import sprint.mission.discodeit.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
@@ -23,39 +24,29 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create() {
-        User newUser = User.createUser();
-        UUID userId = newUser.getCommon().getId();
-        return data.putIfAbsent(userId, newUser);
+    public User create(User userToCreate) {
+        UUID key = userToCreate.getCommon().getId();
+        return Optional.ofNullable(data.putIfAbsent(key, userToCreate))
+                .map(existingUser -> User.createEmptyUser())
+                .orElse(userToCreate);
     }
 
     @Override
     public User read(UUID key) {
-        return data.compute(key, (id, user) -> {
-            if (user == null) return User.createEmptyUser();
-
-            return user;
-        });
+        return Optional.ofNullable(data.get(key))
+                .orElse(User.createEmptyUser());
     }
 
     @Override
     public User update(UUID key, User userToUpdate) {
-        if (data.containsKey(key))
-        {
-            UUID newKey = userToUpdate.getCommon().getId();
-            data.put(newKey, userToUpdate);
-            data.remove(key);
-            return data.get(newKey);
-        }
-
-        return User.createEmptyUser();
+        return Optional.ofNullable(data.computeIfPresent(
+                key, (id, user)-> userToUpdate))
+                .orElse(User.createEmptyUser());
     }
 
     @Override
     public User delete(UUID key) {
-        if (data.containsKey(key))
-            return data.remove(key);
-
-        return User.createEmptyUser();
+        return Optional.ofNullable(data.remove(key))
+                .orElse(User.createEmptyUser());
     }
 }

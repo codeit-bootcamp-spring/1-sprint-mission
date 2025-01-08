@@ -1,11 +1,11 @@
-package discodeit.service;
+package sprint.mission.discodeit.service;
 
-import discodeit.entity.Channel;
+import sprint.mission.discodeit.entity.Channel;
 
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel create();
+    Channel create(Channel channelToCreate);
     Channel read(UUID key);
     Channel update(UUID key, Channel channelToUpdate);
     Channel delete(UUID key);

@@ -1,10 +1,11 @@
-package discodeit.service.jcf;
+package sprint.mission.discodeit.service.jcf;
 
-import discodeit.entity.Channel;
-import discodeit.service.ChannelService;
+import sprint.mission.discodeit.entity.Channel;
+import sprint.mission.discodeit.service.ChannelService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -23,39 +24,29 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create() {
-        Channel newChannel = Channel.createChannel();
-        UUID userId = newChannel.getCommon().getId();
-        return data.putIfAbsent(userId, newChannel);
+    public Channel create(Channel channelToCreate) {
+        UUID key = channelToCreate.getCommon().getId();
+        return Optional.ofNullable(data.putIfAbsent(key, channelToCreate))
+                .map(existingChannel -> Channel.createEmptyChannel())
+                .orElse(channelToCreate);
     }
 
     @Override
     public Channel read(UUID key) {
-        return data.compute(key, (id, user) -> {
-            if (user == null) return Channel.createEmptyChannel();
-
-            return user;
-        });
+        return Optional.ofNullable(data.get(key))
+                .orElse(Channel.createEmptyChannel());
     }
 
     @Override
     public Channel update(UUID key, Channel channelToUpdate) {
-        if (data.containsKey(key))
-        {
-            UUID newKey = channelToUpdate.getCommon().getId();
-            data.put(newKey, channelToUpdate);
-            data.remove(key);
-            return data.get(newKey);
-        }
-
-        return Channel.createEmptyChannel();
+        return Optional.ofNullable(data.computeIfPresent(
+                        key, (id, user)-> channelToUpdate))
+                .orElse(Channel.createEmptyChannel());
     }
 
     @Override
     public Channel delete(UUID key) {
-        if (data.containsKey(key))
-            return data.remove(key);
-
-        return Channel.createEmptyChannel();
+        return Optional.ofNullable(data.remove(key))
+                .orElse(Channel.createEmptyChannel());
     }
 }

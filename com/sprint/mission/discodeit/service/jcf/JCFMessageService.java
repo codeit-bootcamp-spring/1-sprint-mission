@@ -1,10 +1,11 @@
-package discodeit.service.jcf;
+package sprint.mission.discodeit.service.jcf;
 
-import discodeit.entity.Message;
-import discodeit.service.MessageService;
+import sprint.mission.discodeit.entity.Message;
+import sprint.mission.discodeit.service.MessageService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
@@ -23,39 +24,29 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message create() {
-        Message newMessage = Message.createMessage();
-        UUID userId = newMessage.getCommon().getId();
-        return data.putIfAbsent(userId, newMessage);
+    public Message create(Message userToCreate) {
+        UUID key = userToCreate.getCommon().getId();
+        return Optional.ofNullable(data.putIfAbsent(key, userToCreate))
+                .map(existingMessage -> Message.createEmptyMessage())
+                .orElse(userToCreate);
     }
 
     @Override
     public Message read(UUID key) {
-        return data.compute(key, (id, user) -> {
-            if (user == null) return Message.createEmptyMessage();
-
-            return user;
-        });
+        return Optional.ofNullable(data.get(key))
+                .orElse(Message.createEmptyMessage());
     }
 
     @Override
     public Message update(UUID key, Message messageToUpdate) {
-        if (data.containsKey(key))
-        {
-            UUID newKey = messageToUpdate.getCommon().getId();
-            data.put(newKey, messageToUpdate);
-            data.remove(key);
-            return data.get(newKey);
-        }
-
-        return Message.createEmptyMessage();
+        return Optional.ofNullable(data.computeIfPresent(
+                        key, (id, user)-> messageToUpdate))
+                .orElse(Message.createEmptyMessage());
     }
 
     @Override
     public Message delete(UUID key) {
-        if (data.containsKey(key))
-            return data.remove(key);
-
-        return Message.createEmptyMessage();
+        return Optional.ofNullable(data.remove(key))
+                .orElse(Message.createEmptyMessage());
     }
 }

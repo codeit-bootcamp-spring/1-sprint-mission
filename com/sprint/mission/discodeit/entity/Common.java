@@ -1,4 +1,4 @@
-package discodeit.entity;
+package sprint.mission.discodeit.entity;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -10,6 +10,9 @@ public class Common {
 
     private Common() {
         this(UUID.randomUUID(), System.currentTimeMillis(), System.currentTimeMillis());
+    }
+    private Common(UUID id) {
+        this(id, System.currentTimeMillis(), System.currentTimeMillis());
     }
     private Common(UUID id, Long createAt) {
         this(id, createAt, System.currentTimeMillis());
@@ -25,6 +28,16 @@ public class Common {
 
     public static Common createCommon() {
         return new Common();
+    }
+    public static Common createCommon(UUID id) {
+        return new Common(id);
+    }
+    public static Common createEmptyCommon() {
+        return new Common(
+                new UUID(0, 0),
+                0L,
+                0L
+        );
     }
 
     public UUID getId() {
@@ -56,6 +69,15 @@ public class Common {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createAt, updateAt);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Common{" +
+                "id=" + id +
+                ", createAt=" + createAt +
+                ", updateAt=" + updateAt +
+                '}';
     }
 }
