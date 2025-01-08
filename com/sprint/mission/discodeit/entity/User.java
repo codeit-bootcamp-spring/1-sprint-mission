@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class User {
     private static final User EMPTY_USER =
-            new User(BaseEntity.createEmptyCommon());
+            new User(BaseEntity.createEmptyBasicEntity());
 
     private final BaseEntity baseEntity;
     private String name;
@@ -26,7 +26,7 @@ public class User {
     }
 
     public static final class Builder {
-        private BaseEntity baseEntity = BaseEntity.createCommon();
+        private BaseEntity baseEntity = BaseEntity.createBasicEntity();
         private final String name;
         private final String email;
         private String phoneNumber = "";

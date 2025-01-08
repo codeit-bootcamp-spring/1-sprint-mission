@@ -20,25 +20,19 @@ public class BaseEntity {
     private BaseEntity(UUID id) {
         this(id, System.currentTimeMillis(), System.currentTimeMillis());
     }
-    private BaseEntity(UUID id, Long createAt) {
-        this(id, createAt, System.currentTimeMillis());
-    }
-    private BaseEntity(Long createAt, Long updateAt) {
-        this(UUID.randomUUID(), createAt, updateAt);
-    }
     private BaseEntity(UUID id, Long createAt, Long updateAt) {
         this.id       = id;
         this.createAt = createAt;
         this.updateAt = updateAt;
     }
 
-    public static BaseEntity createCommon() {
+    public static BaseEntity createBasicEntity() {
         return new BaseEntity();
     }
-    public static BaseEntity createCommon(UUID id) {
+    public static BaseEntity createBasicEntity(UUID id) {
         return new BaseEntity(id);
     }
-    public static BaseEntity createEmptyCommon() {
+    public static BaseEntity createEmptyBasicEntity() {
         return EMPTY_BASE_ENTITY;
     }
 
@@ -52,14 +46,6 @@ public class BaseEntity {
 
     public Long getUpdateAt() {
         return updateAt;
-    }
-
-    public BaseEntity updateId(BaseEntity baseEntity) {
-        return new BaseEntity(baseEntity.createAt, baseEntity.updateAt);
-    }
-
-    public BaseEntity updateUpdateAt(BaseEntity baseEntity) {
-        return new BaseEntity(baseEntity.id, baseEntity.createAt);
     }
 
     @Override

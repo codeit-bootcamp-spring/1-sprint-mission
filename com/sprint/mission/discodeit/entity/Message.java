@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Message {
     private static final Message EMPTY_MESSAGE =
-            new Message(BaseEntity.createEmptyCommon());
+            new Message(BaseEntity.createEmptyBasicEntity());
 
     private final BaseEntity baseEntity;
     private final String     content;
@@ -13,7 +13,7 @@ public class Message {
         this(baseEntity, "");
     }
     private Message(String content) {
-        this(BaseEntity.createCommon(), content);
+        this(BaseEntity.createBasicEntity(), content);
     }
     private Message(BaseEntity baseEntity, String content) {
         this.baseEntity = baseEntity;

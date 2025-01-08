@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class Channel {
     private static final Channel EMPTY_CHANNEL =
-            new Channel(BaseEntity.createEmptyCommon());
+            new Channel(BaseEntity.createEmptyBasicEntity());
 
     private final BaseEntity baseEntity;
     private final String     name;
@@ -13,7 +13,7 @@ public class Channel {
         this(baseEntity, "");
     }
     private Channel(String name) {
-        this(BaseEntity.createCommon(), name);
+        this(BaseEntity.createBasicEntity(), name);
     }
     private Channel(BaseEntity baseEntity, String name) {
         this.baseEntity = baseEntity;

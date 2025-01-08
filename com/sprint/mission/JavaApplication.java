@@ -36,7 +36,7 @@ public class JavaApplication {
         System.out.println("userService.update()");
         System.out.println(userService.update(
                 frogKey, new User.Builder("fffrog", "fffrog@email.com")
-                        .common(BaseEntity.createCommon(frogKey))
+                        .common(BaseEntity.createBasicEntity(frogKey))
                         .build()));
 //        System.out.println(userService.update(
 //                UUID.randomUUID(), new User.Builder("ppprog", "")
@@ -68,7 +68,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("messageService.update()");
-        System.out.println(messageService.update(hiKey, Message.createMessage(BaseEntity.createCommon(hiKey), "mid")));
+        System.out.println(messageService.update(hiKey, Message.createMessage(BaseEntity.createBasicEntity(hiKey), "mid")));
 //        System.out.println(messageService.update(
 //                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
         System.out.println();
@@ -98,7 +98,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("channelService.update()");
-        System.out.println(channelService.update(c1Key, Channel.createChannel(BaseEntity.createCommon(c1Key), "c3")));
+        System.out.println(channelService.update(c1Key, Channel.createChannel(BaseEntity.createBasicEntity(c1Key), "c3")));
 //        System.out.println(channelService.update(
 //                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
         System.out.println();
