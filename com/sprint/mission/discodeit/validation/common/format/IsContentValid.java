@@ -5,6 +5,8 @@ import sprint.mission.discodeit.exception.InvalidFormatException;
 import static sprint.mission.discodeit.constant.Constants.*;
 
 public class IsContentValid {
+    private IsContentValid() {}
+
     private static final class InstanceHolder {
         private static final IsContentValid INSTANCE = new IsContentValid();
     }

@@ -4,6 +4,8 @@ import sprint.mission.discodeit.exception.ErrorCode;
 import sprint.mission.discodeit.exception.InvalidFormatException;
 
 public class IsEmailValid {
+    private IsEmailValid() {}
+
     private static final class InstanceHolder {
         private static final IsEmailValid INSTANCE = new IsEmailValid();
     }

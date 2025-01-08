@@ -9,9 +9,8 @@ public enum ErrorCode {
     * 020 ~ 029 : Message Error
     * 030 ~ 039 : Channel Error
     */
-    ERROR_000("Invalid Id", "Id must not be " + EMPTY_UUID.getAsString()),
-    ERROR_001("Invalid CreatedAt", "CreatedAt must not be " + EMPTY_TIME.getAsString()),
-    ERROR_002("Invalid UpdatedAt", "UpdatedAt must not be " + EMPTY_TIME.getAsString()),
+    ERROR_000("Invalid Id", "Id must not be '" + EMPTY_UUID.getAsString() + "'"),
+    ERROR_001("Invalid Time", "Time must not be " + EMPTY_TIME.getAsString()),
     ERROR_010("Invalid Name Format", "Name must be " + MAX_NAME_LENGTH.getAsString() + " characters or less"),
     ERROR_011("Invalid Email Format", "Email must be '" + EMAIL_FORMAT.getAsString() + "'"),
     ERROR_012("Invalid PhoneNumber Format", "PhoneNumber must be '" + PHONE_NUMBER_FORMAT.getAsString() + "'"),

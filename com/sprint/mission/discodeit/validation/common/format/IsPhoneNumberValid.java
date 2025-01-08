@@ -5,6 +5,8 @@ import sprint.mission.discodeit.exception.InvalidFormatException;
 import static sprint.mission.discodeit.constant.Constants.*;
 
 public class IsPhoneNumberValid {
+    private IsPhoneNumberValid() {}
+
     private static final class InstanceHolder {
         private static final IsPhoneNumberValid INSTANCE = new IsPhoneNumberValid();
     }
