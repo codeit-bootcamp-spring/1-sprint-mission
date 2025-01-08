@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### .idea 디렉토리 형상관리 제외 ###
+.idea/
