@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity.common;
 
-import static com.sprint.mission.discodeit.entity.common.Status.CREATED;
-import static com.sprint.mission.discodeit.entity.common.Status.MODIFY;
+import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
+import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -25,10 +25,8 @@ public class AbstractUUIDTest {
         assertAll(
                 () -> assertThat(entity.getId()).as("Id should not be null").isNotNull(),
                 () -> assertThat(entity.getCreateAt()).as("createAt should not be null").isNotNull(),
-                () -> assertThat(entity.getStatus()).isEqualTo(CREATED),
-                () -> assertThat(entity.getUpdateAt().isEmpty())
-                        .as("At Initialized updateAt time is must be Empty")
-                        .isTrue()
+                () -> assertThat(entity.getStatus()).isEqualTo(REGISTERED),
+                () -> assertThat(entity.getUpdateAt()).as("At Initialized updateAt time is must be Empty").isEmpty()
         );
     }
 
@@ -38,11 +36,11 @@ public class AbstractUUIDTest {
         // given
         assertThat(entity.getUpdateAt()).isEmpty();
         // when
-        var updatedTime = entity.update();
+        entity.update();
         //then
         assertAll(
                 () -> assertThat(entity.getUpdateAt()).as("invoke update() then updateAt must be present").isPresent(),
-                () -> assertThat(entity.getStatus()).isEqualTo(MODIFY)
+                () -> assertThat(entity.getStatus()).isEqualTo(MODIFIED)
         );
     }
 

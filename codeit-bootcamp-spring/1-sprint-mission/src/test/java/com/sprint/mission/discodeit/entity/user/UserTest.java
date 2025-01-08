@@ -1,7 +1,43 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+@DisplayName("User Test")
 class UserTest {
+
+    private User user;
+
+    @Test
+    void createUserTest() {
+        // given
+        String userName = "test1";
+
+        assertThat(new User(new UserName(userName))).isNotNull();
+    }
+
+    @Nested
+    class InitializeNew {
+
+        @BeforeEach
+        void setUp() {
+            user = new User(new UserName("test1"));
+        }
+
+        @Test
+        @DisplayName("유저 객체를 생성한 후 객체의 name value 와 초기화 시 입력 값과 동일 테스트")
+        void givenUserWhenGetUserNameThenReturnUserName() {
+            // given
+
+            // when
+            var userName = user.getName();
+            // then
+            assertThat(user.getName()).isEqualTo("test1");
+        }
+    }
 
 }
