@@ -18,10 +18,9 @@ public abstract class AbstractUUIDEntity {
 
     protected AbstractUUIDEntity() {
         this.id = UUID.randomUUID();
-        this.createAt = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        this.createAt = createUnixTimestamp();
         this.status = CREATED;
     }
-
 
     public UUID getId() {
         return id;
@@ -31,11 +30,20 @@ public abstract class AbstractUUIDEntity {
         return createAt;
     }
 
+    public Long getUpdateAt() {
+        return updateAt;
+    }
+
     public Status getStatus() {
         return status;
     }
 
-    public void modifyStatus() {
+    public long update() {
         this.status = MODIFY;
+        return this.updateAt = createUnixTimestamp();
+    }
+
+    private long createUnixTimestamp() {
+        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }
