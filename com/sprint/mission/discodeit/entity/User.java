@@ -4,18 +4,18 @@ import java.util.Objects;
 
 public class User {
     private static final User EMPTY_USER =
-            new User(Common.createEmptyCommon());
+            new User(BaseEntity.createEmptyCommon());
 
-    private final Common common;
+    private final BaseEntity baseEntity;
     private String name;
     private String email;
     private String phoneNumber;
 
-    private User(Common common) {
-        this.common = common;
+    private User(BaseEntity baseEntity) {
+        this.baseEntity = baseEntity;
     }
     private User(Builder builder) {
-        common      = builder.common;
+        baseEntity  = builder.baseEntity;
         name        = builder.name;
         email       = builder.email;
         phoneNumber = builder.phoneNumber;
@@ -26,7 +26,7 @@ public class User {
     }
 
     public static final class Builder {
-        private Common common = Common.createCommon();
+        private BaseEntity baseEntity = BaseEntity.createCommon();
         private final String name;
         private final String email;
         private String phoneNumber = "";
@@ -36,8 +36,8 @@ public class User {
             this.email = email;
         }
 
-        public Builder common(Common common) {
-            this.common = common;
+        public Builder common(BaseEntity baseEntity) {
+            this.baseEntity = baseEntity;
             return this;
         }
         public Builder phoneNumber(String phoneNumber) {
@@ -50,8 +50,8 @@ public class User {
         }
     }
 
-    public Common getCommon() {
-        return common;
+    public BaseEntity getCommon() {
+        return baseEntity;
     }
     public String getName() {
         return name;
@@ -67,18 +67,18 @@ public class User {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(common, user.common) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
+        return Objects.equals(baseEntity, user.baseEntity) && Objects.equals(name, user.name) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(common, name, email, phoneNumber);
+        return Objects.hash(baseEntity, name, email, phoneNumber);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "common=" + common +
+                "common=" + baseEntity +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +

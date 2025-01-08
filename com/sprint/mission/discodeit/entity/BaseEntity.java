@@ -3,8 +3,8 @@ package sprint.mission.discodeit.entity;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Common {
-    private static final Common EMPTY_COMMON = new Common(
+public class BaseEntity {
+    private static final BaseEntity EMPTY_BASE_ENTITY = new BaseEntity(
             new UUID(0, 0),
             0L,
             0L
@@ -14,32 +14,32 @@ public class Common {
     private final Long createAt;
     private final Long updateAt;
 
-    private Common() {
+    private BaseEntity() {
         this(UUID.randomUUID(), System.currentTimeMillis(), System.currentTimeMillis());
     }
-    private Common(UUID id) {
+    private BaseEntity(UUID id) {
         this(id, System.currentTimeMillis(), System.currentTimeMillis());
     }
-    private Common(UUID id, Long createAt) {
+    private BaseEntity(UUID id, Long createAt) {
         this(id, createAt, System.currentTimeMillis());
     }
-    private Common(Long createAt, Long updateAt) {
+    private BaseEntity(Long createAt, Long updateAt) {
         this(UUID.randomUUID(), createAt, updateAt);
     }
-    private Common(UUID id, Long createAt, Long updateAt) {
+    private BaseEntity(UUID id, Long createAt, Long updateAt) {
         this.id       = id;
         this.createAt = createAt;
         this.updateAt = updateAt;
     }
 
-    public static Common createCommon() {
-        return new Common();
+    public static BaseEntity createCommon() {
+        return new BaseEntity();
     }
-    public static Common createCommon(UUID id) {
-        return new Common(id);
+    public static BaseEntity createCommon(UUID id) {
+        return new BaseEntity(id);
     }
-    public static Common createEmptyCommon() {
-        return EMPTY_COMMON;
+    public static BaseEntity createEmptyCommon() {
+        return EMPTY_BASE_ENTITY;
     }
 
     public UUID getId() {
@@ -54,19 +54,19 @@ public class Common {
         return updateAt;
     }
 
-    public Common updateId(Common common) {
-        return new Common(common.createAt, common.updateAt);
+    public BaseEntity updateId(BaseEntity baseEntity) {
+        return new BaseEntity(baseEntity.createAt, baseEntity.updateAt);
     }
 
-    public Common updateUpdateAt(Common common) {
-        return new Common(common.id, common.createAt);
+    public BaseEntity updateUpdateAt(BaseEntity baseEntity) {
+        return new BaseEntity(baseEntity.id, baseEntity.createAt);
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        Common common = (Common) o;
-        return Objects.equals(id, common.id) && Objects.equals(createAt, common.createAt) && Objects.equals(updateAt, common.updateAt);
+        BaseEntity baseEntity = (BaseEntity) o;
+        return Objects.equals(id, baseEntity.id) && Objects.equals(createAt, baseEntity.createAt) && Objects.equals(updateAt, baseEntity.updateAt);
     }
 
     @Override

@@ -4,34 +4,34 @@ import java.util.Objects;
 
 public class Channel {
     private static final Channel EMPTY_CHANNEL =
-            new Channel(Common.createEmptyCommon());
+            new Channel(BaseEntity.createEmptyCommon());
 
-    private final Common common;
-    private final String name;
+    private final BaseEntity baseEntity;
+    private final String     name;
 
-    private Channel(Common common) {
-        this(common, "");
+    private Channel(BaseEntity baseEntity) {
+        this(baseEntity, "");
     }
     private Channel(String name) {
-        this(Common.createCommon(), name);
+        this(BaseEntity.createCommon(), name);
     }
-    private Channel(Common common, String name) {
-        this.common = common;
+    private Channel(BaseEntity baseEntity, String name) {
+        this.baseEntity = baseEntity;
         this.name   = name;
     }
 
     public static Channel createChannel(String name) {
         return new Channel(name);
     }
-    public static Channel createChannel(Common common, String name) {
-        return new Channel(common, name);
+    public static Channel createChannel(BaseEntity baseEntity, String name) {
+        return new Channel(baseEntity, name);
     }
     public static Channel createEmptyChannel() {
         return EMPTY_CHANNEL;
     }
 
-    public Common getCommon() {
-        return common;
+    public BaseEntity getCommon() {
+        return baseEntity;
     }
     public String getName() {
         return name;
@@ -41,18 +41,18 @@ public class Channel {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Channel channel = (Channel) o;
-        return Objects.equals(common, channel.common) && Objects.equals(name, channel.name);
+        return Objects.equals(baseEntity, channel.baseEntity) && Objects.equals(name, channel.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(common, name);
+        return Objects.hash(baseEntity, name);
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "common=" + common +
+                "common=" + baseEntity +
                 ", name='" + name + '\'' +
                 '}';
     }

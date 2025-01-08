@@ -1,7 +1,7 @@
 package sprint.mission;
 
 import sprint.mission.discodeit.entity.Channel;
-import sprint.mission.discodeit.entity.Common;
+import sprint.mission.discodeit.entity.BaseEntity;
 import sprint.mission.discodeit.entity.Message;
 import sprint.mission.discodeit.entity.User;
 import sprint.mission.discodeit.service.jcf.JCFChannelService;
@@ -36,11 +36,11 @@ public class JavaApplication {
         System.out.println("userService.update()");
         System.out.println(userService.update(
                 frogKey, new User.Builder("fffrog", "fffrog@email.com")
-                        .common(Common.createCommon(frogKey))
+                        .common(BaseEntity.createCommon(frogKey))
                         .build()));
-        System.out.println(userService.update(
-                UUID.randomUUID(), new User.Builder("ppprog", "")
-                        .build()));
+//        System.out.println(userService.update(
+//                UUID.randomUUID(), new User.Builder("ppprog", "")
+//                        .build())); // validation not passed
         System.out.println();
 
         System.out.println("userService.delete()");
@@ -68,8 +68,9 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("messageService.update()");
-        System.out.println(messageService.update(hiKey, Message.createMessage(Common.createCommon(hiKey), "mid")));
-        System.out.println(messageService.update(UUID.randomUUID(), Message.createMessage("middle")));
+        System.out.println(messageService.update(hiKey, Message.createMessage(BaseEntity.createCommon(hiKey), "mid")));
+//        System.out.println(messageService.update(
+//                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
         System.out.println();
 
         System.out.println("messageService.delete()");
@@ -97,8 +98,9 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("channelService.update()");
-        System.out.println(channelService.update(c1Key, Channel.createChannel(Common.createCommon(c1Key), "c3")));
-        System.out.println(channelService.update(UUID.randomUUID(), Channel.createChannel("c123456")));
+        System.out.println(channelService.update(c1Key, Channel.createChannel(BaseEntity.createCommon(c1Key), "c3")));
+//        System.out.println(channelService.update(
+//                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
         System.out.println();
 
         System.out.println("channelService.delete()");
@@ -108,8 +110,8 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        testUser();
+        //testUser();
         //testMessage();
-        //testChannel();
+        testChannel();
     }
 }
