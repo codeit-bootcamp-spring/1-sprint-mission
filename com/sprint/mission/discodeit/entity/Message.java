@@ -3,6 +3,9 @@ package sprint.mission.discodeit.entity;
 import java.util.Objects;
 
 public class Message {
+    private static final Message EMPTY_MESSAGE =
+            new Message(Common.createEmptyCommon());
+
     private final Common common;
     private final String name;
 
@@ -27,7 +30,7 @@ public class Message {
         return new Message(common, name);
     }
     public static Message createEmptyMessage() {
-        return new Message(Common.createEmptyCommon());
+        return EMPTY_MESSAGE;
     }
 
     public Common getCommon() {

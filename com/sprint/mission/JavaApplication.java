@@ -12,8 +12,11 @@ import java.util.UUID;
 
 public class JavaApplication {
     private static void testUser() {
-        User frog = User.createUser("frog");
-        User baek = User.createUser("baek");
+        User frog = new User.Builder("frog", "frog@email.com")
+                .build();
+        User baek = new User.Builder("baek", "baek@email.com")
+                .phoneNumber("010-1234-5678")
+                .build();
 
         JCFUserService userService = JCFUserService.getInstance();
         System.out.println("userService.create()");
@@ -31,8 +34,13 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("userService.update()");
-        System.out.println(userService.update(frogKey, User.createUser(Common.createCommon(frogKey), "fffrog")));
-        System.out.println(userService.update(UUID.randomUUID(), User.createUser("ppprog")));
+        System.out.println(userService.update(
+                frogKey, new User.Builder("fffrog", "fffrog@email.com")
+                        .common(Common.createCommon(frogKey))
+                        .build()));
+        System.out.println(userService.update(
+                UUID.randomUUID(), new User.Builder("ppprog", "")
+                        .build()));
         System.out.println();
 
         System.out.println("userService.delete()");
@@ -100,8 +108,8 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-        //testUser();
+        testUser();
         //testMessage();
-        testChannel();
+        //testChannel();
     }
 }

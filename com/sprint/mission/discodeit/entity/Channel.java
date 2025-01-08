@@ -3,6 +3,9 @@ package sprint.mission.discodeit.entity;
 import java.util.Objects;
 
 public class Channel {
+    private static final Channel EMPTY_CHANNEL =
+            new Channel(Common.createEmptyCommon());
+
     private final Common common;
     private final String name;
 
@@ -24,7 +27,7 @@ public class Channel {
         return new Channel(common, name);
     }
     public static Channel createEmptyChannel() {
-        return new Channel(Common.createEmptyCommon());
+        return EMPTY_CHANNEL;
     }
 
     public Common getCommon() {

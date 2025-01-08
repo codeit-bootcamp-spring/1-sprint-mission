@@ -4,6 +4,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Common {
+    private static final Common EMPTY_COMMON = new Common(
+            new UUID(0, 0),
+            0L,
+            0L
+    );
+
     private final UUID id;
     private final Long createAt;
     private final Long updateAt;
@@ -21,7 +27,7 @@ public class Common {
         this(UUID.randomUUID(), createAt, updateAt);
     }
     private Common(UUID id, Long createAt, Long updateAt) {
-        this.id = id;
+        this.id       = id;
         this.createAt = createAt;
         this.updateAt = updateAt;
     }
@@ -33,11 +39,7 @@ public class Common {
         return new Common(id);
     }
     public static Common createEmptyCommon() {
-        return new Common(
-                new UUID(0, 0),
-                0L,
-                0L
-        );
+        return EMPTY_COMMON;
     }
 
     public UUID getId() {
