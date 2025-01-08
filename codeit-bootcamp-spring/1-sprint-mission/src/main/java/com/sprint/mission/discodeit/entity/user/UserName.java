@@ -7,14 +7,22 @@ import java.util.Objects;
 
 public class UserName {
 
-    private static final int NAME_MIN_LENGTH = 3;
-    private static final int NAME_MAX_LENGTH = 10;
+    public static final int NAME_MIN_LENGTH = 3;
+    public static final int NAME_MAX_LENGTH = 20;
 
     private final String name;
 
     public UserName(String name) {
         validUsernameBiggerThan3AndLessThen10(name);
         this.name = name;
+    }
+
+    public UserName changeName(String name) {
+        return new UserName(name);
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

@@ -13,7 +13,12 @@ public class User extends AbstractUUIDEntity {
     }
 
     public String getName() {
-        return name.toString();
+        return name.getName();
+    }
+
+    public void changeName(String newName) {
+        this.name = name.changeName(newName);
+        updateStatusAndUpdateAt();
     }
 
 }
