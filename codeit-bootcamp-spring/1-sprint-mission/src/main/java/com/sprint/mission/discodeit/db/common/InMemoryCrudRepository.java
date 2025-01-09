@@ -14,7 +14,7 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     protected final Map<UUID, T> store = new HashMap<>();
 
     @Override
-    public T save(final T entity) {
+    public final T save(final T entity) {
         var id = Objects.requireNonNull(entity.getId());
         var savedEntity = store.put(id, entity);
         return savedEntity;
