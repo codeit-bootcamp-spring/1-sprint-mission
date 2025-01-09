@@ -17,4 +17,11 @@ public class User {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                '}';
+    }
 }

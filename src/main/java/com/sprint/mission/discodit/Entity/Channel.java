@@ -16,4 +16,11 @@ public class Channel {
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                '}';
+    }
 }

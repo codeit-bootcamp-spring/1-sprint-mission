@@ -1,25 +1,29 @@
 package com.sprint.mission.discodit.Service.JCF;
 
+import com.sprint.mission.discodit.Entity.User;
 import com.sprint.mission.discodit.Service.UserService;
 
 import java.util.List;
 
 public class JcfUserService implements UserService {
-    public final List<Integer> list;
+    public final List<User> list;
 
-    public JcfUserService(List<Integer> list) {
+    public JcfUserService(List<User> list) {
         this.list = list;
     }
-    public void add(int i){
-        list.add(i);
+    public void add(User user){
+        list.add(user);
     }
     public void remove(int index){
         list.remove(index);
     }
     public void printList(){
-        System.out.println("list = " + list);
+        for (User user : list) {
+            System.out.println("user = " + user);
+        }
     }
-    public void setList(int index, int num){
-        list.set(index,num);
+    public void setList(int index, User user){
+        list.set(index,user);
     }
+
 }
