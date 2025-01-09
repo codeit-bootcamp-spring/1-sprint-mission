@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID extends UUID>
+public class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID extends UUID>
         implements CrudRepository<T, ID> {
 
     protected final Map<UUID, T> store = new HashMap<>();
