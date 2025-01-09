@@ -5,6 +5,7 @@ import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,5 +48,22 @@ public abstract class AbstractUUIDEntity {
 
     private long createUnixTimestamp() {
         return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbstractUUIDEntity that = (AbstractUUIDEntity) o;
+        return id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
