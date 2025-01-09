@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.entity;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class User {
         this.id = UUID.randomUUID().toString();
         this.userName = userName;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
+        this.msgList = new ArrayList<>();// 메시지 리스트 초기화
     }
 
     //get
@@ -42,4 +44,7 @@ public class User {
     }
 
 
+    public void up(User user, Message message) {
+        user.getMsgList().add(message);
+    }
 }

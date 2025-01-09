@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessagelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.Date;
@@ -93,9 +94,42 @@ public class JavaApplication {
         /////////메시지 테스트
 
         System.out.println("\n------------\n*메시지 도메인 test");
-        Message message1= new Message("안녕하세요");
-        
-        
+        Message message1= new Message(user3, "안녕하세요");
+        Message message2= new Message(user2, "야옹야옹");
+        Message message3 = new Message(user3,"반가워요~");
+        Message message4 = new Message(user3,"잘지내요~");
+
+        JCFMessagelService jcfMessagelService = new JCFMessagelService();
+
+        //메시지 등록
+        jcfMessagelService.createMessage(message1);
+        jcfMessagelService.createMessage(message2);
+        jcfMessagelService.createMessage(message3);
+        jcfMessagelService.createMessage(message4);
+
+        //메시지 조회
+        System.out.println( jcfMessagelService.readMessage(message1.getMsgId()).getUser().getUserName() + ": "
+                + jcfMessagelService.readMessage(message1.getMsgId()).getContent());
+        //메시지 모두 조회
+        System.out.println("메시지를 모두 조회합니다.");
+        for (Message msg : jcfMessagelService.readAllMessage()) {
+            System.out.println( msg.getUser().getUserName() + ": "
+                    +  msg.getContent());
+        }
+
+        //메시지 수정
+        jcfMessagelService.modifyMessage(message4.getMsgId(), "잘지내요~ 멍멍" );
+
+        //메시지 삭제
+        jcfMessagelService.deleteMessage(message3.getMsgId() );
+
+        //메시지 모두 조회
+        System.out.println("메시지를 모두 조회합니다.");
+        for (Message msg : jcfMessagelService.readAllMessage()) {
+            System.out.println( msg.getUser().getUserName() + ": "
+                    +  msg.getContent());
+        }
+
 
         ////////////////////////////서비스 간 상호작용
 
@@ -104,7 +138,7 @@ public class JavaApplication {
         jcfChannelService.addUser(channel, user1);
         jcfChannelService.addUser(channel, user2);
 
-
+        //채널의 유저들의 메시지를 시간순으로 출력하기.
 
         
 

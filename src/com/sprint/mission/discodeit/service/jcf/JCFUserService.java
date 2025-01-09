@@ -57,6 +57,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addMessage(User user, Message message) {
-        addMessage(user, message);
+        user.up(user, message);
     }
 }
