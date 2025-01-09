@@ -10,7 +10,7 @@ public class Main {
         UserService u=new JCFUserService();
 
         System.out.println(u.ReadUserAll());
-        u.CreateUser("고구마");
+        u.CreateUser("고구마 ");
         System.out.println(u.ReadUserAll());
         System.out.println(u.ReadUser("고구마"));
         u.UpdateUserName("고구마","감자");
