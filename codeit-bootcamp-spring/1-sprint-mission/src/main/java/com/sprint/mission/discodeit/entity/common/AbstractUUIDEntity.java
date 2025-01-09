@@ -5,7 +5,6 @@ import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -52,30 +52,25 @@ public class AbstractUUIDTest {
     @Test
     @DisplayName("동일한 UUID를 가진 객체간의 동등성 비교를 할 경우 True를 반환하는지 테스트")
     void givenCreateAbstractEntityAndEqualEntityWhenIsEqualsThenReturnTrueTest() throws Exception {
-        // Create two separate AbstractUUIDEntity objects
+        // given
         AbstractUUIDEntity entity1 = new TestUUIDEntity();
         AbstractUUIDEntity entity2 = new TestUUIDEntity();
 
-        // Generate a UUID to assign to both entities
         UUID sameUUID = UUID.randomUUID();
 
-        // Use reflection to set the same UUID for both entities
         setFinalField(entity1, "id", sameUUID);
         setFinalField(entity2, "id", sameUUID);
 
-        // Test equality (should be equal because UUIDs are the same)
+        // then
         assertEquals(entity1, entity2, "Entities with the same UUID should be equal");
 
-        // Test inequality with a new entity
         AbstractUUIDEntity entity3 = new TestUUIDEntity();
         assertNotEquals(entity1, entity3, "Entities with different UUIDs should not be equal");
-
     }
 
     private void setFinalField(Object object, String fieldName, Object value) throws Exception {
-        // Get the field by name
         Field field = object.getClass().getSuperclass().getDeclaredField(fieldName);
-        field.setAccessible(true); // Make the field accessible
-        field.set(object, value); // Set the new value
+        field.setAccessible(true);
+        field.set(object, value);
     }
 }
