@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity;
+import java.util.List;
 import java.util.UUID;
 
 
 public class User {
+    private List<Message> msgList;
     private String id ;
     private String userName;
     private long createdAt;
@@ -26,6 +28,9 @@ public class User {
     }
     public long getUpdatedAt(){
         return this.updatedAt;
+    }
+    public List<Message> getMsgList(){
+        return this.msgList;
     }
 
     //update

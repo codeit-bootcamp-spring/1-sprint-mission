@@ -7,9 +7,9 @@ public class Message {
     private long createdAt;
     private long updatedAt;
 
-    public Message(String msgMame){
+    public Message(String content){
         this.id = UUID.randomUUID().toString();
-        this.content = msgMame;
+        this.content = content;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
     }
 
@@ -17,7 +17,7 @@ public class Message {
     public String getMsgId(){
         return this.id;
     }
-    public String getcontent(){
+    public String getContent(){
         return this.content;
     }
     public long getCreatedAt(){
@@ -29,6 +29,9 @@ public class Message {
 
     //update
     public void updateUpdatedAt(){
+        this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
+    }
+    public void updateContent(String content){
         this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
     }
 }
