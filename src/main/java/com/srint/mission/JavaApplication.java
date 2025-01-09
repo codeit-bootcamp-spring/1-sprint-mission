@@ -105,7 +105,7 @@ public class JavaApplication {
 
         //조회
         System.out.println("단건 조회하기");
-        Channel readchannel = channelService.read(channelA.getUserId());
+        Channel readchannel = channelService.read(channelA.getId());
         System.out.println(readchannel);
         System.out.println();
 
