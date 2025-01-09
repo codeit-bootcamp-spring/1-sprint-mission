@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'application' // application 플러그인 추가
+}
+
+group = 'com.sprint.mission'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+application {
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication' // Main 클래스 경로 설정
+}
+
+test {
+    useJUnitPlatform()
+}
