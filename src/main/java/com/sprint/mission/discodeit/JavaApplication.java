@@ -29,7 +29,7 @@ public class JavaApplication {
         UUID generalChannelId = channelService.getAllChannels().get(0).getId();
 
         // Message 1
-        messageService.createMessage("Hello, this is my first message", firstUserId, generalChannelId);
+        messageService.createMessage("This is my first message", firstUserId, generalChannelId);
         System.out.println("\nMessages:");
         messageService.getAllMessages().forEach(message ->
                 System.out.println("User: " + message.getUserId() + ", Channel: " + message.getChannelId() + ", Content: " + message.getContent()));
@@ -38,7 +38,7 @@ public class JavaApplication {
         UUID secondUserId = userService.getAllUsers().get(1).getId();
         UUID randomChannelId = channelService.getAllChannels().get(1).getId();
         // Message2
-        messageService.createMessage("Hello, this is my second message", secondUserId, randomChannelId);
+        messageService.createMessage("This is my second message", secondUserId, randomChannelId);
         System.out.println("\nMessages:");
         messageService.getAllMessages().forEach(message ->
                 System.out.println("User: " + message.getUserId() + ", Channel: " + message.getChannelId() + ", Content: " + message.getContent()));
