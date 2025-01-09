@@ -1,56 +1,73 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.service.JCFChannelService;
-import com.sprint.mission.discodeit.service.JCFMessageService;
-import com.sprint.mission.discodeit.service.JCFUserService;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.jcf.*;
+
+import java.util.UUID;
 
 public class JavaApplication {
-    public static <UUID> void main(String[] args) {
-        //-> 도메인 별 서비스 구현체 테스트
+    public static void main(String[] args) {
         JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
         JCFMessageService messageService = new JCFMessageService();
 
-        //등록
-        //user 등록
-         userService.createUser("Alice");
-         userService.createUser("Charlie");
-         userService.createUser("Liz");
+        // User
+        userService.createUser("Hazel");
+        userService.createUser("ALice");
+        System.out.println("Users:");
         userService.getAllUsers().forEach(user ->
-                System.out.println("User: " + user.getUsername()));
-        System.out.println();
+                System.out.println(user.getId() + " - " + user.getUsername()));
 
-        //Channel 등록
+        // Channel
         channelService.createChannel("General");
-        channelService.createChannel("Premium");
-        channelService.createChannel("Standard");
-
+        channelService.createChannel("Random");
+        System.out.println("\nChannels:");
         channelService.getAllChannels().forEach(channel ->
-                System.out.println("Channel: " + channel.getChannelName()));
-        System.out.println();
+                System.out.println(channel.getId() + " - " + channel.getChannelName()));
 
-        //Message 등록
-            var userId = userService.getAllUsers().get(0).getId(); // 첫번째 인덱스에 있는 userId 반환
-            var channelId = channelService.getAllChannels().get(0).getId(); //위와 동일한 구성
 
-        messageService.createMessage("new Message arrived", userId, channelId);
+        UUID firstUserId = userService.getAllUsers().get(0).getId();
+        UUID generalChannelId = channelService.getAllChannels().get(0).getId();
+
+        // Message 1
+        messageService.createMessage("Hello, this is my first message", firstUserId, generalChannelId);
+        System.out.println("\nMessages:");
         messageService.getAllMessages().forEach(message ->
-                System.out.println("Content: " + message.getContent()));
+                System.out.println("User: " + message.getUserId() + ", Channel: " + message.getChannelId() + ", Content: " + message.getContent()));
 
 
-        System.out.println();
-        //조회(단건, 다건)
-        //수정 -> 수정된 데이터 조회
-        userService.updateUser(userService.getUser(userId), "Hazel"); //id 부분 선언 후 변경 필요
+        UUID secondUserId = userService.getAllUsers().get(1).getId();
+        UUID randomChannelId = channelService.getAllChannels().get(1).getId();
+        // Message2
+        messageService.createMessage("Hello, this is my second message", secondUserId, randomChannelId);
+        System.out.println("\nMessages:");
+        messageService.getAllMessages().forEach(message ->
+                System.out.println("User: " + message.getUserId() + ", Channel: " + message.getChannelId() + ", Content: " + message.getContent()));
+
+        // Update user
+        userService.updateUser(firstUserId, "AliceUpdated");
+        System.out.println("\nUpdated Users:");
         userService.getAllUsers().forEach(user ->
-                System.out.println("수정 후 Users : " + user.getUsername())); //수정이 잘 되었는지 확인 필요
-        System.out.println();
+                System.out.println(user.getId() + " - " + user.getUsername()));
 
-        //삭제
-        //조회를 통해 삭제되었는지 확인
-       channelService.deleteChannel(channelService.getChannel(channelId)); //id 부분 선언 후 변경 필요
+        //Delete User
+        userService.deleteUser(firstUserId);
+        System.out.println("\nRemain Users: ");
+        userService.getAllUsers().forEach(user ->
+                System.out.println(user.getId() + " - " + user.getUsername()));
+
+
+        // Delete channel
+        channelService.deleteChannel(generalChannelId);
+        System.out.println("\nRemaining Channels:");
         channelService.getAllChannels().forEach(channel ->
-                System.out.println("남아있는 Channel : " + channel.getChannelName()));
+                System.out.println(channel.getId() + " - " + channel.getChannelName()));
 
+        //Delete message
+        messageService.deleteMessage(messageService.getAllMessages().get(0).getId());
+        System.out.println("\nRemaining Message: ");
+        messageService.getAllMessages().forEach(message ->
+                System.out.println("User : " + message.getUserId() + " , Channel : " + message.getChannelId()
+                        + "Message : " + message.getContent()));
     }
 }

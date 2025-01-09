@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+public class User extends Entity {
     private String username;
     public User(String username) {
         super();
@@ -13,5 +13,13 @@ public class User extends BaseEntity {
 
     public void updateUsername(String username) {
         this.username = username;
+        setUpdatedAt(System.currentTimeMillis());
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                '}';
     }
 }
