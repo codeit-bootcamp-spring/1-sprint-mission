@@ -1,35 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import java.util.*;
 
 public class Channel extends BaseEntity {
     private String name;
     private String description;
+    private Set<String> participantIds;
+    private List<UUID> messageIds;
 
-    // 생성자
-    public Channel(String name, String description) {
-        super(); // BaseEntity의 생성자 호출
+    public Channel(String name, String description, Set<String> participantIds, List<UUID> messageIds) {
         this.name = name;
         this.description = description;
+        this.participantIds = participantIds;
+        this.messageIds = messageIds;
     }
 
-    // Getter 메서드
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    // 필드 업데이트 메서드
-    public void update(String name, String description) {
-        if (name != null) {
-            this.name = name;
-        }
-        if (description != null) {
-            this.description = description;
-        }
-        updateTimestamp(); // 수정 시간 갱신
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Set<String> getParticipantIds() {
+        return participantIds;
+    }
+
+    public void setParticipantIds(Set<String> participantIds) {
+        this.participantIds = participantIds;
+    }
+
+    public List<UUID> getMessageIds() {
+        return messageIds;
+    }
+
+    public void setMessageIds(List<UUID> messageIds) {
+        this.messageIds = messageIds;
     }
 }

@@ -6,7 +6,6 @@ public class Message extends BaseEntity {
     private String content;
     private String userId;   // 메시지를 작성한 사용자 ID
     private String channelId; // 메시지가 속한 채널 ID
-
     // 생성자
     public Message(String content, String userId, String channelId) {
         super(); // BaseEntity의 생성자 호출
@@ -28,11 +27,18 @@ public class Message extends BaseEntity {
         return channelId;
     }
 
-    // 필드 업데이트 메서드
-    public void update(String content) {
-        if (content != null) {
-            this.content = content;
-        }
-        updateTimestamp(); // 수정 시간 갱신
+    public void updateContent(String content) {
+        this.content = content;
+        setUpdatedAt(System.currentTimeMillis());
+    }
+
+    public void updateUserId(String userId) {
+        this.userId = userId;
+        setUpdatedAt(System.currentTimeMillis());
+    }
+
+    public void updateChannelId(String channelId) {
+        this.channelId = channelId;
+        setUpdatedAt(System.currentTimeMillis());
     }
 }

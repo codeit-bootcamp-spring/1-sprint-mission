@@ -3,18 +3,18 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class BaseEntity {
-    private final String id;
+    private final UUID id;
     private final long createdAt;
     private long updatedAt;
 
     // 기본 생성자: id와 createdAt 초기화
     public BaseEntity() {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
     }
 
-    public String getId() {
+    public UUID getId() {
         return id;
     }
 
