@@ -26,8 +26,8 @@
     - [x] createdAt는 생성자에서 초기화하세요.
     - [x] id, createdAt, updatedAt을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
   - [x] 메소드
-    - [ ] 각 필드를 반환하는 Getter 함수를 정의하세요.
-    - [ ] 필드를 수정하는 update 함수를 정의하세요.
+    - [x] 각 필드를 반환하는 Getter 함수를 정의하세요.
+    - [x] 필드를 수정하는 update 함수를 정의하세요.
 ### 서비스 설계 및 구현
 - [x] 도메인 모델 별 CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 인터페이스로 선언하세요.
   - [x] 인터페이스 패키지명: com.sprint.mission.discodeit.service
@@ -57,7 +57,8 @@
 
 
 ## 스크린샷
-![image](이미지url)
+![image](https://github.com/k01zero/practice-project/blob/master/%EC%8A%A4%ED%94%84%EB%A6%B0%ED%8A%B8%20%EB%AF%B8%EC%85%98%201%20-%20%EB%8F%84%EB%A9%94%EC%9D%B8%20%EA%B5%AC%EC%A1%B0%EB%B0%8F%20%EA%B8%B0%EB%8A%A5%EC%9D%84%20%EC%9C%84%ED%95%9C%20%EC%84%A4%EA%B3%84%20-%20%EC%8B%9C%ED%8A%B81-1.png?raw=true)
+https://docs.google.com/spreadsheets/d/1jaSS_jD11BvTe0mmyEBVb5KBYNxTvuNifRDFtVUX208/edit?usp=sharing
 
 ## 멘토에게
 - (질문 1) 사고의 과정을 어떻게 하면 될까요?(*이전에 이런 작업을 해본 경험이 없는 상태예요!)
