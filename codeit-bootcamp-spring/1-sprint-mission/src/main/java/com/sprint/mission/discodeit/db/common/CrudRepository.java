@@ -3,16 +3,15 @@ package com.sprint.mission.discodeit.db.common;
 import java.io.Serializable;
 import java.util.Optional;
 
-public interface CrudRepository<T, ID extends Serializable>
-        extends Repository<T, ID>{
+public interface CrudRepository<T, ID> extends Repository<T, ID>{
 
-    <S extends T> S save(S entity);
+    T save(T entity);
 
     Optional<T> findById(ID id);
 
     Iterable<T> findAll();
 
-    Long count();
+    int count();
 
     void deleteById(ID id);
 
