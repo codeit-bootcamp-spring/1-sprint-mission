@@ -15,7 +15,10 @@ public interface UserService {
     void updateUserEmail(User user, String email);
 
     // 모든 유저 조회
-    List<User> getAllUserList();
+    void getAllUserList();
+
+    // 유저 조회
+    void getUserInfo(User user);
     
     // 이름으로 유저 조회
     User searchByUserName(String userName);

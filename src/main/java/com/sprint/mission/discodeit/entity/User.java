@@ -95,6 +95,6 @@ public class User {
     }
 
     public String displayInfoUser() {
-        return "User Name: " + name + ", User Email: " + email + "Channel List: " + channelList;
+        return "User Name: " + name + ", User Email: " + email + ", Channel List: " + channelList;
     }
 }

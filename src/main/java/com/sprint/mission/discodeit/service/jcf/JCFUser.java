@@ -21,10 +21,17 @@ public class JCFUser implements UserService {
         return newUser;
     }
 
-    // 모든 유저 가져오기
+    // 모든 유저 조회
     @Override
-    public List<User> getAllUserList() {
-        return data;
+    public void getAllUserList() {
+        for (User user : data) {
+            System.out.println(user.displayInfoUser());
+        }
+    }
+
+    @Override
+    public void getUserInfo(User user) {
+        System.out.println(user.displayInfoUser());
     }
 
     // 이름으로 유저찾기

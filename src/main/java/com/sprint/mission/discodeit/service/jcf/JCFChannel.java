@@ -52,11 +52,6 @@ public class JCFChannel implements ChannelService {
         data.remove(channel);
     }
 
-    // 채널 정보 출력
-    public void printChannelInfo(Channel channel) {
-        System.out.println(channel.displayInfoChannel());
-    }
-
     // ? 채널의 모든 멤버
     @Override
     public List<User> getAllMemberList(Channel channel) {
@@ -85,5 +80,10 @@ public class JCFChannel implements ChannelService {
         } else {
             System.out.println("채널에 존재하지 않는 멤버입니다.");
         }
+    }
+
+    // 채널 정보 출력
+    public void printChannelInfo(Channel channel) {
+        System.out.println(channel.displayInfoChannel());
     }
 }
