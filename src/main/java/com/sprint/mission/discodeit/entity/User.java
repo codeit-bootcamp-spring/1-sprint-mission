@@ -16,12 +16,16 @@ public class User {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         channelList = new ArrayList<>();
-        updateName(name);
-        updateEmail(email);
+        setName(name);
+        setEmail(email);
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
@@ -36,29 +40,41 @@ public class User {
         return updatedAt;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public List<Channel> getChannelList() {
         return channelList;
     }
 
-    public void setUpdatedAt() {
+    private boolean setName(String name) {
+        if (name.isBlank()) {
+            return false;
+        }
+        this.name = name;
+        return true;
+    }
+
+    private boolean setEmail(String email) {
+        if (isValidEmail(email)) {
+            this.email = email;
+            return true;
+        }
+        return false;
+    }
+
+    private void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis();
     }
 
     public void updateName(String name) {
-        if (name.isBlank()){
-            System.out.println("닉네임을 입력해주세요.");
+        if (setName(name)){
+            updateUpdatedAt();
         } else {
-            this.name = name;
+            System.out.println("닉네임을 입력해주세요.");
         }
     }
 
     public void updateEmail(String email) {
-        if (isValidEmail(email)){
-            this.email = email;
+        if (setEmail(email)){
+            updateUpdatedAt();
         } else {
             System.out.println("이메일 형식에 맞지 않습니다.");
         }
