@@ -10,15 +10,16 @@ public class Main {
         UserService u=new JCFUserService();
 
         System.out.println(u.ReadUserAll());
-        u.CreateUser("고구마 ");
+        u.CreateUser("고구마");
+        u.CreateUser("김치");
+        u.CreateUser("우유");
         System.out.println(u.ReadUserAll());
         System.out.println(u.ReadUser("고구마"));
         u.UpdateUserName("고구마","감자");
         System.out.println(u.ReadUser("고구마"));
         System.out.println(u.ReadUser("감자"));
         u.DeleteUser("고구마");
-        u.DeleteUser("감자");
-        System.out.println(u.ReadUser("감자"));
+
 
 
 
@@ -37,6 +38,9 @@ public class Main {
         m.DeleteMessage("안녕하세요");
         m.DeleteMessage("잘가요");
         System.out.println(m.ReadMessage("잘가요"));
+        m.CreateMessage("잘 지내세요?","저 맛탕 되었어요");
+        m.CreateMessage("마지막으로?","달달해요");
+        System.out.println(m.ReadMessageAll());
 
 
 
@@ -50,6 +54,9 @@ public class Main {
         System.out.println(c.ReadChannel("뿌리식물"));
         c.DeleteChannel("뿌리식물");
         System.out.println(c.ReadChannel("뿌리식물"));
+        c.CreateChaneel("구황작물");
+        c.CreateChaneel("튀기면 맛있는 작물");
+        System.out.println(c.ReadChannelAll());
 
 
 
