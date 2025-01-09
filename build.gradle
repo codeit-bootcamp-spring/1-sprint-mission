@@ -1,118 +1,24 @@
 plugins {
     id 'java'
     id 'application' // application 플러그인 추가
-    id 'org.springframework.boot' version '3.3.6'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'com.gorylenko.gradle-git-properties' version '2.4.1' // git 정보 읽기
 }
 
 group = 'com.sprint.mission'
-version = '1.2-M8'
-
-
-java {
-    // sourceCompatibility = JavaVersion.VERSION_17
-    // targetCompatibility = JavaVersion.VERSION_17
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    // JUnit 5 의존성
-    testImplementation platform('org.junit:junit-bom:5.10.0')  // JUnit BOM 사용 (버전 관리)
-    testImplementation 'org.junit.jupiter:junit-jupiter'      // JUnit Jupiter API
-
-    // Spring Boot Data JPA 의존성
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // Spring Boot Web 의존성 (Spring MVC, REST 등)
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-
-    // Spring Validation 의존성
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    // Spring Actuator 의존성
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    testImplementation 'org.springframework.security:spring-security-test'
-
-    // Lombok 의존성 (간결한 코드 작성)
-    compileOnly 'org.projectlombok:lombok'             // 컴파일 타임에만 Lombok을 사용
-    annotationProcessor 'org.projectlombok:lombok'    // Lombok 애노테이션 프로세서
-
-    // mapstruct 의존성 (간결한 코드 작성) - lombok에 의존성이 있어서 뒤에 선언
-    implementation 'org.mapstruct:mapstruct:1.6.3'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-
-    // PostgreSQL 의존성
-    runtimeOnly 'org.postgresql:postgresql'            // 런타임에만 PostgreSQL 드라이버
-    // h2 의존성
-    runtimeOnly 'com.h2database:h2'
-
-    // Spring Boot Test 의존성
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    // JUnit 플랫폼 런처 (JUnit 테스트 실행)
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // Springdoc OpenAPI 의존성 (Swagger UI를 위한 OpenAPI 지원)
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
-
-    // AWS S3 SDK 의존성
-    implementation 'software.amazon.awssdk:s3:2.31.7'
-
-    // Spring Security 의존성
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation("org.springframework.security:spring-security-test")
-
-}
-
-
-gitProperties {
-    dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-    dateFormatTimeZone = "UTC"
-}
-
-tasks.register('writeBuildProperties') {
-    doLast {
-        def props = new Properties()
-        props.setProperty('version', project.version.toString())
-        props.setProperty('time', new Date().format("yyyy-MM-dd'T' HH:mm:ss'Z'", Timezone.getTimeZone("UTC")))
-
-        def file = file("$buildDir/resources/main/build.properties")
-        file.parentFile.mkdir()
-        props.store(file.newWriter(), null)
-    }
-}
-
-
-if (project.hasProperty("skipTests")) {
-    test {
-        enabled = false
-    }
-} else {
-    tasks.named('test') {
-        useJUnitPlatform()
-    }
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 application {
-    // mainClass = 'com.sprint.mission.discodeit.JavaApplication' // Main 클래스 경로 설정
-    mainClass = 'com.sprint.mission.discodeit.DiscodeitApplication'
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication' // Main 클래스 경로 설정
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+test {
+    useJUnitPlatform()
 }
-

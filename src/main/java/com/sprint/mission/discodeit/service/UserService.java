@@ -1,34 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 public interface UserService {
+    public abstract void Create(String nickname);
 
-  @Transactional
-    // Create
-  UserDto createUser(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
+    // Read : 전체 유저 조회, 특정 유저 조회
+    public abstract void ReadAll();
+    public abstract void ReadUser(String nickname);
 
-  // Read : 전체 유저 조회, 특정 유저 조회
-  List<UserDto> showAllUsers();
+    // Update : 특정 유저 닉네임 변경
+    public abstract void UpdateNickname(String nickname);
 
-  UserDto getUserById(UUID id);
+    // Delete : 전체 유저 삭제, 특정 유저 삭제
+    public abstract void DeleteAll();
+    public abstract void DeleteUser(String nickname);
 
-  @Transactional
-    // Update
-  UserDto updateUserInfo(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest);
-
-  @Transactional
-    // Delete : 특정 유저 삭제
-  void removeUserById(UUID id);
 }

@@ -1,70 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.util.Collection;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+public class User extends BaseEntity{
+    private String nickname;
 
-@Entity
-@Table(name = "users")
-@Getter
-@AllArgsConstructor // @Builder가 모든 필드를 받는 생성자를 필요로 한다
-@Builder
-public class User extends BaseUpdatableEntity {
+    public User(String nickname){
+        this.nickname = nickname;
+    }
+    public String getNickname(){
+        return nickname;
+    }
+    public void setNickname(String nickname){
+        this.nickname = nickname;
 
-  @Column(nullable = false, length = 50)
-  private String username;
-
-  @Column(nullable = false, length = 100)
-  private String email;
-
-  @Column(nullable = false, length = 60)
-  private String password;
-
-  @OneToOne
-  @JoinColumn(name = "profile_id")
-  private BinaryContent profile;
-
-  @ManyToMany(fetch = FetchType.EAGER)
-  @JoinTable(
-      name = "user_roles", // 중간 조인 테이블
-      joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-      inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-  )
-  private Collection<Role> roles;
-
-  // JPA용 기본 생성자, JPA만 접근할 수 있도록 protected 접근자 설정
-  protected User() {
-  }
-
-  public void updateUsername(String newUsername) {
-    this.username = newUsername;
-  }
-
-  public void updateEmail(String newEmail) {
-    this.email = newEmail;
-  }
-
-  public void updatePassword(String newPassword) {
-    this.password = newPassword;
-  }
-
-  public void updateProfile(BinaryContent newProfile) {
-    this.profile = newProfile;
-  }
-
-  public void updateRole(Collection<Role> roles) {
-    this.roles.clear();
-    this.roles.addAll(roles);
-  }
+    }
 }
