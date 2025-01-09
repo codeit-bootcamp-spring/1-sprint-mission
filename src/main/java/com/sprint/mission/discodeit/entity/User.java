@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class User {
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final long createdAt;
+    private final List<Channel> channelList; // 참가중인 채널
     private long updatedAt;
     private String name;
     private String email;
-    private List<Channel> channelList; // 참가중인 채널
 
     public User(String name, String email) {
         id = UUID.randomUUID();
@@ -80,7 +80,7 @@ public class User {
         }
     }
 
-    public void addChannal(Channel newChannel) {
+    public void addChannel(Channel newChannel) {
         channelList.add(newChannel);
     }
 

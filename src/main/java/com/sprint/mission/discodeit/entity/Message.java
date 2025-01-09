@@ -3,16 +3,17 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message {
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final Channel channel;
+    private final User writer;
+    private final long createdAt;
     private long updatedAt;
-    private Channel channel;
-    private User writer;
     private String content;
 
-    public Message(User writer, String content) {
+    public Message(Channel channel, User writer, String content) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
+        this.channel = channel;
         this.writer = writer;
         updateContent(content);
     }

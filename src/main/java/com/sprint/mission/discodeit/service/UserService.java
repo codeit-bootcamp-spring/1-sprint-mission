@@ -11,12 +11,16 @@ public interface UserService {
     User createUser(String name, String email);
 
     // 유저 정보 수정: 닉네임, 이메일
-    void updateUserName(String name);
-    void updateUserEmail(String email);
+    void updateUserName(User user, String name);
+    void updateUserEmail(User user, String email);
 
-    // 유저 정보 출력
-    void displayInfoUser();
+    // 모든 유저 조회
+    List<User> getAllUserList();
+    
+    // 이름으로 유저 조회
+    User searchByUserName(String userName);
+    
+    // 유저 삭제
+    void deleteUser(User user);
 
-    // 유저 채널 조회
-    List<Channel> getAllChannelList();
 }

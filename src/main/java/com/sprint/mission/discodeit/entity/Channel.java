@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class Channel {
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final User owner;
+    private final List<Message> messageList;
+    private final List<User> memberList;
+    private final long createdAt;
     private long updatedAt;
     private String title;
-    private User owner;
-    private List<Message> messageList;
-    private List<User> memberList;
 
     public Channel(String title, User owner) {
         id = UUID.randomUUID();
@@ -51,17 +51,33 @@ public class Channel {
         return memberList;
     }
 
+    private boolean setTitle(String title){
+        if (title.isBlank()){
+            return false;
+        }
+        this.title = title;
+        return true;
+    }
+
     // update
-    public void setUpdatedAt() {
+    public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis();
     }
 
     public void updateTitle(String title) {
-        if (title.isBlank()){
-            System.out.println("채널명을 입력해주세요.");
+        if (setTitle(title)){
+            updateUpdatedAt();
         } else {
-            this.title = title;
+            System.out.println("채널명을 입력해주세요.");
         }
+    }
+
+    public void addMember(User newMember) {
+        memberList.add(newMember);
+    }
+
+    public void removeMember(User newMember) {
+        memberList.remove(newMember);
     }
 
     public void addMessage(Message newMessage) {
