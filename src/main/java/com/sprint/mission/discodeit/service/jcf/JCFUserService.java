@@ -10,6 +10,14 @@ public class JCFUserService implements BaseService<User> {
 
     @Override
     public User create(User user) {
+        if (isUsernameDuplicate(user.getUsername())) {
+            throw new IllegalArgumentException("유저 이름이 이미 존재합니다.");
+        }
+
+        if (!isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
+        }
+
         data.put(user.getId(), user);
         return user;
     }
@@ -26,20 +34,32 @@ public class JCFUserService implements BaseService<User> {
 
     @Override
     public User update(UUID id, User user) {
-        try{
-            User checkUser = data.get(id);
-            if (checkUser != null) {
-                checkUser.update(user.getNickname(), user.getUsername(), user.getEmail(), user.getPhoneNumber());
-            }
-            return checkUser;
-        } catch (IllegalArgumentException e){
-            System.out.println("유효하지 않는 id입니다.");
-            return null;
+        User checkUser = data.get(id);
+
+        if (isUsernameDuplicate(user.getUsername())) {
+            throw new IllegalArgumentException("유저 이름이 이미 존재합니다.");
         }
+
+        if (!isValidEmail(user.getEmail())) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다.");
+        }
+
+        checkUser.update(user.getNickname(), user.getUsername(), user.getEmail(), user.getPhoneNumber());
+        return checkUser;
     }
 
     @Override
     public void delete(UUID id) {
         data.remove(id);
+    }
+
+    private boolean isUsernameDuplicate(String username) {
+        return data.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailRegex);
     }
 }

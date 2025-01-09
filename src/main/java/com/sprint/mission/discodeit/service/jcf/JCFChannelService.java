@@ -10,6 +10,10 @@ public class JCFChannelService implements BaseService<Channel> {
 
     @Override
     public Channel create(Channel channel) {
+        if (channel.getName() == null || channel.getName().isEmpty()) {
+            throw new NullPointerException("유효하지 않은 채널명입니다.");
+        }
+
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -26,16 +30,12 @@ public class JCFChannelService implements BaseService<Channel> {
 
     @Override
     public Channel update(UUID id, Channel channel) {
-        try{
-            Channel checkChannel = data.get(id);
-            if (checkChannel != null) {
-                checkChannel.update(channel.getName());
-            }
-            return checkChannel;
-        } catch (IllegalArgumentException e){
-            System.out.println("유효하지 않는 id입니다.");
-            return null;
+        Channel checkChannel = data.get(id);
+        if (channel.getName() == null || channel.getName().isEmpty()) {
+            throw new NullPointerException("유효하지 않은 채널명입니다.");
         }
+        checkChannel.update(channel.getName());
+        return checkChannel;
     }
 
     @Override
