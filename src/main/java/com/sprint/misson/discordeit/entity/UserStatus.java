@@ -1,6 +1,6 @@
 package com.sprint.misson.discordeit.entity;
 
-public enum Status {
+public enum UserStatus {
     ACTIVE,
     INACTIVE,
     AWAY_FROM_KEYBOARD
