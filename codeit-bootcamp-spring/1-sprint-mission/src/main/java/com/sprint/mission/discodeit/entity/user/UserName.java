@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import static com.sprint.mission.discodeit.entity.user.UserName.UserErrorMessage.NAME_LENGTH_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.entity.user.UserName.UserErrorMessage.NAME_NULL_MESSAGE;
+
+import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.NAME_LENGTH_ERROR_MESSAGE;
+import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.USER_NAME_NULL;
 
 import java.util.Objects;
 
@@ -49,27 +50,12 @@ public class UserName {
 
     private void validUsernameBiggerThan3AndLessThen10(String name) {
 
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException(NAME_NULL_MESSAGE.message);
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException(USER_NAME_NULL.getMessage());
         }
 
         if (name.trim().length() < NAME_MIN_LENGTH || name.trim().length() > NAME_MAX_LENGTH) {
-            throw new IllegalArgumentException(NAME_LENGTH_ERROR_MESSAGE.message);
-        }
-    }
-
-    static enum UserErrorMessage {
-        NAME_NULL_MESSAGE("Username cannot be null or empty"),
-        NAME_LENGTH_ERROR_MESSAGE("Username Length Error"),
-        ;
-        private final String message;
-
-        UserErrorMessage(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
+            throw new IllegalArgumentException(NAME_LENGTH_ERROR_MESSAGE.getMessage());
         }
     }
 }
