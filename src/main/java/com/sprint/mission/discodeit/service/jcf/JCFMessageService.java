@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class JCFMessageService implements MessageService {
     Scanner sc = new Scanner(System.in);
-    private ArrayList<Message> messages;
+    private final ArrayList<Message> messages;
     public JCFMessageService(){
         messages = new ArrayList<>();
     }
