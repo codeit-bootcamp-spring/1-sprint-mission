@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.UUID;
