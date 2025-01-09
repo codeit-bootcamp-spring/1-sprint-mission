@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.db.common;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,8 +17,8 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     @Override
     public final T save(final T entity) {
         var id = Objects.requireNonNull(entity.getId());
-        var savedEntity = store.put(id, entity);
-        return savedEntity;
+        store.put(id, entity);
+        return entity;
     }
 
     @Override
@@ -27,7 +28,7 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     }
 
     @Override
-    public Iterable<T> findAll() {
+    public List<T> findAll() {
         if (store.isEmpty()) {
             return Collections.emptyList();
         }
