@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
+
+import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
@@ -26,8 +30,9 @@ public class JCFUserService implements UserService {
     @Override
     public UserInfoResponse findUserByUsername(FindUserRequest findUserRequest) {
         var entity = userRepository.findByUsername(findUserRequest.username())
+                .filter(user -> user.getStatus() == REGISTERED)
                 .map(converter::toDto)
-                .orElseThrow();
+                .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
         return entity;
     }
 
