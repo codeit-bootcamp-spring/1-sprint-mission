@@ -29,7 +29,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel create(Channel channelToCreate) {
         channelValidator.validate(channelToCreate);
-        UUID key = channelToCreate.getCommon().getId();
+        UUID key = channelToCreate.getBaseEntity().getId();
         return Optional.ofNullable(data.putIfAbsent(key, channelToCreate))
                 .map(existingChannel -> Channel.createEmptyChannel())
                 .orElse(channelToCreate);

@@ -30,7 +30,7 @@ public class UserValidator implements Validator<User> {
 
     @Override
     public void validate(User user) throws InvalidException {
-        isBaseEntityValid.validateNonEmpty(user.getCommon());
+        isBaseEntityValid.validateNonEmpty(user.getBaseEntity());
         isNameValid.validateFormat(user.getName());
         isEmailValid.validateFormat(user.getEmail());
         // isPhoneNumberValid.validateFormat(user.getPhoneNumber()); // option

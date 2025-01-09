@@ -24,7 +24,7 @@ public class MessageValidator implements Validator<Message> {
 
     @Override
     public void validate(Message message) throws InvalidException {
-        isBaseEntityValid.validateNonEmpty(message.getCommon());
+        isBaseEntityValid.validateNonEmpty(message.getBaseEntity());
         isContentValid.validateFormat(message.getContent());
     }
 }

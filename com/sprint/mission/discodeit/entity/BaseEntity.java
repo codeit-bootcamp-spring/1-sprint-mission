@@ -62,7 +62,7 @@ public class BaseEntity {
 
     @Override
     public String toString() {
-        return "Common{" +
+        return "BaseEntity{" +
                 "id=" + id +
                 ", createAt=" + createAt +
                 ", updateAt=" + updateAt +

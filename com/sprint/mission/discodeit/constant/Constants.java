@@ -3,6 +3,7 @@ package sprint.mission.discodeit.constant;
 public enum Constants {
     NOT_FOUND("-1", true),
     EMPTY_TIME("0", true),
+    EMPTY_STRING("", false),
     EMPTY_UUID("00000000-0000-0000-0000-000000000000", false),
     MAX_NAME_LENGTH("10", true),
     EMAIL_FORMAT("UserName@DomainName.TopLevelDomain", false),

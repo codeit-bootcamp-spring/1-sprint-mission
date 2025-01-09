@@ -2,6 +2,8 @@ package sprint.mission.discodeit.entity;
 
 import java.util.Objects;
 
+import static sprint.mission.discodeit.constant.Constants.*;
+
 public class Channel {
     private static final Channel EMPTY_CHANNEL =
             new Channel(BaseEntity.createEmptyBasicEntity());
@@ -10,7 +12,7 @@ public class Channel {
     private final String     name;
 
     private Channel(BaseEntity baseEntity) {
-        this(baseEntity, "");
+        this(baseEntity, EMPTY_STRING.getAsString());
     }
     private Channel(String name) {
         this(BaseEntity.createBasicEntity(), name);
@@ -30,7 +32,7 @@ public class Channel {
         return EMPTY_CHANNEL;
     }
 
-    public BaseEntity getCommon() {
+    public BaseEntity getBaseEntity() {
         return baseEntity;
     }
     public String getName() {
@@ -52,7 +54,7 @@ public class Channel {
     @Override
     public String toString() {
         return "Channel{" +
-                "common=" + baseEntity +
+                "baseEntity=" + baseEntity + System.lineSeparator() +
                 ", name='" + name + '\'' +
                 '}';
     }

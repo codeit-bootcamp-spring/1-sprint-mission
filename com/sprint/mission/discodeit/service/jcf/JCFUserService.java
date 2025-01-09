@@ -29,7 +29,7 @@ public class JCFUserService implements UserService {
     @Override
     public User create(User userToCreate) {
         userValidator.validate(userToCreate);
-        UUID key = userToCreate.getCommon().getId();
+        UUID key = userToCreate.getBaseEntity().getId();
         return Optional.ofNullable(data.putIfAbsent(key, userToCreate))
                 .map(existingUser -> User.createEmptyUser())
                 .orElse(userToCreate);

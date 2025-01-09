@@ -2,6 +2,8 @@ package sprint.mission.discodeit.entity;
 
 import java.util.Objects;
 
+import static sprint.mission.discodeit.constant.Constants.*;
+
 public class Message {
     private static final Message EMPTY_MESSAGE =
             new Message(BaseEntity.createEmptyBasicEntity());
@@ -10,7 +12,7 @@ public class Message {
     private final String     content;
 
     private Message(BaseEntity baseEntity) {
-        this(baseEntity, "");
+        this(baseEntity, EMPTY_STRING.getAsString());
     }
     private Message(String content) {
         this(BaseEntity.createBasicEntity(), content);
@@ -30,7 +32,7 @@ public class Message {
         return EMPTY_MESSAGE;
     }
 
-    public BaseEntity getCommon() {
+    public BaseEntity getBaseEntity() {
         return baseEntity;
     }
     public String getContent() {
@@ -52,8 +54,8 @@ public class Message {
     @Override
     public String toString() {
         return "Message{" +
-                "common=" + baseEntity +
-                ", name='" + content + '\'' +
+                "baseEntity=" + baseEntity + System.lineSeparator() +
+                ", content='" + content + '\'' +
                 '}';
     }
 }

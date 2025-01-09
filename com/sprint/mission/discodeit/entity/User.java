@@ -1,18 +1,22 @@
 package sprint.mission.discodeit.entity;
 
 import java.util.Objects;
+import static sprint.mission.discodeit.constant.Constants.*;
 
 public class User {
     private static final User EMPTY_USER =
             new User(BaseEntity.createEmptyBasicEntity());
 
     private final BaseEntity baseEntity;
-    private String name;
-    private String email;
-    private String phoneNumber;
+    private final String name;
+    private final String email;
+    private final String phoneNumber;
 
     private User(BaseEntity baseEntity) {
         this.baseEntity = baseEntity;
+        name = EMPTY_STRING.getAsString();
+        email = EMPTY_STRING.getAsString();
+        phoneNumber = EMPTY_STRING.getAsString();
     }
     private User(Builder builder) {
         baseEntity  = builder.baseEntity;
@@ -29,14 +33,14 @@ public class User {
         private BaseEntity baseEntity = BaseEntity.createBasicEntity();
         private final String name;
         private final String email;
-        private String phoneNumber = "";
+        private String phoneNumber = EMPTY_STRING.getAsString();
 
         public Builder(String name, String email) {
             this.name  = name;
             this.email = email;
         }
 
-        public Builder common(BaseEntity baseEntity) {
+        public Builder baseEntity(BaseEntity baseEntity) {
             this.baseEntity = baseEntity;
             return this;
         }
@@ -50,7 +54,7 @@ public class User {
         }
     }
 
-    public BaseEntity getCommon() {
+    public BaseEntity getBaseEntity() {
         return baseEntity;
     }
     public String getName() {
@@ -78,7 +82,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "common=" + baseEntity +
+                "baseEntity=" + baseEntity + System.lineSeparator() +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +

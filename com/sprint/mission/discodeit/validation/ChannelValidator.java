@@ -24,7 +24,7 @@ public class ChannelValidator implements Validator<Channel> {
 
     @Override
     public void validate(Channel channel) throws InvalidException {
-        isBaseEntityValid.validateNonEmpty(channel.getCommon());
+        isBaseEntityValid.validateNonEmpty(channel.getBaseEntity());
         isNameValid.validateFormat(channel.getName());
     }
 }

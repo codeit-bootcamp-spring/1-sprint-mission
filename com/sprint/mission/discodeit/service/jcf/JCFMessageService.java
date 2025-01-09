@@ -29,7 +29,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message create(Message userToCreate) {
         messageValidator.validate(userToCreate);
-        UUID key = userToCreate.getCommon().getId();
+        UUID key = userToCreate.getBaseEntity().getId();
         return Optional.ofNullable(data.putIfAbsent(key, userToCreate))
                 .map(existingMessage -> Message.createEmptyMessage())
                 .orElse(userToCreate);
