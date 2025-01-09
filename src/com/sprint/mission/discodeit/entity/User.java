@@ -37,6 +37,9 @@ public class User {
     public void updateUpdatedAt(){
         this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
     }
+    public void updateUsername(String userName){
+        this.userName =userName;
+    }
 
 
 }
