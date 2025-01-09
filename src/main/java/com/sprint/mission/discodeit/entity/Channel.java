@@ -52,6 +52,10 @@ public class Channel {
     }
 
     // update
+    public void setUpdatedAt() {
+        updatedAt = System.currentTimeMillis();
+    }
+
     public void updateTitle(String title) {
         if (title.isBlank()){
             System.out.println("채널명을 입력해주세요.");
@@ -66,5 +70,9 @@ public class Channel {
 
     public void removeMessage(Message removeMessage) {
         messageList.remove(removeMessage);
+    }
+
+    public String displayInfoChannel() {
+        return "Channel title: " + title + ", Chennel Owner: " + owner.getName() + ", Channel Member: " + memberList;
     }
 }

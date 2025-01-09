@@ -42,11 +42,19 @@ public class Message {
     }
 
     // update
+    public void setUpdatedAt() {
+        updatedAt = System.currentTimeMillis();
+    }
+
     public void updateContent(String updateContent){
         if (updateContent.isBlank()){
             System.out.println("공백은 입력할 수 없습니다.");
         } else {
             this.content = updateContent;
         }
+    }
+
+    public String displayInfoMessage() {
+        return "Channel: " + channel.getTitle() + ", Writer: " + writer + ", Content: " + content + ", send time: " + createdAt;
     }
 }

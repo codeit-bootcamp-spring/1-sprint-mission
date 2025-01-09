@@ -44,7 +44,10 @@ public class User {
         return channelList;
     }
 
-    // update
+    public void setUpdatedAt() {
+        updatedAt = System.currentTimeMillis();
+    }
+
     public void updateName(String name) {
         if (name.isBlank()){
             System.out.println("닉네임을 입력해주세요.");
@@ -61,17 +64,21 @@ public class User {
         }
     }
 
-    private boolean isValidEmail(String email) {
-        // 이메일 유효성 검사
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        return email.matches(emailRegex);
-    }
-
     public void addChannal(Channel newChannel) {
         channelList.add(newChannel);
     }
 
     public void removeChannel(Channel removeChannel) {
         channelList.remove(removeChannel);
+    }
+
+    private boolean isValidEmail(String email) {
+        // 이메일 유효성 검사
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailRegex);
+    }
+
+    public String displayInfoUser() {
+        return "User Name: " + name + ", User Email: " + email + "Channel List: " + channelList;
     }
 }
