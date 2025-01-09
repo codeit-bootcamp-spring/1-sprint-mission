@@ -16,7 +16,7 @@ public class Channel {
     public Channel(String title, User owner) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
-        this.title = title;
+        updateTitle(title);
         this.owner = owner;
         messageList = new ArrayList<>();
         memberList = new ArrayList<>();
@@ -52,8 +52,12 @@ public class Channel {
     }
 
     // update
-    public void updateTitle() {
-        this.title = title;
+    public void updateTitle(String title) {
+        if (title.isBlank()){
+            System.out.println("채널명을 입력해주세요.");
+        } else {
+            this.title = title;
+        }
     }
 
     public void addMessage(Message newMessage) {

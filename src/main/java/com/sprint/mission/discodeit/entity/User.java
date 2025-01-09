@@ -9,17 +9,23 @@ public class User {
     private long createdAt;
     private long updatedAt;
     private String name;
+    private String email;
     private List<Channel> channelList; // 참가중인 채널
 
-    public User(String name) {
+    public User(String name, String email) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
-        this.name = name;
         channelList = new ArrayList<>();
+        updateName(name);
+        updateEmail(email);
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public long getCreatedAt() {
@@ -40,7 +46,25 @@ public class User {
 
     // update
     public void updateName(String name) {
-        this.name = name;
+        if (name.isBlank()){
+            System.out.println("닉네임을 입력해주세요.");
+        } else {
+            this.name = name;
+        }
+    }
+
+    public void updateEmail(String email) {
+        if (isValidEmail(email)){
+            this.email = email;
+        } else {
+            System.out.println("이메일 형식에 맞지 않습니다.");
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        // 이메일 유효성 검사
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailRegex);
     }
 
     public void addChannal(Channel newChannel) {
@@ -50,5 +74,4 @@ public class User {
     public void removeChannel(Channel removeChannel) {
         channelList.remove(removeChannel);
     }
-
 }

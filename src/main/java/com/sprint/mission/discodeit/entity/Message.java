@@ -14,7 +14,7 @@ public class Message {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.writer = writer;
-        this.content = content;
+        updateContent(content);
     }
 
     public UUID getId() {
@@ -43,7 +43,10 @@ public class Message {
 
     // update
     public void updateContent(String updateContent){
-        this.content = updateContent;
+        if (updateContent.isBlank()){
+            System.out.println("공백은 입력할 수 없습니다.");
+        } else {
+            this.content = updateContent;
+        }
     }
-
 }
