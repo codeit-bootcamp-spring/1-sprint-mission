@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+group = 'com.sprint.mission'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    implementation 'org.mindrot:jbcrypt:0.4'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+application {
+    // 실행할 메인 클래스의 경로를 정확히 입력
+    mainClass = 'com.sprint.mission.Main'
+}
