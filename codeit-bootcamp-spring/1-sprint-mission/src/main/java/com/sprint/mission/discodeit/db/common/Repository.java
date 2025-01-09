@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.common;
+package com.sprint.mission.discodeit.db.common;
 
 import java.io.Serializable;
 
