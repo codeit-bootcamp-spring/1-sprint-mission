@@ -12,14 +12,17 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User save(User user){
+    public User create(User user){
+        if (data.containsKey(user.getId())) {
+            throw new IllegalArgumentException("User ID already exists: " + user.getId());
+        }
         data.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public Optional<User> read(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public Optional<User> read(User user) {
+        return Optional.ofNullable(data.get(user.getId()));
     }
 
     @Override
@@ -28,20 +31,22 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UUID id, User user){
-        if (!data.containsKey(id)) {
+    public User update(User existUser, User updateUser){
+        if (!data.containsKey(existUser.getId())) {
             throw new NoSuchElementException("User not found");
         }
-        data.put(id, user);
-        return user;
+        // 기존 객체의 값을 업데이트
+        existUser.updateTime();
+        data.put(existUser.getId(), updateUser);
+        return updateUser;
     }
 
     @Override
-    public boolean delete(UUID id){
-        if (!data.containsKey(id)) {
+    public boolean delete(User user){
+        if (!data.containsKey(user.getId())) {
             return false;
         }
-        data.remove(id);
+        data.remove(user.getId());
         return true;
     }
 }

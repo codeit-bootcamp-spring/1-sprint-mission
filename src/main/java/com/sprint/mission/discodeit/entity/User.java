@@ -6,6 +6,7 @@ public class User extends BaseEntity {
     private String password;
     private String username;
     private String email;
+
     public User(String userid, String password, String username, String email) {
         this.userid = userid;
         this.password = password;
@@ -31,18 +32,16 @@ public class User extends BaseEntity {
 
     public void updateUsername(String username) {
         this.username = username;
-        setUpdatedAt(System.currentTimeMillis());
     }
     public void updateUserEmail(String email) {
         this.email = email;
-        setUpdatedAt(System.currentTimeMillis());
     }
 
-    public void setUserid(String userid) {
+    public void updateUserid(String userid) {
         this.userid = userid;
     }
 
-    public void setPassword(String password) {
+    public void updatePassword(String password) {
         this.password = password;
     }
 }

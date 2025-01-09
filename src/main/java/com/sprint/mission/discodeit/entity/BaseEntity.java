@@ -22,11 +22,10 @@ public class BaseEntity {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
-        return updatedAt;
+    public void updateTime() {
+        this.updatedAt = updatedAt;
     }
-
-    public void setUpdatedAt(long updatedAt) {
+    public void updateTime(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

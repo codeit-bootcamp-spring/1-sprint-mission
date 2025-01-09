@@ -12,14 +12,17 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel save(Channel channel) {
+    public Channel create(Channel channel) {
+        if (data.containsKey(channel.getId())) {
+            throw new IllegalArgumentException("Channel Id already exists: " + channel.getId());
+        }
         data.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
-    public Optional<Channel> read(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public Optional<Channel> read(Channel channel) {
+        return Optional.ofNullable(data.get(channel.getId()));
     }
 
     @Override
@@ -28,20 +31,22 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID id, Channel channel) {
-        if(!data.containsKey(id)) {
-            return null;
+    public Channel update(Channel existChannel, Channel updateChannel) {
+        // 기존 Channel 객체가 존재하는지 확인
+        if (!data.containsKey(existChannel.getId())) {
+            throw new NoSuchElementException("Channel not found");
         }
-        data.put(id, channel);
-        return channel;
+        updateChannel.updateTime();
+        data.put(existChannel.getId(), updateChannel);
+        return updateChannel;
     }
 
     @Override
-    public boolean delete(UUID id) {
-        if (!data.containsKey(id)) {
+    public boolean delete(Channel channel) {
+        if (!data.containsKey(channel.getId())) {
             return false;
         }
-        data.remove(id);
+        data.remove(channel.getId());
         return true;
     }
 

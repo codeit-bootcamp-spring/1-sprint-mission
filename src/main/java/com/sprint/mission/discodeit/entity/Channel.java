@@ -5,14 +5,15 @@ import java.util.*;
 public class Channel extends BaseEntity {
     private String name;
     private String description;
-    private Set<String> participantIds;
-    private List<UUID> messageIds;
+    private Set<User> participants;
+    private List<Message> messageList;
 
-    public Channel(String name, String description, Set<String> participantIds, List<UUID> messageIds) {
+    public Channel(String name, String description, Set<User> participants, List<Message> messageList) {
+        super();
         this.name = name;
         this.description = description;
-        this.participantIds = participantIds;
-        this.messageIds = messageIds;
+        this.participants= participants;
+        this.messageList = messageList;
     }
 
     public String getName() {
@@ -27,23 +28,23 @@ public class Channel extends BaseEntity {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void updateDescription(String description) {
         this.description = description;
     }
 
-    public Set<String> getParticipantIds() {
-        return participantIds;
+    public Set<User> getParticipants() {
+        return participants;
     }
 
-    public void setParticipantIds(Set<String> participantIds) {
-        this.participantIds = participantIds;
+    public void updateParticipants(Set<User> participants) {
+        this.participants = participants;
     }
 
-    public List<UUID> getMessageIds() {
-        return messageIds;
+    public List<Message> getMessageList() {
+        return messageList;
     }
 
-    public void setMessageIds(List<UUID> messageIds) {
-        this.messageIds = messageIds;
+    public void updateMessageList(List<Message> messageList) {
+        this.messageList = messageList;
     }
 }

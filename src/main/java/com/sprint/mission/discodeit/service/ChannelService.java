@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel save(Channel channel);
-    Optional<Channel> read(UUID id);
+    Channel create(Channel channel);
+    Optional<Channel> read(Channel channel);
     List<Channel> readAll();
-    Channel update(UUID id, Channel channel);
-    boolean delete(UUID id);
+    Channel update(Channel existChannel, Channel updateChannel);
+    boolean delete(Channel channel);
 }
