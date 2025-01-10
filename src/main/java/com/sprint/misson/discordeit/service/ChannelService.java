@@ -2,7 +2,6 @@ package com.sprint.misson.discordeit.service;
 
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
-import com.sprint.misson.discordeit.entity.Message;
 
 import java.util.List;
 
