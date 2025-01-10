@@ -16,4 +16,4 @@
 ![image](https://github.com/user-attachments/assets/5f0b4ec6-0962-4210-9fe8-6982a96509bf)
 
 ## 멘토에게
-- 주석으로 질문 남겨놓았습니다. 감사합니다:)
+- TestMain, JcfUserService, Message파일에 주석으로 질문 남겨놓았습니다. 감사합니다:)
