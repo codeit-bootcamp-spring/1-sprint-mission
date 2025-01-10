@@ -37,7 +37,7 @@ public class JavaApplication {
         List<Channel> channelList = jcfChannelService.readAllChannel();
         System.out.println("모든 채널을 출력합니다.");
         for(Channel ch:channelList){
-            System.out.println(ch.getChName());
+            System.out.println(" " + ch.getChName());
         }
         
         //채널 삭제
@@ -45,7 +45,7 @@ public class JavaApplication {
         //모두 읽기
         System.out.println("모든 채널을 출력합니다.");
         for(Channel ch:channelList){
-            System.out.println(ch.getChName());
+            System.out.println(" " +  ch.getChName());
         }
 
 
@@ -72,14 +72,12 @@ public class JavaApplication {
         //전체 조회
         System.out.println("전체 유저를 조회합니다.");
         for(User user: jcfUserService.readAllUser()){
-            System.out.println(user.getUserName());
+            System.out.println(" " + user.getUserName());
         }
 
         //유저 수정
-        jcfUserService.modifyUser(user1.getUserId(), "효정이");
+        jcfUserService.modifyUser(user3.getUserId(), "강아지2");
 
-        //수정 조회
-        System.out.println("유저 조회: " +jcfUserService.readUser(user1.getUserId()).getUserName());
 
         //삭제
         jcfUserService.deleteUser(user1.getUserId());
@@ -87,7 +85,7 @@ public class JavaApplication {
         //전체 조회
         System.out.println("전체 유저를 조회합니다.");
         for(User user: jcfUserService.readAllUser()){
-            System.out.println(user.getUserName());
+            System.out.println(" " + user.getUserName());
         }
 
 
@@ -100,11 +98,6 @@ public class JavaApplication {
         Message message3 = new Message(user3,"반가워요~");
         Message message4 = new Message(user3,"잘지내요~");
 
-        //user-메시지 매핑  -> 이걸 메시지 생성 때 자동화하면 좋을것같음.
-        user3.addMessage(message1);
-        user3.addMessage(message3);
-        user3.addMessage(message4);
-        user2.addMessage(message2);
 
         JCFMessageService jcfMessageService = new JCFMessageService();
 
@@ -120,7 +113,7 @@ public class JavaApplication {
         //메시지 모두 조회
         System.out.println("메시지를 모두 조회합니다.");
         for (Message msg : jcfMessageService.readAllMessage()) {
-            System.out.println( msg.getUser().getUserName() + ": "
+            System.out.println(" " +  msg.getUser().getUserName() + ": "
                     +  msg.getContent());
         }
 
@@ -133,7 +126,7 @@ public class JavaApplication {
         //메시지 모두 조회
         System.out.println("메시지를 모두 조회합니다.");
         for (Message msg : jcfMessageService.readAllMessage()) {
-            System.out.println( msg.getUser().getUserName() + ": "
+            System.out.println(" " +  msg.getUser().getUserName() + ": "
                     +  msg.getContent());
         }
 
@@ -174,7 +167,7 @@ public class JavaApplication {
 
             // 정렬된 메시지 출력
             for (Message msg : allMessages) {
-                System.out.println(msg.getCreatedAt() + " - " + msg.getUser().getUserName() + ": " + msg.getContent());
+                System.out.println(" " + msg.getCreatedAt() + " - " + msg.getUser().getUserName() + ": " + msg.getContent());
             }
         }
         

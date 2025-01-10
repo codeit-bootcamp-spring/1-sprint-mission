@@ -45,8 +45,10 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void modifyChannel(String id, String name) {
         Channel target = readChannel(id);
+        String oriName=target.getChName();
         target.updateName(name);
         target.updateUpdatedAt(); //시간 업데이트
+        System.out.println("채널이름 변경: " + oriName+ " -> " + name );
 
     }
 

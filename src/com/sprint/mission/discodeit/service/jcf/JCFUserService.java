@@ -38,8 +38,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public void modifyUser(String userID, String newName) {
-        readUser(userID).updateUsername(newName);
-        readUser(userID).updateUpdatedAt();
+        User user= readUser(userID);
+        String oriName=user.getUserName();
+        user.updateUsername(newName);
+        user.updateUpdatedAt();
+        System.out.println("유저이름 변경: " + oriName+ " -> " + newName );
 
     }
 

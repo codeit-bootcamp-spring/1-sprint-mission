@@ -16,6 +16,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void createMessage(Message message) {
         messagedata.add(message);
+        message.getUser().addMessage(message);
 
     }
 
@@ -36,17 +37,29 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void modifyMessage(String msgID, String content) {
-        readMessage(msgID).updateContent(content);
-        readMessage(msgID).updateUpdatedAt();
+        Message msg = readMessage(msgID);
+        String oriMsg=msg.getContent();
+        msg.updateContent(content);
+        msg.updateUpdatedAt();
+        System.out.println(msg.getUser().getUserName() + "님의 메시지 변경: \""+ oriMsg + "\" -> \"" +
+                content+  "\"");
     }
 
     @Override
     public void deleteMessage(String msgID) {
         String uname= readMessage(msgID).getUser().getUserName();
         String name= readMessage(msgID).getContent();
-        boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID));
-
+        //boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID)); //메시지삭제
+        boolean isDeleted = this.messagedata.removeIf(msg -> {
+            if (msg.getMsgId().equals(msgID)) {
+                // 유저의 메시지리스트에서삭제
+                msg.getUser().getMsgList().removeIf(m -> m.getMsgId().equals(msgID));
+                return true; // 삭제 조건을 만족할 때 삭제
+            }
+            return false;
+        });
         if(isDeleted) {
+
             System.out.println(uname + "님의 \"" + name + "\" 메시지가 삭제되었습니다.");
 
         }else{
