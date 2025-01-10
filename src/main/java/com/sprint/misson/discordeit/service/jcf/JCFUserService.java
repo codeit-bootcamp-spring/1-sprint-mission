@@ -17,14 +17,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean createUser(String nickname, String email) {
+    public User createUser(String nickname, String email) {
 
         //스트림으로 HashMap 의 value(User) 들 중 이미 존재하는 email 인지 검사
         boolean userEmailExists = data.values().stream()
                 .anyMatch( u -> u.getEmail().equals(email) );
 
         if(userEmailExists) {
-            return false;
+            return null;
         }
 
         User newUser = new User(nickname, email, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED );
@@ -38,7 +38,7 @@ public class JCFUserService implements UserService {
         //          해당하는 key-value 셋이 없었다면 null 반환
         data.put( newUser.getId(), newUser );
 
-        return true;
+        return newUser;
     }
 
     @Override

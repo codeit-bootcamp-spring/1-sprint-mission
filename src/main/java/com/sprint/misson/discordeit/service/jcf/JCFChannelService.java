@@ -19,10 +19,10 @@ public class JCFChannelService implements ChannelService {
 
     //생성
     @Override
-    public boolean CreateChannel(Channel channel) {
-
+    public Channel CreateChannel(String name, ChannelType type) {
+        Channel channel = new Channel( name, type );
         data.put( channel.getId(), channel );
-        return true;
+        return channel;
     }
 
     //모두 조회

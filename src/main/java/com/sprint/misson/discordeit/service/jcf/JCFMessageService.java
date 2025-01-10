@@ -21,12 +21,12 @@ public class JCFMessageService implements MessageService {
 
     //생성
     @Override
-    public boolean createMessage(User user, String content, Channel channel) {
+    public Message createMessage(User user, String content, Channel channel) {
         //todo
         //존재하는 유저? 존재하는 채널?
         Message message = new Message(user, content, channel);
         data.put( message.getId(), message );
-        return false;
+        return message;
     }
 
     //모두 읽기
