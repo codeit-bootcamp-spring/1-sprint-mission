@@ -13,6 +13,7 @@ public class DiscodeitApplication {
     public static void main(String[] args) {
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
+        MessageService messageService = new JCFMessageService();
 
         System.out.println("사용자 등록 시작");
 
@@ -67,6 +68,7 @@ public class DiscodeitApplication {
         System.out.println(userService.read(user1Id)); // null 또는 삭제 확인 메시지 출력
 
 
+        System.out.println();
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>Channel>>>>>>>>>>>>>>>>>>>>>>>");
         List<Channel> channels = List.of(
                 new Channel("SB_1_Sprint", "JAVA Spring BackEnd Developer discode",
@@ -104,6 +106,36 @@ public class DiscodeitApplication {
         channelService.channelOwnerChange(channel1.getId(), users.get(1));
         System.out.println("================");
 
+
+        System.out.println();
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>Message>>>>>>>>>>>>>>>>>>>>>>>");
+
+        List<Message> messages = List.of(
+            new Message("Hello", users.get(1), users.get(4)),
+            new Message("처음 뵙겠습니다~", users.get(1), channels.get(1)),
+            new Message("안녕하세요!", users.get(2), channels.get(0)),
+            new Message("채널 가입 요청 드립니다.", users.get(3), channels.get(2)),
+            new Message("반가워요!", users.get(1), users.get(3)),
+            new Message("공지사항 확인 부탁드립니다.", users.get(0), channels.get(3)),
+            new Message("다음 모임은 언제인가요?", users.get(4), channels.get(1)),
+            new Message("메일 보내드렸습니다.", users.get(2), users.get(0)),
+            new Message("새 프로젝트에 대해서 논의해보아요.", users.get(3), channels.get(4)),
+            new Message("다른 문의사항 있으면 알려주세요.", users.get(2), channels.get(0))
+        );
+
+        messages.forEach(message -> {
+            messageService.create(message);
+        });
+
+        System.out.println("메시지 전송 완료");
+        System.out.println("================");
+
+        System.out.println("전체 메시지 조회 : ");
+        messageService.readAll();
+        System.out.println("================");
+
+        System.out.println(channels.get(1).getChannelName() + " 채널 전체 메시지 조회 : ");
+        messageService.readAll(channels.get(1).getId());
 
     }
 }

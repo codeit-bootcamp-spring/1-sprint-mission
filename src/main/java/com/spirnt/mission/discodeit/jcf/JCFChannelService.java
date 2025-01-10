@@ -59,19 +59,24 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void channelMemberJoin(UUID id, User user){
+    public void channelMemberJoin(UUID id, User joinUser){
         if(data.containsKey(id)){
             Channel joinChannel = data.get(id);
 
             List<User> members = new ArrayList<>(joinChannel.getMember());
-            if (!members.contains(user)) {
-                members.add(user);
-                System.out.println(joinChannel.getChannelName() + " 채널에 " + user.getUsername() + "님이 등록되었습니다.");
+            if (!members.contains(joinUser)) {
+                members.add(joinUser);
+                System.out.println(joinChannel.getChannelName() + " 채널에 " + joinUser.getUsername() + "님이 등록되었습니다.");
             } else {
                 System.out.println("User is already a member.");
             }
             joinChannel.setMember(members);
         }
+    }
+
+    @Override
+    public void channelMemberWithdrawal(UUID id, User withdrawalUser){
+
     }
 
 }

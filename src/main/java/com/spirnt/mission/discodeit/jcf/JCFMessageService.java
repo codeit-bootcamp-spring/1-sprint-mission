@@ -1,7 +1,9 @@
 package com.spirnt.mission.discodeit.jcf;
 
 import com.spirnt.mission.discodeit.entity.Message;
+import com.spirnt.mission.discodeit.entity.User;
 import com.spirnt.mission.discodeit.service.MessageService;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.*;
 
@@ -25,14 +27,47 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> readAll() {
+        data.values().forEach(message -> {
+            String sender = message.getSender().getUsername();
+            String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : "" ;
+
+            if(recipient != ""){
+                System.out.println(sender + "님이 " + recipient + "님에게 글을 남기셨습니다.");
+                System.out.println(sender + " -> " + recipient + " : "  + message.getContent());
+            }else{
+                System.out.println(sender + "님이 " + message.getChannel().getChannelName() + " 채널에 글을 남기셨습니다.");
+                System.out.println(sender + " - " + message.getContent());
+            }
+        });
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public List<Message> readAll(UUID channelId){
+        List<Message> returnData = new ArrayList<>();
+
+        data.values().stream()
+                .filter(message ->
+                        message.getChannel() != null && message.getChannel().getId().equals(channelId))
+                .forEach(message -> {
+                    String sender = message.getSender().getUsername();
+                    String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : "";
+
+                    if (recipient != "") {
+                        System.out.println(sender + " -> " + recipient + " : " + message.getContent());
+                    } else {
+                        System.out.println(sender + " - " + message.getContent());
+                    }
+                });
+
+        return new ArrayList<>(returnData);
     }
 
     @Override
     public Message update(UUID id, Message updatedMessage) {
         if(data.containsKey(id)){
             Message exsitingMessage  = data.get(id);
-            exsitingMessage.updateContent(updatedMessage.getContent());
+//            exsitingMessage.updateContent(updatedMessage.getContent());
             return  exsitingMessage;
         }
         return null;
