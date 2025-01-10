@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity.user;
 
+import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
+import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
+
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 
 public class User extends AbstractUUIDEntity {
@@ -16,7 +19,11 @@ public class User extends AbstractUUIDEntity {
 
     public void changeName(String newName) {
         this.name = name.changeName(newName);
-        updateStatusAndUpdateAt();
+        updateStatusAndUpdateAt(MODIFIED);
+    }
+
+    public void UnRegister() {
+        updateStatusAndUpdateAt(UNREGISTERED);
     }
 
 }

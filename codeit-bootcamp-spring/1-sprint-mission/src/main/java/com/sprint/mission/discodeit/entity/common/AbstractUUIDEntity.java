@@ -40,8 +40,8 @@ public abstract class AbstractUUIDEntity {
         return status;
     }
 
-    public void updateStatusAndUpdateAt() {
-        this.status = MODIFIED;
+    public void updateStatusAndUpdateAt(Status status) {
+        this.status = status;
         this.updateAt = createUnixTimestamp();
     }
 
