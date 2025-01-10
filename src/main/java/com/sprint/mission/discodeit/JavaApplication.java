@@ -17,12 +17,15 @@ public class JavaApplication {
         Map<UUID, Channel> channelData = new HashMap<>();
         Map<UUID, Message> messageData = new HashMap<>();
 
-        // 서비스 구현체 초기화
-        JCFMessageService messageService = new JCFMessageService(messageData, null, null);
-        JCFChannelService channelService = new JCFChannelService(channelData, null, messageService);
-        JCFUserService userService = new JCFUserService(userData, messageService,channelService);
-        messageService = new JCFMessageService(messageData, userService, channelService);
-        channelService = new JCFChannelService(channelData, userService, messageService);
+        // 싱글톤 인스턴스 생성
+        JCFUserService userService = JCFUserService.getInstance(userData);
+        JCFChannelService channelService = JCFChannelService.getInstance(channelData);
+        JCFMessageService messageService = JCFMessageService.getInstance(messageData);
+
+        // 의존성 주입
+        userService.setDependencies(messageService, channelService);
+        channelService.setDependencies(userService, messageService);
+        messageService.setDependencies(userService, channelService);
 
         // === User Service 테스트 ===
         System.out.println("=== 사용자 서비스 테스트 ===");

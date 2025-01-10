@@ -8,12 +8,23 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
+    private static JCFMessageService instance; // 싱글톤 인스턴스
     private final Map<UUID, Message> data;
-    private final JCFUserService userService; //의존성 주입
-    private final JCFChannelService channelService;
+    private JCFUserService userService;
+    private JCFChannelService channelService;
 
-    public JCFMessageService(Map<UUID, Message> data, JCFUserService userService, JCFChannelService channelService) {
+    private JCFMessageService(Map<UUID, Message> data) {
         this.data = data;
+    }
+
+    public static JCFMessageService getInstance(Map<UUID, Message> data) {
+        if (instance == null) {
+            instance = new JCFMessageService(data);
+        }
+        return instance;
+    }
+
+    public void setDependencies(JCFUserService userService, JCFChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
     }

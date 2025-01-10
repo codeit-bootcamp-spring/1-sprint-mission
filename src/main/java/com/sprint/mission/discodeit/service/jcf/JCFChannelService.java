@@ -9,12 +9,23 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
+    private static JCFChannelService instance; // 싱글톤 인스턴스
     private final Map<UUID, Channel> data;
-    private final UserService userService;
-    private final MessageService messageService;
+    private UserService userService;
+    private MessageService messageService;
 
-    public JCFChannelService(Map<UUID, Channel> data, UserService userService, MessageService messageService) {
+    private JCFChannelService(Map<UUID, Channel> data) {
         this.data = data;
+    }
+
+    public static JCFChannelService getInstance(Map<UUID, Channel> data) {
+        if (instance == null) {
+            instance = new JCFChannelService(data);
+        }
+        return instance;
+    }
+
+    public void setDependencies(UserService userService, MessageService messageService) {
         this.userService = userService;
         this.messageService = messageService;
     }

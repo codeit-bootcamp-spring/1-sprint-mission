@@ -8,16 +8,26 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
+    private static JCFUserService instance; // 싱글톤 인스턴스
     private final Map<UUID, User> data;
-    private final MessageService messageService;
-    private final ChannelService channelService;
+    private MessageService messageService;
+    private ChannelService channelService;
 
-    public JCFUserService(Map<UUID, User> data, MessageService messageService, ChannelService channelService) {
+    private JCFUserService(Map<UUID, User> data) {
         this.data = data;
+    }
+
+    public static JCFUserService getInstance(Map<UUID, User> data) {
+        if (instance == null) {
+            instance = new JCFUserService(data);
+        }
+        return instance;
+    }
+
+    public void setDependencies(MessageService messageService, ChannelService channelService) {
         this.messageService = messageService;
         this.channelService = channelService;
     }
-
     @Override
     public User createUser(User user){
         if (data.containsKey(user.getId())) {
