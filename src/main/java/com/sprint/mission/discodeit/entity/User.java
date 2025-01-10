@@ -34,6 +34,7 @@ public class User {
         return username;
     }
 
+
     public void updateUsername(String username) {
         this.username = username;
         this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);

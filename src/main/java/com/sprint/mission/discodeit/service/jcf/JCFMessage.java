@@ -9,11 +9,27 @@ import java.util.UUID;
 
 public class JCFMessage implements MessageService {
     private final List<Message> messages = new ArrayList<>();
+    private final JCFChannel jcfChannel;
+
+    public JCFMessage(JCFChannel jcfChannel) {
+        this.jcfChannel = jcfChannel;
+    }
 
     @Override
-    public Message createMessage(String text) {
-        Message newMessage = new Message(text);
+    public Message createMessage(UUID authorID, String text) {
+        Message newMessage = new Message(text, authorID);
         messages.add(newMessage);
+        return newMessage;
+    }
+
+    @Override
+    public Message createMessage(UUID authorID, UUID channelID, String text) {
+        Message newMessage = new Message(text, authorID);
+        if(jcfChannel.getChannel(channelID).isEmpty()) {
+            return null;
+        }
+        messages.add(newMessage);
+        jcfChannel.addMessageToChannel(channelID, newMessage);
         return newMessage;
     }
 

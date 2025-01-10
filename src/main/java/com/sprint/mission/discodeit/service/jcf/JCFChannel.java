@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,17 @@ public class JCFChannel implements ChannelService {
     public Optional<Channel> getChannel(UUID uuid) {
         for (Channel channel : channels) {
             if (channel.getId().equals(uuid)) {
+                return Optional.of(channel);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Channel> addMessageToChannel(UUID uuid, Message message) {
+        for (Channel channel : channels) {
+            if (channel.getId().equals(uuid)) {
+                channel.addMessage(message);
                 return Optional.of(channel);
             }
         }

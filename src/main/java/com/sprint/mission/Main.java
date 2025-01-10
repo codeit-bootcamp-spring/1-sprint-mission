@@ -6,11 +6,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFChannel;
 import com.sprint.mission.discodeit.service.jcf.JCFMessage;
 import com.sprint.mission.discodeit.service.jcf.JCFUser;
-
-import java.util.List;
 import java.util.Optional;
 
 public class Main {
+    static JCFUser userService = new JCFUser();
+    static JCFChannel channelService = new JCFChannel();
+    static JCFMessage messageService = new JCFMessage(channelService);
+
     public static void main(String[] args) {
         userServiceTest();
 
@@ -21,7 +23,7 @@ public class Main {
 
     private static void channelServiceTest() {
         // ChannelService 테스트
-        JCFChannel channelService = new JCFChannel();
+
         System.out.println("\n=== Channel Service ===");
 
         // 채널 생성
@@ -50,26 +52,30 @@ public class Main {
 
         // 삭제 여부 확인
         System.out.println("조회를 통해 삭제되었는지 확인");
-        channelService.getChannels().forEach(c -> System.out.println("채널 조회 다건: " + c.getChannelName()));
+        channelService.getChannels().forEach(c -> System.out.println("채널 조회 다건: " + c.toString()));
     }
 
     private static void messageServiceTest() {
         // MessageService 테스트
-        JCFMessage messageService = new JCFMessage();
+
         System.out.println("\n=== Message Service ===");
 
+        // 유저 생성
+        User user1 = userService.createUser("1");
+        User user2 = userService.createUser("2");
+
         // 메시지 생성
-        Message message1 = messageService.createMessage("Hello");
-        Message message2 = messageService.createMessage("World");
+        Message message1 = messageService.createMessage(user1.getId(), "Hello");
+        Message message2 = messageService.createMessage(user2.getId(), "World");
         System.out.println("메시지 등록1: " + message1.getText());
         System.out.println("메시지 등록2: " + message2.getText());
 
         // 메시지 조회 단건
         Optional<Message> foundMessage = messageService.getMessage(message1.getId());
-        foundMessage.ifPresent(m -> System.out.println("메시지 조회 단건: " + m.getText()));
+        foundMessage.ifPresent(m -> System.out.println("메시지 조회 단건: " + m.toString()));
 
         // 메시지 조회 다건
-        messageService.getMessages().forEach(m -> System.out.println("메시지 조회 다건: " + m.getText()));
+        messageService.getMessages().forEach(m -> System.out.println("메시지 조회 다건: " + m.toString()));
 
         // 메시지 수정
         messageService.updateMessage(message1.getId(), "Hello Updated");
@@ -89,7 +95,6 @@ public class Main {
 
     private static void userServiceTest() {
         // UserService 테스트
-        JCFUser userService = new JCFUser();
         System.out.println("\n=== User Service ===");
         // 유저 생성
         User user1 = userService.createUser("1");

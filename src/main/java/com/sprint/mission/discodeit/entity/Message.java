@@ -10,6 +10,7 @@ public class Message {
     private Long updatedAt;
 
     private String text;
+    private final UUID authorId;
 
     public void updateText(String text) {
         this.text = text;
@@ -31,11 +32,19 @@ public class Message {
     public String getText() {
         return text;
     }
+    public String toString(){
+        return "\nuuid: "+ id + " text: " + text + " authorId: " + authorId;
+    }
 
-    public Message(String text){
+    public Message(String text, UUID authorId){
+        this.authorId = authorId;
         this.id = UUID.randomUUID();
         this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         this.updatedAt = createdAt;
         this.text = text;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
     }
 }
