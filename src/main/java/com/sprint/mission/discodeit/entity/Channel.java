@@ -54,6 +54,10 @@ public class Channel {
         this.updatedAt = System.currentTimeMillis();
     }
 
+    public void removeUser(User user) {
+        members.remove(user);
+    }
+
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");

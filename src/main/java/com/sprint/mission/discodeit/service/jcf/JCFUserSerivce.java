@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.log.MyLog;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
@@ -15,6 +17,14 @@ public class JCFUserSerivce implements UserService {
 
     @Override
     public MyLog<User> createUser(String name, String phone, String password) {
+        if (!User.isValidPassword(password)) {
+            return new MyLog<>(null, "올바르지 않은 비밀번호 형식 입니다. 비밀번호는 8자리 이상 15자리 이하 대문자 및 특수문자 하나 이상 포함해야 합니다.");
+        }
+
+        if (!User.isValidPhone(phone)) {
+            return new MyLog<>(null, "올바르지 않은 핸드폰 번호 형식 입니다");
+        }
+
         for (User user : userRepository.values()) {
             if (user.getPhone().equals(phone)) {
                 return new MyLog<>(null, "이미 존재하는 아이디 입니다");

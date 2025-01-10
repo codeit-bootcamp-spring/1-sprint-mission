@@ -11,7 +11,7 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> messageRepository;
-    private UserService userService;
+    private final UserService userService;
 
     public JCFMessageService(UserService userService) {
         this.messageRepository = new HashMap<>();
@@ -20,6 +20,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public MyLog<Message> createMessage(String content, User fromUser, User toUser) {
+        if (content.isEmpty()) {
+            return new MyLog<>(null, "메시지 내용을 입력해주세요!");
+        }
         List<User> users = userService.getAllUser();
         if (!(users.contains(fromUser) && users.contains(toUser))) {
             return new MyLog<>(null, "송수신자를 다시 확인해주세요");

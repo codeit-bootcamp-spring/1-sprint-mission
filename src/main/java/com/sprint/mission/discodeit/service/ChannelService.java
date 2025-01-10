@@ -15,7 +15,7 @@ public interface ChannelService {
 
     MyLog<Channel> updateChannel(String name, User newUser);
 
-
-
     MyLog<Channel> deleteChannel(String name);
+
+//    void removeUserFromAllChannels(User user);
 }

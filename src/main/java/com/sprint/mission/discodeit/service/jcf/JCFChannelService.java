@@ -11,7 +11,7 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channelRepository;
-    private UserService userService;
+    private final UserService userService;
 
     public JCFChannelService(UserService userService) {
         this.userService = userService;
@@ -70,4 +70,11 @@ public class JCFChannelService implements ChannelService {
         }
         return new MyLog<>(null, "해당하는 채널이 존재하지 않습니다");
     }
+
+//    @Override
+//    public void removeUserFromAllChannels(User user) {
+//        for (Channel channel : channelRepository.values()) {
+//            channel.removeUser(user);
+//        }
+//    }
 }

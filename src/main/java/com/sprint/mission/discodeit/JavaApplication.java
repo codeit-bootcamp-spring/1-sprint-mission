@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.config.Configuration;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,21 +15,28 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserSerivce;
 import java.util.List;
 
 public class JavaApplication {
-    private static UserService userService = new JCFUserSerivce();
-    private static MessageService messageService = new JCFMessageService(userService);
-    private static ChannelService channelService = new JCFChannelService(userService);
-
     public static void main(String[] args) {
+        Configuration config = Configuration.getInstance();
+        UserService userService = config.userService();
+        MessageService messageService = config.messageService();
+        ChannelService channelService = config.channelService();
+
         System.out.println("<회원 생성하기>");
-        MyLog<User> user1 = userService.createUser("김민준", "010-1111-1111", "1234");
-        MyLog<User> user1_1 = userService.createUser("홍지훈", "010-1111-1111", "1234");
-        MyLog<User> user2 = userService.createUser("이서윤", "010-2222-1111", "1234");
-        MyLog<User> user3 = userService.createUser("박지훈", "010-3333-1111", "1234");
-        MyLog<User> user4 = userService.createUser("최지아", "010-4444-1111", "1234");
-        MyLog<User> user5 = userService.createUser("정다은", "010-5555-1111", "1234");
+        MyLog<User> user1 = userService.createUser("김민준", "010-1111-1111", "Abcdefgh!");
+        MyLog<User> user1_1 = userService.createUser("홍지훈", "010-1111-1111", "Abcdefgh!");
+        MyLog<User> user2 = userService.createUser("이서윤", "010-2222-1111", "Abcdefgh!");
+        MyLog<User> user3 = userService.createUser("박지훈", "010-3333-1111", "Abcdefgh!");
+        MyLog<User> user4 = userService.createUser("최지아", "010-4444-1111", "Abcdefgh!");
+        MyLog<User> user5 = userService.createUser("정다은", "010-5555-1111", "Abcdefgh!");
         System.out.println(user1.getData() + user1.getMessage());
-        System.out.print("동일한 전화번호로 회원가입을 진행한 다른 사람 : ");
+        System.out.println(" - 회원 생성 시 발생할 수 있는 문제");
+        System.out.print("    - 1. 동일한 전화번호로 회원 가입을 진행 : ");
         System.out.println(user1_1.getMessage());
+        MyLog<User> unCorrectPhone = userService.createUser("김철수", "010-12345-12345", "Abcdefgh!");
+        System.out.println("    - 2. 올바르지 않은 전화번호 형식 : " + unCorrectPhone.getMessage());
+        MyLog<User> unCorrectPass = userService.createUser("김영미", "010-1234-4321", "1234");
+        System.out.println("    - 3. 올바르지 않은 비밀번호 형식 : " + unCorrectPass.getMessage());
+        System.out.println("회원 생성 시 문제가 발생하면 저장되지 않음을 확인: " + userService.getAllUser());
         System.out.println();
         System.out.println("===============================================================================");
         System.out.println();
@@ -43,7 +51,7 @@ public class JavaApplication {
         System.out.println("===============================================================================");
         System.out.println();
         System.out.println("<회원 비밀번호 업데이트 하기>");
-        MyLog<User> updateUser1 = userService.updateUserPassword("010-1111-1111", "0912");
+        MyLog<User> updateUser1 = userService.updateUserPassword("010-1111-1111", "Zdefdasdf!@");
         System.out.println(updateUser1.getData() + " " + updateUser1.getMessage());
         System.out.println();
         System.out.println("===============================================================================");
@@ -60,6 +68,14 @@ public class JavaApplication {
         System.out.println(message2To3.getData());
         MyLog<Message> message3To2 = messageService.createMessage("네 만나서 반갑습니다!", user3.getData(), user2.getData());
         System.out.println(message3To2.getData());
+        System.out.println(" - 메시지 생성 시 발생할 수 있는 문제");
+        System.out.print("    - 1. 내용이 작성되지 않은 메시지 : ");
+        MyLog<Message> message4To5 = messageService.createMessage("", user4.getData(), user5.getData());
+        System.out.println(message4To5.getMessage());
+        System.out.print("    - 2. 저장소에 등록되지 않은 회원이 메시지를 보낼 때 : ");
+        User unRegistUser1 = new User("미등록", "010-1919-9191", "Abcdefgh!");
+        MyLog<Message> unregistMessage = messageService.createMessage("안녕하세요 만나서 반갑습니다", unRegistUser1, user2.getData());
+        System.out.println(unregistMessage.getMessage());
         System.out.println();
         System.out.println("===============================================================================");
         System.out.println();
@@ -91,6 +107,10 @@ public class JavaApplication {
         MyLog<Channel> channel1 = channelService.createChannel(userService.getAllUser(), "코드잇 디스코드", user2.getData());
         MyLog<Channel> channel2 = channelService.createChannel(userService.getAllUser(), "코테 준비", user3.getData());
         System.out.println(channel1.getData());
+        System.out.println(" - 채널 생성 시 발생할 수 있는 문제");
+        System.out.print("     - 기존 채널과 동일한 이름으로 채널을 개설하는 경우 : ");
+        MyLog<Channel> sameChannel = channelService.createChannel(userService.getAllUser(), "코드잇 디스코드", user4.getData());
+        System.out.println(sameChannel.getMessage());
         System.out.println();
         System.out.println("===============================================================================");
         System.out.println();
@@ -104,9 +124,10 @@ public class JavaApplication {
         System.out.println("===============================================================================");
         System.out.println();
         System.out.println("<채널에 새로운 멤버 추가하기>");
-        User newUser = new User("홍길동", "010-1234-4321", "1234");
-        MyLog<Channel> updateChannel2 = channelService.updateChannel("코테 준비", newUser);
+        MyLog<User> newUser = userService.createUser("홍길동", "010-1234-4321", "Abcdefgh!");
+        MyLog<Channel> updateChannel2 = channelService.updateChannel("코테 준비", newUser.getData());
         System.out.println("코테 준비 채널에 신규 회원 추가 : " + updateChannel2.getData());
+        System.out.println("회원 전체 리스트에 회원이 추가되었는지 확인: " + userService.getAllUser());
         System.out.println();
         System.out.println("===============================================================================");
         System.out.println();
@@ -114,5 +135,8 @@ public class JavaApplication {
         MyLog<Channel> deleteChannel1 = channelService.deleteChannel("코테 준비");
         System.out.println("코테 준비 채널 삭제하기: " + deleteChannel1.getMessage());
         System.out.println(channelService.getAllChannel());
+        System.out.println();
+        System.out.println("===============================================================================");
+        System.out.println();
     }
 }
