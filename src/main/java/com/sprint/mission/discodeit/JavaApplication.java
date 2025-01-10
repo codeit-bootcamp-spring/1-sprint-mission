@@ -8,125 +8,137 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
 import java.util.*;
-
 public class JavaApplication {
     public static void main(String[] args) {
-// 서비스 구현체 초기화
-        JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        // 데이터 저장소 초기화
+        Map<UUID, User> userData = new HashMap<>();
+        Map<UUID, Channel> channelData = new HashMap<>();
+        Map<UUID, Message> messageData = new HashMap<>();
+
+        // 서비스 구현체 초기화
+        JCFMessageService messageService = new JCFMessageService(messageData, null, null);
+        JCFUserService userService = new JCFUserService(userData, messageService);
+        JCFChannelService channelService = new JCFChannelService(channelData, userService, messageService);
+        messageService = new JCFMessageService(messageData, userService, channelService);
 
         // === User Service 테스트 ===
-        System.out.println("=== User Service 테스트 ===");
+        System.out.println("=== 사용자 서비스 테스트 ===");
 
-        // 1. 등록
+        // 1. 사용자 등록
         User user1 = new User("user01", "password123", "크리스", "chris0123@gmail.com");
         User user2 = new User("user02", "password456", "밥", "bob060@gmail.com");
-        userService.create(user1);
-        userService.create(user2);
+        User user3 = new User("user03", "password789", "엘리", "ellie123@gmail.com");
+        userService.createUser(user1);
+        userService.createUser(user2);
+        userService.createUser(user3);
 
-        // 2. 조회 (단건)
-        System.out.println("\n[User 단건 조회]");
-        Optional<User> retrievedUser = userService.read(user1);
-        retrievedUser.ifPresent(user -> System.out.println("Found User: " + user.getUsername()));
+        System.out.println("\n[사용자 등록 완료]");
 
-        // 3. 조회 (다건)
-        System.out.println("\n[User 다건 조회]");
-        List<User> allUsers = userService.readAll();
-        allUsers.forEach(user -> System.out.println("User: " + user.getUsername()));
+        // 2. 사용자 조회 (단건)
+        System.out.println("\n[단일 사용자 조회]");
+        Optional<User> retrievedUser = userService.readUser(user1);
+        retrievedUser.ifPresent(user -> System.out.println("조회된 사용자: " + user.getUsername()));
 
-        // 4. 수정
-        System.out.println("\n[User 수정]");
+        // 3. 사용자 조회 (다건)
+        System.out.println("\n[모든 사용자 조회]");
+        List<User> allUsers = userService.readAllUsers();
+        allUsers.forEach(user -> System.out.println("사용자: " + user.getUsername()));
+
+        // 4. 사용자 수정
+        System.out.println("\n[사용자 수정]");
         User updatedUser1 = new User("user01", "password123", "크리스지롱", "chris0123@gmail.com");
-        updatedUser1.updateUserid(user1.getUserid());
-        userService.update(user1, updatedUser1);
+        userService.updateUser(user1, updatedUser1);
+        System.out.println("수정 완료");
 
-        // 5. 수정된 데이터 조회
-        System.out.println("\n[수정된 User 조회]");
-        Optional<User> updatedRetrievedUser = userService.read(user1);
-        updatedRetrievedUser.ifPresent(user -> System.out.println("Updated User: " + user.getUsername()));
+        // 5. 수정된 사용자 조회
+        System.out.println("\n[수정된 사용자 조회]");
+        Optional<User> updatedRetrievedUser = userService.readUser(user1);
+        updatedRetrievedUser.ifPresent(user -> System.out.println("수정된 사용자: " + user.getUsername()));
 
-        // 6. 삭제
-        System.out.println("\n[User 삭제]");
-        boolean isDeleted = userService.delete(updatedUser1);
-        System.out.println("Deleted: " + isDeleted);
+        // 6. 사용자 삭제
+        System.out.println("\n[사용자 삭제]");
+        boolean isDeleted = userService.deleteUser(user1);
+        System.out.println("삭제 성공 여부: " + isDeleted);
 
-        // 7. 삭제 확인
-        System.out.println("\n[삭제된 User 확인]");
-        Optional<User> deletedUserCheck = userService.read(updatedUser1);
+        // 7. 삭제된 사용자 확인
+        System.out.println("\n[삭제된 사용자 확인]");
+        Optional<User> deletedUserCheck = userService.readUser(user1);
         System.out.println(deletedUserCheck.isPresent() ? "삭제 실패" : "삭제 성공");
 
-
         // === Channel Service 테스트 ===
-        System.out.println("\n=== Channel Service 테스트 ===");
+        System.out.println("\n=== 채널 서비스 테스트 ===");
 
-        // 1. 등록
+        // 1. 채널 등록
+        System.out.println("\n[채널 등록]");
         Channel channel1 = new Channel("General", "General discussion", new HashSet<>(), new ArrayList<>());
-        channel1.getParticipants().add(user2); // 사용자 추가
-        channelService.create(channel1);
+        Channel channel2 = new Channel("Tech Talk", "Discuss latest tech trends", new HashSet<>(), new ArrayList<>());
 
-        // 2. 조회 (단건)
-        System.out.println("\n[Channel 단건 조회]");
-        Optional<Channel> retrievedChannel = channelService.read(channel1);
-        retrievedChannel.ifPresent(channel -> System.out.println("Found Channel: " + channel.getName()));
+        channelService.createChannel(channel1);
+        channelService.createChannel(channel2);
 
-        // 3. 조회 (다건)
-        System.out.println("\n[Channel 다건 조회]");
-        List<Channel> allChannels = channelService.readAll();
-        allChannels.forEach(channel -> System.out.println("Channel: " + channel.getName()));
+        // 2. 채널에 참가자 추가
+        System.out.println("\n[채널에 참가자 추가]");
+        channelService.addParticipantToChannel(channel1, user2); // 밥 추가
+        channelService.addParticipantToChannel(channel2, user3); // 엘리 추가
 
-        // 4. 수정
-        System.out.println("\n[Channel 수정]");
-        Channel updatedChannel1 = new Channel("General Updated", "Updated discussion", new HashSet<>(), new ArrayList<>());
-        updatedChannel1.getParticipants().add(user2); // 사용자 추가 유지
-        channelService.update(channel1, updatedChannel1);
-
-        // 5. 수정된 데이터 조회
-        System.out.println("\n[수정된 Channel 조회]");
-        Optional<Channel> updatedRetrievedChannel = channelService.read(channel1);
-        updatedRetrievedChannel.ifPresent(channel -> System.out.println("Updated Channel: " + channel.getName()));
-
-        // 6. 삭제
-        System.out.println("\n[Channel 삭제]");
-        boolean isChannelDeleted = channelService.delete(updatedChannel1);
-        System.out.println("Deleted: " + isChannelDeleted);
-
+        System.out.println("참가자 추가 완료");
 
         // === Message Service 테스트 ===
-        System.out.println("\n=== Message Service 테스트 ===");
+        System.out.println("\n=== 메시지 서비스 테스트 ===");
 
-        // 1. 등록
-        Message message1 = new Message("Hello, World!", user1, channel1);
-        Message message2 = new Message("Hi there!", user2, channel1);
+        // 1. 메시지 생성
+        System.out.println("\n[메시지 생성]");
+        Message message1 = new Message("안녕하세요, 밥입니다.",user2, channel1); // 밥은 채널1 참가자
+        Message message2 = new Message("안녕하세요, 엘리입니다.",user3, channel2); // 엘리는 채널2 참가자
 
-        messageService.create(message1);
-        messageService.create(message2);
+        messageService.createMessage(message1);
+        messageService.createMessage(message2);
 
-        // 2. 조회 (단건)
-        System.out.println("\n[Message 단건 조회]");
-        Optional<Message> retrievedMessage = messageService.read(user2);
-        retrievedMessage.ifPresent(message -> System.out.println("Found Message: " + message.getContent()));
+        // 2. 메시지 조회 (단건)
+        System.out.println("\n[단일 메시지 조회]");
+        Optional<Message> retrievedMessage = messageService.readMessage(message1);
+        retrievedMessage.ifPresent(message ->
+                System.out.println("조회된 메시지: " + message.getContent()));
 
-        // 3. 조회 (다건)
-        System.out.println("\n[Message 다건 조회]");
+        // 3. 메시지 조회 (다건)
+        System.out.println("\n[모든 메시지 조회]");
         List<Message> allMessages = messageService.readAll();
-        allMessages.forEach(message -> System.out.println("Message: " + message.getContent()));
+        allMessages.forEach(message ->
+                System.out.println("메시지: " + message.getContent()));
 
-        // 4. 수정
-        System.out.println("\n[Message 수정]");
-        Message updatedMessage1 = new Message("Updated Hello, World!", user2, channel1);
-        messageService.updateByAuthor(user2, updatedMessage1);
+        // 4. 메시지 수정
+        System.out.println("\n[메시지 수정]");
+        try {
+            Message updatedMessage1 = new Message("수정된 메시지입니다.",user2, channel1);
+            messageService.updateByAuthor(user2, updatedMessage1);
+            System.out.println("메시지 수정 완료");
+        } catch (NoSuchElementException e) {
+            System.out.println("메시지 수정 중 오류 발생: " + e.getMessage());
+        }
 
-        // 5. 수정된 데이터 조회
-        System.out.println("\n[수정된 Message 조회]");
-        Optional<Message> updatedRetrievedMessage = messageService.read(user2);
-        updatedRetrievedMessage.ifPresent(message -> System.out.println("Updated Message: " + message.getContent()));
+        // 5. 수정된 메시지 조회
+        System.out.println("\n[수정된 메시지 조회]");
+        Optional<Message> updatedRetrievedMessage = messageService.readMessage(message2);
+        updatedRetrievedMessage.ifPresent(message ->
+                System.out.println("수정된 메시지: " + message.getContent()));
 
-        // 6. 삭제
-        System.out.println("\n[Message 삭제]");
-        boolean isMessageDeleted = messageService.delete(message1.getId());
-        System.out.println("Deleted: " + isMessageDeleted);
+        // 6. 메시지 삭제
+        System.out.println("\n[메시지 삭제]");
+        boolean isMessageDeleted = messageService.deleteMessage(message1);
+        System.out.println("메시지 삭제 성공 여부: " + isMessageDeleted);
 
+        // 7. 삭제된 메시지 확인
+        System.out.println("\n[삭제된 메시지 확인]");
+        Optional<Message> deletedMessageCheck = messageService.readMessage(message1);
+        System.out.println(deletedMessageCheck.isPresent() ? "삭제 실패" : "삭제 성공");
+
+        // 8. 검증 실패 테스트 (채널에 없는 사용자가 메시지를 생성하려고 할 때)
+        System.out.println("\n[검증 실패 테스트]");
+        try {
+            Message invalidMessage = new Message("이 채널에 속하지 않은 사용자입니다.",user1, channel1); // user1은 채널 참가자가 아님
+            messageService.createMessage(invalidMessage);
+        } catch (IllegalArgumentException e) {
+            System.out.println("예외 발생: " + e.getMessage());
+        }
     }
-
 }

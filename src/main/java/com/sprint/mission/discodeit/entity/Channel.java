@@ -20,7 +20,7 @@ public class Channel extends BaseEntity {
         return name;
     }
 
-    public void setName(String name) {
+    public void updateName(String name) {
         this.name = name;
     }
 

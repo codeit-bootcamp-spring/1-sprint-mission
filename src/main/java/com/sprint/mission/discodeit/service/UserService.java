@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User create(User user);
-    Optional<User> read(User user);
-    List<User> readAll();
-    User update(User existUser, User updateUser);
-    boolean delete(User user);
+    User createUser(User user);
+    Optional<User> readUser(User user);
+    List<User> readAllUsers();
+    User updateUser(User existUser, User updateUser);
+    boolean deleteUser(User user);
 }
