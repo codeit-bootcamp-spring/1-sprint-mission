@@ -87,6 +87,6 @@
     - 힌트: Message를 생성할 때 연관된 도메인 모델 데이터 확인하기
 
 스크린샷
-![진짜사용자.png](../../OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/%EC%A7%84%EC%A7%9C%EC%82%AC%EC%9A%A9%EC%9E%90.png)
-![채널캡처.png](../../OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/%EC%B1%84%EB%84%90%EC%BA%A1%EC%B2%98.png)
-![메시지캡처.png](../../OneDrive/%EB%B0%94%ED%83%95%20%ED%99%94%EB%A9%B4/%EB%A9%94%EC%8B%9C%EC%A7%80%EC%BA%A1%EC%B2%98.png)
+[메시지캡처.png](data/%EB%A9%94%EC%8B%9C%EC%A7%80%EC%BA%A1%EC%B2%98.png)
+![진짜사용자.png](data/%EC%A7%84%EC%A7%9C%EC%82%AC%EC%9A%A9%EC%9E%90.png)
+![채널캡처.png](data/%EC%B1%84%EB%84%90%EC%BA%A1%EC%B2%98.png)
