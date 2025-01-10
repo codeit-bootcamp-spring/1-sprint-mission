@@ -35,7 +35,7 @@ public class JavaApplication {
         System.out.println("- user3 생성 성공: " + (user3!=null));
 
 
-        //Todo invalid 값도 추가하여 예외처리하기.
+        //예외 - 중복
         System.out.println("\n* 중복 이메일 케이스");
         System.out.println("-> 닉네임: \"중복\", 이메일: \"codeit@codeit.co.kr\"로 생성 시도");
         User userDuplicateEmail  = userService.createUser("중복", "codeit@codeit.co.kr");
@@ -57,14 +57,14 @@ public class JavaApplication {
         Channel channel3 = channelService.CreateChannel("공지사항", ChannelType.TEXT);
         Channel channel4 = channelService.CreateChannel("회의실", ChannelType.VOICE);
 
-        System.out.println("> 채널 생성 결과:");
+        System.out.println("\n> 채널 생성 결과:");
         System.out.println("- channal1 생성: " + (channel1 != null) );
         System.out.println("- channal2 생성: " + (channel2 != null));
         System.out.println("- channal3 생성: " +(channel3 != null));
         System.out.println("- channal4 생성" + (channel4 != null));
 
 
-        System.out.println("> 전체 채널 목록:");
+        System.out.println("\n> 전체 채널 목록:");
         channelService.getChannels()
                 .forEach(c -> System.out.println(
                         "[Channel]"
@@ -82,12 +82,11 @@ public class JavaApplication {
         Message msg5 = messageService.createMessage(user1, "회의실 채널입니다.", channel4);
 
         System.out.println("> 메시지 생성 결과:");
-        System.out.println("- 메시지1: " + msg1);
-        System.out.println("- 메시지2: " + msg2);
-        System.out.println("- 메세지3: " + msg3);
-        System.out.println("- 메세지4: " + msg4);
-        System.out.println("- 메세지5: " + msg5);
-
+        System.out.println("- 메시지1: " + (msg1!=null));
+        System.out.println("- 메시지2: " + (msg2!=null));
+        System.out.println("- 메세지3: " + (msg3!=null));
+        System.out.println("- 메세지4: " + (msg4!=null));
+        System.out.println("- 메세지5: " + (msg5!=null));
 
         System.out.println("\n> 전체 메시지 목록:");
         messageService.getMessages()
@@ -126,7 +125,7 @@ public class JavaApplication {
         System.out.println("\n1) 전체 목록 조회");
         List<User> tempUsers = userService.getUsers();
 
-        System.out.println( "\n> 조회 결과");
+        System.out.println( "> 조회 결과");
         tempUsers.forEach(
                 u -> System.out.println(
                         "[User]"
@@ -141,7 +140,7 @@ public class JavaApplication {
 
         System.out.println("> 조회할 UUID: "+ uuidStringForTest);
         User userByUUID=userService.getUserByUUID( uuidStringForTest );
-        System.out.println( "\n> 조회 결과\n" +
+        System.out.println( "> 조회 결과\n" +
                 "[User]"
                 + "\n - id: " + userByUUID.getId().toString()
                 + "\n - nickName: "+ userByUUID.getNickname()
@@ -151,12 +150,11 @@ public class JavaApplication {
         User foundUser = userService.getUserByEmail("codeit@codeit.co.kr");
         System.out.println("- codeit@codeit.co.kr을 이메일로 가진 유저 이름: "+foundUser.getNickname());
         User notFoundUser = userService.getUserByEmail("no_one@test.com");
-        System.out.println("- no_one@test.com을 이메일로 가진 유저 이름: "+ notFoundUser.getNickname());
-
+        System.out.println("- no_one@test.com을 이메일로 가진 유저 이름: "+ (notFoundUser == null? "ERROR - No user has such an email." : notFoundUser.getNickname() ));
 
         System.out.println("\n4) 닉네임으로 조회(다건): ");
         List<User> result = userService.getUsersByNickname( "박유진" );
-        System.out.println("\"박유진\" 닉네임을 가진 User 조회 결과: ");
+        System.out.println("> \"박유진\" 닉네임을 가진 User 조회 결과: ");
         result.forEach( u -> System.out.println(
                 "[User]"
                         + "\n - id: " + u.getId().toString()
@@ -189,7 +187,7 @@ public class JavaApplication {
 
         System.out.println("> 조회할 UUID: "+ uuidStringForChannelTest);
         Channel channelByUUID =channelService.getChannelByUUID( uuidStringForChannelTest );
-        System.out.println( "\n> 조회 결과\n" +
+        System.out.println( "> 조회 결과\n" +
                 "[Channel]"
                 + "\n - id: " + channelByUUID.getId().toString()
                 + "\n - channelName: "+ channelByUUID.getChannelName()
@@ -207,7 +205,7 @@ public class JavaApplication {
 
 
         System.out.println("\n4) 채널 type(종류)으로 조회(다건)");
-        System.out.println("> Channal Type이 text인 채널 조회 결과: ");
+        System.out.println("> Channal Type이 TEXT인 채널 조회 결과: ");
         channelService.getChannelByType( ChannelType.TEXT )
                 .forEach( c-> System.out.println(
                         "[Channel]"
@@ -282,10 +280,10 @@ public class JavaApplication {
 
 
         // 3. 수정 테스트
-        System.out.println("\n=== 3. 수정 테스트 ===");
+        System.out.println("\n\n=== 3. 수정 테스트 ===");
 
         System.out.println("\n--- User 수정 ---");
-        System.out.println("-> User1의 이름을 '코드잇'에서 'codeit'으로 수정: ");
+        System.out.println("\n-> User1의 이름을 '코드잇'에서 'codeit'으로 수정: ");
 
         System.out.println("\n> 전체 유저 목록 조회: ");
         userService.getUsers().forEach(
@@ -318,7 +316,7 @@ public class JavaApplication {
 
 
         System.out.println("\n\n--- Channel 수정 ---");
-        System.out.println("-> channel1의 이름을 '일반1'에서 '수다방'으로 수정: ");
+        System.out.println("\n-> channel1의 이름을 '일반1'에서 '수다방'으로 수정: ");
 
         System.out.println("\n> 전체 채널 목록:");
         channelService.getChannels()
@@ -346,7 +344,7 @@ public class JavaApplication {
                                 + "\n - updatedAt: "+c.getUpdatedAt().toString()
                 ));
 
-        System.out.println("\n--- Message 수정 ---");
+        System.out.println("\n\n--- Message 수정 ---");
         System.out.println("\n -> msg1ForChannel1의 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
 
         System.out.println("\n> 전체 메세지 목록: ");
@@ -389,7 +387,6 @@ public class JavaApplication {
                         "[Message]"
                                 + "\n - id: " + m.getId().toString()
                                 + "\n - sender: "+ m.getSender().getNickname()
-                                + "\n - channel: "+ m.getChannel().getChannelName()
                                 + "\n - content: "+ m.getContent()
                 ));
 
@@ -403,7 +400,6 @@ public class JavaApplication {
                         "[Message]"
                                 + "\n - id: " + m.getId().toString()
                                 + "\n - sender: "+ m.getSender().getNickname()
-                                + "\n - channel: "+ m.getChannel().getChannelName()
                                 + "\n - content: "+ m.getContent()
                 ));
 
@@ -417,7 +413,6 @@ public class JavaApplication {
                         "[Channel]"
                                 + "\n - id: " + c.getId().toString()
                                 + "\n - name: "+ c.getChannelName()
-                                + "\n - type: "+ c.getChannelType()
                 ));
 
         List<Channel> normalChannels = channelService.getChannelsByName( "일반" );
@@ -432,7 +427,6 @@ public class JavaApplication {
                         "[Channel]"
                                 + "\n - id: " + c.getId().toString()
                                 + "\n - name: "+ c.getChannelName()
-                                + "\n - type: "+ c.getChannelType()
                 ));
 
 
