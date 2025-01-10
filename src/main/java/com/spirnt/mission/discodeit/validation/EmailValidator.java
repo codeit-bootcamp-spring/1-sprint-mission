@@ -1,2 +1,5 @@
-package com.spirnt.mission.discodeit.validation;public class EmailValidator {
+package com.spirnt.mission.discodeit.validation;
+
+public interface EmailValidator {
+    boolean isValid(String email);
 }
