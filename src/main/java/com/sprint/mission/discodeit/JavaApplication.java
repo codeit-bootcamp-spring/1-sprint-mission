@@ -1,4 +1,4 @@
-package com.sprint.mission;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
