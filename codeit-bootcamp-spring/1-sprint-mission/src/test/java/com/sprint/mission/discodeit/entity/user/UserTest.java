@@ -21,6 +21,7 @@ class UserTest {
     }
 
     @Nested
+    @DisplayName("유저 생성 수정 삭제")
     class InitializeNew {
 
         @BeforeEach
@@ -38,6 +39,13 @@ class UserTest {
             // then
             assertThat(user.getName()).isEqualTo("test1");
         }
+
+        // TODO : 유저 이름 수정 성공 테스트
+
+        // TODO : 유저 이름 수정 실패 테스트
+
+        // TODO : 유저 상태 해지 테스트
     }
+
 
 }

@@ -23,7 +23,8 @@ public class UserConverter {
     public UserInfoResponse toDto(User user) {
         var dto = new UserInfoResponse(
                 user.getId(),
-                user.getName()
+                user.getName(),
+                user.getStatus()
         );
         return dto;
     }

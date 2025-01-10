@@ -8,11 +8,11 @@ import com.sprint.mission.discodeit.entity.user.dto.UserInfoResponse;
 
 public interface UserService {
 
-    void register(RegisterUserRequest registerUserRequest);
+    UserInfoResponse register(RegisterUserRequest registerUserRequest);
 
     UserInfoResponse findUserByUsername(FindUserRequest findUserRequest);
 
-    void modifyUserInfo(ModifyUserInfoRequest request);
+    UserInfoResponse modifyUserInfo(ModifyUserInfoRequest request);
 
     void UnRegisterUser(UnregisterUserRequest request);
 }
