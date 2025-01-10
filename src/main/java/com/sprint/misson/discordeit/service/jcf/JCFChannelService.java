@@ -1,13 +1,14 @@
 package com.sprint.misson.discordeit.service.jcf;
 
 import com.sprint.misson.discordeit.entity.Channel;
-import com.sprint.misson.discordeit.entity.Message;
+import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
 
@@ -37,12 +38,21 @@ public class JCFChannelService implements ChannelService {
         return data.get( UUID.fromString( channelId ) );
     }
 
-    //다건 조회 - 특정 채널의 메세지 목록 조회
+    //다건 조회 - 채널 타입
     @Override
-    public List<Message> getChannelMessages(Channel channel){
-        return data.get( channel.getId() ).getMessages();
+    public List<Channel> getChannelByType(ChannelType channelType) {
+        return data.values().stream()
+                .filter( c -> c.getChannelType().equals( channelType ))
+                .collect( Collectors.toList());
     }
 
+    //다건 조회 - 채널명
+    @Override
+    public List<Channel> getChannelsByName(String channelName) {
+        return data.values().stream().filter(
+                c->c.getChannelName().contains( channelName )
+        ).collect( Collectors.toList());
+    }
     //수정
     @Override
     public boolean updateChannel(Channel channel) {
