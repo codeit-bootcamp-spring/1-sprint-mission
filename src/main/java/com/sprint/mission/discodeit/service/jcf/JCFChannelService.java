@@ -23,7 +23,7 @@ public class JCFChannelService implements ChannelService {
         Channel channel = data.stream()
             .filter(c -> c.getId().equals(id))
             .findFirst()
-            .orElse(null);
+            .orElseThrow(() -> new IllegalArgumentException("channel not found"));
         return channel;
     }
 
@@ -34,29 +34,25 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID id, String newName) {
-        data.stream().filter(c -> c.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(channel -> channel.updateName(newName), () -> System.out.println("channel not found"));
+        Channel channel = findChannel(id);
+        channel.updateName(newName);
     }
 
     @Override
     public void updateMember(UUID id, List<User> members) {
-        data.stream().filter(c -> c.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(channel -> channel.updateMembers(members), () -> System.out.println("channel not found"));
+        Channel channel = findChannel(id);
+        channel.updateMembers(members);
     }
 
     @Override
     public void sendMessage(UUID id, Message message) {
-        data.stream().filter(c -> c.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(channel -> channel.addMessage(message), () -> System.out.println("channel not found"));
+        Channel channel = findChannel(id);
+        channel.getMessages().add(message);
     }
 
     @Override
     public void removeChannel(UUID id) {
-        data.stream().filter(c -> c.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(data::remove, () -> System.out.println("channel not found"));
+        Channel channel = findChannel(id);
+        data.remove(channel);
     }
 }

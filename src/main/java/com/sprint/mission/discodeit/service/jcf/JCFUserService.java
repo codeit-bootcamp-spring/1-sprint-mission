@@ -21,7 +21,7 @@ public class JCFUserService implements UserService {
         User user = data.stream()
             .filter(u -> u.getId().equals(id))
             .findFirst()
-            .orElse(null);
+            .orElseThrow(() -> new IllegalArgumentException("user not found"));
         return user;
     }
 
@@ -30,7 +30,7 @@ public class JCFUserService implements UserService {
         User user = data.stream()
             .filter(u -> u.getName().equals(name))
             .findFirst()
-            .orElse(null);
+            .orElseThrow(() -> new IllegalArgumentException("user not found"));
         return user;
     }
 
@@ -41,23 +41,18 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(UUID id, String newName) {
-        data.stream().filter(u -> u.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(user -> user.updateName(newName), () -> System.out.println("user not found"));
+        User user = findUserById(id);
+        user.updateName(newName);
     }
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
-        data.stream()
-            .filter(u -> u.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(user -> user.updatePassword(newPassword), () -> System.out.println("user not found"));
+        User user = findUserById(id);
+        user.updatePassword(newPassword);
     }
 
     @Override
     public void removeUser(UUID id) {
-        data.stream().filter(u -> u.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(data::remove, () -> System.out.println("user not found"));
+        data.remove(findUserById(id));
     }
 }

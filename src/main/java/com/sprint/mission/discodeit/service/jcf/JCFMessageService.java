@@ -23,8 +23,7 @@ public class JCFMessageService implements MessageService {
         Message message = data.stream()
             .filter(m -> m.getId().equals(id))
             .findFirst()
-            .orElse(null);
-
+            .orElseThrow(() -> new IllegalArgumentException("message not found"));
         return message;
     }
 
@@ -35,15 +34,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID id, String newContent) {
-        data.stream().filter(m -> m.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(message -> message.updateContent(newContent), () -> System.out.println("message not found"));
+        Message message = findMessage(id);
+        message.updateContent(newContent);
     }
 
     @Override
     public void removeMessage(UUID id) {
-        data.stream().filter(m -> m.getId().equals(id))
-            .findFirst()
-            .ifPresentOrElse(data::remove, () -> System.out.println("message not found"));
+        Message message = findMessage(id);
+        data.remove(message);
     }
 }
