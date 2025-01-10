@@ -14,7 +14,7 @@ public class UserName {
     private final String name;
 
     public UserName(String name) {
-        validUsernameBiggerThan3AndLessThen10(name);
+        validUsernameBiggerThan3AndLessThen20(name);
         this.name = name;
     }
 
@@ -43,12 +43,16 @@ public class UserName {
         return Objects.equals(name, userName.name);
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hashCode(name);
     }
 
-    private void validUsernameBiggerThan3AndLessThen10(String name) {
+    /**
+     * @MethodName : 요구사항 변경으로 이름 길이 제한이 변경될 경우 메서드 이름에 반영
+     */
+    private void validUsernameBiggerThan3AndLessThen20(String name) {
 
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException(USER_NAME_NULL.getMessage());
