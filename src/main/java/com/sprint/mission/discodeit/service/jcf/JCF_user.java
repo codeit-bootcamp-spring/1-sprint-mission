@@ -4,10 +4,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class JCF_user implements UserService {
 
@@ -17,28 +16,46 @@ public class JCF_user implements UserService {
         userSet = new ArrayList<>();
     }
     @Override
-    public void Creat(User user) {
-        userSet.add(user);
-
+    public void creat(User user) {
+        boolean duplication = userSet.stream().anyMatch(user1 -> user1.getName().equals(user.getName()));
+        if (duplication) {
+            System.out.println("name duplication!");
+        } else {
+            userSet.add(user);
+        }
     }
 
     @Override
-    public void Delete(User user) {
+    public void delete(User user) {
         userSet.remove(user);
+
     }
 
     @Override
-    public void Update(User user, User updateUser) {
-        userSet.replaceAll(users -> users.equals(user) ? updateUser : users);
+    public void update(User user, String name) {
+        boolean duplication = userSet.stream().anyMatch(user1 -> user1.getName().equals(name));
+        userSet.forEach(users -> {
+            if (users.getId().equals(user.getId()) && !duplication) {
+                users.updateName(name);
+            }
+        });
+//
     }
 
     @Override
-    public List<User> Write(UUID id) {
-        return userSet.stream().filter(user_id -> user_id.GetId().equals(id)).collect(Collectors.toList());
+    public User write(String name) {
+        Optional<User> user = userSet.stream().filter(user1 -> user1.getName().equals(name)).findFirst();
+        if (user.isPresent()) {
+            return user.get();
+        }
+        else {
+            System.out.println("Name not found");
+            return null;
+        }
     }
 
     @Override
-    public List<User> AllWrite() {
+    public List<User> allWrite() {
         return userSet;
     }
 }
