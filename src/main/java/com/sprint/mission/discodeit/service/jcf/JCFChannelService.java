@@ -53,7 +53,6 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void updateChannel(String channelId, ChannelUpdateDto updatedChannel) {
         Channel channel = data.get(channelId);
-
         //TODO: user 권한 확인
         //TODO: channel 존재하지 않을때
         updatedChannel.getChannelName().ifPresent(channel::updateChannelName);
