@@ -131,7 +131,7 @@ public class JavaApplication {
         User foundUser = userService.getUserByEmail("codeit@codeit.co.kr");
         System.out.println("- codeit@codeit.co.kr을 이메일로 가진 유저 이름: "+foundUser.getNickname());
         User notFoundUser = userService.getUserByEmail("no_one@test.com");
-        System.out.println("- no_one@test.com을 이메일로 가진 유저 이름: "+foundUser.getNickname());
+        System.out.println("- no_one@test.com을 이메일로 가진 유저 이름: "+ notFoundUser.getNickname());
 
 
         System.out.println("\n4) 닉네임으로 조회(다건): ");
