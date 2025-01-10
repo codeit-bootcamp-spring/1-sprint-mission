@@ -51,8 +51,8 @@ public class Message {
         return updatedAt;
     }
 
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt=updatedAt;
+    public void updateUpdatedAt() {
+        this.updatedAt=System.currentTimeMillis();;
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현

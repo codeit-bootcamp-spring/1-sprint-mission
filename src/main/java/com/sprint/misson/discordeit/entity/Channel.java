@@ -61,8 +61,8 @@ public class Channel {
         return updatedAt;
     }
 
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt=updatedAt;
+    public void updateUpdatedAt() {
+        this.updatedAt=System.currentTimeMillis();;
     }
 
     //채널 생성된 이후, 채널 종류를 변경할 수 없으므로 update 미구현

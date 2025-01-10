@@ -65,8 +65,8 @@ public class User {
         return updatedAt;
     }
 
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt=updatedAt;
+    public void updateUpdatedAt() {
+        this.updatedAt=System.currentTimeMillis();
     }
 
     public UserStatus getUserStatus() {
