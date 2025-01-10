@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.common;
 
 import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
 import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
+import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,9 +41,17 @@ public abstract class AbstractUUIDEntity {
         return status;
     }
 
-    public void updateStatusAndUpdateAt(Status status) {
+    private void updateStatus(Status status) {
         this.status = status;
         this.updateAt = createUnixTimestamp();
+    }
+
+    public void updateStatusAndUpdateAt() {
+        updateStatus(MODIFIED);
+    }
+
+    public void updateUnregistered() {
+        updateStatus(UNREGISTERED);
     }
 
     private long createUnixTimestamp() {

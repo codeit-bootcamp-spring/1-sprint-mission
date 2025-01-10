@@ -19,11 +19,11 @@ public class User extends AbstractUUIDEntity {
 
     public void changeName(String newName) {
         this.name = name.changeName(newName);
-        updateStatusAndUpdateAt(MODIFIED);
+        updateStatusAndUpdateAt();
     }
 
-    public void UnRegister() {
-        updateStatusAndUpdateAt(UNREGISTERED);
+    public void unregister() {
+        updateUnregistered();
     }
 
 }

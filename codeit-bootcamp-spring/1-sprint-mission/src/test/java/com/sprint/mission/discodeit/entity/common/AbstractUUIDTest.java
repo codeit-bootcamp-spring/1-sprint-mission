@@ -41,7 +41,7 @@ public class AbstractUUIDTest {
         // given
         assertThat(entity.getUpdateAt()).isEmpty();
         // when
-        entity.updateStatusAndUpdateAt(MODIFIED);
+        entity.updateStatusAndUpdateAt();
         //then
         assertAll(
                 () -> assertThat(entity.getUpdateAt()).as("invoke update() then updateAt must be present").isPresent(),
