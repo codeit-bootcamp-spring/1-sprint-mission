@@ -55,9 +55,9 @@ public class JCFChannelService implements ChannelService {
         Channel channel = data.get(channelId);
         //TODO: user 권한 확인
         //TODO: channel 존재하지 않을때
-        updatedChannel.getChannelName().ifPresent(channel::updateChannelName);
-        updatedChannel.getMaxNumberOfPeople().ifPresent(channel::updateMaxNumberOfPeople);
-        updatedChannel.getTag().ifPresent(channel::updateTag);
+        updatedChannel.getChannelName().ifPresent(channel::setChannelName);
+        updatedChannel.getMaxNumberOfPeople().ifPresent(channel::setMaxNumberOfPeople);
+        updatedChannel.getTag().ifPresent(channel::setTag);
         updatedChannel.getIsPrivate().ifPresent(aPrivate -> channel.updatePrivate(aPrivate, channel));
 
     }

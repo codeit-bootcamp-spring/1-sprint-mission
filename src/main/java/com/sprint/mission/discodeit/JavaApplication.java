@@ -4,6 +4,10 @@ import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.ChannelValidationException;
+import com.sprint.mission.discodeit.exception.MessageValidationException;
+import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
@@ -21,10 +25,9 @@ public class JavaApplication {
     static UserService userService = JCFUserService.getInstance();
     static MessageService messageService = JCFMessageService.getInstance();
     static MessageServiceV2 messageServiceV2 = JCFMessageServiceV2.getInstance();
+    static ChannelFactory channelFactory;
     public static void main(String[] args) {
-//        userSimulation();
-//        channelSimulation();
-//        messageSimulation();
+        channelFactory = new ChannelFactory(userService, messageServiceV2);
         userSimulation();
         channelSimulation2();
         messageSimulation2();
@@ -32,28 +35,30 @@ public class JavaApplication {
 
     static void userSimulation(){
         // 유저 생성
+        User user = null;
+        User user2 = null;
 
         System.out.println("=== 유저 생성 및 조회 ===");
-        User user = new User(
-            "exampleUsername",
-            "examplePwd",
-            "example@gmail.com",
-            "exampleNickname",
-            "01012345678",
-            "https:://example-url.com",
-            "this is example description"
-        );
+        try {
+            user = new User.UserBuilder("exampleUserName", "examplePwd", "example@gmail.com")
+                .nickname("exampleNickname")
+                .phoneNumber("01012345678")
+                .profilePictureURL("https://example-url.com")
+                .description("this is example description")
+                .build();
+        }catch (UserValidationException e){
+            System.out.println(e.getMessage());
+        }
 
-        User user2 = new User(
-            "exampleUsername2",
-            "examplePwd2",
-            "example2@gmail.com",
-            "exampleNickname2",
-            "01013345678",
-            "https:://example-url.com2",
-            "this is example description2"
-        );
-
+        try {
+            user2 = new User.UserBuilder("exampleU2", "examplePwd2", "example2@gmail.com")
+                .nickname("exampleNick2")
+                .phoneNumber("01013345678")
+                .description("this is example description2")
+                .build();
+        }catch (UserValidationException e){
+            System.out.println(e.getMessage());
+        }
         userService.createUser(user);
         userService.createUser(user2);
 
@@ -119,26 +124,33 @@ public class JavaApplication {
     static void channelSimulation2(){
 
         System.out.println("\n=== 채널 생성 / 조회 ===");
+        Channel chatChannel = null;
 
-        Channel chatChannel = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleChatName",
-            100,
-            false,
-            "General",
-            new ChatBehaviorV2(userService, messageServiceV2)
-        );
+        try {
+            chatChannel = channelFactory.createChatChannel(
+                "server-uuid-1",
+                "category-uuid-1",
+                "exampleChatName",
+                100
+            );
+        }catch (ChannelValidationException e){
+            System.out.println(e.getMessage());
+        }
 
-        Channel voiceChannel = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleVoiceName",
-            100,
-            false,
-            "General",
-            new VoiceBehavior()
-        );
+
+
+        Channel voiceChannel = null;
+
+        try {
+            voiceChannel = channelFactory.createVoiceChannel(
+                "server-uuid-1",
+                "category-uuid-1",
+                "exampleVoiceName",
+                false
+            );
+        }catch (ChannelValidationException e){
+            System.out.println(e.getMessage());
+        }
 
         String chatChannelId = chatChannel.getUUID();
         String voiceChannelId = voiceChannel.getUUID();
@@ -173,36 +185,46 @@ public class JavaApplication {
     static void messageSimulation2(){
 
         System.out.println("\n=== 메시지를 보낼 유저와 채널 생성 ===");
-        User user = new User(
-            "exampleUsername",
-            "examplePwd",
-            "example@gmail.com",
-            "exampleNickname",
-            "01012345678",
-            "https:://example-url.com",
-            "this is example description"
-        );
+
+        User user = null;
+
+        try {
+            user = new User.UserBuilder("exampleUsername2", "examplePwd2", "exaample2@gmail.com")
+                .nickname("exampleNickname2")
+                .phoneNumber("01011345678")
+                .profilePictureURL("https://example-url.com2")
+                .description("this is example description2")
+                .build();
+        }catch (UserValidationException e){
+            System.out.println(e.getMessage());
+        }
+
         userService.createUser(user);
 
-        Channel chatChannel = new Channel(
-            "server-uuid-2",
-            "category-uuid-2",
-            "exampleChannelName",
-            100,
-            false,
-            "General",
-            new ChatBehaviorV2(userService, messageServiceV2)
-        );
+        Channel chatChannel = null;
+        try {
+            chatChannel = channelFactory.createChatChannel(
+                "server-uuid-2",
+                "category-uuid-2",
+                "exampleChannelName",
+                100
+            );
+        }catch (ChannelValidationException e){
+            System.out.println(e.getMessage());
+        }
 
-        Channel chatChannel2 = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleChannelName2",
-            100,
-            false,
-            "General",
-            new ChatBehaviorV2(userService, messageServiceV2)
-        );
+        Channel chatChannel2 = null;
+
+        try {
+            chatChannel2 = channelFactory.createChatChannel(
+                "server-uuid-22",
+                "category-uuid-22",
+                "exampleChannelName2",
+                100
+            );
+        }catch (ChannelValidationException e){
+            System.out.println(e.getMessage());
+        }
 
         ChatBehaviorV2 chatBehavior = (ChatBehaviorV2) chatChannel.getBehavior();
         ChatBehaviorV2 chatBehavior2 = (ChatBehaviorV2) chatChannel2.getBehavior();
@@ -210,41 +232,51 @@ public class JavaApplication {
         channelService.createChannel(chatChannel);
         channelService.createChannel(chatChannel2);
 
-        Message message = new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is first Chat",
-            null,
-            null
-        );
+        Message message = null;
+
+        try {
+            message = new Message.MessageBuilder(
+                user.getUUID(),
+                chatChannel.getUUID(),
+                "this is first Chat"
+            ).build();
+        }catch (MessageValidationException e){
+            System.out.println(e.getMessage());
+        }
 
         chatBehavior.setChannel(chatChannel);
         chatBehavior2.setChannel(chatChannel2);
 
         chatBehavior.addMessage(message);
-        chatBehavior.addMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is second Chat",
-            null,
-            null
-        ));
+        try {
+            chatBehavior.addMessage(new Message.MessageBuilder(
+                user.getUUID(),
+                chatChannel.getUUID(),
+                "this is second Chat"
+            ).build());
+        }catch (MessageValidationException e){
+            System.out.println(e.getMessage());
+        }
 
-        chatBehavior.addMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is third Chat",
-            null,
-            null
-        ));
+        try {
+            chatBehavior.addMessage(new Message.MessageBuilder(
+                user.getUUID(),
+                chatChannel.getUUID(),
+                "this is third Chat"
+            ).build());
+        }catch (MessageValidationException e){
+            System.out.println(e.getMessage());
+        }
 
-        chatBehavior2.addMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is second channel first Chat",
-            null,
-            null
-        ));
+        try {
+            chatBehavior2.addMessage(new Message.MessageBuilder(
+                user.getUUID(),
+                chatChannel.getUUID(),
+                "this is second channel first Chat"
+            ).build());
+        }catch (MessageValidationException e){
+            System.out.println(e.getMessage());
+        }
 
         Message m = chatBehavior.getSingleMessage(message.getUUID());
         System.out.println(m);
@@ -265,231 +297,16 @@ public class JavaApplication {
         chatBehavior.getChatHistory().stream().forEach(System.out::println);
 
         System.out.println("\n=== 존재하지 않는 유저의 메시지 생성 ===");
-        Message falseUserMessage = new Message(
-            "false-user-uuid",
-            chatChannel.getUUID(),
-            "false",
-            null,
-            null
-        );
-        try {
-            chatBehavior.addMessage(falseUserMessage);
-        }catch (IllegalArgumentException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    static void channelSimulation(){
-
-        // 채널 생성
-        Channel chatChannel = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleChannelName",
-            100,
-            false,
-            "General",
-            new ChatBehavior(JCFUserService.getInstance(),JCFMessageService.getInstance())
-        );
-
-        Channel voiceChannel = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleChannelName",
-            100,
-            false,
-            "General",
-            new VoiceBehavior()
-        );
-
-        String channelId = chatChannel.getUUID();
-        channelService.createChannel(chatChannel);
-        channelService.createChannel(voiceChannel);
-        Channel fetchedChannel = channelService.getChannelById(channelId).get();
-        System.out.println(fetchedChannel);
-
-        System.out.println("=== 여러 채널 조회 ===");
-
-        List<Channel> channels = channelService.getAllChannels();
-
-        for(Channel c : channels){
-            System.out.println(c);
-        }
-
-        // 체널 수정
-        ChannelUpdateDto updateDto = new ChannelUpdateDto(
-            Optional.of("updatedChannelName"),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty()
-        );
-
-        channelService.updateChannel(channelId, updateDto);
-
-        System.out.println(channelService.getChannelById(channelId).get());
-
-        // 채팅 채널
-
-        User user = userService.readAllUsers().get(0);
-        String userId = user.getUUID();
-        System.out.println(user);
-
-        ChatBehavior chat = (ChatBehavior) chatChannel.getBehavior();
-
-        chat.addMessage( new Message(
-            userId,
-            chatChannel.getUUID(),
-            "this is example message",
-            null,
-            null
-        ));
-
-        chat.addMessage( new Message(
-            userId,
-            chatChannel.getUUID(),
-            "this is example message2",
-            null,
-            null
-        ));
-
-        chat.addMessage( new Message(
-            userId,
-            chatChannel.getUUID(),
-            "this is final message",
-            null,
-            null
-        ));
-
-        // 메시지 내역 출력
-        System.out.println("=== 채팅 채널 메시지 내역 ===");
-        List<Message> history = chat.getChatHistory();
-        for(Message m : history){
-            System.out.println(m);
-        }
-
-        // 존재하지 않는 user 의 메시지는 추가할 수 없음
 
         try {
-            chat.addMessage(new Message(
-                "randomUserID",
+            Message falseUserMessage = new Message.MessageBuilder(
+                "false-user-uuid",
                 chatChannel.getUUID(),
-                "this error test",
-                null,
-                null
-            ));
-        } catch (IllegalArgumentException e){
+                "false"
+            ).build();
+            chatBehavior.addMessage(falseUserMessage);
+        }catch (IllegalArgumentException | MessageValidationException e){
             System.out.println(e.getMessage());
         }
-
-        // 체널 삭제
-
-        channelService.deleteChannel(channelId);
-        System.out.println(channelService.getAllChannels().size() == 1);
-
-    }
-
-    static void messageSimulation(){
-        User user = userService.readAllUsers().get(0);
-        Channel chatChannel = new Channel(
-            "server-uuid-2",
-            "category-uuid-2",
-            "exampleChannelName",
-            100,
-            false,
-            "General",
-            new ChatBehavior(JCFUserService.getInstance(),JCFMessageService.getInstance())
-        );
-
-        Channel chatChannel2 = new Channel(
-            "server-uuid-1",
-            "category-uuid-1",
-            "exampleChannelName2",
-            100,
-            false,
-            "General",
-            new ChatBehavior(JCFUserService.getInstance(),JCFMessageService.getInstance())
-        );
-
-
-
-        ChatBehavior chatBehavior = (ChatBehavior) chatChannel.getBehavior();
-        ChatBehavior chatBehavior2 = (ChatBehavior) chatChannel2.getBehavior();
-
-        channelService.createChannel(chatChannel);
-        channelService.createChannel(chatChannel2);
-        Message message = new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is first chat!",
-            null,
-            null
-        );
-
-        messageService.createMessage(message, chatBehavior);
-
-        messageService.createMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is example message",
-            null,
-            null
-        ), chatBehavior2 );
-
-
-        messageService.createMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is example message2",
-            null,
-            null
-        ), chatBehavior2 );
-
-
-        messageService.createMessage(new Message(
-            user.getUUID(),
-            chatChannel.getUUID(),
-            "this is example message3",
-            null,
-            null
-        ), chatBehavior2 );
-
-        List<Channel> channels = channelService.getAllChannels();
-
-        // 채널별 메시지 조회
-        for(Channel c : channels){
-            if(c.getBehavior() instanceof ChatBehavior){
-                ChatBehavior currentChat = (ChatBehavior) c.getBehavior();
-                List<Message> currentChatHistory = messageService.getChatHistory(currentChat);
-                System.out.println(c.getChannelName() + " Chat History");
-                for(Message m : currentChatHistory){
-                    System.out.println(m.getContent());
-                }
-            }
-        }
-
-        // channel1 메시지 조회
-        System.out.println("=== channel 1 message history === ");
-        for(Message m : messageService.getChatHistory(chatBehavior)){
-            System.out.println(m);
-        }
-
-        // channel1 메시지 수정
-
-        System.out.println("=== edit message ===");
-        String messageId = messageService.getChatHistory(chatBehavior).get(0).getUUID();
-        messageService.modifyMessage(messageId, "this is edited message", chatBehavior);
-
-        System.out.println(messageService.getMessageById(messageId, chatBehavior).get().getContent());
-        // channel1 메시지 삭제
-
-
-        messageService.deleteMessage(messageId, chatBehavior);
-        //삭제 후 조회
-
-        System.out.println("=== channel 1 message history === ");
-        for(Message m : messageService.getChatHistory(chatBehavior)){
-            System.out.println(m);
-        }
-
     }
 }

@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 
+@Getter @Setter
 public class Message {
     private String UUID;
     private String userUUID;
@@ -16,61 +20,54 @@ public class Message {
     private String threadUUID;
     private Map<String, Reactions> messageReactions;
 
-    public Message(
-                   String userUUID,
-                   String channelUUID,
-                   String content,
-                   String contentImage,
-                   String threadUUID) {
-
-        this.UUID = UuidGenerator.generateUUID();
-        this.userUUID = userUUID;
-        this.channelUUID = channelUUID;
-        this.content = content;
-        this.contentImage = contentImage == null ? "" : contentImage;
-        this.threadUUID = threadUUID == null ? "" : threadUUID;
-        this.createdAt = System.currentTimeMillis();
+    private Message(MessageBuilder builder) {
+        this.UUID = builder.UUID;
+        this.userUUID = builder.userUUID;
+        this.channelUUID = builder.channelUUID;
+        this.content = builder.content;
+        this.contentImage = builder.contentImage;
+        this.threadUUID = builder.threadUUID;
+        this.isEdited = builder.isEdited;
+        this.createdAt = builder.createdAt;
+        this.updatedAt = builder.updatedAt;
     }
 
-    public String getUUID() {
-        return UUID;
+    public static class MessageBuilder {
+        private final String UUID;
+        private final String userUUID;
+        private final String channelUUID;
+        private final String content;
+        private Boolean isEdited = false;
+        private String contentImage = "";
+        private String threadUUID = "";
+        private Long createdAt = System.currentTimeMillis();
+        private Long updatedAt = System.currentTimeMillis();
+
+        public MessageBuilder(String userUUID, String channelUUID, String content) throws MessageValidationException {
+            if(userUUID == null || channelUUID == null || content == null){
+                throw new MessageValidationException();
+            }
+            this.UUID = UuidGenerator.generateUUID();
+            this.userUUID = userUUID;
+            this.channelUUID = channelUUID;
+            this.content = content;
+        }
+
+        public MessageBuilder contentImage(String contentImage) {
+            this.contentImage = contentImage == null ? "" : contentImage;
+            return this;
+        }
+
+        public MessageBuilder threadUUID(String threadUUID) {
+            this.threadUUID = threadUUID == null ? "" : threadUUID;
+            return this;
+        }
+
+        public Message build() {
+            return new Message(this);
+        }
     }
 
-    public String getUserUUID() {
-        return userUUID;
-    }
-
-    public String getChannelUUID() {
-        return channelUUID;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Boolean getIsEdited() {
-        return isEdited;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContentImage() {
-        return contentImage;
-    }
-
-    public String getThreadUUID() {
-        return threadUUID;
-    }
-
-    public Map<String, Reactions> getMessageReactions() {
-        return messageReactions;
-    }
     public void setContent(String content) {
         this.content = content;
         this.isEdited = true;
@@ -79,18 +76,6 @@ public class Message {
 
     public void setContentImage(String contentImage) {
         this.contentImage = contentImage == null ? "" : contentImage;
-    }
-
-    public void setThreadUUID(String threadUUID) {
-        this.threadUUID = threadUUID;
-    }
-
-    public void addReaction(String userUUID, Reactions reaction) {
-        messageReactions.put(userUUID, reaction);
-    }
-
-    public void removeReaction(String userUUID) {
-        messageReactions.remove(userUUID);
     }
 
     public void setIsEdited(){

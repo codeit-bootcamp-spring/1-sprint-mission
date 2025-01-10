@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.constant.UserConstant;
+import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.time.LocalDateTime;
-
+@Getter @Setter
 public class User {
     private String UUID;
     private String username;
@@ -16,104 +19,67 @@ public class User {
     private Long createdAt;
     private Long updatedAt;
 
-    public User(String username,
-                String password,
-                String email,
-                String nickname,
-                String phoneNumber,
-                String profilePictureURL,
-                String description) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
-        this.profilePictureURL = profilePictureURL;
-        this.description = description;
+    private User(UserBuilder builder) {
         this.UUID = UuidGenerator.generateUUID();
+        this.username = builder.username;
+        this.password = builder.password;
+        this.email = builder.email;
+        this.nickname = builder.nickname;
+        this.phoneNumber = builder.phoneNumber;
+        this.profilePictureURL = builder.profilePictureURL != null ? builder.profilePictureURL : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
+        this.description = builder.description;
         this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
     }
 
-    public String getUUID() {
-        return UUID;
-    }
+    public static class UserBuilder {
+        private final String username;
+        private final String password;
+        private final String email;
+        private String nickname;
+        private String phoneNumber;
+        private String profilePictureURL;
+        private String description;
 
-    public void setUUID(String UUID) {
-        this.UUID = UUID;
-    }
+        public UserBuilder(String username, String password, String email) throws UserValidationException {
+            this.username = username;
+            this.password = password;
+            if(!email.matches(UserConstant.EMAIL_REGEX)){
+                throw new UserValidationException(UserConstant.ERROR_INVALID_EMAIL);
+            }
+            this.email = email;
+        }
 
-    public String getUsername() {
-        return username;
-    }
+        public UserBuilder nickname(String nickname) throws UserValidationException {
 
-    public void updateUsername(String username) {
-        this.username = username;
-    }
+            if(nickname.length() <= UserConstant.USERNAME_MIN_LENGTH
+                || nickname.length() > UserConstant.USERNAME_MAX_LENGTH) {
+                throw new UserValidationException(UserConstant.ERROR_USERNAME_LENGTH);
+            }
 
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password){
-        this.password = password;
-    }
-    public void updatePassword(String password) {
-        this.password = password;
-    }
+            this.nickname = nickname;
+            return this;
+        }
 
-    public String getEmail() {
-        return email;
-    }
+        public UserBuilder phoneNumber(String phoneNumber) {
+            //TODO : 핸드폰 번호 검증 로직
+            this.phoneNumber = phoneNumber;
+            return this;
+        }
 
-    public void updateEmail(String email) {
-        this.email = email;
-    }
+        public UserBuilder profilePictureURL(String profilePictureURL) {
+            this.profilePictureURL = profilePictureURL;
+            return this;
+        }
 
-    public String getNickname() {
-        return nickname;
-    }
+        public UserBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void updatePhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getProfilePictureURL() {
-        return profilePictureURL;
-    }
-
-    public void updateProfilePictureURL(String profilePictureURL) {
-        this.profilePictureURL = profilePictureURL;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void updateDescription(String description) {
-        this.description = description;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+        public User build() {
+            return new User(this);
+        }
     }
 
     @Override

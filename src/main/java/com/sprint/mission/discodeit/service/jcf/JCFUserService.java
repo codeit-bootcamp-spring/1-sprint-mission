@@ -57,17 +57,17 @@ public class JCFUserService implements UserService {
         }
         User originalUser = data.get(id);
 
-        updatedUser.getUsername().ifPresent(originalUser::updateUsername);
+        updatedUser.getUsername().ifPresent(originalUser::setUsername);
         updatedUser.getPassword()
             .map(PasswordEncryptor::hashPassword)
-            .ifPresent(originalUser::updatePassword);
-        updatedUser.getEmail().ifPresent(originalUser::updateEmail);
-        updatedUser.getNickname().ifPresent(originalUser::updateNickname);
-        updatedUser.getPhoneNumber().ifPresent(originalUser::updatePhoneNumber);
-        updatedUser.getProfilePictureURL().ifPresent(originalUser::updateProfilePictureURL);
-        updatedUser.getDescription().ifPresent(originalUser::updateDescription);
+            .ifPresent(originalUser::setPassword);
+        updatedUser.getEmail().ifPresent(originalUser::setEmail);
+        updatedUser.getNickname().ifPresent(originalUser::setNickname);
+        updatedUser.getPhoneNumber().ifPresent(originalUser::setPhoneNumber);
+        updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
+        updatedUser.getDescription().ifPresent(originalUser::setDescription);
 
-        originalUser.updateUpdatedAt(System.currentTimeMillis());
+        originalUser.setUpdatedAt(System.currentTimeMillis());
 
         data.put(id, originalUser);
     }
@@ -94,7 +94,6 @@ public class JCFUserService implements UserService {
         for(User currentUser : data.values()){
             if(currentUser.getPhoneNumber().equals(newUser.getPhoneNumber())) return false;
         }
-
         return true;
     }
 }
