@@ -129,7 +129,7 @@ class InMemoryCrudRepositoryTest {
             // then
             assertAll(
                     () -> assertThat(allEntity).isNotEmpty(),
-                    () -> assertThat(repository.count()).isEqualTo(repositorySize)
+                    () -> assertThat(allEntity.size()).isEqualTo(repositorySize)
             );
         }
     }
