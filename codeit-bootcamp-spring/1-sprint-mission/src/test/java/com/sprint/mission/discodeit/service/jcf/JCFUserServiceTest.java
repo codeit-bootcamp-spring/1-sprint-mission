@@ -68,18 +68,17 @@ class JCFUserServiceTest {
     void givenUsernameWhenFindUserByUsernameThenReturnUserInfoResponse() {
         // given
         Optional<User> mockUser = Optional.of(user);
-        var findUserRequest = new FindUserRequest("jaewoo");
-        when(userRepository.findByUsername("jaewoo"))
-                .thenReturn(mockUser);
+        var findUserRequest = new FindUserRequest(NAME);
+        when(userRepository.findByUsername(NAME)).thenReturn(mockUser);
 
         // when
         var user = userService.findUserByUsername(findUserRequest);
 
         // then
         assertThat(user).isNotNull();
-        assertThat(user.username()).isEqualTo("jaewoo");
+        assertThat(user.username()).isEqualTo(NAME);
 
-        verify(userRepository).findByUsername("jaewoo");
+        verify(userRepository).findByUsername(NAME);
     }
     // TODO : 해지된 유지이름으로 조회 시 실패 테스트
 
