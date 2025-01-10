@@ -56,11 +56,14 @@
 
 
 ## 스크린샷
-![스크린샷]
-![스크린샷 2025-01-09 시간: 13 22 25](https://github.com/user-attachments/assets/12ebd80a-c041-4a48-a362-10043fc7b809)
-
-
+[User CRUD Results]
+![IMG_4673](https://github.com/user-attachments/assets/046328f8-0b6d-41e0-a32d-6905170aa34f)
+[Channel CRUD Results]
+![IMG_4675](https://github.com/user-attachments/assets/19751bb9-36c1-4510-887f-c420709dd302)
+[Message CRUD Results]
+![IMG_4670](https://github.com/user-attachments/assets/17f6c010-a829-4df9-a31e-3e7346dd45c1)
 ## 멘토에게
-- 모듈화가 어려워서 기본 사항만 구현하였습니다. 
-- 아직 Stream()과 람다식 사용이 다소 익숙하지 않아 연습하는 느낌으로 진행하였습니다.
+- 모듈화 구조가 아직 어렵습니다. 제대로 구현했는지, 어떤식으로 더 구현하면 좋을지 피드백 받고 싶습니다.
+- 아직 Stream()과 람다식 사용이 다소 익숙하지 않아 많이 연습하며 진행해보았습니다.
+
 - 셀프 코드 리뷰를 통해 질문 이어가겠습니다.
