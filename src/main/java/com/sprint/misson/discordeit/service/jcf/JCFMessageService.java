@@ -77,6 +77,7 @@ public class JCFMessageService implements MessageService {
         if(message == null){
             return false;
         }
+        message.updateUpdatedAt();
         data.put( message.getId(), message );
         return true;
     }

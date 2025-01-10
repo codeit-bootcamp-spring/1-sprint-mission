@@ -93,6 +93,7 @@ public class JCFUserService implements UserService {
         if(user == null) {
             return false;
         }
+        user.updateUpdatedAt();
         data.put( user.getId(), user );
         return true;
 

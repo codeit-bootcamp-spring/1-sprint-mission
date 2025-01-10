@@ -49,6 +49,7 @@ public class JCFChannelService implements ChannelService {
         if ( channel.getId() == null ) {
             return false;
         }
+        channel.updateUpdatedAt();
         data.put( channel.getId(), channel );
         return true;
     }
