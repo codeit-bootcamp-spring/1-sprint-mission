@@ -3,42 +3,50 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JcfUserService implements UserService {
-    private List<User> data=new ArrayList<>();
 
+    List<User> data=new ArrayList<>();//Map이 더 성능이 좋을까요?
     @Override
-    public void create(User user) {
+    public void createUser(User user) {
         data.add(user);
     }
 
     @Override
-    public List<User> readAll() {
-        return new ArrayList<>(data);
+    public Optional<User> userList(UUID id) {
+        for (User dataList : data) {
+            if(dataList.getId().equals(id)){
+                return Optional.of(dataList);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
-    public void update(UUID id, User updatedUser) {
-        for (User user : data) {
-            if(user.getId().equals(id)) {
-                user.updateUsername(updatedUser.getUsername());
-                user.updateEmail(updatedUser.getEmail());
-                user.getUpdatedAt();
-                return;
+    public List<User> allUserList() {
+         return data; //보여주기만 하니까 원본을 return시켰습니다. 해당 내용을 복사해서 보여줘야하나요?
+    }
+
+    @Override
+    public void updateUser(UUID id,User user) {
+        for (User dataList : data) {
+            if(dataList.getId().equals(id)){
+              /*  if (dataList.updateUserName(user.getUserName())) {
+                    dataList.getUserName()=user.getUserName();
+                }*/
+                dataList.updateUserEmail(user.getUserEmail());
+                dataList.updateUserName(user.getUserName());
             }
         }
     }
 
     @Override
-    public void delete(UUID id) {
-        for (int i = 0; i < data.size(); i++) {
-            if(data.get(i).getId().equals(id)){
-                data.remove(i);
-                return;
-        }
+    public void deleteUser(UUID id) {
+        for (User dataList : data) {
+            if (dataList.getId().equals(id)) {
+                data.remove(dataList);
+            }
         }
     }
 }

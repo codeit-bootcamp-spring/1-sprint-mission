@@ -1,39 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
 public class User extends Base{
-    private String username;
-    private String email;
+   private String userName;
+   private String userEmail;
 
-    public User(String username, String email) {
+    public User(String userName, String userEmail) {
         super();
-        this.username = username;
-        this.email = email;
+        this.userName = userName;
+        this.userEmail = userEmail;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void updateUsername(String username) {
-        this.username = username;
-        getUpdatedAt();
+    public void updateUserName(String userName) {
+        this.userName = userName;
+        setUpdatedAt();
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-        getUpdatedAt();
+    public void updateUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+        setUpdatedAt();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id="+getId()+
-                "username='" + username + '\'' +
-                ", email='" + email + '\'' +
+                "userName='" + userName + '\'' +
+                ", userEmail='" + userEmail + '\'' +
                 '}';
     }
 }
