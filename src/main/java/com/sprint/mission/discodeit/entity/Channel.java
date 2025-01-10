@@ -32,17 +32,7 @@ public class Channel extends BaseObject {
         if(user == null) {
             throw new IllegalArgumentException("유저를 추가해주세요");
         }
-
-        System.out.println("Before add - channelUsers type: " + channelUsers.getClass().getName());
-        System.out.println("Before add - user to add: " + user);
-
-        try {
-            this.channelUsers.add(user);
-        } catch (Exception e) {
-            System.out.println("Exception during add: " + e);
-            throw e;
-        }
-
+        
         setUpdatedAt();
     }
 
