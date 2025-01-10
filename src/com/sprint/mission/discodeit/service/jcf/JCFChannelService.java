@@ -21,7 +21,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void createChannel(Channel channel) {
         channeldata.add(channel);
-        System.out.println(Utils.transTime(channel.getCreatedAt())  + " 채널명: " + channel.getChName() + " 아이디: " + channel.getChId() +" 채널이 추가되었습니다.");
+        System.out.println(" 채널명: " + channel.getChName() + " 채널이 추가되었습니다.");
     }
 
     @Override

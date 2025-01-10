@@ -44,7 +44,7 @@ public class User {
     }
 
 
-    public void up(User user, Message message) {
-        user.getMsgList().add(message);
+    public void addMessage(Message message) {
+        this.msgList.add(message);
     }
 }

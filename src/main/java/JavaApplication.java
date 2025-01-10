@@ -4,10 +4,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessagelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class JavaApplication {
@@ -54,7 +55,7 @@ public class JavaApplication {
 
         System.out.println("\n------------\n*유저 도메인 test");
         User user1 = new User("효정");
-        User user2 = new User("찰스");
+        User user2 = new User("고양이");
         User user3 = new User("강아지");
 
         JCFUserService jcfUserService = new JCFUserService();
@@ -99,33 +100,39 @@ public class JavaApplication {
         Message message3 = new Message(user3,"반가워요~");
         Message message4 = new Message(user3,"잘지내요~");
 
-        JCFMessagelService jcfMessagelService = new JCFMessagelService();
+        //user-메시지 매핑  -> 이걸 메시지 생성 때 자동화하면 좋을것같음.
+        user3.addMessage(message1);
+        user3.addMessage(message3);
+        user3.addMessage(message4);
+        user2.addMessage(message2);
+
+        JCFMessageService jcfMessageService = new JCFMessageService();
 
         //메시지 등록
-        jcfMessagelService.createMessage(message1);
-        jcfMessagelService.createMessage(message2);
-        jcfMessagelService.createMessage(message3);
-        jcfMessagelService.createMessage(message4);
+        jcfMessageService.createMessage(message1);
+        jcfMessageService.createMessage(message2);
+        jcfMessageService.createMessage(message3);
+        jcfMessageService.createMessage(message4);
 
         //메시지 조회
-        System.out.println( jcfMessagelService.readMessage(message1.getMsgId()).getUser().getUserName() + ": "
-                + jcfMessagelService.readMessage(message1.getMsgId()).getContent());
+        System.out.println( jcfMessageService.readMessage(message1.getMsgId()).getUser().getUserName() + ": "
+                + jcfMessageService.readMessage(message1.getMsgId()).getContent());
         //메시지 모두 조회
         System.out.println("메시지를 모두 조회합니다.");
-        for (Message msg : jcfMessagelService.readAllMessage()) {
+        for (Message msg : jcfMessageService.readAllMessage()) {
             System.out.println( msg.getUser().getUserName() + ": "
                     +  msg.getContent());
         }
 
         //메시지 수정
-        jcfMessagelService.modifyMessage(message4.getMsgId(), "잘지내요~ 멍멍" );
+        jcfMessageService.modifyMessage(message4.getMsgId(), "잘지내요~ 멍멍" );
 
         //메시지 삭제
-        jcfMessagelService.deleteMessage(message3.getMsgId() );
+        jcfMessageService.deleteMessage(message3.getMsgId() );
 
         //메시지 모두 조회
         System.out.println("메시지를 모두 조회합니다.");
-        for (Message msg : jcfMessagelService.readAllMessage()) {
+        for (Message msg : jcfMessageService.readAllMessage()) {
             System.out.println( msg.getUser().getUserName() + ": "
                     +  msg.getContent());
         }
@@ -138,8 +145,38 @@ public class JavaApplication {
         jcfChannelService.addUser(channel, user1);
         jcfChannelService.addUser(channel, user2);
 
-        //채널의 유저들의 메시지를 시간순으로 출력하기.
 
+        System.out.println("\n\n");
+        //심화?
+        //채널의 유저들의 메시지를 시간순으로 출력하기.
+        for(Channel ch : jcfChannelService.readAllChannel()){
+            System.out.println("++채널: " + ch.getChName()+ "의 모든 채팅 출력 ");
+
+            // 해당 채널에 속한 유저들 가져오기
+            List<User> channelUsers = jcfUserService.readAllUser(); // 채널에 속한 유저 목록을 가져온다고 가정
+
+            for (User user : channelUsers) {
+                System.out.print(user.getUserName() + ", ");
+            }
+            System.out.println("님이 접속중입니다.");
+
+            // 유저들에 대한 메시지 리스트
+            List<Message> allMessages = new ArrayList<>();
+
+            // 각 유저의 메시지를 모두 모은다
+            for (User user : channelUsers) {
+                List<Message> userMessages = user.getMsgList(); // 유저가 작성한 메시지를 가져옴.
+                allMessages.addAll(userMessages);
+            }
+
+//            // 메시지들을 시간순으로 정렬
+            allMessages.sort(Comparator.comparing(Message::getCreatedAt)); //
+
+            // 정렬된 메시지 출력
+            for (Message msg : allMessages) {
+                System.out.println(msg.getCreatedAt() + " - " + msg.getUser().getUserName() + ": " + msg.getContent());
+            }
+        }
         
 
 

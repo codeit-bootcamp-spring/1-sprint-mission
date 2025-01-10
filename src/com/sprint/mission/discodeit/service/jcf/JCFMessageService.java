@@ -6,10 +6,10 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JCFMessagelService implements MessageService {
+public class JCFMessageService implements MessageService {
     final List<Message> messagedata;
 
-    public JCFMessagelService() {
+    public JCFMessageService() {
         this.messagedata = new ArrayList<>();
     }
 
@@ -37,17 +37,20 @@ public class JCFMessagelService implements MessageService {
     @Override
     public void modifyMessage(String msgID, String content) {
         readMessage(msgID).updateContent(content);
+        readMessage(msgID).updateUpdatedAt();
     }
 
     @Override
     public void deleteMessage(String msgID) {
-        String name= readMessage(msgID).getMsgId();
+        String uname= readMessage(msgID).getUser().getUserName();
+        String name= readMessage(msgID).getContent();
         boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID));
 
         if(isDeleted) {
-            System.out.println(name + " 메시지가 삭제되었습니다.");
+            System.out.println(uname + "님의 \"" + name + "\" 메시지가 삭제되었습니다.");
+
         }else{
-            System.out.println(name + " 메시지 삭제 실패하였습니다.");
+            System.out.println(" 메시지 삭제 실패하였습니다.");
         }
 
 

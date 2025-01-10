@@ -39,6 +39,7 @@ public class JCFUserService implements UserService {
     @Override
     public void modifyUser(String userID, String newName) {
         readUser(userID).updateUsername(newName);
+        readUser(userID).updateUpdatedAt();
 
     }
 
@@ -57,6 +58,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public void addMessage(User user, Message message) {
-        user.up(user, message);
+        user.addMessage(message);
     }
 }
