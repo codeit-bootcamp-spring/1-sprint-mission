@@ -3,7 +3,9 @@ package com.sprint.misson.discordeit.service.jcf;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.Message;
 import com.sprint.misson.discordeit.entity.User;
+import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
+import com.sprint.misson.discordeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,19 +15,33 @@ import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
 
-    final HashMap<UUID, Message> data;
+    private static final JCFMessageService instance = new JCFMessageService();
+
+    private final HashMap<UUID, Message> data;
+    private final UserService userService;
+    private final ChannelService channelService ;
 
     public JCFMessageService() {
         this.data= new HashMap<>();
+        this.userService= JCFUserService.getInstance();
+        this.channelService= JCFChannelService.getInstance();
+    }
+
+    public static JCFMessageService getInstance() {
+        return instance;
     }
 
     //생성
     @Override
     public Message createMessage(User user, String content, Channel channel) {
-        //todo
-        //존재하는 유저? 존재하는 채널?
-        //User가 Null일 경우, 존재하지 않을 경우 처리
-        //Channel이 Null일 경우, 존재하지 않을 경우 처리
+
+        User userByUUID = userService.getUserByUUID( user.getId().toString() );
+        Channel channelByUUID =channelService.getChannelByUUID( channel.getId().toString() );
+
+        if( userByUUID == null || content == null || content.isEmpty() || channelByUUID == null ) {
+            return null;
+        }
+
         Message message = new Message(user, content, channel);
         data.put( message.getId(), message );
         return message;

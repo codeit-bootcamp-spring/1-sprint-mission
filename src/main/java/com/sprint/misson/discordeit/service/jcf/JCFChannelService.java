@@ -13,10 +13,14 @@ import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
 
-    final HashMap<UUID, Channel> data;
+    private static final JCFChannelService instance = new JCFChannelService();
+    private final HashMap<UUID, Channel> data;
 
     public JCFChannelService() {
         this.data = new HashMap<>();
+    }
+    public static JCFChannelService getInstance() {
+        return instance;
     }
 
     //생성

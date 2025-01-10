@@ -10,11 +10,16 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    final HashMap<UUID, User> data;
-
+    //싱글톤으로 구현
+    private static final JCFUserService instance = new JCFUserService();
+    private final HashMap<UUID, User> data;
 
     public JCFUserService() {
         this.data = new HashMap<>();
+    }
+
+    public static JCFUserService getInstance() {
+        return instance;
     }
 
     @Override

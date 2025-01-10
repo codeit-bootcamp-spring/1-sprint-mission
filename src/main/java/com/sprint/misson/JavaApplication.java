@@ -15,12 +15,11 @@ import java.util.List;
 public class JavaApplication {
 
     public static void main(String[] args) {
-        UserService userService=new JCFUserService();
-        ChannelService channelService=new JCFChannelService();
-        MessageService messageService=new JCFMessageService();
 
-        //TODO - 심화
-        //서비스 간 의존성 주입
+        //서비스 간 의존성 주입 - Eager 방식으로 싱글톤 구현
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
+        MessageService messageService =JCFMessageService.getInstance();
 
         //1. 등록
         System.out.println("=== 1. 등록 테스트 ===");
@@ -100,8 +99,27 @@ public class JavaApplication {
                         + "\n - content: "+ m.getContent()
                 ));
 
-        System.out.println();
-        System.out.println("\n=== 2. 조회 테스트 ===");
+        //Todo
+        // 각 예외 별로 어떤 메세지를 보여줄지 정하기
+
+        System.out.println("\n\n* 심화 - 메세지 예외 처리");
+
+        System.out.println("\n1) DB에 존재하지 않는 유저로 메세지 생성 ");
+        User notExistUser = new User("없는유저", "noOne@test.com", UserStatus.ACTIVE, "hello", AccountStatus.UNVERIFIED );
+        Message msgByNone=messageService.createMessage( notExistUser, "can not be created. The user is not exist.", channel1 );
+        System.out.println("> 결과: " + (msgByNone!= null) );
+
+        System.out.println("\n2) DB에 존재하지 않는 Channel로 메세지 생성 ");
+        Channel notExistChannel = new Channel("없는채널", ChannelType.TEXT);
+        Message msgFromNowhere=messageService.createMessage( user1, "can not be created. The channel is not exist.", notExistChannel );
+        System.out.println("> 결과: " + (msgFromNowhere!= null) );
+
+        System.out.println("\n3) DB에 존재하지 않는 User와 Channel로 메세지 생성 ");
+        Message msgFromNowhereNone =messageService.createMessage( notExistUser, "can not be created. The channel and the user is not exist.", notExistChannel );
+        System.out.println("> 결과: " + (msgFromNowhereNone!= null) );
+
+
+        System.out.println("\n\n=== 2. 조회 테스트 ===");
 
         System.out.println("\n--- User 조회 ---");
 
