@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    // 유저 생성
+    // 새로운 유저 생성
     User createUser(String name, String email);
 
-    // 유저 정보 수정: 닉네임, 이메일
+    // 유저 정보 수정 - name 과 email 만 수정 가능
     void updateUserName(User user, String name);
     void updateUserEmail(User user, String email);
 
@@ -17,7 +17,7 @@ public interface UserService {
     List<User> getAllUserList();
     User searchById(UUID userId);
 
-    // 유저 정보 출력
+    // 유저 정보 전체 리스트로 출력
     void printUserInfo(User user);
     void printUserListInfo(List<User> userList);
 

@@ -45,11 +45,13 @@ public class JCFChannelService implements ChannelService {
         return null;
     }
 
+    //채널 정보 출력
     @Override
     public void printChannelInfo(Channel channel) {
         System.out.println(channel);
     }
 
+    //채널 정보 - 여러건 출력
     @Override
     public void printChannelListInfo(List<Channel> channelList) {
         for (Channel channel : channelList) {

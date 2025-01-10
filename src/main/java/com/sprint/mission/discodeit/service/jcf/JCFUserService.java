@@ -51,11 +51,13 @@ public class JCFUserService implements UserService {
         System.out.println("탈퇴되었습니다.");
     }
 
+    //하나의 유저 정보 출력
     @Override
     public void printUserInfo(User user) {
         System.out.println(user);
     }
 
+    //유저 정보 list로 출력
     @Override
     public void printUserListInfo(List<User> userList) {
         for (User user : userList) {
@@ -80,6 +82,7 @@ public class JCFUserService implements UserService {
         }
     }
 
+    //내부에서 사용하는 이름 -> 유효성 검사
     private boolean correctName(String name) {
         if (name.isBlank()) {
             System.out.println("이름을 입력해주세요");
@@ -91,6 +94,7 @@ public class JCFUserService implements UserService {
         return false;
     }
 
+    //유효성 검사 -> 이메일 형식
     private boolean correctEmail(String email) {
         String emailFormat = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         if (!email.matches(emailFormat)) {
