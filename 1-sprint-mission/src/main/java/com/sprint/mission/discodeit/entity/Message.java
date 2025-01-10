@@ -5,8 +5,8 @@ import com.sun.nio.sctp.MessageInfo;
 import java.util.UUID;
 
 public class Message {
-    private UUID ID;
-    private Long createdAt;
+    final private UUID id;
+    final private Long createdAt;
     private Long updatedAt;
     private String title;
     private String MessageBody;
@@ -17,9 +17,9 @@ public class Message {
     private UUID reciverID;
 
     public Message(String title,String MessageBody){
-        this.ID= UUID.randomUUID();
+        this.id= UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
-        this.updatedAt=(long)0;
+        this.updatedAt=null;
         this.title=title;
         this.MessageBody=MessageBody;
         this.senderName="";
@@ -30,25 +30,18 @@ public class Message {
     };
 
     public UUID getId() {
-        return ID;
+        return id;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
     public String getMessageBody(){
         return MessageBody;
-    }
-
-    public void setId(UUID ID){
-        this.ID=ID;
-    }
-    public void setCreatedAt(long createdAt) {
-        this.createdAt= createdAt;
     }
 
     public void setUpdatedAt() {
@@ -98,7 +91,7 @@ public class Message {
         this.reciverID = reciverID;
     }
     public String DiplayMessageInfo(){
-        String one= "메세지 아이디: "+ID+" createdAt: "+ createdAt+ " updatedAt: "+updatedAt;
+        String one= "메세지 아이디: "+id+" createdAt: "+ createdAt+ " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
         String two="\nsenderName: "+senderName+" senderID : "+senderID;
         String three="\nreciverName: "+reciverName+" reciverID : "+reciverID;
         String four="\n제목 : "+title+" Message :"+MessageBody;

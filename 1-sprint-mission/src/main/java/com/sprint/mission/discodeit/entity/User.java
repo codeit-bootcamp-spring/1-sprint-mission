@@ -7,39 +7,32 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class User {
-    private UUID ID;
-    private Long createdAt;
+    final private UUID id;
+    final  private Long createdAt;
     private Long updatedAt;
     private String Name;
-    private ArrayList<Channel> channels=new ArrayList<>();
-    private MessageService personal_message=new JCFMessageService();
+
 
     //뭐 더있나
     public User(String Name){
-        this.ID= UUID.randomUUID();
+        this.id= UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
-        this.updatedAt=(long)0;
+        this.updatedAt=null;
         this.Name=Name;
     };
     public UUID getId() {
-        return ID;
+        return id;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
     public String getName(){
         return Name;
-    }
-    public void setId(UUID ID){
-        this.ID=ID;
-    }
-    public void setCreatedAt(long createdAt) {
-        this.createdAt= createdAt;
     }
 
     public void setUpdatedAt() {
@@ -50,7 +43,8 @@ public class User {
     }
 
     public String DisplayInfo(){
-        return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+" updatedAt: "+getUpdatedAt();
+        return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+
+                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
     }
 
 

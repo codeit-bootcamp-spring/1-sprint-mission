@@ -13,6 +13,7 @@ public class Main {
         u.CreateUser("고구마");
         u.CreateUser("김치");
         u.CreateUser("우유");
+        u.CreateUser("김치");
         System.out.println(u.ReadUserAll());
         System.out.println(u.ReadUser("고구마"));
         u.UpdateUserName("고구마","감자");
@@ -40,6 +41,7 @@ public class Main {
         System.out.println(m.ReadMessage("잘가요"));
         m.CreateMessage("잘 지내세요?","저 맛탕 되었어요");
         m.CreateMessage("마지막으로?","달달해요");
+        m.CreateMessage("잘 지내세요?","다른 메세지");
         System.out.println(m.ReadMessageAll());
 
 
@@ -56,7 +58,11 @@ public class Main {
         System.out.println(c.ReadChannel("뿌리식물"));
         c.CreateChaneel("구황작물");
         c.CreateChaneel("튀기면 맛있는 작물");
+        c.CreateChaneel("구황작물");
+
         System.out.println(c.ReadChannelAll());
+
+
 
 
 

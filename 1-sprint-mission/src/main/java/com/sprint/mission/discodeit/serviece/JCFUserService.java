@@ -12,21 +12,26 @@ public class JCFUserService implements UserService{
 
     @Override
     public void CreateUser(String name) {
-        User new_user=new User(name);
-        userList.add(new_user);
+        if(find_user(name).isEmpty()){
+            User new_user=new User(name);
+            userList.add(new_user);
+        }
+        else{
+            System.out.println("이미 존재하는 이름입니다.");
+        }
     }
 
     @Override
     public String ReadUser(String name) {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
+        boolean existChannel =false;
         for(User now:userList){
-            flag=true;
+            existChannel =true;
             if(now.getName().equals(name)){
                 list.append(now.DisplayInfo()).append("\n");
             }
         }
-        if(flag&& !list.toString().isEmpty())
+        if(existChannel && !list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 유저가 없습니다.";
@@ -35,14 +40,14 @@ public class JCFUserService implements UserService{
     @Override
     public String ReadUser(UUID ID) {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
+        boolean existChannel =false;
         for(User now:userList){
-            flag=true;
+            existChannel =true;
             if(now.getId().equals(ID)){
                 list.append(now.DisplayInfo()).append("\n");
             }
         }
-        if(flag&& !list.toString().isEmpty())
+        if(existChannel && !list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 유저가 없습니다.";
@@ -102,27 +107,23 @@ public class JCFUserService implements UserService{
     }
 
     private void deleteUserInfo(ArrayList<User> instance){
-        if(instance.isEmpty()){
+        if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 유저가 없습니다.");
         }else if(instance.size()==1){
             userList.remove(instance.get(0));
             System.out.println("성공적으로 삭제했습니다.");
-        }else{
-            System.out.println("중복된 유저가 있습니다.");
         }
 
     }
 
     private void updateUserNameInfo(ArrayList<User> instance, String changeName) {
-        if (instance.isEmpty()) {
+        if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 유저가 없습니다.");
         } else if (instance.size() == 1) {
             User find = instance.get(0);
             find.setName(changeName);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
-        } else {
-            System.out.println("중복된 유저가 있습니다.");
         }
     }
 

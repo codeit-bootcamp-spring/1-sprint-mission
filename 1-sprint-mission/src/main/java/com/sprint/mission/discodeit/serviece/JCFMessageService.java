@@ -10,21 +10,26 @@ public class JCFMessageService implements MessageService{
 
     @Override
     public void CreateMessage(String title,String body) {
-        Message new_Message=new Message(title,body);
-        MessageList.add(new_Message);
+        if (find_Message(title).isEmpty()) {
+            Message new_Message=new Message(title,body);
+            MessageList.add(new_Message);
+        } else {
+            System.out.println("이미 존재하는 제목입니다.");
+        }
+
     }
 
     @Override
     public String ReadMessage(UUID ID) {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
+        boolean existChannel =false;
         for(Message now:MessageList){
-            flag=true;
+            existChannel =true;
             if(now.getId().equals(ID)){
                 list.append(now.DiplayMessageInfo()).append("\n");
             }
         }
-        if(flag&& !list.toString().isEmpty())
+        if(existChannel && !list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 메세지가 없습니다.";
@@ -33,14 +38,14 @@ public class JCFMessageService implements MessageService{
     @Override
     public String ReadMessage(String title) {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
+        boolean existChannel =false;
         for(Message now:MessageList){
-            flag=true;
+            existChannel =true;
             if(now.gettitle().equals(title)){
                 list.append(now.DiplayMessageInfo()).append("\n");
             }
         }
-        if(flag&& !list.toString().isEmpty())
+        if(existChannel && !list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 메세지가 없습니다.";
@@ -49,13 +54,13 @@ public class JCFMessageService implements MessageService{
     @Override
     public String ReadMessageAll() {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
+        boolean existChannel =false;
         for(Message now:MessageList){
-            flag=true;
+            existChannel =true;
             list.append(now.DiplayMessageInfo()).append("\n");
 
         }
-        if(flag&& !list.toString().isEmpty())
+        if(existChannel && !list.toString().isEmpty())
             return list.toString();
         else
             return "등록된 메세지가 없습니다.";
@@ -124,28 +129,24 @@ public class JCFMessageService implements MessageService{
 
 
     private void ChangeMessageTitle(ArrayList<Message> instance, String changetitle) {
-        if (instance.isEmpty()) {
+        if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
         } else if (instance.size() == 1) {
             Message find = instance.get(0);
             find.setTtitle(changetitle);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
-        } else {
-            System.out.println("중복된 메세지가 있습니다.");
         }
     }
 
     private void ChangeMessageBody(ArrayList<Message> instance, String changeBody) {
-        if (instance.isEmpty()) {
+        if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 메세지가가 없습니다.");
         } else if (instance.size() == 1) {
             Message find = instance.get(0);
             find.setMessageBody(changeBody);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
-        } else {
-            System.out.println("중복된 메세지가 있습니다.");
         }
     }
 

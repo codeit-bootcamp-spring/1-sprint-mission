@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Channel {
-    private UUID ID;
-    private Long createdAt;
+    final private UUID id;
+    final private Long createdAt;
     private Long updatedAt;
     private String ChannelName;
     private ArrayList<User> userlist;
     private ArrayList<Message> messageslist;
 
     public Channel(String ChannelName){
-        this.ID= UUID.randomUUID();
+        this.id= UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
-        this.updatedAt=(long)0;
+        this.updatedAt=null;
         this.ChannelName=ChannelName;
 
         userlist=new ArrayList<>();
@@ -22,24 +22,18 @@ public class Channel {
     };
 
     public UUID getId() {
-        return ID;
+        return id;
     }
 
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
     public String getChannelName(){
         return ChannelName;
-    }
-    public void setId(UUID ID){
-        this.ID=ID;
-    }
-    public void setCreatedAt(long createdAt) {
-        this.createdAt= createdAt;
     }
 
     public void setUpdatedAt() {
@@ -60,8 +54,8 @@ public class Channel {
     }
 
     public String DisplayChannelInfo(){
-        String one="ChannelName: "+ChannelName+" ID: "+ID;
-        String two="createdAt: "+createdAt+" updatedAt: "+updatedAt;
+        String one="ChannelName: "+ChannelName+" ID: "+id;
+        String two="createdAt: "+createdAt+" updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
         return one+"\n"+two;
     }
 }
