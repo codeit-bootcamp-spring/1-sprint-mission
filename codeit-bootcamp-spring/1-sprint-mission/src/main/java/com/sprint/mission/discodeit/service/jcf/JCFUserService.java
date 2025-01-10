@@ -28,6 +28,7 @@ public class JCFUserService implements UserService {
     @Override
     public UserInfoResponse register(RegisterUserRequest registerUserRequest) {
         var entity = converter.toEntity(registerUserRequest);
+        // TODO : 이메일, 또는 이름으로 중복 검사 실시 해야함.
         var savedEntity = data.save(entity);
         return converter.toDto(savedEntity);
     }

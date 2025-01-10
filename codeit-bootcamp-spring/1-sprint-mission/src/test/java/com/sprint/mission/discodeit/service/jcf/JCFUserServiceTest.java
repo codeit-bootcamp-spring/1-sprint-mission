@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
+import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,6 +13,8 @@ import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.entity.user.UserName;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
+import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
+import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
 import com.sprint.mission.discodeit.service.user.UserConverter;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,39 +23,102 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("UserInterface smoke testing")
 class JCFUserServiceTest {
+    private static final String NAME = "SB_1기_백재우";
 
     UserRepository userRepository;
     UserConverter userConverter;
     JCFUserService userService;
-
+    User user;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         userConverter = new UserConverter();
         userService = new JCFUserService(userRepository, userConverter);
+        user = new User(new UserName(NAME));
+    }
+
+    @Test
+    @DisplayName("유저 등록 userService register 호출 시 userInfoResponse 반환")
+    void givenNewUserRequestWhenRegisterThenReturnUserInfoResponse() {
+        // given
+        RegisterUserRequest registerUserRequest = new RegisterUserRequest(NAME);
+        var registerUser = userConverter.toEntity(registerUserRequest);
+        when(userRepository.save(any(User.class))).thenReturn(registerUser);
+
+        // when
+        var infoResponse = userService.register(registerUserRequest);
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(infoResponse).isNotNull();
+
+                    assertAll(
+                            () -> assertThat(infoResponse.username()).isEqualTo(NAME),
+                            () -> assertThat(infoResponse.status()).isEqualTo(REGISTERED)
+                    );
+                }
+        );
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
     @DisplayName("유저 이름으로 findUserByUsername 호출 시 UserResponse 반환")
     void givenUsernameWhenFindUserByUsernameThenReturnUserInfoResponse() {
-        Optional<User> mockUser = Optional.of(new User(new UserName("jaewoo")));
-
+        // given
+        Optional<User> mockUser = Optional.of(user);
+        var findUserRequest = new FindUserRequest("jaewoo");
         when(userRepository.findByUsername("jaewoo"))
                 .thenReturn(mockUser);
 
-        var user = userService.findUserByUsername(new FindUserRequest("jaewoo"));
+        // when
+        var user = userService.findUserByUsername(findUserRequest);
 
+        // then
         assertThat(user).isNotNull();
         assertThat(user.username()).isEqualTo("jaewoo");
 
         verify(userRepository).findByUsername("jaewoo");
     }
+    // TODO : 해지된 유지이름으로 조회 시 실패 테스트
 
-    // 수정
+    @Test
+    @DisplayName("유저 정보 수정 modifyUserInfo 호출 시 UserResponse 반환")
+    void givenModifyUserInfoRequestWhenModifyUserInfoThenReturnUserInfoResponse() {
+        // given
+        var modifyUserInfoRequest = new ModifyUserInfoRequest(user.getId(), "CHANGE NAME");
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-    // 저장
+        // when
+        var userInfoResponse = userService.modifyUserInfo(modifyUserInfoRequest);
+
+        // then
+        assertAll(
+                () -> {
+                    assertThat(userInfoResponse).isNotNull();
+
+                    assertAll(
+                            () -> assertThat(userInfoResponse.status()).isEqualTo(MODIFIED),
+                            () -> assertThat(userInfoResponse.username()).isEqualTo("CHANGE NAME")
+                    );
+                }
+        );
+
+        verify(userRepository).save(any(User.class));
+        verify(userRepository).findById(user.getId());
+    }
 
     // 탈퇴
+    @Test
+    @DisplayName("유저 회원 탈퇴 unregister 호출 시 유저 상태 변경")
+    void givenUnregisterUserRequestWhenUnregisterThenUserStatusIsChanged() {
+        // given
+
+        // when
+
+        // then
+    }
 
 }
