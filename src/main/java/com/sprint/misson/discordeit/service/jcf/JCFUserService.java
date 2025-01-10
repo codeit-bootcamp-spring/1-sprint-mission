@@ -35,7 +35,8 @@ public class JCFUserService implements UserService {
 
         User newUser = new User(nickname, email, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED );
 
-        //TODO - 이메일 인증 추가 구현
+        //TODO - 추가 구현할만 한 기능
+        //이메일 인증
         //1. 이메일 발송
         //2. 사용자가 이메일에서 인증 버튼 클릭 or 인증 코드 입력
         //3. 인증 완료 시, user.accountStatus 를 VERIFIED 로 변경

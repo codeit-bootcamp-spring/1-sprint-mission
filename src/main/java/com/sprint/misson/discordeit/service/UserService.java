@@ -1,5 +1,6 @@
 package com.sprint.misson.discordeit.service;
 
+import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.entity.UserStatus;
