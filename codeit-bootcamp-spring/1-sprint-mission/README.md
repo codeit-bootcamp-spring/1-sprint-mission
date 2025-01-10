@@ -49,21 +49,21 @@
         -[ ] 생성자
             - [x] `id`는 생성자에서 초기화하세요.
             - [x] `createdAt`는 생성자에서 초기화하세요.
-            - [ ] `id`, `createdAt`, `updatedAt`을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
+            - [x] `id`, `createdAt`, `updatedAt`을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
         - [ ] 메소드
             - [ ] 각 필드를 반환하는 `Getter` 함수를 정의하세요.
             - [ ] 필드를 수정하는 `update` 함수를 정의하세요.
 
 **3️⃣ 서비스 설계 및 구현**
 
-- [ ] 도메인 모델 별 CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 인터페이스로 선언하세요.
-    - [ ] 인터페이스 패키지명: `com.sprint.mission.discodeit.service`
-    - [ ] 인터페이스 네이밍 규칙: `[도메인 모델 이름]Service`
-- [ ] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-    - [ ] 클래스 패키지명: `com.sprint.mission.discodeit.service.jcf`
-    - [ ] 클래스 네이밍 규칙: `JCF[인터페이스 이름]`
-    - [ ] Java Collections Framework를 활용하여 데이터를 저장할 수 있는 필드(data)를 final로 선언하고 생성자에서 초기화하세요.
-    - [ ] `data` 필드를 활용해 생성, 조회, 수정, 삭제하는 메소드를 구현하세요.
+- [x] 도메인 모델 별 CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 인터페이스로 선언하세요.
+    - [x] 인터페이스 패키지명: `com.sprint.mission.discodeit.service`
+    - [x] 인터페이스 네이밍 규칙: `[도메인 모델 이름]Service`
+- [x] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
+    - [x] 클래스 패키지명: `com.sprint.mission.discodeit.service.jcf`
+    - [x] 클래스 네이밍 규칙: `JCF[인터페이스 이름]`
+    - [x] Java Collections Framework를 활용하여 데이터를 저장할 수 있는 필드(data)를 final로 선언하고 생성자에서 초기화하세요.
+    - [x] `data` 필드를 활용해 생성, 조회, 수정, 삭제하는 메소드를 구현하세요.
 
 **4️⃣ 메인 클래스 구현**
 
