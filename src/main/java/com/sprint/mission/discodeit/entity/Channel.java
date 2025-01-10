@@ -47,4 +47,14 @@ public class Channel extends BaseEntity {
     public void updateMessageList(List<Message> messageList) {
         this.messageList = messageList;
     }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", participants=[" + participants + "]" +
+                ", messageCount=" + ((messageList != null) ? messageList.size() : 0) +
+                '}';
+    }
 }

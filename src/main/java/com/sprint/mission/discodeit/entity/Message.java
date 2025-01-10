@@ -40,4 +40,17 @@ public class Message extends BaseEntity {
         this.channel = channel;
         updateTime();
     }
+
+    @Override
+    public String toString() {
+        String authorName = (author != null) ? author.getUsername() : "Unknown";
+        String channelName = (channel != null) ? channel.getName() : "Unknown";
+
+        return "Message{" +
+                "id='" + getId() + '\'' +
+                "content='" + content + '\'' +
+                ", author='" + authorName + '\'' +
+                ", channel='" + channelName + '\'' +
+                '}';
+    }
 }

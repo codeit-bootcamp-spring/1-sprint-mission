@@ -26,8 +26,7 @@ public class JCFChannelService implements ChannelService {
         }
 
         data.put(channel.getId(), channel);
-
-        System.out.println("[" + channel.getName()+" 채널 등록 완료] ");
+        System.out.println(channel.toString());
         return channel;
     }
 
@@ -41,14 +40,18 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("User does not exists: " + user.getUsername());
         }
         channel.getParticipants().add(existUser.get());
+        System.out.println(channel.toString());
+        System.out.println(channel.getName()+" 채널에 "+ user.getUsername() + " 유저 추가 완료\n");
     }
     @Override
     public Optional<Channel> readChannel(Channel channel) {
+        System.out.println(channel.toString());
         return Optional.ofNullable(data.get(channel.getId()));
     }
 
     @Override
     public List<Channel> readAllChannels() {
+
         return new ArrayList<>(data.values());
     }
 
@@ -58,12 +61,14 @@ public class JCFChannelService implements ChannelService {
         if (!data.containsKey(existChannel.getId())) {
             throw new NoSuchElementException("Channel not found");
         }
+        System.out.println("업데이트 이전 채널 = "+existChannel.toString());
         existChannel.updateName(updateChannel.getName());
         existChannel.updateDescription(updateChannel.getDescription());
         existChannel.updateParticipants(updateChannel.getParticipants());
         existChannel.updateMessageList(updateChannel.getMessageList());
         existChannel.updateTime();
         data.put(existChannel.getId(), existChannel);
+        System.out.println("업데이트 이후 채널 = "+existChannel.toString());
         return existChannel;
 
     }

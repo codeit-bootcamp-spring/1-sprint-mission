@@ -25,8 +25,8 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Author and Channel cannot be null");
         }
         // User가 실제로 존재하는지 확인
-        if(!userService.readUser(message.getAuthor()).isPresent() || !channelService.readChannel(message.getChannel()).isPresent()) {
-            throw new IllegalArgumentException("Author or Channel do not exist " + message.getAuthor().getId());
+        if(!userService.readUser(message.getAuthor()).isPresent()) {
+            throw new IllegalArgumentException("Author does not exist " + message.getAuthor().getId());
         }
         //Channel이 실제로 존재하는지 확인
         Optional<Channel> existingChannel = channelService.readChannel(message.getChannel());
@@ -39,14 +39,13 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Author is not a participant of the channel: " + message.getChannel().getId());
         }
         data.put(message.getId(), message);
-
-        System.out.println("[" + message.getChannel().getName()+" 해당 채널에 " +
-                message.getAuthor().getUsername()+" 유저의 메시지 등록 완료] ");
+        System.out.println(message.toString()+"\n메세지 생성 완료\n");
         return message;
     }
 
     @Override
     public Optional<Message> readMessage(Message message) {
+        System.out.println(message.toString());
         return Optional.ofNullable(data.get(message.getId()));
     }
 
@@ -64,10 +63,12 @@ public class JCFMessageService implements MessageService {
            throw new NoSuchElementException("No message found for the given User");
        }
         Message message = existingMessage.get();
+        System.out.println("수정 전 메시지 = "+message.getContent());
         message.updateContent(updatedMessage.getContent());
         message.updateChannel(updatedMessage.getChannel());
         message.updateTime();
         data.put(message.getId(), message);
+        System.out.println("수정 후 메시지 = "+message.getContent());
         return message;
     }
 
