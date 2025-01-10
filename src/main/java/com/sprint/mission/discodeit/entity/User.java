@@ -30,11 +30,9 @@ public class User extends BaseEntity {
     }
     @Override
     public String toString() {
-        return "User{" +
+        return "User {" +
                 "name='" + name + '\'' +
                 ", email='" + email + '\'' +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
                 '}';
     }
 

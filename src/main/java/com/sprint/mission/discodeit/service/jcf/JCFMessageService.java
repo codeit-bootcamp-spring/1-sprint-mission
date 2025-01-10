@@ -11,6 +11,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void createMessage(Message message) {
+
         if (messages.containsKey(message.getId().toString())) {
             throw new IllegalArgumentException("이미 존재하는 메세지입니다. " + message.getId());
         }
@@ -42,6 +43,7 @@ public class JCFMessageService implements MessageService {
         messages.remove(id);
         System.out.println("메세지가 삭제되었습니다. " + id);
     }
+
 
 
 }

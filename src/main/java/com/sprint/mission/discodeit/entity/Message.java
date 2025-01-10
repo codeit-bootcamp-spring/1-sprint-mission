@@ -34,4 +34,13 @@ public class Message extends BaseEntity {
         this.channel = channel;
         update();
     }
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", author='" + author + '\'' +
+                ", channel='" + channel + '\'' +
+
+                '}';
+    }
 }

@@ -55,6 +55,15 @@ public class Channel extends BaseEntity {
             update();
         }
     }
+    @Override
+    public String toString() {
+        return "Channel = [" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", isPrivate=" + isPrivate +
+                ", members=" + members +
+                ']';
+    }
 
 
 }

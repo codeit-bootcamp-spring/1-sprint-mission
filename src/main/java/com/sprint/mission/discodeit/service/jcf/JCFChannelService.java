@@ -16,7 +16,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("이미 존재하는 채널입니다 : " + channel.getId());
         }
         channels.put(channel.getId().toString(), channel);
-        System.out.println("채널이 생성되었습니다." + channel.getId());
+        System.out.println("채널이 생성되었습니다." + channel.getId()+ ", Created At: " + channel.getCreatedAt());
     }
     @Override
     public Channel readChannel(String id) {
@@ -28,11 +28,12 @@ public class JCFChannelService implements ChannelService {
     }
     @Override
     public void updateChannel(Channel channel) {
+
         if(!channels.containsKey(channel.getId().toString())) {
             throw new IllegalArgumentException("존재하지 않는 채널입니다. " + channel.getId());
         }
         channels.put(channel.getId().toString(), channel);
-        System.out.println("채널이 업데이트 되었습니다. " + channel.getId() );
+        System.out.println("채널이 업데이트 되었습니다. " + channel.getId() +  ", Updated At: " + channel.getUpdatedAt());
     }
 
     @Override
@@ -53,7 +54,7 @@ public class JCFChannelService implements ChannelService {
     public void removeMember(String channelId, User member) {
         Channel channel = readChannel(channelId);
         channel.removeMember(member);
-        System.out.println("멤버가 추가되었습니다. " + member.getName());
+        System.out.println("멤버가 삭제되었습니다. " + member.getName());
     }
 
 }
