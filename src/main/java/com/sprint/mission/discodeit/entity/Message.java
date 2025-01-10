@@ -2,40 +2,57 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message extends Entity {
+public class Message {
+    private final UUID id;
+    private final Channel channel;
+    private final User user;
+    private final long createdAt;
+    private long updatedAt;
     private String content;
-    private final UUID userId;
-    private final UUID channelId;
-    public Message(String content, UUID userId, UUID channelId) {
-        super();
+
+    public Message(Channel channel, User user, String content) {
+        id = UUID.randomUUID();
+        createdAt = System.currentTimeMillis();
+        this.channel = channel;
+        this.user = user;
         this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
+    }
+    public UUID getId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public User getWriter() {
+        return user;
     }
 
     public String getContent() {
         return content;
     }
 
-    public UUID getUserId() {
-        return userId;
+    // update
+    public void updateUpdatedAt() {
+        updatedAt = System.currentTimeMillis();
     }
 
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public void updateContent(String message) {
-        this.content = content;
-        setUpdatedAt(System.currentTimeMillis());
+    public void updateContent(String updateContent){
+        this.content = updateContent;
+        updateUpdatedAt();
     }
 
     @Override
     public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", userId=" + userId +
-                ", channelId=" + channelId +
-                '}';
+        return "Message{channel:" + channel.getTitle() + "user:" + user.getName() + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 }

@@ -14,23 +14,21 @@ public class Entity {
         this.updatedAt = createdAt;
     }
 
+    //getter method
     public UUID getId() {
         return id;
     }
 
-    public Long getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
     //필드 수정 -> update 메소드
-    public void update() {
+    public void update(long updatedAt) {
         this.updatedAt = System.currentTimeMillis();
-    }
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

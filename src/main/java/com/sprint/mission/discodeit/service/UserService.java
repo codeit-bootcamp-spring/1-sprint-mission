@@ -6,9 +6,22 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(String username);
-    User getUserId(UUID id);
-    List<User> getAllUsers();
-    void updateUser(UUID id, String username);
-    void deleteUser(UUID id);
+    // 유저 생성
+    User createUser(String name, String email);
+
+    // 유저 정보 수정: 닉네임, 이메일
+    void updateUserName(User user, String name);
+    void updateUserEmail(User user, String email);
+
+    // 모든 유저 조회
+    List<User> getAllUserList();
+    User searchById(UUID userId);
+
+    // 유저 정보 출력
+    void printUserInfo(User user);
+    void printUserListInfo(List<User> userList);
+
+    // 유저 삭제
+    void deleteUser(User user);
+
 }
