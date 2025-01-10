@@ -48,7 +48,7 @@ public class Channel {
         return channelName;
     }
 
-    public void updateChannelName(String channelName) {
+    public void setChannelName(String channelName) {
         this.channelName=channelName;
     }
 
@@ -61,7 +61,7 @@ public class Channel {
         return updatedAt;
     }
 
-    public void updateUpdatedAt() {
+    public void setUpdatedAt() {
         this.updatedAt=System.currentTimeMillis();;
     }
 

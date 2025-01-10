@@ -44,7 +44,7 @@ public class User {
         return nickname;
     }
 
-    public void updateNickname(String nickname) {
+    public void setNickname(String nickname) {
         this.nickname = nickname;
     }
 
@@ -52,7 +52,7 @@ public class User {
         return email;
     }
 
-    public void updateEmail(String email) {
+    public void setEmail(String email) {
         this.email=email;
     }
 
@@ -65,14 +65,14 @@ public class User {
         return updatedAt;
     }
 
-    public void updateUpdatedAt() {
+    public void setUpdatedAt() {
         this.updatedAt=System.currentTimeMillis();
     }
 
     public UserStatus getUserStatus() {
         return userStatus;
     }
-    public void updateUserStatus(UserStatus userStatus) {
+    public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
 
@@ -80,7 +80,7 @@ public class User {
         return accountStatus;
     }
 
-    public void updateAccountStatus(AccountStatus accountStatus) {
+    public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus=accountStatus;
     }
 
@@ -88,7 +88,7 @@ public class User {
         return statusMessage;
     }
 
-    public void updateStatusMessage(String statusMessage) {
+    public void setStatusMessage(String statusMessage) {
         this.statusMessage=statusMessage;
     }
 

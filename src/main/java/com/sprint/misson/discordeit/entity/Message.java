@@ -38,7 +38,7 @@ public class Message {
         return content;
     }
 
-    public void updateContent(String content) {
+    public void setContent(String content) {
         this.content=content;
     }
 
@@ -51,7 +51,7 @@ public class Message {
         return updatedAt;
     }
 
-    public void updateUpdatedAt() {
+    public void setUpdatedAt() {
         this.updatedAt=System.currentTimeMillis();;
     }
 
