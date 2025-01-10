@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
-import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
-
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 
 public class User extends AbstractUUIDEntity {
