@@ -24,6 +24,8 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(User user, String content, Channel channel) {
         //todo
         //존재하는 유저? 존재하는 채널?
+        //User가 Null일 경우, 존재하지 않을 경우 처리
+        //Channel이 Null일 경우, 존재하지 않을 경우 처리
         Message message = new Message(user, content, channel);
         data.put( message.getId(), message );
         return message;
@@ -73,7 +75,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean updateMessage(Message message) {
-        //TODO - UserService Update 와 마찬가지.
         if(message == null){
             return false;
         }

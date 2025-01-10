@@ -84,12 +84,6 @@ public class JCFUserService implements UserService {
     @Override
     public boolean updateUser(User user) {
 
-        // todo - 질문
-        // 메인에서 update 함수로 객체 필드 수정 시,
-        // HashMap 에 저장된 해당 user 객체도 업데이트 되지 않나?
-        // -> 메세지를 다른 메세지로 대체할 수는 없지 않나?
-        // -> @transactional 없이 트랜젝션처럼 구현해야하나?
-
         if(user == null) {
             return false;
         }
@@ -97,20 +91,32 @@ public class JCFUserService implements UserService {
         data.put( user.getId(), user );
         return true;
 
-        // 시나리오
-        // getUser 로 User 객체를 조회
-        // 1) 존재할 경우 data.get()을 통해 user 객체를 가져옴
-        // -> main 에서 특정 필드들 수정
-        // -> Service 에서 data 에 업데이트
-
-        // 2) 존재하지 않을 경우, null 이므로 업데이트 불가능
-        // -> false 반환
-
-        // 주의: HashMap 은 put 할 때 key 가 null 이어도 저장된다.
-
-
-
     }
+    // Todo - 질문
+    // Q: 메인에서 update 함수로 객체 필드 수정 시,
+    // HashMap 에 저장된 해당 user 객체도 업데이트 되는데, 다시 data.put()을 해야하는지
+    // -> JPA 사용?
+    // -> DTO 사용?
+    // -> @transactional 없이 트랜젝션처럼 구현해야하나?
+
+    /* @Override
+    public boolean updateUser(String userId, User newUserData) {
+
+        User oldUser =  getUserByUUID( userId );
+        if( oldUser == null) {
+            return false;
+        }
+        oldUser.updateNickname( newUserData.getNickname() );
+        oldUser.updateEmail( newUserData.getEmail() );
+        oldUser.updateUserStatus( newUserData.getUserStatus() );
+        oldUser.updateAccountStatus( newUserData.getAccountStatus() );
+        oldUser.updateStatusMessage( newUserData.getStatusMessage() );
+        oldUser.updateUpdatedAt();
+
+        data.put( oldUser.getId(), oldUser );
+        return true;
+    }*/
+
 
     @Override
     public boolean deleteUser(User user) {
