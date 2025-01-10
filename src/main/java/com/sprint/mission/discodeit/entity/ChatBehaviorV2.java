@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -9,20 +10,19 @@ import java.util.List;
 
 public class ChatBehaviorV2 implements ChannelBehavior{
 
-    private static final JCFMessageServiceV2 messageService = JCFMessageServiceV2.getInstance();
+    private MessageServiceV2 messageService;
     private Channel channel;
     private UserService userService;
-    public ChatBehaviorV2(UserService userService){
+    public ChatBehaviorV2(UserService userService, MessageServiceV2 messageServiceV2){
         this.userService = userService;
+        this.messageService = messageServiceV2;
     }
     @Override
     public void setChannelPrivate(Channel channel) {
-
     }
 
     @Override
     public void setChannelPublic(Channel channel) {
-
     }
 
     public void setChannel(Channel channel) {

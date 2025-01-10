@@ -127,7 +127,7 @@ public class JavaApplication {
             100,
             false,
             "General",
-            new ChatBehaviorV2(userService)
+            new ChatBehaviorV2(userService, messageServiceV2)
         );
 
         Channel voiceChannel = new Channel(
@@ -191,7 +191,7 @@ public class JavaApplication {
             100,
             false,
             "General",
-            new ChatBehaviorV2(userService)
+            new ChatBehaviorV2(userService, messageServiceV2)
         );
 
         Channel chatChannel2 = new Channel(
@@ -201,7 +201,7 @@ public class JavaApplication {
             100,
             false,
             "General",
-            new ChatBehaviorV2(userService)
+            new ChatBehaviorV2(userService, messageServiceV2)
         );
 
         ChatBehaviorV2 chatBehavior = (ChatBehaviorV2) chatChannel.getBehavior();
