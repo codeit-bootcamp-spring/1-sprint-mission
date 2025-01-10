@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MessageService {
-    //메시지 생성
+
     void createMessage(Message message);
-    //메시지 수정
-    void updateMessage(Message message);
-    //메시지 삭제
-    void deleteMessage(String userName, String password);
-    //메시지 목록 확인
-    List<Message> getAllMessage();
+    void updateMessage(Message message, String content, User writer);
+    void deleteMessage(Message message, User writer);
+    List<String> getAllMessage();
+    List<Map<String, String>> getChannelMessage(Channel channel);
+    List<Map<String, String>> getWriterMessage(User user);
 
 }

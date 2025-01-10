@@ -38,7 +38,7 @@ public class JCFUserService implements UserService{
         data.stream()
                 .findFirst()
                 .ifPresentOrElse(
-                        user1 -> user.setUserName(newEmail),
+                        user1 -> user.setEmail(newEmail),
                         () -> {
                             try {
                                 throw new NoSuchElementException("사용자가 없습니다");
@@ -55,7 +55,7 @@ public class JCFUserService implements UserService{
         if (removed) {
             System.out.println("사용자가 삭제되었습니다.");
         } else {
-            System.out.println("사용자를 없거나 비밀번호가 일치하지 않습니다.");
+            System.out.println("사용자가 없거나 비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -66,7 +66,7 @@ public class JCFUserService implements UserService{
                 .filter(user -> user.getUserName().equals(name))
                 .findFirst()
                 .ifPresentOrElse(
-                        user -> user.userInfo(),
+                        user -> user.displayUserInfo(),
                         ()->{
                             try{
                                 throw new NoSuchElementException("사용자가 없습니다.");
@@ -75,6 +75,13 @@ public class JCFUserService implements UserService{
                             }
                         });
 
+    }
+
+    @Override
+    public void getAllUser(){
+        for(User user : data){
+            user.displayUserInfo();
+        }
     }
 
 
