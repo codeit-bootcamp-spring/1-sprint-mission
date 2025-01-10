@@ -24,14 +24,14 @@ public class Message extends BaseEntity {
     // update
     public void updateContent(String content) {
         this.content = content;
-        getUpdatedAt();
+        update();
     }
     public void updateAuthor(String author) {
         this.author = author;
-        getUpdatedAt();
+        update();
     }
     public void updateChannel(String channel) {
         this.channel = channel;
-        getUpdatedAt();
+        update();
     }
 }

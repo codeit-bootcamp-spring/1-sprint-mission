@@ -3,13 +3,11 @@ package com.sprint.mission.discodeit.entity;
 public class User extends BaseEntity {
     private String name;
     private String email;
-    private String status;
 
-    public User(String name, String email, String status) {
+    public User(String name, String email) {
         super();
         this.name = name;
         this.email = email;
-        this.status = status;
     }
 
     //getter
@@ -19,25 +17,27 @@ public class User extends BaseEntity {
     public String getEmail() {
         return email;
     }
-    public String getStatus() {
-        return status;
-    }
-
-
 
     //update
     public void updateName(String name) {
         this.name = name;
+        update();
     }
 
     public void updateEmail(String email) {
         this.email = email;
-        getUpdatedAt();
+        update();
     }
-    public void updateStatus(String status) {
-        this.status = status;
-        getUpdatedAt();
+    @Override
+    public String toString() {
+        return "User{" +
+                "name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", createdAt=" + getCreatedAt() +
+                ", updatedAt=" + getUpdatedAt() +
+                '}';
     }
+
 
 
 }

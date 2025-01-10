@@ -31,28 +31,28 @@ public class Channel extends BaseEntity {
     // update
     public void updateName(String Name) {
         this.name = Name;
-        getUpdatedAt();
+        update();
     }
     public void updateDescription(String Description) {
         this.description = Description;
-        getUpdatedAt();
+        update();
     }
     public void updateIsPrivate(boolean IsPrivate) {
         this.isPrivate = IsPrivate;
-        getUpdatedAt();
+        update();
     }
 
     //member 메소드 구현
     public void addMember (User member) {
         if (!members.contains(member)) {
             members.add(member);
-            getUpdatedAt();
+            update();
         }
     }
     public void removeMember (User member) {
         if(members.contains(member)) {
             members.remove(member);
-            getUpdatedAt();
+            update();
         }
     }
 
