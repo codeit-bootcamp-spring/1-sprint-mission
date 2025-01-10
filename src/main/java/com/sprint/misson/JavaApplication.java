@@ -1,5 +1,7 @@
 package com.sprint.misson;
 
+import com.sprint.misson.discordeit.dto.ChannelDTO;
+import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.*;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
@@ -279,8 +281,10 @@ public class JavaApplication {
                 )
         );
 
-        user1.updateNickname("codeit");
-        userService.updateUser(user1);
+        UserDTO userDto = new UserDTO();
+        userDto.setNickname( "codeit" );
+
+        System.out.println( "\n-> 수정 성공 여부: " + (userService.updateUser( user1.getId().toString(), userDto )!=null));
 
         System.out.println("\n> 수정 후 유저 목록: ");
         userService.getUsers().forEach(
@@ -309,8 +313,9 @@ public class JavaApplication {
                                 + "\n - updatedAt: "+c.getUpdatedAt().toString()
                 ));
 
-        channel1.updateChannelName( "수다방" );
-        channelService.updateChannel( channel1 );
+        ChannelDTO channelDTO = new ChannelDTO();
+        channelDTO.setChannelName( "수다방" );
+        System.out.println( "\n-> 수정 성공 여부: " + (channelService.updateChannel( channel1.getId().toString(), channelDTO ) != null) );
 
         System.out.println("\n> 수정 후 채널 목록: ");
         channelService.getChannels()
@@ -338,10 +343,7 @@ public class JavaApplication {
                                 + "\n - updatedAt: "+m.getUpdatedAt().toString()
                 ));
 
-        //todo
-        //update관련 질문
-        msg1.updateContent( "수다방 채널입니다!" );
-        messageService.updateMessage( msg1 );
+        messageService.updateMessage(msg1.getId().toString(),"수다방 채널입니다!" );
 
         System.out.println("\n> 수정 후 메세지 목록: ");
         messageService.getMessages()
@@ -375,7 +377,7 @@ public class JavaApplication {
 
         User senderMsg = userService.getUsersByNickname( "홍길동" ).get( 0 );
         Message msgToDelete=messageService.getMessageBySender( senderMsg ).get( 0 );
-        messageService.deleteMessage( msgToDelete );
+        System.out.println("\n-> Message 삭제 결과: " + messageService.deleteMessage( msgToDelete ));
 
         System.out.println("\n> 삭제 후 메세지 목록: ");
         messageService.getMessages()
@@ -400,8 +402,10 @@ public class JavaApplication {
                                 + "\n - type: "+ c.getChannelType()
                 ));
 
-        channelService.getChannelsByName( "일반" )
-                .forEach( channelService::deleteChannel );
+        List<Channel> normalChannels = channelService.getChannelsByName( "일반" );
+        normalChannels.forEach( c -> System.out.println(
+                "\n-> 채널 \"" + c.getChannelName() + "\" 삭제 결과: " + channelService.deleteChannel( c )
+        ));
 
 
         System.out.println("\n삭제 후 채널 목록: ");
@@ -426,8 +430,8 @@ public class JavaApplication {
                                 + "\n - email: "+ u.getEmail()
                 )
         );
-
-        userService.deleteUser( userService.getUserByEmail( "gildong@naver.com" ) );
+        User userFoundByEmail=userService.getUserByEmail( "gildong@naver.com" );
+        System.out.println("\n-> User 삭제 결과: " + userService.deleteUser(userFoundByEmail.getId().toString()));
 
         System.out.println("\n> 삭제 후 유저 목록: ");
         userService.getUsers().forEach(

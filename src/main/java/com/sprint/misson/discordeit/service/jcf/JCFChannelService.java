@@ -1,5 +1,6 @@
 package com.sprint.misson.discordeit.service.jcf;
 
+import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.service.ChannelService;
@@ -55,13 +56,39 @@ public class JCFChannelService implements ChannelService {
     }
     //수정
     @Override
-    public boolean updateChannel(Channel channel) {
-        if ( channel.getId() == null ) {
-            return false;
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO) {
+        Channel channel = data.get( UUID.fromString( channelId ) );
+
+        if ( channel == null || channelDTO == null ) {
+            return null;
         }
-        channel.updateUpdatedAt();
-        data.put( channel.getId(), channel );
-        return true;
+
+        //변경 여부 체크
+        boolean isUpdated = false;
+
+        // 채널 이름 변경 처리
+        String newChannelName = channelDTO.getChannelName();
+        if (newChannelName != null
+                && !newChannelName.isEmpty()
+                && !newChannelName.equals(channel.getChannelName())) {
+            channel.setChannelName(newChannelName);
+            isUpdated = true;
+        }
+
+        // hidden 상태 변경 처리
+        boolean newHiddenStatus = channelDTO.isHidden();
+        if (channel.isHidden() != newHiddenStatus) {
+            channel.setHidden(newHiddenStatus);
+            isUpdated = true;
+        }
+
+        // 변경사항이 있는 경우에만 업데이트 시간 설정
+        if (isUpdated) {
+            channel.setUpdatedAt();
+            return channel;
+        }
+
+        return null;
     }
 
     //삭제

@@ -73,14 +73,20 @@ public class JCFMessageService implements MessageService {
                 .collect( Collectors.toList());
     }
 
+    //수정
     @Override
-    public boolean updateMessage(Message message) {
-        if(message == null){
-            return false;
+    public Message updateMessage(String messageId, String newContent) {
+
+        Message message = data.get(UUID.fromString( messageId ));
+
+        if(message == null || message.getContent().equals(newContent) || newContent.isEmpty() ) {
+            return null;
         }
-        message.updateUpdatedAt();
-        data.put( message.getId(), message );
-        return true;
+
+        message.setContent(newContent);
+        message.setUpdatedAt();
+
+        return message;
     }
 
     @Override

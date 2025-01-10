@@ -1,5 +1,6 @@
 package com.sprint.misson.discordeit.service.jcf;
 
+import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.entity.UserStatus;
@@ -82,45 +83,49 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean updateUser(User user) {
+    public User updateUser(String userId, UserDTO userDTO) {
+        User user = data.get( UUID.fromString(userId) );
 
-        if(user == null) {
-            return false;
+        if( user == null || userDTO == null) {
+            return null;
         }
-        user.updateUpdatedAt();
-        data.put( user.getId(), user );
-        return true;
 
+        boolean isUpdated = false;
+
+        if(!user.getNickname().equals( userDTO.getNickname())
+                && userDTO.getNickname() != null
+                && !userDTO.getNickname().isEmpty()) {
+            user.setNickname( userDTO.getNickname() );
+            isUpdated = true;
+        }
+        if(!user.getEmail().equals( userDTO.getEmail())
+                && userDTO.getEmail() != null
+                && !userDTO.getEmail().isEmpty()) {
+            user.setEmail( userDTO.getEmail() );
+            isUpdated = true;
+        }
+        if(!user.getUserStatus().equals( userDTO.getUserStatus())
+                && userDTO.getUserStatus() != null ) {
+            user.setUserStatus( userDTO.getUserStatus()  );
+            isUpdated = true;
+        }
+        if(!user.getAccountStatus().equals( userDTO.getAccountStatus())
+                && userDTO.getAccountStatus() != null){
+            user.setAccountStatus( userDTO.getAccountStatus()  );
+            isUpdated = true;
+        }
+
+        if(isUpdated) {
+            user.setUpdatedAt();
+            return user;
+        }
+
+        return null;
     }
-    // Todo - 질문
-    // Q: 메인에서 update 함수로 객체 필드 수정 시,
-    // HashMap 에 저장된 해당 user 객체도 업데이트 되는데, 다시 data.put()을 해야하는지
-    // -> JPA 사용?
-    // -> DTO 사용?
-    // -> @transactional 없이 트랜젝션처럼 구현해야하나?
-
-    /* @Override
-    public boolean updateUser(String userId, User newUserData) {
-
-        User oldUser =  getUserByUUID( userId );
-        if( oldUser == null) {
-            return false;
-        }
-        oldUser.updateNickname( newUserData.getNickname() );
-        oldUser.updateEmail( newUserData.getEmail() );
-        oldUser.updateUserStatus( newUserData.getUserStatus() );
-        oldUser.updateAccountStatus( newUserData.getAccountStatus() );
-        oldUser.updateStatusMessage( newUserData.getStatusMessage() );
-        oldUser.updateUpdatedAt();
-
-        data.put( oldUser.getId(), oldUser );
-        return true;
-    }*/
-
 
     @Override
-    public boolean deleteUser(User user) {
+    public boolean deleteUser(String userId) {
         //* remove() - key 에 해당하는 값이 없어도 null 반환, 에러 x
-        return data.remove(user.getId()) != null;
+        return data.remove( UUID.fromString(userId), data.get( UUID.fromString(userId)));
     }
 }

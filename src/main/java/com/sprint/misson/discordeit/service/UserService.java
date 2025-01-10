@@ -31,10 +31,10 @@ public interface UserService {
     List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
-    boolean updateUser(User user);
+    User updateUser(String userId, UserDTO userDTO);
 
     //삭제
-    boolean deleteUser(User user);
+    boolean deleteUser(String userId);
 
 
 }

@@ -1,5 +1,6 @@
 package com.sprint.misson.discordeit.service;
 
+import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
 
@@ -24,7 +25,7 @@ public interface ChannelService {
      List<Channel> getChannelByType(ChannelType channelType);
 
     //수정
-     boolean updateChannel(Channel channel);
+     Channel updateChannel(String channelId, ChannelDTO channelDTO);
 
     //삭제
      boolean deleteChannel(Channel channel);
