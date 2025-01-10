@@ -36,7 +36,7 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
                 .stream()
                 .filter(Objects::nonNull)
                 .toList();
-        return existEntities;
+        return Collections.unmodifiableList(existEntities);
     }
 
     @Override
