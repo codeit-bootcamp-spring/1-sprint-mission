@@ -15,23 +15,23 @@ import com.sprint.mission.discodeit.service.user.UserService;
 
 public class JCFUserService implements UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository data;
     private final UserConverter converter;
 
     public JCFUserService(UserRepository userRepository, UserConverter converter) {
-        this.userRepository = userRepository;
+        this.data = userRepository;
         this.converter = converter;
     }
 
     @Override
     public void register(RegisterUserRequest registerUserRequest) {
         var entity = converter.toEntity(registerUserRequest);
-        userRepository.save(entity);
+        data.save(entity);
     }
 
     @Override
     public UserInfoResponse findUserByUsername(FindUserRequest findUserRequest) {
-        var entity = userRepository.findByUsername(findUserRequest.username())
+        var entity = data.findByUsername(findUserRequest.username())
                 .filter(user -> user.getStatus() != UNREGISTERED)
                 .map(converter::toDto)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
@@ -40,24 +40,24 @@ public class JCFUserService implements UserService {
 
     @Override
     public void modifyUserInfo(ModifyUserInfoRequest request) {
-        var entity = userRepository.findById(request.id())
+        var entity = data.findById(request.id())
                 .filter(user -> user.getStatus() != UNREGISTERED)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
 
         entity.changeName(request.changeUsername());
 
-        userRepository.save(entity);
+        data.save(entity);
     }
 
     @Override
     public void UnRegisterUser(UnregisterUserRequest request) {
-        var entity = userRepository.findById(request.id())
+        var entity = data.findById(request.id())
                 .filter(user -> user.getStatus() != UNREGISTERED)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
 
         entity.unregister();
 
-        userRepository.save(entity);
+        data.save(entity);
     }
 
 }
