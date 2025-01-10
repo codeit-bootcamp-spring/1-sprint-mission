@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private final List<User> users = new ArrayList<>();
+    private final List<User> data = new ArrayList<>();
 
     @Override
     public void createUser(String password, String name) {
         User user = new User(password, name);
-        users.add(user);
+        data.add(user);
     }
 
     @Override
     public User findUserById(UUID id) {
-        User user = users.stream()
+        User user = data.stream()
             .filter(u -> u.getId().equals(id))
             .findFirst()
             .orElse(null);
@@ -27,7 +27,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findUserByName(String name) {
-        User user = users.stream()
+        User user = data.stream()
             .filter(u -> u.getName().equals(name))
             .findFirst()
             .orElse(null);
@@ -36,19 +36,19 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> findAllUsers() {
-        return users;
+        return data;
     }
 
     @Override
     public void updateUserName(UUID id, String newName) {
-        users.stream().filter(u -> u.getId().equals(id))
+        data.stream().filter(u -> u.getId().equals(id))
             .findFirst()
             .ifPresentOrElse(user -> user.updateName(newName), () -> System.out.println("user not found"));
     }
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
-        users.stream()
+        data.stream()
             .filter(u -> u.getId().equals(id))
             .findFirst()
             .ifPresentOrElse(user -> user.updatePassword(newPassword), () -> System.out.println("user not found"));
@@ -56,8 +56,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void removeUser(UUID id) {
-        users.stream().filter(u -> u.getId().equals(id))
+        data.stream().filter(u -> u.getId().equals(id))
             .findFirst()
-            .ifPresentOrElse(users::remove, () -> System.out.println("user not found"));
+            .ifPresentOrElse(data::remove, () -> System.out.println("user not found"));
     }
 }
