@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class BaseEntity {
+public abstract class BaseEntity {
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
