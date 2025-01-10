@@ -75,6 +75,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public List<User> getUserByUserStatus(UserStatus userStatus) {
+        return data.values().stream()
+                .filter( u -> u.getUserStatus().equals(userStatus))
+                .toList();
+    }
+
+    @Override
     public boolean updateUser(User user) {
 
         // todo - 질문
