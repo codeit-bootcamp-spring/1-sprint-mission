@@ -9,6 +9,9 @@ public class Message extends Base {
     // 생성자
     public Message(String content, User sender, Channel channel) {
         super();
+        if(sender == null || channel == null) {
+            throw new IllegalArgumentException("Sender and channel cannot be null");
+        }
         this.content = content;
         this.sender = sender;
         this.channel = channel;

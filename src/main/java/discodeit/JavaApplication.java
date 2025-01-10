@@ -68,5 +68,12 @@ public class JavaApplication {
         channelService.read(channel2.getId());
         messageService.delete(message2.getId());
         messageService.read(message2.getId());
+
+        // 의존성 검증 - Message 생성 시 User나 Channel이 존재하지 않는다면 생성 X
+        try {
+            Message illegalMessage = new Message("It will be not create", null, channel2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
