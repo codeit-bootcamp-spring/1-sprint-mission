@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
 import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
+import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,6 +16,7 @@ import com.sprint.mission.discodeit.entity.user.UserName;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
+import com.sprint.mission.discodeit.entity.user.dto.UnregisterUserRequest;
 import com.sprint.mission.discodeit.service.user.UserConverter;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,10 +116,17 @@ class JCFUserServiceTest {
     @DisplayName("유저 회원 탈퇴 unregister 호출 시 유저 상태 변경")
     void givenUnregisterUserRequestWhenUnregisterThenUserStatusIsChanged() {
         // given
+        var unregisterUserRequest = new UnregisterUserRequest(user.getId(), NAME);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
         // when
+        userService.UnRegisterUser(unregisterUserRequest);
 
         // then
+        assertThat(user.getStatus()).isEqualTo(UNREGISTERED);
+        verify(userRepository).findById(user.getId());
+        verify(userRepository).save(any(User.class));
     }
 
 }
