@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +11,8 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("User Test")
 class UserTest {
-
+    private static final String USER_NAME = "test";
+    private static final String CHANNEL_NAME = "코드잇-스프린트_1기";
     private User user;
 
     @Test
@@ -18,16 +20,15 @@ class UserTest {
         // given
         String userName = "test1";
 
-        assertThat(new User(new UserName(userName))).isNotNull();
+        assertThat(User.from(userName)).isNotNull();
     }
 
     @Nested
     @DisplayName("유저 생성 수정 삭제")
     class InitializeNew {
-
         @BeforeEach
         void setUp() {
-            user = new User(new UserName("test1"));
+            user = User.from(USER_NAME);
         }
 
         @Test
@@ -38,7 +39,7 @@ class UserTest {
             // when
             var userName = user.getName();
             // then
-            assertThat(user.getName()).isEqualTo("test1");
+            assertThat(user.getName()).isEqualTo(USER_NAME);
         }
 
         // TODO : 유저 이름 수정 성공 테스트
@@ -56,5 +57,21 @@ class UserTest {
         }
     }
 
+    @Nested
+    @DisplayName("유저 채널")
+    class aboutChannel {
+
+        // TODO : 채널 생성 테스트
+        @Test
+        @DisplayName("채널 이름을 유저가 제공하여 새로운 채널을 만들면 생성된 채널 반환")
+        void givenChannelNameWhenUserCreateChannelThenReturnChannel() {
+            // given
+            user = User.from(USER_NAME);
+            // when
+            var channel = user.createChannel(CHANNEL_NAME);
+            // then
+            assertThat(channel).isNotNull();
+        }
+    }
 
 }

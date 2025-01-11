@@ -37,7 +37,7 @@ public class JCFUserService implements UserService {
         var entity = data.findByUsername(findUserRequest.username())
                 .filter(User::isNotUnregistered)
                 .map(converter::toDto)
-                .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
         return entity;
     }
 
@@ -61,11 +61,16 @@ public class JCFUserService implements UserService {
         data.save(entity);
     }
 
+    @Override
+    public void createChannel() {
+
+    }
+
 
     private User findById(UUID id) {
         var entity = data.findById(id)
                 .filter(User::isNotUnregistered)
-                .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
         return entity;
     }
 }
