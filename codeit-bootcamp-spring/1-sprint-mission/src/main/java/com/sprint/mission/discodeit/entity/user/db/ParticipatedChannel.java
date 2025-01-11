@@ -12,8 +12,8 @@ public class ParticipatedChannel {
         this.participatedChannels = participatedChannels;
     }
 
-    public static ParticipatedChannel of() {
-        return new ParticipatedChannel(new ArrayList<Channel>());
+    public static ParticipatedChannel from(List<Channel> participatedChannels) {
+        return new ParticipatedChannel(participatedChannels);
     }
 
     public Channel createChannel(String channelName) {
