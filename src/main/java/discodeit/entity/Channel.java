@@ -1,5 +1,7 @@
 package discodeit.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Channel {
@@ -8,8 +10,10 @@ public class Channel {
     private long updatedAt;
     private String name;
     private String introduction;
+    private User owner;
+    private List<User> participants;
 
-    public Channel(String name, String introduction) {
+    public Channel(String name, String introduction, User owner) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
         id = UUID.randomUUID();
         createdAt = currentUnixTime;
@@ -17,6 +21,8 @@ public class Channel {
 
         this.name = name;
         this.introduction = introduction;
+        this.owner = owner;
+        participants = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -49,5 +55,17 @@ public class Channel {
 
     public void updateIntroduction(String introduction) {
         this.introduction = introduction;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public List<User> getParticipants() {
+        return participants;
+    }
+
+    public void updateParticipants(User user) {
+        participants.add(user);
     }
 }
