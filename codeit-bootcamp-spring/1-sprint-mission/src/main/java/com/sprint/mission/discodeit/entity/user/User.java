@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
-import com.sprint.mission.discodeit.entity.user.db.ParticipatedChannel;
+import com.sprint.mission.discodeit.entity.user.entity.ParticipatedChannel;
 import java.util.ArrayList;
 
 public class User extends AbstractUUIDEntity {
@@ -17,8 +17,9 @@ public class User extends AbstractUUIDEntity {
         channel = ParticipatedChannel.from(new ArrayList<Channel>(1_000));
     }
 
-    public String getName() {
-        return name.getName();
+    public static User from(final String username) {
+        var userName = UserName.from(username);
+        return new User(userName);
     }
 
     public void changeName(String newName) {
@@ -26,13 +27,17 @@ public class User extends AbstractUUIDEntity {
         updateStatusAndUpdateAt();
     }
 
-    public void unregister() {
-        updateUnregistered();
+    public Channel createChannel(String channelName) {
+        var createdChannel = channel.createChannel(channelName);
+        return createdChannel;
     }
 
-    public Channel createChannel(String channelName) {
-        var channel = this.channel.createChannel(channelName);
-        return channel;
+    public String getName() {
+        return name.getName();
+    }
+
+    public void unregister() {
+        updateUnregistered();
     }
 }
 

@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.entity.user.db;
+package com.sprint.mission.discodeit.entity.user.entity;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ParticipatedChannel {
@@ -21,4 +20,10 @@ public class ParticipatedChannel {
         participatedChannels.add(channel);
         return channel;
     }
+
+    // 채널 찾기
+
+    // 채널 삭제
+
+    // 채널 수정
 }

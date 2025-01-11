@@ -18,4 +18,8 @@ public class Channel extends AbstractUUIDEntity {
         return new Channel(channelName);
     }
 
+    public String getChannelName() {
+        return channelName;
+    }
+
 }
