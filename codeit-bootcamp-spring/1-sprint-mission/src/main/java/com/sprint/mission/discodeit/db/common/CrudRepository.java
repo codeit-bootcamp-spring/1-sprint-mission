@@ -14,5 +14,5 @@ public interface CrudRepository<T, ID> extends Repository<T, ID> {
 
     void deleteById(ID id);
 
-    boolean existsById(ID id);
+    boolean isExistsById(ID id);
 }

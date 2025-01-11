@@ -54,6 +54,10 @@ public abstract class AbstractUUIDEntity {
         updateStatus(UNREGISTERED);
     }
 
+    public boolean isNotUnregistered() {
+        return status != UNREGISTERED;
+    }
+
     private long createUnixTimestamp() {
         return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }

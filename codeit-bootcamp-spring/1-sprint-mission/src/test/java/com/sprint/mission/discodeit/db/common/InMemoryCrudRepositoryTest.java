@@ -102,7 +102,7 @@ class InMemoryCrudRepositoryTest {
             // given
             var existId = entity.getId();
             // when
-            var result = repository.existsById(existId);
+            var result = repository.isExistsById(existId);
             // then
             assertThat(result).isTrue();
         }
@@ -113,7 +113,7 @@ class InMemoryCrudRepositoryTest {
             // given
             var id = UUID.randomUUID();
             // when
-            var result = repository.existsById(id);
+            var result = repository.isExistsById(id);
             //then
             assertThat(result).isFalse();
         }
