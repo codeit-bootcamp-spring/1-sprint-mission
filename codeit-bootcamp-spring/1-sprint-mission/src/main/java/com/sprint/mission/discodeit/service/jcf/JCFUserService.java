@@ -66,11 +66,14 @@ public class JCFUserService implements UserService {
 
     }
 
-
     private User findById(UUID id) {
         var entity = data.findById(id)
                 .filter(User::isNotUnregistered)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
         return entity;
+    }
+
+    public static JCFUserService getInstance(UserRepository userRepository) {
+        return new JCFUserService(userRepository, UserConverter.getInstance());
     }
 }

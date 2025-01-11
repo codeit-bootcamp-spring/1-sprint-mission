@@ -27,15 +27,15 @@ import org.junit.jupiter.api.Test;
 class JCFUserServiceTest {
     private static final String NAME = "SB_1기_백재우";
 
-    UserRepository userRepository;
-    UserConverter userConverter;
-    JCFUserService userService;
-    User user;
+    private UserRepository userRepository;
+    private UserConverter userConverter;
+    private JCFUserService userService;
+    private User user;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        userConverter = new UserConverter();
+        userConverter = UserConverter.getInstance();
         userService = new JCFUserService(userRepository, userConverter);
         user = new User(new UserName(NAME));
     }
