@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    void createUser(String name, String email, String phoneNumber, String password);
+    User createUser(String name, String email, String phoneNumber, String password);
     UUID readId(User user);
     long getCreatedAt(User user);
     long getUpdatedAt(User user);
