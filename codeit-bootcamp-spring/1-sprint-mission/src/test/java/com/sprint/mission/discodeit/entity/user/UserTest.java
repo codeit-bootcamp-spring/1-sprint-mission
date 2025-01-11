@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sprint.mission.discodeit.entity.common.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,7 +45,15 @@ class UserTest {
 
         // TODO : 유저 이름 수정 실패 테스트
 
-        // TODO : 유저 상태 해지 테스트
+        @Test
+        @DisplayName("유저 해지 요청 후 유저의 상태 변경")
+        void givenUnregisterRequestWhenUnregisterThenStatusChange() {
+            // given
+            // when
+            user.unregister();
+            // then
+            assertThat(user.getStatus()).isEqualTo(Status.UNREGISTERED);
+        }
     }
 
 

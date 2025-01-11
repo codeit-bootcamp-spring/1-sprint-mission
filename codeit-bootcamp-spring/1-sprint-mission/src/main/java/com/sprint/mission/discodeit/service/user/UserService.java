@@ -15,4 +15,6 @@ public interface UserService {
     UserInfoResponse modifyUserInfo(ModifyUserInfoRequest request);
 
     void UnRegisterUser(UnregisterUserRequest request);
+
+    void createChannel();
 }
