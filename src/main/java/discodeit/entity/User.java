@@ -1,5 +1,7 @@
 package discodeit.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class User {
@@ -7,23 +9,23 @@ public class User {
     private UUID id;
     private long createdAt;
     private long updatedAt;
-    private String userName;
-    private String displayName;
+    private String name;
     private String email;
     private String phoneNumber;
     private String password;
+    private List<Channel> joinedChannels;
 
-    public User(String userName, String displayName, String email, String phoneNumber, String password) {
+    public User(String name, String email, String phoneNumber, String password) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
         id = UUID.randomUUID();
         createdAt = currentUnixTime;
         updatedAt = currentUnixTime;
 
-        this.userName = userName;
-        this.displayName = displayName;
+        this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        joinedChannels = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -42,20 +44,12 @@ public class User {
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getName() {
+        return name;
     }
 
-    public void updateUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public void updateDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void updateName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -76,5 +70,13 @@ public class User {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public List<Channel> getJoinedChannels() {
+        return joinedChannels;
+    }
+
+    public void updateJoinedChannels(Channel channel) {
+        joinedChannels.add(channel);
     }
 }
