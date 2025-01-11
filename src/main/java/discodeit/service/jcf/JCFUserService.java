@@ -40,8 +40,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void getInfo(User user) {
-
+    public String getInfo(User user) {
+        return user.toString();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updatePassword(User user, String password) {
-        
+
     }
 
     @Override

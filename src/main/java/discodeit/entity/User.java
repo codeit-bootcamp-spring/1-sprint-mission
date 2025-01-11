@@ -79,4 +79,18 @@ public class User {
     public void updateJoinedChannels(Channel channel) {
         joinedChannels.add(channel);
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+                name + "님의 정보입니다." + System.lineSeparator()
+                        + "Name: " + name + System.lineSeparator()
+                        + "Email: " + email + System.lineSeparator()
+                        + "Phone number: " + phoneNumber + System.lineSeparator()
+                        + "Joined Channels: "
+                        + String.join(", ", joinedChannels.stream()
+                        .map(Channel::getName)
+                        .toList())
+        );
+    }
 }

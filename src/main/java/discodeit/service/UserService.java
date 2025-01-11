@@ -11,7 +11,7 @@ public interface UserService {
     UUID readId(User user);
     long getCreatedAt(User user);
     long getUpdatedAt(User user);
-    void getInfo(User user);
+    String getInfo(User user);
     String getName(User user);
     String getEmail(User user);
     String getPhoneNumber(User user);
