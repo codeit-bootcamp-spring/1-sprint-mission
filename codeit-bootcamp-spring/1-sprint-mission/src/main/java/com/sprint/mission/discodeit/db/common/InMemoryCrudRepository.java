@@ -50,7 +50,7 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     }
 
     @Override
-    public boolean existsById(final ID id) {
+    public boolean isExistsById(final ID id) {
         var isExist = store.containsKey(id);
         return isExist;
     }

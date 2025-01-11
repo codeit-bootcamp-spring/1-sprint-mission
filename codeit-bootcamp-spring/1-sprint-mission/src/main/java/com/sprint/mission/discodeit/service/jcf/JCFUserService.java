@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.USER_NOT_FOUND;
-import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.user.UserRepository;
@@ -36,7 +35,7 @@ public class JCFUserService implements UserService {
     @Override
     public UserInfoResponse findUserByUsername(FindUserRequest findUserRequest) {
         var entity = data.findByUsername(findUserRequest.username())
-                .filter(user -> user.getStatus() != UNREGISTERED)
+                .filter(User::isNotUnregistered)
                 .map(converter::toDto)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
         return entity;
@@ -65,7 +64,7 @@ public class JCFUserService implements UserService {
 
     private User findById(UUID id) {
         var entity = data.findById(id)
-                .filter(user -> user.getStatus() != UNREGISTERED)
+                .filter(User::isNotUnregistered)
                 .orElseThrow(() -> new UserException(USER_NOT_FOUND.getMessage()));
         return entity;
     }
