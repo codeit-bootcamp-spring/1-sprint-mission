@@ -6,8 +6,9 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    //채널 기준으로 메시지를 정리
-    Map<UUID, Map<UUID, Message>> msgData = new HashMap<>();
+    //채널 UUID 기준으로 메시지를 정리
+    //
+    private final Map<UUID, Map<UUID, Message>> msgData = new HashMap<>();
 
 
     public void addChannelMsg(Message msg) {
@@ -18,7 +19,7 @@ public class JCFMessageService implements MessageService {
     }
 
     // 메시지 조회
-    // 리턴을 매시지 객체로 하는게 좋은자.. 따로 필드값을 뽑아서 리스트로 뽑는게 좋을지 모르겠...
+    // 리턴을 매시지 객체로 하는게 좋은지.. 따로 필드값을 뽑아서 리스트로 뽑는게 좋을지 모르겠...
     public Message getMessage(UUID msgId) {
         for (Map<UUID, Message> channelMessages : msgData.values()) {
             if (channelMessages.containsKey(msgId)) {
@@ -36,7 +37,7 @@ public class JCFMessageService implements MessageService {
 
 
     public void updateMsg(UUID msgId, String newContent) {
-        // getMessage() 메서드를 활용하여 해당 메시지를 가져옴
+        //msgId 를 가지는 메시지를 검색
         Message msg = getMessage(msgId);  // 메시지 ID로 메시지를 찾음
 
         if (msg != null) {
@@ -48,7 +49,7 @@ public class JCFMessageService implements MessageService {
     }
 
 
-
+    // print 내용을 따로 분리하는게 좋을까요..?
     public void deleteMsg(UUID msgId) {
         // getMessage 메시지 검색
         Message msg = getMessage(msgId);

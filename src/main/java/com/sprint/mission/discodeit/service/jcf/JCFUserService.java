@@ -6,13 +6,13 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-
-    private final HashMap<UUID, User> data = new HashMap<>() ;
+    //key 값으로 value User 객체의 UUID 값을 할당해줌
+    private final Map<UUID, User> data = new HashMap<>() ;
 
 
     @Override
     public void userServiceAdd(User user) {
-        data.put(user.getuuID(), user);  // 입력된 사용자 객체를 데이터 리스트에 추가
+        data.put(user.getuuID(), user);
     }
 
     // 유저 서비스 목록에서 특정단일 사용자 객체 반환

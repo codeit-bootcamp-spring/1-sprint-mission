@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
-    HashMap<UUID, Channel> data = new HashMap<>();
+    private final HashMap<UUID, Channel> data = new HashMap<>();
 
 
     public void addChannel(Channel channel){
