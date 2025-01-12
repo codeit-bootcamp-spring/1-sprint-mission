@@ -12,6 +12,7 @@ public class Channel {
     private String introduction;
     private User owner;
     private List<User> participants;
+    private List<Message> messages;
 
     public Channel(String name, String introduction, User owner) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
@@ -23,6 +24,7 @@ public class Channel {
         this.introduction = introduction;
         this.owner = owner;
         participants = new ArrayList<>();
+        messages = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -67,6 +69,14 @@ public class Channel {
 
     public void updateParticipants(User user) {
         participants.add(user);
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void updateMessages(Message message) {
+        messages.add(message);
     }
 
     public boolean isEquals(Channel channel) {
