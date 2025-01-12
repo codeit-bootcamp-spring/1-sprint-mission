@@ -11,11 +11,27 @@ import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
-    private final ChannelService jcfChannelService;
-    private final MessageService jcfMessageService;
+    private ChannelService jcfChannelService;
+    private MessageService jcfMessageService;
 
-    public JCFUserService(ChannelService jcfChannelService, MessageService jcfMessageService) {
+    private JCFUserService() {
+    }
+
+    private static class JCFUserServiceHolder {
+        private static final UserService INSTANCE = new JCFUserService();
+    }
+
+    public static UserService getInstance() {
+        return JCFUserServiceHolder.INSTANCE;
+    }
+
+    @Override
+    public void updateChannelService(ChannelService jcfChannelService) {
         this.jcfChannelService = jcfChannelService;
+    }
+
+    @Override
+    public void updateMessageService(MessageService jcfMessageService) {
         this.jcfMessageService = jcfMessageService;
     }
 

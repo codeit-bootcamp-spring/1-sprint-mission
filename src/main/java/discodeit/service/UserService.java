@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
+    void updateChannelService(ChannelService channelService);
+    void updateMessageService(MessageService messageService);
     User createUser(String name, String email, String phoneNumber, String password);
     UUID readId(User user);
     long getCreatedAt(User user);

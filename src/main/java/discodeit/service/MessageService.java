@@ -6,6 +6,8 @@ import discodeit.entity.User;
 import java.util.UUID;
 
 public interface MessageService {
+    void updateUserService(UserService userService);
+    void updateChannelService(ChannelService channelService);
     void createMessage(String content, User sender);
     UUID readId(Message message);
     long getCreateAt(Message message);

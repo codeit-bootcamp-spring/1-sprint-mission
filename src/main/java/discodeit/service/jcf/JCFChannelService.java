@@ -3,11 +3,37 @@ package discodeit.service.jcf;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
+import discodeit.service.MessageService;
+import discodeit.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
+
+    private UserService jcfUserService;
+    private MessageService jcfMessageService;
+
+    private JCFChannelService() {
+    }
+
+    private static class JCFChannelServiceHolder {
+        private static final ChannelService INSTANCE = new JCFChannelService();
+    }
+
+    public static ChannelService getInstance() {
+        return JCFChannelServiceHolder.INSTANCE;
+    }
+
+    @Override
+    public void updateUserService(UserService jcfUserService) {
+        this.jcfUserService = jcfUserService;
+    }
+
+    @Override
+    public void updateMessageService(MessageService jcfMessageService) {
+        this.jcfMessageService = jcfMessageService;
+    }
 
     @Override
     public void createChannel(String name, String introduction, User owner) {

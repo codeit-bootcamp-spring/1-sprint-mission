@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
+    void updateUserService(UserService userService);
+    void updateMessageService(MessageService messageService);
     void createChannel(String name, String introduction, User owner);
     UUID getId(Channel channel);
     long getCreatedAt(Channel channel);
