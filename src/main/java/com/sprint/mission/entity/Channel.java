@@ -29,10 +29,6 @@ public class Channel {
         this.channelName = channelName;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
     @Override
     public String toString() {
         return "Channel{" + "user='" + user + '\'' +
