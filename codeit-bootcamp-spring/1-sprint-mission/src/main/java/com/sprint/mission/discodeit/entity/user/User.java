@@ -14,6 +14,7 @@ public class User extends AbstractUUIDEntity {
 
     public User(UserName name) {
         this.name = name;
+        // TODO of로 생성했을 때 불변객체라는건 아는데, of로 초기화했을때의 문제점 없는가? static factory method 안에서 초기화 하는 방법은?
         channel = ParticipatedChannel.from(new ArrayList<Channel>(1_000));
     }
 

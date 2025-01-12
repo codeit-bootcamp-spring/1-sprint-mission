@@ -11,6 +11,7 @@ public class ParticipatedChannel {
         this.participatedChannels = participatedChannels;
     }
 
+    // TODO
     public static ParticipatedChannel from(List<Channel> participatedChannels) {
         return new ParticipatedChannel(participatedChannels);
     }
