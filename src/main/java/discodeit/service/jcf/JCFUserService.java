@@ -83,8 +83,9 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updatePassword(User user, String password) {
-
+    public void updatePassword(User user, String originalPassword, String newPassword) {
+        user.updatePassword(originalPassword, newPassword);
+        user.updateUpdatedAt();
     }
 
     @Override

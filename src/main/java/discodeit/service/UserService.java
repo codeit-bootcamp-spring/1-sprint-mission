@@ -19,7 +19,7 @@ public interface UserService {
     void updateName(User user, String name);
     void updateEmail(User user, String email);
     void updatePhoneNumber(User user, String phoneNumber);
-    void updatePassword(User user, String password);
+    void updatePassword(User user, String originalPassword, String newPassword);
     void updateJoinedChannels(User user, Channel channel);
     void deleteUser(User user);
     void deleteJoinedChannel(User user, Channel channel);

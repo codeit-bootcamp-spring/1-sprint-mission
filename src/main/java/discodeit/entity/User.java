@@ -1,5 +1,7 @@
 package discodeit.entity;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +26,7 @@ public class User {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.password = password;
+        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
         joinedChannels = new ArrayList<>();
     }
 
@@ -68,8 +70,11 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public void updatePassword(String password) {
-        this.password = password;
+    public void updatePassword(String originalPassword, String newPassword) {
+        if (!BCrypt.checkpw(originalPassword, password)) {
+            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+        }
+        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
 
     public List<Channel> getJoinedChannels() {
