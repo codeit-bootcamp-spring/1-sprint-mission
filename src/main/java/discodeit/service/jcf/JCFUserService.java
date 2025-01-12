@@ -100,6 +100,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteJoinedChannel(User user, Channel channel) {
-
+        user.deleteJoinedChannel(channel);
+        user.updateUpdatedAt();
     }
 }

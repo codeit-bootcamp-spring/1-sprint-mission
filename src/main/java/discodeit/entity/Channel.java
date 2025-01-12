@@ -68,4 +68,8 @@ public class Channel {
     public void updateParticipants(User user) {
         participants.add(user);
     }
+
+    public boolean isEquals(Channel channel) {
+        return id.equals(channel.getId());
+    }
 }

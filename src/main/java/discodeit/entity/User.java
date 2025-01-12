@@ -80,6 +80,21 @@ public class User {
         joinedChannels.add(channel);
     }
 
+    public void deleteJoinedChannel(Channel channel) {
+        Channel deleteChannel = findChannel(channel);
+        if (deleteChannel == null) {
+            throw new IllegalArgumentException("가입되지 않은 채널입니다.");
+        }
+        joinedChannels.remove(deleteChannel);
+    }
+
+    public Channel findChannel(Channel channel) {
+        return joinedChannels.stream()
+                .filter(joinedChannel -> joinedChannel.isEquals(channel))
+                .findAny()
+                .orElse(null);
+    }
+
     @Override
     public String toString() {
         return String.format(
