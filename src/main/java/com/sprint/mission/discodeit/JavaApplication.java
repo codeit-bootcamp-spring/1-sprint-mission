@@ -9,11 +9,9 @@ import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
@@ -23,8 +21,7 @@ import java.util.Optional;
 public class JavaApplication {
     static ChannelService channelService = JCFChannelService.getInstance();
     static UserService userService = JCFUserService.getInstance();
-    static MessageService messageService = JCFMessageService.getInstance();
-    static MessageServiceV2 messageServiceV2 = JCFMessageServiceV2.getInstance();
+    static MessageServiceV2 messageServiceV2 = JCFMessageServiceV2.getInstance(userService);
     static ChannelFactory channelFactory;
     public static void main(String[] args) {
         channelFactory = new ChannelFactory(userService, messageServiceV2);
@@ -77,7 +74,7 @@ public class JavaApplication {
         }
 
         // 유저 정보 업데이트
-        System.out.println("\n=== 유저 정보 업데이트 ===");
+        System.out.println("\n=== 유저 정보 업데이트 및 기존 유저와 동등성 ===");
         UserUpdateDto updateDto = new UserUpdateDto(
             Optional.of("changedUsername"),
             Optional.empty(),
@@ -124,7 +121,8 @@ public class JavaApplication {
     static void channelSimulation2(){
 
         System.out.println("\n=== 채널 생성 / 조회 ===");
-        Channel chatChannel = null;
+
+        ChatChannel chatChannel = null;
 
         try {
             chatChannel = channelFactory.createChatChannel(
@@ -139,7 +137,7 @@ public class JavaApplication {
 
 
 
-        Channel voiceChannel = null;
+        VoiceChannel voiceChannel = null;
 
         try {
             voiceChannel = channelFactory.createVoiceChannel(
@@ -160,7 +158,7 @@ public class JavaApplication {
         System.out.println(channelService.getChannelById(chatChannelId).get());
 
         System.out.println("\n=== 모든 채널 조회 ===");
-        List<Channel> channels = channelService.getAllChannels();
+        List<BaseChannel> channels = channelService.getAllChannels();
         channels.stream().forEach(System.out::println);
 
         System.out.println("\n=== 채널 업데이트 ===");
@@ -177,7 +175,7 @@ public class JavaApplication {
         System.out.println("\n=== 음성 채널 삭제 후 전채 조회 ===");
         channelService.deleteChannel(voiceChannelId);
 
-        List<Channel> channels2 = channelService.getAllChannels();
+        List<BaseChannel> channels2 = channelService.getAllChannels();
         channels2.stream().forEach(System.out::println);
 
     }
@@ -201,7 +199,7 @@ public class JavaApplication {
 
         userService.createUser(user);
 
-        Channel chatChannel = null;
+        ChatChannel chatChannel = null;
         try {
             chatChannel = channelFactory.createChatChannel(
                 "server-uuid-2",
@@ -213,7 +211,7 @@ public class JavaApplication {
             System.out.println(e.getMessage());
         }
 
-        Channel chatChannel2 = null;
+        ChatChannel chatChannel2 = null;
 
         try {
             chatChannel2 = channelFactory.createChatChannel(
@@ -225,9 +223,6 @@ public class JavaApplication {
         }catch (ChannelValidationException e){
             System.out.println(e.getMessage());
         }
-
-        ChatBehaviorV2 chatBehavior = (ChatBehaviorV2) chatChannel.getBehavior();
-        ChatBehaviorV2 chatBehavior2 = (ChatBehaviorV2) chatChannel2.getBehavior();
 
         channelService.createChannel(chatChannel);
         channelService.createChannel(chatChannel2);
@@ -244,67 +239,70 @@ public class JavaApplication {
             System.out.println(e.getMessage());
         }
 
-        chatBehavior.setChannel(chatChannel);
-        chatBehavior2.setChannel(chatChannel2);
+//        chatBehavior.setChannel(chatChannel);
+//        chatBehavior2.setChannel(chatChannel2);
 
-        chatBehavior.addMessage(message);
+
+
         try {
-            chatBehavior.addMessage(new Message.MessageBuilder(
+            messageServiceV2.createMessage(user.getUUID(), message, chatChannel);
+            messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
                 user.getUUID(),
                 chatChannel.getUUID(),
                 "this is second Chat"
-            ).build());
+            ).build(), chatChannel);
         }catch (MessageValidationException e){
             System.out.println(e.getMessage());
         }
 
         try {
-            chatBehavior.addMessage(new Message.MessageBuilder(
+            messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
                 user.getUUID(),
                 chatChannel.getUUID(),
                 "this is third Chat"
-            ).build());
+            ).build(), chatChannel);
         }catch (MessageValidationException e){
             System.out.println(e.getMessage());
         }
 
         try {
-            chatBehavior2.addMessage(new Message.MessageBuilder(
+            messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
                 user.getUUID(),
                 chatChannel.getUUID(),
                 "this is second channel first Chat"
-            ).build());
+            ).build(), chatChannel2);
         }catch (MessageValidationException e){
             System.out.println(e.getMessage());
         }
 
-        Message m = chatBehavior.getSingleMessage(message.getUUID());
+        Message m = messageServiceV2.getMessageById(message.getUUID(), chatChannel).get();
         System.out.println(m);
 
         System.out.println("\n=== 1번 채널 채팅 내역 ===");
-        chatBehavior.getChatHistory().stream().forEach(System.out::println);
+        messageServiceV2.getMessagesByChannel(chatChannel).stream().forEach(System.out::println);
 
         System.out.println("\n=== 2번 채널 채팅 내역 ===");
-        chatBehavior2.getChatHistory().stream().forEach(System.out::println);
+        messageServiceV2.getMessagesByChannel(chatChannel2).stream().forEach(System.out::println);
 
         System.out.println("\n=== 메시지 업데이트 ===");
         MessageUpdateDto updateMessage = new MessageUpdateDto(Optional.of("this is updated content"), Optional.empty());
-        chatBehavior.updateMessage(message.getUUID() ,updateMessage);
-        System.out.println(chatBehavior.getSingleMessage(message.getUUID()));
+        messageServiceV2.updateMessage(chatChannel, message.getUUID(), updateMessage);
+        System.out.println(messageServiceV2.getMessageById(message.getUUID(), chatChannel));
 
         System.out.println("\n=== 1번 채널 채팅 삭제 ===");
-        chatBehavior.deleteMessage(message.getUUID());
-        chatBehavior.getChatHistory().stream().forEach(System.out::println);
+        messageServiceV2.deleteMessage(message.getUUID(), chatChannel);
+        messageServiceV2.getMessagesByChannel(chatChannel).stream().forEach(System.out::println);
 
         System.out.println("\n=== 존재하지 않는 유저의 메시지 생성 ===");
 
         try {
+            String falseUserUUID = "false-id";
             Message falseUserMessage = new Message.MessageBuilder(
                 "false-user-uuid",
                 chatChannel.getUUID(),
                 "false"
             ).build();
-            chatBehavior.addMessage(falseUserMessage);
+            messageServiceV2.createMessage(falseUserUUID, falseUserMessage, chatChannel);
         }catch (IllegalArgumentException | MessageValidationException e){
             System.out.println(e.getMessage());
         }

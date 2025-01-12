@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.BaseChannel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -10,7 +10,7 @@ import java.util.*;
 public class JCFChannelService implements ChannelService {
 
     private static volatile JCFChannelService channelRepository;
-    private final Map<String, Channel> data;
+    private final Map<String, BaseChannel> data;
 
     private JCFChannelService(){
         data = new HashMap<>();
@@ -27,7 +27,7 @@ public class JCFChannelService implements ChannelService {
         return channelRepository;
     }
     @Override
-    public Channel createChannel(Channel channel) {
+    public BaseChannel createChannel(BaseChannel channel) {
         if(!checkIfChannelNameIsEmpty(channel.getChannelName())){
             throw new IllegalArgumentException("채널명은 비어있을 수 없습니다.");
         }
@@ -36,29 +36,29 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> getChannelById(String channelId) {
+    public Optional<BaseChannel> getChannelById(String channelId) {
         return Optional.ofNullable(data.get(channelId));
     }
 
     @Override
-    public List<Channel> getAllChannels() {
+    public List<BaseChannel> getAllChannels() {
         return Collections.unmodifiableList(new ArrayList<>(data.values()));
     }
 
     @Override
-    public List<Channel> getChannelsByCategory(String categoryId) {
+    public List<BaseChannel> getChannelsByCategory(String categoryId) {
         return null;
     }
 
     @Override
     public void updateChannel(String channelId, ChannelUpdateDto updatedChannel) {
-        Channel channel = data.get(channelId);
+        BaseChannel channel = data.get(channelId);
         //TODO: user 권한 확인
         //TODO: channel 존재하지 않을때
         updatedChannel.getChannelName().ifPresent(channel::setChannelName);
         updatedChannel.getMaxNumberOfPeople().ifPresent(channel::setMaxNumberOfPeople);
         updatedChannel.getTag().ifPresent(channel::setTag);
-        updatedChannel.getIsPrivate().ifPresent(aPrivate -> channel.updatePrivate(aPrivate, channel));
+        updatedChannel.getIsPrivate().ifPresent(aPrivate -> channel.updatePrivate(aPrivate));
 
     }
 
@@ -69,17 +69,17 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public String generateInviteCode(Channel channel) {
+    public String generateInviteCode(BaseChannel channel) {
         return null;
     }
 
     @Override
-    public void setPrivate(Channel channel) {
+    public void setPrivate(BaseChannel channel) {
 
     }
 
     @Override
-    public void setPublic(Channel channel) {
+    public void setPublic(BaseChannel channel) {
 
     }
 
@@ -87,7 +87,7 @@ public class JCFChannelService implements ChannelService {
         return !channelName.isEmpty();
     }
 
-    private boolean checkIfUserIsOwner(Channel channel, User user){
+    private boolean checkIfUserIsOwner(BaseChannel channel, User user){
         return true;
     }
 }
