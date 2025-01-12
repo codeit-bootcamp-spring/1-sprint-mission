@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class JavaApplication {
@@ -150,6 +151,8 @@ public class JavaApplication {
             System.out.println(e.getMessage());
         }
 
+
+
         String chatChannelId = chatChannel.getUUID();
         String voiceChannelId = voiceChannel.getUUID();
 
@@ -243,7 +246,6 @@ public class JavaApplication {
 //        chatBehavior2.setChannel(chatChannel2);
 
 
-
         try {
             messageServiceV2.createMessage(user.getUUID(), message, chatChannel);
             messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
@@ -275,7 +277,8 @@ public class JavaApplication {
             System.out.println(e.getMessage());
         }
 
-        Message m = messageServiceV2.getMessageById(message.getUUID(), chatChannel).get();
+        Optional<Message> optionalMessage = messageServiceV2.getMessageById(message.getUUID(), chatChannel);
+        Message m = optionalMessage.orElseThrow(() -> new NoSuchElementException("Message not found"));
         System.out.println(m);
 
         System.out.println("\n=== 1번 채널 채팅 내역 ===");

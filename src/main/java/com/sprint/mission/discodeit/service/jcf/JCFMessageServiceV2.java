@@ -4,13 +4,12 @@ import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFMessageServiceV2 implements MessageServiceV2 {
+public class JCFMessageServiceV2 implements MessageServiceV2<ChatChannel> {
 
     private static volatile JCFMessageServiceV2 messageRepository;
     private UserService userService;
