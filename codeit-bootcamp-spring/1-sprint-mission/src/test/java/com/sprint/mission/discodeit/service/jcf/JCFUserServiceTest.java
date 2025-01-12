@@ -37,7 +37,7 @@ class JCFUserServiceTest {
         userRepository = mock(UserRepository.class);
         userConverter = UserConverter.getInstance();
         userService = new JCFUserService(userRepository, userConverter);
-        user = new User(new UserName(NAME));
+        user = User.from(NAME);
     }
 
     @Test

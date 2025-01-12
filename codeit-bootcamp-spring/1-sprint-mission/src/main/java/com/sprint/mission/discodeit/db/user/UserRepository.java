@@ -8,4 +8,10 @@ import java.util.UUID;
 public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
+
+
+
+    public static UserRepository getInMemoryUserRepositoryImpl() {
+        return UserRepositoryImpl.getInstance();
+    }
 }

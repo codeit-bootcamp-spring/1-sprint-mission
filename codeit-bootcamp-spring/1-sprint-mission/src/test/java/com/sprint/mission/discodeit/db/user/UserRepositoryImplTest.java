@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.user.UserName;
 import com.sprint.mission.discodeit.testdummy.TestDummyFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,12 +12,12 @@ import org.junit.jupiter.api.Test;
 class UserRepositoryImplTest {
     private static final String TEST_NAME = "Test";
     private User user;
-    private UserRepositoryImpl userRepository;
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
         userRepository = TestDummyFactory.getUserRepository();
-        user = new User(new UserName(TEST_NAME));
+        user = User.from(TEST_NAME);
         userRepository.save(user);
     }
 

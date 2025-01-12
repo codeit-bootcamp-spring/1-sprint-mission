@@ -31,10 +31,6 @@ public interface UserService {
             return JCFUserService.getInstance(userRepository);
         }
 
-        /**
-         * TODO inMemory가 아닌 데이터베이스 라면 다른 구현객체 반환
-         */
-
         return null;
     }
 }

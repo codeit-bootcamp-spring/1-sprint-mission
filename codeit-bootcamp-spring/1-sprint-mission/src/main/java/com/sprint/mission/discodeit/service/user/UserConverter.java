@@ -21,9 +21,7 @@ public class UserConverter {
 
     public User toEntity(RegisterUserRequest request) {
         try {
-            var user = new User(
-                    new UserName(request.name())
-            );
+            var user = User.from(request.name());
             return user;
         } catch (IllegalArgumentException e) {
             // TODO validator 사용으로 예외가 안던져지는 문제 발생

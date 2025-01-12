@@ -7,7 +7,11 @@ import jakarta.validation.constraints.Size;
 public class Channel extends AbstractUUIDEntity {
 
     @NotNull
-    @Size(min = 3, max = 50, message = "create channel must be between {min} and {max} : reject channel name `${validatedValue}`")
+    @Size(
+            min = 3,
+            max = 50,
+            message = "create channel must be between {min} and {max} : reject channel name `${validatedValue}`"
+    )
     private String channelName;
 
     private Channel(String channelName) {

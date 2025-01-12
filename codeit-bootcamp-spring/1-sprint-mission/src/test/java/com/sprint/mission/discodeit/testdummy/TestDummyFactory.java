@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.testdummy;
 
+import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.db.user.UserRepositoryImpl;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.user.UserName;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestDummyFactory {
 
     private static final List<User> users = new ArrayList<>(List.of(
-            new User(new UserName("홍길동")),
-            new User(new UserName("김길동")),
-            new User(new UserName("이길동")),
-            new User(new UserName("박길동"))
+            User.from("홍길동"),
+            User.from("김길동"),
+            User.from("이길동"),
+            User.from("박깅동")
     ));
 
 
-    public static UserRepositoryImpl getUserRepository() {
-        var userRepository = new UserRepositoryImpl();
+    public static UserRepository getUserRepository() {
+        var userRepository = UserRepositoryImpl.getInstance();
         users.forEach(userRepository::save);
         return userRepository;
     }
