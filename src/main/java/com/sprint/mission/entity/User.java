@@ -14,6 +14,7 @@ public class User {
         this.id = id;
         this.email = email;
         this.createdAt = System.currentTimeMillis();
+        this.updateAt = this.createdAt;
     }
 
 
@@ -44,6 +45,7 @@ public class User {
                 "updateAt=" + updateAt +
                 ", id=" + id +
                 ", createdAt=" + createdAt +
+                ", updateAt=" + updateAt +
                 ", email='" + email + '\'' +
                 '}';
     }

@@ -7,6 +7,7 @@ public class Message {
     private Channel channel;
     private String message;
     private long createdAt;
+    private long updateAt;
 
 
     public Message(User user, Channel channel, String message) {
@@ -15,6 +16,7 @@ public class Message {
             this.channel = channel;
             this.message = message;
             this.createdAt = System.currentTimeMillis();
+            this.updateAt = this.createdAt;
         }
 
     }
@@ -33,6 +35,7 @@ public class Message {
 
     public void setMessage (String message){
             this.message = message;
+            this.updateAt = System.currentTimeMillis();
     }
 
     public long getCreatedAt () {
@@ -45,7 +48,8 @@ public class Message {
                     ", user=" + user +
                     ", channel='" + channel + '\'' +
                     ", message='" + message + '\'' +
-                    ", createdAt=" + createdAt +
+                    ", createdAt=" + createdAt + '\'' +
+                    ", updateAt=" + updateAt + '\'' +
                     '}';
     }
 }
