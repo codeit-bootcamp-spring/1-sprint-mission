@@ -31,17 +31,17 @@ public class JavaApplication {
         Message message2 = messageService.createMessage(UUID.randomUUID(), "Bob", "Hi Alice!");
 
         // 출력
-        System.out.println("User Info:");
+        System.out.println("사용자 UUID:");
         System.out.println(user1.getId());
         System.out.println(user2.getId());
         System.out.println("============================");
 
-        System.out.println("Channel Info:");
+        System.out.println("채널 정보:");
         System.out.println(channel1.getChannelName());
         System.out.println(channel2.getChannelName());
         System.out.println("============================");
 
-        System.out.println("Message Info:");
+        System.out.println("메시지 정보:");
         System.out.println(message1.getMessage());
         System.out.println(message2.getMessage());
         System.out.println("============================");
