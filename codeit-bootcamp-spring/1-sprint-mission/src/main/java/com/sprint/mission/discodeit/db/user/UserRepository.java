@@ -14,4 +14,8 @@ public interface UserRepository extends CrudRepository<User, UUID> {
     public static UserRepository getInMemoryUserRepositoryImpl() {
         return UserRepositoryImpl.getInstance();
     }
+
+    public static UserRepository getUserRepositoryInstance() {
+        return UserRepositoryImpl.getInstance();
+    }
 }
