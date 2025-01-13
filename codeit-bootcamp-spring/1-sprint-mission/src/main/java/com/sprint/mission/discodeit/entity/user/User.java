@@ -9,11 +9,11 @@ public class User extends AbstractUUIDEntity {
 
     private UserName name;
 
-    private final ParticipatedChannel channel;
+    private final ParticipatedChannel channels;
 
     public User(UserName name, ParticipatedChannel channel) {
         this.name = name;
-        this.channel = channel;
+        this.channels = channel;
     }
 
     public static User createFrom(final String username) {
@@ -28,7 +28,7 @@ public class User extends AbstractUUIDEntity {
     }
 
     public Channel createNewChannel(String channelName) {
-        var createdChannel = channel.generateFrom(channelName);
+        var createdChannel = channels.createChannel(channelName);
         return createdChannel;
     }
 

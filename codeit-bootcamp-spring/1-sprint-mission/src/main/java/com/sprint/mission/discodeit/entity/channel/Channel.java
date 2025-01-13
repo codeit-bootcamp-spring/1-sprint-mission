@@ -25,6 +25,10 @@ public class Channel extends AbstractUUIDEntity {
         return channelName;
     }
 
+    public void ChangeName(String newName) {
+        channelName = newName;
+    }
+
     public boolean isEqualFromName(String channelName) {
         return this.channelName.equals(channelName);
     }

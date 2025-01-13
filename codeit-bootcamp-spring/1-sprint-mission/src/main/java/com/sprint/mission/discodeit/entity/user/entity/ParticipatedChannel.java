@@ -18,7 +18,7 @@ public class ParticipatedChannel {
         return new ParticipatedChannel(new HashMap<UUID, Channel>());
     }
 
-    public Channel generateFrom(String channelName) {
+    public Channel createChannel(String channelName) {
         var channel = Channel.createFrom(channelName);
         participatedChannels.put(channel.getId(), channel);
 
@@ -38,7 +38,12 @@ public class ParticipatedChannel {
 
         return findByNameChannel;
     }
-    // 채널 삭제
 
     // 채널 수정
+    public void changeChannelName(UUID channelId, String newName) {
+        var findedChannel = findById(channelId).orElseThrow(IllegalArgumentException::new);
+        findedChannel.ChangeName(newName);
+        participatedChannels.put(findedChannel.getId(), findedChannel);
+    }
+    // 채널 삭제
 }
