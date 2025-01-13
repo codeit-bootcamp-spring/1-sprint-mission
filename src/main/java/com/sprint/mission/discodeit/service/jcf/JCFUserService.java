@@ -57,7 +57,7 @@ public class JCFUserService implements UserService {
         // nickname 을 key로 설정했어서
         // delete 과정을 거친 후 생성
         //String newNickname = sc.next();
-        String newNickname = inputHandler.getNewNickNameInput();
+        String newNickname = inputHandler.getNewInput();
         Users.put(newNickname, Users.get(nickname));
         Users.get(newNickname).setNickname(newNickname);
         Users.remove(nickname);

@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Message;
 
 public interface MessageService {
     public abstract void Create(Channel channel, String messageText);
 
     // Read : 전체 메세지 조회, 특정 메세지 읽기
-    public abstract void ReadAll();
+    public abstract int ReadAll();
 
-    public abstract void ReadMessage(int num);
+    public abstract Message ReadMessage(int num);
 
     // Update : 특정 메세지 수정
     public abstract void Update(int num);
