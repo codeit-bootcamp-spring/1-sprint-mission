@@ -2,40 +2,30 @@ package mission.service.jcf;
 
 
 import mission.entity.User;
+import mission.repository.UserRepository;
+import mission.repository.jcf.JCFUserRepository;
 import mission.service.UserService;
 
 import java.util.*;
 
 public class JCFUserService implements UserService {
 
+    private final UserRepository userRepository = new JCFUserRepository();
     private final Map<UUID, User> data = new HashMap<>();
-    // Map<UUID, Map<String, User>> 하면 닉네임 중복 로직에서 더 복잡할 것 같아서 분리
-    private final Set<String> userNames = new HashSet<>();
 
     @Override
     public User create(User user) {
-        // 중복 제거 (id, name)
-        if (data.containsKey(user.getId())){
-            throw new IllegalArgumentException("이미 존재하는 id입니다.");
-        } // 중복될일이 없긴 한데....
-
-        if (userNames.contains(user.getName())){
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
-        }
-        // 아이디 등록 + userName 목록도 추가
-        userNames.add(user.getName());
-        data.put(user.getId(), user);
-        return user;
+        return userRepository.saveUser(user);
     }
 
     @Override
     public User find(UUID id) {
-        return data.get(id);
+        return userRepository.findById(id);
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        return userRepository.findAll();
     }
 
     @Override // 그냥 한번에 닉네임, 비밀번호 다 바꾼다고 가정

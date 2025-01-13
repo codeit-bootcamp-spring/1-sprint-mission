@@ -1,8 +1,7 @@
 package mission.service.jcf;
 
 import mission.entity.Message;
-import mission.service.jcf.MessageService;
-
+import mission.service.MessageService;
 
 import java.util.*;
 

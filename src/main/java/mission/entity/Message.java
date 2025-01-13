@@ -9,6 +9,8 @@ public class Message {
     private final UUID id;
     private final String firstId;
     private String message;
+
+    private User writer;
     private Long createAt;
     private Long updateAt;
 
@@ -18,6 +20,14 @@ public class Message {
         String string = id.toString();
         firstId = string.split("-")[0];
         createAt = System.currentTimeMillis();
+    }
+
+    public User getWriter() {
+        return writer;
+    }
+
+    public void setWriter(User writer) {
+        this.writer = writer;
     }
 
     public UUID getId() {
