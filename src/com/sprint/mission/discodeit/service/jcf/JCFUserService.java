@@ -13,17 +13,9 @@ public class JCFUserService implements UserService {
     private final Map<UUID, User> data; // assume that it is repository
     private final UserValidator   userValidator;
 
-    private JCFUserService() {
+    public JCFUserService() {
         data          = new HashMap<>();
         userValidator = UserValidator.getInstance();
-    }
-
-    private static final class InstanceHolder {
-        private final static JCFUserService INSTANCE = new JCFUserService();
-    }
-
-    public static JCFUserService getInstance() {
-        return InstanceHolder.INSTANCE;
     }
 
     /**

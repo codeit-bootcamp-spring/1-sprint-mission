@@ -1,6 +1,7 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.factory.*;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.proxy.*;
 
@@ -14,7 +15,8 @@ public class JavaApplication {
                 .phoneNumber("010-1234-5678")
                 .build();
 
-        UserService userService = UserServiceProxy.getInstance();
+        UserServiceFactory factory = UserServiceFactoryType.JCF.getFactory();
+        UserService userService = factory.createUserService();
         System.out.println("---------------------------------");
         System.out.println("userService.createUser()");
         System.out.println("pass User 'frog'! " + System.lineSeparator() + "User info: " + userService.createUser(frog));
@@ -60,7 +62,8 @@ public class JavaApplication {
         Message hi = Message.createMessage("hi");
         Message lo = Message.createMessage("lo");
 
-        MessageService messageService = MessageServiceProxy.getInstance();
+        MessageServiceFactory factory = MessageServiceFactoryType.JCF.getFactory();
+        MessageService messageService = factory.createMessageService();
         System.out.println("---------------------------------");
         System.out.println("messageService.createMessage()");
         System.out.println("pass Message 'hi'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(hi));
@@ -105,7 +108,8 @@ public class JavaApplication {
         Channel c1 = Channel.createChannel("c1");
         Channel c2 = Channel.createChannel("c2");
 
-        ChannelService channelService = ChannelServiceProxy.getInstance();
+        ChannelServiceFactory factory = ChannelServiceFactoryType.JCF.getFactory();
+        ChannelService channelService = factory.createChannelService();
         System.out.println("---------------------------------");
         System.out.println("channelService.createChannel()");
         System.out.println("pass Channel 'c1'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c1));

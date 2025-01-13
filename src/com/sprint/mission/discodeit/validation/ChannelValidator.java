@@ -2,16 +2,13 @@ package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.validation.common.BaseEntityValidator;
-import com.sprint.mission.discodeit.validation.common.NameValidator;
+import com.sprint.mission.discodeit.validation.format.NameValidator;
 
-public class ChannelValidator {
-    private final BaseEntityValidator baseEntityValidator;
-    private final NameValidator       nameValidator;
+public class ChannelValidator extends BaseEntityValidator {
+    private final NameValidator nameValidator;
 
     private ChannelValidator() {
-        baseEntityValidator = BaseEntityValidator.getInstance();
-        nameValidator       = NameValidator.getInstance();
+        nameValidator = new NameValidator();
     }
 
     private static final class InstanceHolder {
@@ -23,9 +20,9 @@ public class ChannelValidator {
     }
 
     public void validateBaseEntityFormat(Channel channel) throws InvalidFormatException {
-        baseEntityValidator.validateIdFormat(channel.getId());
-        baseEntityValidator.validateCreateAtFormat(channel.getCreateAt());
-        baseEntityValidator.validateUpdateAtFormat(channel.getUpdateAt());
+        super.validateIdFormat(channel.getId());
+        super.validateCreateAtFormat(channel.getCreateAt());
+        super.validateUpdateAtFormat(channel.getUpdateAt());
     }
     public void validateNameFormat(Channel channel) throws InvalidFormatException {
         nameValidator.validateNameFormat(channel.getName());

@@ -2,23 +2,14 @@ package com.sprint.mission.discodeit.service.proxy;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
 import java.util.UUID;
 
 public class MessageServiceProxy implements MessageService {
     private final MessageService messageService;
 
-    private MessageServiceProxy() {
-        messageService = JCFMessageService.getInstance();
-    }
-
-    private final static class InstanceHolder {
-        private final static MessageServiceProxy INSTANCE = new MessageServiceProxy();
-    }
-
-    public static MessageServiceProxy getInstance() {
-        return InstanceHolder.INSTANCE;
+    public MessageServiceProxy(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     @Override

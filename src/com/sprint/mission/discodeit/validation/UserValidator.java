@@ -1,20 +1,20 @@
 package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.validation.common.BaseEntityValidator;
-import com.sprint.mission.discodeit.validation.common.NameValidator;
+import com.sprint.mission.discodeit.validation.format.EmailValidator;
+import com.sprint.mission.discodeit.validation.format.NameValidator;
+import com.sprint.mission.discodeit.validation.format.PhoneNumberValidator;
 
-import static com.sprint.mission.discodeit.constant.IntegerConstant.PHONE_NUMBER_LENGTH;
-
-public class UserValidator {
-    private final BaseEntityValidator  baseEntityValidator;
+public class UserValidator extends BaseEntityValidator {
     private final NameValidator        nameValidator;
+    private final PhoneNumberValidator phoneNumberValidator;
+    private final EmailValidator       emailValidator;
 
     private UserValidator() {
-        baseEntityValidator  = BaseEntityValidator.getInstance();
-        nameValidator        = NameValidator.getInstance();
+        nameValidator        = new NameValidator();
+        phoneNumberValidator = new PhoneNumberValidator();
+        emailValidator       = new EmailValidator();
     }
 
     private static final class InstanceHolder {
@@ -26,36 +26,17 @@ public class UserValidator {
     }
 
     public void validateBaseEntityFormat(User user) throws InvalidFormatException {
-        baseEntityValidator.validateIdFormat(user.getId());
-        baseEntityValidator.validateCreateAtFormat(user.getCreateAt());
-        baseEntityValidator.validateUpdateAtFormat(user.getUpdateAt());
+        super.validateIdFormat(user.getId());
+        super.validateCreateAtFormat(user.getCreateAt());
+        super.validateUpdateAtFormat(user.getUpdateAt());
     }
     public void validateNameFormat(User user) throws InvalidFormatException {
         nameValidator.validateNameFormat(user.getName());
     }
-    public void validateEmailFormat(String email) throws InvalidFormatException {
-        if (email == null || email.trim().isEmpty())
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        int index;
-        if ((index = email.indexOf('@')) == -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if (email.indexOf('@', index + 1) != -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if ((index = email.indexOf('.', index + 1)) == -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if (email.indexOf('.', index + 1) != -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
+    public void validateEmailFormat(User user) throws InvalidFormatException {
+        emailValidator.validateEmailFormat(user.getEmail());
     }
-    public void validatePhoneNumberFormat(String phoneNumber) throws InvalidFormatException {
-        if (phoneNumber == null || phoneNumber.trim().isEmpty())
-            throw new InvalidFormatException(ErrorCode.INVALID_PHONE_NUMBER_FORMAT);
-
-        if (phoneNumber.replaceAll("-", "").length() !=
-                PHONE_NUMBER_LENGTH.getValue())
-            throw new InvalidFormatException(ErrorCode.INVALID_PHONE_NUMBER_FORMAT);
+    public void validatePhoneNumberFormat(User user) throws InvalidFormatException {
+        phoneNumberValidator.validatePhoneNumberFormat(user.getPhoneNumber());
     }
 }

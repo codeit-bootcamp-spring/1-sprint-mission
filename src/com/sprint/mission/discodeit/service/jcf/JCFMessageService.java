@@ -13,17 +13,9 @@ public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data; // assume that it is repository
     private final MessageValidator   messageValidator;
 
-    private JCFMessageService() {
+    public JCFMessageService() {
         data             = new HashMap<>();
         messageValidator = MessageValidator.getInstance();
-    }
-
-    private static final class InstanceHolder {
-        private final static JCFMessageService INSTANCE = new JCFMessageService();
-    }
-
-    public static JCFMessageService getInstance() {
-        return InstanceHolder.INSTANCE;
     }
 
     /**

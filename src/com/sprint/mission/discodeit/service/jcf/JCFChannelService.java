@@ -13,17 +13,9 @@ public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data; // assume that it is repository
     private final ChannelValidator   channelValidator;
 
-    private JCFChannelService() {
+    public JCFChannelService() {
         data             = new HashMap<>();
         channelValidator = ChannelValidator.getInstance();
-    }
-
-    private static final class InstanceHolder {
-        private final static JCFChannelService INSTANCE = new JCFChannelService();
-    }
-
-    public static JCFChannelService getInstance() {
-        return InstanceHolder.INSTANCE;
     }
 
     /**

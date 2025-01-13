@@ -9,16 +9,8 @@ import java.util.UUID;
 public class ChannelServiceProxy implements ChannelService {
     private final ChannelService channelService;
 
-    private ChannelServiceProxy() {
-        channelService = JCFChannelService.getInstance();
-    }
-
-    private final static class InstanceHolder {
-        private final static ChannelServiceProxy INSTANCE = new ChannelServiceProxy();
-    }
-
-    public static ChannelServiceProxy getInstance() {
-        return InstanceHolder.INSTANCE;
+    public ChannelServiceProxy(ChannelService channelService) {
+        this.channelService = channelService;
     }
 
     @Override
