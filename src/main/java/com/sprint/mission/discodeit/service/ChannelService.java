@@ -13,6 +13,6 @@ public interface ChannelService {
     void updateChannel(Channel channel, String name, User admin);
     List<Map<String, String>> getAllChannel();
     List<String> getAllMember(Channel channel);
-
+    boolean channelExits(Channel channel);
 
 }

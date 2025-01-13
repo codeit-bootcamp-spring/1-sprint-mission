@@ -22,6 +22,11 @@ public class JCFChannelService implements ChannelService{
     }
 
     @Override
+    public boolean channelExits(Channel channel){
+        return data.contains(channel);
+    }
+
+    @Override
     public void deleteChannel(Channel channel, User admin) {
         boolean removed = data.removeIf(check -> check.equals(channel) && check.getAdmin().equals(admin));
         if (removed){

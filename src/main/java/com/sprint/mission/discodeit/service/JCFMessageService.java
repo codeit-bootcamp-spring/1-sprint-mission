@@ -41,10 +41,17 @@ public class JCFMessageService implements MessageService{
     public void deleteMessage(Message message, User writer){
         boolean removed = data.removeIf(removeMessage -> removeMessage.equals(message) && removeMessage.getWriter().equals(writer));
         if (removed) {
-
             System.out.println("메시지가 삭제되었습니다.");
         } else {
             System.out.println("메시지가 없거나 작성자만 삭제할 수 있습니다.");
+        }
+    }
+
+    @Override
+    public void deleteChannelMessage(Channel channel){
+        boolean removed = data.removeIf(removeMessage-> removeMessage.getChannel().equals(channel));
+        if (removed){
+            System.out.println("해당 채널의 메시지가 삭제되었습니다.");
         }
     }
 

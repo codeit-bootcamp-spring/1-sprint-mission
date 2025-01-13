@@ -8,7 +8,7 @@ public class User {
     private Long updatedAt;
     private String userName;
     private String email;
-    private final String password;
+    private String password;
 
     public User(String userName, String email, String password){
         id = UUID.randomUUID();
@@ -56,6 +56,5 @@ public class User {
     public void displayUserInfo(){
         System.out.println("사용자 이름: " + userName + "\n이메일: " + email);
     }
-
 
 }
