@@ -15,8 +15,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void createUser(String password, String name) {
-        password = getEncryptedPassword(password);
-        User user = new User(password, name);
+        String encryptedPassword = getEncryptedPassword(password);
+        User user = new User(encryptedPassword, name);
         data.add(user);
     }
 
@@ -50,7 +50,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
-        findUserById(id).ifPresentOrElse(u -> u.updatePassword(newPassword), () -> {
+        String encryptedPassword = getEncryptedPassword(newPassword);
+        findUserById(id).ifPresentOrElse(u -> u.updatePassword(encryptedPassword), () -> {
             throw new IllegalArgumentException("user not found: " + id);
         });
     }
