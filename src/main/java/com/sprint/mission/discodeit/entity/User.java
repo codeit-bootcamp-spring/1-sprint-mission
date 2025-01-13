@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class User {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
     private String password;
     private String name;
@@ -42,5 +42,12 @@ public class User {
     public void updateName(String name) {
         this.name = name;
         this.updatedAt = System.currentTimeMillis();
+    }
+
+
+    // 단방향 암호화 (sha256 + salt)
+    private String getEncryptedPassword(String password) {
+
+        return password;
     }
 }

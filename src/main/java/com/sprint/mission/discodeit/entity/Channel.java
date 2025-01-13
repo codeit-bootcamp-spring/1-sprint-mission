@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class Channel {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
     private String name;
+    //owner 추가
     private List<User> members;
     private List<Message> messages;
 

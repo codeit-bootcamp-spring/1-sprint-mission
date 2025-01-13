@@ -3,20 +3,28 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Message {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
+    private final User sender;
     private Long updatedAt;
-    private User sender;
     private String content;
     private MessageType type;
 
-    public Message(User sender, String content, MessageType type) {
+    private Message(User sender, String content, MessageType type) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = null;
         this.sender = sender;
         this.content = content;
         this.type = type;
+    }
+
+    public static Message ofCommon(User sender, String content) {
+        return new Message(sender, content, MessageType.COMMON);
+    }
+
+    public static Message ofReply(User sender, String content) {
+        return new Message(sender, content, MessageType.REPLY);
     }
 
     public UUID getId() {
@@ -33,11 +41,6 @@ public class Message {
 
     public User getSender() {
         return sender;
-    }
-
-    public void updateSender(User sender) {
-        this.sender = sender;
-        this.updatedAt = System.currentTimeMillis();
     }
 
     public String getContent() {
