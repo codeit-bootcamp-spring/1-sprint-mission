@@ -3,60 +3,50 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
     // DB 대체 Message data
-    private final List<Message> data = new ArrayList<>();
+    private final Map<UUID, Message> data = new HashMap<>();
 
     @Override
     public void craete(UUID channelId, String message, UUID writer) {
-        data.add(new Message(channelId, message, writer));
+
+        Message newMessage = new Message(channelId, message, writer);
+
+        data.put(newMessage.getId(), newMessage);
     }
 
     @Override
     public Message read(UUID id) {
-        return data.stream()
-                .filter(message -> message.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return data.get(id);
     }
 
     @Override
     public List<Message> allRead() {
-        return data;
+        return data.values().stream().toList();
     }
 
     @Override
     public List<Message> allRead(UUID channelID) {
-        return Arrays.asList((Message) data.stream()
-                .filter(message -> message.getChannelId().equals(channelID)));
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelID))
+                .toList();
     }
 
     @Override
-    public void updateMessage(UUID messageId, String updateMessage) {
+    public void updateMessage(UUID id, String updateMessage) {
 
         if (updateMessage.isBlank()){
             return;
         }
 
-        data.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .forEach(message -> {
-                    message.updateMessage(updateMessage);
-                });
+        data.get(id).updateMessage(updateMessage);
     }
 
     @Override
-    public void delete(UUID messageId) {
-        Message delMessage = data.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst()
-                .orElse(null);
+    public void delete(UUID id) {
 
-        data.remove(delMessage);
+        data.remove(id);
     }
 }

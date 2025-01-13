@@ -7,14 +7,13 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
     // DB 대체 User data
-    // Map<email, user>
     private final Map<UUID, User> data = new HashMap<>();
 
     private static UserService userService;
 
     private JCFUserService(){}
 
-    public static UserService getJCFUserService(){
+    public static UserService getInstance(){
         if (userService == null){
             userService = new JCFUserService();
         }
@@ -25,7 +24,7 @@ public class JCFUserService implements UserService {
 
     // User 생성(가입)
     @Override
-    public void craete(String email, String pw, String name, String nickname, String phoneNumber) {
+    public void craete(String email, String password, String name, String nickname, String phoneNumber) {
         
         if (checkEmail(email, data)){
             System.out.println("이미 가입된 이메일입니다.");
@@ -36,7 +35,7 @@ public class JCFUserService implements UserService {
             System.out.println("올바르지 않은 형식의 이메일입니다.\n");
             return;
         }
-        if (pw.length() < 8) {
+        if (password.length() < 8) {
             System.out.println("비밀번호는 8자리 이상이어야 합니다.\n");
             return;
         }
@@ -50,7 +49,7 @@ public class JCFUserService implements UserService {
             return;
         }
 
-        User newUser = new User(email, pw, name, nickname, phoneNumber);
+        User newUser = new User(email, password, name, nickname, phoneNumber);
 
         data.put(newUser.getId(), newUser);
         System.out.println("[ 가입 완료 ]\n");
@@ -95,16 +94,15 @@ public class JCFUserService implements UserService {
     }
 
     // 비밀번호 수정
-    @Override
-    public void updatePw(UUID id, String updatePw) {
-        if (updatePw.length() < 8) {
+    public void updatePassword(UUID id, String updatePassword) {
+        if (updatePassword.length() < 8) {
             System.out.println("비밀번호는 8자리 이상이어야 합니다.\n");
 
             return;
         }
 
         User updateUser = data.get(id);
-        updateUser.updatePw(updatePw);
+        updateUser.updatePassword(updatePassword);
     }
 
     // 이름 수정
