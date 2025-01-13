@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit.entity.user;
+package com.sprint.mission.discodeit.entity.user.entity;
 
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
-import com.sprint.mission.discodeit.entity.user.entity.ParticipatedChannel;
 import java.util.List;
 import java.util.UUID;
 

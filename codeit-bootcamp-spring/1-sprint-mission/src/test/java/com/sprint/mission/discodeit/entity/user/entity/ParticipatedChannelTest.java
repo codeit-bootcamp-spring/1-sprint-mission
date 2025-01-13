@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.sprint.mission.discodeit.common.error.user.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.user.User;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

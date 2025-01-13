@@ -5,7 +5,7 @@ import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

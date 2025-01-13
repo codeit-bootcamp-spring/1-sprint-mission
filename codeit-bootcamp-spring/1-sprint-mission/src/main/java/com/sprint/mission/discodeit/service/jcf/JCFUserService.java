@@ -4,7 +4,7 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FO
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.user.UserRepository;
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity.user;
 
-import static com.sprint.mission.discodeit.entity.user.UserName.NAME_MAX_LENGTH;
+import static com.sprint.mission.discodeit.entity.user.entity.UserName.NAME_MAX_LENGTH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.BDDAssertions.then;
 
+import com.sprint.mission.discodeit.entity.user.entity.UserName;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;

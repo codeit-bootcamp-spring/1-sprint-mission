@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.user;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserInfoResponse;
 import java.util.Objects;

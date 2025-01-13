@@ -4,7 +4,6 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PA
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.user.User;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;

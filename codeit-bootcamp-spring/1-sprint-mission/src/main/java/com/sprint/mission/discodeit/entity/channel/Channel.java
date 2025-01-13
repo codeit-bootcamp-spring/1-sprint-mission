@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity.channel;
 import com.sprint.mission.discodeit.common.error.ErrorMessage;
 import com.sprint.mission.discodeit.common.error.user.ChannelException;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
-import com.sprint.mission.discodeit.entity.user.User;
+import com.sprint.mission.discodeit.entity.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 

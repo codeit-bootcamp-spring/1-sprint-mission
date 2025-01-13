@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity.user;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.entity.common.Status;
+import com.sprint.mission.discodeit.entity.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

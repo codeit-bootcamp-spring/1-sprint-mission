@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity.user;
+package com.sprint.mission.discodeit.entity.user.entity;
 
 
 import jakarta.validation.constraints.NotNull;
