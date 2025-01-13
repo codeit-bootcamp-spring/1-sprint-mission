@@ -1,20 +1,19 @@
-package com.sprint.mission.discodeit.serviece;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class JCFChannelServiece implements ChannelService{
+public class JCEFChannelService implements ChannelService{
 
-    final ArrayList<Channel> ChannelList=new ArrayList<>();
+    private final List<Channel> ChannelList=new ArrayList<>();
 
     @Override
-    public void CreateChaneel(String name) {
+    public void CreateChannelDefault(String name) {
         if(find_Channel(name).isEmpty()){
-            Channel new_channel=new Channel(name);
+            Channel new_channel=Channel.CreateDefaultChannel(name);
             ChannelList.add(new_channel);
         }else {
             System.out.println("이미 존재하는 채널입니다.");
@@ -22,33 +21,17 @@ public class JCFChannelServiece implements ChannelService{
 
     }
 
-    @Override
-    public String ReadChannel(UUID id) {
-        StringBuilder list= new StringBuilder();
-        boolean existChannel =false;
-        for(Channel now:ChannelList){
-            existChannel =true;
-            if(now.getId().equals(id)){
-                list.append(now.DisplayChannelInfo()).append("\n");
-            }
-        }
-        if(existChannel && !list.toString().isEmpty())
-            return list.toString();
-        else
-            return "해당하는 채널이 없습니다.";
-    }
 
     @Override
-    public String ReadChannel(String name) {
+    public <T>String ReadChannel(T key) {
         StringBuilder list= new StringBuilder();
-        boolean existChannel =false;
         for(Channel now:ChannelList){
-            existChannel =true;
-            if(now.getChannelName().equals(name)){
-                list.append(now.DisplayChannelInfo()).append("\n");
+            if((key instanceof String&&now.getChannelName().equals(key))||
+            (key instanceof UUID&&now.getId().equals(key))){
+                list.append(now.toString()).append("\n");
             }
         }
-        if(existChannel && !list.toString().isEmpty())
+        if(!list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 채널이 없습니다.";
@@ -57,14 +40,11 @@ public class JCFChannelServiece implements ChannelService{
     @Override
     public String ReadChannelAll() {
         StringBuilder list= new StringBuilder();
-        boolean existChannel =false;
         for(Channel now:ChannelList){
-            existChannel =true;
-
-            list.append(now.DisplayChannelInfo()).append("\n");
+            list.append(now.toString()).append("\n");
 
         }
-        if(existChannel && !list.toString().isEmpty())
+        if(!list.toString().isEmpty())
             return list.toString();
         else
             return "등록된 채널이 없습니다.";

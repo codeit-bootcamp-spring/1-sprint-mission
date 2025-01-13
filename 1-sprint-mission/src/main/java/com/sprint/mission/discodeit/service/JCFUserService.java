@@ -1,19 +1,19 @@
-package com.sprint.mission.discodeit.serviece;
+package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService{
 
-    final ArrayList<User> userList=new ArrayList<>();
+    private final List<User> userList=new ArrayList<>();
 
     @Override
-    public void CreateUser(String name) {
+    public void CreateUserDefault(String name) {
         if(find_user(name).isEmpty()){
-            User new_user=new User(name);
+            User new_user=User.createDefaultUser(name);
             userList.add(new_user);
         }
         else{
@@ -22,32 +22,16 @@ public class JCFUserService implements UserService{
     }
 
     @Override
-    public String ReadUser(String name) {
-        StringBuilder list= new StringBuilder();
-        boolean existChannel =false;
-        for(User now:userList){
-            existChannel =true;
-            if(now.getName().equals(name)){
-                list.append(now.DisplayInfo()).append("\n");
-            }
-        }
-        if(existChannel && !list.toString().isEmpty())
-            return list.toString();
-        else
-            return "해당하는 유저가 없습니다.";
-    }
+    public <T> String ReadUser(T key) {
+        StringBuilder list = new StringBuilder();
+        for (User now : userList) {
+            if ((key instanceof String && now.getName().equals(key)) ||
+                    (key instanceof UUID && now.getId().equals(key))) {
+                list.append(now.toString()).append("\n");
 
-    @Override
-    public String ReadUser(UUID ID) {
-        StringBuilder list= new StringBuilder();
-        boolean existChannel =false;
-        for(User now:userList){
-            existChannel =true;
-            if(now.getId().equals(ID)){
-                list.append(now.DisplayInfo()).append("\n");
             }
         }
-        if(existChannel && !list.toString().isEmpty())
+        if(!list.toString().isEmpty())
             return list.toString();
         else
             return "해당하는 유저가 없습니다.";
@@ -56,13 +40,11 @@ public class JCFUserService implements UserService{
     @Override
     public String ReadUserAll() {
         StringBuilder list= new StringBuilder();
-        boolean flag=false;
         for(User now:userList){
-            flag=true;
-            list.append(now.DisplayInfo()).append("\n");
+            list.append(now.toString()).append("\n");
 
         }
-        if(flag&& !list.toString().isEmpty())
+        if(!list.toString().isEmpty())
             return list.toString();
         else
             return "등록된 유저가 없습니다.";

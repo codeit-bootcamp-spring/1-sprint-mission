@@ -7,19 +7,19 @@ public class Channel {
     final private UUID id;
     final private Long createdAt;
     private Long updatedAt;
-    private String ChannelName;
-    private ArrayList<User> userlist;
-    private ArrayList<Message> messageslist;
+    private String channelName;
+    private final ArrayList<User> userlist=new ArrayList<>();
+    private final ArrayList<Message> messageslist=new ArrayList<>();
 
-    public Channel(String ChannelName){
+    public Channel(String channelName){
         this.id= UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
-        this.ChannelName=ChannelName;
-
-        userlist=new ArrayList<>();
-        messageslist=new ArrayList<>();
+        this.channelName=channelName;
     };
+    public static Channel CreateDefaultChannel(String channelName){
+        return new Channel(channelName);
+    }
 
     public UUID getId() {
         return id;
@@ -33,14 +33,14 @@ public class Channel {
         return updatedAt;
     }
     public String getChannelName(){
-        return ChannelName;
+        return channelName;
     }
 
     public void setUpdatedAt() {
         this.updatedAt= System.currentTimeMillis();
     }
     public void setChannelName(String ChannelName){
-        this.ChannelName= ChannelName;
+        this.channelName= ChannelName;
     }
 
     public void addUser(ArrayList<User> list){
@@ -53,9 +53,12 @@ public class Channel {
         messageslist.add(m);
     }
 
-    public String DisplayChannelInfo(){
-        String one="ChannelName: "+ChannelName+" ID: "+id;
-        String two="createdAt: "+createdAt+" updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
-        return one+"\n"+two;
+    public String toString(){
+        StringBuilder display = new StringBuilder();
+        display.append("ChannelName: ").append(channelName)
+                .append(" ID: ").append(id)
+                .append("\ncreatedAt: ").append(createdAt)
+                .append(" updatedAt: ").append(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
+        return display.toString();
     }
 }

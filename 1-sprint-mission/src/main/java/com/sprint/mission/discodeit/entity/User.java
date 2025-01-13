@@ -1,25 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.serviece.JCFMessageService;
-import com.sprint.mission.discodeit.serviece.MessageService;
-
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class User {
     final private UUID id;
     final  private Long createdAt;
     private Long updatedAt;
-    private String Name;
+    private String name;
 
 
     //뭐 더있나
-    public User(String Name){
+    public User(String name){
         this.id= UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
-        this.Name=Name;
+        this.name=name;
     };
+
+    public static User createDefaultUser(String name){
+        return new User(name);
+    }
+
     public UUID getId() {
         return id;
     }
@@ -32,17 +33,18 @@ public class User {
         return updatedAt;
     }
     public String getName(){
-        return Name;
+        return name;
     }
 
     public void setUpdatedAt() {
         this.updatedAt= System.currentTimeMillis();
     }
-    public void setName(String Name){
-        this.Name= Name;
+    public void setName(String name){
+        this.name= name;
     }
 
-    public String DisplayInfo(){
+    @Override
+    public String toString(){
         return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+
                 " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
     }

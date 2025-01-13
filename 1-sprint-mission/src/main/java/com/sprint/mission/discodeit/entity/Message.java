@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sun.nio.sctp.MessageInfo;
-
 import java.util.UUID;
 
 public class Message {
@@ -12,9 +10,9 @@ public class Message {
     private String MessageBody;
 
     private String senderName;
-    private String reciverName;
-    private UUID senderID;
-    private UUID reciverID;
+    private String receiverName;
+    private UUID senderId;
+    private UUID receiverId;
 
     public Message(String title,String MessageBody){
         this.id= UUID.randomUUID();
@@ -23,11 +21,14 @@ public class Message {
         this.title=title;
         this.MessageBody=MessageBody;
         this.senderName="";
-        this.reciverName="";
-        this.senderID=null;
-        this.reciverID=null;
+        this.receiverName ="";
+        this.senderId=null;
+        this.receiverId =null;
 
     };
+    public static Message CreateDefaultMessage(String title,String MessageBody){
+        return new Message(title,MessageBody);
+    }
 
     public UUID getId() {
         return id;
@@ -55,56 +56,62 @@ public class Message {
         if(this.senderName!=null)
             return senderName;
         else
-            return"";
+            return null;
     }
-    public String getReciverName() {
+    public String getReceiverName() {
         if(this.senderName!=null)
             return senderName;
         else
-            return"";
+            return null;
     }
     public UUID getSenderID() {
-        return senderID;
+        return senderId;
     }
-    public UUID getReciverID() {
-        return reciverID;
+    public UUID getReceiverID() {
+        return receiverId;
     }
-    public void setReciverID(UUID reciverID) {
-        this.reciverID = reciverID;
+    public void setReceiverID(UUID receiverId) {
+        this.receiverId = receiverId;
     }
-    public void setSenderID(UUID senderID) {
-        this.senderID = senderID;
+    public void setSenderID(UUID senderId) {
+        this.senderId = senderId;
     }
-    public void setReciverName(String reciverName) {
-        this.reciverName = reciverName;
+    public void setReceiverName(String receiverName) {
+        this.receiverName = receiverName;
     }
     public void setSenderName(String senderName) {
         this.senderName = senderName;
     }
 
-    public void SetSender(UUID senderID,String senderName){
+    public void SetSender(UUID senderId,String senderName){
         this.senderName=senderName;
-        this.senderID=senderID;
+        this.senderId=senderId;
     }
-    public void SetReciver(UUID reciverID,String reciverName){
-        this.reciverName = reciverName;
-        this.reciverID = reciverID;
+    public void SetReceiver(UUID receiverId,String receiverName){
+        this.receiverName = receiverName;
+        this.receiverId = receiverId;
     }
-    public String DiplayMessageInfo(){
-        String one= "메세지 아이디: "+id+" createdAt: "+ createdAt+ " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
-        String two="\nsenderName: "+senderName+" senderID : "+senderID;
-        String three="\nreciverName: "+reciverName+" reciverID : "+reciverID;
-        String four="\n제목 : "+title+" Message :"+MessageBody;
-        return one+two+three+four;
-
+    @Override
+    public String toString(){
+        StringBuilder display = new StringBuilder();
+        display.append("메세지 아이디: ").append(id)
+                .append(" createdAt: ").append(createdAt)
+                .append(" updatedAt: ").append(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))
+                .append("\nsenderName: ").append(senderName)
+                .append(" senderID: ").append(senderId)
+                .append("\nReceiverName: ").append(receiverName)
+                .append(" ReceiverID: ").append(receiverId)
+                .append("\n제목: ").append(title)
+                .append(" Message: ").append(MessageBody);
+        return display.toString();
     }
 
 
-    public String gettitle() {
+    public String getTitle() {
         return title;
     }
 
-    public void setTtitle(String title) {
+    public void setTitle(String title) {
         this.title = title;
     }
 }

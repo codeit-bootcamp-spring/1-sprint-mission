@@ -1,17 +1,14 @@
-package com.sprint.mission.discodeit.serviece;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 public interface MessageService {
-    void CreateMessage(String title, String body);
+    void CreateMessageDefault(String title, String body);
 
-    String ReadMessage(UUID ID);
+    <T> String ReadMessage(T key);
 
-    String ReadMessage(String title);
 
     String ReadMessageAll();
 
