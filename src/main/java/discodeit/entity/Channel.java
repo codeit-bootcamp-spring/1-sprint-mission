@@ -80,14 +80,14 @@ public class Channel {
     }
 
     public void deleteParticipant(User user) {
-        User deleteUser = findUser(user);
+        User deleteUser = findParticipant(user);
         if (deleteUser == null) {
             throw new IllegalArgumentException("삭제할 유저를 찾을 수 없습니다.");
         }
         participants.remove(deleteUser);
     }
 
-    public User findUser(User user) {
+    public User findParticipant(User user) {
         return participants.stream()
                 .filter(participant -> participant.isEqualTo(user))
                 .findAny()

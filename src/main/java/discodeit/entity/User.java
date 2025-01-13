@@ -66,14 +66,14 @@ public class User {
     }
 
     public void deleteJoinedChannel(Channel channel) {
-        Channel deleteChannel = findChannel(channel);
+        Channel deleteChannel = findJoinedChannel(channel);
         if (deleteChannel == null) {
             throw new IllegalArgumentException("가입되지 않은 채널입니다.");
         }
         joinedChannels.remove(deleteChannel);
     }
 
-    public Channel findChannel(Channel channel) {
+    public Channel findJoinedChannel(Channel channel) {
         return joinedChannels.stream()
                 .filter(joinedChannel -> joinedChannel.isEqualTo(channel))
                 .findAny()
