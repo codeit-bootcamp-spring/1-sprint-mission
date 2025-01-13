@@ -50,7 +50,7 @@ public class ParticipatedChannel {
                         UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())
                 );
 
-        foundChannel.ChangeName(newName);
+        foundChannel.changeName(newName);
         participatedChannels.put(foundChannel.getId(), foundChannel);
     }
 

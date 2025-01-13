@@ -25,7 +25,11 @@ public class Channel extends AbstractUUIDEntity {
         return new Channel(channelName, creator);
     }
 
-    public void ChangeName(String newName) {
+    public static Channel createDefaultNameAndUser(User user) {
+        return new Channel("Default Channel Name", user);
+    }
+
+    public void changeName(String newName) {
         channelName = newName;
         updateStatusAndUpdateAt();
     }
