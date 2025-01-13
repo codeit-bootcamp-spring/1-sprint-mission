@@ -11,6 +11,7 @@ public class User {
 
     private final UUID id;
     private String name;
+    private String oldName;
     private final String firstId;
     private String password;
     private final LocalDateTime createAt;
@@ -33,14 +34,6 @@ public class User {
     // 메시지 수정 ==> d이거는 근데.... Message에서해야하나
     public void updateMessage(Message message, String updateMessage){
         message.setMessage(updateMessage);
-    }
-
-    // 메시지 등록
-    public Message createMessage(Message message, Channel channel){
-        messages.add(message);
-        message.setWriter(this);
-        message.setWritedAt(channel);
-        return message;
     }
 
     public User(String name, String password){
@@ -92,6 +85,14 @@ public class User {
 
     public LocalDateTime getCreateAt() {
         return createAt;
+    }
+
+    public String getOldName() {
+        return oldName;
+    }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
     }
 
     public LocalDateTime getUpdateAt() {

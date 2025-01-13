@@ -7,14 +7,15 @@ import mission.repository.jcf.JCFMessageRepository;
 import mission.service.MessageService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
 
     private final JCFMessageRepository messageRepository = new JCFMessageRepository();
 
     @Override
-    public Message create(Channel writeAt, User wirter, String writedMessage) {
-        return messageRepository.createMessage(writeAt, wirter, writedMessage);
+    public Message create(Message message) {
+        return messageRepository.createMessage(message);
     }
 
     @Override
@@ -34,6 +35,19 @@ public class JCFMessageService implements MessageService {
             }
         }
         return null;
+    }
+
+    public Message findMessageById(Channel channel, UUID messageId){
+        Map<UUID, Message> messageMap = findMessagesInChannel(channel).stream()
+                .collect(Collectors.toMap(
+                        Message::getId,  // Message객체 id를 키
+                        message -> message  // 파라미터 -> 반환값
+                ));
+        try {
+            return messageMap.get(messageId);
+        } catch (Exception e){
+            throw new NullPointerException("MessageId를 잘못 입력했습니다");
+        }
     }
 
     @Override

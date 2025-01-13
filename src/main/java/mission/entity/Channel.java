@@ -12,11 +12,13 @@ public class Channel {
     private final String firstId;
 
     private String name;
+    private String oldName;
     private List<User> userList = new ArrayList<>();
     private Integer userCount;
 
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 
     public Channel(String name) {
         this.name = name;
@@ -34,6 +36,13 @@ public class Channel {
         return name;
     }
 
+    public String getOldName() {
+        return oldName;
+    }
+
+    public void setOldName(String oldName) {
+        this.oldName = oldName;
+    }
     public List<User> getUserList() {
         return userList;
     }

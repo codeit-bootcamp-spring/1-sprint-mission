@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface MessageService {
     //등록
-    Message create(Channel channel, User user, String message);
+    Message create(Message message);
 
     // 조회 단건
     List<Message> findMessagesInChannel(Channel channel);

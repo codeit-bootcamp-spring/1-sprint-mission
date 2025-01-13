@@ -16,8 +16,8 @@ public class JCFChannelService implements ChannelService {
     private final JCFChannelRepository channelRepository = new JCFChannelRepository();
 
     @Override
-    public Channel create(String channelName) {
-        return channelRepository.register(channelName);
+    public Channel create(Channel channel) {
+        return channelRepository.register(channel);
     }
 
     @Override
@@ -36,14 +36,17 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID id, String newName) {
-        Channel findChannel = channelRepository.findById(id);
-        return channelRepository.updateChannelName(findChannel, newName);
+    public Channel update(Channel channel) {
+        return channelRepository.updateChannelName(channel);
     }
 
     @Override
     public void deleteById(UUID id) {
         channelRepository.delete(id);
+    }
+
+    public void validateDuplicateName(String name){
+        channelRepository.validateDuplicateName(name);
     }
 }
 

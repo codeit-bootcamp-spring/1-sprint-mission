@@ -13,9 +13,14 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository = new JCFUserRepository();
     //private final Map<UUID, User> data = new HashMap<>();
 
-    public User create(String name, String password) {
-        User user = new User(name, password);
+    @Override
+    public User create(User user) {
         return userRepository.saveUser(user);
+    }
+
+    @Override
+    public User update(User user) {
+        return userRepository.updateUserNamePW(user);
     }
 
     @Override
@@ -27,18 +32,19 @@ public class JCFUserService implements UserService {
     public User findByNamePW(String name, String password) {
         return userRepository.findByNamePW(name, password);
     }
+
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    @Override // 그냥 한번에 닉네임, 비밀번호 다 바꾼다고 가정
-    public User update(UUID id, String newName, String password) {
-        return userRepository.updateUserNamePW(id, newName, password);
-    }
 
     @Override
     public void delete(UUID id, String name, String password) {
         userRepository.delete(id, name, password);
+    }
+
+    public void validateDuplicateName(String name){
+        userRepository.validateDuplicateUserName(name);
     }
 }

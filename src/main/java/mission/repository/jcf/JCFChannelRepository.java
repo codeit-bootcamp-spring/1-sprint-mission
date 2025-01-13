@@ -13,18 +13,11 @@ public class JCFChannelRepository implements ChannelRepository {
 
 
     // 보통 채널을 만들면 바로 그 채널로 들어가지기 때문에 등록과 동시에 반환
-    public Channel register(String channelName) {
+    public Channel register(Channel channel) {
         // 채널 이름 중복 검증 후 채널 생성
-        try {
-            validateDuplicateName(channelName);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("이미 그런 채널명 있습니다.");
-        }
-
-        Channel newChannel = new Channel(channelName);
-        channelNames.add(newChannel.getName());
-        data.put(newChannel.getId(), newChannel);
-        return newChannel;
+        channelNames.add(channel.getName());
+        data.put(channel.getId(), channel);
+        return channel;
     }
 
 
@@ -35,7 +28,11 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID id) {
-        return data.get(id);
+        try {
+            return data.get(id);
+        } catch (NullPointerException e) {
+            throw new NullPointerException("그런 채널은 존재하지 않습니다.");
+        } // 필요한 이유 Message 만들 때
     }
 
     @Override
@@ -53,19 +50,18 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel updateChannelName(Channel findChannel, String newName) {
+    public Channel updateChannelName(Channel updatingChannel) {
         // 새로운 채널 이름 중복 검증
-        validateDuplicateName(newName);
-
-        channelNames.remove(findChannel.getName());
-        channelNames.add(newName);
-        findChannel.setName(newName);
-        return findChannel;
+        validateDuplicateName(updatingChannel.getName());
+        channelNames.remove(updatingChannel.getOldName());
+        channelNames.add(updatingChannel.getName());
+        return updatingChannel;
     }
 
-    private void validateDuplicateName(String name){
+    public void validateDuplicateName(String name){
         if (channelNames.contains(name)){
-            throw new IllegalArgumentException("이미 존재하는 id입니다");
+            throw new IllegalArgumentException(
+                    String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
         }
     }
 

@@ -11,5 +11,5 @@ public interface ChannelRepository {
 
     Channel findByName(String channelName);
 
-    Channel updateChannelName(Channel findChannel, String newName);
+    Channel updateChannelName(Channel updatingChannel);
 }

@@ -13,11 +13,12 @@ public interface UserRepository {
 
     List<User> findAll();
 
+    //User updateUserNamePW(User user);
+
     void validateDuplicateUserName(String userName);
 
     User findByNamePW(String name, String password);
-
-    User updateUserNamePW(UUID id, String newName, String password);
-
     void delete(UUID id, String name, String password);
+
+    User updateUserNamePW(User user);
 }

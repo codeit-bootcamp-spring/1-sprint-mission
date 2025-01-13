@@ -25,13 +25,20 @@ public class Message {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    public Message(String message){
+    public Message(String message) {
         this.message = message;
         id = UUID.randomUUID();
         firstId = id.toString().split("-")[0];
         createAt = LocalDateTime.now();
     }
 
+    public static Message createMessage(Channel channel, User user, String message) {
+        Message mess = new Message(message);
+        mess.setWriter(user);
+        mess.setWritedAt(channel);
+        user.getMessages().add(mess);
+        return mess;
+    }
     public User getWriter() {
         return writer;
     }
