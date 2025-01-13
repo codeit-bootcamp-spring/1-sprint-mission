@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
+import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
+import static com.sprint.mission.discodeit.entity.common.Status.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.common.Status;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -98,24 +103,71 @@ class ParticipatedChannelTest {
         }
 
         @Test
-        @DisplayName("유저가 참여한 채널에 존재하지 않는 Id로 채널 조회 시 에러")
+        @DisplayName("유저가 참여한 채널에 존재하지 않는 Id로 채널 조회 시 에러 발생")
         void givenNotExistChannelIdWhenFindByIdThenThrowException() {
             // given
             var notExistedId = UUID.randomUUID();
 
             // when
+            var throwable = catchThrowable(() ->
+                    channels.findById(notExistedId).orElseThrow(() ->
+                            UserException.of(USER_NOT_PARTICIPATED_CHANNEL))
+            );
 
             // then
-
+            assertThat(throwable).isInstanceOf(UserException.class)
+                    .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
         }
 
         @Test
         @DisplayName("유저가 참여한 채널에 존재하지 않는 ChannelName 으로 채널 조회시 에러")
         void givenNotExistedChannelNameWhenFindByNameThenThrowException() {
-            var notExistedChannelName = UUID.randomUUID();
+            // given
+            var notExistedChannelName = "SB_999기_백재우";
+
+            // when
+            var throwable = catchThrowable(() ->
+                    channels.findByName(notExistedChannelName).orElseThrow(() ->
+                                    UserException.errorMessageAndChannelName(USER_NOT_PARTICIPATED_CHANNEL, notExistedChannelName)
+                    )
+            );
+            // then
+            assertThat(throwable).isInstanceOf(UserException.class)
+                    .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
         }
 
         // TODO 채널 수정 테스트
+        @Test
+        @DisplayName("유저가 참여한 채널의 id로 채널이름을 변경 성공")
+        void givenParticipatedChannelIdAndNewChannelNameWhenChangeChannelNameThenSuccess() {
+            // given
+            var channelId = createdChannel1.getId();
+            var changeChannelName = createdChannel1.getChannelName();
+            // when
+            channels.changeChannelName(channelId, "new ChannelName");
+            // then
+            assertAll(
+                    () -> {
+                        assertThat(createdChannel1.getChannelName()).isNotEqualTo(changeChannelName);
+                        assertThat(createdChannel1.getStatus()).isEqualTo(MODIFIED);
+                    }
+            );
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 채널 id로 유저가 참여한 채널의 id로 채널이름 변경 시 에러")
+        void givenNotExistedChannelIdWhenChangeChannelNameThenThrowUserException() {
+            // given
+            var notExistedChannelId = UUID.randomUUID();
+            var changeChannelName = "new ChannelName";
+
+            // when
+            var throwable = catchThrowable(() -> channels.changeChannelName(notExistedChannelId, changeChannelName));
+            // then
+            assertThat(throwable).isInstanceOf(UserException.class)
+                    .hasMessageContaining(notExistedChannelId.toString());
+
+        }
     }
 
 }
