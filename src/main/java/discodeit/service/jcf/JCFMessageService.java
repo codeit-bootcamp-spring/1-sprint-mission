@@ -35,43 +35,43 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(String content, User sender) {
-
+    public Message createMessage(String content, User sender) {
+        return new Message(content, sender);
     }
 
     @Override
     public UUID readId(Message message) {
-        return null;
+        return message.getId();
     }
 
     @Override
     public long getCreateAt(Message message) {
-        return 0;
+        return message.getCreatedAt();
     }
 
     @Override
     public long getUpdatedAt(Message message) {
-        return 0;
+        return message.getUpdatedAt();
     }
 
     @Override
-    public void getInfo(Message message) {
-
+    public String getInfo(Message message) {
+        return message.toString();
     }
 
     @Override
     public String getContent(Message message) {
-        return "";
+        return message.getContent();
     }
 
     @Override
     public User getSender(Message message) {
-        return null;
+        return  message.getSender();
     }
 
     @Override
-    public void updateContent(Message message) {
-
+    public void updateContent(Message message, String content) {
+        message.updateContent(content);
     }
 
     @Override

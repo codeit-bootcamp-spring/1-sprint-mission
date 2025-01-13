@@ -109,8 +109,7 @@ public class Channel {
                         .toList()) + System.lineSeparator()
                         + "-- Messages -- " + System.lineSeparator()
                         + String.join(System.lineSeparator(), messages.stream()
-                        .map(message -> message.getSender().getName() + ": " + message.getContent())
-                        .toList())
+                        .map(Message::toString).toList())
         );
     }
 }

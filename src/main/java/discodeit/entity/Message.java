@@ -46,4 +46,9 @@ public class Message {
     public User getSender() {
         return sender;
     }
+
+    @Override
+    public String toString() {
+        return String.format(sender.getName() + ": " + content);
+    }
 }
