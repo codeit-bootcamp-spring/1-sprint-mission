@@ -89,12 +89,12 @@ public class Channel {
 
     public User findUser(User user) {
         return participants.stream()
-                .filter(participant -> participant.isEquals(user))
+                .filter(participant -> participant.isEqualTo(user))
                 .findAny()
                 .orElse(null);
     }
 
-    public boolean isEquals(Channel channel) {
+    public boolean isEqualTo(Channel channel) {
         return id.equals(channel.getId());
     }
 

@@ -6,6 +6,7 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,8 +14,10 @@ public class JCFUserService implements UserService {
 
     private ChannelService jcfChannelService;
     private MessageService jcfMessageService;
+    private final List<User> users;
 
     private JCFUserService() {
+        this.users = new ArrayList<>();
     }
 
     private static class JCFUserServiceHolder {
@@ -37,47 +40,31 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String name, String email, String phoneNumber, String password) {
-        return new User(name, email, phoneNumber, password);
+        User newUser = new User(name, email, phoneNumber, password);
+        users.add(newUser);
+        return newUser;
     }
 
     @Override
-    public UUID readId(User user) {
-        return user.getId();
+    public User findById(UUID id) {
+        User findUser = findUser(id);
+        if (findUser == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        return findUser;
     }
 
     @Override
-    public long getCreatedAt(User user) {
-        return user.getCreatedAt();
-    }
-
-    @Override
-    public long getUpdatedAt(User user) {
-        return user.getUpdatedAt();
+    public User findUser(UUID id) {
+        return users.stream()
+                .filter(user -> user.isIdEqualTo(id))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
     public String getInfo(User user) {
         return user.toString();
-    }
-
-    @Override
-    public String getName(User user) {
-        return user.getName();
-    }
-
-    @Override
-    public String getEmail(User user) {
-        return user.getEmail();
-    }
-
-    @Override
-    public String getPhoneNumber(User user) {
-        return user.getPhoneNumber();
-    }
-
-    @Override
-    public List<Channel> getJoinedChannels(User user) {
-        return user.getJoinedChannels();
     }
 
     @Override

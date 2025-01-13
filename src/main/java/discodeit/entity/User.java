@@ -34,14 +34,6 @@ public class User {
         return id;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateUpdatedAt() {
         this.updatedAt = System.currentTimeMillis() / 1000;
     }
@@ -54,16 +46,8 @@ public class User {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
     public void updateEmail(String email) {
         this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
     }
 
     public void updatePhoneNumber(String phoneNumber) {
@@ -75,10 +59,6 @@ public class User {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-    }
-
-    public List<Channel> getJoinedChannels() {
-        return joinedChannels;
     }
 
     public void updateJoinedChannels(Channel channel) {
@@ -95,13 +75,17 @@ public class User {
 
     public Channel findChannel(Channel channel) {
         return joinedChannels.stream()
-                .filter(joinedChannel -> joinedChannel.isEquals(channel))
+                .filter(joinedChannel -> joinedChannel.isEqualTo(channel))
                 .findAny()
                 .orElse(null);
     }
 
-    public boolean isEquals(User user) {
+    public boolean isEqualTo(User user) {
         return id.equals(user.getId());
+    }
+
+    public boolean isIdEqualTo(UUID id) {
+        return this.id.equals(id);
     }
 
     @Override
