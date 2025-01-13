@@ -15,8 +15,7 @@ public class JCFChannelService implements ChannelService {
     public Channel createChannel(User user, String channelName) {
         Channel newChannel = new Channel(user, channelName);
         channelData.add(newChannel);
-        System.out.println(user + "님이 " + channelName + "에 " +
-                "채널 생성 : " + newChannel + "\n채널이 성공적으로 생성되었습니다!\n");
+        System.out.println("채널 생성 성공");
         return newChannel;
     }
 
@@ -27,7 +26,8 @@ public class JCFChannelService implements ChannelService {
         for (Channel channel : channelData) {
             if (channel.getUser().equals(user)&& channel.getChannelName().equals(channelName)) {
                 channel.setChannelName(modifiedChannelName);
-                System.out.println("채널명 변경 : " + modifiedChannelName + "\n채널명이 변경되었습니다.\n");
+                System.out.println("채널명 변경 성공");
+                printChannel(channel);
                 return;
             }
         }
@@ -37,8 +37,11 @@ public class JCFChannelService implements ChannelService {
     // 전체 채널 조회
     @Override
     public List<Channel> getAllChannelList() {
-        System.out.println("채널 목록" + channelData + "\n");
-        return new ArrayList<>(channelData);
+        for (Channel channel : channelData) {
+            System.out.println("채널 전체 조회");
+            printChannel(channel);
+        }
+        return channelData;
     }
 
     // 유저가 속한 채널 조회
@@ -59,9 +62,17 @@ public class JCFChannelService implements ChannelService {
         }
         if (channelToDelete != null && channelData.contains(channelToDelete)) {
             channelData.remove(channelToDelete);
-            System.out.println("채널 삭제 : " + channelName + "\n채널이 성공적으로 삭제되었습니다.\n");
+            System.out.println("채널 삭제 성공");
+            printChannel(channelToDelete);
         } else {
             throw new IllegalArgumentException("채널을 찾을 수 없습니다.");
         }
+    }
+
+    // 채널 출력 포멧팅
+    private void printChannel(Channel channel) {
+        System.out.println(" - 사용자: " + channel.getUser().getEmail());
+        System.out.println(" - 채널: " + channel.getChannelName());
+        System.out.println(" - 생성 시간: " + channel.getCreatedAt() + "\n");
     }
 }

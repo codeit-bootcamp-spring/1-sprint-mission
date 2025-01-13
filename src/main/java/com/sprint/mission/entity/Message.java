@@ -42,10 +42,5 @@ public class Message {
             return createdAt;
     }
 
-    @Override
-    public String toString () {
-        return "\n유저 : " + user + channel  + "\n메시지 : " + message +
-                    ", 생성 : " + createdAt;
-    }
 }
 

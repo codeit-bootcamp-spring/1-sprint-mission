@@ -39,12 +39,4 @@ public class User {
         return updateAt;
     }
 
-    @Override
-    public String toString() {
-        return
-                "id : " + id +
-                ", 이메일 : " + email +
-                ",  생성 : " + createdAt +
-                ", 업데이트 : " + updateAt ;
-    }
 }

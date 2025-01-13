@@ -32,11 +32,8 @@ public class Channel {
         this.channelName = channelName;
         this.updateAt = System.currentTimeMillis();
     }
-
-    @Override
-    public String toString() {
-        return "\n채널명 : " + channelName +
-                "\n유저 : " + user  +
-                " 생성 : " + createdAt;
+    public long getCreatedAt() {
+        return createdAt;
     }
+
 }

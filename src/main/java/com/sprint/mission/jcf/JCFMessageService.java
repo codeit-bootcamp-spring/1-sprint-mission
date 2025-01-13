@@ -25,8 +25,8 @@ public class JCFMessageService implements MessageService {
         }
         Message newMessage = new Message(user, channel, message);
         messageData.add(newMessage);
-        System.out.println(user + "님이 " + channel + "에 " +
-                "메시지 생성 : " + newMessage + "\n메시지가 성공적으로 생성되었습니다!\n");
+        System.out.println("메시지가 생성되었습니다.");
+        printMessage(newMessage);
         return newMessage;
     }
 
@@ -37,7 +37,8 @@ public class JCFMessageService implements MessageService {
         for (Message message : messageData) {
             if (!message.equals(modifiedMessage) && message.getUser().equals(user) && message.getMessage().equals(Message)) {
                 message.setMessage(modifiedMessage);
-                System.out.println("메시지 변경 : " + modifiedMessage + "\n메시지가 변경되었습니다.\n");
+                System.out.println("메시지가 변경 변경되었습니다.");
+                printMessage(message);
                 return;
             } else {
                 throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
@@ -48,31 +49,48 @@ public class JCFMessageService implements MessageService {
     // 유저의 모든 메시지 조회
     @Override
     public List<Message> getAllMessageList() {
-        System.out.println("메시지 목록" + messageData);
-        return new ArrayList<>(messageData);
+        for (Message message : messageData) {
+            System.out.println("메시지 전체 조회");
+            printMessage(message);
+        } return messageData;
     }
 
     // 특정 유저 메시지 조회
     @Override
     public void printChannelMessage(User user) {
-        System.out.println(messageData);
+        for (Message message : messageData) {
+            if (message.getUser().equals(user)) {
+                System.out.println("사용자의 메시지 조회");
+                printMessage(message);
+            }
+        }
     }
 
     // 메시지 삭제, 메시지를 찾을 수 없을 경우 예외 처리
     @Override
-    public void deleteMessage(String message) {
+    public void deleteMessage(String messageContent) {
         Message messageToDelete = null;
-        for (Message message1 : messageData) {
-            if (message1.getMessage().equals(message)) {
-                messageToDelete = message1;
+        for (Message message : messageData) {
+            if (message.getMessage().equals(messageContent)) {
+                messageToDelete = message;
                 break;
             }
         }
-        if (messageToDelete != null && messageData.contains(messageToDelete)) {
+
+        if (messageToDelete != null) {
             messageData.remove(messageToDelete);
-            System.out.println("\n메시지 삭제 : " + message + "\n메시지가 성공적으로 삭제되었습니다.\n");
-        } else{
-            throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+            System.out.println("메시지가 삭제되었습니다:");
+            printMessage(messageToDelete);
+        } else {
+            throw new IllegalArgumentException("[오류] 메시지를 찾을 수 없습니다.");
         }
+    }
+    // 메시지 출력 포맷팅
+    private void printMessage(Message message) {
+        System.out.println(" - 사용자: " + message.getUser().getID());
+        System.out.println(" - 이메일: " + message.getUser().getEmail());
+        System.out.println(" - 채널: " + message.getChannel().getChannelName());
+        System.out.println(" - 메시지: " + message.getMessage());
+        System.out.println(" - 생성 시간: " + message.getCreatedAt() + "\n");
     }
 }

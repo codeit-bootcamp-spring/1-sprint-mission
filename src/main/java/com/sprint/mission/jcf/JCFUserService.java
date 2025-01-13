@@ -1,5 +1,6 @@
 package com.sprint.mission.jcf;
 
+import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.service.UserService;
 
@@ -17,7 +18,7 @@ public class JCFUserService implements UserService {
         if (email.contains("@") && email.contains(".")) {
             User newUser = new User(UUID.randomUUID(), email);
             userData.add(newUser);
-            System.out.println("계정 생성 : " + newUser + "\n계정이 성공적으로 생성되었습니다!\n");
+            System.out.println("계정 생성 완료");
             return newUser;
         } else {
             throw new IllegalArgumentException("올바른 이메일 형식인지 확인해 주세요.");
@@ -30,7 +31,8 @@ public class JCFUserService implements UserService {
     public void updateMail(User user, String mail) {
         if (mail.contains("@") && mail.contains(".") &&! user.getEmail().equals(mail)){
             user.setEmail(mail);
-            System.out.println("이메일 변경 : " + user + "\n이메일이 변경되었습니다.\n");
+            System.out.println("이메일 변경 완료");
+            printUser(user);
         } else {
             throw new IllegalArgumentException("올바른 이메일 형식인지 확인해 주세요.");
         }
@@ -39,14 +41,22 @@ public class JCFUserService implements UserService {
     // 모든 유저 조회
     @Override
     public List<User> getSearchAllUser() {
-        System.out.println("유저 목록 = " + userData);
-        return new ArrayList<>(userData);
+        for (User user : userData) {
+            System.out.println("사용자 정보 전부 조회");
+            printUser(user);
+        }
+        return userData;
     }
 
     // 특정 유저 조회
     @Override
     public void searchUser(User user) {
-        System.out.println(user);
+        if(userData.contains(user)){
+            System.out.println("사용자 정보");
+            printUser(user);
+        } else {
+            throw new IllegalArgumentException("유저를 찾을 수 없습니다");
+        }
     }
 
 
@@ -54,14 +64,21 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUser(User user) {
         if (userData.contains(user)) {
+            System.out.println("계정 삭제 완료");
             userData.remove(user);
-            System.out.println("계정 삭제 : " + user + "\n계정이 성공적으로 삭제되었습니다.\n");
+            printUser(user);
         } else {
             throw new IllegalArgumentException("유저를 찾을 수 없습니다");
         }
     }
     public List<User> getUserData() {
         return userData;
+    }
+
+    private void printUser(User user) {
+        System.out.println(" - 사용자: " + user.getID());
+        System.out.println(" - 이메일: " + user.getEmail());
+        System.out.println(" - 생성 시간: " + user.getCreatedAt() + "\n");
     }
 
 }
