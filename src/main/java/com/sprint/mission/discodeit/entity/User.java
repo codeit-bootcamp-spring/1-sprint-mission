@@ -1,30 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity{
-    private String username;
-    private String email;
+import java.util.UUID;
 
-    public User(String username, String email) {
-        super();
-        this.username = username;
-        this.email = email;
+public class User {
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    private String name;
+
+    public User(UUID id, Long createdAt, Long updatedAt, String name) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.name = name;
     }
 
-    public String getUsername() {
-        return username;
+    public UUID getId() {
+        return id;
     }
 
-    public String getEmail() {
-        return email;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public void updateUsername(String username) {
-        this.username = username;
-        super.update();
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void updateEmail(String email) {
-        this.email = email;
-        super.update();
+    public String getName() {
+        return name;
     }
+
+    public void update(String name, Long updatedAt) {
+        this.name = name;
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
 }

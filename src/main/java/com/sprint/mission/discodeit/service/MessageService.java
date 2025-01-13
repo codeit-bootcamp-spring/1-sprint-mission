@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message create(Message message);
-    Message read(UUID id);
-    List<Message> readAll();
-    Message update(UUID id, String content);
-    boolean delete(UUID id);
+    Message createMessage(UUID id, Long createdAt, Long updatedAt, String content);
+    Message getMessage(UUID id);
+    List<Message> getAllMessages();
+    void updateMessage(UUID id, String content, Long updatedAt);
+    void deleteMessage(UUID id);
 }

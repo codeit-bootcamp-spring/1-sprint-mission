@@ -6,39 +6,42 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data;
+    private final List<Message> data;
 
     public JCFMessageService() {
-        this.data = new HashMap<>();
+        this.data = new ArrayList<>();
     }
 
     @Override
-    public Message create(Message message) {
-        data.put(message.getId(), message);
+    public Message createMessage(UUID id, Long createdAt, Long updatedAt, String content) {
+        Message message = new Message(id, createdAt, updatedAt, content);
+        data.add(message);
         return message;
     }
 
     @Override
-    public Message read(UUID id) {
-        return data.get(id);
+    public Message getMessage(UUID id) {
+        return data.stream()
+                .filter(message -> message.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
-    public List<Message> readAll() {
-        return new ArrayList<>(data.values());
+    public List<Message> getAllMessages() {
+        return new ArrayList<>(data);
     }
 
     @Override
-    public Message update(UUID id, String content) {
-        Message message = data.get(id);
+    public void updateMessage(UUID id, String content, Long updatedAt) {
+        Message message = getMessage(id);
         if (message != null) {
-            message.updateContent(content);
+            message.update(updatedAt);
         }
-        return message;
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return data.remove(id) != null;
+    public void deleteMessage(UUID id) {
+        data.removeIf(message -> message.getId().equals(id));
     }
 }

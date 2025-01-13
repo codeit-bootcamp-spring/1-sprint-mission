@@ -1,30 +1,37 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends BaseEntity{
-    private String content;
-    private User sender;
+import java.util.UUID;
 
-    public Message(String content, User sender) {
-        super();
+public class Message{
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    private String content;
+
+    public Message(UUID id, Long createdAt, Long updatedAt, String content) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.content = content;
-        this.sender = sender;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getContent() {
         return content;
     }
 
-    public User getSender() {
-        return sender;
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
-        super.update();
-    }
-
-    public void updateSender(User sender) {
-        this.sender = sender;
-        super.update();
+    public void update(Long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }
