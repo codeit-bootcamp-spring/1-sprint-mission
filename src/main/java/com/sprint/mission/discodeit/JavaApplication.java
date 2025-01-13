@@ -3,29 +3,26 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.factory.ServiceFactory;
+import com.sprint.mission.discodeit.factory.jcf.JCFServiceFactory;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // 데이터 저장소 초기화
-        Map<UUID, User> userData = new HashMap<>();
-        Map<UUID, Channel> channelData = new HashMap<>();
-        Map<UUID, Message> messageData = new HashMap<>();
+        // 팩토리 생성
+        ServiceFactory factory = new JCFServiceFactory();
 
-        // 싱글톤 인스턴스 생성
-        JCFUserService userService = JCFUserService.getInstance(userData);
-        JCFChannelService channelService = JCFChannelService.getInstance(channelData);
-        JCFMessageService messageService = JCFMessageService.getInstance(messageData);
-
-        // 의존성 주입
-        userService.setDependencies(messageService, channelService);
-        channelService.setDependencies(userService, messageService);
-        messageService.setDependencies(userService, channelService);
+        //서비스 객체 생성
+        UserService userService = factory.createUserService();
+        ChannelService channelService = factory.createChannelService();
+        MessageService messageService = factory.createMessageService();
 
         // === User Service 테스트 ===
         System.out.println("=== 사용자 서비스 테스트 ===");

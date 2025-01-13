@@ -9,20 +9,13 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private static JCFChannelService instance; // 싱글톤 인스턴스
-    private final Map<UUID, Channel> data;
+    private final Map<UUID, Channel> channelData;
     private UserService userService;
     private MessageService messageService;
 
-    private JCFChannelService(Map<UUID, Channel> data) {
-        this.data = data;
-    }
-
-    public static JCFChannelService getInstance(Map<UUID, Channel> data) {
-        if (instance == null) {
-            instance = new JCFChannelService(data);
-        }
-        return instance;
+    //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
+    public JCFChannelService(Map<UUID, Channel> channelData) {
+        this.channelData = channelData;
     }
 
     public void setDependencies(UserService userService, MessageService messageService) {
@@ -32,18 +25,18 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(Channel channel) {
-        if (data.containsKey(channel.getId())) {
+        if (channelData.containsKey(channel.getId())) {
             throw new IllegalArgumentException("Channel Id already exists: " + channel.getId());
         }
 
-        data.put(channel.getId(), channel);
+        channelData.put(channel.getId(), channel);
         System.out.println(channel.toString());
         return channel;
     }
 
     @Override
     public void addParticipantToChannel(Channel channel, User user) {
-        if(!data.containsKey(channel.getId())) {
+        if(!channelData.containsKey(channel.getId())) {
             throw new IllegalArgumentException("Channel does not exists: " + channel.getId());
         }
         Optional<User> existUser = userService.readUser(user);
@@ -57,19 +50,19 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Optional<Channel> readChannel(Channel channel) {
         System.out.println(channel.toString());
-        return Optional.ofNullable(data.get(channel.getId()));
+        return Optional.ofNullable(channelData.get(channel.getId()));
     }
 
     @Override
     public List<Channel> readAllChannels() {
 
-        return new ArrayList<>(data.values());
+        return new ArrayList<>(channelData.values());
     }
 
     @Override
     public Channel updateChannel(Channel existChannel, Channel updateChannel) {
         // 기존 Channel 객체가 존재하는지 확인
-        if (!data.containsKey(existChannel.getId())) {
+        if (!channelData.containsKey(existChannel.getId())) {
             throw new NoSuchElementException("Channel not found");
         }
         System.out.println("업데이트 이전 채널 = "+existChannel.toString());
@@ -78,7 +71,7 @@ public class JCFChannelService implements ChannelService {
         existChannel.updateParticipants(updateChannel.getParticipants());
         existChannel.updateMessageList(updateChannel.getMessageList());
         existChannel.updateTime();
-        data.put(existChannel.getId(), existChannel);
+        channelData.put(existChannel.getId(), existChannel);
         System.out.println("업데이트 이후 채널 = "+existChannel.toString());
         return existChannel;
 
@@ -86,13 +79,13 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean deleteChannel(Channel channel) {
-        if (!data.containsKey(channel.getId())) {
+        if (!channelData.containsKey(channel.getId())) {
             return false;
         }
 
         //채널 삭제 시 관련 메시지들 모두 삭제
         messageService.deleteMessageByChannel(channel);
-        data.remove(channel.getId());
+        channelData.remove(channel.getId());
         return true;
     }
 

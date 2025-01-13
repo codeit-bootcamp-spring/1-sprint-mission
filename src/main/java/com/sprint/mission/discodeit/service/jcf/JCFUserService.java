@@ -4,54 +4,47 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private static JCFUserService instance; // 싱글톤 인스턴스
-    private final Map<UUID, User> data;
+    private final Map<UUID, User> userData;
     private MessageService messageService;
     private ChannelService channelService;
 
-    private JCFUserService(Map<UUID, User> data) {
-        this.data = data;
-    }
-
-    public static JCFUserService getInstance(Map<UUID, User> data) {
-        if (instance == null) {
-            instance = new JCFUserService(data);
-        }
-        return instance;
+    //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
+    public JCFUserService(Map<UUID, User> userData) {
+        this.userData = userData;
     }
 
     public void setDependencies(MessageService messageService, ChannelService channelService) {
         this.messageService = messageService;
         this.channelService = channelService;
     }
+
     @Override
     public User createUser(User user){
-        if (data.containsKey(user.getId())) {
+        if (userData.containsKey(user.getId())) {
             throw new IllegalArgumentException("User ID already exists: " + user.getId());
         }
-        data.put(user.getId(), user);
-        System.out.println(user.toString());
+        userData.put(user.getId(), user);
+        System.out.println(user);
         return user;
     }
 
     @Override
     public Optional<User> readUser(User user) {
         System.out.println(user.toString());
-        return Optional.ofNullable(data.get(user.getId()));
+        return Optional.ofNullable(userData.get(user.getId()));
     }
 
     @Override
     public List<User> readAllUsers() {
-        return new ArrayList<>(data.values());
+        return new ArrayList<>(userData.values());
     }
 
     @Override
     public User updateUser(User existUser, User updateUser){
-        if (!data.containsKey(existUser.getId())) {
+        if (!userData.containsKey(existUser.getId())) {
             throw new NoSuchElementException("User not found");
         }
         // 기존 객체의 값을 업데이트
@@ -62,14 +55,14 @@ public class JCFUserService implements UserService {
         existUser.updatePassword(updateUser.getPassword());
         existUser.updateUserEmail(updateUser.getEmail());
 
-        data.put(existUser.getId(), existUser);
+        userData.put(existUser.getId(), existUser);
         System.out.println("수정 유저= "+existUser.toString());
         return existUser;
     }
 
     @Override
     public boolean deleteUser(User user){
-        if (!data.containsKey(user.getId())) {
+        if (!userData.containsKey(user.getId())) {
             return false;
         }
         System.out.println(user.toString());
@@ -85,7 +78,7 @@ public class JCFUserService implements UserService {
                         "'"+user.getUsername()+ "' 제거 완료");
             }
         });
-        data.remove(user.getId());
+        userData.remove(user.getId());
         return true;
     }
 }
