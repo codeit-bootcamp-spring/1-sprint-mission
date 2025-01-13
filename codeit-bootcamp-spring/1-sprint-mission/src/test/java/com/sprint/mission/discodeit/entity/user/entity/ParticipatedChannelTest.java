@@ -152,7 +152,7 @@ class ParticipatedChannelTest {
             var changeChannelName = createdChannel1.getChannelName();
 
             // when
-            channels.changeChannelName(channelId, "new ChannelName", USER);
+            channels.changeChannelNameOrThrow(channelId, "new ChannelName", USER);
 
             // then
             assertAll(
@@ -171,7 +171,7 @@ class ParticipatedChannelTest {
             var changeChannelName = "new ChannelName";
 
             // when
-            var throwable = catchThrowable(() -> channels.changeChannelName(notExistedChannelId, changeChannelName, USER));
+            var throwable = catchThrowable(() -> channels.changeChannelNameOrThrow(notExistedChannelId, changeChannelName, USER));
 
             // then
             assertThat(throwable).isInstanceOf(UserException.class)
@@ -189,7 +189,7 @@ class ParticipatedChannelTest {
 
             // when
             var throwable = catchThrowable(() ->
-                    channels.changeChannelName(channelId, changeChannelName, notCreatorUser)
+                    channels.changeChannelNameOrThrow(channelId, changeChannelName, notCreatorUser)
             );
 
             // then

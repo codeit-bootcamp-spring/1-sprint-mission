@@ -68,7 +68,7 @@ class UserNameTest {
 
         @BeforeEach
         void setup() {
-            userName = UserName.createFrom(USER_NAME);;
+            userName = UserName.createFrom(USER_NAME);
         }
 
         @Test

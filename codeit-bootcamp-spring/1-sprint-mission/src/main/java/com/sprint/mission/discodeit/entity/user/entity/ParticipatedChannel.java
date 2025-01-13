@@ -20,7 +20,7 @@ public class ParticipatedChannel {
     }
 
     public static ParticipatedChannel newDefault() {
-        return new ParticipatedChannel(new HashMap<UUID, Channel>());
+        return new ParticipatedChannel(new HashMap<>());
     }
 
     public Channel createChannel(String channelName, User user) {
@@ -51,7 +51,7 @@ public class ParticipatedChannel {
         return foundChannelByName;
     }
     // TODO 메서드 이름에 throw 붙여주어야 하는가 Naming issue
-    public void changeChannelName(UUID channelId, String newName, User user) {
+    public void changeChannelNameOrThrow(UUID channelId, String newName, User user) {
         var foundChannel = findById(channelId)
                 .orElseThrow(() ->
                         UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())

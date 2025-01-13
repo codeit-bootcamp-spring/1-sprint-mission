@@ -15,7 +15,7 @@ public abstract class AbstractUUIDEntity {
 
     private final Long createAt;
 
-    protected Long updateAt = null;
+    private Long updateAt = null;
 
     private Status status;
 

@@ -20,8 +20,8 @@ public class UserConverter {
 
     public User toEntity(RegisterUserRequest request) {
         try {
-            var user = User.createFrom(request.name());
-            return user;
+            var createdUser = User.createFrom(request.name());
+            return createdUser;
         } catch (IllegalArgumentException e) {
             // TODO validator 사용으로 예외가 안던져지는 문제 발생
             throw UserException.of(e.getMessage(), e);
@@ -29,11 +29,11 @@ public class UserConverter {
     }
 
     public UserInfoResponse toDto(User user) {
-        var dto = new UserInfoResponse(
+        var responseDto = new UserInfoResponse(
                 user.getId(),
                 user.getName(),
                 user.getStatus()
         );
-        return dto;
+        return responseDto;
     }
 }

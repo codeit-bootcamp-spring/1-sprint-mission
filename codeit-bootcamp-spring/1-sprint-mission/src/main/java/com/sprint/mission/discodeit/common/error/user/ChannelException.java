@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.common.error.ErrorMessage;
 
 public class ChannelException extends RuntimeException {
 
-    private ChannelException() {}
-
     private ChannelException(String message) {
         super(message);
     }

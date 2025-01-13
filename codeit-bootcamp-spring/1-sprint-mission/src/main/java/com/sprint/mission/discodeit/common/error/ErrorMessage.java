@@ -32,7 +32,4 @@ public enum ErrorMessage {
         return message;
     }
 
-    public int getErrorCode() {
-        return errorCode;
-    }
 }
