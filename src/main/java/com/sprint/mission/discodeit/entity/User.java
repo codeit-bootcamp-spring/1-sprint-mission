@@ -44,10 +44,4 @@ public class User {
         this.updatedAt = System.currentTimeMillis();
     }
 
-
-    // 단방향 암호화 (sha256 + salt)
-    private String getEncryptedPassword(String password) {
-
-        return password;
-    }
 }

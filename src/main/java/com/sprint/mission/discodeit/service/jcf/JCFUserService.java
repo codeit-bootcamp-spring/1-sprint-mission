@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.entity.security.Encrypt.getEncryptedPassword;
+
 public class JCFUserService implements UserService {
     private final List<User> data = new ArrayList<>();
 
     @Override
     public void createUser(String password, String name) {
+        password = getEncryptedPassword(password);
         User user = new User(password, name);
         data.add(user);
     }
