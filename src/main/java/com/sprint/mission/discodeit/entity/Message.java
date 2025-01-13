@@ -43,10 +43,6 @@ public class Message {
         return channel;
     }
 
-    public void displayMessageInfo(){
-        System.out.println("채널 이름: " + channel + "\n작성자: " + writer + "\n" + content);
-    }
-
     public void setContent(String content){
         this.content = content;
         updatedAt = System.currentTimeMillis();
