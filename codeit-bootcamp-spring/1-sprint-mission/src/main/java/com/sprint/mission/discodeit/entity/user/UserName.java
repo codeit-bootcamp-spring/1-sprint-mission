@@ -10,7 +10,10 @@ public class UserName {
     public static final int NAME_MIN_LENGTH = 3;
     public static final int NAME_MAX_LENGTH = 20;
 
-    @Size(min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH, message = "'${validatedValue}' must be between {min} and {max} characters long")
+    @Size(
+            min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH,
+            message = "'${validatedValue}' must be between {min} and {max} characters long"
+    )
     @NotNull    //TODO : => NotBlank , 테스트 코드 수정 후 변경
     private final String name;
 

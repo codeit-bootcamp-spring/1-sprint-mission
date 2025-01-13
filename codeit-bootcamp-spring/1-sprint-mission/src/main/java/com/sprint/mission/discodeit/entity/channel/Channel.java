@@ -8,8 +8,7 @@ public class Channel extends AbstractUUIDEntity {
 
     @NotNull
     @Size(
-            min = 3,
-            max = 50,
+            min = 3, max = 50,
             message = "create channel must be between {min} and {max} : reject channel name `${validatedValue}`"
     )
     private String channelName;
@@ -18,12 +17,16 @@ public class Channel extends AbstractUUIDEntity {
         this.channelName = channelName;
     }
 
-    public static Channel of(String channelName) {
+    public static Channel createFrom(String channelName) {
         return new Channel(channelName);
     }
 
     public String getChannelName() {
         return channelName;
+    }
+
+    public boolean isEqualFromName(String channelName) {
+        return this.channelName.equals(channelName);
     }
 
 }
