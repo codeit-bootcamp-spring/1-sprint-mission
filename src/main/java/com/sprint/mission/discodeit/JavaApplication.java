@@ -19,7 +19,7 @@ public class JavaApplication {
          * User 실행
          */
         // JCFUserService 인스턴스 생성
-        UserService userService = JCFUserService.getJCFUserService();
+        UserService userService = JCFUserService.getInstance();
 
         // 유저 등록
         userService.craete("test1@test.com", "12345678", "name", "nickname", "010-1224-1234");
@@ -46,7 +46,7 @@ public class JavaApplication {
         displayUserInfo(userService.read(UserTestUuid1));
 
         // 비밀번호 수정
-        userService.updatePw(UserTestUuid1, "10203040");
+        userService.updatePassword(UserTestUuid1, "10203040");
         // 수정된 데이터 조회
         System.out.println("\n비밀번호 수정");
         displayUserInfo(userService.read(UserTestUuid1));
@@ -81,7 +81,7 @@ public class JavaApplication {
          * Channel 실행
          */
         // JCFChannelService 인스턴스 생성
-        ChannelService channelService = JCFChannelService.getJCFChannelService();
+        ChannelService channelService = JCFChannelService.getInstance();
 
         // 채널 생성
         channelService.craete(UserTestUuid1, "testCategory1", "test1", "explain");
@@ -118,11 +118,11 @@ public class JavaApplication {
         displayAllChannel(channelService.allRead());
 
         // 멤버 수정
-        displayChannel( channelTestUuid1, channelService.read(channelTestUuid1));
+        displayChannel(channelTestUuid1, channelService.read(channelTestUuid1));
         channelService.updateMembers(channelTestUuid1, UserTestUuid2);
         channelService.updateMembers(channelTestUuid1, UserTestUuid3);
         System.out.println("\n\n 채널 멤버 수정 테스트");
-        displayChannel( channelTestUuid1, channelService.read(channelTestUuid1));
+        displayChannel(channelTestUuid1, channelService.read(channelTestUuid1));
 
 //        // 채널 삭제
 //        channelService.delete(channelTestUuid1);
@@ -140,11 +140,15 @@ public class JavaApplication {
         messageService.craete(channelTestUuid1, "first msg", UserTestUuid1);
         messageService.craete(channelTestUuid1, "second msg", UserTestUuid1);
         messageService.craete(channelTestUuid1, "third msg", UserTestUuid1);
+        messageService.craete(channelTestUuid2, "fourth msg", UserTestUuid1);
+        messageService.craete(channelTestUuid2, "fifth msg", UserTestUuid1);
 
         // 테스트용 uuid
         UUID messageTestUuid1 = messageService.allRead().get(0).getId();
         UUID messageTestUuid2 = messageService.allRead().get(1).getId();
         UUID messageTestUuid3 = messageService.allRead().get(2).getId();
+        UUID messageTestUuid4 = messageService.allRead().get(3).getId();
+        UUID messageTestUuid5 = messageService.allRead().get(4).getId();
 
         // 메시지 1건 조회
         System.out.println("\n\n 메시지 1건 조회 테스트");
@@ -152,7 +156,7 @@ public class JavaApplication {
 
         // 메시지 특정 채널 전체 조회
         System.out.println("\n\n 메시지 특정 채널 전체 조회 테스트");
-        displayAllMessage(channelTestUuid1, messageService.allRead());
+        displayAllMessage(messageService.allRead(channelTestUuid1));
 
         // 메시지 전체 조회
         System.out.println("\n\n 메시지 전체 조회 테스트");
@@ -186,14 +190,7 @@ public class JavaApplication {
         data.stream()
                 // 정렬 시 @ 앞까지만 잘라서 오름차순
                 .sorted(Comparator.comparing(user -> user.getEmail().split("@")[0]))
-                .forEach(user -> {
-                    System.out.println(
-                            "이메일: " + user.getEmail()
-                                    + ", 이름: " + user.getName()
-                                    + ", 닉네임: " + user.getNickname()
-                                    + ", 전화번호: " + user.getPhoneNumber() + "\n"
-                    );
-                });
+                .forEach(JavaApplication::displayUserInfo);
     }
 
     // 채널 1개 출력
@@ -203,7 +200,27 @@ public class JavaApplication {
             return;
         }
 
-        UserService userService = JCFUserService.getJCFUserService();
+        UserService userService = JCFUserService.getInstance();
+
+        printChannel(userService, channel);
+    }
+
+    // 모든 유저 모든 채널 출력
+    public static void displayAllChannel(List<Channel> channels) {
+
+        UserService userService = JCFUserService.getInstance();
+
+        channels.stream()
+                .sorted(Comparator.comparing((Channel channel) -> userService.read(channel.getOwnerId()).getEmail().split("@")[0])
+                        .thenComparing(Channel::getCategory)
+                        .thenComparing(Channel::getName))
+                .forEach(channel -> {
+                    printChannel(userService, channel);
+                });
+    }
+
+    // 채널 출력 시 공통(출력) 부분
+    public static void printChannel(UserService userService, Channel channel){
 
         System.out.print(
                 "채널 주인: " + userService.read(channel.getOwnerId()).getEmail()
@@ -213,46 +230,20 @@ public class JavaApplication {
                         + ", 멤버: "
         );
 
-        channel.getMembers().stream()
-                .forEach(member -> {
-                    System.out.print(userService.read(member).getEmail() + " ");
-                });
+        // 멤버 목록 출력
+        // stream 쓰지 않아도 list에 forEach 메서드 내장되어 있음
+        channel.getMembers().forEach(member -> {
+            System.out.print(userService.read(member).getEmail() + " ");
+        });
 
         System.out.println();
-    }
-
-    // 모든 유저 모든 채널 출력
-    public static void displayAllChannel(List<Channel> channels) {
-
-        UserService userService = JCFUserService.getJCFUserService();
-
-        channels.stream()
-                .sorted(Comparator.comparing((Channel channel) -> userService.read(channel.getOwnerId()).getEmail().split("@")[0])
-                        .thenComparing(Channel::getCategory)
-                        .thenComparing(Channel::getName))
-                .forEach(channel -> {
-                    System.out.print(
-                            "채널 주인: " + userService.read(channel.getOwnerId()).getEmail()
-                                    + ", 카테고리: " + channel.getCategory()
-                                    + ", 채널명: " + channel.getName()
-                                    + ", 채널 설명: " + channel.getExplanation()
-                                    + ", 멤버: "
-                    );
-
-                    channel.getMembers().stream()
-                            .forEach(member -> {
-                                System.out.print(userService.read(member).getEmail() + " ");
-                            });
-
-                    System.out.println();
-                });
     }
 
     // 메시지 1건 조회
     public static void displayMessage(Message message) {
 
-        UserService userService = JCFUserService.getJCFUserService();
-        ChannelService channelService = JCFChannelService.getJCFChannelService();
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
 
         System.out.println(
                 "채널: " + channelService.read(message.getChannelId()).getName()
@@ -265,36 +256,15 @@ public class JavaApplication {
     // 메시지 전체 조회
     public static void displayAllMessage(List<Message> messages) {
 
-        if (messages == null){
+        if (messages == null) {
             System.out.println("메시지 없음");
+            return;
         }
 
-        UserService userService = JCFUserService.getJCFUserService();
-        ChannelService channelService = JCFChannelService.getJCFChannelService();
+        UserService userService = JCFUserService.getInstance();
+        ChannelService channelService = JCFChannelService.getInstance();
 
-        messages.stream()
-                .forEach(message -> {
-                    System.out.println(
-                            "채널: " + channelService.read(message.getChannelId()).getName()
-                                    + ", 작성자: " + userService.read(message.getWriter()).getEmail()
-                                    + ", 내용: " + message.getMessage()
-                    );
-                });
-    }
-
-    // 특정 채널 메시지 전체 조회
-    public static void displayAllMessage(UUID channelId, List<Message> messages) {
-        
-        if (messages == null){
-            System.out.println("메시지 없음");
-        }
-        
-        UserService userService = JCFUserService.getJCFUserService();
-        ChannelService channelService = JCFChannelService.getJCFChannelService();
-
-        messages.stream()
-                .filter(message -> channelService.read(message.getChannelId()).getId().equals(channelId))
-                .forEach(message -> {
+        messages.forEach(message -> {
                     System.out.println(
                             "채널: " + channelService.read(message.getChannelId()).getName()
                                     + ", 작성자: " + userService.read(message.getWriter()).getEmail()

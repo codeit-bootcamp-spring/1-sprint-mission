@@ -1,21 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class Channel {      // 채널 (게시판)
     // 공통 필드
-    private UUID id;            // pk
-    private long createdAt;     // 생성 시간
-    private long updatedAt;     // 수정 시간
+    private final UUID id;            // pk
+    private final Long createdAt;     // 생성 시간
+    private Long updatedAt;           // 수정 시간
 
-    private UUID ownerId;         // 채널 주인
-    private String category;    // 채널 카테고리
-    private String name;        // 채널 이름
-    private String explanation; // 채널 설명
-    private List<UUID> members; // 멤버 목록
+    private final UUID ownerId;       // 채널 주인
+    private String category;          // 채널 카테고리
+    private String name;              // 채널 이름
+    private String explanation;       // 채널 설명
+    private List<UUID> members;       // 멤버 목록
 
 
     // 생성자
@@ -73,21 +72,25 @@ public class Channel {      // 채널 (게시판)
     // update 함수
     public void updateCategory(String category){
         this.category = category;
-        this.updatedAt = System.currentTimeMillis();
+        updateUpdateAt();
     }
 
     public void updateName(String name) {
         this.name = name;
-        this.updatedAt = System.currentTimeMillis();
+        updateUpdateAt();
     }
 
     public void updateExplanation(String explanation) {
         this.explanation = explanation;
-        this.updatedAt = System.currentTimeMillis();
+        updateUpdateAt();
     }
 
     public void updateMembers(List<UUID> members) {
         this.members = members;
+        updateUpdateAt();
+    }
+
+    public void updateUpdateAt(){
         this.updatedAt = System.currentTimeMillis();
     }
 }

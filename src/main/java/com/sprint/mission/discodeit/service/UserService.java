@@ -17,7 +17,7 @@ public interface UserService {
 
     // 수정
     void updateEmail(UUID id, String updateEmail);
-    void updatePw(UUID id, String updatePw);
+    void updatePassword(UUID id, String updatePassword);
     void updateName(UUID id, String updateName);
     void updateNickname(UUID id, String updateNickname);
     void updatePhoneNumber(UUID id, String updatePhoneNumber);
