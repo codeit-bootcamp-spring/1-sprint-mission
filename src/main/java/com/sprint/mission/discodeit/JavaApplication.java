@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.MessageType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -12,6 +11,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -29,9 +29,11 @@ public class JavaApplication {
         userService.findAllUsers().forEach(user -> System.out.println(user.getName()));
 
         //단건 조회
-        User singleUser = userService.findUserByName("Alice");
-        System.out.println("\n유저 단건 조회");
-        System.out.println(singleUser.getName() + singleUser.getId() + singleUser.getCreatedAt());
+        userService.findUserByName("Alice")
+            .ifPresentOrElse(user ->
+                System.out.println("유저 단건 조회: " + user.getName()), () -> {
+                throw new IllegalArgumentException("user not found");
+            });
 
         //유저 이름 업데이트
         userService.updateUserName(userService.findAllUsers().get(0).getId(), "Alice2");
@@ -58,7 +60,11 @@ public class JavaApplication {
 
         //단건 조회
         System.out.println("\n채널 단건 조회");
-        System.out.println(channelService.findChannel(channelService.findAllChannels().get(0).getId()).getName());
+        UUID channelId = channelService.findAllChannels().get(0).getId();
+        channelService.findChannel(channelId)
+            .ifPresentOrElse(channel -> System.out.println(channel.getName()), () -> {
+                throw new IllegalArgumentException("channel not found" + channelId);
+            });
 
         //채널 이름 업데이트
         System.out.println("\n채널 이름 업데이트");
@@ -68,7 +74,8 @@ public class JavaApplication {
         //멤버 업데이트
         System.out.println("\n멤버 업데이트");
         channelService.updateMember(channelService.findAllChannels().get(0).getId(), List.of(userService.findAllUsers().get(0), userService.findAllUsers().get(1)));
-        channelService.findChannel(channelService.findAllChannels().get(0).getId()).getMembers().forEach(user -> System.out.println(user.getName()));
+        channelService.findChannel(channelService.findAllChannels().get(0).getId())
+            .ifPresent(channel -> channel.getMembers().forEach(user -> System.out.println(user.getName())));
 
         //채널 삭제
         System.out.println("\n채널 삭제");
@@ -79,8 +86,8 @@ public class JavaApplication {
         MessageService messageService = new JCFMessageService();
 
         //메시지 생성
-        messageService.createMessage(userService.findAllUsers().get(0), "Hello", MessageType.COMMON);
-        messageService.createMessage(userService.findAllUsers().get(1), "Hi", MessageType.COMMON);
+        messageService.createCommonMessage(userService.findAllUsers().get(0), "Hello");
+        messageService.createReplyMessage(userService.findAllUsers().get(1), "Hi");
 
         //메시지 전체 조회
         System.out.println("\n메시지 전체 조회");
@@ -107,13 +114,13 @@ public class JavaApplication {
         User user2 = userService.findAllUsers().get(1);
         Channel channel = channelService.findAllChannels().get(0);
 
-        Message message1 = new Message(user1, "Good morning", MessageType.COMMON);
-        Message message2 = new Message(user2, "Good bye", MessageType.COMMON);
+        Message message1 = Message.ofCommon(user1, "Good morning");
+        Message message2 = Message.ofReply(user2, "Good bye"); // reply는 답장 대상을 받도록 수정 필요
         channelService.sendMessage(channel.getId(), message1);
         channelService.sendMessage(channel.getId(), message2);
 
         System.out.println("\n" + channel.getName() + " 채널의 메세지 : ");
-        channel.getMessages().stream().forEach(message -> System.out.println("(" + message.getSender().getName() + ") " + message.getContent()));
+        channel.getMessages().forEach(message -> System.out.println("(" + message.getSender().getName() + ") " + message.getContent()));
 
     }
 }

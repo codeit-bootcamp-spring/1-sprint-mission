@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -19,11 +20,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findChannel(UUID id) {
-        Channel channel = data.stream()
+    public Optional<Channel> findChannel(UUID id) {
+        Optional<Channel> channel = data.stream()
             .filter(c -> c.getId().equals(id))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("channel not found"));
+            .findFirst();
         return channel;
     }
 
@@ -34,25 +34,27 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateChannelName(UUID id, String newName) {
-        Channel channel = findChannel(id);
-        channel.updateName(newName);
+        findChannel(id).ifPresentOrElse(c -> c.updateName(newName), () -> {
+            throw new IllegalArgumentException("channel not found: " + id);
+        });
     }
 
     @Override
-    public void updateMember(UUID id, List<User> members) {
-        Channel channel = findChannel(id);
-        channel.updateMembers(members);
+    public void updateMember(UUID id, List<User> members) { //유저 검증도 필요할 듯
+        findChannel(id).ifPresentOrElse(c -> c.updateMembers(members), () -> {
+            throw new IllegalArgumentException("channel not found: " + id);
+        });
     }
 
     @Override
     public void sendMessage(UUID id, Message message) {
-        Channel channel = findChannel(id);
-        channel.getMessages().add(message);
+        findChannel(id).ifPresentOrElse(c -> c.getMessages().add(message), () -> {
+            throw new IllegalArgumentException("channel not found: " + id);
+        });
     }
 
     @Override
     public void removeChannel(UUID id) {
-        Channel channel = findChannel(id);
-        data.remove(channel);
+        findChannel(id).ifPresent(data::remove);
     }
 }

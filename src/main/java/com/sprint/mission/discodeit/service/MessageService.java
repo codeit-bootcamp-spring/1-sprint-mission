@@ -1,16 +1,18 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.MessageType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void createMessage(User sender, String content, MessageType type); //이게 전송...?
+    void createCommonMessage(User sender, String content);
 
-    Message findMessage(UUID id);
+    void createReplyMessage(User sender, String content);
+
+    Optional<Message> findMessage(UUID id);
 
     List<Message> findAllMessages();
 

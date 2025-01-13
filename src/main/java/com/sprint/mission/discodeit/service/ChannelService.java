@@ -5,12 +5,13 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
     void createChannel(String name, List<User> members);
 
-    Channel findChannel(UUID id);
+    Optional<Channel> findChannel(UUID id);
 
     List<Channel> findAllChannels();
 
@@ -19,7 +20,6 @@ public interface ChannelService {
     void updateMember(UUID id, List<User> members);
 
     void sendMessage(UUID id, Message message);
-
 
     void removeChannel(UUID id);
 

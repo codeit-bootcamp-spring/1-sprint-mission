@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
@@ -17,20 +18,18 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findUserById(UUID id) {
-        User user = data.stream()
+    public Optional<User> findUserById(UUID id) {
+        Optional<User> user = data.stream()
             .filter(u -> u.getId().equals(id))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("user not found"));
+            .findFirst();
         return user;
     }
 
     @Override
-    public User findUserByName(String name) {
-        User user = data.stream()
+    public Optional<User> findUserByName(String name) {
+        Optional<User> user = data.stream()
             .filter(u -> u.getName().equals(name))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("user not found"));
+            .findFirst();
         return user;
     }
 
@@ -41,18 +40,20 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserName(UUID id, String newName) {
-        User user = findUserById(id);
-        user.updateName(newName);
+        findUserById(id).ifPresentOrElse(u -> u.updateName(newName), () -> {
+            throw new IllegalArgumentException("user not found: " + id);
+        });
     }
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
-        User user = findUserById(id);
-        user.updatePassword(newPassword);
+        findUserById(id).ifPresentOrElse(u -> u.updatePassword(newPassword), () -> {
+            throw new IllegalArgumentException("user not found: " + id);
+        });
     }
 
     @Override
     public void removeUser(UUID id) {
-        data.remove(findUserById(id));
+        findUserById(id).ifPresent(data::remove);
     }
 }
