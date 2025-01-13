@@ -13,13 +13,12 @@ public class BaseEntity {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
     }
-    // id, createdAt은 setter 생략...하고 싶은데?!
     public UUID getId(){return id;}
     public void setId(UUID id){ this.id = id;}
     public Long getCreatedAt(){
         return createdAt;
     }
-    public void setCreatedAt(Long CreatedAt){this.createdAt = CreatedAt;}
+    public void setCreatedAt(Long createdAt){this.createdAt = createdAt;}
     public Long getUpdatedAt(){
         return updatedAt;
     }
