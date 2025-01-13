@@ -93,5 +93,8 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteParticipant(Channel channel, User user) {
         channel.deleteParticipant(user);
+        user.deleteJoinedChannel(channel);
+        channel.updateUpdatedAt();
+        user.updateUpdatedAt();
     }
 }
