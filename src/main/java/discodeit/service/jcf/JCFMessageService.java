@@ -72,6 +72,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateContent(Message message, String content) {
         message.updateContent(content);
+        message.updateUpdatedAt();
     }
 
     @Override
