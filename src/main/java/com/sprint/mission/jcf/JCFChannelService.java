@@ -22,10 +22,10 @@ public class JCFChannelService implements ChannelService {
 
     // 채널명 변경
     @Override
-    public void updateChannel(User user, String modifiedChannelName) {
+    public void updateChannel(User user, String channelName, String modifiedChannelName) {
 
         for (Channel channel : channelData) {
-            if (channel.getUser().equals(user)) {
+            if (channel.getUser().equals(user)&& channel.getChannelName().equals(channelName)) {
                 channel.setChannelName(modifiedChannelName);
                 System.out.println("채널명 변경 : " + modifiedChannelName + "\n채널명이 변경되었습니다.");
                 return;

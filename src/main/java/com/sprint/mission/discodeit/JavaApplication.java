@@ -37,35 +37,35 @@ public class JavaApplication {
         // Jack, Bob의 채널 생성
         channelService.createChannel(Jack, "codeit");
         channelService.createChannel(Bob, "codeit2");
+        channelService.createChannel(Jack, "codeit3");
 
         // 전체 채널 조회
         channelService.getAllChannelList();
 
         // 채널명 변경
-        channelService.updateChannel(Jack, "sprint");
+        channelService.updateChannel(Jack,"codeit3", "sprint");
         channelService.getAllChannelList();
 
          // 채널 삭제
         channelService.deleteChannel("sprint");
         channelService.getAllChannelList();
-
         // 메시지 CRUD 구현
         JCFMessageService messageService = new JCFMessageService();
 
         // 메시지 생성
         Channel channel = channelService.createChannel(Bob, "codeit2");
-        messageService.createMessage(Bob, channel, "안녕하세요, Bob입니다.");
-        messageService.createMessage(Bob, channel, "안녕하세요, Jack.");
+        messageService.createMessage(Bob, channel, "수정 전 메시지 생성1");
+        messageService.createMessage(Bob, channel, "수정 전 메시지 생성2");
 
         // 특정 유저 메시지 조회
         messageService.printChannelMessage(Bob);
 
         //메시지 변경
-        messageService.updateMessage(Bob, channel, "안녕하세요, Jack. Bob입니다.");
+        messageService.updateMessage(Bob, channel, "수정 전 메시지 생성1", "Bob입니다.");
         messageService.getAllMessageList();
 
         // 메시지 삭제
-        messageService.deleteMessage("안녕하세요, Jack.");
+        messageService.deleteMessage("수정 전 메시지 생성2");
         messageService.getAllMessageList();
     }
 }

@@ -11,7 +11,7 @@ public interface ChannelService {
     Channel createChannel(User user, String channel);
 
     // 채널명 변경
-    void updateChannel(User user, String afterChannelName);
+    void updateChannel(User user, String channel, String afterChannelName);
 
     // 채널 조회
     List<Channel> getAllChannelList();

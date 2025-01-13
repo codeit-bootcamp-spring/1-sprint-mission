@@ -33,9 +33,9 @@ public class JCFMessageService implements MessageService {
 
     // 메시지 변경
     @Override
-    public void updateMessage(User user, Channel channel, String modifiedMessage) {
+    public void updateMessage(User user, Channel channel,String Message, String modifiedMessage) {
         for (Message message : messageData) {
-            if (!message.equals(modifiedMessage)) {
+            if (!message.equals(modifiedMessage) && message.getUser().equals(user) && message.getMessage().equals(Message)) {
                 message.setMessage(modifiedMessage);
                 System.out.println("메시지 변경 : " + modifiedMessage + "\n메시지가 변경되었습니다.");
                 return;
@@ -63,7 +63,7 @@ public class JCFMessageService implements MessageService {
     public void deleteMessage(String message) {
         Message messageToDelete = null;
         for (Message message1 : messageData) {
-            if (messageData.contains(message1)) {
+            if (message1.getMessage().equals(message)) {
                 messageToDelete = message1;
                 break;
             }

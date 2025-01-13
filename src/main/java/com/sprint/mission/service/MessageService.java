@@ -12,7 +12,7 @@ public interface MessageService {
     Message createMessage(User user, Channel channelName , String message);
 
     // 메시지 변경
-    void updateMessage(User user, Channel channel, String afterMessage);
+    void updateMessage(User user, Channel channel, String Message, String afterMessage);
 
     // 메시지 정보 조회
     List<Message> getAllMessageList();
