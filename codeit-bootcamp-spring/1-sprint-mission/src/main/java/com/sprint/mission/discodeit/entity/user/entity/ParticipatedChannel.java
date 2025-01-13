@@ -4,6 +4,7 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PA
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.user.User;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,36 +22,41 @@ public class ParticipatedChannel {
         return new ParticipatedChannel(new HashMap<UUID, Channel>());
     }
 
-    public Channel createChannel(String channelName) {
-        var channel = Channel.createFrom(channelName);
-        participatedChannels.put(channel.getId(), channel);
+    public Channel createChannel(String channelName, User user) {
+        var createdChannel = Channel.createFromChannelNameAndUser(channelName, user);
+        participatedChannels.put(createdChannel.getId(), createdChannel);
 
-        return channel;
+        return createdChannel;
     }
 
     public Optional<Channel> findById(UUID channelId) {
-        var findChannel = participatedChannels.get(channelId);
-        return Optional.ofNullable(findChannel);
+        var foundChannel = participatedChannels.get(channelId);
+        return Optional.ofNullable(foundChannel);
     }
 
     // TODO 같은 이름을 가진 채널이 여러 개 있을 수 있음. 리스트로 반환 고려해야하지 않을까?
     public Optional<Channel> findByName(String name) {
-        var findByNameChannel = participatedChannels.values()
+        var foundChannelByName = participatedChannels.values()
                 .stream()
                 .filter(channel -> channel.isEqualFromNameAndNotUnregistered(name))
                 .findFirst();
 
-        return findByNameChannel;
+        return foundChannelByName;
     }
-
+    // TODO 메서드 이름에 throw 붙여주어야 하는가 Naming issue
     public void changeChannelName(UUID channelId, String newName) {
-        var findedChannel = findById(channelId)
+        var foundChannel = findById(channelId)
                 .orElseThrow(() ->
                         UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())
                 );
 
-        findedChannel.ChangeName(newName);
-        participatedChannels.put(findedChannel.getId(), findedChannel);
+        foundChannel.ChangeName(newName);
+        participatedChannels.put(foundChannel.getId(), foundChannel);
     }
+
     // 채널 삭제
+    public void deleteChannelById(UUID channelId) {
+        // TODO 에러를 throw ? 그냥 처리 ?
+        findById(channelId).ifPresent(Channel::deleteChannel);
+    }
 }

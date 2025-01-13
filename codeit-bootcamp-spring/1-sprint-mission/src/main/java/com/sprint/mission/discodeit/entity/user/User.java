@@ -28,7 +28,7 @@ public class User extends AbstractUUIDEntity {
     }
 
     public Channel createNewChannel(String channelName) {
-        var createdChannel = channels.createChannel(channelName);
+        var createdChannel = channels.createChannel(channelName, this);
         return createdChannel;
     }
 

@@ -1,14 +1,15 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
 import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
-import static com.sprint.mission.discodeit.entity.common.Status.*;
+import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
+import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.common.Status;
+import com.sprint.mission.discodeit.entity.user.User;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 class ParticipatedChannelTest {
     private static final String CHANNEL_NAME = "코드잇-1기-백엔드";
     private ParticipatedChannel channels;
+    private User user = User.createFrom("SB_1기_백재우");
 
     @Test
     void givenNewParticipatedChannelWhenCreateThenReturnNewParticipatedChannel() {
@@ -35,7 +37,7 @@ class ParticipatedChannelTest {
     @Test
     void givenChannelNameWhenCreateChannelThenReturnNewChannel() {
         // given when
-        var channel = channels.createChannel(CHANNEL_NAME);
+        var channel = channels.createChannel(CHANNEL_NAME, user);
         // then
         assertAll(
                 () -> {
@@ -58,8 +60,8 @@ class ParticipatedChannelTest {
 
         @BeforeEach
         void add() {
-            createdChannel1 = channels.createChannel(addChannelName1);
-            createdChannel2 = channels.createChannel(addChannelName2);
+            createdChannel1 = channels.createChannel(addChannelName1, user);
+            createdChannel2 = channels.createChannel(addChannelName2, user);
         }
 
         @Test
@@ -128,7 +130,8 @@ class ParticipatedChannelTest {
             // when
             var throwable = catchThrowable(() ->
                     channels.findByName(notExistedChannelName).orElseThrow(() ->
-                                    UserException.errorMessageAndChannelName(USER_NOT_PARTICIPATED_CHANNEL, notExistedChannelName)
+                            UserException.errorMessageAndChannelName(USER_NOT_PARTICIPATED_CHANNEL,
+                                    notExistedChannelName)
                     )
             );
             // then
@@ -136,7 +139,6 @@ class ParticipatedChannelTest {
                     .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
         }
 
-        // TODO 채널 수정 테스트
         @Test
         @DisplayName("유저가 참여한 채널의 id로 채널이름을 변경 성공")
         void givenParticipatedChannelIdAndNewChannelNameWhenChangeChannelNameThenSuccess() {
@@ -167,6 +169,17 @@ class ParticipatedChannelTest {
             assertThat(throwable).isInstanceOf(UserException.class)
                     .hasMessageContaining(notExistedChannelId.toString());
 
+        }
+
+        @Test
+        @DisplayName("채널 id 값으로 유저가 참여한 채널을 삭제하면 해당 채널의 상태가 업데이트")
+        void givenDeleteTargetIdWhenDeleteChannelThenChannelStatusIsChanged() {
+            // given
+            var deleteTargetChannelId = createdChannel2.getId();
+            // when
+            channels.deleteChannelById(deleteTargetChannelId);
+            // then
+            assertThat(createdChannel2.getStatus()).isEqualTo(UNREGISTERED);
         }
     }
 
