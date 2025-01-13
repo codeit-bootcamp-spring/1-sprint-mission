@@ -1,7 +1,7 @@
-package mission1.service.jcf;
+package mission.service;
 
 
-import mission1.entity.User;
+import mission.entity.User;
 
 import java.util.List;
 import java.util.UUID;

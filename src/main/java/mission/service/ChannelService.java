@@ -1,7 +1,7 @@
-package mission1.service.jcf;
+package mission.service;
 
 
-import mission1.entity.Channel;
+import mission.entity.Channel;
 
 import java.util.List;
 

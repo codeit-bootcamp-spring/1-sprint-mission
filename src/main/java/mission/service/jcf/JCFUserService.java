@@ -1,8 +1,8 @@
-package mission1.service.jcf.jcf;
+package mission.service.jcf;
 
 
-import mission1.entity.User;
-import mission1.service.jcf.UserService;
+import mission.entity.User;
+import mission.service.UserService;
 
 import java.util.*;
 

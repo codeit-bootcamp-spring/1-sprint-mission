@@ -1,4 +1,4 @@
-package mission1.entity;
+package mission.entity;
 
 import java.util.Objects;
 import java.util.UUID;

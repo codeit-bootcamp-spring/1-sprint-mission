@@ -1,14 +1,14 @@
-package mission1;
+package mission;
 
-import mission1.entity.Channel;
-import mission1.entity.Message;
-import mission1.entity.User;
-import mission1.service.jcf.ChannelService;
-import mission1.service.jcf.MessageService;
-import mission1.service.jcf.UserService;
-import mission1.service.jcf.jcf.JCFChannelService;
-import mission1.service.jcf.jcf.JCFMessageService;
-import mission1.service.jcf.jcf.JCFUserService;
+import mission.entity.Channel;
+import mission.entity.Message;
+import mission.entity.User;
+import mission.service.ChannelService;
+import mission.service.jcf.MessageService;
+import mission.service.UserService;
+import mission.service.jcf.jcf.JCFChannelService;
+import mission.service.jcf.JCFMessageService;
+import mission.service.jcf.JCFUserService;
 
 
 import java.util.List;

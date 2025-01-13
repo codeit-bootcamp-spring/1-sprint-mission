@@ -1,8 +1,8 @@
-package mission1.service.jcf.jcf;
+package mission.service.jcf;
 
 
-import mission1.entity.Channel;
-import mission1.service.jcf.ChannelService;
+import mission.entity.Channel;
+import mission.service.ChannelService;
 
 
 import java.util.*;

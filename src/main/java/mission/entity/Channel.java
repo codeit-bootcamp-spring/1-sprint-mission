@@ -1,4 +1,4 @@
-package mission1.entity;
+package mission.entity;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
