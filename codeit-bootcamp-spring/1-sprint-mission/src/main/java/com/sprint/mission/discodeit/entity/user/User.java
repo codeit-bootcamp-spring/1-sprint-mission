@@ -4,6 +4,8 @@ package com.sprint.mission.discodeit.entity.user;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import com.sprint.mission.discodeit.entity.user.entity.ParticipatedChannel;
+import java.util.List;
+import java.util.UUID;
 
 public class User extends AbstractUUIDEntity {
 
@@ -22,7 +24,7 @@ public class User extends AbstractUUIDEntity {
         return new User(userName, participatedChannel);
     }
 
-    public void changeName(String newName) {
+    public void changeUserName(String newName) {
         this.name = name.changeName(newName);
         updateStatusAndUpdateAt();
     }
@@ -30,6 +32,14 @@ public class User extends AbstractUUIDEntity {
     public Channel createNewChannel(String channelName) {
         var createdChannel = channels.createChannel(channelName, this);
         return createdChannel;
+    }
+
+    public void changeChannelName(UUID id, String channelName) {
+        channels.changeChannelName(id, channelName, this);
+    }
+
+    public List<Channel> getChannels() {
+        return channels.findAllChannels();
     }
 
     public String getName() {

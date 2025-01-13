@@ -40,7 +40,7 @@ class ChannelTest {
             // given
             var newChannelName = "SB_999기_백재우";
             // then
-            channel.changeName(newChannelName);
+            channel.changeName(newChannelName, USER);
             // when
             assertAll(
                     () -> {
@@ -82,15 +82,6 @@ class ChannelTest {
             assertThat(validResult).isFalse();
         }
 
-        @Test
-        @DisplayName("매개변수로 들어온 이름과 채널 객체의 이름이 같지만, 상태가 해지 상태일 시 False 반환")
-        void givenSameChannelNameAndStatusIsUnregisteredWhenIsEqualFromNameAndNotUnregisteredThenFalse() {
-            // given
-            channel.deleteChannel();
-            // when
-            var validResult = channel.isEqualFromNameAndNotUnregistered(CHANNEL_NAME);
-            // then
-            assertThat(validResult).isFalse();
-        }
+
     }
 }

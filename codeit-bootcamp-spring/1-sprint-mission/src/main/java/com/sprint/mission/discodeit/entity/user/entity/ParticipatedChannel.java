@@ -5,7 +5,9 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PA
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.user.User;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +31,12 @@ public class ParticipatedChannel {
         return createdChannel;
     }
 
+    public List<Channel> findAllChannels() {
+        var participatedChannels = this.participatedChannels.values()
+                .stream().toList();
+        return Collections.unmodifiableList(participatedChannels);
+    }
+
     public Optional<Channel> findById(UUID channelId) {
         var foundChannel = participatedChannels.get(channelId);
         return Optional.ofNullable(foundChannel);
@@ -44,13 +52,13 @@ public class ParticipatedChannel {
         return foundChannelByName;
     }
     // TODO 메서드 이름에 throw 붙여주어야 하는가 Naming issue
-    public void changeChannelName(UUID channelId, String newName) {
+    public void changeChannelName(UUID channelId, String newName, User user) {
         var foundChannel = findById(channelId)
                 .orElseThrow(() ->
                         UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())
                 );
 
-        foundChannel.changeName(newName);
+        foundChannel.changeName(newName, user);
         participatedChannels.put(foundChannel.getId(), foundChannel);
     }
 

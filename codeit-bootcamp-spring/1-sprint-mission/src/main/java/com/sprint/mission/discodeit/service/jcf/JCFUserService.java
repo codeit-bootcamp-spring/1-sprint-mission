@@ -45,7 +45,7 @@ public class JCFUserService implements UserService {
     public UserInfoResponse modifyUserInfo(ModifyUserInfoRequest request) {
         var entity = findById(request.id());
 
-        entity.changeName(request.changeUsername());
+        entity.changeUserName(request.changeUsername());
         data.save(entity);
 
         var response = converter.toDto(entity);

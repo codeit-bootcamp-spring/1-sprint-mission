@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity.channel;
 
+import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.user.ChannelException;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import com.sprint.mission.discodeit.entity.user.User;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +31,14 @@ public class Channel extends AbstractUUIDEntity {
         return new Channel("Default Channel Name", user);
     }
 
-    public void changeName(String newName) {
+    public void changeName(String newName, User user) {
+        if (!creator.equals(user)) {
+            throw ChannelException.errorMessageAndCreatorName(
+                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
+                    user.getName()
+            );
+        }
+
         channelName = newName;
         updateStatusAndUpdateAt();
     }

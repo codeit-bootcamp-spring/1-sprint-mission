@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.sprint.mission.discodeit.common.error.user.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.user.User;
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test;
 class ParticipatedChannelTest {
     private static final String CHANNEL_NAME = "코드잇-1기-백엔드";
     private ParticipatedChannel channels;
-    private User user = User.createFrom("SB_1기_백재우");
+    private static final User USER = User.createFrom("SB_1기_백재우");
 
     @Test
     void givenNewParticipatedChannelWhenCreateThenReturnNewParticipatedChannel() {
@@ -37,7 +38,7 @@ class ParticipatedChannelTest {
     @Test
     void givenChannelNameWhenCreateChannelThenReturnNewChannel() {
         // given when
-        var channel = channels.createChannel(CHANNEL_NAME, user);
+        var channel = channels.createChannel(CHANNEL_NAME, USER);
         // then
         assertAll(
                 () -> {
@@ -60,8 +61,8 @@ class ParticipatedChannelTest {
 
         @BeforeEach
         void add() {
-            createdChannel1 = channels.createChannel(addChannelName1, user);
-            createdChannel2 = channels.createChannel(addChannelName2, user);
+            createdChannel1 = channels.createChannel(addChannelName1, USER);
+            createdChannel2 = channels.createChannel(addChannelName2, USER);
         }
 
         @Test
@@ -69,8 +70,10 @@ class ParticipatedChannelTest {
         void givenSomeElementsAddedChannelsWhenFindByIdThenReturnSomeElements() {
             // given
             var channelId = createdChannel1.getId();
+
             // when
             var findByIdParticipatedChannel = channels.findById(channelId);
+
             // then
             assertAll(
                     () -> {
@@ -89,8 +92,10 @@ class ParticipatedChannelTest {
         void givenSomeElementsAddedChannelsWhenFindByNameThenReturnSomeElements() {
             // given
             var channelName = createdChannel1.getChannelName();
+
             // when
             var findByIdParticipatedChannel = channels.findByName(channelName);
+
             // then
             assertAll(
                     () -> {
@@ -134,6 +139,7 @@ class ParticipatedChannelTest {
                                     notExistedChannelName)
                     )
             );
+
             // then
             assertThat(throwable).isInstanceOf(UserException.class)
                     .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
@@ -145,8 +151,10 @@ class ParticipatedChannelTest {
             // given
             var channelId = createdChannel1.getId();
             var changeChannelName = createdChannel1.getChannelName();
+
             // when
-            channels.changeChannelName(channelId, "new ChannelName");
+            channels.changeChannelName(channelId, "new ChannelName", USER);
+
             // then
             assertAll(
                     () -> {
@@ -164,7 +172,8 @@ class ParticipatedChannelTest {
             var changeChannelName = "new ChannelName";
 
             // when
-            var throwable = catchThrowable(() -> channels.changeChannelName(notExistedChannelId, changeChannelName));
+            var throwable = catchThrowable(() -> channels.changeChannelName(notExistedChannelId, changeChannelName, USER));
+
             // then
             assertThat(throwable).isInstanceOf(UserException.class)
                     .hasMessageContaining(notExistedChannelId.toString());
@@ -172,17 +181,36 @@ class ParticipatedChannelTest {
         }
 
         @Test
+        @DisplayName("채널을 생성한 사람이 아닌 다른 누군가 채널이름을 변경하려고 할 경우 에러")
+        void givenNotChannelCreatorWhenChangeChannelNameThenThrowChannelException() {
+            // given
+            var notCreatorUser = User.createFrom("is not Creator");
+            var changeChannelName = "SB_백엔드_1000기";
+            var channelId = createdChannel1.getId();
+
+            // when
+            var throwable = catchThrowable(() ->
+                    channels.changeChannelName(channelId, changeChannelName, notCreatorUser)
+            );
+
+            // then
+            assertThat(throwable).isInstanceOf(ChannelException.class)
+                    .hasMessageContaining(notCreatorUser.getName());
+        }
+
+        @Test
         @DisplayName("채널 id 값으로 유저가 참여한 채널을 삭제하면 해당 채널의 상태가 업데이트")
         void givenDeleteTargetIdWhenDeleteChannelThenChannelStatusIsChanged() {
             // given
             var deleteTargetChannelId = createdChannel2.getId();
+
             // when
             channels.deleteChannelById(deleteTargetChannelId);
+
             // then
             assertThat(createdChannel2.getStatus()).isEqualTo(UNREGISTERED);
         }
     }
-
 }
 
 
