@@ -1,23 +1,38 @@
 package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class JCFMessageService implements MessageService {
-    Scanner sc = new Scanner(System.in);
+    //Scanner sc = new Scanner(System.in);
     private final ArrayList<Message> messages;
-    public JCFMessageService(){
+    // mocking 이용으로 추가
+    private InputHandler inputHandler;
+    public JCFMessageService(InputHandler inputHandler){
         messages = new ArrayList<>();
+        this.inputHandler = inputHandler;
+    }
+
+    // mocking 이용으로 추가
+    public void setInputHandler(InputHandler inputHandler) {
+        this.inputHandler = inputHandler;
+    }
+
+    public String getMessage(int num){
+        return messages.get(num).getMessageText();
+    }
+    public ArrayList<Message> getMessages(){
+        return messages;
     }
     public void Create(Channel channel, String messageText){
         messages.add(new Message(channel, messageText));
     }
 
     // Read : 전체 메세지 조회, 특정 메세지 읽기
-    public void ReadAll(){
+    public int ReadAll(){
         for(Message message: messages){
             System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^message^^^^^^^^^^^^^^^^^^^^^^^^^^^");
             System.out.println("User : " + message.getChannel().getUser().getNickname());
@@ -25,8 +40,9 @@ public class JCFMessageService implements MessageService {
             System.out.println(message.getMessageText());
             System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         }
+        return messages.size();
     }
-    public void ReadMessage(int num){
+    public Message ReadMessage(int num){
         System.out.println("^^^^^^^^^^^^^^^^^^^^^^^^^message^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         System.out.println("User : " + messages.get(num).getChannel().getUser().getNickname());
         System.out.println("Channel : " + messages.get(num).getChannel().getChannelName());
@@ -36,11 +52,13 @@ public class JCFMessageService implements MessageService {
         // User나 Channel을 통해 볼 수 있는 게 맞는 것 같다.
         System.out.println(messages.get(num).getMessageText());
         System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
+        return messages.get(num);
     }
 
     // Update : 특정 메세지 수정
     public void Update(int num){
-        String messageText = sc.next();
+        //String messageText = sc.next();
+        String messageText = inputHandler.getNewInput();
         messages.get(num).setMessageText(messageText);
         messages.get(num).setUpdateAt(System.currentTimeMillis());
     }
@@ -49,7 +67,7 @@ public class JCFMessageService implements MessageService {
     public void DeleteAll(){
         System.out.println("Do you really delete everything?\n");
         System.out.println("                 [y/n]");
-        String keyword = sc.next().toLowerCase();
+        String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             messages.clear();
         }
@@ -57,7 +75,7 @@ public class JCFMessageService implements MessageService {
     public void DeleteMessage(int num){
         System.out.println("Do you really delete Message?\n");
         System.out.println("                 [y/n]");
-        String keyword = sc.next().toLowerCase();
+        String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             messages.remove(num);
         }

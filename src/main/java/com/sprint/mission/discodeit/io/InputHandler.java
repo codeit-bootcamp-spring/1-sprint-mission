@@ -7,7 +7,7 @@ public class InputHandler {
     public InputHandler(){
         sc = new Scanner(System.in);
     }
-    public String getNewNickNameInput(){
+    public String getNewInput(){
         System.out.println("new Nickname :");
         return sc.next();
     }
