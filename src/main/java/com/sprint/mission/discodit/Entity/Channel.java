@@ -3,7 +3,7 @@ package com.sprint.mission.discodit.Entity;
 import java.util.UUID;
 
 public class Channel {
-    UUID id;
+    private final UUID id;
     Long createdAt, updatedAt;
     public Channel(UUID id) {
         this.id = id;

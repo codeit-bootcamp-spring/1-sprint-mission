@@ -3,7 +3,7 @@ package com.sprint.mission.discodit.Entity;
 import java.util.UUID;
 
 public class Message {
-    UUID id;
+    private final UUID id;
     Long createdAt, updatedAt;
     public Message(UUID id) {
         this.id = id;
