@@ -4,6 +4,7 @@ package mission.service;
 import mission.entity.Channel;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ChannelService {
     //등록
@@ -19,4 +20,6 @@ public interface ChannelService {
 
     //[ ] 삭제
     public void delete(String name);
+
+    Channel findById(UUID id);
 }

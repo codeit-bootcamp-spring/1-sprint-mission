@@ -9,4 +9,9 @@ public interface UserRepository {
     User saveUser(User user);
     User findById(UUID id);
     List<User> findAll();
+
+    void validateDuplicateUserName(String userName);
+
+    User findByNamePW(String name, String password);
+
 }

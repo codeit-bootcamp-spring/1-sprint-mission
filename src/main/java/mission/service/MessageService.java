@@ -1,14 +1,16 @@
 package mission.service;
 
 
+import mission.entity.Channel;
 import mission.entity.Message;
+import mission.entity.User;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
     //등록
-    Message create(String message);
+    Message create(Channel channel, User user, String message);
 
     // 조회 단건
     Message findMessage(String message);

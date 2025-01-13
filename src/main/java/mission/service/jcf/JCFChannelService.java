@@ -2,6 +2,7 @@ package mission.service.jcf;
 
 
 import mission.entity.Channel;
+import mission.repository.jcf.JCFChannelRepository;
 import mission.service.ChannelService;
 
 
@@ -9,40 +10,38 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    private final Map<String, Channel> data = new HashMap();
+    //private final Map<String, Channel> data = new HashMap();
     //private final Set<String> channelNames = new HashSet<>();
+
+    private final JCFChannelRepository channelRepository = new JCFChannelRepository();
 
     @Override
     public Channel create(String channelName) {
-        if (data.containsKey(channelName)){
-            throw new IllegalArgumentException("이미 그런 채널명 있습니다.");
-        }
-        Channel newChannel = new Channel(channelName);
-        data.put(channelName, newChannel);
-        return newChannel;
+        return channelRepository.register(channelName);
     }
 
     @Override
     public Channel findByName(String channelName) {
-        if (!data.containsKey(channelName)){
-            throw new IllegalArgumentException("그런 채널명 없습니다");
-        }
-        return data.get(channelName);
+        return channelRepository.findByName(channelName);
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+        return channelRepository.findAll();
     }
 
+    @Override
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id);
+    }
 
     @Override
-    public Channel update(String oldName, String newName){
-        if (!data.containsKey(oldName)){
+    public Channel update(String oldName, String newName) {
+        if (!data.containsKey(oldName)) {
             throw new IllegalArgumentException("그런 채널명 없습니다");
         }
 
-        if (data.containsKey(newName)){
+        if (data.containsKey(newName)) {
             throw new IllegalArgumentException("채널명 중복");
         }
 
@@ -56,7 +55,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void delete(String name) {
-        if (!data.containsKey(name)){
+        if (!data.containsKey(name)) {
             throw new NoSuchElementException("그런 이름의 채널없습니다.");
         }
         data.remove(name);
@@ -73,7 +72,6 @@ public class JCFChannelService implements ChannelService {
     public int hashCode() {
         return Objects.hashCode(data);
     }
-
 
 
 }

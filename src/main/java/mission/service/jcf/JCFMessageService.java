@@ -1,21 +1,20 @@
 package mission.service.jcf;
 
+import mission.entity.Channel;
 import mission.entity.Message;
-import mission.repository.jcf.JCFUserRepository;
+import mission.entity.User;
+import mission.repository.jcf.JCFMessageRepository;
 import mission.service.MessageService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data = new HashMap<>();
-    //private final Set<String> stringList = new HashSet<>();
-    private final JCFUserRepository userRepository = new JCFUserRepository();
+
+    private final JCFMessageRepository messageRepository = new JCFMessageRepository();
 
     @Override
-    public Message create(String message) {
-        Message createdMessage = new Message(message);
-        data.put(createdMessage.getId(), createdMessage);
-        return createdMessage;
+    public Message create(Channel writeAt, User wirter, String writedMessage) {
+        return messageRepository.createMessage(writeAt, wirter, writedMessage);
     }
 
     @Override

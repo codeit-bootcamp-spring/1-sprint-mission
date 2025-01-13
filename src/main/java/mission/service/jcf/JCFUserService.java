@@ -11,18 +11,22 @@ import java.util.*;
 public class JCFUserService implements UserService {
 
     private final UserRepository userRepository = new JCFUserRepository();
-    private final Map<UUID, User> data = new HashMap<>();
+    //private final Map<UUID, User> data = new HashMap<>();
 
-    @Override
-    public User create(User user) {
+    public User create(String name, String password) {
+        User user = new User(name, password);
         return userRepository.saveUser(user);
     }
 
     @Override
-    public User find(UUID id) {
+    public User findById(UUID id) {
         return userRepository.findById(id);
     }
 
+    @Override
+    public User findByNamePW(String name, String password) {
+        return userRepository.findByNamePW(name, password);
+    }
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
