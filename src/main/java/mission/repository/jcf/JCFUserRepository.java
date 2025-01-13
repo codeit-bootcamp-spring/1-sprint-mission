@@ -16,7 +16,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     public User findById(UUID id){
-        return data.get(id);
+        try {
+            return data.get(id);
+        } catch (Exception e) {
+            throw new NullPointerException("ID를 잘못입력하셨습니다.");
+        }
     }
 
     @Override
@@ -34,6 +38,25 @@ public class JCFUserRepository implements UserRepository {
         }
         // user password 일치하는게 없으면
         return null;
+    }
+
+
+    @Override
+    public void delete(UUID id, String name, String password) {
+        User existUser = data.get(id);
+        if (!(existUser.getName().equals(name) && existUser.getPassword().equals(password))){
+            System.out.println("닉네임 or 비밀번호가 틀렸습니다.");
+        } else {
+            System.out.printf("닉네임 %s 성공했습니다", existUser.getName());
+            data.remove(id);
+            userNames.remove(name);
+        }
+    }
+
+    @Override
+    public User updateUserNamePW(UUID id, String newName, String password){
+        User findUser = findById(id);
+        return findUser.setNamePassword(newName, password);
     }
 
 

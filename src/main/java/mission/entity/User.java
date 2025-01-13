@@ -1,6 +1,7 @@
 package mission.entity;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,12 +13,14 @@ public class User {
     private String name;
     private final String firstId;
     private String password;
+    private final LocalDateTime createAt;
+    private LocalDateTime updateAt;
 
     private List<Channel> channels = new ArrayList<>();
     private List<Message> messages = new ArrayList<>();
 
     // 이 User가 입력한 모든 메시지
-    public List<Message> findMessagesAll(){
+    public List<Message> getMessages() {
         return messages;
     }
 
@@ -40,16 +43,12 @@ public class User {
         return message;
     }
 
-    private final Long createAt;
-    private Long updateAt;
-
     public User(String name, String password){
         this.name = name;
         this.password = password;
         id = UUID.randomUUID();
-        String string = id.toString();
-        firstId = string.split("-")[0];
-        createAt = System.currentTimeMillis();
+        firstId = id.toString().split("-")[0];
+        createAt = LocalDateTime.now();
     }
 
     public List<Channel> getChannels() {
@@ -79,10 +78,6 @@ public class User {
         channel.getUserList().remove(this);
     }
 
-
-
-
-
     public UUID getId() {
         return id;
     }
@@ -95,26 +90,26 @@ public class User {
         return password;
     }
 
-    public Long getCreateAt() {
+    public LocalDateTime getCreateAt() {
         return createAt;
     }
 
-    public Long getUpdateAt() {
+    public LocalDateTime getUpdateAt() {
         return updateAt;
     }
 
     public void setName(String name) {
-        updateAt = System.currentTimeMillis();
+        updateAt = LocalDateTime.now();
         this.name = name;
     }
 
     public void setPassword(String password) {
-        updateAt = System.currentTimeMillis();
+        updateAt = LocalDateTime.now();
         this.password = password;
     }
 
     public User setNamePassword(String name, String password) {
-        updateAt = System.currentTimeMillis();
+        updateAt = LocalDateTime.now();
         this.password = password;
         this.name = name;
         return this;

@@ -10,4 +10,6 @@ public interface ChannelRepository {
     List<Channel> findAll();
 
     Channel findByName(String channelName);
+
+    Channel updateChannelName(Channel findChannel, String newName);
 }

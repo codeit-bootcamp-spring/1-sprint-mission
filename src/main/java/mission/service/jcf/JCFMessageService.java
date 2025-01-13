@@ -18,30 +18,27 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message findMessage(String message) {
-        // uuid는 어차피 unique타입
-        for (Message value : data.values()) {
-            if (value.getMessage().equals(message)) {
-                return value;
-            }
-        }
-        throw new IllegalStateException("그런 메시지 보내적이 없어요");
+    public List<Message> findMessagesInChannel(Channel channel) {
+        return messageRepository.findMessagesInChannel(channel);
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(data.values());
+        return messageRepository.findAll();
+    }
+
+    public Message findMessage(User writer, String writedMessage){
+        for (Message message : writer.getMessages()) {
+            if (message.getMessage().equals(writedMessage)){
+                return message;
+            }
+        }
+        return null;
     }
 
     @Override
-    public Message update(UUID id, String newMessage) {
-        if (!data.containsKey(id)) {
-            throw new NoSuchElementException("메시지 id가 틀렸습니다.");
-        }
-
-        Message updatingMessage = data.get(id);
-        updatingMessage.setMessage(newMessage);
-        return updatingMessage;
+    public Message update(UUID messageId, String newMessage) {
+        return messageRepository.updateMessage(messageId, newMessage);
     }
 
     @Override

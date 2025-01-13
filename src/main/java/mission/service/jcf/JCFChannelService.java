@@ -36,21 +36,9 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(String oldName, String newName) {
-        if (!data.containsKey(oldName)) {
-            throw new IllegalArgumentException("그런 채널명 없습니다");
-        }
-
-        if (data.containsKey(newName)) {
-            throw new IllegalArgumentException("채널명 중복");
-        }
-
-        Channel existingChannel = data.get(oldName);
-        existingChannel.setName(newName);
-        data.put(newName, existingChannel);
-        data.remove(oldName); // 기존 key 삭제
-        // 업데이트된 Channel 반환
-        return existingChannel;
+    public Channel update(UUID id, String newName) {
+        Channel findChannel = channelRepository.findById(id);
+        return channelRepository.updateChannelName(findChannel, newName);
     }
 
     @Override
@@ -60,19 +48,6 @@ public class JCFChannelService implements ChannelService {
         }
         data.remove(name);
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        JCFChannelService that = (JCFChannelService) o;
-        return Objects.equals(data, that.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(data);
-    }
-
 
 }
 

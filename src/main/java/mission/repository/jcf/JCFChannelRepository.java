@@ -52,6 +52,17 @@ public class JCFChannelRepository implements ChannelRepository {
         return null;
     }
 
+    @Override
+    public Channel updateChannelName(Channel findChannel, String newName) {
+        // 새로운 채널 이름 중복 검증
+        validateDuplicateName(newName);
+
+        channelNames.remove(findChannel.getName());
+        channelNames.add(newName);
+        findChannel.setName(newName);
+        return findChannel;
+    }
+
     private void validateDuplicateName(String name){
         if (channelNames.contains(name)){
             throw new IllegalArgumentException("이미 존재하는 id입니다");

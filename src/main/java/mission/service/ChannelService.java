@@ -16,7 +16,7 @@ public interface ChannelService {
     List<Channel> findAll();
 
     //[ ] 수정
-    Channel update(String oldName, String newName);
+    Channel update(UUID id, String newName);
 
     //[ ] 삭제
     public void delete(String name);

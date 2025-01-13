@@ -13,7 +13,7 @@ public interface MessageService {
     Message create(Channel channel, User user, String message);
 
     // 조회 단건
-    Message findMessage(String message);
+    List<Message> findMessagesInChannel(Channel channel);
 
     //[ ] 조회(다건)
     List<Message> findAll();
