@@ -16,7 +16,7 @@ public class JCFChannelService implements ChannelService {
         Channel newChannel = new Channel(user, channelName);
         channelData.add(newChannel);
         System.out.println(user + "님이 " + channelName + "에 " +
-                "채널 생성 : " + newChannel + "\n채널이 성공적으로 생성되었습니다!");
+                "채널 생성 : " + newChannel + "\n채널이 성공적으로 생성되었습니다!\n");
         return newChannel;
     }
 
@@ -27,17 +27,17 @@ public class JCFChannelService implements ChannelService {
         for (Channel channel : channelData) {
             if (channel.getUser().equals(user)&& channel.getChannelName().equals(channelName)) {
                 channel.setChannelName(modifiedChannelName);
-                System.out.println("채널명 변경 : " + modifiedChannelName + "\n채널명이 변경되었습니다.");
+                System.out.println("채널명 변경 : " + modifiedChannelName + "\n채널명이 변경되었습니다.\n");
                 return;
             }
         }
-        System.out.println("채널을 찾을 수 없습니다.");
+        throw new IllegalArgumentException("채널을 찾을 수 없습니다.");
     }
 
     // 전체 채널 조회
     @Override
     public List<Channel> getAllChannelList() {
-        System.out.println("채널 목록 = " + channelData);
+        System.out.println("채널 목록" + channelData + "\n");
         return new ArrayList<>(channelData);
     }
 
@@ -59,7 +59,7 @@ public class JCFChannelService implements ChannelService {
         }
         if (channelToDelete != null && channelData.contains(channelToDelete)) {
             channelData.remove(channelToDelete);
-            System.out.println("채널 삭제 : " + channelName + "\n채널이 성공적으로 삭제되었습니다.");
+            System.out.println("채널 삭제 : " + channelName + "\n채널이 성공적으로 삭제되었습니다.\n");
         } else {
             throw new IllegalArgumentException("채널을 찾을 수 없습니다.");
         }

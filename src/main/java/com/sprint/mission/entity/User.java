@@ -41,12 +41,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" +
-                "updateAt=" + updateAt +
-                ", id=" + id +
-                ", createdAt=" + createdAt +
-                ", updateAt=" + updateAt +
-                ", email='" + email + '\'' +
-                '}';
+        return
+                "id : " + id +
+                ", 이메일 : " + email +
+                ",  생성 : " + createdAt +
+                ", 업데이트 : " + updateAt ;
     }
 }

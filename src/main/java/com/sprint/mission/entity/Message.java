@@ -44,13 +44,8 @@ public class Message {
 
     @Override
     public String toString () {
-        return "Message{" +
-                    ", user=" + user +
-                    ", channel='" + channel + '\'' +
-                    ", message='" + message + '\'' +
-                    ", createdAt=" + createdAt + '\'' +
-                    ", updateAt=" + updateAt + '\'' +
-                    '}';
+        return "\n유저 : " + user + channel  + "\n메시지 : " + message +
+                    ", 생성 : " + createdAt;
     }
 }
 

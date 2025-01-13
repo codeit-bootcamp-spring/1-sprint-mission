@@ -35,10 +35,8 @@ public class Channel {
 
     @Override
     public String toString() {
-        return "Channel{" + "user='" + user + '\'' +
-                ", channelName='" + channelName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updateAt=" + updateAt +
-                '}';
+        return "\n채널명 : " + channelName +
+                "\n유저 : " + user  +
+                " 생성 : " + createdAt;
     }
 }

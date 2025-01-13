@@ -15,7 +15,7 @@ public class JavaApplication {
         // 계정 CRUD 구현
         JCFUserService userService = new JCFUserService();
 
-        // Jack, Bob 계정 생성
+        // Jack, Bob 계정 생성 -> 각 유저마다 유저 객체 생성
         User Jack = userService.createUser("codeit@codeit.com");
         User Bob = userService.createUser("yeoksam2@codeit.com");
 
@@ -34,7 +34,7 @@ public class JavaApplication {
         // 채널 CRUD 구현
         ChannelService channelService = new JCFChannelService();
 
-        // Jack, Bob의 채널 생성
+        // Jack, Bob의 채널 생성 -> 각 유저마다 채널 객체 생성
         channelService.createChannel(Jack, "codeit");
         channelService.createChannel(Bob, "codeit2");
         channelService.createChannel(Jack, "codeit3");
@@ -49,10 +49,11 @@ public class JavaApplication {
          // 채널 삭제
         channelService.deleteChannel("sprint");
         channelService.getAllChannelList();
+
         // 메시지 CRUD 구현
         JCFMessageService messageService = new JCFMessageService();
 
-        // 메시지 생성
+        // 메시지 생성 -> 채널에 메시지 객체 생성
         Channel channel = channelService.createChannel(Bob, "codeit2");
         messageService.createMessage(Bob, channel, "수정 전 메시지 생성1");
         messageService.createMessage(Bob, channel, "수정 전 메시지 생성2");

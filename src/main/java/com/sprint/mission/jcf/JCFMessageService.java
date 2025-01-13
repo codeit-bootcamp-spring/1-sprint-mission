@@ -26,7 +26,7 @@ public class JCFMessageService implements MessageService {
         Message newMessage = new Message(user, channel, message);
         messageData.add(newMessage);
         System.out.println(user + "님이 " + channel + "에 " +
-                "메시지 생성 : " + newMessage + "\n메시지가 성공적으로 생성되었습니다!");
+                "메시지 생성 : " + newMessage + "\n메시지가 성공적으로 생성되었습니다!\n");
         return newMessage;
     }
 
@@ -37,10 +37,10 @@ public class JCFMessageService implements MessageService {
         for (Message message : messageData) {
             if (!message.equals(modifiedMessage) && message.getUser().equals(user) && message.getMessage().equals(Message)) {
                 message.setMessage(modifiedMessage);
-                System.out.println("메시지 변경 : " + modifiedMessage + "\n메시지가 변경되었습니다.");
+                System.out.println("메시지 변경 : " + modifiedMessage + "\n메시지가 변경되었습니다.\n");
                 return;
             } else {
-                System.out.println("메시지를 찾을 수 없습니다.");
+                throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
             }
         }
     }
@@ -48,7 +48,7 @@ public class JCFMessageService implements MessageService {
     // 유저의 모든 메시지 조회
     @Override
     public List<Message> getAllMessageList() {
-        System.out.println("메시지 목록 = " + messageData);
+        System.out.println("메시지 목록" + messageData);
         return new ArrayList<>(messageData);
     }
 
@@ -70,7 +70,7 @@ public class JCFMessageService implements MessageService {
         }
         if (messageToDelete != null && messageData.contains(messageToDelete)) {
             messageData.remove(messageToDelete);
-            System.out.println("메시지 삭제 : " + message + "\n메시지가 성공적으로 삭제되었습니다.");
+            System.out.println("\n메시지 삭제 : " + message + "\n메시지가 성공적으로 삭제되었습니다.\n");
         } else{
             throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
         }
