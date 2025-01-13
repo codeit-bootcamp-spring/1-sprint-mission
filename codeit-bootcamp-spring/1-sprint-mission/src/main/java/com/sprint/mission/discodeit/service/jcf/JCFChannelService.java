@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.*;
+import static com.sprint.mission.discodeit.common.error.ErrorMessage.*;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;

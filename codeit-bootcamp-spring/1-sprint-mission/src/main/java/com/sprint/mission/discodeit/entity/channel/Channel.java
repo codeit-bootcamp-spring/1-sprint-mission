@@ -27,10 +27,11 @@ public class Channel extends AbstractUUIDEntity {
 
     public void ChangeName(String newName) {
         channelName = newName;
+        updateStatusAndUpdateAt();
     }
 
-    public boolean isEqualFromName(String channelName) {
-        return this.channelName.equals(channelName);
+    public boolean isEqualFromNameAndNotUnregistered(String channelName) {
+        return this.channelName.equals(channelName) && isNotUnregistered();
     }
 
 }

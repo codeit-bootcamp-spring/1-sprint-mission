@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import static com.sprint.mission.discodeit.common.error.user.UserErrorMessage.USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FOUND;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.user.UserRepository;
