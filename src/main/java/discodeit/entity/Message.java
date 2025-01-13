@@ -47,6 +47,10 @@ public class Message {
         return sender;
     }
 
+    public boolean isIdEqualTo(UUID id) {
+        return this.id.equals(id);
+    }
+
     @Override
     public String toString() {
         return String.format(sender.getName() + ": " + content);

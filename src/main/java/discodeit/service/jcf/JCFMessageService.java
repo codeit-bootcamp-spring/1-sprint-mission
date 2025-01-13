@@ -1,19 +1,24 @@
 package discodeit.service.jcf;
 
+import discodeit.entity.Channel;
 import discodeit.entity.Message;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
     private UserService jcfUserService;
     private ChannelService jcfChannelService;
+    private final List<Message> messages;
 
     private JCFMessageService() {
+        messages = new ArrayList<>();
     }
 
     private static class JCFMessageServiceHolder {
@@ -36,37 +41,31 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message createMessage(String content, User sender) {
-        return new Message(content, sender);
+        Message newMessage = new Message(content, sender);
+        messages.add(newMessage);
+        return newMessage;
     }
 
     @Override
-    public UUID readId(Message message) {
-        return message.getId();
+    public Message findById(UUID id) {
+        Message findMessage = findMessage(id);
+        if (findMessage == null) {
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+        }
+        return findMessage;
     }
 
     @Override
-    public long getCreateAt(Message message) {
-        return message.getCreatedAt();
-    }
-
-    @Override
-    public long getUpdatedAt(Message message) {
-        return message.getUpdatedAt();
+    public Message findMessage(UUID id) {
+        return messages.stream()
+                .filter(message -> message.isIdEqualTo(id))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
     public String getInfo(Message message) {
         return message.toString();
-    }
-
-    @Override
-    public String getContent(Message message) {
-        return message.getContent();
-    }
-
-    @Override
-    public User getSender(Message message) {
-        return  message.getSender();
     }
 
     @Override
