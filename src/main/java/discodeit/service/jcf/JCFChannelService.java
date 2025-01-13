@@ -6,6 +6,7 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,8 +14,10 @@ public class JCFChannelService implements ChannelService {
 
     private UserService jcfUserService;
     private MessageService jcfMessageService;
+    private final List<Channel> channels;
 
     private JCFChannelService() {
+        channels = new ArrayList<>();
     }
 
     private static class JCFChannelServiceHolder {
@@ -37,47 +40,31 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(String name, String introduction, User owner) {
-        return new Channel(name, introduction, owner);
+        Channel newChannel = new Channel(name, introduction, owner);
+        channels.add(newChannel);
+        return newChannel;
     }
 
     @Override
-    public UUID getId(Channel channel) {
-        return channel.getId();
+    public Channel findById(UUID id) {
+        Channel findChannel = findChannel(id);
+        if (findChannel == null) {
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+        }
+        return findChannel;
     }
 
     @Override
-    public long getCreatedAt(Channel channel) {
-        return channel.getCreatedAt();
-    }
-
-    @Override
-    public long getUpdatedAt(Channel channel) {
-        return channel.getUpdatedAt();
+    public Channel findChannel(UUID id) {
+        return channels.stream()
+                .filter(channel -> channel.isIdEqualTo(id))
+                .findAny()
+                .orElse(null);
     }
 
     @Override
     public String getInfo(Channel channel) {
         return channel.toString();
-    }
-
-    @Override
-    public String getName(Channel channel) {
-        return channel.getName();
-    }
-
-    @Override
-    public String getIntroduction(Channel channel) {
-        return channel.getIntroduction();
-    }
-
-    @Override
-    public User getOwner(Channel channel) {
-        return channel.getOwner();
-    }
-
-    @Override
-    public List<User> getParticipants(Channel channel) {
-        return channel.getParticipants();
     }
 
     @Override

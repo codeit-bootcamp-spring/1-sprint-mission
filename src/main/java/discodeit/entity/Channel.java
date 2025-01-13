@@ -98,6 +98,10 @@ public class Channel {
         return id.equals(channel.getId());
     }
 
+    public boolean isIdEqualTo(UUID id) {
+        return this.id.equals(id);
+    }
+
     @Override
     public String toString() {
         return String.format(
