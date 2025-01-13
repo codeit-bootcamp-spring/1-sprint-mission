@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.InvalidEqualityException;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.validation.common.BaseEntityValidator;
 import com.sprint.mission.discodeit.validation.common.NameValidator;
@@ -31,10 +29,5 @@ public class ChannelValidator {
     }
     public void validateNameFormat(Channel channel) throws InvalidFormatException {
         nameValidator.validateNameFormat(channel.getName());
-    }
-
-    public void validateChannelIdEquality(Channel channel1, Channel channel2) throws InvalidEqualityException {
-        if (!channel1.equals(channel2))
-            throw new InvalidEqualityException(ErrorCode.INVALID_CHANNEL_EQUALITY);
     }
 }

@@ -1,22 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
+import static com.sprint.mission.discodeit.constant.IntegerConstant.EMPTY_TIME;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
+import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
 
 public class User extends BaseEntity {
-    private static final User EMPTY_USER = new User();
+    private static final User EMPTY_USER;
+    static {
+        EMPTY_USER = new Builder(
+                EMPTY_STRING.getValue(), EMPTY_STRING.getValue())
+                .id(UUID.fromString(EMPTY_UUID.getValue()))
+                .createAt((long) EMPTY_TIME.getValue())
+                .updateAt((long) EMPTY_TIME.getValue())
+                .phoneNumber(EMPTY_STRING.getValue())
+                .build();
+    }
 
     private final String name;
     private final String email;
     private final String phoneNumber;
 
-    private User() {
-        super(EMPTY_BASE_ENTITY);
-        name = EMPTY_STRING.getValue();
-        email = EMPTY_STRING.getValue();
-        phoneNumber = EMPTY_STRING.getValue();
-    }
     private User(Builder builder) {
-        super(builder.baseEntity);
+        super(
+                builder.id,
+                builder.createAt,
+                builder.updateAt
+        );
         name        = builder.name;
         email       = builder.email;
         phoneNumber = builder.phoneNumber;
@@ -27,7 +38,9 @@ public class User extends BaseEntity {
     }
 
     public static final class Builder {
-        private BaseEntity baseEntity = BaseEntity.createBaseEntity();
+        private UUID id       = UUID.randomUUID();
+        private Long createAt = System.currentTimeMillis();
+        private Long updateAt = System.currentTimeMillis();
         private final String name;
         private final String email;
         private String phoneNumber = EMPTY_STRING.getValue();
@@ -37,8 +50,16 @@ public class User extends BaseEntity {
             this.email = email;
         }
 
-        public Builder baseEntity(BaseEntity baseEntity) {
-            this.baseEntity = baseEntity;
+        public Builder id(UUID id) {
+            this.id = id;
+            return this;
+        }
+        public Builder createAt(Long createAt) {
+            this.createAt = createAt;
+            return this;
+        }
+        public Builder updateAt(Long updateAt) {
+            this.updateAt = updateAt;
             return this;
         }
         public Builder phoneNumber(String phoneNumber) {

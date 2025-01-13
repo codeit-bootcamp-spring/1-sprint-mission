@@ -41,11 +41,10 @@ public class JavaApplication {
         System.out.println("userService.updateUserById()");
         System.out.println("pass UUID 'frogKey' and User 'fffrog': " + System.lineSeparator() + "User info: " + userService.updateUserById(
                 frogKey, new User.Builder("fffrog", "fffrog@email.com")
-                        .baseEntity(BaseEntity.createBaseEntity(frogKey, frog.getCreateAt()))
                         .build()));
-        System.out.println(userService.updateUserById(
-                UUID.randomUUID(), new User.Builder("ppprog", "")
-                        .build())); // validation not passed
+//        System.out.println(userService.updateUserById(
+//                UUID.randomUUID(), new User.Builder("ppprog", "")
+//                        .build())); // validation not passed
         System.out.println();
         System.out.println();
 
@@ -88,7 +87,7 @@ public class JavaApplication {
         System.out.println("messageService.updateMessageById()");
         System.out.println("pass UUID 'hiKey' and Message 'mid': " + System.lineSeparator() + "Message info: " +
                 messageService.updateMessageById(
-                        hiKey, Message.createMessage(BaseEntity.createBaseEntity(hiKey, hi.getCreateAt()), "mid")));
+                        hiKey, Message.createMessage("mid")));
 //        System.out.println(messageService.update(
 //                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
         System.out.println();
@@ -133,7 +132,7 @@ public class JavaApplication {
         System.out.println("channelService.updateChannelById()");
         System.out.println("pass UUID 'c1Key' and Channel 'c3': " + System.lineSeparator() + "Channel info: " +
                 channelService.updateChannelById(
-                        c1Key, Channel.createChannel(BaseEntity.createBaseEntity(c1Key, c1.getCreateAt()), "c3")));
+                        c1Key, Channel.createChannel("c3")));
 //        System.out.println(channelService.update(
 //                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
         System.out.println();

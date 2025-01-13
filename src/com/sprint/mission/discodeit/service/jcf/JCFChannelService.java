@@ -26,13 +26,20 @@ public class JCFChannelService implements ChannelService {
         return InstanceHolder.INSTANCE;
     }
 
+    /**
+     * Create the Channel while ignoring the {@code createAt} and {@code updateAt} fields from {@code channelInfoToCreate}
+     */
     @Override
-    public Channel createChannel(Channel channelToCreate) {
-        channelValidator.validateBaseEntityFormat(channelToCreate);
-        channelValidator.validateNameFormat(channelToCreate);
+    public Channel createChannel(Channel channelInfoToCreate) {
+        channelValidator.validateBaseEntityFormat(channelInfoToCreate);
+        channelValidator.validateNameFormat(channelInfoToCreate);
 
-        UUID key = channelToCreate.getId();
-        return Optional.ofNullable(data.putIfAbsent(key, channelToCreate))
+        Channel channelToCreate = Channel.createChannel(
+                channelInfoToCreate.getId(),
+                channelInfoToCreate.getName()
+        );
+
+        return Optional.ofNullable(data.putIfAbsent(channelToCreate.getId(), channelToCreate))
                 .map(existingChannel -> Channel.createEmptyChannel())
                 .orElse(channelToCreate);
     }
@@ -43,15 +50,23 @@ public class JCFChannelService implements ChannelService {
                 .orElse(Channel.createEmptyChannel());
     }
 
+    /**
+     * Update the Channel while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code channelInfoToUpdate}
+     */
     @Override
-    public Channel updateChannelById(UUID key, Channel channelToUpdate) {
+    public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) {
         Channel existingChannel = findChannelById(key);
-        channelValidator.validateChannelIdEquality(existingChannel, channelToUpdate);
-        channelValidator.validateBaseEntityFormat(channelToUpdate);
-        channelValidator.validateNameFormat(channelToUpdate);
+        channelValidator.validateBaseEntityFormat(channelInfoToUpdate);
+        channelValidator.validateNameFormat(channelInfoToUpdate);
+
+        Channel channelToUpdate = Channel.createChannel(
+                key,
+                existingChannel.getCreateAt(),
+                channelInfoToUpdate.getName()
+        );
 
         return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, channel)-> channelToUpdate))
+                key, (id, channel)-> channelToUpdate))
                 .orElse(Channel.createEmptyChannel());
     }
 

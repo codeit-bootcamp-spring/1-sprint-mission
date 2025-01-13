@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ErrorCode;
-import com.sprint.mission.discodeit.exception.InvalidEqualityException;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.validation.common.BaseEntityValidator;
 import com.sprint.mission.discodeit.validation.common.NameValidator;
@@ -58,10 +57,5 @@ public class UserValidator {
         if (phoneNumber.replaceAll("-", "").length() !=
                 PHONE_NUMBER_LENGTH.getValue())
             throw new InvalidFormatException(ErrorCode.INVALID_PHONE_NUMBER_FORMAT);
-    }
-
-    public void validateUserIdEquality(User user1, User user2) throws InvalidEqualityException {
-        if (!user1.equals(user2))
-            throw new InvalidEqualityException(ErrorCode.INVALID_USER_EQUALITY);
     }
 }

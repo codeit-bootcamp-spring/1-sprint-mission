@@ -26,13 +26,21 @@ public class JCFUserService implements UserService {
         return InstanceHolder.INSTANCE;
     }
 
+    /**
+     * Create the User while ignoring the {@code createAt} and {@code updateAt} fields from {@code userInfoToCreate}
+     */
     @Override
-    public User createUser(User userToCreate) {
-        userValidator.validateBaseEntityFormat(userToCreate);
-        userValidator.validateNameFormat(userToCreate);
+    public User createUser(User userInfoToCreate) {
+        userValidator.validateBaseEntityFormat(userInfoToCreate);
+        userValidator.validateNameFormat(userInfoToCreate);
 
-        UUID key = userToCreate.getId();
-        return Optional.ofNullable(data.putIfAbsent(key, userToCreate))
+        User userToCreate = new User.Builder(
+                userInfoToCreate.getName(), userInfoToCreate.getEmail())
+                .id(userInfoToCreate.getId())
+                .phoneNumber(userInfoToCreate.getPhoneNumber())
+                .build();
+
+        return Optional.ofNullable(data.putIfAbsent(userToCreate.getId(), userToCreate))
                 .map(existingUser -> User.createEmptyUser())
                 .orElse(userToCreate);
     }
@@ -43,12 +51,21 @@ public class JCFUserService implements UserService {
                 .orElse(User.createEmptyUser());
     }
 
+    /**
+     * Update the User while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code userInfoToUpdate}
+     */
     @Override
-    public User updateUserById(UUID key, User userToUpdate) {
+    public User updateUserById(UUID key, User userInfoToUpdate) {
         User exsitingUser = findUserById(key);
-        userValidator.validateUserIdEquality(exsitingUser, userToUpdate);
-        userValidator.validateBaseEntityFormat(userToUpdate);
-        userValidator.validateNameFormat(userToUpdate);
+        userValidator.validateBaseEntityFormat(userInfoToUpdate);
+        userValidator.validateNameFormat(userInfoToUpdate);
+
+        User userToUpdate = new User.Builder(
+                userInfoToUpdate.getName(), userInfoToUpdate.getEmail())
+                .id(key)
+                .createAt(exsitingUser.getCreateAt())
+                .phoneNumber(userInfoToUpdate.getPhoneNumber())
+                .build();
 
         return Optional.ofNullable(data.computeIfPresent(
                 key, (id, user)-> userToUpdate))

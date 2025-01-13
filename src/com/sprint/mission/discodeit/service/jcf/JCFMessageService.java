@@ -26,13 +26,20 @@ public class JCFMessageService implements MessageService {
         return InstanceHolder.INSTANCE;
     }
 
+    /**
+     * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from {@code messageInfoToCreate}
+     */
     @Override
-    public Message createMessage(Message messageToCreate) {
-        messageValidator.validateBaseEntityFormat(messageToCreate);
-        messageValidator.validateContentFormat(messageToCreate);
+    public Message createMessage(Message messageInfoToCreate) {
+        messageValidator.validateBaseEntityFormat(messageInfoToCreate);
+        messageValidator.validateContentFormat(messageInfoToCreate);
 
-        UUID key = messageToCreate.getId();
-        return Optional.ofNullable(data.putIfAbsent(key, messageToCreate))
+        Message messageToCreate = Message.createMessage(
+                messageInfoToCreate.getId(),
+                messageInfoToCreate.getContent()
+        );
+
+        return Optional.ofNullable(data.putIfAbsent(messageToCreate.getId(), messageToCreate))
                 .map(existingMessage -> Message.createEmptyMessage())
                 .orElse(messageToCreate);
     }
@@ -43,12 +50,20 @@ public class JCFMessageService implements MessageService {
                 .orElse(Message.createEmptyMessage());
     }
 
+    /**
+     * Update the Message while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code messageInfoToUpdate}
+     */
     @Override
-    public Message updateMessageById(UUID key, Message messageToUpdate) {
+    public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
         Message existingMessage = findMessageById(key);
-        messageValidator.validateMessageIdEquality(existingMessage, messageToUpdate);
-        messageValidator.validateBaseEntityFormat(messageToUpdate);
-        messageValidator.validateContentFormat(messageToUpdate);
+        messageValidator.validateBaseEntityFormat(messageInfoToUpdate);
+        messageValidator.validateContentFormat(messageInfoToUpdate);
+
+        Message messageToUpdate = Message.createMessage(
+                key,
+                existingMessage.getCreateAt(),
+                messageInfoToUpdate.getContent()
+        );
 
         return Optional.ofNullable(data.computeIfPresent(
                         key, (id, message)-> messageToUpdate))

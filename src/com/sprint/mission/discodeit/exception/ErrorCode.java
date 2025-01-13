@@ -10,9 +10,6 @@ public enum ErrorCode {
     INVALID_EMAIL_FORMAT("Email must be '" + EMAIL_FORMAT.getValue() + "'"),
     INVALID_PHONE_NUMBER_FORMAT("PhoneNumber must be '" + PHONE_NUMBER_FORMAT.getValue() + "'"),
     INVALID_CONTENT_FORMAT("Content must be " + MAX_CONTENT_LENGTH.getValue() + " characters or less"),
-    INVALID_USER_EQUALITY("Same user must have the same key"),
-    INVALID_MESSAGE_EQUALITY("Same message must have the same key"),
-    INVALID_CHANNEL_EQUALITY("Same channel must have the same key"),
     ;
 
     private final String description;
