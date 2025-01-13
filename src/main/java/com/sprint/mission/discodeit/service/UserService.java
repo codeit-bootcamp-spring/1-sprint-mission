@@ -4,8 +4,8 @@ public interface UserService {
     public abstract void Create(String nickname);
 
     // Read : 전체 유저 조회, 특정 유저 조회
-    public abstract void ReadAll();
-    public abstract void ReadUser(String nickname);
+    public abstract int ReadAll();
+    public abstract String ReadUser(String nickname);
 
     // Update : 특정 유저 닉네임 변경
     public abstract void UpdateNickname(String nickname);

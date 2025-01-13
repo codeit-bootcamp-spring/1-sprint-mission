@@ -11,8 +11,13 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation platform('org.junit:junit-bom:5.10.0') // JUnit BOM 사용
+    implementation 'org.junit.jupiter:junit-jupiter' // JUnit API를 전체적으로 포함
+
+    testImplementation platform('org.junit:junit-bom:5.10.0') // 유지
+    testImplementation 'org.junit.jupiter:junit-jupiter' // 유지
+
+    implementation "org.mockito:mockito-core:4.6.1"
 }
 
 application {
@@ -22,3 +27,13 @@ application {
 test {
     useJUnitPlatform()
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+

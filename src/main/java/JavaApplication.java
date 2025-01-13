@@ -1,10 +1,13 @@
+import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import static org.mockito.Mockito.mock;
+
 public class JavaApplication {
     public static void main(String[] args) {
-        JCFUserService userService = new JCFUserService();
+        JCFUserService userService = new JCFUserService(mock(InputHandler.class));
         JCFChannelService channelService = new JCFChannelService();
         JCFMessageService messageService = new JCFMessageService();
         System.out.println("등록-------------------------------------------------------------------------------------------\n");
