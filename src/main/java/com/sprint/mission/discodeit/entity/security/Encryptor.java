@@ -4,7 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class Encrypt {
+public class Encryptor {
     public static String getEncryptedPassword(String password) {
         String result = "";
         String salt = getSalt();
