@@ -1,6 +1,7 @@
 package mission.service.jcf;
 
 import mission.entity.Message;
+import mission.repository.jcf.JCFUserRepository;
 import mission.service.MessageService;
 
 import java.util.*;
@@ -8,7 +9,7 @@ import java.util.*;
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data = new HashMap<>();
     //private final Set<String> stringList = new HashSet<>();
-
+    private final JCFUserRepository userRepository = new JCFUserRepository();
 
     @Override
     public Message create(String message) {

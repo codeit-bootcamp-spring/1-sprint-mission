@@ -11,6 +11,16 @@ public class Message {
     private String message;
 
     private User writer;
+    private Channel writedAt;
+
+    public Channel getWritedAt() {
+        return writedAt;
+    }
+
+    public void setWritedAt(Channel writedAt) {
+        this.writedAt = writedAt;
+    }
+
     private Long createAt;
     private Long updateAt;
 

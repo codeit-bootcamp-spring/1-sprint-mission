@@ -33,9 +33,10 @@ public class User {
     }
 
     // 메시지 등록
-    public Message createMessage(Message message){
+    public Message createMessage(Message message, Channel channel){
         messages.add(message);
         message.setWriter(this);
+        message.setWritedAt(channel);
         return message;
     }
 

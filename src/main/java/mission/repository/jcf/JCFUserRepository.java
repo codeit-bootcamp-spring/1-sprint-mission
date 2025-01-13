@@ -29,6 +29,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     public User findByUsername(String username){
+
+        // 빠르게 찾기 위해 셋 자료구조로 중복 확인
         if (!userNames.contains(username)){
             throw new NoSuchElementException("그런 닉네임 없습니다.");
         }
@@ -39,6 +41,7 @@ public class JCFUserRepository implements UserRepository {
                 return user;
             }
         }
+        return null;
     }
 
     public List<User> findAll(){
