@@ -13,6 +13,7 @@ public class Channel {
 
     private String name;
     private List<User> userList = new ArrayList<>();
+    private Integer userCount;
 
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,19 +25,6 @@ public class Channel {
         this.firstId = idAsString.split("-")[0];
         this.createdAt = LocalDateTime.now();
     }
-
-    // 채널에서 user 등록
-    public void joinUser(User user){
-        userList.add(user);
-        user.getChannels().add(this);
-    }
-
-    // 유저 강퇴
-    public void deleteUser(User user){
-        userList.remove(user);
-        user.getChannels().remove(this);
-    }
-
 
     public UUID getId() {
         return id;
@@ -54,6 +42,10 @@ public class Channel {
         return createdAt;
     }
 
+    public Integer getUserCount() {
+        return userCount = userList.size();
+    }
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
@@ -67,18 +59,20 @@ public class Channel {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Channel channel = (Channel) o;
-        return Objects.equals(id, channel.id);
-                //&& Objects.equals(name, channel.name);
+        return Objects.equals(id, channel.id) && Objects.equals(firstId, channel.firstId) && Objects.equals(name, channel.name) && Objects.equals(userList, channel.userList) && Objects.equals(userCount, channel.userCount) && Objects.equals(createdAt, channel.createdAt) && Objects.equals(updatedAt, channel.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(id, firstId, name, userList, userCount, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
-
-        return "[" + firstId + "] " + "Channel{'" + name + '\'' + '}';
+        return "Channel{" +
+                "firstId='" + firstId + '\'' +
+                ", name='" + name + '\'' +
+                ", userCount=" + getUserCount() +
+                '}';
     }
 }

@@ -30,9 +30,7 @@ public class RepositoryManager {
 
     public Message createMessage(UUID channelId, UUID userId, String message){
         // 채널 찾고, user 찾고
-        User writer = findUserById(userId);
-        Channel writeAt = findChannelById(channelId);
-        return messageService.create(writeAt, writer, message);
+        return messageService.create(findChannelById(channelId), findUserById(userId), message);
     }
 
     /**
@@ -71,8 +69,7 @@ public class RepositoryManager {
     }
 
     public List<User> findUsersInChannel(UUID channelId){
-        Channel findChannel = findChannelById(channelId);
-        return findChannel.getUserList();
+        return findChannelById(channelId).getUserList();
     }
 
     // Channel 찾는 것들
@@ -90,18 +87,15 @@ public class RepositoryManager {
 
     // Message 찾는 것들
     public List<Message> findUserMessage(UUID userId){
-        User findUser = findUserById(userId);
-        return findUser.getMessages();
+        return findUserById(userId).getMessages();
     }
 
     public Message findMessage(UUID userId, String writedMessage){
-        User findUser = findUserById(userId);
-        return messageService.findMessage(findUser, writedMessage);
+        return messageService.findMessage(findUserById(userId), writedMessage);
     }
 
     public List<Message> findMessageInChannel(UUID channelId){
-        Channel findChannel = findChannelById(channelId);
-        return messageService.findMessagesInChannel(findChannel);
+        return messageService.findMessagesInChannel(findChannelById(channelId));
     }
 
     /**
@@ -123,9 +117,7 @@ public class RepositoryManager {
     }
 
     public void deleteMessage(UUID messageId, UUID channelId, UUID userId){
-        Channel writedAt = findChannelById(channelId);
-        User writer = findUserById(userId);
-        messageService.delete(writedAt, messageId, writer);
+        messageService.delete(findChannelById(channelId), messageId, findUserById(userId));
         //writer.getMessages().remove(me)
     }
 
@@ -134,8 +126,8 @@ public class RepositoryManager {
      */
     public void addChannelByUser(UUID channelId, UUID userId){
         Channel channel = findChannelById(channelId);
-        User user = findUserById(userId);
-        user.addChannel(channel);
+
+        findUserById(userId).addChannel(channel);
         // 이 기능도 포함 : channel.getUserList().add(user);
         // 따라서 addUserByChannel 필요 없음
     }

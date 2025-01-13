@@ -22,6 +22,6 @@ public interface MessageService {
     Message update(UUID id, String newMessage);
 
     //[ ] 삭제
-    void delete(UUID id, String message);
-
+    void delete(Channel writedAt, UUID messageId, User writer);
+    //    void delete(UUID id, String message);
 }

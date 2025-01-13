@@ -13,10 +13,10 @@ public class JCFMessageRepository implements MessageRepository {
     private final Map<Channel, List<Message>> data = new HashMap<>();
 
     public Message createMessage(Channel writeAt, User writer, String writedMessage){
-        Message createdMessage = new Message(writedMessage);
-
         // User가 갖고 있는 자기가 쓴 메시지 목록에 추가
-        writer.createMessage(createdMessage, writeAt);
+        Message createdMessage = writer.createMessage(new Message(writedMessage), writeAt);
+        // User가 자기의 메시지를 보관하면서 message도 채널 및 user설정
+
         data.putIfAbsent(createdMessage.getWritedAt(), new ArrayList<>());
         data.get(writeAt).add(createdMessage);
         return createdMessage;
@@ -29,8 +29,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     public Message findMessageById(UUID id){
-        List<Message> all = findAll();
-        for (Message message : all) {
+        for (Message message : findAll()) {
             if (message.getId() == id){
                 return message;
             }
