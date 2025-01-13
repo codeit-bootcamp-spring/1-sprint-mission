@@ -9,11 +9,11 @@ import java.util.UUID;
 public interface ChannelService {
     void updateUserService(UserService userService);
     void updateMessageService(MessageService messageService);
-    void createChannel(String name, String introduction, User owner);
+    Channel createChannel(String name, String introduction, User owner);
     UUID getId(Channel channel);
     long getCreatedAt(Channel channel);
     long getUpdatedAt(Channel channel);
-    void getInfo(Channel channel);
+    String getInfo(Channel channel);
     String getName(Channel channel);
     String getIntroduction(Channel channel);
     User getOwner(Channel channel);

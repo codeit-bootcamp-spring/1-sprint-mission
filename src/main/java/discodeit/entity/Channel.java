@@ -79,7 +79,38 @@ public class Channel {
         messages.add(message);
     }
 
+    public void deleteParticipant(User user) {
+        User deleteUser = findUser(user);
+        if (deleteUser == null) {
+            throw new IllegalArgumentException("삭제할 유저를 찾을 수 없습니다.");
+        }
+        participants.remove(deleteUser);
+    }
+
+    public User findUser(User user) {
+        return participants.stream()
+                .filter(participant -> participant.isEquals(user))
+                .findAny()
+                .orElse(null);
+    }
+
     public boolean isEquals(Channel channel) {
         return id.equals(channel.getId());
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                name + "  | " + introduction + System.lineSeparator()
+                        + "Owner: " + owner.getName() + System.lineSeparator()
+                        + "Participants: "
+                        + String.join(", ", participants.stream()
+                        .map(User::getName)
+                        .toList()) + System.lineSeparator()
+                        + "-- Messages -- " + System.lineSeparator()
+                        + String.join(System.lineSeparator(), messages.stream()
+                        .map(message -> message.getSender().getName() + ": " + message.getContent())
+                        .toList())
+        );
     }
 }

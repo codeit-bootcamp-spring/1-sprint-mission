@@ -100,6 +100,10 @@ public class User {
                 .orElse(null);
     }
 
+    public boolean isEquals(User user) {
+        return id.equals(user.getId());
+    }
+
     @Override
     public String toString() {
         return String.format(

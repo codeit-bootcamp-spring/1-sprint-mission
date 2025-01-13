@@ -36,63 +36,63 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void createChannel(String name, String introduction, User owner) {
-
+    public Channel createChannel(String name, String introduction, User owner) {
+        return new Channel(name, introduction, owner);
     }
 
     @Override
     public UUID getId(Channel channel) {
-        return null;
+        return channel.getId();
     }
 
     @Override
     public long getCreatedAt(Channel channel) {
-        return 0;
+        return channel.getCreatedAt();
     }
 
     @Override
     public long getUpdatedAt(Channel channel) {
-        return 0;
+        return channel.getUpdatedAt();
     }
 
     @Override
-    public void getInfo(Channel channel) {
-
+    public String getInfo(Channel channel) {
+        return channel.toString();
     }
 
     @Override
     public String getName(Channel channel) {
-        return "";
+        return channel.getName();
     }
 
     @Override
     public String getIntroduction(Channel channel) {
-        return "";
+        return channel.getIntroduction();
     }
 
     @Override
     public User getOwner(Channel channel) {
-        return null;
+        return channel.getOwner();
     }
 
     @Override
     public List<User> getParticipants(Channel channel) {
-        return List.of();
+        return channel.getParticipants();
     }
 
     @Override
     public void updateName(Channel channel, String name) {
-
+        channel.updateName(name);
     }
 
     @Override
     public void updateIntroduction(Channel channel, String introduction) {
-
+        channel.updateIntroduction(introduction);
     }
 
     @Override
     public void updateParticipants(Channel channel, User user) {
-
+        channel.updateParticipants(user);
     }
 
     @Override
@@ -102,6 +102,6 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteParticipant(Channel channel, User user) {
-
+        channel.deleteParticipant(user);
     }
 }
