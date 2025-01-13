@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Channel {
-    //채널의 고유한 ID생성
+
     private final UUID channeluuId;
     private final Long createdAt;
     private Long updatedAt;
     private String channelName;
 
-    // 채널 생성
     public Channel(String channelName) {
         this.channeluuId = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
@@ -17,7 +16,7 @@ public class Channel {
         this.channelName = channelName;
     }
 
-    // Getter
+
     public UUID getuuId(){
         return channeluuId;
     }

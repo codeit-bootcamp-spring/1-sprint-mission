@@ -16,7 +16,6 @@ public class User {
     private String iD;
 
 
-    //생성
     public User(String name, String email,String iD ,String password){
         this.uuID = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
@@ -32,7 +31,6 @@ public class User {
     }
 
     public Long getCreatedAt() {
-
         return createdAt;
     }
 

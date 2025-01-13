@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.validation.ValidationService;
 
 import java.util.Map;
 import java.util.UUID;
@@ -16,21 +17,19 @@ public class JavaApplication {
     public static void main(String[] args) {
 
 //        userServiceTest();
-        channelServiceTest();
-//        messageServiceTest();
+//        channelServiceTest();
+        messageServiceTest();
     }
 
     static void userServiceTest(){
 
         UserService userService = new JCFUserService();
 
-        //테스트 유저 생성
         User user1 = new User("설유일","tjf7894@gmail.com", "tjf7894", "1q2w3e4r@");
         User user2 = new User("홍길동","길동@gmail.com", "gildong","1q2w3e@");
 
-        //유저서비스 추가
-        userService.userServiceAdd(user1);
-        userService.userServiceAdd(user2);
+        userService.addUser(user1);
+        userService.addUser(user2);
 
 
         System.out.println("-------------사용자 조회---------------------");
@@ -52,7 +51,7 @@ public class JavaApplication {
         System.out.println(printUser.toString());
 
         System.out.println("--------------사용자 삭제 후 -------------");
-        userService.deleteUser(user2);
+        userService.deleteUser(user2.getuuID());
         allPrintUser = userService.getAllUsers();
         for(User user  : allPrintUser.values()){
             System.out.println("=====================================");
@@ -63,9 +62,11 @@ public class JavaApplication {
     }
 
     static void channelServiceTest(){
+        UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
+        ValidationService validationCheck = new ValidationService(channelService, userService);
+        MessageService messageService = new JCFMessageService(validationCheck);
 
-        //테스트 채널 생성
         Channel channel1 = new Channel("CH.1");
         Channel channel2 = new Channel("CH.2");
 
@@ -91,8 +92,6 @@ public class JavaApplication {
         channelService.updateChannel(channel1.getuuId(), "ch.수정 테스트");
         System.out.println(printCh.toString());
 
-
-        //채널 삭제
         System.out.println("----------------채널 삭제----------------");
         channelService.deleteChannel(channel1.getuuId());
         allPrintCh = channelService.getAllChannels();
@@ -107,15 +106,16 @@ public class JavaApplication {
     }
 
     static void messageServiceTest(){
-        MessageService messageService = new JCFMessageService();
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
+        ValidationService validationCheck = new ValidationService(channelService, userService);
+        MessageService messageService = new JCFMessageService(validationCheck);
 
         User user1 = new User("설유일","tjf7894@gmail.com", "tjf7894", "1q2w3e4r@");
         User user2 = new User("홍길동","길동@gmail.com", "gildong","1q2w3e@");
 
-        userService.userServiceAdd(user1);
-        userService.userServiceAdd(user2);
+        userService.addUser(user1);
+        userService.addUser(user2);
 
         Channel channel1 = new Channel("CH.1");
         Channel channel2 = new Channel("CH.2");
@@ -133,15 +133,14 @@ public class JavaApplication {
 
         System.out.println("-----------------조회 getMessage ------------------");
         Message printMsg =  messageService.getMessage(msg1.getMsguuId());
-        User sendUser = userService.getUser(printMsg.SendUseruuId());
-        Channel destinationCh = channelService.getChannel(printMsg.getDestinationChannel());
+        User sendUser = userService.getUser(printMsg.SendUser().getuuID());
+        Channel destinationCh = channelService.getChannel(printMsg.getDestinationChannel().getuuId());
 
         System.out.println(
                 "목적지 채널 : "+ destinationCh.getChannelName() +"\n" +
                         "보낸 유저 : " +sendUser.getName() +"\n"+
                         "메시지 내용 : " + printMsg.getContent());
 
-        //메시지 객체에 저장된 필드들이 객체가 아니라 UUID를 저장해서 가독성이 매우 떨어짐... 어떻게 할까..ㅇ,ㅁ
         System.out.println("-----------------모든 메시지 조회 getAllMsg()------------------");
         Map<UUID, Map<UUID, Message>> allMessages = messageService.getAllMsg();
 
