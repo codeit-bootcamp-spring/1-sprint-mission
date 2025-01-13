@@ -41,7 +41,7 @@ class UserNameTest {
     @DisplayName("요구되는 유저의 이름이 비어있는 value 제공 시 에러 발생 테스트")
     void givenUserNameLengthLessThanRequiredLengthWhenCreateUserThenThrowException(String name) {
         // given
-        userName = UserName.from(name);
+        userName = UserName.createFrom(name);
         Set<ConstraintViolation<UserName>> violations = validator.validate(userName);
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -52,7 +52,7 @@ class UserNameTest {
     @DisplayName("유저의 이름의 제한을 넘어가는 문자열로 생성 시 에러 발생 테스트")
     void givenMoreThanInvalidLengthNameWhenCreateUserNameThenThrowException(String overLengthName) {
         // given
-        userName = UserName.from(overLengthName);
+        userName = UserName.createFrom(overLengthName);
         Set<ConstraintViolation<UserName>> violations = validator.validate(userName);
         // then
         assertThat(violations.size()).isEqualTo(1);
@@ -67,7 +67,7 @@ class UserNameTest {
 
         @BeforeEach
         void setup() {
-            userName = UserName.from(USER_NAME);;
+            userName = UserName.createFrom(USER_NAME);;
         }
 
         @Test

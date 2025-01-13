@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.user.UserName;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
@@ -37,7 +36,7 @@ class JCFUserServiceTest {
         userRepository = mock(UserRepository.class);
         userConverter = UserConverter.getInstance();
         userService = new JCFUserService(userRepository, userConverter);
-        user = User.from(NAME);
+        user = User.createFrom(NAME);
     }
 
     @Test

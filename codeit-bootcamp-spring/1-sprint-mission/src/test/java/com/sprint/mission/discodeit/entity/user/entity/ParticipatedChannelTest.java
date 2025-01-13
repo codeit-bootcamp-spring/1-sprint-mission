@@ -16,7 +16,7 @@ class ParticipatedChannelTest {
     @Test
     void givenNewParticipatedChannelWhenCreateThenReturnNewParticipatedChannel() {
         // given when
-        var createdParticipatedChannel = ParticipatedChannel.from(new ArrayList<>());
+        var createdParticipatedChannel = ParticipatedChannel.newDefault();
         // then
         assertThat(createdParticipatedChannel).isNotNull();
     }
@@ -28,13 +28,13 @@ class ParticipatedChannelTest {
 
         @BeforeEach
         void setUp() {
-            participatedChannel = ParticipatedChannel.from(new ArrayList<>());
+            participatedChannel = ParticipatedChannel.newDefault();
         }
 
         @Test
         void givenChannelNameWhenCreateChannelThenReturnNewChannel() {
             // given when
-            var channel = participatedChannel.createChannel(CHANNEL_NAME);
+            var channel = participatedChannel.generateFrom(CHANNEL_NAME);
             // then
             assertAll(
                     () -> {

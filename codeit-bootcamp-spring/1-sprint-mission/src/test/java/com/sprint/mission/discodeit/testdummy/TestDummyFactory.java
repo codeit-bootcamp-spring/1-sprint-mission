@@ -9,10 +9,10 @@ import java.util.List;
 public class TestDummyFactory {
 
     private static final List<User> users = new ArrayList<>(List.of(
-            User.from("홍길동"),
-            User.from("김길동"),
-            User.from("이길동"),
-            User.from("박깅동")
+            User.createFrom("홍길동"),
+            User.createFrom("김길동"),
+            User.createFrom("이길동"),
+            User.createFrom("박깅동")
     ));
 
 

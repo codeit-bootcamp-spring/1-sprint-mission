@@ -18,7 +18,7 @@ public class UserName {
         this.name = name;
     }
 
-    public static UserName from(final String username) {
+    public static UserName createFrom(final String username) {
         return new UserName(username);
     }
 

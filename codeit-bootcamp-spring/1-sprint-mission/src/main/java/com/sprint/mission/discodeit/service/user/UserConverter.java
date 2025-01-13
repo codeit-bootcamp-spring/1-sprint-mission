@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.user;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.user.User;
-import com.sprint.mission.discodeit.entity.user.UserName;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserInfoResponse;
 import java.util.Objects;
@@ -21,7 +20,7 @@ public class UserConverter {
 
     public User toEntity(RegisterUserRequest request) {
         try {
-            var user = User.from(request.name());
+            var user = User.createFrom(request.name());
             return user;
         } catch (IllegalArgumentException e) {
             // TODO validator 사용으로 예외가 안던져지는 문제 발생

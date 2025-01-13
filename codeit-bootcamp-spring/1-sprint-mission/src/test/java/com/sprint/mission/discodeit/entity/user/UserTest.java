@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.entity.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +19,7 @@ class UserTest {
         // given
         String userName = "test1";
 
-        assertThat(User.from(userName)).isNotNull();
+        assertThat(User.createFrom(userName)).isNotNull();
     }
 
     @Nested
@@ -28,7 +27,7 @@ class UserTest {
     class InitializeNew {
         @BeforeEach
         void setUp() {
-            user = User.from(USER_NAME);
+            user = User.createFrom(USER_NAME);
         }
 
         @Test
@@ -66,9 +65,9 @@ class UserTest {
         @DisplayName("채널 이름을 유저가 제공하여 새로운 채널을 만들면 생성된 채널 반환")
         void givenChannelNameWhenUserCreateChannelThenReturnChannel() {
             // given
-            user = User.from(USER_NAME);
+            user = User.createFrom(USER_NAME);
             // when
-            var channel = user.createChannel(CHANNEL_NAME);
+            var channel = user.createNewChannel(CHANNEL_NAME);
             // then
             assertThat(channel).isNotNull();
         }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParticipatedChannel {
@@ -11,12 +12,11 @@ public class ParticipatedChannel {
         this.participatedChannels = participatedChannels;
     }
 
-    // TODO
-    public static ParticipatedChannel from(List<Channel> participatedChannels) {
-        return new ParticipatedChannel(participatedChannels);
+    public static ParticipatedChannel newDefault() {
+        return new ParticipatedChannel(new ArrayList<Channel>(1_000));
     }
 
-    public Channel createChannel(String channelName) {
+    public Channel generateFrom(String channelName) {
         var channel = Channel.of(channelName);
         participatedChannels.add(channel);
         return channel;

@@ -17,7 +17,7 @@ class UserRepositoryImplTest {
     @BeforeEach
     void setUp() {
         userRepository = TestDummyFactory.getUserRepository();
-        user = User.from(TEST_NAME);
+        user = User.createFrom(TEST_NAME);
         userRepository.save(user);
     }
 
