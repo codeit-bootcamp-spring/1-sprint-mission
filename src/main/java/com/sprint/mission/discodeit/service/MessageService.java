@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
+    void setDependencies(UserService userService, ChannelService channelService);
     Message createMessage(Message message);
     Optional<Message> readMessage(Message message);
     List<Message> readAll();

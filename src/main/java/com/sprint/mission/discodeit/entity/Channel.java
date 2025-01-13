@@ -7,13 +7,15 @@ public class Channel extends BaseEntity {
     private String description;
     private Set<User> participants;
     private List<Message> messageList;
+    private ChannelType channelType;
 
-    public Channel(String name, String description, Set<User> participants, List<Message> messageList) {
+    public Channel(String name, String description, Set<User> participants, List<Message> messageList, ChannelType channelType) {
         super();
         this.name = name;
         this.description = description;
         this.participants= participants;
         this.messageList = messageList;
+        this.channelType = channelType;
     }
 
     public String getName() {
@@ -48,6 +50,13 @@ public class Channel extends BaseEntity {
         this.messageList = messageList;
     }
 
+    public ChannelType getChannelType() {
+        return channelType;
+    }
+
+    public void updateChannelType(ChannelType channelType) {
+        this.channelType = channelType;
+    }
     @Override
     public String toString() {
         return "Channel{" +

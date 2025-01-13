@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.ServiceFactory;
@@ -8,9 +9,6 @@ import com.sprint.mission.discodeit.factory.jcf.JCFServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
 import java.util.*;
 
@@ -76,9 +74,9 @@ public class JavaApplication {
 
         // 1. 채널 등록
         System.out.println("\n[채널 등록]");
-        Channel channel1 = new Channel("General", "General discussion", new HashSet<>(), new ArrayList<>());
-        Channel channel2 = new Channel("Tech Talk", "Discuss latest tech trends", new HashSet<>(), new ArrayList<>());
-        Channel channel3 = new Channel("Another Office","Disscuss about brand",new HashSet<>(), new ArrayList<>());
+        Channel channel1 = new Channel("General", "General discussion", new HashSet<>(), new ArrayList<>(), ChannelType.GROUP);
+        Channel channel2 = new Channel("Tech Talk", "Discuss latest tech trends", new HashSet<>(), new ArrayList<>(), ChannelType.GROUP);
+        Channel channel3 = new Channel("Another Office","Disscuss about brand",new HashSet<>(), new ArrayList<>(), ChannelType.GROUP);
         channelService.createChannel(channel1);
         channelService.createChannel(channel2);
         channelService.createChannel(channel3);
@@ -100,7 +98,7 @@ public class JavaApplication {
 
         // 5. 수정
         System.out.println("\n[Channel 수정]");
-        Channel updatedChannel1 = new Channel("General Updated", "Updated discussion", new HashSet<>(), new ArrayList<>());
+        Channel updatedChannel1 = new Channel("General Updated", "Updated discussion", new HashSet<>(), new ArrayList<>(), ChannelType.GROUP);
         updatedChannel1.getParticipants().add(user2); // 사용자 추가 유지
         channelService.updateChannel(channel1, updatedChannel1);
         System.out.println("수정완료");

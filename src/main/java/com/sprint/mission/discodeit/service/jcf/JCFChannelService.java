@@ -18,6 +18,7 @@ public class JCFChannelService implements ChannelService {
         this.channelData = channelData;
     }
 
+    @Override
     public void setDependencies(UserService userService, MessageService messageService) {
         this.userService = userService;
         this.messageService = messageService;

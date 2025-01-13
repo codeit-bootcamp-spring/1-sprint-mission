@@ -15,40 +15,37 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFServiceFactory implements ServiceFactory {
-    private final Map<UUID, User> userData;
-    private final Map<UUID, Channel> channelData;
-    private final Map<UUID, Message> messageData;
+    private final Map<UUID, User> userData = new HashMap<>();
+    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final Map<UUID, Message> messageData = new HashMap<>();
+
+    private UserService userService;
+    private ChannelService channelService;
+    private MessageService messageService;
 
     public JCFServiceFactory() {
-        this.userData = new HashMap<>();
-        this.channelData = new HashMap<>();
-        this.messageData = new HashMap<>();
-    }
+        //서비스 객체 생성
+        this.userService = new JCFUserService(userData);
+        this.channelService = new JCFChannelService(channelData);
+        this.messageService = new JCFMessageService(messageData);
 
-    @Override
-    public UserService createUserService(){
-        JCFUserService userService = new JCFUserService(userData);
-        ChannelService channelService = createChannelService();
-        MessageService messageService = createMessageService();
+        //의존성 주입
         userService.setDependencies(messageService, channelService);
+        channelService.setDependencies(userService, messageService);
+        messageService.setDependencies(userService, channelService);
+    }
+    @Override
+    public UserService createUserService() {
         return userService;
     }
 
     @Override
     public ChannelService createChannelService() {
-        JCFChannelService channelService = new JCFChannelService(channelData);
-        UserService userService = createUserService();
-        MessageService messageService = createMessageService();
-        channelService.setDependencies(userService, messageService);
         return channelService;
     }
 
     @Override
     public MessageService createMessageService() {
-        JCFMessageService messageService = new JCFMessageService(messageData);
-        UserService userService = createUserService();
-        ChannelService channelService = createChannelService();
-        messageService.setDependencies(userService, channelService);
         return messageService;
     }
 }

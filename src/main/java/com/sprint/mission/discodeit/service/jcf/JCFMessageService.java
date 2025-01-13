@@ -19,6 +19,7 @@ public class JCFMessageService implements MessageService {
         this.messageData = messageData;
     }
 
+    @Override
     public void setDependencies(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;

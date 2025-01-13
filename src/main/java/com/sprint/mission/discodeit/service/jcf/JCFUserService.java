@@ -16,6 +16,7 @@ public class JCFUserService implements UserService {
         this.userData = userData;
     }
 
+    @Override
     public void setDependencies(MessageService messageService, ChannelService channelService) {
         this.messageService = messageService;
         this.channelService = channelService;
