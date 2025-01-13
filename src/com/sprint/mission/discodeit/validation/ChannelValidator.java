@@ -24,8 +24,8 @@ public class ChannelValidator {
 
     public void validateBaseEntityFormat(Channel channel) throws InvalidFormatException {
         baseEntityValidator.validateIdFormat(channel.getId());
-        baseEntityValidator.validateTimeFormat(channel.getCreateAt());
-        baseEntityValidator.validateTimeFormat(channel.getUpdateAt());
+        baseEntityValidator.validateCreateAtFormat(channel.getCreateAt());
+        baseEntityValidator.validateUpdateAtFormat(channel.getUpdateAt());
     }
     public void validateNameFormat(Channel channel) throws InvalidFormatException {
         nameValidator.validateNameFormat(channel.getName());

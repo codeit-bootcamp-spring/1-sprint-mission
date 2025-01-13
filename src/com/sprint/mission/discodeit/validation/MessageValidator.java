@@ -24,8 +24,8 @@ public class MessageValidator {
 
     public void validateBaseEntityFormat(Message message) throws InvalidFormatException {
         baseEntityValidator.validateIdFormat(message.getId());
-        baseEntityValidator.validateTimeFormat(message.getCreateAt());
-        baseEntityValidator.validateTimeFormat(message.getUpdateAt());
+        baseEntityValidator.validateCreateAtFormat(message.getCreateAt());
+        baseEntityValidator.validateUpdateAtFormat(message.getUpdateAt());
     }
     public void validateContentFormat(Message message) throws InvalidFormatException {
         String content = message.getContent();

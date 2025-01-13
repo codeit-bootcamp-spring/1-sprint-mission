@@ -27,8 +27,8 @@ public class UserValidator {
 
     public void validateBaseEntityFormat(User user) throws InvalidFormatException {
         baseEntityValidator.validateIdFormat(user.getId());
-        baseEntityValidator.validateTimeFormat(user.getCreateAt());
-        baseEntityValidator.validateTimeFormat(user.getUpdateAt());
+        baseEntityValidator.validateCreateAtFormat(user.getCreateAt());
+        baseEntityValidator.validateUpdateAtFormat(user.getUpdateAt());
     }
     public void validateNameFormat(User user) throws InvalidFormatException {
         nameValidator.validateNameFormat(user.getName());
