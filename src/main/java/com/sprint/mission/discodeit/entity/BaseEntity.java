@@ -3,8 +3,8 @@ import java.util.UUID;
 
 public class BaseEntity {
     // 공통 필드 작성
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
 
     public BaseEntity(){
@@ -14,11 +14,12 @@ public class BaseEntity {
         this.updatedAt = System.currentTimeMillis();
     }
     public UUID getId(){return id;}
-    public void setId(UUID id){ this.id = id;}
+    // id, createdAt 상수로 변경
+    // public void setId(UUID id){ this.id = id;}
     public Long getCreatedAt(){
         return createdAt;
     }
-    public void setCreatedAt(Long createdAt){this.createdAt = createdAt;}
+    // public void setCreatedAt(Long createdAt){this.createdAt = createdAt;}
     public Long getUpdatedAt(){
         return updatedAt;
     }
