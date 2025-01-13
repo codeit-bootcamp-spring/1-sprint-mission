@@ -60,7 +60,6 @@ class ChannelTest {
             assertThat(channel.getStatus()).isEqualTo(UNREGISTERED);
         }
 
-        // TODO  Channel isEqualFromNameAndNotUnregistered test
         @Test
         @DisplayName("매개변수로 들어온 이름과 채널 객체의 이름이 같을 경우, 상태가 해지 상태가 아닐 시 True 반환")
         void givenSameChannelNameWhenIsEqualFromNameAndNotUnregisteredThenTrue() {
