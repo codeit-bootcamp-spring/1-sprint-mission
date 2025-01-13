@@ -40,8 +40,8 @@ public class JCFUserService implements UserService {
 
 
     @Override
-    public void delete(UUID id, String name, String password) {
-        userRepository.delete(id, name, password);
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     public void validateDuplicateName(String name){

@@ -18,7 +18,8 @@ public interface UserRepository {
     void validateDuplicateUserName(String userName);
 
     User findByNamePW(String name, String password);
-    void delete(UUID id, String name, String password);
 
     User updateUserNamePW(User user);
+
+    void delete(User deletingUser);
 }

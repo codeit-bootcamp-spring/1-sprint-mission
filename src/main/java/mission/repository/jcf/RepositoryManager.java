@@ -66,7 +66,7 @@ public class RepositoryManager {
 
     // Message 수정
     public Message updatedMessage(UUID channelId, UUID messageId, String newString) {
-        Message updatingMessage = findMessageById(channelId, messageId);
+        Message updatingMessage = findMessageByC_M_Id(channelId, messageId);
         return messageService.update(messageId, newString);
     }
 
@@ -124,24 +124,30 @@ public class RepositoryManager {
      * delete
      */
     public void deleteUser(UUID id, String nickName, String password) {
-        userService.delete(id, nickName, password);
+        User deletingUser = findUserById(id);
+        if (!(deletingUser.getName().equals(nickName) && deletingUser.getPassword().equals(password))){
+            System.out.println("닉네임 or 비밀번호가 틀렸습니다.");
+        } else {
+            userService.delete(deletingUser);
+        }
     }
 
     public void deleteChannel(UUID channelId) {
         Channel deletingChannel = findChannelById(channelId);
-        // user들의 channel에서 삭제
+        // 각 user가 갖고 있는 channelList에서 삭제될 채절 remove
         for (User user : deletingChannel.getUserList()) {
             user.getChannels().remove(deletingChannel);
         }
-        // 그 채널에 있는  메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
-        //List<Message> messagesInChannel = findMessageInChannel(channelId);
 
+        // 그 채널에서 생겼더 메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
+        //List<Message> messagesInChannel = findMessageInChannel(channelId);
         channelService.deleteById(channelId);
     }
 
-    public void deleteMessage(UUID messageId, UUID channelId, UUID userId) {
-        messageService.delete(findChannelById(channelId), messageId, findUserById(userId));
-        //writer.getMessages().remove(me)
+    public void deleteMessage(UUID messageId, UUID channelId) {
+        Message deletingMessage = findMessageByC_M_Id(channelId, messageId);
+        // userId 검증 추가로 할 필요도 없겠다. createMessage에서 이미 필요
+        messageService.delete(deletingMessage);
     }
 
     /**
@@ -149,7 +155,6 @@ public class RepositoryManager {
      */
     public void addChannelByUser(UUID channelId, UUID userId) {
         Channel channel = findChannelById(channelId);
-
         findUserById(userId).addChannel(channel);
         // 이 기능도 포함 : channel.getUserList().add(user);
         // 따라서 addUserByChannel 필요 없음

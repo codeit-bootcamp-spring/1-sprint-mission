@@ -43,9 +43,10 @@ public class JCFMessageRepository implements MessageRepository {
         return findMessageById(id);
     }
 
-    public void delete(Channel writedAt, Message deletingMessage, User writer) {
-        data.get(writedAt).remove(deletingMessage);
-        writer.getMessages().remove(deletingMessage);
+    public void delete(Message deletingMessage) {
+        data.get(deletingMessage.getWritedAt()).remove(deletingMessage);
+        // 개인이 보관한다면 아래의 코드는 주석처리
+        deletingMessage.getWriter().getMessages().remove(deletingMessage);
     }
 
     //throw new NoSuchElementException("메시지 id가 틀렸습니다.");

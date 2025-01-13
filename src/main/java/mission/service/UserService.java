@@ -24,6 +24,5 @@ public interface UserService {
     User update(User user);
 
     //[ ] 삭제
-    void delete(UUID id, String name, String password);
-
+    void delete(User user);
 }

@@ -56,8 +56,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void delete(Channel writedAt, UUID messageId, User writer) {
-        Message deletingMessage = messageRepository.findMessageById(messageId);
-        messageRepository.delete(writedAt, deletingMessage, writer);
+    public void delete(Message message) {
+        messageRepository.delete(message);
     }
 }
