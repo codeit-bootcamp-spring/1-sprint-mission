@@ -42,12 +42,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(String name) {
-        if (!data.containsKey(name)) {
-            throw new NoSuchElementException("그런 이름의 채널없습니다.");
-        }
-        data.remove(name);
+    public void deleteById(UUID id) {
+        channelRepository.delete(id);
     }
-
 }
 

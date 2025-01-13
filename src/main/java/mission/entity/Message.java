@@ -1,5 +1,6 @@
 package mission.entity;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,15 +22,14 @@ public class Message {
         this.writedAt = writedAt;
     }
 
-    private Long createAt;
-    private Long updateAt;
+    private final LocalDateTime createAt;
+    private LocalDateTime updateAt;
 
     public Message(String message){
         this.message = message;
         id = UUID.randomUUID();
-        String string = id.toString();
-        firstId = string.split("-")[0];
-        createAt = System.currentTimeMillis();
+        firstId = id.toString().split("-")[0];
+        createAt = LocalDateTime.now();
     }
 
     public User getWriter() {
@@ -48,17 +48,17 @@ public class Message {
         return message;
     }
 
-    public Long getCreateAt() {
+    public LocalDateTime getCreateAt() {
         return createAt;
     }
 
-    public Long getUpdateAt() {
+    public LocalDateTime getUpdateAt() {
         return updateAt;
     }
 
     public void setMessage(String message) {
         this.message = message;
-        updateAt = System.currentTimeMillis();
+        updateAt = LocalDateTime.now();
     }
 
     @Override

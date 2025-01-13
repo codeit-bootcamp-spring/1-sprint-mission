@@ -19,7 +19,6 @@ public interface ChannelService {
     Channel update(UUID id, String newName);
 
     //[ ] 삭제
-    public void delete(String name);
-
+    void deleteById(UUID id);
     Channel findById(UUID id);
 }

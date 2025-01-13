@@ -12,12 +12,11 @@ public class Channel {
     private final String firstId;
 
     private String name;
-
     private List<User> userList = new ArrayList<>();
 
     private final LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
+
     public Channel(String name) {
         this.name = name;
         this.id = UUID.randomUUID();

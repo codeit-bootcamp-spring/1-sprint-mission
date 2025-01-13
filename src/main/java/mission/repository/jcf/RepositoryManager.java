@@ -54,7 +54,6 @@ public class RepositoryManager {
         return messageService.update(messageId, newString);
     }
 
-
     /**
      * finding
      */
@@ -69,6 +68,11 @@ public class RepositoryManager {
 
     public List<User> findAllUsers(){
         return userService.findAll();
+    }
+
+    public List<User> findUsersInChannel(UUID channelId){
+        Channel findChannel = findChannelById(channelId);
+        return findChannel.getUserList();
     }
 
     // Channel 찾는 것들
@@ -105,6 +109,35 @@ public class RepositoryManager {
      */
     public void deleteUser(UUID id, String nickName, String password){
         userService.delete(id, nickName, password);
+    }
+
+    public void deleteChannel(UUID channelId){
+        Channel deletingChannel = findChannelById(channelId);
+        // user들의 channel에서 삭제
+        for (User user : deletingChannel.getUserList()) {
+            user.getChannels().remove(deletingChannel);
+        }
+        // 그 채널에 있는  메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
+        //List<Message> messagesInChannel = messageService.findMessagesInChannel(deletingChannel);
+        channelService.deleteById(channelId);
+    }
+
+    public void deleteMessage(UUID messageId, UUID channelId, UUID userId){
+        Channel writedAt = findChannelById(channelId);
+        User writer = findUserById(userId);
+        messageService.delete(writedAt, messageId, writer);
+        //writer.getMessages().remove(me)
+    }
+
+    /**
+     * 채널과 유저 서로 추가
+     */
+    public void addChannelByUser(UUID channelId, UUID userId){
+        Channel channel = findChannelById(channelId);
+        User user = findUserById(userId);
+        user.addChannel(channel);
+        // 이 기능도 포함 : channel.getUserList().add(user);
+        // 따라서 addUserByChannel 필요 없음
     }
 
 }

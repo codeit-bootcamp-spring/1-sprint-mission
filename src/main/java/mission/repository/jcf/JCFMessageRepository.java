@@ -10,20 +10,20 @@ import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
 
-    private final Map<Channel, List<Message>> messageMap = new HashMap<>();
+    private final Map<Channel, List<Message>> data = new HashMap<>();
 
     public Message createMessage(Channel writeAt, User writer, String writedMessage){
         Message createdMessage = new Message(writedMessage);
 
         // User가 갖고 있는 자기가 쓴 메시지 목록에 추가
         writer.createMessage(createdMessage, writeAt);
-        messageMap.putIfAbsent(createdMessage.getWritedAt(), new ArrayList<>());
-        messageMap.get(writeAt).add(createdMessage);
+        data.putIfAbsent(createdMessage.getWritedAt(), new ArrayList<>());
+        data.get(writeAt).add(createdMessage);
         return createdMessage;
     }
 
     public List<Message> findAll(){
-        return messageMap.values().stream() // 리스트를 스트림으로
+        return data.values().stream() // 리스트를 스트림으로
                 .flatMap(List::stream) // 각 리스트 하나의 스트림 평탄화
                 .collect(Collectors.toList());
     }
@@ -39,12 +39,17 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     public List<Message> findMessagesInChannel(Channel channel){
-        return messageMap.get(channel);
+        return data.get(channel);
     }
 
     public Message updateMessage(UUID id, String newMessage){
         findMessageById(id).setMessage(newMessage);
         return findMessageById(id);
+    }
+
+    public void delete(Channel writedAt, Message deletingMessage, User writer) {
+        data.get(writedAt).remove(deletingMessage);
+        writer.getMessages().remove(deletingMessage);
     }
 
     //throw new NoSuchElementException("메시지 id가 틀렸습니다.");

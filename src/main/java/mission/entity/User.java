@@ -16,8 +16,8 @@ public class User {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    private List<Channel> channels = new ArrayList<>();
-    private List<Message> messages = new ArrayList<>();
+    private final List<Channel> channels = new ArrayList<>();
+    private final List<Message> messages = new ArrayList<>();
 
     // 이 User가 입력한 모든 메시지
     public List<Message> getMessages() {

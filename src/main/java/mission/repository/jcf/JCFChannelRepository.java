@@ -69,5 +69,8 @@ public class JCFChannelRepository implements ChannelRepository {
         }
     }
 
-
+    public void delete(UUID id) {
+        channelNames.remove(data.get(id).getName());
+        data.remove(id);
+    }
 }

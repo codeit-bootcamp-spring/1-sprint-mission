@@ -41,17 +41,8 @@ public class JCFMessageService implements MessageService {
         return messageRepository.updateMessage(messageId, newMessage);
     }
 
-    @Override
-    public void delete(UUID id, String message) {
-        if (!data.containsKey(id)) {
-            throw new NoSuchElementException("메시지 id가 틀렸습니다.");
-        }
-
-        // 메시지 내용이 같은 Message객체 찾아서 없애기
-        if (data.get(id).getMessage().equals(message)) {
-            data.remove(id);
-        } else {
-            throw new NoSuchElementException("메시지가 틀렸습니다");
-        }
+    public void delete(Channel writedAt, UUID messageId, User writer) {
+        Message deletingMessage = messageRepository.findMessageById(messageId);
+        messageRepository.delete(writedAt, deletingMessage, writer);
     }
 }
