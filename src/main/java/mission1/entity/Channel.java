@@ -1,5 +1,6 @@
 package mission1.entity;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,15 +10,15 @@ public class Channel {
     private final String firstId;
 
     private String name;
-    private final Long createAt;
-    private Long updateAt;
+    private final LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Channel(String name) {
         this.name = name;
-        id = UUID.randomUUID();
-        String string = id.toString();
-        firstId = string.split("-")[0];
-        createAt = System.currentTimeMillis();
+        this.id = UUID.randomUUID();
+        String idAsString = id.toString();
+        this.firstId = idAsString.split("-")[0];
+        this.createdAt = LocalDateTime.now();
     }
 
     public UUID getId() {
@@ -28,29 +29,30 @@ public class Channel {
         return name;
     }
 
-    public Long getCreateAt() {
-        return createAt;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public Long getUpdateAt() {
-        return updateAt;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
     public void setName(String name) {
         this.name = name;
-        updateAt = System.currentTimeMillis();
+        updatedAt = LocalDateTime.now();
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Channel channel = (Channel) o;
-        return Objects.equals(id, channel.id) && Objects.equals(name, channel.name);
+        return Objects.equals(id, channel.id);
+                //&& Objects.equals(name, channel.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(id);
     }
 
     @Override

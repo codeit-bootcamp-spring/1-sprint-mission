@@ -30,11 +30,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User find(UUID id) {
-        try {
-            return data.get(id);
-        } catch (NoSuchElementException e){
-            throw new NoSuchElementException("그런 id는 존재하지 않습니다.");
-        }
+        return data.get(id);
     }
 
     @Override
