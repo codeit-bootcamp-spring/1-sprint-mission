@@ -23,8 +23,8 @@ public class JavaApplication {
         User user2 = userService.createUser(UUID.randomUUID(), "Bob");
 
         // 채널 생성
-        Channel channel1 = channelService.createChannel(UUID.randomUUID(), "Alice", "General");
-        Channel channel2 = channelService.createChannel(UUID.randomUUID(), "Bob", "Random");
+        Channel channel1 = channelService.createChannel(UUID.randomUUID(), "Alice", "ch1");
+        Channel channel2 = channelService.createChannel(UUID.randomUUID(), "Bob", "ch2");
 
         // 메시지 생성
         Message message1 = messageService.createMessage(UUID.randomUUID(), "Alice", "Hello, world!");
@@ -47,7 +47,7 @@ public class JavaApplication {
         System.out.println("============================");
 
         // 사용자 리스트 출력
-        System.out.println("All Users:");
+        System.out.println("모든 사용자 출력:");
         List<User> users = userService.allUsers();
         for (int i = 0; i < users.size(); i++) {
             User user = users.get(i);
@@ -59,7 +59,7 @@ public class JavaApplication {
         }
 
         // 채널 리스트 출력
-        System.out.println("All Channels:");
+        System.out.println("채널 리스트:");
         List<Channel> channels = channelService.allChannel();
         for (int i = 0; i < channels.size(); i++) {
             Channel channel = channels.get(i);
@@ -70,7 +70,7 @@ public class JavaApplication {
         }
 
         // 메시지 리스트 출력
-        System.out.println("All Messages:");
+        System.out.println("메시지 출력:");
         List<Message> messages = messageService.getAllMessages();
         for (int i = 0; i < messages.size(); i++) {
             Message message = messages.get(i);
@@ -81,19 +81,15 @@ public class JavaApplication {
         }
 
         // 사용자 삭제
-        System.out.println("Deleting User Alice...");
+        System.out.println("사용자 삭제");
         userService.deleteUser(user1.getId());
 
-        // 삭제 후 사용자 리스트 출력
-        System.out.println("All Users after Deletion:");
         userService.printAllUsers();
 
         // 채널 삭제
-        System.out.println("Deleting Channel Random...");
+        System.out.println("채널 삭제");
         channelService.deleteChannel(channel2.getId());
 
-        // 삭제 후 채널 리스트 출력
-        System.out.println("All Channels after Deletion:");
         List<Channel> updatedChannels = channelService.allChannel();
         for (int i = 0; i < updatedChannels.size(); i++) {
             Channel updatedChannel = updatedChannels.get(i);
@@ -104,11 +100,11 @@ public class JavaApplication {
         }
 
         // 메시지 삭제
-        System.out.println("Deleting Message from Alice...");
+        System.out.println("메시지 삭제");
         messageService.deleteMessage(message1.getId());
 
         // 삭제 후 메시지 리스트 출력
-        System.out.println("All Messages after Deletion:");
+        System.out.println("모든 메시지 출력:");
         List<Message> updatedMessages = messageService.getAllMessages();
         for (int i = 0; i < updatedMessages.size(); i++) {
             Message updatedMessage = updatedMessages.get(i);
