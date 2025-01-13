@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.validation.ValidationService;
+import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.Map;
 import java.util.UUID;
@@ -25,12 +25,9 @@ public class JavaApplication {
 
         UserService userService = new JCFUserService();
 
-        User user1 = new User("설유일","tjf7894@gmail.com", "tjf7894", "1q2w3e4r@");
-        User user2 = new User("홍길동","길동@gmail.com", "gildong","1q2w3e@");
 
-        userService.addUser(user1);
-        userService.addUser(user2);
-
+        User user1 = userService.CreateUser("설유일","tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
+        User user2 = userService.CreateUser("홍길동","길동@gmail.com", "gildong","1q2w3e@");
 
         System.out.println("-------------사용자 조회---------------------");
         User printUser =  userService.getUser(user1.getuuID());
@@ -64,14 +61,11 @@ public class JavaApplication {
     static void channelServiceTest(){
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
-        ValidationService validationCheck = new ValidationService(channelService, userService);
+        MessageValidator validationCheck = new MessageValidator(channelService, userService);
         MessageService messageService = new JCFMessageService(validationCheck);
 
-        Channel channel1 = new Channel("CH.1");
-        Channel channel2 = new Channel("CH.2");
-
-        channelService.addChannel(channel1);
-        channelService.addChannel(channel2);
+        Channel channel1 = channelService.createChannel("CH.1");
+        Channel channel2 = channelService.createChannel("CH.2");
 
         System.out.println("---------------채널 조회------------------");
         Channel printCh = channelService.getChannel(channel1.getuuId());
@@ -108,20 +102,16 @@ public class JavaApplication {
     static void messageServiceTest(){
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
-        ValidationService validationCheck = new ValidationService(channelService, userService);
-        MessageService messageService = new JCFMessageService(validationCheck);
+        MessageValidator messageValida = new MessageValidator(channelService, userService);
+        MessageService messageService = new JCFMessageService(messageValida);
 
-        User user1 = new User("설유일","tjf7894@gmail.com", "tjf7894", "1q2w3e4r@");
-        User user2 = new User("홍길동","길동@gmail.com", "gildong","1q2w3e@");
+        User user1 =  userService.CreateUser("설유일","tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
+        User user2 = userService.CreateUser("홍길동","qasdzxc7894@gmail.com", "gildong","1Q2w3e4r@");
 
-        userService.addUser(user1);
-        userService.addUser(user2);
 
-        Channel channel1 = new Channel("CH.1");
-        Channel channel2 = new Channel("CH.2");
+        Channel channel1 = channelService.createChannel("CH.1");
+        Channel channel2 = channelService.createChannel("CH.2");
 
-        channelService.addChannel(channel1);
-        channelService.addChannel(channel2);
 
         Message msg1 = new Message(user1, channel1, "안녕");
         Message msg2 = new Message(user1, channel1, "hello");

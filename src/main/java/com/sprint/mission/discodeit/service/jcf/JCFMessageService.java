@@ -1,29 +1,26 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.validation.ValidationService;
+import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
     private final Map<UUID, Map<UUID, Message>> msgData = new HashMap<>();
-    private final ValidationService validationService;
+    private final MessageValidator validationService;
 
-    public JCFMessageService(ValidationService validationService) {
+    public JCFMessageService(MessageValidator validationService) {
         this.validationService = validationService;
     }
 
     public void addChannelMsg(Message msg) {
-        if (!validationService.validate(msg.getDestinationChannel().getuuId(), msg.SendUser().getuuID())) {
-            throw new IllegalArgumentException("Invalid channel or user.");
+        if (validationService.checkChannelAndUser(msg.getDestinationChannel().getuuId(), msg.SendUser().getuuID())) {
+            msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
+            msgData.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
+            System.out.println("Message added successfully: " + msg.getContent());
         }
-        msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
-        msgData.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
-        System.out.println("Message added successfully: " + msg.getContent());
     }
     public Message getMessage(UUID msgId) {
         for (Map<UUID, Message> channelMessages : msgData.values()) {

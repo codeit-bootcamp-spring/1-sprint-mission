@@ -9,6 +9,8 @@ public class Channel {
     private Long updatedAt;
     private String channelName;
 
+
+
     public Channel(String channelName) {
         this.channeluuId = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();

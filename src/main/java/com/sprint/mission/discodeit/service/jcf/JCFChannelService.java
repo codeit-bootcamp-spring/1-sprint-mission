@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -11,9 +12,10 @@ public class JCFChannelService implements ChannelService {
     private final HashMap<UUID, Channel> data = new HashMap<>();
 
 
-    public void addChannel(Channel channel){
-
-        data.put(channel.getuuId(), channel);
+    public Channel createChannel(String chName){
+        Channel ch1 = new Channel(chName);
+        data.put(ch1.getuuId(), ch1);
+        return ch1;
     }
 
 
@@ -22,22 +24,21 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-    public HashMap<UUID, Channel> getAllChannels(){
+    public Map<UUID, Channel> getAllChannels() {
         return new HashMap<>(data);
     }
 
 
+
     public void updateChannel(UUID uuId, String name ){
-        for(Channel channel:data.values()){
-            if(channel.getuuId().equals(uuId)){
-                channel.update(name);
-                break;
-            }
+        Channel channel = data.get(uuId);
+        if (channel != null) {
+            channel.update(name);
         }
     }
-
 
     public void deleteChannel(UUID id){
         data.remove(id);
     }
+
 }
