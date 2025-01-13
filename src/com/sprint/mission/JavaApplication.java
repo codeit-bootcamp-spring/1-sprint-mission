@@ -1,9 +1,12 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.*;
-import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.service.proxy.*;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.UUID;
 
@@ -15,8 +18,7 @@ public class JavaApplication {
                 .phoneNumber("010-1234-5678")
                 .build();
 
-        UserServiceFactory factory = UserServiceFactoryType.JCF.getFactory();
-        UserService userService = factory.createUserService();
+        UserService userService = UserServiceFactory.JCF_USER_SERVICE.createUserService();
         System.out.println("---------------------------------");
         System.out.println("userService.createUser()");
         System.out.println("pass User 'frog'! " + System.lineSeparator() + "User info: " + userService.createUser(frog));
@@ -44,9 +46,10 @@ public class JavaApplication {
         System.out.println("pass UUID 'frogKey' and User 'fffrog': " + System.lineSeparator() + "User info: " + userService.updateUserById(
                 frogKey, new User.Builder("fffrog", "fffrog@email.com")
                         .build()));
-//        System.out.println(userService.updateUserById(
-//                UUID.randomUUID(), new User.Builder("ppprog", "")
-//                        .build())); // validation not passed
+        System.out.println();
+        System.out.println(userService.updateUserById(
+                UUID.randomUUID(), new User.Builder("ppprog", "")
+                        .build())); // validation not passed
         System.out.println();
         System.out.println();
 
@@ -62,8 +65,7 @@ public class JavaApplication {
         Message hi = Message.createMessage("hi");
         Message lo = Message.createMessage("lo");
 
-        MessageServiceFactory factory = MessageServiceFactoryType.JCF.getFactory();
-        MessageService messageService = factory.createMessageService();
+        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE.createMessageService();
         System.out.println("---------------------------------");
         System.out.println("messageService.createMessage()");
         System.out.println("pass Message 'hi'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(hi));
@@ -91,8 +93,9 @@ public class JavaApplication {
         System.out.println("pass UUID 'hiKey' and Message 'mid': " + System.lineSeparator() + "Message info: " +
                 messageService.updateMessageById(
                         hiKey, Message.createMessage("mid")));
-//        System.out.println(messageService.update(
-//                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
+        System.out.println();
+        System.out.println(messageService.updateMessageById(
+                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
         System.out.println();
         System.out.println();
 
@@ -108,8 +111,7 @@ public class JavaApplication {
         Channel c1 = Channel.createChannel("c1");
         Channel c2 = Channel.createChannel("c2");
 
-        ChannelServiceFactory factory = ChannelServiceFactoryType.JCF.getFactory();
-        ChannelService channelService = factory.createChannelService();
+        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE.createChannelService();
         System.out.println("---------------------------------");
         System.out.println("channelService.createChannel()");
         System.out.println("pass Channel 'c1'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c1));
@@ -137,8 +139,9 @@ public class JavaApplication {
         System.out.println("pass UUID 'c1Key' and Channel 'c3': " + System.lineSeparator() + "Channel info: " +
                 channelService.updateChannelById(
                         c1Key, Channel.createChannel("c3")));
-//        System.out.println(channelService.update(
-//                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
+        System.out.println();
+        System.out.println(channelService.updateChannelById(
+                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
         System.out.println();
         System.out.println();
 

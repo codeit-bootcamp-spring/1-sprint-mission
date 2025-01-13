@@ -1,7 +1,22 @@
 package com.sprint.mission.discodeit.factory;
 
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.proxy.MessageServiceProxy;
 
-public interface MessageServiceFactory {
-    MessageService createMessageService();
+import java.util.function.Supplier;
+
+public enum MessageServiceFactory {
+    JCF_MESSAGE_SERVICE(() -> new MessageServiceProxy(new JCFMessageService())),
+    ;
+
+    private final Supplier<MessageService> supplier;
+
+    MessageServiceFactory(Supplier<MessageService> supplier) {
+        this.supplier = supplier;
+    }
+
+    public MessageService createMessageService() {
+        return supplier.get();
+    }
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
@@ -23,8 +24,12 @@ public class JCFUserService implements UserService {
      */
     @Override
     public User createUser(User userInfoToCreate) {
-        userValidator.validateBaseEntityFormat(userInfoToCreate);
-        userValidator.validateNameFormat(userInfoToCreate);
+        try {
+            userValidator.validateBaseEntityFormat(userInfoToCreate);
+            userValidator.validateNameFormat(userInfoToCreate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         User userToCreate = new User.Builder(
                 userInfoToCreate.getName(), userInfoToCreate.getEmail())
@@ -49,8 +54,12 @@ public class JCFUserService implements UserService {
     @Override
     public User updateUserById(UUID key, User userInfoToUpdate) {
         User exsitingUser = findUserById(key);
-        userValidator.validateBaseEntityFormat(userInfoToUpdate);
-        userValidator.validateNameFormat(userInfoToUpdate);
+        try {
+            userValidator.validateBaseEntityFormat(userInfoToUpdate);
+            userValidator.validateNameFormat(userInfoToUpdate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         User userToUpdate = new User.Builder(
                 userInfoToUpdate.getName(), userInfoToUpdate.getEmail())

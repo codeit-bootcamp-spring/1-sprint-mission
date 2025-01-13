@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
@@ -23,8 +24,12 @@ public class JCFMessageService implements MessageService {
      */
     @Override
     public Message createMessage(Message messageInfoToCreate) {
-        messageValidator.validateBaseEntityFormat(messageInfoToCreate);
-        messageValidator.validateContentFormat(messageInfoToCreate);
+        try {
+            messageValidator.validateBaseEntityFormat(messageInfoToCreate);
+            messageValidator.validateContentFormat(messageInfoToCreate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         Message messageToCreate = Message.createMessage(
                 messageInfoToCreate.getId(),
@@ -48,8 +53,13 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
         Message existingMessage = findMessageById(key);
-        messageValidator.validateBaseEntityFormat(messageInfoToUpdate);
-        messageValidator.validateContentFormat(messageInfoToUpdate);
+
+        try {
+            messageValidator.validateBaseEntityFormat(messageInfoToUpdate);
+            messageValidator.validateContentFormat(messageInfoToUpdate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         Message messageToUpdate = Message.createMessage(
                 key,

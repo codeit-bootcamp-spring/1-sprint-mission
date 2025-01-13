@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
@@ -23,8 +24,12 @@ public class JCFChannelService implements ChannelService {
      */
     @Override
     public Channel createChannel(Channel channelInfoToCreate) {
-        channelValidator.validateBaseEntityFormat(channelInfoToCreate);
-        channelValidator.validateNameFormat(channelInfoToCreate);
+        try {
+            channelValidator.validateBaseEntityFormat(channelInfoToCreate);
+            channelValidator.validateNameFormat(channelInfoToCreate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         Channel channelToCreate = Channel.createChannel(
                 channelInfoToCreate.getId(),
@@ -48,8 +53,12 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) {
         Channel existingChannel = findChannelById(key);
-        channelValidator.validateBaseEntityFormat(channelInfoToUpdate);
-        channelValidator.validateNameFormat(channelInfoToUpdate);
+        try {
+            channelValidator.validateBaseEntityFormat(channelInfoToUpdate);
+            channelValidator.validateNameFormat(channelInfoToUpdate);
+        } catch (InvalidFormatException e) {
+            System.out.println(e.getMessage());
+        }
 
         Channel channelToUpdate = Channel.createChannel(
                 key,
