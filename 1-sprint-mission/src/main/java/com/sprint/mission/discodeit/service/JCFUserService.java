@@ -51,28 +51,28 @@ public class JCFUserService implements UserService{
     }
 
     @Override
-    public void UpdateUserName(String name,String changeName) {
+    public boolean UpdateUserName(String name,String changeName) {
         ArrayList<User> instance = find_user(name);
-        updateUserNameInfo(instance,changeName);
+        return updateUserNameInfo(instance,changeName);
     }
 
     @Override
-    public void UpdateUserName(UUID id,String changeName) {
+    public boolean UpdateUserName(UUID id,String changeName) {
         ArrayList<User> instance = find_user(id);
-        updateUserNameInfo(instance,changeName);
+        return updateUserNameInfo(instance,changeName);
     }
 
     @Override
-    public void DeleteUser(UUID id) {
+    public boolean DeleteUser(UUID id) {
         ArrayList<User> instance = find_user(id);
-        deleteUserInfo(instance);
+        return deleteUserInfo(instance);
     }
 
 
     @Override
-    public void DeleteUser(String name) {
+    public boolean DeleteUser(String name) {
         ArrayList<User> instance = find_user(name);
-        deleteUserInfo(instance);
+        return deleteUserInfo(instance);
     }
 
 
@@ -88,25 +88,30 @@ public class JCFUserService implements UserService{
         );
     }
 
-    private void deleteUserInfo(ArrayList<User> instance){
+    private boolean deleteUserInfo(ArrayList<User> instance){
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 유저가 없습니다.");
+            return false;
         }else if(instance.size()==1){
             userList.remove(instance.get(0));
             System.out.println("성공적으로 삭제했습니다.");
+            return true;
         }
-
+        return false;
     }
 
-    private void updateUserNameInfo(ArrayList<User> instance, String changeName) {
+    private boolean updateUserNameInfo(ArrayList<User> instance, String changeName) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 유저가 없습니다.");
+            return false;
         } else if (instance.size() == 1) {
             User find = instance.get(0);
             find.setName(changeName);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
+            return true;
         }
+        return false;
     }
 
 

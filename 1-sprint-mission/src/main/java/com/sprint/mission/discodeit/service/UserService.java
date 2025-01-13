@@ -6,10 +6,10 @@ public interface UserService {
     void CreateUserDefault(String name);
     <T> String ReadUser(T user);
     String ReadUserAll();
-    void UpdateUserName(String name,String change);
-    void UpdateUserName(UUID id,String changeName);
-    void DeleteUser(UUID id);
-    void DeleteUser(String name);
+    boolean UpdateUserName(String name,String change);
+    boolean UpdateUserName(UUID id,String changeName);
+    boolean DeleteUser(UUID id);
+    boolean DeleteUser(String name);
 
 
 

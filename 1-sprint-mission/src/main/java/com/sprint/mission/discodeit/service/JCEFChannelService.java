@@ -51,24 +51,24 @@ public class JCEFChannelService implements ChannelService{
     }
 
     @Override
-    public void UpdateChannelName(UUID id, String name) {
+    public boolean UpdateChannelName(UUID id, String name) {
         ArrayList<Channel> instance = find_Channel(id);
-        updateChannel(instance,name);
+        return updateChannel(instance,name);
     }
-    public void UpdateChannelName(String ChannelName, String name) {
+    public boolean UpdateChannelName(String ChannelName, String name) {
         ArrayList<Channel> instance = find_Channel(ChannelName);
-        updateChannel(instance,name);
+        return updateChannel(instance,name);
     }
     @Override
-    public void DeleteChannel(UUID id) {
+    public boolean DeleteChannel(UUID id) {
         ArrayList<Channel> instance = find_Channel(id);
-        deleteChannel(instance);
+        return deleteChannel(instance);
     }
 
     @Override
-    public void DeleteChannel(String Name) {
+    public boolean DeleteChannel(String Name) {
         ArrayList<Channel> instance = find_Channel(Name);
-        deleteChannel(instance);
+        return deleteChannel(instance);
     }
 
 
@@ -86,23 +86,30 @@ public class JCEFChannelService implements ChannelService{
     }
 
 
-    private void deleteChannel(ArrayList<Channel> instance) {
+    private boolean deleteChannel(ArrayList<Channel> instance) {
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 채널가 없습니다.");
+            return false;
         }else if(instance.size()==1){
             ChannelList.remove(instance.get(0));
             System.out.println("성공적으로 삭제했습니다.");
+            return true;
         }
+        return false;
     }
 
-    private void updateChannel(ArrayList<Channel> instance, String changeName) {
+    private boolean updateChannel(ArrayList<Channel> instance, String changeName) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 채널이 없습니다.");
+            return false;
         } else if (instance.size() == 1) {
             Channel find = instance.get(0);
             find.setChannelName(changeName);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
+            return true;
         }
+
+        return false;
     }
 }

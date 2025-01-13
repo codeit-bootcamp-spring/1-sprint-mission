@@ -50,49 +50,52 @@ public class JCFMessageService implements MessageService{
     }
 
     @Override
-    public void UpdateMessageTitle(UUID ID, String change) {
+    public boolean UpdateMessageTitle(UUID ID, String change) {
         ArrayList<Message> instance = find_Message(ID);
-        ChangeMessageTitle(instance,change);
+        return ChangeMessageTitle(instance,change);
     }
 
     @Override
-    public void UpdateMessageTitle(String title, String change) {
+    public boolean UpdateMessageTitle(String title, String change) {
         ArrayList<Message> instance = find_Message(title);
-        ChangeMessageTitle(instance,change);
+        return ChangeMessageTitle(instance,change);
     }
     @Override
-    public void UpdateMessageBody(UUID ID, String change) {
+    public boolean UpdateMessageBody(UUID ID, String change) {
         ArrayList<Message> instance = find_Message(ID);
-        ChangeMessageBody(instance,change);
+        return ChangeMessageBody(instance,change);
     }
 
     @Override
-    public void UpdateMessageBody(String title, String change) {
+    public boolean UpdateMessageBody(String title, String change) {
         ArrayList<Message> instance = find_Message(title);
-        ChangeMessageBody(instance,change);
+        return ChangeMessageBody(instance,change);
     }
 
     @Override
-    public void DeleteMessage(UUID id) {
+    public boolean DeleteMessage(UUID id) {
         ArrayList<Message> instance = find_Message(id);
-        DeleteMessageInfo(instance);
+        return DeleteMessageInfo(instance);
     }
 
     @Override
-    public void DeleteMessage(String title) {
+    public boolean DeleteMessage(String title) {
         ArrayList<Message> instance = find_Message(title);
-        DeleteMessageInfo(instance);
+        return DeleteMessageInfo(instance);
     }
 
 
-    private void DeleteMessageInfo(ArrayList<Message> instance) {
+    private boolean DeleteMessageInfo(ArrayList<Message> instance) {
         if (instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
+            return false;
         } else if (instance.size() == 1) {
             MessageList.remove(instance.get(0));
             System.out.println("성공적으로 삭제했습니다.");
+            return true;
         } else {
             System.out.println("중복된 메세지가 있습니다.");
+            return false;
         }
     }
 
@@ -111,26 +114,32 @@ public class JCFMessageService implements MessageService{
 
 
 
-    private void ChangeMessageTitle(ArrayList<Message> instance, String changetitle) {
+    private boolean ChangeMessageTitle(ArrayList<Message> instance, String changetitle) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
+            return false;
         } else if (instance.size() == 1) {
             Message find = instance.get(0);
             find.setTitle(changetitle);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
+            return true;
         }
+        return false;
     }
 
-    private void ChangeMessageBody(ArrayList<Message> instance, String changeBody) {
+    private boolean ChangeMessageBody(ArrayList<Message> instance, String changeBody) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 메세지가가 없습니다.");
+            return false;
         } else if (instance.size() == 1) {
             Message find = instance.get(0);
             find.setMessageBody(changeBody);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
+            return true;
         }
+        return false;
     }
 
     @Override

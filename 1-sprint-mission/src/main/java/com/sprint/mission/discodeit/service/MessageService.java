@@ -12,17 +12,17 @@ public interface MessageService {
 
     String ReadMessageAll();
 
-    void UpdateMessageTitle(UUID ID, String change);
+    boolean UpdateMessageTitle(UUID ID, String change);
 
-    void UpdateMessageTitle(String name, String change);
+    boolean UpdateMessageTitle(String name, String change);
 
-    void UpdateMessageBody(UUID ID, String change);
+    boolean UpdateMessageBody(UUID ID, String change);
 
-    void UpdateMessageBody(String name, String change);
+    boolean UpdateMessageBody(String name, String change);
 
-    void DeleteMessage(UUID id);
+    boolean DeleteMessage(UUID id);
 
-    void DeleteMessage(String title);
+    boolean DeleteMessage(String title);
     void AddMessage(Message m);
     /// /////////////////////////////////////////////////////
 }

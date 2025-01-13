@@ -7,9 +7,9 @@ public interface ChannelService {
     void CreateChannelDefault(String name);
     <T> String ReadChannel(T user);
     String ReadChannelAll();
-    void UpdateChannelName(UUID id, String name);
-    void UpdateChannelName(String ChannelName, String name);
-    void DeleteChannel(UUID id);
-    void DeleteChannel(String Name);
+    boolean UpdateChannelName(UUID id, String name);
+    boolean UpdateChannelName(String ChannelName, String name);
+    boolean DeleteChannel(UUID id);
+    boolean DeleteChannel(String Name);
 
 }
