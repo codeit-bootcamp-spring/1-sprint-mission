@@ -87,9 +87,24 @@ public class Channel {
         participants.remove(deleteUser);
     }
 
+    public void deleteMessage(Message message) {
+        Message deleteMessage = findMessage(message);
+        if (deleteMessage == null) {
+            throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
+        }
+        messages.remove(message);
+    }
+
     public User findParticipant(User user) {
         return participants.stream()
                 .filter(participant -> participant.isEqualTo(user))
+                .findAny()
+                .orElse(null);
+    }
+
+    public Message findMessage(Message message) {
+        return messages.stream()
+                .filter(findMessage -> findMessage.isEqualTo(message))
                 .findAny()
                 .orElse(null);
     }

@@ -47,6 +47,10 @@ public class Message {
         return sender;
     }
 
+    public boolean isEqualTo(Message message) {
+        return id.equals(message.getId());
+    }
+
     public boolean isIdEqualTo(UUID id) {
         return this.id.equals(id);
     }

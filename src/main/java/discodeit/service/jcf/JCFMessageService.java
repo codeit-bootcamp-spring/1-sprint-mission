@@ -75,7 +75,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void deleteMessage(Message message) {
-
+    public void deleteMessage(Channel channel, Message message) {
+        channel.deleteMessage(message);
+        messages.remove(message);
     }
 }
