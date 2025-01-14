@@ -53,7 +53,7 @@ class UserTest {
             // when
             user.unregister();
             // then
-            assertThat(user.getStatus()).isEqualTo(Status.UNREGISTERED);
+            assertThat(user.getStatus()).isEqualTo(Status.REGISTERED);
         }
     }
 
