@@ -9,13 +9,8 @@ public interface UserRepository extends CrudRepository<User, UUID> {
 
     Optional<User> findByUsername(String username);
 
-
-
     public static UserRepository getInMemoryUserRepositoryImpl() {
-        return UserRepositoryImpl.getInstance();
+        return UserRepositoryInMemory.getInstance();
     }
 
-    public static UserRepository getUserRepositoryInstance() {
-        return UserRepositoryImpl.getInstance();
-    }
 }

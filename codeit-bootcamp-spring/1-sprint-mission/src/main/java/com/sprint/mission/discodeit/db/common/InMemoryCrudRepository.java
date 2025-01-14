@@ -32,10 +32,11 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
         if (store.isEmpty()) {
             return Collections.emptyList();
         }
+        
         var existEntities = store.values()
                 .stream()
-                .filter(Objects::nonNull)
                 .toList();
+
         return Collections.unmodifiableList(existEntities);
     }
 

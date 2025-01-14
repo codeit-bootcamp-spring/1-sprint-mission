@@ -27,46 +27,40 @@ public class JCFUserService implements UserService {
     @Override
     public UserInfoResponse register(RegisterUserRequest registerUserRequest) {
         var entity = converter.toEntity(registerUserRequest);
-        // TODO : 이메일, 또는 이름으로 중복 검사 실시 해야함.
         var savedEntity = data.save(entity);
         return converter.toDto(savedEntity);
     }
 
     @Override
-    public UserInfoResponse findUserByUsername(FindUserRequest findUserRequest) {
-        var entity = data.findByUsername(findUserRequest.username())
+    public UserInfoResponse findUserByUsernameOrThrow(FindUserRequest findUserRequest) {
+        var foundUser = data.findByUsername(findUserRequest.username())
                 .filter(User::isNotUnregistered)
                 .map(converter::toDto)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
-        return entity;
+        return foundUser;
     }
 
     @Override
     public UserInfoResponse modifyUserInfo(ModifyUserInfoRequest request) {
-        var entity = findById(request.id());
+        var foundUser = findByIdOrThrow(request.id());
 
-        entity.changeUserName(request.changeUsername());
-        data.save(entity);
+        foundUser.changeUserName(request.changeUsername());
+        data.save(foundUser);
 
-        var response = converter.toDto(entity);
+        var response = converter.toDto(foundUser);
         return response;
     }
 
     @Override
     public void UnRegisterUser(UnregisterUserRequest request) {
-        var entity = findById(request.id());
+        var foundUser = findByIdOrThrow(request.id());
 
-        entity.unregister();
+        foundUser.unregister();
 
-        data.save(entity);
+        data.save(foundUser);
     }
 
-    @Override
-    public void createChannel() {
-
-    }
-
-    private User findById(UUID id) {
+    private User findByIdOrThrow(UUID id) {
         var entity = data.findById(id)
                 .filter(User::isNotUnregistered)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));

@@ -7,6 +7,8 @@ import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 
 public class ValidationUtils {
+    
+    // TODO hibernate-validator 공식 문서 참조. 응용 하지를 못했음 => 모든 에러 잡아주는 객체 or 서비스 ? 일단 두고 각 객체에 검증 로직 추가해야함
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 

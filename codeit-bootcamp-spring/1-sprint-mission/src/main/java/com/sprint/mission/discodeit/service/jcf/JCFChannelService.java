@@ -13,13 +13,17 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
 
-    public JCFChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
+    public JCFChannelService(
+            ChannelRepository channelRepository,
+            UserRepository userRepository
+    ) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
     }
 
     @Override
-    public void createChannel(CreateNewChannelRequest request) {
+    public void createChannelOrThrow(CreateNewChannelRequest request) {
+
         var findUser = userRepository.findById(request.userId())
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
 

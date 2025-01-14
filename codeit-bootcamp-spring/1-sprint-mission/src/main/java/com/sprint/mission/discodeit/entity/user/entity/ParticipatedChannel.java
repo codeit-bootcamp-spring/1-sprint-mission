@@ -24,7 +24,7 @@ public class ParticipatedChannel {
     }
 
     public Channel createChannel(String channelName, User user) {
-        var createdChannel = Channel.createFromChannelNameAndUser(channelName, user);
+        var createdChannel = Channel.createOfChannelNameAndUser(channelName, user);
         participatedChannels.put(createdChannel.getId(), createdChannel);
 
         return createdChannel;
@@ -48,17 +48,17 @@ public class ParticipatedChannel {
     public Optional<Channel> findByName(String name) {
         var foundChannelByName = participatedChannels.values()
                 .stream()
-                .filter(channel -> channel.isEqualFromNameAndNotUnregistered(name))
+                .filter(channel -> channel.isStatusNotUnregisteredAndEqualsTo(name))
                 .findFirst();
 
         return foundChannelByName;
     }
 
     public Channel changeChannelNameOrThrow(UUID channelId, String newName, User user) {
-        var foundChannel = findById(channelId)
-                .orElseThrow(() ->
-                        UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())
-                );
+        var foundChannel =
+                findById(channelId)
+                        .orElseThrow(
+                                () -> UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString()));
 
         foundChannel.changeName(newName, user);
         participatedChannels.put(foundChannel.getId(), foundChannel);

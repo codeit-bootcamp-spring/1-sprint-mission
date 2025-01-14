@@ -21,7 +21,7 @@ class ChannelTest {
     @Test
     @DisplayName("새로운 채널 생성")
     void createChannelThenSuccess() {
-        assertThat(Channel.createFromChannelNameAndUser(CHANNEL_NAME, USER))
+        assertThat(Channel.createOfChannelNameAndUser(CHANNEL_NAME, USER))
                 .isNotNull();
     }
 
@@ -31,7 +31,7 @@ class ChannelTest {
 
         @BeforeEach
         void setUp() {
-            channel = Channel.createFromChannelNameAndUser(CHANNEL_NAME, USER);
+            channel = Channel.createOfChannelNameAndUser(CHANNEL_NAME, USER);
         }
 
         @Test
@@ -66,7 +66,7 @@ class ChannelTest {
             // given
 
             // when
-            var validResult = channel.isEqualFromNameAndNotUnregistered(CHANNEL_NAME);
+            var validResult = channel.isStatusNotUnregisteredAndEqualsTo(CHANNEL_NAME);
             // then
             assertThat(validResult).isTrue();
         }
@@ -77,7 +77,7 @@ class ChannelTest {
             // given
             var differentChannelName = "스프린트_백엔드_100기";
             // when
-            var validResult = channel.isEqualFromNameAndNotUnregistered(differentChannelName);
+            var validResult = channel.isStatusNotUnregisteredAndEqualsTo(differentChannelName);
             // then
             assertThat(validResult).isFalse();
         }

@@ -25,16 +25,16 @@ public abstract class AbstractUUIDEntity {
         this.status = REGISTERED;
     }
 
+    public Optional<Long> getUpdateAt() {
+        return Optional.ofNullable(updateAt);
+    }
+
     public UUID getId() {
         return id;
     }
 
     public Long getCreateAt() {
         return createAt;
-    }
-
-    public Optional<Long> getUpdateAt() {
-        return Optional.ofNullable(updateAt);
     }
 
     public Status getStatus() {

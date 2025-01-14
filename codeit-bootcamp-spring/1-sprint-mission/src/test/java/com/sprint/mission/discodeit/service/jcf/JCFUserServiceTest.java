@@ -73,7 +73,7 @@ class JCFUserServiceTest {
         when(userRepository.findByUsername(NAME)).thenReturn(mockUser);
 
         // when
-        var user = userService.findUserByUsername(findUserRequest);
+        var user = userService.findUserByUsernameOrThrow(findUserRequest);
 
         // then
         assertThat(user).isNotNull();

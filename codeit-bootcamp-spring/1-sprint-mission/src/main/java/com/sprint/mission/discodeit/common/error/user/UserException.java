@@ -20,12 +20,27 @@ public class UserException extends RuntimeException {
         return new UserException(message, cause);
     }
 
-    public static UserException errorMessageAndId(ErrorMessage message, String id) {
-        var format = String.format("%s : not participated channel id %s", message.getMessage(), id);
+
+    public static UserException errorMessageAndId(
+            ErrorMessage message, String id
+    ) {
+        var format = String.format(
+                "%s : not participated channel id %s",
+                message.getMessage(), id
+        );
+
         return new UserException(format);
     }
-    public static UserException errorMessageAndChannelName(ErrorMessage message, String channelName) {
-        var format = String.format("%s : not participated channel name %s", message.getMessage(), channelName);
+
+
+    public static UserException errorMessageAndChannelName(
+            ErrorMessage message, String channelName
+    ) {
+        var format = String.format(
+                "%s : not participated channel name %s",
+                message.getMessage(), channelName
+        );
+
         return new UserException(format);
     }
 
