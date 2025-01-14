@@ -2,50 +2,61 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    List<Message> data = new ArrayList<>();
+    private final MessageRepository messageRepository;
+
+    public JCFMessageService() {
+        this.messageRepository = new InMemoryMessageRepository();
+    }
 
     @Override
     public void createCommonMessage(User sender, String content) {
         Message message = Message.ofCommon(sender, content);
-        data.add(message);
+        messageRepository.save(message);
     }
 
     @Override
     public void createReplyMessage(User sender, String content) {
         Message message = Message.ofReply(sender, content);
-        data.add(message);
+        messageRepository.save(message);
     }
 
     @Override
-    public Optional<Message> findMessage(UUID id) {
-        Optional<Message> message = data.stream()
-            .filter(m -> m.getId().equals(id))
-            .findFirst();
-        return message;
+    public Message findMessageById(UUID id) {
+        return messageRepository.findMessageById(id)
+            .orElseThrow(() -> new IllegalArgumentException("message not found: " + id));
+    }
+
+    @Override
+    public List<Message> findMessageBySender(UUID senderId) {
+        List<Message> messages = messageRepository.findMessagesBySender(senderId);
+        if (messages.isEmpty()) {
+            throw new IllegalArgumentException("Messages not found for sender: " + senderId);
+        }
+        return messages;
     }
 
     @Override
     public List<Message> findAllMessages() {
-        return data;
+        return messageRepository.findAllMessages();
     }
 
     @Override
     public void updateMessage(UUID id, String newContent) {
-        findMessage(id).ifPresentOrElse(m -> m.updateContent(newContent), () -> {
+        messageRepository.findMessageById(id).ifPresentOrElse(m -> m.updateContent(newContent), () -> {
             throw new IllegalArgumentException("message not found: " + id);
         });
     }
 
     @Override
     public void removeMessage(UUID id) {
-        findMessage(id).ifPresent(data::remove);
+        messageRepository.remove(id);
     }
 }

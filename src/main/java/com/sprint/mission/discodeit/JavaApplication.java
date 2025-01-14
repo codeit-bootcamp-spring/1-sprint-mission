@@ -3,6 +3,12 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryChannelRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryMessageRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,8 +21,12 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        UserRepository userRepository = new InMemoryUserRepository();
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        MessageRepository messageRepository = new InMemoryMessageRepository();
+
         //------ User ------
-        UserService userService = new JCFUserService();
+        UserService userService = new JCFUserService(userRepository);
 
         //등록
         userService.createUser("1234", "Alice");
@@ -29,11 +39,10 @@ public class JavaApplication {
         userService.findAllUsers().forEach(user -> System.out.println(user.getName()));
 
         //단건 조회
-        userService.findUserByName("Alice")
-            .ifPresentOrElse(user ->
-                System.out.println("유저 단건 조회: " + user.getName()), () -> {
-                throw new IllegalArgumentException("user not found");
-            });
+        userService.findUserByName("Alice");
+
+
+        userService.findUserById(userService.findAllUsers().get(0).getId());
 
         //유저 이름 업데이트
         userService.updateUserName(userService.findAllUsers().get(0).getId(), "Alice2");
@@ -61,10 +70,7 @@ public class JavaApplication {
         //단건 조회
         System.out.println("\n채널 단건 조회");
         UUID channelId = channelService.findAllChannels().get(0).getId();
-        channelService.findChannel(channelId)
-            .ifPresentOrElse(channel -> System.out.println(channel.getName()), () -> {
-                throw new IllegalArgumentException("channel not found" + channelId);
-            });
+        channelService.findChannelById(channelId);
 
         //채널 이름 업데이트
         System.out.println("\n채널 이름 업데이트");
@@ -74,8 +80,7 @@ public class JavaApplication {
         //멤버 업데이트
         System.out.println("\n멤버 업데이트");
         channelService.updateMember(channelService.findAllChannels().get(0).getId(), List.of(userService.findAllUsers().get(0), userService.findAllUsers().get(1)));
-        channelService.findChannel(channelService.findAllChannels().get(0).getId())
-            .ifPresent(channel -> channel.getMembers().forEach(user -> System.out.println(user.getName())));
+        channelService.findChannelById(channelService.findAllChannels().get(0).getId());
 
         //채널 삭제
         System.out.println("\n채널 삭제");

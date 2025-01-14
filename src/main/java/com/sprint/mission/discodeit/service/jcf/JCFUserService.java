@@ -1,63 +1,64 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.entity.security.Encrypt.getEncryptedPassword;
+import static com.sprint.mission.discodeit.entity.security.Encryptor.getEncryptedPassword;
 
 public class JCFUserService implements UserService {
-    private final List<User> data = new ArrayList<>();
+    private final UserRepository userRepository;
+
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void createUser(String password, String name) {
         String encryptedPassword = getEncryptedPassword(password);
         User user = new User(encryptedPassword, name);
-        data.add(user);
+        userRepository.save(user);
     }
 
     @Override
-    public Optional<User> findUserById(UUID id) {
-        Optional<User> user = data.stream()
-            .filter(u -> u.getId().equals(id))
-            .findFirst();
-        return user;
+    public User findUserById(UUID id) {
+        return userRepository.findUserById(id)
+            .orElseThrow(() -> new IllegalArgumentException("user not found: " + id));
     }
 
     @Override
-    public Optional<User> findUserByName(String name) {
-        Optional<User> user = data.stream()
-            .filter(u -> u.getName().equals(name))
-            .findFirst();
-        return user;
+    public User findUserByName(String name) {
+        return userRepository.findUserByName(name)
+            .orElseThrow(() -> new IllegalArgumentException("user not found: " + name));
     }
 
     @Override
     public List<User> findAllUsers() {
-        return data;
+        return userRepository.findAllUsers();
     }
 
     @Override
     public void updateUserName(UUID id, String newName) {
-        findUserById(id).ifPresentOrElse(u -> u.updateName(newName), () -> {
-            throw new IllegalArgumentException("user not found: " + id);
-        });
+        userRepository.findUserById(id)
+            .ifPresentOrElse(u -> u.updateName(newName), () -> {
+                throw new IllegalArgumentException("user not found: " + id);
+            });
     }
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
         String encryptedPassword = getEncryptedPassword(newPassword);
-        findUserById(id).ifPresentOrElse(u -> u.updatePassword(encryptedPassword), () -> {
-            throw new IllegalArgumentException("user not found: " + id);
-        });
+        userRepository.findUserById(id)
+            .ifPresentOrElse(u -> u.updatePassword(encryptedPassword), () -> {
+                throw new IllegalArgumentException("user not found: " + id);
+            });
     }
 
     @Override
     public void removeUser(UUID id) {
-        findUserById(id).ifPresent(data::remove);
+        userRepository.remove(id);
     }
 }

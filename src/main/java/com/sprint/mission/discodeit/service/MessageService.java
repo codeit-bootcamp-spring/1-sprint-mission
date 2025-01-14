@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
@@ -12,7 +11,9 @@ public interface MessageService {
 
     void createReplyMessage(User sender, String content);
 
-    Optional<Message> findMessage(UUID id);
+    Message findMessageById(UUID id);
+
+    List<Message> findMessageBySender(UUID senderId);
 
     List<Message> findAllMessages();
 
