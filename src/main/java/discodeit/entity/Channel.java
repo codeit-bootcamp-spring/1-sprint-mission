@@ -54,6 +54,7 @@ public class Channel {
     }
 
     public void updateParticipants(User user) {
+        isDuplicateUser(user);
         participants.add(user);
     }
 
@@ -115,6 +116,12 @@ public class Channel {
 
     public boolean isIdEqualTo(UUID id) {
         return this.id.equals(id);
+    }
+
+    public void isDuplicateUser(User user) {
+        if (participants.contains(user)) {
+            throw new IllegalArgumentException("이미 가입된 유저입니다.");
+        }
     }
 
     @Override

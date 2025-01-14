@@ -87,6 +87,7 @@ public class JCFChannelService implements ChannelService {
         channel.updateUpdatedAt();
     }
 
+    // 유저의 채널 가입은 이 메서드에서만 실행
     @Override
     public void updateParticipants(Channel channel, User user) {
         channel.updateParticipants(user);
