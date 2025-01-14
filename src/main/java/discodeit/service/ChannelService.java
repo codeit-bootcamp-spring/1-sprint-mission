@@ -17,6 +17,6 @@ public interface ChannelService {
     void updateIntroduction(Channel channel, String introduction);
     void updateParticipants(Channel channel, User user);
     void updateMessages(Channel channel, Message message);
-    void deleteChannel(Channel channel);
+    void deleteChannel(Channel channel, User user);
     void deleteParticipant(Channel channel, User user);
 }

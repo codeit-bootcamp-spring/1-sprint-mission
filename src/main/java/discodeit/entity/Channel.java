@@ -67,7 +67,10 @@ public class Channel {
         participants.remove(deleteUser);
     }
 
-    public void deleteAllParticipants() {
+    public void deleteAllParticipants(User user) {
+        if (!owner.isEqualTo(user)) {
+            throw new IllegalArgumentException("채널 삭제는 방장만 가능합니다.");
+        }
         participants.forEach(participant -> participant.deleteJoinedChannel(this));
     }
 

@@ -108,7 +108,7 @@ public class JCFUserService implements UserService {
             try {
                 jcfChannelService.deleteParticipant(joinedChannel, user);
             } catch (IllegalArgumentException e) {
-                jcfChannelService.deleteChannel(joinedChannel);
+                jcfChannelService.deleteChannel(joinedChannel, user);
             }
         }
         users.remove(user);
