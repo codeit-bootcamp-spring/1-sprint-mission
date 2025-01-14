@@ -104,11 +104,12 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUser(User user) {
         // 가입된 채널인데 참여자 목록에 없으면 Owner -> 채널 자체를 삭제
-        for (Channel joinedChannel : user.getJoinedChannels()) {
+        List<Channel> joinedChannels = user.getJoinedChannels();
+        while (joinedChannels.size() != 0) {
             try {
-                jcfChannelService.deleteParticipant(joinedChannel, user);
+                jcfChannelService.deleteParticipant(joinedChannels.get(0), user);
             } catch (IllegalArgumentException e) {
-                jcfChannelService.deleteChannel(joinedChannel, user);
+                jcfChannelService.deleteChannel(joinedChannels.get(0), user);
             }
         }
         users.remove(user);

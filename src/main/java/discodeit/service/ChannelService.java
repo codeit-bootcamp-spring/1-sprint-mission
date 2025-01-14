@@ -4,6 +4,7 @@ import discodeit.entity.Channel;
 import discodeit.entity.Message;
 import discodeit.entity.User;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
@@ -19,4 +20,5 @@ public interface ChannelService {
     void updateMessages(Channel channel, Message message);
     void deleteChannel(Channel channel, User user);
     void deleteParticipant(Channel channel, User user);
+    List<Channel> getChannels();
 }

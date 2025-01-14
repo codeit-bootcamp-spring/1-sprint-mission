@@ -52,6 +52,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+    public List<Channel> getChannels() {
+        return channels;
+    }
+
+    @Override
     public Channel findById(UUID id) {
         Channel findChannel = findChannel(id);
         if (findChannel == null) {
@@ -100,10 +105,11 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(Channel channel, User user) {
         channel.deleteAllParticipants(user);
-        Channel finalChannel = channel;
-        channel.getMessages().stream().forEach(message -> jcfMessageService.deleteMessage(message, finalChannel, user));
+        List<Message> messagesInChannel = channel.getMessages();
+        while (messagesInChannel.size() != 0) {
+            jcfMessageService.deleteMessage(messagesInChannel.get(0), channel, user);
+        }
         channels.remove(channel);
-        channel = null;
     }
 
     @Override

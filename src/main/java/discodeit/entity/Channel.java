@@ -71,7 +71,9 @@ public class Channel {
         if (!owner.isEqualTo(user)) {
             throw new IllegalArgumentException("채널 삭제는 방장만 가능합니다.");
         }
+        owner.deleteJoinedChannel(this);
         participants.forEach(participant -> participant.deleteJoinedChannel(this));
+        participants.clear();
     }
 
     public void deleteMessage(Message message, User user) {
@@ -79,7 +81,7 @@ public class Channel {
         if (deleteMessage == null) {
             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
         }
-        deleteMessage.checkSender(user);
+//        deleteMessage.checkSender(user);
         messages.remove(message);
     }
 
