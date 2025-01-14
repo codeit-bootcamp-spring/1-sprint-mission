@@ -26,11 +26,6 @@ public class JCFChannelService implements ChannelService {
         this.inputHandler = inputHandler;
     }
 
-    // 의존성 주입을 위한 Channel 반환
-//    public Channel getChannel(String channelName){
-//        return Channels.get(channelName);
-//    }
-
     public UUID createChannel(User user, String channelName){
         // 채널 생성
         Channel channel = new Channel(user, channelName);
