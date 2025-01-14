@@ -33,8 +33,10 @@ public class User extends AbstractUUIDEntity {
         return createdChannel;
     }
 
-    public void changeChannelName(UUID id, String channelName) {
-        channels.changeChannelNameOrThrow(id, channelName, this);
+    public Channel changeChannelName(UUID channelId, String channelName) {
+        var targetChannel = channels.changeChannelNameOrThrow(channelId, channelName, this);
+
+        return targetChannel;
     }
 
     public List<Channel> getChannels() {

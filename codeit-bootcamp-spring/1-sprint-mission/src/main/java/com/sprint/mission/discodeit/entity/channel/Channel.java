@@ -32,7 +32,7 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public void changeName(String newName, User user) {
-        if (!creator.equals(user)) {
+        if (!isCreator(user)) {
             throw ChannelException.errorMessageAndCreatorName(
                     ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
                     user.getName()
@@ -49,6 +49,10 @@ public class Channel extends AbstractUUIDEntity {
 
     public boolean isEqualFromNameAndNotUnregistered(String channelName) {
         return this.channelName.equals(channelName) && isNotUnregistered();
+    }
+
+    private boolean isCreator(User user) {
+        return this.creator.equals(user);
     }
 
     public String getChannelName() {

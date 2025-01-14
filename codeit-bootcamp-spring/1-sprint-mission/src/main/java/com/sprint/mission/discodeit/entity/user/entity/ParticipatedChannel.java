@@ -31,8 +31,11 @@ public class ParticipatedChannel {
     }
 
     public List<Channel> findAllChannels() {
-        var participatedChannels = this.participatedChannels.values()
-                .stream().toList();
+        var participatedChannels =
+                this.participatedChannels.values()
+                .stream()
+                .toList();
+
         return Collections.unmodifiableList(participatedChannels);
     }
 
@@ -50,8 +53,8 @@ public class ParticipatedChannel {
 
         return foundChannelByName;
     }
-    // TODO 메서드 이름에 throw 붙여주어야 하는가 Naming issue
-    public void changeChannelNameOrThrow(UUID channelId, String newName, User user) {
+
+    public Channel changeChannelNameOrThrow(UUID channelId, String newName, User user) {
         var foundChannel = findById(channelId)
                 .orElseThrow(() ->
                         UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString())
@@ -59,11 +62,12 @@ public class ParticipatedChannel {
 
         foundChannel.changeName(newName, user);
         participatedChannels.put(foundChannel.getId(), foundChannel);
+
+        return foundChannel;
     }
 
     // 채널 삭제
     public void deleteChannelById(UUID channelId) {
-        // TODO 에러를 throw ? 그냥 처리 ?
         findById(channelId).ifPresent(Channel::deleteChannel);
     }
 }
