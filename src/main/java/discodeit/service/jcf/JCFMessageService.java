@@ -40,9 +40,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(String content, User sender) {
+    public Message createMessage(Channel channel, String content, User sender) {
         Message newMessage = new Message(content, sender);
         messages.add(newMessage);
+        jcfChannelService.updateMessages(channel, newMessage);
         return newMessage;
     }
 
@@ -50,7 +51,7 @@ public class JCFMessageService implements MessageService {
     public Message findById(UUID id) {
         Message findMessage = findMessage(id);
         if (findMessage == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
         }
         return findMessage;
     }

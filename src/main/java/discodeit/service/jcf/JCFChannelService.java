@@ -1,6 +1,7 @@
 package discodeit.service.jcf;
 
 import discodeit.entity.Channel;
+import discodeit.entity.Message;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
@@ -84,6 +85,11 @@ public class JCFChannelService implements ChannelService {
         channel.updateParticipants(user);
         jcfUserService.updateJoinedChannels(user, channel);
         channel.updateUpdatedAt();
+    }
+
+    @Override
+    public void updateMessages(Channel channel, Message message) {
+        channel.updateMessages(message);
     }
 
     @Override
