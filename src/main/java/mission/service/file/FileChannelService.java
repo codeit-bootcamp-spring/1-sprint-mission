@@ -6,8 +6,6 @@ import mission.service.ChannelService;
 import mission.service.exception.DuplicateName;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -21,21 +19,11 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel create(Channel channel){
-        // 이름 검증은 이 앞단에서
         try {
             return fileChannelRepository.register(channel);
         } catch (IOException e) {
             throw new RuntimeException("채널 등록 실패" + e.getMessage());
         }
-    }
-
-    @Override
-    public Channel findByName(String channelName) {
-        Set<Channel> channels = findAll();
-        Map<String, Channel> channelMap = channels.stream().collect(
-                Collectors.toMap(Channel::getName, Function.identity()));
-
-        return channelMap.get(channelName);  // 없으면 null 반환
     }
 
     @Override
@@ -45,6 +33,18 @@ public class FileChannelService implements ChannelService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Channel findByName(String channelName) {
+        Channel findChannel = findAll().stream().collect(Collectors.toMap(
+                Channel::getName, Function.identity())).get(channelName);
+
+        if (findChannel == null){
+            System.out.printf("%s는 없는 채널명입니다.", channelName);
+            System.out.println();
+        }
+        return findChannel;
     }
 
     @Override
@@ -66,18 +66,17 @@ public class FileChannelService implements ChannelService {
     public void deleteById(UUID id) {
         fileChannelRepository.deleteById(id);
     }
-
-    public void delete(Channel channel) {
-        fileChannelRepository.delete(channel);
-    }
-
+    // 무슨 인자를 받든 상관 없음
+//    @Override
+//    public void delete(Channel channel) {
+//        deleteById(channel.getId());
+//    }
 
     /**
      * 검증
      */
     public void validateDuplicateName(String validatingName){
-        List<Channel> channels = findAll();
-        Map<String, Channel> channelMap = channels.stream().collect(Collectors.toMap(
+        Map<String, Channel> channelMap = findAll().stream().collect(Collectors.toMap(
                 Channel::getName,
                 Function.identity()
         ));

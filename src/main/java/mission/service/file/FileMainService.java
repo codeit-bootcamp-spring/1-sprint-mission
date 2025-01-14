@@ -15,6 +15,7 @@ import java.util.UUID;
 // 이 검사를 뚫어야 (user or channel or message)service가 시작되게 설계
 public class FileMainService {
 
+    // 지금은 간단한 CRUD 기능이지만 Channel, Message, User 서비스간 의존이 늘어나면 이렇게 Main 클래스 필요
     private final FileChannelService fileChannelService = new FileChannelService();
     private final FileUserService fileUserService = new FileUserService();
     private final FileMessageService fileMessageService = new FileMessageService();

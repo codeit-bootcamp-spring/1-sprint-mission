@@ -13,13 +13,17 @@ public interface ChannelService {
 
     Channel findByName(String name);
 
-    //[ ] 조회(다건)
+    //[ ] 조회(단, 다건)
     Set<Channel> findAll();
+    Channel findById(UUID id);
 
     //[ ] 수정
-    Channel update(Channel channel);
 
+    Channel update(Channel channel);
     //[ ] 삭제
     void deleteById(UUID id);
-    Channel findById(UUID id);
+
+    //void delete(Channel channel);
+
+    void validateDuplicateName(String name);
 }

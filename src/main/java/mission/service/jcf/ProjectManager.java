@@ -10,6 +10,8 @@ import java.util.UUID;
 
 public class ProjectManager {
 
+    // Channel, Message, User 서비스간 의존이 생기므로(앞으로 더 생길 예정) 이렇게 Main 클래스 있는게 더 나을거라 판단
+    // 추가로 service의 업무를 분담(ex. 중복 검증 후 생성)
     private final JCFUserService userService = new JCFUserService();
     private final JCFMessageService messageService = new JCFMessageService();
     private final JCFChannelService channelService = new JCFChannelService();
@@ -27,10 +29,10 @@ public class ProjectManager {
         return channelService.create(new Channel(name));
     }
 
+    // 서비스간 의존 예시
     public Message createMessage(UUID channelId, UUID userId, String message) {
         // 채널 찾고, user 찾고 (find~ 메서드 이 과정에서 검증 다 끝남) => message 생성
-        Message writeMessage = Message.createMessage(findChannelById(channelId), findUserById(userId), message);
-        return messageService.create(writeMessage);
+        return messageService.create(Message.createMessage(findChannelById(channelId), findUserById(userId), message));
     }
 
     /**
@@ -50,7 +52,6 @@ public class ProjectManager {
     // User 개인정보 변경
     public User updateUserNamePW(UUID id, String newName, String password) {
         User updatingUser = findUserById(id);
-        // oldName 설정 이유 : 레포지토리에 userName 리스트를 삭제해야하기 때문
         if (updatingUser == null) {
             return null;
         }
@@ -61,10 +62,8 @@ public class ProjectManager {
     // Channel 이름 변경
     public Channel updateChannelName(UUID channelId, String newName) {
         channelService.validateDuplicateName(newName);
-
         Channel updatedChannel = findChannelById(channelId);
         // @트랜잭션 도입 예정이면 중간 처리 에러 시 어차피 롤백 나오니까 먼저 set
-        updatedChannel.setOldName(updatedChannel.getOldName());
         updatedChannel.setName(newName);
         return channelService.update(updatedChannel);
     }
@@ -138,20 +137,12 @@ public class ProjectManager {
     }
 
     public void deleteChannel(UUID channelId) {
-        Channel deletingChannel = findChannelById(channelId);
-        // 각 user가 갖고 있는 channelList에서 삭제될 채절 remove
-        for (User user : deletingChannel.getUserList()) {
-            user.getChannels().remove(deletingChannel);
-        }
-
-        // 그 채널에서 생겼더 메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
-        //List<Message> messagesInChannel = findMessageInChannel(channelId);
         channelService.deleteById(channelId);
     }
 
+    // 채널주인이 삭제 (개인이 삭제하는거는 보류)
     public void deleteMessage(UUID messageId, UUID channelId) {
         Message deletingMessage = findMessageByC_M_Id(channelId, messageId);
-        // userId 검증 추가로 할 필요도 없겠다. createMessage에서 이미 필요
         messageService.delete(deletingMessage);
     }
 

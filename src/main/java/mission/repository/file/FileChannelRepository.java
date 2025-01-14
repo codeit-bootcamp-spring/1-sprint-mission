@@ -2,6 +2,7 @@ package mission.repository.file;
 
 
 import mission.entity.Channel;
+import mission.repository.ChannelRepository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,13 +10,15 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FileChannelRepository {
+public class FileChannelRepository implements ChannelRepository {
 
     private static final Path CHANNEL_DIRECT_PATH = Path.of("userDirectory");
 
+    @Override
     // 생성과 수정 2개 기능을 함
     public Channel register(Channel channel) throws IOException {
         Path channelPath = getChannelDirectPath(channel.getId());
+
         if (!Files.exists(channelPath)) {
             Files.createFile(channelPath);
         }
@@ -26,6 +29,7 @@ public class FileChannelRepository {
         return channel;
     }
 
+    @Override
     public Set<Channel> findAll() throws IOException {
         return Files.exists(CHANNEL_DIRECT_PATH)
                 ? Files.list(CHANNEL_DIRECT_PATH)
@@ -36,27 +40,19 @@ public class FileChannelRepository {
                 : new HashSet<>();
     }
 
+    @Override
     public Channel findById(UUID id) throws IOException, ClassNotFoundException {
         Path channelPath = getChannelDirectPath(id);
         if (!Files.exists(channelPath)) {
             System.out.println("주어진 id의 채널파일이 존재하지 않습니다.");
             return null;
         }
-
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(channelPath))){
             return (Channel) ois.readObject();
         }
     }
 
-    public void delete(Channel channel) {
-        ;
-        try {
-            Files.delete(getChannelDirectPath(channel.getId()));
-        } catch (IOException e) {
-            throw new RuntimeException("삭제 실패 " + e.getMessage());
-        }
-    }
-
+    @Override
     public void deleteById(UUID id) {
         try {
             Files.delete(getChannelDirectPath(id));
@@ -64,11 +60,6 @@ public class FileChannelRepository {
             throw new RuntimeException("삭제 실패 " + e.getMessage());
         }
     }
-
-//
-//    public Channel findByName(String channelName) {
-//        return null;
-//    }
 
     /**
      * 편의 메서드
@@ -105,6 +96,4 @@ public class FileChannelRepository {
             Files.createDirectory(CHANNEL_DIRECT_PATH);
         }
     }
-
-
 }
