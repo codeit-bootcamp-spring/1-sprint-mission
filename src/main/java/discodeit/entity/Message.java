@@ -19,14 +19,6 @@ public class Message {
         this.sender = sender;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
     public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis() / 1000;
     }
@@ -39,10 +31,6 @@ public class Message {
         if (!sender.isIdEqualTo(user.getId())) {
             throw new IllegalArgumentException("자신의 메시지만 삭제할 수 있습니다.");
         }
-    }
-
-    public boolean isEqualTo(Message message) {
-        return id.equals(message.getId());
     }
 
     public boolean isIdEqualTo(UUID id) {

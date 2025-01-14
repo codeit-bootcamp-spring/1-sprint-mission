@@ -27,10 +27,6 @@ public class Channel {
         messages = new ArrayList<>();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
     public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis() / 1000;
     }
@@ -92,10 +88,6 @@ public class Channel {
 
     public void deleteAllMessages() {
         messages.clear();
-    }
-
-    public boolean isEqualTo(Channel channel) {
-        return id.equals(channel.getId());
     }
 
     public boolean isIdEqualTo(UUID id) {
