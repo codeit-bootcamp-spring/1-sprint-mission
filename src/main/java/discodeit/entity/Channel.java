@@ -87,6 +87,10 @@ public class Channel {
         participants.remove(deleteUser);
     }
 
+    public void deleteAllParticipants() {
+        participants.forEach(participant -> participant.deleteJoinedChannel(this));
+    }
+
     public void deleteMessage(Message message) {
         Message deleteMessage = findMessage(message);
         if (deleteMessage == null) {
@@ -120,7 +124,7 @@ public class Channel {
     @Override
     public String toString() {
         return String.format(
-                name + "  | " + introduction + System.lineSeparator()
+                name + " | " + introduction + System.lineSeparator()
                         + "Owner: " + owner.getName() + System.lineSeparator()
                         + "Participants: "
                         + String.join(", ", participants.stream()

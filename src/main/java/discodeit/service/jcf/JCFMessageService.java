@@ -79,5 +79,6 @@ public class JCFMessageService implements MessageService {
     public void deleteMessage(Channel channel, Message message) {
         channel.deleteMessage(message);
         messages.remove(message);
+        message = null;
     }
 }
