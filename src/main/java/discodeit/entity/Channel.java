@@ -31,14 +31,6 @@ public class Channel {
         return id;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis() / 1000;
     }
@@ -51,20 +43,8 @@ public class Channel {
         this.name = name;
     }
 
-    public String getIntroduction() {
-        return introduction;
-    }
-
     public void updateIntroduction(String introduction) {
         this.introduction = introduction;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public List<User> getParticipants() {
-        return participants;
     }
 
     public void updateParticipants(User user) {

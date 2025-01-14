@@ -23,28 +23,12 @@ public class Message {
         return id;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis() / 1000;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public void updateContent(String content) {
         this.content = content;
-    }
-
-    public User getSender() {
-        return sender;
     }
 
     public boolean isEqualTo(Message message) {
@@ -54,11 +38,6 @@ public class Message {
     public boolean isIdEqualTo(UUID id) {
         return this.id.equals(id);
     }
-
-    public boolean isSenderEqualTo(User user) {
-        return sender.getId().equals(user.getId());
-    }
-
 
     @Override
     public String toString() {
