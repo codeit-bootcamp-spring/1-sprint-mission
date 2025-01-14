@@ -2,19 +2,21 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.HashMap;
+
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     //Scanner sc = new Scanner(System.in);
-    // HashMap(channelName - ChannelS)
-    private final HashMap<String, Channel> Channels;
+    // private final HashMap<String, Channel> Channels;
+    private final ChannelRepository channelRepository;
     // mocking 이용으로 추가
     private InputHandler inputHandler;
 
-    public JCFChannelService(InputHandler inputHandler){
+    public JCFChannelService(ChannelRepository channelRepository, InputHandler inputHandler){
         // 생성자에서 Channels 데이터 초기화
-        this.Channels = new HashMap<>();
+        this.channelRepository = channelRepository;
         // mocking 이용으로 추가
         this.inputHandler = inputHandler;
     }
@@ -25,59 +27,55 @@ public class JCFChannelService implements ChannelService {
     }
 
     // 의존성 주입을 위한 Channel 반환
-    public Channel getChannel(String channelName){
-        return Channels.get(channelName);
+//    public Channel getChannel(String channelName){
+//        return Channels.get(channelName);
+//    }
+
+    public UUID createChannel(User user, String channelName){
+        // 채널 생성
+        Channel channel = new Channel(user, channelName);
+        // 데이터 처리는 다른 레이어에서
+        channelRepository.saveChannel(channel);
+        return channel.getId();
     }
 
-    public  void Create(User user, String channelName){
-        Channels.put(channelName, new Channel(user, channelName));
-    }
-
-    public int ReadAll(){
+    public int showAllChannels(){
         //Channel ChannelName -  User NickName
-        if (Channels.isEmpty()) {
-            System.out.println("No Channel exists.\n");
-        }else {
-            for (Channel channel : Channels.values()) {
-                System.out.println("Channel Name : " + channel.getChannelName() + " made by  " + channel.getUser().getNickname());
-            }
-        }
-        return Channels.size();
-    }
-    public Channel ReadChannel(String channelName){
-        // 특정 채널을 불러오기
-        if(Channels.get(channelName) == null ){
-            System.out.println(channelName + " does not exist\n");
+        if (channelRepository.getAllChannels().isEmpty()) {
+            System.out.println("No Channels exists.\n");
         }else{
-            System.out.println("Channel Name : " + channelName + " made by  " + Channels.get(channelName).getUser().getNickname());
+            System.out.println(channelRepository.getAllChannels().toString());
         }
-        return Channels.get(channelName);
-        // + 가진 message 개수 되나?
+        return channelRepository.getAllChannels().size();
+    }
+    public Channel getChannelById(UUID id){
+        // 특정 채널을 불러오기
+        if(channelRepository.findChannelById(id) == null ){
+            System.out.println("Channel does not exist\n");
+            return null;
+        }else{
+            System.out.println(channelRepository.findChannelById(id).toString());
+            return channelRepository.findChannelById(id);
+        }
     }
 
-    public void Update(String channelName){
-        // 채널 이름 수정 및 수정 시간 업데이트
-        // delete 과정을 거친 후 생성
+    public void updateChannelName(UUID id){
         System.out.println("new ChannelName :");
-        // String newChannelName = sc.next();
-        // 채널에서 해당 사항을 알았어서 여기 작성
-        // JCF의 해시코드 key랑 Channel 객체 내부 name을 같이 변경해야 한다.
-        Channels.put(inputHandler.getNewInput(), Channels.get(channelName));
-        Channels.get(inputHandler.getNewInput()).setChannelName(inputHandler.getNewInput());
-        Channels.remove(channelName);
+        channelRepository.findChannelById(id).setChannelName(inputHandler.getNewInput());
         // 수정 시간 업데이트를 위해
-        Channels.get(inputHandler.getNewInput()).setUpdateAt((System.currentTimeMillis()));
+        channelRepository.findChannelById(id).setUpdateAt(System.currentTimeMillis());
     }
-    public void DeleteAll(){
+
+    public void deleteAllChannels(){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
-            Channels.clear();
+            channelRepository.deleteAllChannels();
         }
     }
-    public void DeleteChannel(String channelName){
+    public void deleteChannelById(UUID id){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
-            Channels.remove(channelName);
+            channelRepository.deleteChannelById(id);
         }
     }
 }

@@ -1,7 +1,12 @@
 package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryChannelRepository;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*; // mock(), when() 메서드를 사용하기 위한 import
 
@@ -9,12 +14,13 @@ public class JCFChannelServiceTest {
     @Test
     void testCreateChannel(){
         User user = new User("TestUser");
-
-        // 너무... 불필요한 요소가 많이 생기는 것 아닌가
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user, "TestChannelCreate");
-        assertNotNull(channelService.getChannel("TestChannelCreate"));
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
+
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+
+        UUID id = channelService.createChannel(user, "TestChannelCreate");
+        assertNotNull(channelService.getChannelById(id));
     }
 
     @Test
@@ -22,10 +28,13 @@ public class JCFChannelServiceTest {
         User user = new User("TestUser");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user, "TestChannel ReadAll 1");
-        channelService.Create(user,"TestChannel ReadAll 2");
-        assertEquals(2, channelService.ReadAll());
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
+
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+        channelService.createChannel(user, "TestChannel ReadAll 1");
+        channelService.createChannel(user,"TestChannel ReadAll 2");
+
+        assertEquals(2, channelService.showAllChannels());
     }
 
     @Test
@@ -33,9 +42,11 @@ public class JCFChannelServiceTest {
         User user = new User("TestUser");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user,"TestChannel ReadChannel");
-        assertNotNull(channelService.ReadChannel("TestChannel ReadChannel"));
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
+
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+        UUID id = channelService.createChannel(user,"TestChannel ReadChannel");
+        assertNotNull(channelService.getChannelById(id));
     }
 
     @Test
@@ -46,12 +57,12 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getNewInput()).thenReturn("Changed Test channel name");
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
 
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user,"TestChannel Update channelName");
-        channelService.Update("TestChannel Update channelName");
-
-        assertEquals("Changed Test channel name", channelService.getChannel("Changed Test channel name").getChannelName());
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+        UUID id = channelService.createChannel(user,"TestChannel Update channelName");
+        channelService.updateChannelName(id);
+        assertEquals("Changed Test channel name", channelService.getChannelById(id).getChannelName());
     }
 
     @Test
@@ -62,16 +73,16 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
 
 
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user,"testChannel DeleteAll1");
-        channelService.Create(user,"testChannel DeleteAll2");
-        channelService.DeleteAll();
-        assertNull(channelService.getChannel("testChannel DeleteAll1"));
-        assertNull(channelService.getChannel("testChannel DeleteAll2"));
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+        UUID userId1 = channelService.createChannel(user,"testChannel DeleteAll1");
+        UUID userId2 = channelService.createChannel(user,"testChannel DeleteAll2");
+        channelService.deleteAllChannels();
+        assertNull(channelService.getChannelById(userId1));
+        assertNull(channelService.getChannelById(userId2));
     }
-
 
     @Test
     void testDeleteChannel(){
@@ -81,11 +92,12 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
+        ChannelRepository channelRepository = new InMemoryChannelRepository();
 
-        JCFChannelService channelService = new JCFChannelService(mockInputHandler);
-        channelService.Create(user,"testUserDeleteUser");
-        channelService.DeleteChannel("testUserDeleteUser");
+        JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
+        UUID id = channelService.createChannel(user,"testUserDeleteUser");
+        channelService.deleteChannelById(id);
 
-        assertNull(channelService.getChannel("testUserDeleteUser"));
+        assertNull(channelService.getChannelById(id));
     }
 }

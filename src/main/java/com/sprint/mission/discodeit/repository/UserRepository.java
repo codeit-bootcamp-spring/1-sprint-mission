@@ -7,7 +7,7 @@ public interface UserRepository {
     // 저장
     void saveUser(User user);
     // 읽기 = 찾기
-    User findById(UUID id);
+    User findUserById(UUID id);
     Map<UUID, User> getAllUsers();
     // 삭제
     void deleteAllUsers();

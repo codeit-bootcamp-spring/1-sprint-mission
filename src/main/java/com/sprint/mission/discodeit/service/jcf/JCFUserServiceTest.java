@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.impl.InMemoryUserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -34,7 +32,7 @@ public class JCFUserServiceTest {
         userService.createUser("TestUserReadAll1");
         userService.createUser("TestUserReadAll2");
 
-        assertEquals(2, userService.getAllUsers());
+        assertEquals(2, userService.showAllUsers());
     }
 
     @Test
@@ -77,7 +75,7 @@ public class JCFUserServiceTest {
         JCFUserService userService = new JCFUserService( userRepository, mockInputHandler);
         UUID userId1 = userService.createUser("testUserDeleteAll1");
         UUID userId2 = userService.createUser("testUserDeleteAll2");
-        userService.deleteAllUsers();
+        userService.clearAllUsers();
 
         assertNull(userService.getUserById(userId1));
         assertNull(userService.getUserById(userId2));
@@ -93,7 +91,7 @@ public class JCFUserServiceTest {
 
         JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
         UUID id = userService.createUser("testUserDeleteUser");
-        userService.deleteUserById(id);
+        userService.removeUserById(id);
 
         assertNull(userService.getUserById(id));
     }
