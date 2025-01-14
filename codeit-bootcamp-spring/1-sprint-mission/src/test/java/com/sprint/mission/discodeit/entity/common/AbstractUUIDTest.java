@@ -68,6 +68,7 @@ public class AbstractUUIDTest {
         assertNotEquals(entity1, entity3, "Entities with different UUIDs should not be equal");
     }
 
+    // 리플렉션. 이 부분 코드 리뷰 XXX
     private void setFinalField(Object object, String fieldName, Object value) throws Exception {
         Field field = object.getClass().getSuperclass().getDeclaredField(fieldName);
         field.setAccessible(true);
