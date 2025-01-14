@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends BaseEntity{
-    private User user;
+    private User owner;
     private String channelName;
-    public Channel(User user, String channelName){
-        this.user = user;
+    public Channel(User owner, String channelName){
+        this.owner = owner;
         this.channelName = channelName;
     }
     public String getChannelName(){
@@ -13,12 +13,12 @@ public class Channel extends BaseEntity{
     public void setChannelName(String channelName){
        this.channelName = channelName;
     }
-    public User getUser(){return user;}
+    public User getUser(){return owner;}
 
     @Override
     public String toString(){
         return "\n"
-                + "User : "  + user.getNickname()
+                + "User : "  + owner.getNickname()
                 + "\n"
                 + "Channel : " + getChannelName()
                 + "\n"
