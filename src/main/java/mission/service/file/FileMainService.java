@@ -7,6 +7,7 @@ import mission.repository.file.FileUserRepository;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 
 // 많은 일은 안하지만 그래도 생성, 업데이트 시 id, name, PW 검사정도만
@@ -54,14 +55,14 @@ public class FileMainService {
         return fileUserService.findById(id);
     }
 
-    public List<User> findAllUser() throws IOException {
+    public Set<User> findAllUser() throws IOException {
         return fileUserService.findAll();
     }
 
     // id 잃어버렸을 때, name과 pw로 찾기
     public User findUserByNamePW(String name, String password) throws IOException {
         // 코드 중복 줄이고 파라미터 귀찮으니 User서비스가 아닌 여기서 처리
-        List<User> users = findAllUser();
+        Set<User> users = findAllUser();
         return users.stream()
                 .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
                 .findFirst()
@@ -120,6 +121,4 @@ public class FileMainService {
         }
         fileUserService.delete(deletingUser);
     }
-
-
 }

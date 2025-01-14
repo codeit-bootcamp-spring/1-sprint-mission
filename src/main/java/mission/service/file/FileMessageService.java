@@ -7,9 +7,7 @@ import mission.repository.file.FileMessageRepository;
 import mission.service.MessageService;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -28,20 +26,18 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAll() {
+    public Set<Message> findAll() {
         return fileMessageRepository.findAll();
     }
 
     @Override
-    public List<Message> findMessagesInChannel(Channel channel) {
+    public Set<Message> findMessagesInChannel(Channel channel) {
         // return channel.getMessageList();
         // 위처럼 바로 반환시 메시지 생성 후 IO 오류 발생 메시지도 포함되버림
-        List<Message> messageList = findAll();
-        List<Message> messageListInChannel = messageList.stream()
+        Set<Message> messageList = findAll();
+        return messageList.stream()
                 .filter(message -> message.getWritedAt().equals(channel))
-                .collect(Collectors.toList());
-
-        return messageListInChannel;
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     public List<Message> findMessagesInChannelByUser(Channel channel, User user){
@@ -50,15 +46,14 @@ public class FileMessageService implements MessageService {
                 .collect(Collectors.toList());
     }
 
-    public List<Message> findMessageInChannelByString(Channel channel, String writedString) {
-        List<Message> messagesInChannel = findMessagesInChannel(channel);
-        return messagesInChannel.stream()
+    public Set<Message> findMessageInChannelByString(Channel channel, String writedString) {
+        return findMessagesInChannel(channel).stream()
                 .filter(message -> message.getMessage().equals(writedString))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     // 전체 메시지 조회
-    public List<Message> findMessageByString(String writedMessage){
+    public Set<Message> findMessageByString(String writedMessage){
         return fileMessageRepository.findMessageByString(writedMessage);
     }
 
@@ -76,6 +71,7 @@ public class FileMessageService implements MessageService {
         fileMessageRepository.delete(message);
     }
 }
+
 //    public Message findMessage(User writer, String writedMessage){
 //        for (Message message : writer.getMessages()) {
 //            if (message.getMessage().equals(writedMessage)){

@@ -26,7 +26,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public Set<Channel> findAll() {
         return channelRepository.findAll();
     }
 

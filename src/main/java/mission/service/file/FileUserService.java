@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class FileUserService {
         }
     }
 
-    public List<User> findAll() {
+    public Set<User> findAll() {
         try {
             return fileUserRepository.findAll();
         } catch (IOException e) {

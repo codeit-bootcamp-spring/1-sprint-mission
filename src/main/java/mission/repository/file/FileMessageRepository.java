@@ -9,10 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileMessageRepository {
@@ -32,15 +29,15 @@ public class FileMessageRepository {
     }
 
     // 너무 많이 활용해서 여기서 바로 오류 catch
-    public List<Message> findAll(){
+    public Set<Message> findAll(){
         try {
             return Files.exists(MS_DIRECT_PATH)
                     ? Files.list(MS_DIRECT_PATH)
                     .filter(path -> path.toString().endsWith(".ser"))
                     .map(this::readMessageFromFile)
-                    .collect(Collectors.toList())
+                    .collect(Collectors.toCollection(HashSet::new))
 
-                    : new ArrayList<>();
+                    : new HashSet<>();
         } catch (IOException e) {
             throw new RuntimeException("findAll => 입출력 오류 발생: ",e);
         }
@@ -52,11 +49,11 @@ public class FileMessageRepository {
                 : null;
     }
 
-    public List<Message> findMessageByString(String writedMessage){
-        List<Message> messageList = findAll();
-        return messageList.stream().filter(
-                message -> message.getMessage().equals(writedMessage)
-        ).collect(Collectors.toList());
+    public Set<Message> findMessageByString(String writedMessage){
+        Set<Message> messageList = findAll();
+        Map<String, List<Message>> writedMessageMap = messageList.stream()
+                .collect(Collectors.groupingBy(message -> message.getMessage()));
+        return new HashSet<>(writedMessageMap.get(writedMessage));
     }
 
 //    public Message findMessageInChannelByString(UUID id) {

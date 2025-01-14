@@ -23,8 +23,8 @@ public class JCFChannelRepository implements ChannelRepository {
 
 
     @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+    public Set<Channel> findAll() {
+        return new HashSet<>(data.values());
     }
 
     @Override

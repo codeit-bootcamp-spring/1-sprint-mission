@@ -6,6 +6,7 @@ import mission.entity.Message;
 import mission.entity.User;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface MessageService {
@@ -13,10 +14,10 @@ public interface MessageService {
     Message create(Message message);
 
     // 조회 단건
-    List<Message> findMessagesInChannel(Channel channel);
+    Set<Message> findMessagesInChannel(Channel channel);
 
     //[ ] 조회(다건)
-    List<Message> findAll();
+    Set<Message> findAll();
 
     //[ ] 수정
     Message update(UUID id, String newMessage);

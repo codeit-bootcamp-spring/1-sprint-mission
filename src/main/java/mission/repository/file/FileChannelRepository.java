@@ -6,9 +6,7 @@ import mission.entity.Channel;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileChannelRepository {
@@ -28,14 +26,14 @@ public class FileChannelRepository {
         return channel;
     }
 
-    public List<Channel> findAll() throws IOException {
+    public Set<Channel> findAll() throws IOException {
         return Files.exists(CHANNEL_DIRECT_PATH)
                 ? Files.list(CHANNEL_DIRECT_PATH)
                 .filter(path -> path.toString().endsWith(".ser"))
                 .map(this::readChannelFromFile)
-                .collect(Collectors.toList())
+                .collect(Collectors.toCollection(HashSet::new))
 
-                : new ArrayList<>();
+                : new HashSet<>();
     }
 
     public Channel findById(UUID id) throws IOException, ClassNotFoundException {

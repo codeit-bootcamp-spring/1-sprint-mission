@@ -34,7 +34,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
+    public Set<User> findAll() {
         return userRepository.findAll();
     }
 

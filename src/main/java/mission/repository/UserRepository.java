@@ -3,6 +3,7 @@ package mission.repository;
 import mission.entity.User;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface UserRepository {
@@ -11,7 +12,7 @@ public interface UserRepository {
 
 //    User updateNamePW(UUID id, String newName, String password);
 
-    List<User> findAll();
+    Set<User> findAll();
 
     //User updateUserNamePW(User user);
 

@@ -4,6 +4,7 @@ package mission.service;
 import mission.entity.User;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface UserService {
@@ -15,7 +16,7 @@ public interface UserService {
     User findByNamePW(String name, String password);
 
     //[ ] 조회(다건)
-    List<User> findAll();
+    Set<User> findAll();
 
     //[ ] 수정
     //User update(UUID id, String name, String password);

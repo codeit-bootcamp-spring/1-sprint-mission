@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel findByName(String channelName) {
-        List<Channel> channels = findAll();
+        Set<Channel> channels = findAll();
         Map<String, Channel> channelMap = channels.stream().collect(
                 Collectors.toMap(Channel::getName, Function.identity()));
 
@@ -38,7 +39,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public Set<Channel> findAll() {
         try {
             return fileChannelRepository.findAll();
         } catch (IOException e) {

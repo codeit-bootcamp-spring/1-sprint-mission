@@ -8,10 +8,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileUserRepository {
@@ -25,7 +22,7 @@ public class FileUserRepository {
         // 이름 중복검사는 메인 서비스에서
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
 
-        // 존재하지 않으면 저장 (나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할거같음)
+        //        // 존재하지 않으면 저장 (나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할거같음)
         if (!Files.exists(filePath)) {
             Files.createFile(filePath);
         }
@@ -39,15 +36,15 @@ public class FileUserRepository {
     /**
      * 조회
      */
-    public List<User> findAll() throws IOException {
+    public Set<User> findAll() throws IOException {
         if (!Files.exists(USER_DIRECT_PATH)) {
-            return new ArrayList<>();
+            return new HashSet<>();
         } else {
             return Files.list(USER_DIRECT_PATH)
                     .filter(path -> path.toString().endsWith(".ser"))
                     .map(this::readUserFromFile)
                     // 역직렬화
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toCollection(HashSet::new));
         }
     }
 
@@ -105,10 +102,6 @@ public class FileUserRepository {
     // Path 만드는 역할만 (검증은 x)
     private Path getUserFilePath(UUID userId) {
         return USER_DIRECT_PATH.resolve(userId.toString() + ".ser");
-    }
-
-    public User findByNamePW(String name, String password) {
-        return null;
     }
 
     // 파일 생성
