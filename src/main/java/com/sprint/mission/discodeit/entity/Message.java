@@ -17,4 +17,23 @@ public class Message extends BaseEntity{
     public Channel getChannel(){
         return channel;
     }
+
+    @Override
+    public String toString(){
+        return "\n"
+                + "User : " + channel.getUser().getNickname()
+                + "\n"
+                + "Channel : " + channel.getChannelName()
+                + "\n"
+                + "^^^^^^^^^^^^^^^^^^^^^^^^^message^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+                + "\n"
+                + "Message txt : " + getMessageText()
+                + "\n"
+                + "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
+                + "\n"
+                + "created at : " + getCreatedAt()
+                + "\n"
+                + "updated at : " + getUpdatedAt()
+                + "\n";
+    }
 }
