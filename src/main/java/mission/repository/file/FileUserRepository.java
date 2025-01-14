@@ -20,9 +20,6 @@ public class FileUserRepository {
     // User 디렉토리 Path 객체
     private static final Path USER_DIRECT_PATH = Path.of("userDirectory");
 
-    // 파일
-    private static final String FILE_NAME = " ";
-
     // 유저 저장
     public User saveUser(User user) throws IOException {
         // 이름 중복검사는 메인 서비스에서
@@ -79,6 +76,7 @@ public class FileUserRepository {
     public void delete(User user) throws IOException {
         Path deletingUserPath = getUserFilePath(user.getId());
         System.out.printf("%s 파일 삭제 완료", user.getName());
+        System.out.println();
         Files.delete(deletingUserPath);
 
 

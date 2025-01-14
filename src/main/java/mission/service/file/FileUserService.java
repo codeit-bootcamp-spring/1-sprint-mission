@@ -51,15 +51,6 @@ public class FileUserService {
         }
     }
 
-    // id 잃어버렸을 때, name과 pw로 찾기
-    public User findByNamePW(String name, String password) {
-        List<User> users = findAll();
-        return users.stream()
-                .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
-                .findFirst()
-                .orElse(null);
-    }
-
     public List<User> findAll() {
         try {
             return fileUserRepository.findAll();

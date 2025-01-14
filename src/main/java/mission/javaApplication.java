@@ -18,35 +18,44 @@ public class javaApplication {
         initDirectory();
 
         // 유저 생성 테스트
-        User userA = UserCreateTest("직원 A", "1234");
-        User userB = UserCreateTest("직원 B", "4321");
+        User userA = userCreateTest("직원 A", "1234");
+        User userB = userCreateTest("직원 B", "4321");
 
 
         // 찾는 유저 테스트
-        User findUser = UserFindTest(userA.getId());
-        System.out.println("findUser = " + findUser);
-        System.out.println("findUser = userA : " + userA.equals(findUser));
+        User findUserById = userFindTest(userA.getId());
+        User findUserByN_PW = fileMainService.findUserByNamePW("직원 A", "1234");
+        System.out.println("findUserById = " + findUserById);
+        System.out.println("findUserById = userA : " + userA.equals(findUserById));
+        System.out.println("findUserByN_PW = userA : " + userA.equals(findUserByN_PW));
 
         // 모두 찾는 테스트
         List<User> users = findUsers();
 
+        // 닉네임 패스워드 수정
+        User updateUserA = fileMainService.updateUserNamePW(userA.getId(), userA.getName(), userA.getPassword(), "유저 F", "9999");
+        System.out.println("기존 유저 A id = 업테이트 유저 id : " + updateUserA.getId().equals(userA.getId()));
+        System.out.println("기존 유저 A의 닉네임 = 업데이트 유저 닉네임 : " + updateUserA.getName().equals(userA.getName()));
+
         // User B 삭제 테스트 : 필요 정보 ID, NAME, PW
         fileMainService.deleteUser(userB.getId(), userB.getName(), userB.getPassword());
-        //UserFindTest(userB.getId());
+        System.out.println("전체 유저 목록 = " + findUsers());
+
+
     }
 
     private static List<User> findUsers() throws IOException {
-        List<User> users = fileMainService.findAll();
+        List<User> users = fileMainService.findAllUser();
         System.out.println("전체 유저 수 = " + users.size());
         return users;
     }
 
-    private static User UserFindTest(UUID findId) throws IOException {
+    private static User userFindTest(UUID findId) throws IOException {
         User findUser = fileMainService.findUserById(findId);
         return findUser;
     }
 
-    private static User UserCreateTest(String name, String password) throws IOException {
+    private static User userCreateTest(String name, String password) throws IOException {
         User createUser = fileMainService.createUser(name, password);
         System.out.println("createUser = " + createUser);
         return createUser;

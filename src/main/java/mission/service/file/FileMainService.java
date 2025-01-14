@@ -31,11 +31,21 @@ public class FileMainService {
         return fileUserService.findById(id);
     }
 
-    public List<User> findAll() throws IOException {
+    public List<User> findAllUser() throws IOException {
         return fileUserService.findAll();
     }
 
-    public User updateUserNamePW(UUID id, String oldName, String password, String newName) throws IOException {
+    // id 잃어버렸을 때, name과 pw로 찾기
+    public User findUserByNamePW(String name, String password) throws IOException {
+        // 코드 중복 줄이고 파라미터 귀찮으니 User서비스가 아닌 여기서 처리
+        List<User> users = findAllUser();
+        return users.stream()
+                .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public User updateUserNamePW(UUID id, String oldName, String password, String newName, String newPassword) throws IOException {
         // 1. id 검증   2. 입력한 닉네임,PW 검증 후 수정해서 FILEUSERSERVICE에 넘김
         // (3 선택) 여기서 newName을 검증할지 말지 결정 <= 이거까지 맡으면 main이 하는 일이 많은 것 같은데
 
@@ -51,7 +61,7 @@ public class FileMainService {
 
         // 3번은 fileUserService에 맡김
         existingUser.setOldName(existingUser.getName());
-        existingUser.setNamePassword(newName, password);
+        existingUser.setNamePassword(newName, newPassword);
         return fileUserService.update(existingUser);
     }
 
