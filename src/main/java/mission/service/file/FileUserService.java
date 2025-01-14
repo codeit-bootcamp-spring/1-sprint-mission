@@ -2,22 +2,22 @@ package mission.service.file;
 
 import mission.entity.User;
 import mission.repository.file.FileUserRepository;
+import mission.service.UserService;
+import mission.service.exception.DuplicateName;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class FileUserService {
+public class FileUserService implements UserService {
 
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
-    public User create(User user){
-        // 검증을 더 앞에서 하자 validateDuplicateName
+    @Override
+    public User create(User user) {
+        // 중복 검증 하려면 User 생성 시 validateDuplicateName
         try {
             return fileUserRepository.saveUser(user);
         } catch (IOException e) {
@@ -25,24 +25,19 @@ public class FileUserService {
         }
     }
 
-    // username, pw 변경 => 메인에서 id 있는지 확인한 뒤 네임, pw를 여기에 넘겨주는
-    public User update(User updatingUser) throws IOException {
-        // userName, pw 검증은 main 서비스에서
+    @Override
+    public User update(User updatingUser) {
         try {
-            // 새로운 닉네임 중복 검증
-            validateDuplicateName(updatingUser.getName());
-            // oldName을 갖고 잇음 (수정 전)
+            return fileUserRepository.updateUserNamePW(updatingUser);
         } catch (IOException e) {
-            throw new RuntimeException(
-                    String.format("%S는 이미 존재하는 닉네임입니다", updatingUser.getName()), e);
+            throw new RuntimeException("수정 I/O 오류: " + e.getMessage(), e);
         }
-
-        return fileUserRepository.updateUserNamePW(updatingUser);
     }
 
-    public User findById(UUID id){
+    @Override
+    public User findById(UUID id) {
         try {
-            return fileUserRepository.findUserById(id);
+            return fileUserRepository.findById(id);
         } catch (IOException e) {
             throw new RuntimeException("파일 읽기 오류" + e.getMessage(), e);
         } catch (ClassNotFoundException e) {
@@ -50,16 +45,13 @@ public class FileUserService {
         }
     }
 
+    @Override
     public Set<User> findAll() {
-        try {
-            return fileUserRepository.findAll();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return fileUserRepository.findAll();
     }
 
-    public void delete(User user){
+    @Override
+    public void delete(User user) {
         try {
             fileUserRepository.delete(user);
         } catch (NoSuchFileException e) {
@@ -72,15 +64,30 @@ public class FileUserService {
     }
 
     // 검증은 레포지토리까지 갈 필요도 없이 여기서 처리
-    public void validateDuplicateName(String name) throws IOException {
-        Set<User> users = findAll();
-        if (users.contains(name)){
-            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
+    @Override
+    public void validateDuplicateName(String name) {
+        if (findAll().contains(name)) {
+            throw new DuplicateName(
+                    String.format("%s는 이미 존재하는 닉네임입니다.", name));
         }
     }
 
+    @Override
+    public Set<User> findUsersByName(String findName) {
+        return findAll().stream()
+                .filter(user -> user.getName().equals(findName))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public User findByNamePW(String name, String password) {
+        return (User) findUsersByName(name).stream()
+                .filter(user -> user.getPassword().equals(password));
+        // 패스워드도 이름도 똑같다면 컬렉션 반환인데, 그럴 가능성 없다고 가증
+    }
+
     // 디렉토리 생성
-    public void createUserDirectory(){
+    public void createUserDirectory() {
         try {
             fileUserRepository.createUserDirectory();
         } catch (IOException e) {

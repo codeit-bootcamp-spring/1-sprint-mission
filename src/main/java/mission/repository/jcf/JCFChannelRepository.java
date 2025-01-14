@@ -52,7 +52,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel updateChannelName(Channel updatingChannel) {
-        // 새로운 채널 이름 중복 검증
+        // 새로운 채널 이름 중복 검증 << 이거를 앞단에서 해야 할 듯
         validateDuplicateName(updatingChannel.getName());
         channelNames.remove(updatingChannel.getOldName());
         channelNames.add(updatingChannel.getName());

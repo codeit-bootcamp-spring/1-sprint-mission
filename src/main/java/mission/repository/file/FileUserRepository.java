@@ -1,23 +1,23 @@
 package mission.repository.file;
 
 import mission.entity.User;
+import mission.repository.UserRepository;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FileUserRepository {
+public class FileUserRepository implements UserRepository {
 
 
     // User 디렉토리 Path 객체
     private static final Path USER_DIRECT_PATH = Path.of("userDirectory");
 
-    // 유저 저장
+    @Override
     public User saveUser(User user) throws IOException {
         // 이름 중복검사는 메인 서비스에서
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
@@ -33,22 +33,36 @@ public class FileUserRepository {
         return user;
     }
 
+    @Override
+    public User updateUserNamePW(User updatingUser) throws IOException {
+        // 덮어쓰기
+        saveUser(updatingUser);
+        return updatingUser;
+    }
+
+
     /**
      * 조회
      */
-    public Set<User> findAll() throws IOException {
-        if (!Files.exists(USER_DIRECT_PATH)) {
-            return new HashSet<>();
-        } else {
-            return Files.list(USER_DIRECT_PATH)
-                    .filter(path -> path.toString().endsWith(".ser"))
-                    .map(this::readUserFromFile)
-                    // 역직렬화
-                    .collect(Collectors.toCollection(HashSet::new));
+    @Override
+    public Set<User> findAll(){
+        try {
+            if (!Files.exists(USER_DIRECT_PATH)) {
+                return new HashSet<>();
+            } else {
+                return Files.list(USER_DIRECT_PATH)
+                        .filter(path -> path.toString().endsWith(".ser"))
+                        .map(this::readUserFromFile)
+                        // 역직렬화
+                        .collect(Collectors.toCollection(HashSet::new));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("전체 조회 I/O 오류 발생: " + e.getMessage(), e);
         }
     }
 
-    public User findUserById(UUID id) throws IOException, ClassNotFoundException {
+    @Override
+    public User findById(UUID id) throws IOException, ClassNotFoundException {
         // 1. id로 filePath 얻기
         Path userFilePath = getUserFilePath(id);
 
@@ -63,29 +77,15 @@ public class FileUserRepository {
         return (User) ois.readObject(); // 저장 성공
     }
 
-    public User updateUserNamePW(User updatingUser) throws IOException {
-        UUID id = updatingUser.getId();
-        // NULL일리가 없음 이미 서비스 단에서 NAME PW 검사할 때 걸러짐
-        // 덮어쓰기
-        saveUser(updatingUser);
-        return updatingUser;
-    }
-
+    @Override
     public void delete(User user) throws IOException {
         Path deletingUserPath = getUserFilePath(user.getId());
         System.out.printf("%s 파일 삭제 완료", user.getName());
         System.out.println();
         Files.delete(deletingUserPath);
-
-
-//        } catch (NoSuchFileException e) {
-//            throw new RuntimeException(String.format(
-//                    "[%s] %s의 파일은 존재하지 않습니다", user.getFirstId(), user.getName()));
-//        } catch (IOException e) {
-//            System.out.println("User 파일 삭제 중 오류 발생");
-//            e.printStackTrace();
-//        }
     }
+
+
 
 
     /**

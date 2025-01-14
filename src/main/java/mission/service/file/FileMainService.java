@@ -42,8 +42,7 @@ public class FileMainService {
     }
 
     public Channel createChannel(String channelName){
-        // 이름 중복 검증을 하고 channel 생성
-        fileChannelService.validateDuplicateName(channelName);
+        // 중복 검증 처리 시 : fileChannelService.validateDuplicateName(channelName);
         return fileChannelService.create(new Channel(channelName));
     }
 

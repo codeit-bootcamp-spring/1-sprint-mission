@@ -5,6 +5,7 @@ import mission.entity.Message;
 import mission.entity.User;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class ProjectManager {
@@ -14,12 +15,13 @@ public class ProjectManager {
     private final JCFChannelService channelService = new JCFChannelService();
 
     public User createUser(String name, String password) {
-        // 여기서 예외 터지면 유저 생성 X
-        userService.validateDuplicateName(name);
+        // 닉넴 중복 검증 필요할 경우 => userService.validateDuplicateName(name);
+        // 검증에서 예외 터지면 유저 생성 X
         User user = new User(name, password);
         return userService.create(user);
     }
 
+    // 채널명은 중복 허용 X
     public Channel createChannel(String name) {
         channelService.validateDuplicateName(name);
         return channelService.create(new Channel(name));
@@ -49,19 +51,19 @@ public class ProjectManager {
     public User updateUserNamePW(UUID id, String newName, String password) {
         User updatingUser = findUserById(id);
         // oldName 설정 이유 : 레포지토리에 userName 리스트를 삭제해야하기 때문
-        updatingUser.setOldName(updatingUser.getName());
-
+        if (updatingUser == null) {
+            return null;
+        }
         updatingUser.setNamePassword(newName, password);
         return userService.update(updatingUser);
     }
 
     // Channel 이름 변경
     public Channel updateChannelName(UUID channelId, String newName) {
-        // 채널 찾기
-        Channel updatedChannel = findChannelById(channelId);
+        channelService.validateDuplicateName(newName);
 
-        // 옛 이름 설정, 새 이름 설정  ==> 중복검사는 repository에서 할 것
-        // @트랜잭션 도입 예정이면 중복이면 어차피 롤백 나오니까 먼저 nameSet하고 검증해도 상관없을거라는 생각
+        Channel updatedChannel = findChannelById(channelId);
+        // @트랜잭션 도입 예정이면 중간 처리 에러 시 어차피 롤백 나오니까 먼저 set
         updatedChannel.setOldName(updatedChannel.getOldName());
         updatedChannel.setName(newName);
         return channelService.update(updatedChannel);
@@ -85,11 +87,11 @@ public class ProjectManager {
         return userService.findByNamePW(name, password);
     }
 
-    public List<User> findAllUsers() {
+    public Set<User> findAllUsers() {
         return userService.findAll();
     }
 
-    public List<User> findUsersInChannel(UUID channelId) {
+    public Set<User> findUsersInChannel(UUID channelId) {
         return findChannelById(channelId).getUserList();
     }
 
@@ -102,12 +104,12 @@ public class ProjectManager {
         return channelService.findByName(channelName);
     }
 
-    public List<Channel> findAllChannel() {
+    public Set<Channel> findAllChannel() {
         return channelService.findAll();
     }
 
     // Message 찾는 것들
-    public List<Message> findUserMessage(UUID userId) {
+    public Set<Message> findUserMessage(UUID userId) {
         return findUserById(userId).getMessages();
     }
 
@@ -119,7 +121,7 @@ public class ProjectManager {
         return messageService.findMessage(findUserById(userId), writedMessage);
     }
 
-    public List<Message> findMessagesInChannel(UUID channelId) {
+    public Set<Message> findMessagesInChannel(UUID channelId) {
         return messageService.findMessagesInChannel(findChannelById(channelId));
     }
 
@@ -128,7 +130,7 @@ public class ProjectManager {
      */
     public void deleteUser(UUID id, String nickName, String password) {
         User deletingUser = findUserById(id);
-        if (!(deletingUser.getName().equals(nickName) && deletingUser.getPassword().equals(password))){
+        if (!(deletingUser.getName().equals(nickName) && deletingUser.getPassword().equals(password))) {
             System.out.println("닉네임 or 비밀번호가 틀렸습니다.");
         } else {
             userService.delete(deletingUser);
@@ -153,4 +155,16 @@ public class ProjectManager {
         messageService.delete(deletingMessage);
     }
 
+    /**
+     * 강퇴 및 채널 탈퇴
+     */
+
+    // 강퇴 및 채널 탈퇴
+    public void drops(UUID channel_Id, UUID droppingUser_Id) {
+        Channel droppingChannel = findChannelById(channel_Id);
+        User droppingUser = findUserById(droppingUser_Id);
+
+        droppingChannel.getUserList().remove(droppingUser);
+        droppingUser.getChannels().remove(droppingChannel);
+    }
 }
