@@ -1,20 +1,13 @@
-package mission.repository.jcf;
+package mission.service.jcf;
 
 import mission.entity.Channel;
 import mission.entity.Message;
 import mission.entity.User;
-import mission.service.jcf.JCFChannelService;
-import mission.service.jcf.JCFMessageService;
-import mission.service.jcf.JCFUserService;
 
-import javax.swing.plaf.PanelUI;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-public class RepositoryManager {
+public class ProjectManager {
 
     private final JCFUserService userService = new JCFUserService();
     private final JCFMessageService messageService = new JCFMessageService();
