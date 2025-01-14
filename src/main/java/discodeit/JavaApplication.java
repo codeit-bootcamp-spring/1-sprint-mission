@@ -71,8 +71,6 @@ public class JavaApplication {
 
         // 채널 삭제
         jcfChannelService.deleteChannel(channel1, user1);
-        jcfUserService.deleteUser(user1);
-
 
         System.out.println("***** 채널 삭제 후 유저들의 참여 채널 목록에서 정상 삭제 여부 조회 *****");
         System.out.println(jcfUserService.getInfo(user1) + System.lineSeparator());
