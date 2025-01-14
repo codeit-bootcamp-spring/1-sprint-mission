@@ -8,18 +8,17 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFChannelService implements ChannelService {
-    private static volatile JCFChannelService instance; // 싱글톤 패턴
+    private static volatile JCFChannelService instance;
     private final Map<UUID, Channel> data;
 
-    //private 설정으로 외부 new 키워드 제한
     private JCFChannelService() {
-        this.data = new ConcurrentHashMap<>();
+        this.data = new ConcurrentHashMap<>(); // data 동시성 관리
     }
 
     public static JCFChannelService getInstance() {
-        if(instance == null){
+        if (instance == null) {
             synchronized (JCFChannelService.class) {
-                if(instance == null) {
+                if (instance == null) {
                     instance = new JCFChannelService();
                 }
             }

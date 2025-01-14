@@ -14,6 +14,4 @@ public enum ChannelType {
     GUILD_DIRECTORY,
     GUILD_FORUM,
     GUILD_MEDIA
-
-
 }

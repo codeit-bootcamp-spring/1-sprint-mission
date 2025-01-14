@@ -11,14 +11,14 @@ public class JCFUserService implements UserService {
     private static volatile JCFUserService instance;
     private final Map<UUID, User> data;
 
-    private JCFUserService(){
+    private JCFUserService() {
         this.data = new ConcurrentHashMap<>();
     }
 
-    public static JCFUserService getInstance(){
-        if(instance == null){
+    public static JCFUserService getInstance() {
+        if (instance == null) {
             synchronized (JCFUserService.class) {
-                if(instance == null) {
+                if (instance == null) {
                     instance = new JCFUserService();
                 }
             }

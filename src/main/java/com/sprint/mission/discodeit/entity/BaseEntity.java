@@ -9,7 +9,7 @@ public abstract class BaseEntity {
 
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis() / 1000L;
+        this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
     }
 
@@ -25,7 +25,7 @@ public abstract class BaseEntity {
         return updatedAt;
     }
 
-    public void updateTimeStamp(){
-        this.updatedAt = System.currentTimeMillis() / 1000L;
+    public void updateTimeStamp() {
+        updatedAt = System.currentTimeMillis();
     }
 }

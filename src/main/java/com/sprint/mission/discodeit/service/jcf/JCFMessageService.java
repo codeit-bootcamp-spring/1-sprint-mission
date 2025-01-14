@@ -2,25 +2,31 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    private static volatile JCFMessageService instance; //싱글톤 패턴
+    private static volatile JCFMessageService instance;
     private final Map<UUID, Message> data;
+    private final UserService userService;
+    private final ChannelService channelService;
 
-    private JCFMessageService(){
+    private JCFMessageService(UserService userService, ChannelService channelService) {
         this.data = new ConcurrentHashMap<>();
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
-    //synchronized 키워드로 thread-safe 보장, lazy init, Double-check locking 기법 적용
-    public static JCFMessageService getInstance(){
-        if(instance == null){
+    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+        if (instance == null) {
             synchronized (JCFMessageService.class) {
-                if(instance == null) {
-                    instance = new JCFMessageService();
+                if (instance == null) {
+                    instance = new JCFMessageService(userService, channelService);
                 }
             }
         }
@@ -29,6 +35,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message sendMessage(Message newMessage, List<User> allUsers) {
+        validateChannel(newMessage.getChannel().getId());
+        validateUser(newMessage.getAuthor().getId());
         data.put(newMessage.getId(), newMessage);
         // mentions 인식 및 알림
         List<User> mentionedUsers = parseMentions(newMessage, allUsers);
@@ -38,6 +46,8 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getChannelMessages(UUID channelId) {
+        validateChannel(channelId);
+
         return data.values().stream()
                 .filter(message ->
                         message.getChannel().getId().equals(channelId))
@@ -47,6 +57,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> getUserMessage(User author) {
+        validateUser(author.getId());
         return data.values().stream()
                 .filter(message -> message.getAuthor().equals(author))
                 .toList();
@@ -67,16 +78,10 @@ public class JCFMessageService implements MessageService {
 
     //맨션된 유저들 리스트에 추가
     private List<User> parseMentions(Message message, List<User> allUsers) {
-        List<User> mentions = new ArrayList<>();
-        String content = message.getContent();
-        if (content != null && !content.trim().isEmpty()) {
-            for (User user : allUsers) {
-                String mentionPattern = "@" + user.getName();
-                if(content.contains(mentionPattern)){
-                    mentions.add(user);
-                }
-            }
-        }
+        List<User> mentions = allUsers.stream()
+                .filter(user -> message.getContent().contains("@" + user.getName()))
+                .toList();
+
         message.getMentions().clear();
         message.getMentions().addAll(mentions);
         return mentions;
@@ -84,9 +89,18 @@ public class JCFMessageService implements MessageService {
 
     private void notifyMentions(User sender, List<User> mentions) {
         for (User user : mentions) {
-            // 콘솔 알림 출력
-            System.out.println("[" + sender.getName() + "] 님이 [" + user.getName() + "] 님을 멘션했어요!");
+            // 콘솔로 맨션된 유저들에게 알림 출력
+            System.out.println("[" + sender.getName() + "]님이 [" + user.getName() + "]님을 멘션했어요!");
         }
     }
 
+    private void validateChannel(UUID channelId) {
+        channelService.getChannelDetails(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("채널 id : " + channelId + " **존재하지 않는 채널입니다!**"));
+    }
+
+    private void validateUser(UUID userId) {
+        userService.getUserDetails(userId)
+                .orElseThrow(() ->  new IllegalArgumentException("채널 id : " + userId + " **존재하지 않는 채널입니다!**"));
+    }
 }
