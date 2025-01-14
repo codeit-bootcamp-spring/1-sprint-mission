@@ -7,7 +7,21 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
+    private static JCFChannelService instance; // 싱글톤 인스턴스
     private final Map<UUID, Channel> data = new HashMap<>();
+
+    private JCFChannelService() {} // private 생성자
+
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            synchronized (JCFChannelService.class) {
+                if (instance == null) {
+                    instance = new JCFChannelService();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public void create(Channel channel) {
@@ -36,13 +50,5 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
         data.remove(id);
-    }
-
-    // 추가: 데이터가 없을 때 예외를 발생시키는 메서드
-    public Channel findByIdOrThrow(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("Channel not found for ID: " + id);
-        }
-        return data.get(id);
     }
 }

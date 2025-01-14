@@ -7,9 +7,13 @@ import java.time.Instant;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // 1. 사용자 등록
+        // 1. 싱글톤 서비스 인스턴스 생성
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
+
+        // 2. 사용자 등록
         System.out.println("== 사용자 등록 ==");
-        JCFUserService userService = new JCFUserService();
         User user1 = new User("Alice", "alice@example.com");
         User user2 = new User("Bob", "bob@example.com");
         userService.create(user1);
@@ -17,13 +21,13 @@ public class JavaApplication {
         System.out.printf("User: %s (CreatedAt: %s)%n", user1.getUsername(), Instant.ofEpochMilli(user1.getCreatedAt()));
         System.out.printf("User: %s (CreatedAt: %s)%n", user2.getUsername(), Instant.ofEpochMilli(user2.getCreatedAt()));
 
-        // 2. 사용자 수정
+        // 3. 사용자 수정
         System.out.println("\n== 사용자 수정 ==");
         user1.updateUsername("Alice Updated");
         userService.update(user1.getId(), user1);
         System.out.printf("Updated User: %s (UpdatedAt: %s)%n", user1.getUsername(), Instant.ofEpochMilli(user1.getUpdateAT()));
 
-        // 3. 사용자 삭제 후 조회
+        // 4. 사용자 삭제 후 조회
         System.out.println("\n== 사용자 삭제 ==");
         userService.delete(user1.getId());
         userService.read(user1.getId()).ifPresentOrElse(
@@ -31,9 +35,8 @@ public class JavaApplication {
                 () -> System.out.println("삭제된 사용자입니다.")
         );
 
-        // 4. 채널 등록
+        // 5. 채널 등록
         System.out.println("\n== 채널 등록 ==");
-        JCFChannelService channelService = new JCFChannelService();
         Channel channel1 = new Channel("testChannel", "General discussion channel", user2);
         Channel channel2 = new Channel("test2Channel", "Random discussion channel", user2);
         channelService.create(channel1);
@@ -41,13 +44,13 @@ public class JavaApplication {
         System.out.printf("Channel: %s (CreatedAt: %s)%n", channel1.getName(), Instant.ofEpochMilli(channel1.getCreatedAt()));
         System.out.printf("Channel: %s (CreatedAt: %s)%n", channel2.getName(), Instant.ofEpochMilli(channel2.getCreatedAt()));
 
-        // 5. 채널 수정
+        // 6. 채널 수정
         System.out.println("\n== 채널 수정 ==");
         channel1.updateDescription("Updated General discussion channel");
         channelService.update(channel1.getId(), channel1);
         System.out.printf("Updated Channel: %s (UpdatedAt: %s)%n", channel1.getName(), Instant.ofEpochMilli(channel1.getUpdateAT()));
 
-        // 6. 채널 삭제 후 조회
+        // 7. 채널 삭제 후 조회
         System.out.println("\n== 채널 삭제 ==");
         channelService.delete(channel1.getId());
         channelService.read(channel1.getId()).ifPresentOrElse(
@@ -55,9 +58,8 @@ public class JavaApplication {
                 () -> System.out.println("삭제된 채널입니다.")
         );
 
-        // 7. 메시지 등록
+        // 8. 메시지 등록
         System.out.println("\n== 메시지 등록 ==");
-        JCFMessageService messageService = new JCFMessageService(userService, channelService);
         Message message1 = new Message("test_message", user2.getId(), channel2.getId());
         Message message2 = new Message("test_message2", user2.getId(), channel2.getId());
         messageService.create(message1);
@@ -65,13 +67,13 @@ public class JavaApplication {
         System.out.printf("Message: %s (CreatedAt: %s)%n", message1.getContent(), Instant.ofEpochMilli(message1.getCreatedAt()));
         System.out.printf("Message: %s (CreatedAt: %s)%n", message2.getContent(), Instant.ofEpochMilli(message2.getCreatedAt()));
 
-        // 8. 메시지 수정
+        // 9. 메시지 수정
         System.out.println("\n== 메시지 수정 ==");
         message1.updateContent("Updated test_message");
         messageService.update(message1.getId(), message1);
         System.out.printf("Updated Message: %s (UpdatedAt: %s)%n", message1.getContent(), Instant.ofEpochMilli(message1.getUpdateAT()));
 
-        // 9. 메시지 삭제 후 조회
+        // 10. 메시지 삭제 후 조회
         System.out.println("\n== 메시지 삭제 ==");
         messageService.delete(message1.getId());
         messageService.read(message1.getId()).ifPresentOrElse(
@@ -79,7 +81,7 @@ public class JavaApplication {
                 () -> System.out.println("삭제된 메시지입니다.")
         );
 
-        // 10. 전체 조회
+        // 11. 전체 조회
         System.out.println("\n== 전체 조회 ==");
         System.out.println("Users: ");
         userService.readAll().forEach(user ->

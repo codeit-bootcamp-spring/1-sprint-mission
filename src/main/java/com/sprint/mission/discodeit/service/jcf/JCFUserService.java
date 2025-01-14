@@ -7,7 +7,21 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
+    private static JCFUserService instance; // 싱글톤 인스턴스
     private final Map<UUID, User> data = new HashMap<>();
+
+    private JCFUserService() {} // private 생성자
+
+    public static JCFUserService getInstance() {
+        if (instance == null) {
+            synchronized (JCFUserService.class) {
+                if (instance == null) {
+                    instance = new JCFUserService();
+                }
+            }
+        }
+        return instance;
+    }
 
     @Override
     public void create(User user) {
@@ -36,10 +50,5 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(UUID id) {
         data.remove(id);
-    }
-
-    // 추가: 데이터가 없을 때 예외를 발생시키는 메서드
-    public User findByIdOrThrow(UUID id) {
-        return data.getOrDefault(id, null);
     }
 }
