@@ -80,7 +80,7 @@ public class JavaApplication {
         System.out.println("\n=== 채널 정보 수정 ===");
         channelService.updateChannel(channelId1, "ChannelUpdated", System.currentTimeMillis());
 
-        // 수정된 데이터 조회
+        // 수정된 채널 조회
         System.out.println("\n=== 수정된 채널 데이터 조회 ===");
         Channel modifiedChannel = channelService.getChannel(channelId1);
         System.out.println("Modified Channel: " + modifiedChannel);
