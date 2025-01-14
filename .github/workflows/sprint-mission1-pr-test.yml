@@ -25,4 +25,4 @@ jobs:
         run: find . -name "gradlew" -exec chmod +x {} \;
 
       - name: 🚀 테스트 진행
-        run: cd codeit-bootcamp-spring/1-sprint-mission && ./gradlew --info test
+        run: cd codeit-bootcamp-spring/1-sprint-mission && ./gradlew clean test
