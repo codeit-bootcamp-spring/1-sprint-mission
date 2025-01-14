@@ -1,5 +1,6 @@
 package mission.service.file;
 
+import mission.entity.Channel;
 import mission.entity.User;
 import mission.repository.file.FileUserRepository;
 
@@ -16,9 +17,20 @@ public class FileMainService {
     private final FileUserService fileUserService = new FileUserService();
     private final FileMessageService fileMessageService = new FileMessageService();
 
+    /**
+     * 디렉토리 생성
+     */
     public void createUserDirectory() throws IOException {
         fileUserService.createUserDirectory();
     }
+
+    public void createChannelDirectory() {
+        fileChannelService.createChannelDirect();
+    }
+
+    /**
+     * 파일 생성
+     */
 
     public User createUser(String name, String password) throws IOException {
         // 중복검사 해야됨
@@ -26,6 +38,17 @@ public class FileMainService {
         User newbie = new User(name, password);
         return fileUserService.create(newbie);
     }
+
+    public Channel createChannel(String channelName){
+        // 이름 중복 검증을 하고 channel 생성
+        fileChannelService.validateDuplicateName(channelName);
+        return fileChannelService.create(new Channel(channelName));
+    }
+
+
+    /**
+     * 조회
+     */
 
     public User findUserById(UUID id) {
         return fileUserService.findById(id);
@@ -44,6 +67,11 @@ public class FileMainService {
                 .findFirst()
                 .orElse(null);
     }
+
+
+    /**
+     * 업데이트
+     */
 
     public User updateUserNamePW(UUID id, String oldName, String password, String newName, String newPassword) throws IOException {
         // 1. id 검증   2. 입력한 닉네임,PW 검증 후 수정해서 FILEUSERSERVICE에 넘김
@@ -65,6 +93,16 @@ public class FileMainService {
         return fileUserService.update(existingUser);
     }
 
+    public Channel updateChannelName(UUID channelId, String oldName, String newName){
+        Channel updatingChannel = fileChannelService.findById(channelId);
+        if (updatingChannel.getName() != oldName){
+            return null;
+        }
+
+        updatingChannel.setOldName(updatingChannel.getName());
+        updatingChannel.setName(newName);
+        return fileChannelService.update(updatingChannel);
+    }
 
     /**
      * 삭제

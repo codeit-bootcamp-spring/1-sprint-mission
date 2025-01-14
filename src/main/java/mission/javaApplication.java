@@ -37,6 +37,8 @@ public class javaApplication {
         System.out.println("기존 유저 A id = 업테이트 유저 id : " + updateUserA.getId().equals(userA.getId()));
         System.out.println("기존 유저 A의 닉네임 = 업데이트 유저 닉네임 : " + updateUserA.getName().equals(userA.getName()));
 
+        // 중복검사해야하네
+
         // User B 삭제 테스트 : 필요 정보 ID, NAME, PW
         fileMainService.deleteUser(userB.getId(), userB.getName(), userB.getPassword());
         System.out.println("전체 유저 목록 = " + findUsers());

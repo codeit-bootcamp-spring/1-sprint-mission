@@ -2,6 +2,7 @@ package mission.repository.jcf;
 
 import mission.entity.User;
 import mission.repository.UserRepository;
+import mission.service.exception.DuplicateName;
 
 import java.util.*;
 
@@ -28,7 +29,7 @@ public class JCFUserRepository implements UserRepository {
     public User findByNamePW(String name, String password) {
         try {
             // 닉네입 존재여부 확인
-            validationIsUsername(name);
+            validateDuplicateUserName(name);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -75,17 +76,17 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void validateDuplicateUserName(String userName) {
         if (userNames.contains(userName)) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다");
+            throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", userName));
         }
     }
 
-    private void validationIsUsername(String username) {
-        // 빠르게 찾기 위해 셋 자료구조로 중복 확인
-        if (!userNames.contains(username)) {
-            throw new NoSuchElementException(
-                    String.format("닉네임 %s(은)는 존재하지 않습니다.", username));
-        }
-    }
+//    private void validationIsUsername(String username) {
+//        // 빠르게 찾기 위해 셋 자료구조로 중복 확인
+//        if (!userNames.contains(username)) {
+//            throw new NoSuchElementException(
+//                    String.format("닉네임 %s(은)는 존재하지 않습니다.", username));
+//        }
+//    }
 
 //    public List<User> findUserByTeam(){
 //

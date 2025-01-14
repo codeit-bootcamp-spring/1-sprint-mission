@@ -7,6 +7,7 @@ import mission.repository.jcf.JCFMessageRepository;
 import mission.service.MessageService;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
@@ -41,7 +42,7 @@ public class JCFMessageService implements MessageService {
         Map<UUID, Message> messageMap = findMessagesInChannel(channel).stream()
                 .collect(Collectors.toMap(
                         Message::getId,  // Message객체 id를 키
-                        message -> message  // 파라미터 -> 반환값
+                        Function.identity()  // 파라미터 -> 반환값
                 ));
         try {
             return messageMap.get(messageId);

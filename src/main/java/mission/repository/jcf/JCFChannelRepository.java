@@ -2,6 +2,7 @@ package mission.repository.jcf;
 
 import mission.entity.Channel;
 import mission.repository.ChannelRepository;
+import mission.service.exception.DuplicateName;
 
 import java.util.*;
 
@@ -60,7 +61,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     public void validateDuplicateName(String name){
         if (channelNames.contains(name)){
-            throw new IllegalArgumentException(
+            throw new DuplicateName(
                     String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
         }
     }

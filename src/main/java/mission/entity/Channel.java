@@ -1,12 +1,15 @@
 package mission.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
+
+    private static final long serialVersionUID = 2L;
 
     private final UUID id;
     private final String firstId;

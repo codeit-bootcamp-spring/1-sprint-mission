@@ -6,15 +6,22 @@ import mission.repository.file.FileUserRepository;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class FileUserService {
 
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
     // 생성
-    public void createUserDirectory() throws IOException {
-        fileUserRepository.createUserDirectory();
+    public void createUserDirectory(){
+        try {
+            fileUserRepository.createUserDirectory();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public User create(User user){
@@ -72,7 +79,14 @@ public class FileUserService {
         }
     }
 
+    // 검증은 레포지토리까지 갈 필요도 없이 여기서 처리
     public void validateDuplicateName(String name) throws IOException {
-        fileUserRepository.validationUserName(name);
+        List<User> users = findAll();
+        // List -> Map으로 바꿔서 조회 빠르게 (이전에 다른 강의에서 봤던건데, 크게 효과있는지는 모르겠다 - map변환과정이 짧나?)
+        Map<String, User> userListMap = users.stream().collect(
+                Collectors.toMap(User::getName, Function.identity()));
+        if (userListMap.get(name) != null){
+            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
+        }
     }
 }

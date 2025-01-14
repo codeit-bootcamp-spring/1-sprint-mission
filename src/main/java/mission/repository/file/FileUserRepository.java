@@ -57,6 +57,7 @@ public class FileUserRepository {
 
         // 2. 1에서 얻은 filePath가 유효한지 테스트
         if (!Files.exists(userFilePath)) {
+            System.out.println("주어진 id의 유저파일이 존재하지 않습니다.");
             return null;
         }
 
@@ -106,23 +107,13 @@ public class FileUserRepository {
         return USER_DIRECT_PATH.resolve(userId.toString() + ".ser");
     }
 
-    public void validationUserName(String name) throws IOException {
-        List<User> users = findAll();
-        // List -> Map으로 바꿔서 조회 빠르게 (이전에 다른 강의에서 봤던건데, 크게 효과있는지는 모르겠다)
-        Map<String, List<User>> userListMap = users.stream().collect(Collectors.groupingBy(user -> user.getName()));
-        if (userListMap.get(name) != null){
-            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
-        }
-    }
-
     public User findByNamePW(String name, String password) {
         return null;
     }
 
-
     // 파일 생성
     public void createUserDirectory() throws IOException {
-        // 그냥 매번 새로 생성한다고 가능
+        // 존재하면 안의 파일 전부 삭제
         if (Files.exists(USER_DIRECT_PATH)){
             try {
                 Files.list(USER_DIRECT_PATH).forEach(path -> {
@@ -133,11 +124,11 @@ public class FileUserRepository {
                     }
                 });
             } catch (IOException e) {
-                System.out.println("디렉토리 초기화 실패");
+                System.out.println("U 디렉토리 초기화 실패");
             }
-            Files.delete(USER_DIRECT_PATH);
+        } else {
+            Files.createDirectory(USER_DIRECT_PATH);
         }
-        Files.createDirectory(USER_DIRECT_PATH);
     }
 }
 
