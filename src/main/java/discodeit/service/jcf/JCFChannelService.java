@@ -52,11 +52,6 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannels() {
-        return channels;
-    }
-
-    @Override
     public Channel findById(UUID id) {
         Channel findChannel = findChannel(id);
         if (findChannel == null) {
@@ -79,14 +74,14 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateName(Channel channel, String name) {
-        channel.updateName(name);
+    public void updateName(Channel channel, String name, User user) {
+        channel.updateName(name, user);
         channel.updateUpdatedAt();
     }
 
     @Override
-    public void updateIntroduction(Channel channel, String introduction) {
-        channel.updateIntroduction(introduction);
+    public void updateIntroduction(Channel channel, String introduction, User user) {
+        channel.updateIntroduction(introduction, user);
         channel.updateUpdatedAt();
     }
 

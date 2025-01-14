@@ -14,11 +14,10 @@ public interface ChannelService {
     Channel findById(UUID id);
     Channel findChannel(UUID id);
     String getInfo(Channel channel);
-    void updateName(Channel channel, String name);
-    void updateIntroduction(Channel channel, String introduction);
+    void updateName(Channel channel, String name, User user);
+    void updateIntroduction(Channel channel, String introduction, User user);
     void updateParticipants(Channel channel, User user);
     void updateMessages(Channel channel, Message message);
     void deleteChannel(Channel channel, User user);
     void deleteParticipant(Channel channel, User user);
-    List<Channel> getChannels();
 }
