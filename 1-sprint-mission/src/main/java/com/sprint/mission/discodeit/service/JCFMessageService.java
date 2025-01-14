@@ -2,18 +2,16 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService{
-    private final List<Message> MessageList=new ArrayList<>();
+    private final Map<UUID,Message> MessageList=new TreeMap<>();
 
     @Override
     public void CreateMessageDefault(String title,String body) {
         if (find_Message(title).isEmpty()) {
             Message new_Message=Message.CreateDefaultMessage(title,body);
-            MessageList.add(new_Message);
+            MessageList.put(new_Message.getId(),new_Message);
         } else {
             System.out.println("이미 존재하는 제목입니다.");
         }
@@ -23,12 +21,19 @@ public class JCFMessageService implements MessageService{
     @Override
     public <T>String ReadMessage(T key) {
         StringBuilder list= new StringBuilder();
-        for(Message now:MessageList){
-            if((key instanceof String&&now.getTitle().equals(key))||
-            (key instanceof UUID&&now.getId().equals(key))){
-                list.append(now.toString()).append("\n");
-            }
+
+        TreeMap<UUID,Message> foundMessage=new TreeMap<>();
+
+        if (key instanceof String) {
+            foundMessage = find_Message((String) key);
+        } else if (key instanceof UUID) {
+            foundMessage = find_Message((UUID) key);
         }
+
+        for (Message val : foundMessage.values()) {
+            list.append(val.toString());
+        }
+
         if(!list.toString().isEmpty())
             return list.toString();
         else
@@ -39,9 +44,8 @@ public class JCFMessageService implements MessageService{
     @Override
     public String ReadMessageAll() {
         StringBuilder list= new StringBuilder();
-        for(Message now:MessageList){
-            list.append(now.toString()).append("\n");
-
+        for (Message val : MessageList.values()) {
+            list.append(val.toString());
         }
         if(!list.toString().isEmpty())
             return list.toString();
@@ -51,46 +55,48 @@ public class JCFMessageService implements MessageService{
 
     @Override
     public boolean UpdateMessageTitle(UUID ID, String change) {
-        ArrayList<Message> instance = find_Message(ID);
+        TreeMap<UUID,Message> instance = find_Message(ID);
         return ChangeMessageTitle(instance,change);
     }
 
     @Override
     public boolean UpdateMessageTitle(String title, String change) {
-        ArrayList<Message> instance = find_Message(title);
+        TreeMap<UUID,Message> instance = find_Message(title);
         return ChangeMessageTitle(instance,change);
     }
     @Override
     public boolean UpdateMessageBody(UUID ID, String change) {
-        ArrayList<Message> instance = find_Message(ID);
+        TreeMap<UUID,Message> instance = find_Message(ID);
         return ChangeMessageBody(instance,change);
     }
 
     @Override
     public boolean UpdateMessageBody(String title, String change) {
-        ArrayList<Message> instance = find_Message(title);
+        TreeMap<UUID,Message> instance = find_Message(title);
         return ChangeMessageBody(instance,change);
     }
 
     @Override
     public boolean DeleteMessage(UUID id) {
-        ArrayList<Message> instance = find_Message(id);
+        TreeMap<UUID, Message> instance = find_Message(id);
         return DeleteMessageInfo(instance);
     }
 
     @Override
     public boolean DeleteMessage(String title) {
-        ArrayList<Message> instance = find_Message(title);
+        TreeMap<UUID, Message> instance = find_Message(title);
         return DeleteMessageInfo(instance);
     }
 
 
-    private boolean DeleteMessageInfo(ArrayList<Message> instance) {
+    private boolean DeleteMessageInfo(TreeMap<UUID, Message> instance) {
         if (instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            MessageList.remove(instance.get(0));
+            Message find = instance.firstEntry().getValue();
+            find.deleteExistMessageId();
+            MessageList.remove(find.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
         } else {
@@ -99,27 +105,31 @@ public class JCFMessageService implements MessageService{
         }
     }
 
-    private ArrayList<Message> find_Message(UUID ID) {
-        return new  ArrayList<>(
-                MessageList.stream().filter(user -> user.getId().equals(ID)).toList()
-        );
+    private TreeMap<UUID,Message> find_Message(UUID id) {
+        TreeMap<UUID, Message> findMessage = new TreeMap<>();
+        findMessage.put(id,MessageList.get(id));
+        return findMessage;
     }
 
 
-    private ArrayList<Message> find_Message(String title) {
-        return new  ArrayList<>(
-                MessageList.stream().filter(user -> user.getTitle().equals(title)).toList()
-        );
+    private TreeMap<UUID,Message> find_Message(String title) {
+        TreeMap<UUID, Message> findMessage = new TreeMap<>();
+        for(Message message:MessageList.values()){
+            if(message.getTitle().equals(title)){
+                findMessage.put(message.getId(),message);
+            }
+        }
+        return findMessage;
     }
 
 
 
-    private boolean ChangeMessageTitle(ArrayList<Message> instance, String changetitle) {
+    private boolean ChangeMessageTitle(TreeMap<UUID, Message> instance, String changetitle) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Message find = instance.get(0);
+            Message find = instance.firstEntry().getValue();
             find.setTitle(changetitle);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
@@ -128,23 +138,25 @@ public class JCFMessageService implements MessageService{
         return false;
     }
 
-    private boolean ChangeMessageBody(ArrayList<Message> instance, String changeBody) {
+    private boolean ChangeMessageBody(TreeMap<UUID, Message> instance, String changeBody) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Message find = instance.get(0);
+            Message find = instance.firstEntry().getValue();
             find.setMessageBody(changeBody);
             find.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
             return true;
+        }else{
+            return false;
         }
-        return false;
+
     }
 
     @Override
     public void AddMessage(Message m) {
-        MessageList.add(m);
+        MessageList.put(m.getId(),m);
     }
 
 

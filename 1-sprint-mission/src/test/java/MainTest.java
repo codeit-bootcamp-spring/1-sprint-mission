@@ -14,13 +14,13 @@ public class MainTest {
     @Test
     public void testUserService() {
         UserService userService=new JCFUserService();
-        assertEquals("등록된 유저가 없습니다.", userService.ReadUserAll(), "실패.");
+        assertEquals("등록된 유저가 없습니다.", userService.ReadUserAll(), "실패1.");
 
         userService.CreateUserDefault("고구마");
         userService.CreateUserDefault("김치");
         userService.CreateUserDefault("우유");
         userService.CreateUserDefault("김치");
-        assertNotNull(userService.ReadUser("고구마"), "실패");
+        assertNotNull(userService.ReadUser("고구마"), "실패2");
         assertEquals("해당하는 유저가 없습니다.", userService.ReadUser("돼지"));
         userService.UpdateUserName("고구마","감자");
         assertEquals("해당하는 유저가 없습니다.", userService.ReadUser("고구마"));

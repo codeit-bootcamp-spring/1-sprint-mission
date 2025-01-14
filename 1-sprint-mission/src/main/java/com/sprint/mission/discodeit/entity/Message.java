@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Message {
@@ -8,6 +10,7 @@ public class Message {
     private Long updatedAt;
     private String title;
     private String MessageBody;
+    private static final Set<UUID> existMessageIdCheck=new HashSet<>();
 
     private String senderName;
     private String receiverName;
@@ -15,7 +18,13 @@ public class Message {
     private UUID receiverId;
 
     public Message(String title,String MessageBody){
-        this.id= UUID.randomUUID();
+        UUID instance;
+        do {
+            instance = UUID.randomUUID();
+        } while (existMessageIdCheck.contains(instance));
+        this.id = instance;
+        existMessageIdCheck.add(instance);
+
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.title=title;
@@ -28,6 +37,10 @@ public class Message {
     };
     public static Message CreateDefaultMessage(String title,String MessageBody){
         return new Message(title,MessageBody);
+    }
+
+    public void deleteExistMessageId(){
+        existMessageIdCheck.remove(this.id);
     }
 
     public UUID getId() {
@@ -64,6 +77,9 @@ public class Message {
         else
             return null;
     }
+
+
+
     public UUID getSenderID() {
         return senderId;
     }

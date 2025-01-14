@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Channel {
@@ -10,15 +12,25 @@ public class Channel {
     private String channelName;
     private final ArrayList<User> userlist=new ArrayList<>();
     private final ArrayList<Message> messageslist=new ArrayList<>();
+    private static final Set<UUID> existChannelIdCheck = new HashSet<>();
 
     public Channel(String channelName){
-        this.id= UUID.randomUUID();
+        UUID instance;
+        do {
+            instance = UUID.randomUUID();
+        } while (existChannelIdCheck.contains(instance));
+        this.id = instance;
+        existChannelIdCheck.add(instance);
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.channelName=channelName;
     };
     public static Channel CreateDefaultChannel(String channelName){
         return new Channel(channelName);
+    }
+
+    public void deleteExistChannelId(){
+        existChannelIdCheck.remove(this.id);
     }
 
     public UUID getId() {

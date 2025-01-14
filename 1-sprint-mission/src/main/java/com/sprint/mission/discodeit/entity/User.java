@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class User {
@@ -7,11 +9,17 @@ public class User {
     final  private Long createdAt;
     private Long updatedAt;
     private String name;
+    private static final Set<UUID> existUserIdCheck = new HashSet<>();
 
 
-    //뭐 더있나
     public User(String name){
-        this.id= UUID.randomUUID();
+        UUID instance;
+        do {
+            instance = UUID.randomUUID();
+        } while (existUserIdCheck.contains(instance));
+        this.id = instance;
+        existUserIdCheck.add(instance);
+
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.name=name;
@@ -41,6 +49,10 @@ public class User {
     }
     public void setName(String name){
         this.name= name;
+    }
+
+    public void deleteExistUserId(){
+        existUserIdCheck.remove(this.id);
     }
 
     @Override
