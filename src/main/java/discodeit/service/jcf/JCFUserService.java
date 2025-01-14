@@ -44,6 +44,8 @@ public class JCFUserService implements UserService {
     @Override
     public User createUser(String name, String email, String phoneNumber, String password) {
         validator.validate(name, email, phoneNumber);
+        isDuplicateEmail(email);
+        isDuplicatePhoneNumber(phoneNumber);
         User newUser = new User(name, email, phoneNumber, password);
         users.add(newUser);
         return newUser;
@@ -81,6 +83,7 @@ public class JCFUserService implements UserService {
     @Override
     public void updateEmail(User user, String email) {
         validator.validateEmail(email);
+        isDuplicateEmail(email);
         user.updateEmail(email);
         user.updateUpdatedAt();
     }
@@ -88,6 +91,7 @@ public class JCFUserService implements UserService {
     @Override
     public void updatePhoneNumber(User user, String phoneNumber) {
         validator.validatePhoneNumber(phoneNumber);
+        isDuplicatePhoneNumber(phoneNumber);
         user.updatePhoneNumber(phoneNumber);
         user.updateUpdatedAt();
     }
@@ -125,5 +129,15 @@ public class JCFUserService implements UserService {
         channel.deleteParticipant(user);
         user.updateUpdatedAt();
         channel.updateUpdatedAt();
+    }
+
+    @Override
+    public void isDuplicateEmail(String email) {
+        users.stream().forEach(user -> user.isDuplicateEmail(email));
+    }
+
+    @Override
+    public void isDuplicatePhoneNumber(String phoneNumber) {
+        users.stream().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

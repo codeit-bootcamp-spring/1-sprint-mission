@@ -19,4 +19,6 @@ public interface UserService {
     void updateJoinedChannels(User user, Channel channel);
     void deleteUser(User user);
     void deleteJoinedChannel(User user, Channel channel);
+    void isDuplicateEmail(String email);
+    void isDuplicatePhoneNumber(String phoneNumber);
 }

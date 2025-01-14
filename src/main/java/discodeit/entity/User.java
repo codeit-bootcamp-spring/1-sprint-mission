@@ -84,6 +84,18 @@ public class User {
         return this.id.equals(id);
     }
 
+    public void isDuplicateEmail(String email) {
+        if (this.email.equals(email)) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+    }
+
+    public void isDuplicatePhoneNumber(String phoneNumber) {
+        if (this.phoneNumber.equals(phoneNumber)) {
+            throw new IllegalArgumentException("이미 존재하는 번호입니다.");
+        }
+    }
+
     public void withdraw() {
         this.id = null;
         this.name = "(알 수 없음)";
