@@ -11,6 +11,15 @@ public class User extends BaseEntity{
     }
     public void setNickname(String nickname){
         this.nickname = nickname;
-
+    }
+    @Override
+    public String toString(){
+        return "\n"
+                + "nickname : " + nickname
+                + "\n"
+                + "create at : " + getCreatedAt()
+                + "\n"
+                + "updated at : " + getUpdatedAt()
+                + "\n";
     }
 }

@@ -1,6 +1,13 @@
 package com.sprint.mission.discodeit.service.jcf;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.impl.InMemoryUserRepository;
+import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*; // mock(), when() 메서드를 사용하기 위한 import
 
@@ -8,29 +15,37 @@ import static org.mockito.Mockito.*; // mock(), when() 메서드를 사용하기
 
 public class JCFUserServiceTest {
     @Test
-    void testCreateChannel(){
-        // 너무... 불필요한 요소가 많이 생기는 것 아닌가
+    void testCreateUserChannel(){
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("TestUserCreate");
-        assertNotNull(userService.getUser("TestUserCreate"));
+        UserRepository userRepository = new InMemoryUserRepository();
+
+        JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
+
+        UUID id = userService.createUser("TestUserCreate");
+        assertNotNull(userService.getUserById(id));
     }
 
     @Test
-    void testReadAllUsers(){
+    void testGetAllUsers(){
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("TestUserReadAll1");
-        userService.Create("TestUserReadAll2");
-        assertEquals(2, userService.ReadAll());
+        UserRepository userRepository = new InMemoryUserRepository();
+
+        JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
+        userService.createUser("TestUserReadAll1");
+        userService.createUser("TestUserReadAll2");
+
+        assertEquals(2, userService.getAllUsers());
     }
 
     @Test
     void testReadUser(){
         InputHandler mockInputHandler = mock(InputHandler.class);
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("TestUserReadUser");
-        assertNotNull(userService.ReadUser("TestUserReadUser"));
+        UserRepository userRepository = new InMemoryUserRepository();
+
+        JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
+        UUID id = userService.createUser("TestUserReadUser");
+
+        assertNotNull(userService.getUserById(id));
     }
 
     @Test
@@ -40,12 +55,14 @@ public class JCFUserServiceTest {
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getNewInput()).thenReturn("겨울");
 
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("TestUserUpdateNickname");
-        userService.UpdateNickname("TestUserUpdateNickname");
+        UserRepository userRepository = new InMemoryUserRepository();
 
+        JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
+        UUID id = userService.createUser("TestUserUpdateNickname");
 
-        assertEquals("겨울", userService.getUser("겨울").getNickname());
+        userService.updateUserNickname(id);
+
+        assertEquals("겨울", userService.getUserById(id));
     }
 
     @Test
@@ -54,16 +71,17 @@ public class JCFUserServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
+        UserRepository userRepository = new InMemoryUserRepository();
 
 
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("testUserDeleteAll1");
-        userService.Create("testUserDeleteAll2");
-        userService.DeleteAll();
-        assertNull(userService.getUser("testUserDeleteAll1"));
-        assertNull(userService.getUser("testUserDeleteAll2"));
+        JCFUserService userService = new JCFUserService( userRepository, mockInputHandler);
+        UUID userId1 = userService.createUser("testUserDeleteAll1");
+        UUID userId2 = userService.createUser("testUserDeleteAll2");
+        userService.deleteAllUsers();
+
+        assertNull(userService.getUserById(userId1));
+        assertNull(userService.getUserById(userId2));
     }
-
 
     @Test
     void testDeleteUser(){
@@ -71,12 +89,13 @@ public class JCFUserServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
+        UserRepository userRepository = new InMemoryUserRepository();
 
-        JCFUserService userService = new JCFUserService(mockInputHandler);
-        userService.Create("testUserDeleteUser");
-        userService.DeleteUser("testUserDeleteUser");
+        JCFUserService userService = new JCFUserService(userRepository, mockInputHandler);
+        UUID id = userService.createUser("testUserDeleteUser");
+        userService.deleteUserById(id);
 
-        assertNull(userService.getUser("testUserDeleteUser"));
+        assertNull(userService.getUserById(id));
     }
 
 }

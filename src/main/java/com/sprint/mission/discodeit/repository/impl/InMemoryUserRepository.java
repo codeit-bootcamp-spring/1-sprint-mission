@@ -18,10 +18,13 @@ public class InMemoryUserRepository implements UserRepository {
     public User findById(UUID id){
         return users.get(id);
     }
-    public Map<UUID, User> findAll() {
+    public Map<UUID, User> getAllUsers() {
         return users;
     }
-    public void deleteUser(UUID id){
+    public void deleteAllUsers(){
+        users.clear();
+    }
+    public void deleteUserById(UUID id){
         users.remove(id);
     }
 }

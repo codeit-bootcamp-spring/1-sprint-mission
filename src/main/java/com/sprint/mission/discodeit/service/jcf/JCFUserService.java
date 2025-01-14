@@ -1,20 +1,25 @@
 package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.HashMap;
+
+import java.util.UUID;
+
 import com.sprint.mission.discodeit.io.InputHandler;
 
 
 public class JCFUserService implements UserService {
     //Scanner sc = new Scanner(System.in);
-    // HashMap(nickname - user)
-    private final HashMap<String, User> Users;
+    // private final HashMap<String, User> Users;
+
+    private final UserRepository userRepository;
+
     // mocking 이용으로 추가
     private InputHandler inputHandler;
 
-    public JCFUserService(InputHandler inputHandler){
+    public JCFUserService(UserRepository userRepository, InputHandler inputHandler){
         // 생성자에서 users 데이터 초기화
-        this.Users = new HashMap<>();
+        this.userRepository = userRepository;
         // mocking 이용으로 추가
         this.inputHandler = inputHandler;
     }
@@ -24,59 +29,55 @@ public class JCFUserService implements UserService {
         this.inputHandler = inputHandler;
     }
 
-    // 의존성 주입을 위한 user 반환
-    public User getUser(String nickname){
-        return Users.get(nickname);
-    }
+//    public User getUser(String nickname){
+//        return ;
+//    }
 
-    public void Create(String nickname){
+    public UUID createUser(String nickname){
         User user = new User(nickname);
-        Users.put(nickname, user);
+        // 인터페이스 구현체의 메서드 saveUser(User user) 이용
+        userRepository.saveUser(user);
+        return user.getId();
     }
 
-    public int ReadAll(){
+    public int getAllUsers(){
         // 전체 유저 조희
-        if (Users.isEmpty()) {
+        if (userRepository.getAllUsers().isEmpty()) {
             System.out.println("No users exists.\n");
         }else{
-            System.out.println("All Users : " + Users.keySet());
+            System.out.println(userRepository.getAllUsers().toString());
         }
-        return Users.size();
+        return userRepository.getAllUsers().size();
     }
-    public String ReadUser(String nickname){
-        if(Users.get(nickname) == null ){
-            System.out.println(nickname + " does not exist\n");
+    public User getUserById(UUID id){
+        if(userRepository.getAllUsers().get(id) == null ){
+            System.out.println(userRepository.getAllUsers().get(id) + " does not exist\n");
         }else{
-            System.out.println("User name is " + Users.get(nickname).getNickname());
-            System.out.println("You created this account at: " + Users.get(nickname).getCreatedAt());
+            System.out.println( userRepository.getAllUsers().get(id).toString());
+//            System.out.println("User name is " + userRepository.getAllUsers().get(id).getNickname());
+//            System.out.println("User ID is " + userRepository.getAllUsers().get(id).getId());
+//            System.out.println("You created this account at: " + userRepository.getAllUsers().get(id).getCreatedAt());
         }
-        return Users.get(nickname).getNickname();
+        return userRepository.getAllUsers().get(id);
     }
 
-    public void UpdateNickname(String nickname){
-        // nickname 을 key로 설정했어서
-        // delete 과정을 거친 후 생성
-        //String newNickname = sc.next();
+    public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
-        Users.put(newNickname, Users.get(nickname));
-        Users.get(newNickname).setNickname(newNickname);
-        Users.remove(nickname);
+        userRepository.findById(id).setNickname(newNickname);
         // 수정 시간 업데이트를 위해
-        Users.get(newNickname).setUpdateAt((System.currentTimeMillis()));
+        userRepository.findById(id).setUpdateAt(System.currentTimeMillis());
     }
 
-    public void DeleteAll(){
-        //String keyword = sc.next().toLowerCase();
+    public void deleteAllUsers(){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
-            Users.clear();
+            userRepository.deleteAllUsers();
         }
     }
-    public void DeleteUser(String nickname){
-        //String keyword = sc.next().toLowerCase();
+    public void deleteUserById(UUID id){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
-            Users.remove(nickname);
+            userRepository.deleteUserById(id);
         }
     }
 }
