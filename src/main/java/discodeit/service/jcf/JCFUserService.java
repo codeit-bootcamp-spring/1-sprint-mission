@@ -73,18 +73,21 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateName(User user, String name) {
+        validator.validateName(name);
         user.updateName(name);
         user.updateUpdatedAt();
     }
 
     @Override
     public void updateEmail(User user, String email) {
+        validator.validateEmail(email);
         user.updateEmail(email);
         user.updateUpdatedAt();
     }
 
     @Override
     public void updatePhoneNumber(User user, String phoneNumber) {
+        validator.validatePhoneNumber(phoneNumber);
         user.updatePhoneNumber(phoneNumber);
         user.updateUpdatedAt();
     }
