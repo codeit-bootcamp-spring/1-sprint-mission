@@ -6,13 +6,13 @@ import java.util.*;
 
 public class JCEFChannelService implements ChannelService{
 
-    private final Map<UUID,Channel> ChannelList=new TreeMap<>();
+    private final Map<UUID,Channel> channelList=new TreeMap<>();
 
     @Override
     public void CreateChannelDefault(String name) {
         if(find_Channel(name).isEmpty()){
             Channel new_channel=Channel.CreateDefaultChannel(name);
-            ChannelList.put(new_channel.getId(),new_channel);
+            channelList.put(new_channel.getId(),new_channel);
         }else {
             System.out.println("이미 존재하는 채널입니다.");
         }
@@ -43,7 +43,7 @@ public class JCEFChannelService implements ChannelService{
     @Override
     public String ReadChannelAll() {
         StringBuilder list= new StringBuilder();
-        for(Channel val:ChannelList.values()){
+        for(Channel val:channelList.values()){
             list.append(val.toString());
         }
 
@@ -77,7 +77,7 @@ public class JCEFChannelService implements ChannelService{
 
     private TreeMap<UUID,Channel> find_Channel(String name) {
         TreeMap<UUID,Channel> findChannel=new TreeMap<>();
-        for(Channel channel:ChannelList.values()){
+        for(Channel channel:channelList.values()){
             if(channel.getChannelName().equals(name)){
                 findChannel.put(channel.getId(),channel);
             }
@@ -88,7 +88,7 @@ public class JCEFChannelService implements ChannelService{
 
     private TreeMap<UUID,Channel> find_Channel(UUID ID) {
         TreeMap<UUID,Channel> findChannel=new TreeMap<>();
-        findChannel.put(ID,ChannelList.get(ID));
+        findChannel.put(ID,channelList.get(ID));
         return findChannel;
     }
 
@@ -100,7 +100,7 @@ public class JCEFChannelService implements ChannelService{
         }else if(instance.size()==1){
             Channel find=instance.firstEntry().getValue();
             find.deleteExistChannelId();
-            ChannelList.remove(find.getId());
+            channelList.remove(find.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
         }else{

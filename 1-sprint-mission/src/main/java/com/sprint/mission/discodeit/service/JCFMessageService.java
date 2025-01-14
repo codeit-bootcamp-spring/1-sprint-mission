@@ -5,13 +5,13 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.*;
 
 public class JCFMessageService implements MessageService{
-    private final Map<UUID,Message> MessageList=new TreeMap<>();
+    private final Map<UUID,Message> messageList=new TreeMap<>();
 
     @Override
     public void CreateMessageDefault(String title,String body) {
         if (find_Message(title).isEmpty()) {
             Message new_Message=Message.CreateDefaultMessage(title,body);
-            MessageList.put(new_Message.getId(),new_Message);
+            messageList.put(new_Message.getId(),new_Message);
         } else {
             System.out.println("이미 존재하는 제목입니다.");
         }
@@ -44,7 +44,7 @@ public class JCFMessageService implements MessageService{
     @Override
     public String ReadMessageAll() {
         StringBuilder list= new StringBuilder();
-        for (Message val : MessageList.values()) {
+        for (Message val : messageList.values()) {
             list.append(val.toString());
         }
         if(!list.toString().isEmpty())
@@ -96,7 +96,7 @@ public class JCFMessageService implements MessageService{
         } else if (instance.size() == 1) {
             Message find = instance.firstEntry().getValue();
             find.deleteExistMessageId();
-            MessageList.remove(find.getId());
+            messageList.remove(find.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
         } else {
@@ -107,14 +107,14 @@ public class JCFMessageService implements MessageService{
 
     private TreeMap<UUID,Message> find_Message(UUID id) {
         TreeMap<UUID, Message> findMessage = new TreeMap<>();
-        findMessage.put(id,MessageList.get(id));
+        findMessage.put(id,messageList.get(id));
         return findMessage;
     }
 
 
     private TreeMap<UUID,Message> find_Message(String title) {
         TreeMap<UUID, Message> findMessage = new TreeMap<>();
-        for(Message message:MessageList.values()){
+        for(Message message:messageList.values()){
             if(message.getTitle().equals(title)){
                 findMessage.put(message.getId(),message);
             }
@@ -156,7 +156,7 @@ public class JCFMessageService implements MessageService{
 
     @Override
     public void AddMessage(Message m) {
-        MessageList.put(m.getId(),m);
+        messageList.put(m.getId(),m);
     }
 
 

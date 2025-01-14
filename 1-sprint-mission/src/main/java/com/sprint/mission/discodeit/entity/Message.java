@@ -9,7 +9,7 @@ public class Message {
     final private Long createdAt;
     private Long updatedAt;
     private String title;
-    private String MessageBody;
+    private String messageBody;
     private static final Set<UUID> existMessageIdCheck=new HashSet<>();
 
     private String senderName;
@@ -17,7 +17,7 @@ public class Message {
     private UUID senderId;
     private UUID receiverId;
 
-    public Message(String title,String MessageBody){
+    public Message(String title,String messageBody){
         UUID instance;
         do {
             instance = UUID.randomUUID();
@@ -28,15 +28,15 @@ public class Message {
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.title=title;
-        this.MessageBody=MessageBody;
+        this.messageBody=messageBody;
         this.senderName="";
         this.receiverName ="";
         this.senderId=null;
         this.receiverId =null;
 
     };
-    public static Message CreateDefaultMessage(String title,String MessageBody){
-        return new Message(title,MessageBody);
+    public static Message CreateDefaultMessage(String title,String messageBody){
+        return new Message(title,messageBody);
     }
 
     public void deleteExistMessageId(){
@@ -55,14 +55,14 @@ public class Message {
         return updatedAt;
     }
     public String getMessageBody(){
-        return MessageBody;
+        return messageBody;
     }
 
     public void setUpdatedAt() {
         this.updatedAt= System.currentTimeMillis();
     }
-    public void setMessageBody(String MessageBody){
-        this.MessageBody= MessageBody;
+    public void setMessageBody(String messageBody){
+        this.messageBody= messageBody;
     }
 
     public String getSenderName() {
@@ -118,7 +118,7 @@ public class Message {
                 .append("\nReceiverName: ").append(receiverName)
                 .append(" ReceiverID: ").append(receiverId)
                 .append("\n제목: ").append(title)
-                .append(" Message: ").append(MessageBody);
+                .append(" Message: ").append(messageBody);
         return display.toString();
     }
 

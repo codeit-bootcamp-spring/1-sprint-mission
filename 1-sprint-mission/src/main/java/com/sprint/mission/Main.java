@@ -5,19 +5,19 @@ import com.sprint.mission.discodeit.service.*;
 public class Main {
     public static void main(String[] args) {
 
-//        UserService u=new JCFUserService();
-//
-//        System.out.println(u.ReadUserAll());
-//        u.CreateUserDefault("고구마");
-//        u.CreateUserDefault("김치");
-//        u.CreateUserDefault("우유");
-//        u.CreateUserDefault("김치");
-//        System.out.println(u.ReadUserAll());
-//        System.out.println(u.ReadUser("고구마"));
-//        u.UpdateUserName("고구마","감자");
-//        System.out.println(u.ReadUser("고구마"));
-//        System.out.println(u.ReadUser("감자"));
-//        u.DeleteUser("감자");
+        UserService u=new JCFUserService();
+
+        System.out.println(u.ReadUserAll());
+        u.CreateUserDefault("고구마");
+        u.CreateUserDefault("김치");
+        u.CreateUserDefault("우유");
+        u.CreateUserDefault("김치");
+        System.out.println(u.ReadUserAll());
+        System.out.println(u.ReadUser("고구마"));
+        u.UpdateUserName("고구마","감자");
+        System.out.println(u.ReadUser("고구마"));
+        System.out.println(u.ReadUser("감자"));
+        u.DeleteUser("감자");
 
 //
 //
