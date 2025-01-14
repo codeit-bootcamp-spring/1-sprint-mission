@@ -93,7 +93,7 @@ public class User {
     }
 
     public void withdraw() {
-        id = null;
+        this.id = null;
         this.name = "(알 수 없음)";
         this.email = null;
         this.phoneNumber = null;

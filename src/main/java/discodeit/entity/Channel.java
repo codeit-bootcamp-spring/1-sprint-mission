@@ -87,8 +87,12 @@ public class Channel {
         if (deleteMessage == null) {
             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
         }
-//        deleteMessage.checkSender(user);
+        deleteMessage.checkSender(user);
         messages.remove(message);
+    }
+
+    public void deleteAllMessages() {
+        messages.clear();
     }
 
     public User findParticipant(User user) {

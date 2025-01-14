@@ -80,4 +80,11 @@ public class JCFMessageService implements MessageService {
         channel.deleteMessage(message, user);
         messages.remove(message);
     }
+
+    @Override
+    public void deleteAllMessages(List<Message> deleteMessages) {
+        for (Message deleteMessage : deleteMessages) {
+            messages.remove(deleteMessage);
+        }
+    }
 }

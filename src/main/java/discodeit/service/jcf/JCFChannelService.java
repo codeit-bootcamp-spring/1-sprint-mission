@@ -100,10 +100,8 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(Channel channel, User user) {
         channel.deleteAllParticipants(user);
-        List<Message> messagesInChannel = channel.getMessages();
-        while (messagesInChannel.size() != 0) {
-            jcfMessageService.deleteMessage(messagesInChannel.get(0), channel, user);
-        }
+        jcfMessageService.deleteAllMessages(channel.getMessages());
+        channel.deleteAllMessages();
         channels.remove(channel);
     }
 
