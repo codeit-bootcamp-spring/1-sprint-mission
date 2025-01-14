@@ -8,7 +8,8 @@ public interface UserRepository {
     void saveUser(User user);
     // 읽기 = 찾기
     User findById(UUID id);
-    Map<UUID, User> findAll();
+    Map<UUID, User> getAllUsers();
     // 삭제
-    void deleteUser(UUID id);
+    void deleteAllUsers();
+    void deleteUserById(UUID id);
 }
