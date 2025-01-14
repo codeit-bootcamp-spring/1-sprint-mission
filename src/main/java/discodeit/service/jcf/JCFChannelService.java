@@ -43,6 +43,7 @@ public class JCFChannelService implements ChannelService {
     public Channel createChannel(String name, String introduction, User owner) {
         Channel newChannel = new Channel(name, introduction, owner);
         channels.add(newChannel);
+        jcfUserService.updateJoinedChannels(owner, newChannel);
         return newChannel;
     }
 
