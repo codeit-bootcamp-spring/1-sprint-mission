@@ -1,24 +1,23 @@
 package com.sprint.mission.discodeit.entity;
 
+// 채팅 사용자 엔티티
 public class User extends BaseEntity {
-    private String username;
+    private String name; // 사용자 이름
 
-    public User(String username) {
+    // 사용자 이름을 초기화하는 생성자
+    public User(String name) {
         super();
-        this.username = username;
+        this.name = name;
     }
 
-    public String getUsername() {
-        return username;
+    // 사용자 이름을 반환
+    public String getName() {
+        return name;
     }
 
-    public void updateUsername(String username) {
-        this.username = username;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-
-    @Override
-    public String toString() {
-        return "User{id=" + getId() + ", username='" + username + "'}";
+    // 사용자 이름을 설정하고 수정 시간을 업데이트
+    public void setName(String name) {
+        this.name = name;
+        updateTimestamp();
     }
 }

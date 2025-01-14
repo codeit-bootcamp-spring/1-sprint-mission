@@ -1,41 +1,45 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.jcf.JCFEntityService;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // 서비스 초기화
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(userService, channelService);
+        // 싱글톤 서비스 인스턴스 생성
+        JCFEntityService<User> userService = JCFEntityService.getInstance(User.class);
+        JCFEntityService<Channel> channelService = JCFEntityService.getInstance(Channel.class);
+        JCFEntityService<Message> messageService = JCFEntityService.getInstance(Message.class);
 
-        // Step 1: User 생성
-        User alice = new User("Alice");
-        userService.create(alice);
-        System.out.println("Created User: " + alice);
+        // 사용자 생성
+        User user1 = new User("Alice");
+        userService.create(user1);
 
+        // 채널 생성
+        Channel channel1 = new Channel("General");
+        channelService.create(channel1);
 
-        // Step 2: Channel 생성
-        Channel general = new Channel("General");
-        channelService.create(general);
-        System.out.println("Created Channel: " + general);
+        // 메시지 생성
+        Message message1 = new Message("Hello World!", user1, channel1);
+        messageService.create(message1);
 
+        // 엔티티 조회 및 출력
+        userService.read(user1.getId()).ifPresent(u -> System.out.println("User: " + u.getName()));
+        channelService.read(channel1.getId()).ifPresent(c -> System.out.println("Channel: " + c.getTitle()));
+        messageService.read(message1.getId()).ifPresent(m -> System.out.println("Message: " + m.getContent()));
 
-        // Step 3: Message 생성 (정상적인 경우)
-        try {
-            Message message = new Message("Hello, world!", alice.getId().toString(), general.getId().toString());
-            messageService.create(message);
-            System.out.println("Messages: " + messageService.findAll());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        // 엔티티 업데이트
+        user1.setName("Bob");
+        userService.update(user1.getId(), user1);
+
+        // 업데이트 확인
+        userService.read(user1.getId()).ifPresent(u -> System.out.println("Updated User: " + u.getName()));
+
+        // 엔티티 삭제 및 확인
+        messageService.delete(message1.getId());
+        System.out.println("Message exists after deletion: " + messageService.read(message1.getId()).isPresent());
+
+        // Stream API를 사용하여 조건에 맞는 사용자 필터링
+        userService.findByCondition(u -> u.getName().startsWith("B"))
+                .forEach(u -> System.out.println("Filtered User: " + u.getName()));
     }
 }
