@@ -15,7 +15,7 @@ public class InMemoryUserRepository implements UserRepository {
     public void saveUser(User user){
         users.put(user.getId(), user);
     }
-    public User findById(UUID id){
+    public User findUserById(UUID id){
         return users.get(id);
     }
     public Map<UUID, User> getAllUsers() {

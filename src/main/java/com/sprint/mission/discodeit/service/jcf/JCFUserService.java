@@ -29,10 +29,6 @@ public class JCFUserService implements UserService {
         this.inputHandler = inputHandler;
     }
 
-//    public User getUser(String nickname){
-//        return ;
-//    }
-
     public UUID createUser(String nickname){
         User user = new User(nickname);
         // 인터페이스 구현체의 메서드 saveUser(User user) 이용
@@ -40,7 +36,7 @@ public class JCFUserService implements UserService {
         return user.getId();
     }
 
-    public int getAllUsers(){
+    public int showAllUsers(){
         // 전체 유저 조희
         if (userRepository.getAllUsers().isEmpty()) {
             System.out.println("No users exists.\n");
@@ -63,18 +59,18 @@ public class JCFUserService implements UserService {
 
     public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
-        userRepository.findById(id).setNickname(newNickname);
+        userRepository.findUserById(id).setNickname(newNickname);
         // 수정 시간 업데이트를 위해
-        userRepository.findById(id).setUpdateAt(System.currentTimeMillis());
+        userRepository.findUserById(id).setUpdateAt(System.currentTimeMillis());
     }
 
-    public void deleteAllUsers(){
+    public void clearAllUsers(){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             userRepository.deleteAllUsers();
         }
     }
-    public void deleteUserById(UUID id){
+    public void removeUserById(UUID id){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             userRepository.deleteUserById(id);

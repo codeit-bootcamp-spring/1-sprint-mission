@@ -13,7 +13,18 @@ public class Channel extends BaseEntity{
     public void setChannelName(String channelName){
        this.channelName = channelName;
     }
-    public User getUser(){
-        return user;
+    public User getUser(){return user;}
+
+    @Override
+    public String toString(){
+        return "\n"
+                + "User : "  + user.getNickname()
+                + "\n"
+                + "Channel : " + getChannelName()
+                + "\n"
+                + "create at : " + getCreatedAt()
+                + "\n"
+                + "Updated at : " + getUpdatedAt()
+                + "\n";
     }
 }
