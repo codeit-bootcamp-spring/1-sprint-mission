@@ -67,11 +67,10 @@ public class Channel {
     }
 
     public void deleteParticipant(User user) {
-        User deleteUser = findParticipant(user);
-        if (deleteUser == null) {
+        if (!participants.contains(user)) {
             throw new IllegalArgumentException("삭제할 유저를 찾을 수 없습니다.");
         }
-        participants.remove(deleteUser);
+        participants.remove(user);
     }
 
     public void deleteAllParticipants(User user) {
@@ -84,30 +83,15 @@ public class Channel {
     }
 
     public void deleteMessage(Message message, User user) {
-        Message deleteMessage = findMessage(message);
-        if (deleteMessage == null) {
+        if (!messages.contains(message)) {
             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
         }
-        deleteMessage.checkSender(user);
+        message.checkSender(user);
         messages.remove(message);
     }
 
     public void deleteAllMessages() {
         messages.clear();
-    }
-
-    public User findParticipant(User user) {
-        return participants.stream()
-                .filter(participant -> participant.isEqualTo(user))
-                .findAny()
-                .orElse(null);
-    }
-
-    public Message findMessage(Message message) {
-        return messages.stream()
-                .filter(findMessage -> findMessage.isEqualTo(message))
-                .findAny()
-                .orElse(null);
     }
 
     public boolean isEqualTo(Channel channel) {
