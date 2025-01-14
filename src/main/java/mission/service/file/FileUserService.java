@@ -62,7 +62,7 @@ public class FileUserService {
 
     public List<User> findAll() {
         try {
-            fileUserRepository.findAll();
+            return fileUserRepository.findAll();
         } catch (IOException e) {
             e.printStackTrace();
         }

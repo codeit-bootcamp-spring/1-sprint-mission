@@ -23,13 +23,6 @@ public class FileUserRepository {
     // 파일
     private static final String FILE_NAME = " ";
 
-    // 파일 생성
-    public void createUserDirectory() throws IOException {
-        // 그냥 매번 새로 생성한다고 가능
-        Path userDirectPath = Files.createDirectory(USER_DIRECT_PATH);
-        // 중복 검증 할지 말지 catch (FileAlreadyExistsException e) {//System.out.println("이미 존재하는 디렉토리입니다");
-    }
-
     // 유저 저장
     public User saveUser(User user) throws IOException {
         // 이름 중복검사는 메인 서비스에서
@@ -54,7 +47,7 @@ public class FileUserRepository {
             return new ArrayList<>();
         } else {
             return Files.list(USER_DIRECT_PATH)
-                    .filter(path -> path.endsWith(".ser"))
+                    .filter(path -> path.toString().endsWith(".ser"))
                     .map(this::readUserFromFile)
                     // 역직렬화
                     .collect(Collectors.toList());
@@ -85,8 +78,8 @@ public class FileUserRepository {
 
     public void delete(User user) throws IOException {
         Path deletingUserPath = getUserFilePath(user.getId());
+        System.out.printf("%s 파일 삭제 완료", user.getName());
         Files.delete(deletingUserPath);
-        System.out.println("파일 삭제 완료");
 
 
 //        } catch (NoSuchFileException e) {
@@ -126,6 +119,27 @@ public class FileUserRepository {
 
     public User findByNamePW(String name, String password) {
         return null;
+    }
+
+
+    // 파일 생성
+    public void createUserDirectory() throws IOException {
+        // 그냥 매번 새로 생성한다고 가능
+        if (Files.exists(USER_DIRECT_PATH)){
+            try {
+                Files.list(USER_DIRECT_PATH).forEach(path -> {
+                    try {
+                        Files.delete(path); // 개별 파일 삭제
+                    } catch (IOException e) {
+                        throw new RuntimeException("파일 삭제 실패" + e.getMessage());
+                    }
+                });
+            } catch (IOException e) {
+                System.out.println("디렉토리 초기화 실패");
+            }
+            Files.delete(USER_DIRECT_PATH);
+        }
+        Files.createDirectory(USER_DIRECT_PATH);
     }
 }
 
