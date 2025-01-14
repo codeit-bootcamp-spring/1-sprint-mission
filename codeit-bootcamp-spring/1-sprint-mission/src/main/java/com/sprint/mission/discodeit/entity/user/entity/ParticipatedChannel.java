@@ -66,8 +66,7 @@ public class ParticipatedChannel {
         return foundChannel;
     }
 
-    // 채널 삭제
-    public void deleteChannelById(UUID channelId) {
-        findById(channelId).ifPresent(Channel::deleteChannel);
+    public void deleteChannelById(UUID channelId, User user) {
+        findById(channelId).ifPresent(channel -> channel.deleteChannel(user));
     }
 }

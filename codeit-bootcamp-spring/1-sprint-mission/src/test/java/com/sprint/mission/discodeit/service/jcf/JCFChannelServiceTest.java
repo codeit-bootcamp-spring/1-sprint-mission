@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 
 class JCFChannelServiceTest {
 
@@ -22,5 +24,12 @@ class JCFChannelServiceTest {
         userRepository = mock(UserRepository.class);
 
         channelService = spy(new JCFChannelService(channelRepository, userRepository));
+    }
+
+    @Nested
+    @DisplayName("")
+    class crudChannelService {
+
+
     }
 }

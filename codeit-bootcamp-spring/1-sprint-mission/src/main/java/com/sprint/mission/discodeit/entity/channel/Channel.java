@@ -48,7 +48,14 @@ public class Channel extends AbstractUUIDEntity {
         updateStatusAndUpdateAt();
     }
 
-    public void deleteChannel() {
+    public void deleteChannel(User user) {
+        if (!isCreator(user)) {
+            throw ChannelException.ofErrorMessageAndCreatorName(
+                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
+                    user.getName()
+            );
+        }
+
         updateUnregistered();
     }
 

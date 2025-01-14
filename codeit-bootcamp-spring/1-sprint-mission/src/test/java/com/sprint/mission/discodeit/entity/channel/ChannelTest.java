@@ -55,7 +55,7 @@ class ChannelTest {
         void givenChannelWhenDeleteChannelThenStatusUpdate() {
             // given
             // when
-            channel.deleteChannel();
+            channel.deleteChannel(USER);
             // then
             assertThat(channel.getStatus()).isEqualTo(UNREGISTERED);
         }

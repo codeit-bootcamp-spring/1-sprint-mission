@@ -30,9 +30,9 @@ public class User extends AbstractUUIDEntity {
     }
 
     /**
-     * TODO 채널을 생성하는 책임이 여기? 아님!!
-     * 채널 객체 자체를 생성하는 것은 아님 채널 객체에 요청하는 것인데 약간 애매하다.
-     * 채널 서비스 레이어에서 호출해서 채널이 생성되면 디비에 저장하는 로직 구상중
+     *  유저에게 채널을 생성하는 책임이 있는 것이아니라,
+     *  다른 객체에 해당 작업을 위임, 그런데 메서드 명이 영...
+     *  이 부분 코드 리뷰 부탁드릴게요!
      */
     public Channel createNewChannel(String channelName) {
         var createdChannel = participatedChannels.createChannel(channelName, this);
@@ -44,6 +44,10 @@ public class User extends AbstractUUIDEntity {
                 participatedChannels.changeChannelNameOrThrow(channelId, channelName, this);
 
         return targetChannel;
+    }
+
+    public void deleteParticipatedChannel(UUID channelId) {
+        participatedChannels.deleteChannelById(channelId, this);
     }
 
     public List<Channel> getParticipatedChannels() {

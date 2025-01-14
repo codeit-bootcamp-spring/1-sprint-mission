@@ -204,7 +204,7 @@ class ParticipatedChannelTest {
             var deleteTargetChannelId = createdChannel2.getId();
 
             // when
-            channels.deleteChannelById(deleteTargetChannelId);
+            channels.deleteChannelById(deleteTargetChannelId, USER);
 
             // then
             assertThat(createdChannel2.getStatus()).isEqualTo(UNREGISTERED);
