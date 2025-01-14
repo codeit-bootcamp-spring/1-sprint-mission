@@ -1,6 +1,9 @@
 name: sprint mission 1 PR Test
 
 on:
+  push:
+    branches:
+      - 'part1-백재우-sprint1'
   pull_request:
     branches:
       - 'part1-백재우'
@@ -20,6 +23,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
+
 
       - name: ☕ gradlew 실행 권한 설정
         run: find . -name "gradlew" -exec chmod +x {} \;
