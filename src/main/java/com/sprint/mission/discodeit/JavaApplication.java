@@ -39,7 +39,7 @@ public class JavaApplication {
         userService.updateUser(userId1, "AliceUpdated", System.currentTimeMillis());
 
         // 수정된 데이터 조회
-        System.out.println("\n=== 수정된 데이터 조회 ===");
+        System.out.println("\n=== 수정된 유저 데이터 조회 ===");
         User modifiedUser = userService.getUser(userId1);
         System.out.println("Modified User: " + modifiedUser);
 
@@ -89,12 +89,12 @@ public class JavaApplication {
         System.out.println("\n=== 채널 삭제 ===");
         channelService.deleteChannel(channelId2);
 
-        // 삭제된 데이터 확인
+        // 삭제된 채널 확인
         System.out.println("\n=== 삭제된 채널 데이터 확인 ===");
         Channel deletedChannel = channelService.getChannel(channelId2);
         System.out.println("Deleted Channel (Should be null): " + deletedChannel);
 
-        System.out.println("\n=== 최종 유저 데이터 확인 ===");
+        System.out.println("\n=== 최종 채널 데이터 확인 ===");
         channelService.getAllChannels().forEach(channel ->
                 System.out.println("Channel: " + channel.getName())
         );
@@ -118,7 +118,7 @@ public class JavaApplication {
                 System.out.println("Message: " + message.getContent())
         );
 
-        // 채널 수정
+        // 메시지 수정
         System.out.println("\n=== 메시지 수정 ===");
         messageService.updateMessage(messageId1, "MessageUpdated", System.currentTimeMillis());
 
