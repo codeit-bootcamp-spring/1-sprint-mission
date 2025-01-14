@@ -11,7 +11,7 @@ public class Phone {
 
     public Phone(String phone) {
         if (!PHONE_PATTERN.matcher(phone).matches()) {
-            throw new IllegalArgumentException("하이픈을 추가해서 작성해주세요: " + phone);
+            throw new IllegalArgumentException("invalidate type: " + phone);
         }
         this.value = phone;
     }

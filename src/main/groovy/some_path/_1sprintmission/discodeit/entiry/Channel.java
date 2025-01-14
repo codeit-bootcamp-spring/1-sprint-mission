@@ -58,6 +58,7 @@ public class Channel extends BaseEntity {
                 "id=" + getId().toString() +
                 ", name='" + name + '\'' +
                 ", users=" + users.stream().map(User::getUsername).toList() +
+                ", limitPerson='" + limitPerson + '\'' +
                 '}';
     }
 

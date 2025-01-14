@@ -11,7 +11,7 @@ public class Email {
 
     public Email(String email) {
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("지원하지 않는 이메일 형식입니다: " + email);
+            throw new IllegalArgumentException("invalid type: " + email);
         }
         this.value = email;
     }

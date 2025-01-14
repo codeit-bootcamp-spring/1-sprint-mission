@@ -5,7 +5,7 @@ import some_path._1sprintmission.discodeit.entiry.User;
 import some_path._1sprintmission.discodeit.service.UserService;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 public class JCFUserService implements UserService {
     private final Map<UUID, User> data = new HashMap<>();
     Random random = new Random();

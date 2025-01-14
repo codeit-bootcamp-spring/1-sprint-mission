@@ -99,12 +99,14 @@ public class User extends BaseEntity {
 
     public void joinChannel(Channel channel) {
         if (channels.add(channel)) {
+            System.out.println("**** " + username + " joined " + channel.getName() + " ****");
             channel.addMember(this);
         }
     }
 
     public void leaveChannel(Channel channel) {
         if (channels.remove(channel)) {
+            System.out.println("**** " +  username + " leaved " + channel.getName() + " ****");
             channel.removeMember(this);
         }
     }
