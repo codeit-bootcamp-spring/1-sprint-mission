@@ -27,7 +27,7 @@ public class Message implements Serializable {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    public Message(String message) {
+    private Message(String message) {
         this.message = message;
         id = UUID.randomUUID();
         firstId = id.toString().split("-")[0];
@@ -39,8 +39,10 @@ public class Message implements Serializable {
         mess.setWriter(user);
         mess.setWritedAt(channel);
         user.getMessages().add(mess);
+        channel.getMessageList().add(mess);
         return mess;
     }
+
     public User getWriter() {
         return writer;
     }

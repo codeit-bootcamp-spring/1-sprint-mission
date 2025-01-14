@@ -15,21 +15,12 @@ public class FileUserService {
 
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
-    // 생성
-    public void createUserDirectory(){
-        try {
-            fileUserRepository.createUserDirectory();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public User create(User user){
         // 검증을 더 앞에서 하자 validateDuplicateName
         try {
             return fileUserRepository.saveUser(user);
         } catch (IOException e) {
-            throw new RuntimeException("생성 실패");
+            throw new RuntimeException("생성 실패", e);
         }
     }
 
@@ -42,7 +33,7 @@ public class FileUserService {
             // oldName을 갖고 잇음 (수정 전)
         } catch (IOException e) {
             throw new RuntimeException(
-                    String.format("%S는 이미 존재하는 닉네임입니다", updatingUser.getName()));
+                    String.format("%S는 이미 존재하는 닉네임입니다", updatingUser.getName()), e);
         }
 
         return fileUserRepository.updateUserNamePW(updatingUser);
@@ -52,9 +43,9 @@ public class FileUserService {
         try {
             return fileUserRepository.findUserById(id);
         } catch (IOException e) {
-            throw new RuntimeException("파일 읽기 오류" + e.getMessage());
+            throw new RuntimeException("파일 읽기 오류" + e.getMessage(), e);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("입력한 id에 해당하는 파일이 없습니다");
+            throw new RuntimeException("입력한 id에 해당하는 파일이 없습니다", e);
         }
     }
 
@@ -72,7 +63,7 @@ public class FileUserService {
             fileUserRepository.delete(user);
         } catch (NoSuchFileException e) {
             throw new RuntimeException(String.format(
-                    "[%s] %s의 파일은 존재하지 않습니다", user.getFirstId(), user.getName()));
+                    "[%s] %s의 파일은 존재하지 않습니다", user.getFirstId(), user.getName()), e);
         } catch (IOException e) {
             System.out.println("User 파일 삭제 중 오류 발생");
             e.printStackTrace();
@@ -87,6 +78,15 @@ public class FileUserService {
                 Collectors.toMap(User::getName, Function.identity()));
         if (userListMap.get(name) != null){
             throw new IllegalStateException("이미 존재하는 닉네임입니다.");
+        }
+    }
+
+    // 디렉토리 생성
+    public void createUserDirectory(){
+        try {
+            fileUserRepository.createUserDirectory();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

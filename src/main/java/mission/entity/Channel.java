@@ -17,6 +17,7 @@ public class Channel implements Serializable {
     private String name;
     private String oldName;
     private List<User> userList = new ArrayList<>();
+    private List<Message> messageList = new ArrayList<>();
     private Integer userCount;
 
     private final LocalDateTime createdAt;
@@ -41,6 +42,9 @@ public class Channel implements Serializable {
 
     public String getOldName() {
         return oldName;
+    }
+    public List<Message> getMessageList(){
+        return messageList;
     }
 
     public void setOldName(String oldName) {

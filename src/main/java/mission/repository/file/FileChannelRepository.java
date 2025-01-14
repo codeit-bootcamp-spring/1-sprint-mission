@@ -17,8 +17,7 @@ public class FileChannelRepository {
 
     // 생성과 수정 2개 기능을 함
     public Channel register(Channel channel) throws IOException {
-        Path channelPath = CHANNEL_DIRECT_PATH.resolve(channel.getId() + ".ser");
-
+        Path channelPath = getChannelDirectPath(channel.getId());
         if (!Files.exists(channelPath)) {
             Files.createFile(channelPath);
         }
@@ -46,8 +45,9 @@ public class FileChannelRepository {
             return null;
         }
 
-        ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(channelPath));
-        return (Channel) ois.readObject();
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(channelPath))){
+            return (Channel) ois.readObject();
+        }
     }
 
     public void delete(Channel channel) {
@@ -75,6 +75,10 @@ public class FileChannelRepository {
     /**
      * 편의 메서드
      */
+    private Path getChannelDirectPath(UUID id) {
+        return CHANNEL_DIRECT_PATH.resolve(id.toString() + ".ser");
+    }
+
     public Channel readChannelFromFile(Path channelPath) {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(channelPath))) {
             return (Channel) ois.readObject();
@@ -83,6 +87,9 @@ public class FileChannelRepository {
         }
     }
 
+    /**
+     * 디렉토리 생성
+     */
     public void createChannelDirectory() throws IOException {
 
         if (Files.exists(CHANNEL_DIRECT_PATH)) {
@@ -101,7 +108,5 @@ public class FileChannelRepository {
         }
     }
 
-    private Path getChannelDirectPath(UUID id) {
-        return CHANNEL_DIRECT_PATH.resolve(id.toString() + ".ser");
-    }
+
 }
