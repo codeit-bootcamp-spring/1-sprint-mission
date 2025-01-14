@@ -1,6 +1,9 @@
 name: sprint mission 1 PR Test
 
 on:
+  push:
+    branches:
+      - 'part1-백재우-sprint1'
   pull_request:
     branches:
       - 'part1-백재우-sprint1'
