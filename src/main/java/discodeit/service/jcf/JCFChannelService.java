@@ -101,7 +101,7 @@ public class JCFChannelService implements ChannelService {
     public void deleteChannel(Channel channel, User user) {
         channel.deleteAllParticipants(user);
         Channel finalChannel = channel;
-        channel.getMessages().stream().forEach(message -> jcfMessageService.deleteMessage(finalChannel, message));
+        channel.getMessages().stream().forEach(message -> jcfMessageService.deleteMessage(message, finalChannel, user));
         channels.remove(channel);
         channel = null;
     }

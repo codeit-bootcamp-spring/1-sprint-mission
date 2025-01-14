@@ -74,11 +74,12 @@ public class Channel {
         participants.forEach(participant -> participant.deleteJoinedChannel(this));
     }
 
-    public void deleteMessage(Message message) {
+    public void deleteMessage(Message message, User user) {
         Message deleteMessage = findMessage(message);
         if (deleteMessage == null) {
             throw new IllegalArgumentException("삭제할 메시지를 찾을 수 없습니다.");
         }
+        deleteMessage.checkSender(user);
         messages.remove(message);
     }
 

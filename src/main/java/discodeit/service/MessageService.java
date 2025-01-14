@@ -14,5 +14,5 @@ public interface MessageService {
     Message findMessage(UUID id);
     String getInfo(Message message);
     void updateContent(Message message, String content);
-    void deleteMessage(Channel channel, Message message);
+    void deleteMessage(Message message, Channel channel, User user);
 }

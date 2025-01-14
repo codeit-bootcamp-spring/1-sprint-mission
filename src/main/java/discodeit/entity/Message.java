@@ -31,6 +31,12 @@ public class Message {
         this.content = content;
     }
 
+    public void checkSender(User user) {
+        if (!sender.isEqualTo(user)) {
+            throw new IllegalArgumentException("자신의 메시지만 삭제할 수 있습니다.");
+        }
+    }
+
     public boolean isEqualTo(Message message) {
         return id.equals(message.getId());
     }
