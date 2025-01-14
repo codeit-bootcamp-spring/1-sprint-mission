@@ -1,13 +1,16 @@
 package mission.entity;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private String name;
@@ -82,6 +85,9 @@ public class User {
     public String getPassword() {
         return password;
     }
+    public String getFirstId(){
+        return firstId;
+    }
 
     public LocalDateTime getCreateAt() {
         return createAt;
@@ -120,12 +126,12 @@ public class User {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(password, user.password) && Objects.equals(createAt, user.createAt) && Objects.equals(updateAt, user.updateAt);
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(password, user.password) ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, password, createAt, updateAt);
+        return Objects.hash(id, name, password);
     }
 
     @Override

@@ -32,6 +32,16 @@ public class ProjectManager {
     }
 
     /**
+     * 채널과 유저 서로 추가
+     */
+    public void addChannelByUser(UUID channelId, UUID userId) {
+        Channel channel = findChannelById(channelId);
+        findUserById(userId).addChannel(channel);
+        // 이 기능도 포함 : channel.getUserList().add(user);
+        // 따라서 addUserByChannel 필요 없음
+    }
+
+    /**
      * updating
      */
 
@@ -141,16 +151,6 @@ public class ProjectManager {
         Message deletingMessage = findMessageByC_M_Id(channelId, messageId);
         // userId 검증 추가로 할 필요도 없겠다. createMessage에서 이미 필요
         messageService.delete(deletingMessage);
-    }
-
-    /**
-     * 채널과 유저 서로 추가
-     */
-    public void addChannelByUser(UUID channelId, UUID userId) {
-        Channel channel = findChannelById(channelId);
-        findUserById(userId).addChannel(channel);
-        // 이 기능도 포함 : channel.getUserList().add(user);
-        // 따라서 addUserByChannel 필요 없음
     }
 
 }
