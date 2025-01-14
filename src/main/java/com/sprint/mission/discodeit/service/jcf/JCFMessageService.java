@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.ExceptionCode;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-
+    //< 채널 UUID < 메시지 UUID, 매시지 객체 >>
     private final Map<UUID, Map<UUID, Message>> msgData = new HashMap<>();
     private final MessageValidator validationService;
 
@@ -15,13 +19,16 @@ public class JCFMessageService implements MessageService {
         this.validationService = validationService;
     }
 
-    public void addChannelMsg(Message msg) {
-        if (validationService.checkChannelAndUser(msg.getDestinationChannel().getuuId(), msg.SendUser().getuuID())) {
-            msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
-            msgData.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
-            System.out.println("Message added successfully: " + msg.getContent());
+    public Message CreateMsg(User user, Channel channel, String content) {
+        if (!validationService.validateMessage(user, channel, content)){
+            throw new CustomException(ExceptionCode.MESSAGE_CREATION_FAILED);
         }
+        Message msg = new Message(user, channel, content);
+        msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
+        msgData.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
+        return msg;
     }
+
     public Message getMessage(UUID msgId) {
         for (Map<UUID, Message> channelMessages : msgData.values()) {
             if (channelMessages.containsKey(msgId)) {

@@ -38,5 +38,4 @@ public class UserValidator {
     public static boolean validateUser(String name, String email, String password) {
         return isValidName(name) && isValidEmail(email) && isValidPassword(password);
     }
-
 }

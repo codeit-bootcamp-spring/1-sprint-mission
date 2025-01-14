@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.validation;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionCode;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -17,14 +20,32 @@ public class MessageValidator {
         this.userService = userService;
     }
 
-    public boolean checkChannelAndUser(UUID channelId, UUID userId) {
-        if (channelService.getChannel(channelId) == null) {
-            throw new CustomException(ExceptionCode.POST_NOT_FOUND); // 채널을 찾을 수 없다는 예외
+    public boolean validateContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new CustomException(ExceptionCode.INVALID_MESSAGE_CONTENT);
         }
-        if (userService.getUser(userId) == null) {
-            throw new CustomException(ExceptionCode.USER_NOT_FOUND); // 사용자를 찾을 수 없다는 예외
-        }
-
         return true;
+    }
+
+    public boolean validateSender(UUID userId) {
+        if (userService.getUser(userId) == null) {
+            throw new CustomException(ExceptionCode.USER_NOT_FOUND);
+        }
+        return true;
+    }
+
+    public boolean validateDestinationChannel(UUID channelId) {
+        if (channelService.getChannel(channelId) == null) {
+            throw new CustomException(ExceptionCode.CHANNEL_NOT_FOUND);
+        }
+        return true;
+    }
+
+    public boolean validateMessage(User user, Channel channel, String content) {
+        boolean isContentValid = validateContent(content);
+        boolean isSenderValid = validateSender(user.getuuID());
+        boolean isDestinationChannelValid = validateDestinationChannel(channel.getuuId());
+
+        return isContentValid && isSenderValid && isDestinationChannelValid;
     }
 }

@@ -113,13 +113,10 @@ public class JavaApplication {
         Channel channel2 = channelService.createChannel("CH.2");
 
 
-        Message msg1 = new Message(user1, channel1, "안녕");
-        Message msg2 = new Message(user1, channel1, "hello");
-
 
         System.out.println("메시지 추가 addChannelMsg ");
-        messageService.addChannelMsg(msg1);
-        messageService.addChannelMsg(msg2);
+        Message msg1 = messageService.CreateMsg(user1, channel1, "안녕");
+        Message msg2 = messageService.CreateMsg(user2, channel2, "hello");
 
         System.out.println("-----------------조회 getMessage ------------------");
         Message printMsg =  messageService.getMessage(msg1.getMsguuId());
