@@ -6,7 +6,7 @@ on:
       - 'part1-백재우-sprint1'
   pull_request:
     branches:
-      - 'part1-백재우-sprint1'
+      - 'part1-백재우'
     paths:
       - 'codeit-bootcamp-spring/1-sprint-mission/**'
 
@@ -24,8 +24,11 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
       - name: ☕ gradlew 실행 권한 설정
         run: find . -name "gradlew" -exec chmod +x {} \;
 
       - name: 🚀 테스트 진행
-        run: cd codeit-bootcamp-spring/1-sprint-mission && ./gradlew clean test
+        run: cd codeit-bootcamp-spring/1-sprint-mission && ./gradlew --info test
