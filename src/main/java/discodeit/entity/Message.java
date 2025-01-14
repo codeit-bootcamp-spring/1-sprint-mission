@@ -55,6 +55,11 @@ public class Message {
         return this.id.equals(id);
     }
 
+    public boolean isSenderEqualTo(User user) {
+        return sender.getId().equals(user.getId());
+    }
+
+
     @Override
     public String toString() {
         return String.format(sender.getName() + ": " + content);

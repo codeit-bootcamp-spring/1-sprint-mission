@@ -42,6 +42,10 @@ public class User {
         return name;
     }
 
+    public List<Channel> getJoinedChannels() {
+        return joinedChannels;
+    }
+
     public void updateName(String name) {
         this.name = name;
     }
@@ -86,6 +90,15 @@ public class User {
 
     public boolean isIdEqualTo(UUID id) {
         return this.id.equals(id);
+    }
+
+    public void withdraw() {
+        id = null;
+        this.name = "(알 수 없음)";
+        this.email = null;
+        this.phoneNumber = null;
+        this.password = null;
+        joinedChannels = null;
     }
 
     @Override
