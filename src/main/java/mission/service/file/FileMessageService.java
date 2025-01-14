@@ -61,14 +61,24 @@ public class FileMessageService implements MessageService {
         return fileMessageRepository.findMessageById(id);
     }
 
+    /**
+     * 업테이트
+     */
     @Override
-    public Message update(UUID messageId, String newMessage) {
-        return fileMessageRepository.updateMessage(messageId, newMessage);
+    public Message update(Message message) {
+        return fileMessageRepository.updateMessage(message);
     }
 
+    /**
+     * 삭제
+     */
     @Override
     public void delete(Message message) {
-        fileMessageRepository.delete(message);
+        try {
+            fileMessageRepository.delete(message);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 삭제 실패: ",e);
+        }
     }
 }
 

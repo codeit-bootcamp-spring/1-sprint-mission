@@ -3,10 +3,7 @@ package mission.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class User implements Serializable {
 
@@ -20,11 +17,11 @@ public class User implements Serializable {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    private final List<Channel> channels = new ArrayList<>();
-    private final List<Message> messages = new ArrayList<>();
+    private final Set<Channel> channels = new HashSet<>();
+    private final Set<Message> messages = new HashSet<>();
 
     // 이 User가 입력한 모든 메시지
-    public List<Message> getMessages() {
+    public Set<Message> getMessages() {
         return messages;
     }
 
@@ -47,7 +44,7 @@ public class User implements Serializable {
         createAt = LocalDateTime.now();
     }
 
-    public List<Channel> getChannels() {
+    public Set<Channel> getChannels() {
         return channels;
     }
 

@@ -2,10 +2,7 @@ package mission.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class Channel implements Serializable {
 
@@ -16,8 +13,8 @@ public class Channel implements Serializable {
 
     private String name;
     private String oldName;
-    private List<User> userList = new ArrayList<>();
-    private List<Message> messageList = new ArrayList<>();
+    private Set<User> userList = new HashSet<>();
+    private Set<Message> messageList = new HashSet<>();
     private Integer userCount;
 
     private final LocalDateTime createdAt;
@@ -43,14 +40,14 @@ public class Channel implements Serializable {
     public String getOldName() {
         return oldName;
     }
-    public List<Message> getMessageList(){
+    public Set<Message> getMessageList(){
         return messageList;
     }
 
     public void setOldName(String oldName) {
         this.oldName = oldName;
     }
-    public List<User> getUserList() {
+    public Set<User> getUserList() {
         return userList;
     }
 

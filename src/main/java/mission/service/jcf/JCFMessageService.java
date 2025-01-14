@@ -20,12 +20,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findMessagesInChannel(Channel channel) {
+    public Set<Message> findMessagesInChannel(Channel channel) {
         return messageRepository.findMessagesInChannel(channel);
     }
 
     @Override
-    public List<Message> findAll() {
+    public Set<Message> findAll() {
         return messageRepository.findAll();
     }
 

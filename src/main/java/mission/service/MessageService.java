@@ -20,7 +20,7 @@ public interface MessageService {
     Set<Message> findAll();
 
     //[ ] 수정
-    Message update(UUID id, String newMessage);
+    Message update(Message message);
 
     //[ ] 삭제
     void delete(Message message);

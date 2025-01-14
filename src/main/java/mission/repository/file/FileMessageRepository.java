@@ -16,6 +16,8 @@ public class FileMessageRepository {
 
     private static final Path MS_DIRECT_PATH = Path.of("MS_Directory");
 
+    // 수정, 생성이 스는 메서드
+    // 수정, 생성 오류 메시지 따로 설정하기 위해 throws
     public Message createMessage(Message message) throws IOException {
         Path msDirectPath = getMsDirectPath(message.getId());
 
@@ -62,11 +64,17 @@ public class FileMessageRepository {
 //                : null;
 //    }
 
-    public Message updateMessage(UUID messageId, String newMessage) {
-        return null;
+    public Message updateMessage(Message message) {
+        try {
+            return createMessage(message);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 수정 시도 실패 - I/O 오류",e);
+        }
     }
 
-    public void delete(Message message) {
+    public void delete(Message message) throws IOException {
+        Path deletingMS_Path = getMsDirectPath(message.getId());
+        Files.delete(deletingMS_Path);
     }
 
     /**

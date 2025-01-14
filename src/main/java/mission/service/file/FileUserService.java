@@ -73,11 +73,8 @@ public class FileUserService {
 
     // 검증은 레포지토리까지 갈 필요도 없이 여기서 처리
     public void validateDuplicateName(String name) throws IOException {
-        List<User> users = findAll();
-        // List -> Map으로 바꿔서 조회 빠르게 (이전에 다른 강의에서 봤던건데, 크게 효과있는지는 모르겠다 - map변환과정이 짧나?)
-        Map<String, User> userListMap = users.stream().collect(
-                Collectors.toMap(User::getName, Function.identity()));
-        if (userListMap.get(name) != null){
+        Set<User> users = findAll();
+        if (users.contains(name)){
             throw new IllegalStateException("이미 존재하는 닉네임입니다.");
         }
     }

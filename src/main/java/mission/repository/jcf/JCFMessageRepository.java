@@ -19,10 +19,10 @@ public class JCFMessageRepository implements MessageRepository {
         return message;
     }
 
-    public List<Message> findAll(){
+    public Set<Message> findAll(){
         return data.values().stream() // 리스트를 스트림으로
                 .flatMap(List::stream) // 각 리스트 하나의 스트림 평탄화
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     public Message findMessageById(UUID id){
@@ -34,7 +34,7 @@ public class JCFMessageRepository implements MessageRepository {
         return null;
     }
 
-    public List<Message> findMessagesInChannel(Channel channel){
+    public Set<Message> findMessagesInChannel(Channel channel){
         return data.get(channel);
     }
 

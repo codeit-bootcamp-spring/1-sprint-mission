@@ -1,6 +1,7 @@
 package mission.service.file;
 
 import mission.entity.Channel;
+import mission.entity.Message;
 import mission.entity.User;
 import mission.repository.file.FileUserRepository;
 
@@ -103,6 +104,12 @@ public class FileMainService {
         updatingChannel.setOldName(updatingChannel.getName());
         updatingChannel.setName(newName);
         return fileChannelService.update(updatingChannel);
+    }
+
+    public Message updateMessage(UUID messageId, String newMessage){
+        Message updatingMessage = fileMessageService.findMessageById(messageId);
+        updatingMessage.setMessage(newMessage);
+        return fileMessageService.update(updatingMessage);
     }
 
     /**

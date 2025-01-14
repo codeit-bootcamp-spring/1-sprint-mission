@@ -27,6 +27,7 @@ public class Message implements Serializable {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
+    // 무조건 메시지는 CREATE로 생성하도록
     private Message(String message) {
         this.message = message;
         id = UUID.randomUUID();
