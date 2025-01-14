@@ -3,7 +3,7 @@ name: sprint mission 1 PR Test
 on:
   pull_request:
     branches:
-      - 'part1-백재우'
+      - 'part1-백재우-sprint1'
     paths:
       - 'codeit-bootcamp-spring/1-sprint-mission/**'
 
