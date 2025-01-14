@@ -1,6 +1,11 @@
 package discodeit.Validator;
 
+import java.util.regex.Pattern;
+
 public class UserValidator implements Validator {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
+    private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile("^\\d{3}-\\d{3,4}-\\d{4}$");
 
     public void validate(String name, String email, String phoneNumber) {
         validateName(name);
@@ -23,15 +28,13 @@ public class UserValidator implements Validator {
     }
 
     public void checkEmailFormat(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        if (!email.matches(emailRegex)) {
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new IllegalArgumentException("잘못된 이메일 형식입니다.");
         }
     }
 
     public void checkPhoneNumberFormat(String phoneNumber) {
-        String phoneNumberRegex = "^\\d{3}-\\d{3,4}-\\d{4}$";
-        if (!phoneNumber.matches(phoneNumber)) {
+        if (!PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches()) {
             throw new IllegalArgumentException("잘못된 핸드폰 번호 형식입니다.");
         }
     }
