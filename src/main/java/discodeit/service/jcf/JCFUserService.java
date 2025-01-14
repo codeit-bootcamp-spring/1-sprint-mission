@@ -1,5 +1,6 @@
 package discodeit.service.jcf;
 
+import discodeit.Validator.UserValidator;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
@@ -12,12 +13,14 @@ import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
-    private ChannelService jcfChannelService;
-    private MessageService jcfMessageService;
+    private final UserValidator validator;
     private final List<User> users;
+    private ChannelService jcfChannelService;
+    private MessageService jcfMessageService;;
 
     private JCFUserService() {
-        this.users = new ArrayList<>();
+        validator = new UserValidator();
+        users = new ArrayList<>();
     }
 
     private static class JCFUserServiceHolder {
@@ -40,6 +43,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(String name, String email, String phoneNumber, String password) {
+        validator.validate(name, email, phoneNumber);
         User newUser = new User(name, email, phoneNumber, password);
         users.add(newUser);
         return newUser;

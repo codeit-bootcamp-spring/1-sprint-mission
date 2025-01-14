@@ -13,9 +13,9 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
+    private final List<Message> messages;
     private UserService jcfUserService;
     private ChannelService jcfChannelService;
-    private final List<Message> messages;
 
     private JCFMessageService() {
         messages = new ArrayList<>();

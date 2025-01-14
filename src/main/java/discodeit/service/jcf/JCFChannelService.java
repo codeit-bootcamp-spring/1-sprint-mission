@@ -1,5 +1,6 @@
 package discodeit.service.jcf;
 
+import discodeit.Validator.ChannelValidator;
 import discodeit.entity.Channel;
 import discodeit.entity.Message;
 import discodeit.entity.User;
@@ -13,11 +14,13 @@ import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
+    private final ChannelValidator validator;
+    private final List<Channel> channels;
     private UserService jcfUserService;
     private MessageService jcfMessageService;
-    private final List<Channel> channels;
 
     private JCFChannelService() {
+        validator = new ChannelValidator();
         channels = new ArrayList<>();
     }
 
@@ -41,6 +44,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(String name, String introduction, User owner) {
+        validator.validate(name, introduction);
         Channel newChannel = new Channel(name, introduction, owner);
         channels.add(newChannel);
         jcfUserService.updateJoinedChannels(owner, newChannel);
