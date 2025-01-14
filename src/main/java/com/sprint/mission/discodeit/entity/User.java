@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
+import static com.sprint.mission.discodeit.entity.security.Encryptor.getEncryptedPassword;
+
 public class User {
     private final UUID id;
     private final Long createdAt;
@@ -14,7 +16,7 @@ public class User {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = null;
-        this.password = password;
+        this.password = getEncryptedPassword(password);
         this.name = name;
     }
 
@@ -35,7 +37,7 @@ public class User {
     }
 
     public void updatePassword(String password) {
-        this.password = password;
+        this.password = getEncryptedPassword(password);
         this.updatedAt = System.currentTimeMillis();
     }
 

@@ -7,8 +7,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.entity.security.Encryptor.getEncryptedPassword;
-
 public class JCFUserService implements UserService {
     private final UserRepository userRepository;
 
@@ -18,8 +16,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void createUser(String password, String name) {
-        String encryptedPassword = getEncryptedPassword(password);
-        User user = new User(encryptedPassword, name);
+        User user = new User(password, name);
         userRepository.save(user);
     }
 
@@ -50,9 +47,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserPassword(UUID id, String newPassword) {
-        String encryptedPassword = getEncryptedPassword(newPassword);
         userRepository.findUserById(id)
-            .ifPresentOrElse(u -> u.updatePassword(encryptedPassword), () -> {
+            .ifPresentOrElse(u -> u.updatePassword(newPassword), () -> {
                 throw new IllegalArgumentException("user not found: " + id);
             });
     }
