@@ -82,6 +82,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void updateParticipants(Channel channel, User user) {
         channel.updateParticipants(user);
+        jcfUserService.updateJoinedChannels(user, channel);
         channel.updateUpdatedAt();
     }
 

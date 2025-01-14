@@ -94,6 +94,7 @@ public class JCFUserService implements UserService {
     @Override
     public void updateJoinedChannels(User user, Channel channel) {
         user.updateJoinedChannels(channel);
+        jcfChannelService.updateParticipants(channel, user);
         user.updateUpdatedAt();
     }
 
