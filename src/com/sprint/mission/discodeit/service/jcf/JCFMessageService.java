@@ -24,10 +24,7 @@ public class JCFMessageService implements MessageService {
      */
     @Override
     public Message createMessage(Message messageInfoToCreate) throws InvalidFormatException {
-        messageValidator.validateIdFormat(messageInfoToCreate);
-        messageValidator.validateCreateAtFormat(messageInfoToCreate);
-        messageValidator.validateUpdateAtFormat(messageInfoToCreate);
-        messageValidator.validateContentFormat(messageInfoToCreate);
+        validateFormat(messageInfoToCreate);
 
         Message messageToCreate = Message.createMessage(
                 messageInfoToCreate.getId(),
@@ -50,13 +47,9 @@ public class JCFMessageService implements MessageService {
      */
     @Override
     public Message updateMessageById(UUID key, Message messageInfoToUpdate) throws InvalidFormatException {
-        messageValidator.validateIdFormat(messageInfoToUpdate);
-        messageValidator.validateCreateAtFormat(messageInfoToUpdate);
-        messageValidator.validateUpdateAtFormat(messageInfoToUpdate);
-        messageValidator.validateContentFormat(messageInfoToUpdate);
+        validateFormat(messageInfoToUpdate);
 
         Message existingMessage = findMessageById(key);
-
         Message messageToUpdate = Message.createMessage(
                 key,
                 existingMessage.getCreateAt(),
@@ -66,6 +59,13 @@ public class JCFMessageService implements MessageService {
         return Optional.ofNullable(data.computeIfPresent(
                         key, (id, message) -> messageToUpdate))
                 .orElse(Message.createEmptyMessage());
+    }
+
+    private void validateFormat(Message messageInfoToUpdate) throws InvalidFormatException {
+        messageValidator.validateIdFormat(messageInfoToUpdate);
+        messageValidator.validateCreateAtFormat(messageInfoToUpdate);
+        messageValidator.validateUpdateAtFormat(messageInfoToUpdate);
+        messageValidator.validateContentFormat(messageInfoToUpdate);
     }
 
     @Override

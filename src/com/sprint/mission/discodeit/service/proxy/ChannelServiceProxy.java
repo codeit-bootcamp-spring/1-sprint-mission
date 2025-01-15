@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.log.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class ChannelServiceProxy implements ChannelService {

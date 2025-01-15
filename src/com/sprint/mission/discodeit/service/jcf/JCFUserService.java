@@ -24,11 +24,7 @@ public class JCFUserService implements UserService {
      */
     @Override
     public User createUser(User userInfoToCreate) throws InvalidFormatException {
-        userValidator.validateIdFormat(userInfoToCreate);
-        userValidator.validateCreateAtFormat(userInfoToCreate);
-        userValidator.validateUpdateAtFormat(userInfoToCreate);
-        userValidator.validateNameFormat(userInfoToCreate);
-        userValidator.validateEmailFormat(userInfoToCreate);
+        validateFormat(userInfoToCreate);
 
         User userToCreate = new User.Builder(
                 userInfoToCreate.getName(), userInfoToCreate.getEmail())
@@ -52,14 +48,9 @@ public class JCFUserService implements UserService {
      */
     @Override
     public User updateUserById(UUID key, User userInfoToUpdate) throws InvalidFormatException {
-        userValidator.validateIdFormat(userInfoToUpdate);
-        userValidator.validateCreateAtFormat(userInfoToUpdate);
-        userValidator.validateUpdateAtFormat(userInfoToUpdate);
-        userValidator.validateNameFormat(userInfoToUpdate);
-        userValidator.validateEmailFormat(userInfoToUpdate);
+        validateFormat(userInfoToUpdate);
 
         User exsitingUser = findUserById(key);
-
         User userToUpdate = new User.Builder(
                 userInfoToUpdate.getName(), userInfoToUpdate.getEmail())
                 .id(key)
@@ -70,6 +61,14 @@ public class JCFUserService implements UserService {
         return Optional.ofNullable(data.computeIfPresent(
                         key, (id, user) -> userToUpdate))
                 .orElse(User.createEmptyUser());
+    }
+
+    private void validateFormat(User userInfoToCreate) throws InvalidFormatException {
+        userValidator.validateIdFormat(userInfoToCreate);
+        userValidator.validateCreateAtFormat(userInfoToCreate);
+        userValidator.validateUpdateAtFormat(userInfoToCreate);
+        userValidator.validateNameFormat(userInfoToCreate);
+        userValidator.validateEmailFormat(userInfoToCreate);
     }
 
     @Override

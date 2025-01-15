@@ -24,10 +24,7 @@ public class JCFChannelService implements ChannelService {
      */
     @Override
     public Channel createChannel(Channel channelInfoToCreate) throws InvalidFormatException {
-        channelValidator.validateIdFormat(channelInfoToCreate);
-        channelValidator.validateCreateAtFormat(channelInfoToCreate);
-        channelValidator.validateUpdateAtFormat(channelInfoToCreate);
-        channelValidator.validateNameFormat(channelInfoToCreate);
+        validateFormat(channelInfoToCreate);
 
         Channel channelToCreate = Channel.createChannel(
                 channelInfoToCreate.getId(),
@@ -50,13 +47,9 @@ public class JCFChannelService implements ChannelService {
      */
     @Override
     public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) throws InvalidFormatException {
-        channelValidator.validateIdFormat(channelInfoToUpdate);
-        channelValidator.validateCreateAtFormat(channelInfoToUpdate);
-        channelValidator.validateUpdateAtFormat(channelInfoToUpdate);
-        channelValidator.validateNameFormat(channelInfoToUpdate);
+        validateFormat(channelInfoToUpdate);
 
         Channel existingChannel = findChannelById(key);
-
         Channel channelToUpdate = Channel.createChannel(
                 key,
                 existingChannel.getCreateAt(),
@@ -66,6 +59,13 @@ public class JCFChannelService implements ChannelService {
         return Optional.ofNullable(data.computeIfPresent(
                         key, (id, channel) -> channelToUpdate))
                 .orElse(Channel.createEmptyChannel());
+    }
+
+    private void validateFormat(Channel channelInfoToUpdate)  throws InvalidFormatException {
+        channelValidator.validateIdFormat(channelInfoToUpdate);
+        channelValidator.validateCreateAtFormat(channelInfoToUpdate);
+        channelValidator.validateUpdateAtFormat(channelInfoToUpdate);
+        channelValidator.validateNameFormat(channelInfoToUpdate);
     }
 
     @Override

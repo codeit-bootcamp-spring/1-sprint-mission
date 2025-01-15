@@ -2,29 +2,39 @@ package com.sprint.mission.discodeit.log.service;
 
 import com.sprint.mission.discodeit.exception.ErrorCode;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.*;
 
 public class ServiceLogger {
     private static final Logger LOGGER   = Logger.getLogger(ServiceLogger.class.getName());
-    private static final String LOG_PATH = "service.log";
+    private static final String LOG_EXT  = ".log";
+    private static final String LOG_DIR  = "log";
+    private static final String LOG_NAME = "service";
+    private static final String LOG_PATH = LOG_DIR + File.separator + LOG_NAME + LOG_EXT;
     private FileHandler    fileHandler;
     private ConsoleHandler consoleHandler;
 
+    static {
+        File logDirectory = new File(LOG_DIR);
+        if (!logDirectory.exists()) {
+            logDirectory.mkdir();
+        }
+    }
     private ServiceLogger() {
         try {
             fileHandler = new FileHandler(LOG_PATH, true);
             consoleHandler = new ConsoleHandler();
         } catch (SecurityException | IOException e) {
-            severe(e, this.getClass());
+            severe(e, e.getStackTrace());
         }
 
         Formatter serviceFormatter = new ServiceFormatter();
         fileHandler.setFormatter(serviceFormatter);
-        fileHandler.setLevel(Level.WARNING);
-
         consoleHandler.setFormatter(serviceFormatter);
+
+        fileHandler.setLevel(Level.WARNING);
         consoleHandler.setLevel(Level.WARNING);
 
         LOGGER.setUseParentHandlers(false);
@@ -45,7 +55,10 @@ public class ServiceLogger {
     public void warning(ErrorCode errorCode, String message, UUID id) {
         LOGGER.warning("[" + errorCode.toString() + "] " + message + ", ID: " + id.toString());
     }
-    public void severe(Exception exception, Class<?> occuredClass) {
-        LOGGER.severe(exception.getClass().getName() + " occurred in " + occuredClass.getName());
+    public void severe(Exception exception, StackTraceElement[] stackTraceElement) {
+        StackTraceElement root = stackTraceElement[0];
+        LOGGER.severe(exception.getClass().getName() +
+                " occurred in '" + root.getClassName() + "'" +
+                " with '" + root.getMethodName() + "'");
     }
 }
