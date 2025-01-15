@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.config.factory;
 
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.channel.ChannelRepositoryInMemory;
-import com.sprint.mission.discodeit.db.message.MessageRepository;
+import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepository;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.db.user.UserRepositoryInMemory;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.message.MessageService;
+import com.sprint.mission.discodeit.service.message.directMessage.DirectMessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 
 /**
@@ -23,8 +23,8 @@ public class ApplicationInMemoryFactory implements AppFactory {
     private ChannelRepository channelRepository;
     private ChannelService channelService;
 
-    private MessageService messageService;
-    private MessageRepository messageRepository;
+    private DirectMessageService messageService;
+    private DirectMessageRepository messageRepository;
 
     private ApplicationInMemoryFactory() {}
 
@@ -68,12 +68,12 @@ public class ApplicationInMemoryFactory implements AppFactory {
     }
 
     @Override
-    public MessageService getMessageService() {
+    public DirectMessageService getMessageService() {
         return null;
     }
 
     @Override
-    public MessageRepository getMessageRepository() {
+    public DirectMessageRepository getMessageRepository() {
         return null;
     }
 }
