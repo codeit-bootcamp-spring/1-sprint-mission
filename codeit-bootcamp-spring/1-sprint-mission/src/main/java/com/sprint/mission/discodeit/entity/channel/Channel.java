@@ -59,9 +59,9 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     private void checkCreatorEqualsOrThrow(User user) {
-        var compareResult = isNotCreator(user);
+        var isNotCreator = isNotCreator(user);
 
-        if (!compareResult) {
+        if (isNotCreator) {
             throw ChannelException.ofErrorMessageAndCreatorName(
                     ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
                     user.getName()
