@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.validation.format;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 

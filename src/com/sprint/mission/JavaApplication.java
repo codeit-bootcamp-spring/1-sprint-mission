@@ -18,7 +18,7 @@ public class JavaApplication {
                 .phoneNumber("010-1234-5678")
                 .build();
 
-        UserService userService = UserServiceFactory.JCF_USER_SERVICE.createUserService();
+        UserService userService = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService();
         System.out.println("---------------------------------");
         System.out.println("userService.createUser()");
         System.out.println("pass User 'frog'! " + System.lineSeparator() + "User info: " + userService.createUser(frog));
@@ -55,17 +55,18 @@ public class JavaApplication {
 
         System.out.println("---------------------------------");
         System.out.println("userService.deleteUserById()");
-        System.out.println("pass UUID 'frogKey'! " + System.lineSeparator() + "User info: " +  userService.deleteUserById(frogKey));
+        System.out.println("pass UUID 'frogKey'! " + System.lineSeparator() + "User info: " + userService.deleteUserById(frogKey));
         System.out.println();
         System.out.println("pass UUID 'frogKey(already deleted)'! " + System.lineSeparator() + "User info: " + userService.deleteUserById(frogKey));
         System.out.println();
         System.out.println();
     }
+
     private static void testMessage() {
         Message hi = Message.createMessage("hi");
         Message lo = Message.createMessage("lo");
 
-        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE.createMessageService();
+        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE_FACTORY.createMessageService();
         System.out.println("---------------------------------");
         System.out.println("messageService.createMessage()");
         System.out.println("pass Message 'hi'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(hi));
@@ -101,17 +102,18 @@ public class JavaApplication {
 
         System.out.println("---------------------------------");
         System.out.println("messageService.deleteMessageById()");
-        System.out.println("pass UUID 'hiKey'! " + System.lineSeparator() + "Message info: " +  messageService.deleteMessageById(hiKey));
+        System.out.println("pass UUID 'hiKey'! " + System.lineSeparator() + "Message info: " + messageService.deleteMessageById(hiKey));
         System.out.println();
         System.out.println("pass UUID 'hiKey(already deleted)'! " + System.lineSeparator() + "Message info: " + messageService.deleteMessageById(hiKey));
         System.out.println();
         System.out.println();
     }
+
     private static void testChannel() {
         Channel c1 = Channel.createChannel("c1");
         Channel c2 = Channel.createChannel("c2");
 
-        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE.createChannelService();
+        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE_FACTORY.createChannelService();
         System.out.println("---------------------------------");
         System.out.println("channelService.createChannel()");
         System.out.println("pass Channel 'c1'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c1));
@@ -147,7 +149,7 @@ public class JavaApplication {
 
         System.out.println("---------------------------------");
         System.out.println("channelService.deleteChannelById()");
-        System.out.println("pass UUID 'c1Key'! " + System.lineSeparator() + "Channel info: " +  channelService.deleteChannelById(c1Key));
+        System.out.println("pass UUID 'c1Key'! " + System.lineSeparator() + "Channel info: " + channelService.deleteChannelById(c1Key));
         System.out.println();
         System.out.println("pass UUID 'c1Key(already deleted)'! " + System.lineSeparator() + "Channel info: " + channelService.deleteChannelById(c1Key));
         System.out.println();

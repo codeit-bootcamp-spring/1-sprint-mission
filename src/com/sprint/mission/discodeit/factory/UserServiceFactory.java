@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.service.proxy.UserServiceProxy;
 import java.util.function.Supplier;
 
 public enum UserServiceFactory {
-    JCF_USER_SERVICE(() -> new UserServiceProxy(new JCFUserService())),
+    JCF_USER_SERVICE_FACTORY(() -> new UserServiceProxy(new JCFUserService())),
     ;
 
     private final Supplier<UserService> supplier;

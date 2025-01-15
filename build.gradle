@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'checkstyle'
 }
 
 group = 'com.com.sprint.misson'
@@ -12,6 +13,11 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+checkstyle {
+    toolVersion = '1.0' // CheckStyle version
+    configFile = rootProject.file('checkstyle.xml') // Checkstyle path
 }
 
 test {

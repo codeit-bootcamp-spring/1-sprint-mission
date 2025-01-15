@@ -1,13 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.IntegerConstant.EMPTY_TIME;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
 
-public class Channel extends BaseEntity {
-    private static final Channel EMPTY_CHANNEL;
+public class Channel {
+    public static final Channel EMPTY_CHANNEL;
+    private final UUID   id;
+    private final Long   createAt;
+    private final Long   updateAt;
+    private final String name;
+
     static {
         EMPTY_CHANNEL = createChannel(
                 UUID.fromString(EMPTY_UUID.getValue()),
@@ -16,9 +22,6 @@ public class Channel extends BaseEntity {
                 EMPTY_STRING.getValue()
         );
     }
-
-    private final String name;
-
     private Channel(String name) {
         this(
                 UUID.randomUUID(),
@@ -44,12 +47,10 @@ public class Channel extends BaseEntity {
         );
     }
     private Channel(UUID id, Long createAt, Long updateAt, String name) {
-        super(
-                id,
-                createAt,
-                updateAt
-        );
-        this.name = name;
+        this.id       = id;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+        this.name     = name;
     }
 
     public static Channel createChannel(String name) {
@@ -68,6 +69,15 @@ public class Channel extends BaseEntity {
         return EMPTY_CHANNEL;
     }
 
+    public UUID getId() {
+        return id;
+    }
+    public Long getCreateAt() {
+        return createAt;
+    }
+    public Long getUpdateAt() {
+        return updateAt;
+    }
     public String getName() {
         return name;
     }
@@ -75,19 +85,21 @@ public class Channel extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        return super.equals(o);
+        Channel that = (Channel) o;
+        return Objects.equals(id, that.id);
     }
-
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "name='" + name + '\'' +
-                "} " + System.lineSeparator() +
-                super.toString();
+                "id=" + id +
+                ", createAt=" + createAt +
+                ", updateAt=" + updateAt +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

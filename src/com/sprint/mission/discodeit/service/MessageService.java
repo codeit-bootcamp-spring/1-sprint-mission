@@ -6,7 +6,10 @@ import java.util.UUID;
 
 public interface MessageService {
     Message createMessage(Message messageToCreate);
+
     Message findMessageById(UUID key);
+
     Message updateMessageById(UUID key, Message messageToUpdate);
+
     Message deleteMessageById(UUID key);
 }

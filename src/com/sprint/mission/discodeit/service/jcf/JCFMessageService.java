@@ -12,10 +12,10 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data; // assume that it is repository
-    private final MessageValidator   messageValidator;
+    private final MessageValidator messageValidator;
 
     public JCFMessageService() {
-        data             = new HashMap<>();
+        data = new HashMap<>();
         messageValidator = MessageValidator.getInstance();
     }
 
@@ -23,13 +23,11 @@ public class JCFMessageService implements MessageService {
      * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from {@code messageInfoToCreate}
      */
     @Override
-    public Message createMessage(Message messageInfoToCreate) {
-        try {
-            messageValidator.validateBaseEntityFormat(messageInfoToCreate);
-            messageValidator.validateContentFormat(messageInfoToCreate);
-        } catch (InvalidFormatException e) {
-            System.out.println(e.getMessage());
-        }
+    public Message createMessage(Message messageInfoToCreate) throws InvalidFormatException {
+        messageValidator.validateIdFormat(messageInfoToCreate);
+        messageValidator.validateCreateAtFormat(messageInfoToCreate);
+        messageValidator.validateUpdateAtFormat(messageInfoToCreate);
+        messageValidator.validateContentFormat(messageInfoToCreate);
 
         Message messageToCreate = Message.createMessage(
                 messageInfoToCreate.getId(),
@@ -51,15 +49,13 @@ public class JCFMessageService implements MessageService {
      * Update the Message while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code messageInfoToUpdate}
      */
     @Override
-    public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
-        Message existingMessage = findMessageById(key);
+    public Message updateMessageById(UUID key, Message messageInfoToUpdate) throws InvalidFormatException {
+        messageValidator.validateIdFormat(messageInfoToUpdate);
+        messageValidator.validateCreateAtFormat(messageInfoToUpdate);
+        messageValidator.validateUpdateAtFormat(messageInfoToUpdate);
+        messageValidator.validateContentFormat(messageInfoToUpdate);
 
-        try {
-            messageValidator.validateBaseEntityFormat(messageInfoToUpdate);
-            messageValidator.validateContentFormat(messageInfoToUpdate);
-        } catch (InvalidFormatException e) {
-            System.out.println(e.getMessage());
-        }
+        Message existingMessage = findMessageById(key);
 
         Message messageToUpdate = Message.createMessage(
                 key,
@@ -68,7 +64,7 @@ public class JCFMessageService implements MessageService {
         );
 
         return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, message)-> messageToUpdate))
+                        key, (id, message) -> messageToUpdate))
                 .orElse(Message.createEmptyMessage());
     }
 

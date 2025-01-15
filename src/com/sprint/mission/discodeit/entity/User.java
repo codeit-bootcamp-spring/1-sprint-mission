@@ -1,13 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.IntegerConstant.EMPTY_TIME;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
 
-public class User extends BaseEntity {
-    private static final User EMPTY_USER;
+public class User {
+    public static final User EMPTY_USER;
+    private final UUID   id;
+    private final Long   createAt;
+    private final Long   updateAt;
+    private final String name;
+    private final String email;
+    private final String phoneNumber;
+
     static {
         EMPTY_USER = new Builder(
                 EMPTY_STRING.getValue(), EMPTY_STRING.getValue())
@@ -17,17 +25,10 @@ public class User extends BaseEntity {
                 .phoneNumber(EMPTY_STRING.getValue())
                 .build();
     }
-
-    private final String name;
-    private final String email;
-    private final String phoneNumber;
-
     private User(Builder builder) {
-        super(
-                builder.id,
-                builder.createAt,
-                builder.updateAt
-        );
+        id          = builder.id;
+        createAt    = builder.createAt;
+        updateAt    = builder.updateAt;
         name        = builder.name;
         email       = builder.email;
         phoneNumber = builder.phoneNumber;
@@ -38,7 +39,7 @@ public class User extends BaseEntity {
     }
 
     public static final class Builder {
-        private UUID id       = UUID.randomUUID();
+        private UUID id = UUID.randomUUID();
         private Long createAt = System.currentTimeMillis();
         private Long updateAt = System.currentTimeMillis();
         private final String name;
@@ -46,7 +47,7 @@ public class User extends BaseEntity {
         private String phoneNumber = EMPTY_STRING.getValue();
 
         public Builder(String name, String email) {
-            this.name  = name;
+            this.name = name;
             this.email = email;
         }
 
@@ -72,6 +73,15 @@ public class User extends BaseEntity {
         }
     }
 
+    public UUID getId() {
+        return id;
+    }
+    public Long getCreateAt() {
+        return createAt;
+    }
+    public Long getUpdateAt() {
+        return updateAt;
+    }
     public String getName() {
         return name;
     }
@@ -85,21 +95,23 @@ public class User extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        return super.equals(o);
+        User that = (User) o;
+        return Objects.equals(id, that.id);
     }
-
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", createAt=" + createAt +
+                ", updateAt=" + updateAt +
+                ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
-                "} " + System.lineSeparator() +
-                super.toString();
+                '}';
     }
 }

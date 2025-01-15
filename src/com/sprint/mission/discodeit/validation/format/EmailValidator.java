@@ -3,22 +3,15 @@ package com.sprint.mission.discodeit.validation.format;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class EmailValidator {
+    private static final Pattern PATTERN = Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}");
+
     public void validateEmailFormat(String email) throws InvalidFormatException {
-        if (email == null || email.trim().isEmpty())
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        int index;
-        if ((index = email.indexOf('@')) == -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if (email.indexOf('@', index + 1) != -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if ((index = email.indexOf('.', index + 1)) == -1)
-            throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
-
-        if (email.indexOf('.', index + 1) != -1)
+        Matcher matcher = PATTERN.matcher(email);
+        if (!matcher.matches())
             throw new InvalidFormatException(ErrorCode.INVALID_EMAIL_FORMAT);
     }
 }

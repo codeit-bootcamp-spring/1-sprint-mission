@@ -1,13 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.IntegerConstant.EMPTY_TIME;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
 
-public class Message extends BaseEntity {
-    private static final Message EMPTY_MESSAGE;
+public class Message {
+    public static final Message EMPTY_MESSAGE;
+    private final UUID   id;
+    private final Long   createAt;
+    private final Long   updateAt;
+    private final String content;
+
     static {
         EMPTY_MESSAGE = createMessage(
                 UUID.fromString(EMPTY_UUID.getValue()),
@@ -16,9 +22,6 @@ public class Message extends BaseEntity {
                 EMPTY_STRING.getValue()
         );
     }
-
-    private final String content;
-
     private Message(String content) {
         this(
                 UUID.randomUUID(),
@@ -44,12 +47,10 @@ public class Message extends BaseEntity {
         );
     }
     private Message(UUID id, Long createAt, Long updateAt, String content) {
-        super(
-                id,
-                createAt,
-                updateAt
-        );
-        this.content = content;
+        this.id       = id;
+        this.createAt = createAt;
+        this.updateAt = updateAt;
+        this.content  = content;
     }
 
     public static Message createMessage(String content) {
@@ -68,6 +69,15 @@ public class Message extends BaseEntity {
         return EMPTY_MESSAGE;
     }
 
+    public UUID   getId() {
+        return id;
+    }
+    public Long   getCreateAt() {
+        return createAt;
+    }
+    public Long   getUpdateAt() {
+        return updateAt;
+    }
     public String getContent() {
         return content;
     }
@@ -75,19 +85,21 @@ public class Message extends BaseEntity {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        return super.equals(o);
+        Message that = (Message) o;
+        return Objects.equals(id, that.id);
     }
-
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hash(id);
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "content='" + content + '\'' +
-                "} " + System.lineSeparator() +
-                super.toString();
+                "id=" + id +
+                ", createAt=" + createAt +
+                ", updateAt=" + updateAt +
+                ", content='" + content + '\'' +
+                '}';
     }
 }
