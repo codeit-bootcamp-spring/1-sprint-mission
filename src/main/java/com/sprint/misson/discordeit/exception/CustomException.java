@@ -7,8 +7,8 @@ public class CustomException extends RuntimeException {
 
     //기본 사용
     public CustomException(ErrorCode errorCode) {
-      super(errorCode.getMessage());
-      this.errorCode = errorCode;
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 
     //상세메세지와 함께 사용
@@ -16,11 +16,11 @@ public class CustomException extends RuntimeException {
     //TODO - 고민
     //ErrorCode에 이미 이유가 적혀있는데, 굳이 detail 메세지를 직접 작성할 필요가 있을까?
     public CustomException(ErrorCode errorCode, String detailMessage) {
-      super(detailMessage);
-      this.errorCode = errorCode;
+        super(detailMessage);
+        this.errorCode = errorCode;
     }
 
     public ErrorCode getErrorCode() {
-      return errorCode;
+        return errorCode;
     }
 }

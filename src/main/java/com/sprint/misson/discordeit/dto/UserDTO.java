@@ -33,28 +33,28 @@ public class UserDTO {
         return statusMessage;
     }
 
-    public AccountStatus getAccountStatus(){
+    public AccountStatus getAccountStatus() {
         return accountStatus;
     }
 
     public void setAccountStatus(AccountStatus accountStatus) {
-        this.accountStatus=accountStatus;
+        this.accountStatus = accountStatus;
     }
 
     public void setStatusMessage(String statusMessage) {
-        this.statusMessage=statusMessage;
+        this.statusMessage = statusMessage;
     }
 
     public void setUserStatus(UserStatus userStatus) {
-        this.userStatus=userStatus;
+        this.userStatus = userStatus;
     }
 
     public void setEmail(String email) {
-        this.email=email;
+        this.email = email;
     }
 
     public void setNickname(String nickname) {
-        this.nickname=nickname;
+        this.nickname = nickname;
     }
 
 }

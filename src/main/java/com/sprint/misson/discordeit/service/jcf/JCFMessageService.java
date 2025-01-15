@@ -95,6 +95,8 @@ public class JCFMessageService implements MessageService {
     }
 
     //다건 조회 - 생성 날짜
+    //todo
+    //날짜 포멧 오류 등 예외 처리 필요-검색 시 기준을 날짜로 할지
     @Override
     public List<Message> getMessageByCreatedAt(Long createdAt) {
         return data.values().stream()

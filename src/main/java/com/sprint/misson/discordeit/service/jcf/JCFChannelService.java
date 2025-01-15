@@ -17,6 +17,7 @@ public class JCFChannelService implements ChannelService {
     public JCFChannelService() {
         this.data = new HashMap<>();
     }
+
     public static JCFChannelService getInstance() {
         return instance;
     }
@@ -26,20 +27,22 @@ public class JCFChannelService implements ChannelService {
     public Channel CreateChannel(String name, ChannelType type) {
         Channel channel = new Channel( name, type );
         data.put( channel.getId(), channel );
+        Channel channel = new Channel(name, type);
+        data.put(channel.getId(), channel);
         return channel;
     }
 
     //모두 조회
     @Override
     public List<Channel> getChannels() {
-        return new ArrayList<>( data.values() );
+        return new ArrayList<>(data.values());
     }
 
     //단일 조회 - UUID
     @Override
     public Channel getChannelByUUID(String channelId) throws RuntimeException {
         Channel channel = data.get(UUID.fromString(channelId));
-        if ( channel == null ) {
+        if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
         }
         return channel;
@@ -59,15 +62,15 @@ public class JCFChannelService implements ChannelService {
         return data.values().stream().filter(
                 c -> c.getChannelName().contains(channelName)).toList();
     }
+
     //수정
     @Override
     public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws RuntimeException {
-        Channel channel = data.get( UUID.fromString( channelId ) );
+        Channel channel = data.get(UUID.fromString(channelId));
 
-        if ( channel == null  ) {
+        if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
-        }
-        else if ( channelDTO == null ) {
+        } else if (channelDTO == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
@@ -101,7 +104,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public boolean deleteChannel(Channel channel) throws RuntimeException {
         Channel ch = data.get(channel.getId());
-        if ( ch == null ) {
+        if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channel.getId()));
         }
         return true;

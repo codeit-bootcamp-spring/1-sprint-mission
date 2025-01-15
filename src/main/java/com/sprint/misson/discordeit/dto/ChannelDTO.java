@@ -12,7 +12,7 @@ public class ChannelDTO {
     }
 
     public void setChannelName(String channelName) {
-        this.channelName=channelName;
+        this.channelName = channelName;
     }
 
     public boolean isHidden() {
@@ -20,6 +20,6 @@ public class ChannelDTO {
     }
 
     public void setPublic(boolean isHidden) {
-        this.isHidden=isHidden;
+        this.isHidden = isHidden;
     }
 }

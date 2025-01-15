@@ -28,7 +28,7 @@ public class Message {
     public UUID getId() {
         return id;
     }
-    
+
     //메세지가 생성된 이후, 보낸 사람을 변경할 수 없으므로 update 미구현
     public User getSender() {
         return sender;
@@ -39,7 +39,7 @@ public class Message {
     }
 
     public void setContent(String content) {
-        this.content=content;
+        this.content = content;
     }
 
     //메세지가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
@@ -52,7 +52,8 @@ public class Message {
     }
 
     public void setUpdatedAt() {
-        this.updatedAt=System.currentTimeMillis();;
+        this.updatedAt = System.currentTimeMillis();
+        ;
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
@@ -64,16 +65,19 @@ public class Message {
     //추후에 추가할 것
     //멘션, 답장(reply)
 
-    public String toShortString(){
+    public String toShortString() {
         return "[Message]\n id: " + id + "\n sender: " + sender.getNickname() + "\n content: " + content + "\n channel: " + channel.getChannelName();
     }
-    public String toFullString(){
+
+    public String toFullString() {
         return toShortString() + "\n createdAt: " + createdAt + "\n updatedAt: " + updatedAt;
     }
-    public void displayFullInfo(){
+
+    public void displayFullInfo() {
         System.out.println(toFullString());
     }
-    public void displayShortInfo(){
+
+    public void displayShortInfo() {
         System.out.println(toShortString());
     }
 

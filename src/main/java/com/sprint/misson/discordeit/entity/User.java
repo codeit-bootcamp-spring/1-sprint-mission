@@ -53,7 +53,7 @@ public class User {
     }
 
     public void setEmail(String email) {
-        this.email=email;
+        this.email = email;
     }
 
     //사용자가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
@@ -66,12 +66,13 @@ public class User {
     }
 
     public void setUpdatedAt() {
-        this.updatedAt=System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
     }
 
     public UserStatus getUserStatus() {
         return userStatus;
     }
+
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
@@ -81,7 +82,7 @@ public class User {
     }
 
     public void setAccountStatus(AccountStatus accountStatus) {
-        this.accountStatus=accountStatus;
+        this.accountStatus = accountStatus;
     }
 
     public String getStatusMessage() {
@@ -89,22 +90,22 @@ public class User {
     }
 
     public void setStatusMessage(String statusMessage) {
-        this.statusMessage=statusMessage;
+        this.statusMessage = statusMessage;
     }
 
     public String toFullString() {
-        return this.toShortString() +"\n updatedAt: " + updatedAt+ "\n accountStatus: " + accountStatus + "\n statusMessage: " + statusMessage ;
+        return this.toShortString() + "\n updatedAt: " + updatedAt + "\n accountStatus: " + accountStatus + "\n statusMessage: " + statusMessage;
     }
 
     public String toShortString() {
-        return "[User]\n id: "+id + "\n nickname: " + nickname + "\n email:  " + email + "\n userStatus: " + userStatus+"\n createdAt: " + createdAt ;
+        return "[User]\n id: " + id + "\n nickname: " + nickname + "\n email:  " + email + "\n userStatus: " + userStatus + "\n createdAt: " + createdAt;
     }
 
-    public void displayShortInfo(){
+    public void displayShortInfo() {
         System.out.println(toShortString());
     }
 
-    public void displayFullInfo(){
+    public void displayFullInfo() {
         System.out.println(toFullString());
     }
 

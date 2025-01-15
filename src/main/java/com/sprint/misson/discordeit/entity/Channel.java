@@ -46,7 +46,7 @@ public class Channel {
     }
 
     public void setChannelName(String channelName) {
-        this.channelName=channelName;
+        this.channelName = channelName;
     }
 
     //채널 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
@@ -59,7 +59,7 @@ public class Channel {
     }
 
     public void setUpdatedAt() {
-        this.updatedAt=System.currentTimeMillis();;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     //채널 생성된 이후, 채널 종류를 변경할 수 없으므로 update 미구현
@@ -74,25 +74,26 @@ public class Channel {
     }
 
     public void setHidden(boolean isHidden) {
-        this.isHidden= isHidden;
+        this.isHidden = isHidden;
     }
 
     public HashSet<User> getUserList() {
         return userList;
     }
 
-    public String toShortString(){
-        return "[Channel]\n id: "+id+ "\n channelName: "+channelName+ "\n channelType: "+channelType + "\n total users: "+ userList.size();
+    public String toShortString() {
+        return "[Channel]\n id: " + id + "\n channelName: " + channelName + "\n channelType: " + channelType + "\n total users: " + userList.size();
     }
 
-    public String toFullString(){
-        return toShortString() + "\n isHidden: "+ isHidden +"\n createdAt: "+createdAt+ "\n updatedAt: "+updatedAt ;
+    public String toFullString() {
+        return toShortString() + "\n isHidden: " + isHidden + "\n createdAt: " + createdAt + "\n updatedAt: " + updatedAt;
     }
 
-    public void displayFullInfo(){
+    public void displayFullInfo() {
         System.out.println(toFullString());
     }
-    public void displayShortInfo(){
+
+    public void displayShortInfo() {
         System.out.println(toShortString());
     }
 

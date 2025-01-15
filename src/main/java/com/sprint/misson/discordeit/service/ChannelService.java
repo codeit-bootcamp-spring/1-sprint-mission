@@ -16,17 +16,17 @@ public interface ChannelService {
 
     //읽기
     //단건 조회 - UUID
-     Channel getChannelByUUID(String channelId);
+    Channel getChannelByUUID(String channelId);
 
     //다건 조회 - name
-     List<Channel> getChannelsByName(String channelName);
+    List<Channel> getChannelsByName(String channelName);
 
     //다건 조회 - 채널 타입
-     List<Channel> getChannelByType(ChannelType channelType);
+    List<Channel> getChannelByType(ChannelType channelType);
 
     //수정
-     Channel updateChannel(String channelId, ChannelDTO channelDTO);
+    Channel updateChannel(String channelId, ChannelDTO channelDTO);
 
     //삭제
-     boolean deleteChannel(Channel channel);
+    boolean deleteChannel(Channel channel);
 }

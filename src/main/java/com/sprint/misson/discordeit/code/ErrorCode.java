@@ -9,7 +9,7 @@ public enum ErrorCode {
     USER_NOT_IN_CHANNEL(1004, "사용자가 해당 채널에 있지 않습니다."),
 
     //채널 관련 에러
-    CHANNEL_NOT_FOUND(2001,"채널을 찾을 수 없습니다."),
+    CHANNEL_NOT_FOUND(2001, "채널을 찾을 수 없습니다."),
 
     //메세지 관련 에러
     MESSAGE_NOT_FOUND(3001, "메세지를 찾을 수 없습니다."),
@@ -17,7 +17,7 @@ public enum ErrorCode {
     MESSAGE_CHANNEL_NOT_MATCH(3003, "해당 메세지가 작성된 채널이 아닙니다."),
 
     //데이터 관련 에러
-    EMPTY_DATA(4001,"DTO가 비어있습니다.");
+    EMPTY_DATA(4001, "DTO가 비어있습니다.");
 
     private final int code;
     private final String message;
@@ -30,6 +30,7 @@ public enum ErrorCode {
     public int getCode() {
         return code;
     }
+
     public String getMessage() {
         return message;
     }
