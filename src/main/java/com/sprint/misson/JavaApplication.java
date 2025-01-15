@@ -67,6 +67,30 @@ public class JavaApplication {
         System.out.println("\n> 채널 생성 결과 및 전체 채널 목록:");
         channelService.getChannels().forEach(Channel::displayShortInfo);
 
+        System.out.println("\n* 채널에 유저 추가 및 삭제: ");
+
+        System.out.println();
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user1));
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user2));
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user3));
+        channel1.displayShortInfo();
+
+        System.out.println();
+        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2, user1));
+        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2, user2));
+        channel2.displayShortInfo();
+
+        System.out.println();
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user1));
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user2));
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user3));
+        channel3.displayShortInfo();
+
+        System.out.println();
+        System.out.println("- " + channel4.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel4, user1));
+        channel4.displayShortInfo();
+
+
         System.out.println("\n\n--- Massage 등록---");
 
         Message msg1 = messageService.createMessage(user1, "일반1 채널입니다!", channel1);
@@ -157,6 +181,11 @@ public class JavaApplication {
         userService.getUsersByNickname("박유진").forEach(User::displayShortInfo);
 
         System.out.println("\n5) 유저 상태로 조회(다건): ");
+        System.out.println("- default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경");
+        UserDTO userDTO = new UserDTO();
+        userDTO.setUserStatus(UserStatus.INACTIVE);
+        userService.updateUser(user3.getId().toString(), userDTO);
+
         System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
         userService.getUserByUserStatus(UserStatus.ACTIVE).forEach(User::displayShortInfo);
 
@@ -193,6 +222,9 @@ public class JavaApplication {
         System.out.println("> Channal Type이 TEXT인 채널 조회 결과: ");
         channelService.getChannelByType(ChannelType.TEXT).forEach(Channel::displayShortInfo);
 
+        System.out.println("\n5) 채널에 참여중인 유저 목록 조회");
+        System.out.println("> channel1에 참여 중인 유저 목록 조회 결과:");
+        channelService.getUsersInChannel(channel1).forEach(u -> System.out.println(u.getId()));
 
         System.out.println("\n--- Message 조회 ---");
         System.out.println("\n1) 전체 목록 조회");
