@@ -8,24 +8,40 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
 public class ServiceFactory implements Factory{
+    private static UserService userServiceInstance;
+    private static ChannelService channelServiceInstance;
+    private static MessageService messageServiceInstance;
+    private static MessageValidator messageValidatorInstance;
 
     @Override
-    public UserService createUserService() {
-        return new JCFUserService();
+    public synchronized UserService  createUserService() {
+        if(userServiceInstance == null){
+            userServiceInstance = new JCFUserService();
+        }
+        return userServiceInstance;
     }
 
     @Override
-    public ChannelService createChannelService() {
-        return new JCFChannelService();
+    public synchronized ChannelService createChannelService() {
+        if(channelServiceInstance == null){
+            channelServiceInstance = new JCFChannelService();
+        }
+        return channelServiceInstance;
     }
 
     @Override
-    public MessageValidator createMessageValidator(){
-        return new MessageValidator(createChannelService(),createUserService());
+    public synchronized MessageValidator createMessageValidator(){
+        if(messageValidatorInstance == null){
+            messageValidatorInstance = new MessageValidator(createChannelService(), createUserService());
+        }
+        return messageValidatorInstance;
     }
 
     @Override
-    public MessageService createMessageService() {
-        return new JCFMessageService(createMessageValidator());
+    public synchronized MessageService createMessageService() {
+        if(messageValidatorInstance == null){
+            messageServiceInstance = new JCFMessageService(createMessageValidator());
+        }
+        return messageServiceInstance;
     }
 }
