@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.entity.message;
 
+import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 
-public class DirectMessage {
+public class DirectMessage extends AbstractUUIDEntity {
     // 보내는 방법을 추상화
     private final Sender<User, User> sender;
 
@@ -37,6 +38,17 @@ public class DirectMessage {
         sender.sendMessage(messageSender, messageReceiver, message);
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public User getMessageSender() {
+        return messageSender;
+    }
+
+    public User getMessageReceiver() {
+        return messageReceiver;
+    }
 }
 /**
  *  메세지를 주고 받는 행위를 어떻게 처리해주어야 할까?

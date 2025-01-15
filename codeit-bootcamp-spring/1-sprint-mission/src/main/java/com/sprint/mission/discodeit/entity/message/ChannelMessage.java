@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity.message;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 
-public class ChannelMessage {
+public class ChannelMessage extends AbstractUUIDEntity {
 
     private final Sender<User, Channel> sender;
 
@@ -39,6 +40,19 @@ public class ChannelMessage {
 
         return new ChannelMessage(channelSender, message, messageSender, receiverChannel);
     }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public User getMessageSender() {
+        return messageSender;
+    }
+
+    public Channel getReceiverChannel() {
+        return receiverChannel;
+    }
+
     // 채널에 속한 모든 사람들에게 알림을 전송해야겠네 ?
     public void sendMessage() {
         sender.sendMessage(messageSender, receiverChannel, message);

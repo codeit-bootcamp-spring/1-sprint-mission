@@ -73,7 +73,7 @@ public class ParticipatedChannel {
         var foundChannel =
                 findByChannelIdNotUnregisteredOrThrow(channelId)
                         .orElseThrow(
-                                () -> UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL,
+                                () -> UserException.ofErrorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL,
                                         channelId.toString()));
 
         foundChannel.changeName(newName, user);

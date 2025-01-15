@@ -10,4 +10,6 @@ public class ChannelRepositoryInMemory extends InMemoryCrudRepository<Channel, U
     public static ChannelRepository getChannelRepositoryInMemory() {
         return new ChannelRepositoryInMemory();
     }
+
+
 }

@@ -21,7 +21,7 @@ public class UserException extends RuntimeException {
     }
 
 
-    public static UserException errorMessageAndId(
+    public static UserException ofErrorMessageAndId(
             ErrorMessage message, String id
     ) {
         var format = String.format(
@@ -33,7 +33,7 @@ public class UserException extends RuntimeException {
     }
 
 
-    public static UserException errorMessageAndChannelName(
+    public static UserException ofErrorMessageAndChannelName(
             ErrorMessage message, String channelName
     ) {
         var format = String.format(
