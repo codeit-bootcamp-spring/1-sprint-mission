@@ -9,7 +9,8 @@ public enum ExceptionText {
     USER_NOT_FOUND("해당되는 id 의 사용자를 찾을 수 없습니다."),
     INVALID_MESSAGE_CONTENT("메시지 내용은 null 또는 빈 값일 수 없습니다."),
     MESSAGE_CREATION_FAILED("메시지 생성 실패"),
-    USER_CREATION_FAILED("유저 생성 실패");
+    USER_CREATION_FAILED("유저 생성 실패"),
+    MESSAGE_NOT_FOUND("등록된 메시지가 없습니다.");
 
     private final String message;
 

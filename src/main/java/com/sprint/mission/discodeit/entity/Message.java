@@ -55,12 +55,11 @@ public class Message {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "Message{\n" +
                 "UUId=" + msguuId +
-                ", \ndestinationChannel = " + destinationCh.getChannelName() +
-                ", \ncreatedAt = " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedA t= " + sdf.format(new java.util.Date(updatedAt)) +
-                ", \ncontent ='" + content + '\'' +
-                ", \nsendUser = " + SendUser.getName() +
-                "}";
+                ", \ndestinationChannel : " + destinationCh.getChannelName() +
+                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
+                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) +
+                ", \ncontent : " + content + '\'' +
+                ", \nsendUser : " + SendUser.getName() + "\n}";
     }
 
 }

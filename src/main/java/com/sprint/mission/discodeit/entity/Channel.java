@@ -44,11 +44,10 @@ public class Channel {
     public String toString() {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "Channel{\n" +
-                "UUId=" + channeluuId +
-                ", \nchannelName='" + channelName + '\'' +
-                ", \ncreatedAt=" + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt=" + sdf.format(new java.util.Date(updatedAt)) +
-                '}';
+                "UUId : " + channeluuId +
+                ", \nchannelName : " + channelName +
+                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
+                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) + "\n}";
     }
 
 }

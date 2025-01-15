@@ -19,6 +19,7 @@ public class JCFMessageService implements MessageService {
         this.validationService = validationService;
     }
 
+    @Override
     public Message CreateMsg(User user, Channel channel, String content) {
         if (!validationService.validateMessage(user, channel, content)){
             throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
@@ -29,6 +30,7 @@ public class JCFMessageService implements MessageService {
         return msg;
     }
 
+    @Override
     public Message getMessage(UUID msgId) {
         for (Map<UUID, Message> channelMessages : msgData.values()) {
             if (channelMessages.containsKey(msgId)) {
@@ -39,23 +41,20 @@ public class JCFMessageService implements MessageService {
         return null;
     }
 
-
+    @Override
     public Map<UUID, Map<UUID, Message>> getAllMsg() {
         return new HashMap<>(msgData);
     }
 
-
+    @Override
     public void updateMsg(UUID msgId, String newContent) {
         Message msg = getMessage(msgId);
-        if (msg != null) {
-            msg.update(newContent);
-            System.out.println("Message content has been updated --> ("+ newContent + ")");
-        } else {
-            System.out.println("Message ID " + msgId + " not found.");
-        }
+        msg.update(newContent);
+        System.out.println("Message content has been updated --> ("+ newContent + ")");
 
-        }
+    }
 
+    @Override
     public void deleteMsg(UUID msgId) {
         for (Map<UUID, Message> channelMessages : msgData.values()) {
             if (channelMessages.containsKey(msgId)) {
@@ -65,5 +64,14 @@ public class JCFMessageService implements MessageService {
             }
         }
         System.out.println("Message not found: " + msgId);
+    }
+
+    @Override
+    public void deleteMessagesByChannel(UUID channelId) {
+        if (!msgData.containsKey(channelId)) {
+            System.out.println("No messages found for channel ID");
+        }
+        msgData.remove(channelId);
+        System.out.println("All messages for channel " + channelId + " have been deleted.");
     }
 }
