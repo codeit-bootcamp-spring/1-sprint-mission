@@ -3,12 +3,11 @@ package com.sprint.misson;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.*;
+import com.sprint.misson.discordeit.factory.JCFServiceFactory;
+import com.sprint.misson.discordeit.factory.ServiceFactory;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
-import com.sprint.misson.discordeit.service.jcf.JCFChannelService;
-import com.sprint.misson.discordeit.service.jcf.JCFMessageService;
-import com.sprint.misson.discordeit.service.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,10 +16,20 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-        //서비스 간 의존성 주입 - Eager 방식으로 싱글톤 구현
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance();
+        //서비스간 의존성 구현을 팩토리 패턴을 사용하여 구현
+        // 팩토리 패턴의 장점
+        // 1. 객체 생성 로직을 한 곳에서 관리 (관심사 분리)
+        // 2. 의존성 주입을 명확하게 제어
+        // 3. 객체 생성 방식을 쉽게 변경 가능
+        // 4. 테스트가 용이함 (Mock 객체 주입 등이 쉬워짐)
+        // 5. 싱글톤 인스턴스 관리가 쉬워짐
+
+        ServiceFactory serviceFactory = new JCFServiceFactory();
+
+        UserService userService = serviceFactory.createUserService();
+        ChannelService channelService = serviceFactory.createChannelService();
+        MessageService messageService = serviceFactory.createMessageService();
+
 
         //1. 등록
         System.out.println("=== 1. 등록 테스트 ===");

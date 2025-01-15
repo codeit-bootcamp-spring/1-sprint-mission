@@ -7,20 +7,18 @@ import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
+import com.sprint.misson.discordeit.service.UserService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    private static final JCFChannelService instance = new JCFChannelService();
     private final HashMap<UUID, Channel> data;
+    private final UserService userService;
 
-    public JCFChannelService() {
+    public JCFChannelService(UserService userService) {
         this.data = new HashMap<>();
-    }
-
-    public static JCFChannelService getInstance() {
-        return instance;
+        this.userService = userService;
     }
 
     //생성
