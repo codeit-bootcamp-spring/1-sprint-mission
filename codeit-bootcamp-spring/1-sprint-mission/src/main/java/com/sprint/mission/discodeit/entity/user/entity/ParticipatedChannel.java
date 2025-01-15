@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user.entity;
 
 import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
 
+import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.Status;
@@ -41,10 +42,20 @@ public class ParticipatedChannel {
         return Collections.unmodifiableList(participatedChannels);
     }
 
-    public Optional<Channel> findById(UUID channelId) {
-        var foundChannel = participatedChannels.get(channelId);
+    private Optional<Channel> findByChannelId(UUID channelId) {
+        var foundParticipatedChannel = participatedChannels.get(channelId);
+        return Optional.ofNullable(foundParticipatedChannel);
+    }
+
+    public Optional<Channel> findByChannelIdNotUnregisteredOrThrow(UUID channelId) {
+        var foundChannel =
+                findByChannelId(channelId)
+                        .orElseThrow(
+                                () -> ChannelException.ofErrorMessageAndNotExistChannelId(USER_NOT_PARTICIPATED_CHANNEL, channelId));
+
         var notRegisteredChannel =
                 foundChannel.getStatus() == Status.UNREGISTERED ? null : foundChannel;
+
         return Optional.ofNullable(notRegisteredChannel);
     }
 
@@ -60,7 +71,7 @@ public class ParticipatedChannel {
 
     public Channel changeChannelNameOrThrow(UUID channelId, String newName, User user) {
         var foundChannel =
-                findById(channelId)
+                findByChannelIdNotUnregisteredOrThrow(channelId)
                         .orElseThrow(
                                 () -> UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL,
                                         channelId.toString()));
@@ -72,7 +83,8 @@ public class ParticipatedChannel {
     }
 
     public void exitChannelById(UUID channelId) {
-        findById(channelId).ifPresent(foundChannel -> participatedChannels.remove(foundChannel.getId()));
+        findByChannelId(channelId)
+                .ifPresent(foundChannel -> participatedChannels.remove(foundChannel.getId()));
     }
 
     public int countParticipatedChannels() {

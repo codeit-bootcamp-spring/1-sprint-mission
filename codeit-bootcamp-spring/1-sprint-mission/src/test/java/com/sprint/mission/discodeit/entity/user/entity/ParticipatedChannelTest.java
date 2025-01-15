@@ -2,15 +2,12 @@ package com.sprint.mission.discodeit.entity.user.entity;
 
 import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
 import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
-import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
-import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -72,7 +69,7 @@ class ParticipatedChannelTest {
             var channelId = createdChannel1.getId();
 
             // when
-            var findByIdParticipatedChannel = channels.findById(channelId);
+            var findByIdParticipatedChannel = channels.findByChannelIdNotUnregisteredOrThrow(channelId);
 
             // then
             assertAll(
@@ -110,19 +107,18 @@ class ParticipatedChannelTest {
         }
 
         @Test
-        @DisplayName("유저가 참여한 채널에 존재하지 않는 Id로 채널 조회 시 에러 발생")
+        @DisplayName("유저가 참여한 채널에 존재하지 않는 channel Id로 채널 조회 시 에러 발생")
         void givenNotExistChannelIdWhenFindByIdThenThrowException() {
             // given
-            var notExistedId = UUID.randomUUID();
+            var notExistedChannelId = UUID.randomUUID();
 
             // when
             var throwable = catchThrowable(() ->
-                    channels.findById(notExistedId).orElseThrow(() ->
-                            UserException.of(USER_NOT_PARTICIPATED_CHANNEL))
+                    channels.findByChannelIdNotUnregisteredOrThrow(notExistedChannelId)
             );
 
             // then
-            assertThat(throwable).isInstanceOf(UserException.class)
+            assertThat(throwable).isInstanceOf(ChannelException.class)
                     .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
         }
 
@@ -181,7 +177,7 @@ class ParticipatedChannelTest {
             var throwable = catchThrowable(() -> channels.changeChannelNameOrThrow(notExistedChannelId, changeChannelName, USER));
 
             // then
-            assertThat(throwable).isInstanceOf(UserException.class)
+            assertThat(throwable).isInstanceOf(ChannelException.class)
                     .hasMessageContaining(notExistedChannelId.toString());
 
         }
