@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.common.error.channel;
 
 import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import java.util.UUID;
 
 public class ChannelException extends RuntimeException {
 
@@ -14,6 +15,17 @@ public class ChannelException extends RuntimeException {
 
     public static ChannelException of(ErrorMessage message) {
         return new ChannelException(message.getMessage());
+    }
+
+    public static ChannelException ofErrorMessageAndNotExistChannelId(ErrorMessage message, UUID causeInputParameter) {
+        var format =
+                String.format(
+                        "%s : input Channel Id = %s",
+                        message.getMessage(),
+                        causeInputParameter.toString()
+                );
+
+        return new ChannelException(format);
     }
 
     public static ChannelException ofErrorMessageAndCreatorName(

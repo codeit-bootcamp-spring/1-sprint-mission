@@ -16,6 +16,7 @@ public enum ErrorMessage {
     /**
      * 2000 ~ 2999 Channel 관련 에러
      */
+    CHANNEL_NOT_FOUND(2_000, "존재하지 않는 채널입니다."),
     CHANNEL_NOT_EQUAL_CREATOR(2_001, "채널을 생성한 사람만 채널이름을 변경할 수 있습니다."),
     ;
 

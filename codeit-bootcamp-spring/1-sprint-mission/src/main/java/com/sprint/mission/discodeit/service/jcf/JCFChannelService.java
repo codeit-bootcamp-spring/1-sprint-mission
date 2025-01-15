@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import static com.sprint.mission.discodeit.common.error.ErrorMessage.CHANNEL_NOT_FOUND;
 import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FOUND;
 
+import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.user.UserRepository;
-import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.dto.ChangeChannelNameRequest;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;
+import com.sprint.mission.discodeit.entity.channel.dto.DeleteChannelRequest;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import java.util.UUID;
@@ -30,7 +32,7 @@ public class JCFChannelService implements ChannelService {
 
         var findUser = findUserByIdOrThrow(request.userId());
 
-        var createdChannel = findUser.createNewChannel(request.channelName());
+        var createdChannel = findUser.openNewChannel(request.channelName());
 
         channelRepository.save(createdChannel);
         userRepository.save(findUser);
@@ -46,17 +48,19 @@ public class JCFChannelService implements ChannelService {
         userRepository.save(foundUser);
     }
 
-    // 삭제
-
-
     @Override
-    public void deleteUserParticipatedChannelByChannelId(String channelId) {
+    public void deleteChannelByChannelIdOrThrow(DeleteChannelRequest request) {
+        var foundChannel = channelRepository.findById(request.channelId())
+                .orElseThrow(
+                        () -> ChannelException.ofErrorMessageAndNotExistChannelId(CHANNEL_NOT_FOUND,
+                                request.channelId())
+                );
 
+        var foundUser = findUserByIdOrThrow(request.userId());
+        foundChannel.deleteChannel(foundUser);
+
+        channelRepository.save(foundChannel);
     }
-
-    /**
-     * 읽기 - 단건 - 복수건
-     */
 
     private User findUserByIdOrThrow(UUID id) {
         var foundUser = userRepository.findById(id)
