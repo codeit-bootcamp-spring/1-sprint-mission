@@ -32,9 +32,9 @@ public class JavaApplication {
 
 
         //1. 등록
-        System.out.println("=== 1. 등록 테스트 ===");
+        System.out.println("\n=== 1. 등록 테스트 ===");
 
-        System.out.println("--- User 등록---");
+        System.out.println("\n--- User 등록---");
         User user1 = userService.createUser("코드잇", "codeit@codeit.co.kr");
         User user2 = userService.createUser("박유진", "yudility@gmail.com");
         User user3 = userService.createUser("홍길동", "gildong@naver.com");
@@ -53,9 +53,6 @@ public class JavaApplication {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        System.out.println("\n> 전체 유저 목록: ");
-        userService.getUsers().forEach(User::displayShortInfo);
 
 
         System.out.println("\n\n--- Channel 등록---");
@@ -99,38 +96,38 @@ public class JavaApplication {
         Message msg4 = messageService.createMessage(user2, "공지사항 채널입니다! 반갑습니다.", channel3);
         Message msg5 = messageService.createMessage(user1, "회의실 채널입니다.", channel4);
 
-        System.out.println("> 메시지 생성 결과 및 전체 목록:");
+        System.out.println("\n> 메시지 생성 결과 및 전체 목록:");
         messageService.getMessages().forEach(Message::displayShortInfo);
 
         System.out.println("\n\n* 심화 - 메세지 예외 처리");
 
-        System.out.println("\n1) DB에 존재하지 않는 유저로 메세지 생성 ");
+        System.out.println("\n1) DB에 존재하지 않는 User로 메세지 생성 ");
         User notExistUser = new User("없는유저", "noOne@test.com", UserStatus.ACTIVE, "hello", AccountStatus.UNVERIFIED);
-        System.out.println("- 테스트 유저");
+        System.out.println("\n- 테스트 유저");
         notExistUser.displayShortInfo();
         System.out.println("\n> 결과: ");
         try {
-            messageService.createMessage(notExistUser, "can not be created. The user is not exist.", channel1).displayShortInfo();
+            messageService.createMessage(notExistUser, "test message", channel1).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n2) DB에 존재하지 않는 Channel로 메세지 생성 ");
         Channel notExistChannel = new Channel("없는채널", ChannelType.TEXT);
-        System.out.println("- 테스트 채널");
+        System.out.println("\n- 테스트 채널");
         notExistChannel.displayShortInfo();
         System.out.println("\n> 결과: ");
         try {
-            messageService.createMessage(user1, "can not be created. The channel is not exist.", notExistChannel).displayShortInfo();
+            messageService.createMessage(user1, "test message", notExistChannel).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n3) DB에 존재하지 않는 User와 Channel로 메세지 생성 ");
-        System.out.println("- 테스트 채널 및 유저(위 테스트 케이스 사용)");
+        System.out.println("\n- 테스트 채널 및 유저(위 테스트 케이스 사용)");
         System.out.println("\n> 결과: ");
         try {
-            messageService.createMessage(notExistUser, "can not be created. The channel and the user is not exist.", notExistChannel).displayShortInfo();
+            messageService.createMessage(notExistUser, "test message", notExistChannel).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -148,15 +145,13 @@ public class JavaApplication {
         System.out.println("\n2) UUID로 조회(단건)");
         String uuidStringForTest = tempUsers.get(0).getId().toString();
 
-        System.out.println("\n- 조회할 UUID를 가진 유저가 있는 경우: ");
-        System.out.println("> 조회할 UUID: " + uuidStringForTest);
-        System.out.println("\n> 조회 결과:");
+        System.out.println("- 조회할 UUID를 가진 유저가 있는 경우: ");
+        System.out.println("> UUID: " + uuidStringForTest + "로 조회한 결과: ");
         userService.getUserByUUID(uuidStringForTest).displayShortInfo();
 
         System.out.println("\n- 조회할 UUID를 가진 유저가 없는 경우: ");
         UUID testUUID = UUID.randomUUID();
-        System.out.println("> 조회할 UUID: " + testUUID);
-        System.out.println("\n> 조회 결과:");
+        System.out.println("> 조회할 UUID: " + testUUID + "로 조회한 결과:");
         try {
             userService.getUserByUUID(testUUID.toString()).displayShortInfo();
         } catch (Exception e) {
@@ -164,7 +159,7 @@ public class JavaApplication {
         }
 
         System.out.println("\n3) 이메일로 조회(단건): ");
-        System.out.println("\n- 조회할 이메일을 가진 유저가 있는 경우: ");
+        System.out.println("- 조회할 이메일을 가진 유저가 있는 경우: ");
         System.out.println("> codeit@codeit.co.kr을 이메일로 가진 유저 조회 결과: ");
         userService.getUserByEmail("codeit@codeit.co.kr").displayShortInfo();
 
@@ -338,12 +333,11 @@ public class JavaApplication {
         System.out.println("\n--- User 삭제 ---");
         System.out.println("\n -> email이 \"gildong@naver.com\"인 User 삭제");
 
-        System.out.println("\n> 전체 유저 목록 조회: ");
+        System.out.println("\n> 전체 유저 목록: ");
         userService.getUsers().forEach(User::displayShortInfo);
 
         User userFoundByEmail = userService.getUserByEmail("gildong@naver.com");
-        System.out.println("\n-> User 삭제 결과: ");
-        System.out.println(userService.deleteUser(userFoundByEmail.getId().toString()));
+        System.out.println("\n-> User 삭제 결과: " + userService.deleteUser(userFoundByEmail.getId().toString()));
 
         System.out.println("\n> 삭제 후 유저 목록: ");
         userService.getUsers().forEach(User::displayShortInfo);
