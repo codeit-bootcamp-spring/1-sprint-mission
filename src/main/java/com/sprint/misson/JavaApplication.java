@@ -121,6 +121,7 @@ public class JavaApplication {
         System.out.println("\n2) UUID로 조회(단건)");
         String uuidStringForTest =tempUsers.get( 0 ).getId().toString();
 
+        System.out.println("\n- 조회할 UUID를 가진 유저가 있는 경우: ");
         System.out.println("> 조회할 UUID: "+ uuidStringForTest);
         System.out.println("\n> 조회 결과:" );
         userService.getUserByUUID( uuidStringForTest ).displayShortInfo();
@@ -164,9 +165,20 @@ public class JavaApplication {
         System.out.println("\n2) UUID로 조회(단건)");
         String uuidStringForChannelTest =tempChannels.get( 0 ).getId().toString();
 
+        System.out.println("- 조회할 UUID를 가진 채널이 있는 경우: ");
         System.out.println("> 조회할 UUID: "+ uuidStringForChannelTest);
         System.out.println( "\n> 조회 결과: " );
         channelService.getChannelByUUID( uuidStringForChannelTest ).displayShortInfo();
+
+        System.out.println("- 조회할 UUID를 가진 채널이 없는 경우: ");
+        UUID testUUID2 = UUID.randomUUID();
+        System.out.println("> 조회할 UUID: "+ testUUID2);
+        System.out.println( "\n> 조회 결과:" );
+        try{
+            channelService.getChannelByUUID( testUUID2.toString()).displayShortInfo();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
 
         System.out.println("\n3) 채널 이름으로 조회(다건)");
@@ -193,7 +205,15 @@ public class JavaApplication {
         System.out.println( "> 조회 결과\n");
         messageService.getMessageByUUID( uuidStringForMessageTest ).displayShortInfo();
 
-
+        System.out.println("- 조회할 UUID를 가진 메세지가 없는 경우: ");
+        UUID testUUID3 = UUID.randomUUID();
+        System.out.println("> 조회할 UUID: "+ testUUID3);
+        System.out.println( "> 조회 결과\n");
+        try{
+            messageService.getMessageByUUID(testUUID3.toString()).displayShortInfo();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 
         System.out.println("\n3) 내용으로 조회(다건)");
         System.out.println("> 내용에 \"반갑습니다\"가 포함된 메세지 조회: ");
@@ -266,6 +286,7 @@ public class JavaApplication {
         System.out.println("\n> 삭제 후 메세지 목록: ");
         messageService.getMessages().forEach(Message::displayShortInfo);
 
+        //삭제 시에도 유저, 채널 없을 때 예외 보여줘야? -> 애초에 조회가 되어야 삭제가 되니 이거는 빼는걸로
 
         System.out.println("\n--- Channel 삭제 ---");
         System.out.println("\n -> 채널 이름에 \"일반\"이 들어간 채널 삭제");
