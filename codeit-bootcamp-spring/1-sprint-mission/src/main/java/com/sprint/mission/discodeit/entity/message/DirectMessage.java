@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.user.entity.User;
 
 public class DirectMessage {
     // 보내는 방법을 추상화
-    private final Sender sender;
+    private final Sender<User, User> sender;
 
     private final String message;
 
@@ -12,7 +12,7 @@ public class DirectMessage {
 
     private final User messageReceiver;
 
-    private DirectMessage(Sender sender, String message, User messageSender, User messageReceiver) {
+    private DirectMessage(Sender<User, User> sender, String message, User messageSender, User messageReceiver) {
         this.sender = sender;
         this.message = message;
         this.messageSender = messageSender;
