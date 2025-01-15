@@ -26,12 +26,12 @@ public class JavaApplication {
         // 사용자 단건 조회
         System.out.println("=== 유저 단건 조회 ===");
         User user1 = userService.getUser(userId1);
-        System.out.println("User1: " + user1.getName());
+        System.out.println("유저1: " + user1.getName());
 
         // 모든 사용자 조회
         System.out.println("\n=== 모든 유저 조회 ===");
         userService.getAllUsers().forEach(user ->
-                System.out.println("User: " + user.getName())
+                System.out.println("유저목록: " + user.getName())
         );
 
         // 사용자 수정
@@ -41,20 +41,21 @@ public class JavaApplication {
         // 수정된 데이터 조회
         System.out.println("\n=== 수정된 유저 데이터 조회 ===");
         User modifiedUser = userService.getUser(userId1);
-        System.out.println("Modified User: " + modifiedUser);
+        String modifiedUserName = modifiedUser.getName();
+        System.out.println("수정된 유저: " + modifiedUserName);
 
         // 사용자 삭제
-        System.out.println("\n=== 유저 삭제 ===");
+        System.out.println("\n=== 유저가 삭제되었습니다 ===");
         userService.deleteUser(userId2);
 
-        // 삭제된 데이터 확인
+        // 삭제된 유저 확인
         System.out.println("\n=== 삭제된 유저 데이터 확인 ===");
         User deletedUser = userService.getUser(userId2);
-        System.out.println("Deleted User (Should be null): " + deletedUser);
+        System.out.println(deletedUser);
 
         System.out.println("\n=== 최종 유저 데이터 확인 ===");
         userService.getAllUsers().forEach(user ->
-                System.out.println("User: " + user.getName())
+                System.out.println("유저: " + user.getName())
         );
 
         JCFChannelService channelService = new JCFChannelService();
@@ -68,12 +69,12 @@ public class JavaApplication {
         // 채널 단건 조회
         System.out.println("=== 채널 단건 조회 ===");
         Channel channel1 = channelService.getChannel(channelId1);
-        System.out.println("Channel1: " + channel1.getName());
+        System.out.println("채널1: " + channel1.getName());
 
         // 모든 채널 조회
         System.out.println("\n=== 모든 채널 조회 ===");
         channelService.getAllChannels().forEach(channel ->
-                System.out.println("Channel: " + channel.getName())
+                System.out.println("채널: " + channel.getName())
         );
 
         // 채널 수정
@@ -83,7 +84,7 @@ public class JavaApplication {
         // 수정된 채널 조회
         System.out.println("\n=== 수정된 채널 데이터 조회 ===");
         Channel modifiedChannel = channelService.getChannel(channelId1);
-        System.out.println("Modified Channel: " + modifiedChannel);
+        System.out.println("수정된 채널: " + modifiedChannel);
 
         // 채널 삭제
         System.out.println("\n=== 채널 삭제 ===");
@@ -92,11 +93,11 @@ public class JavaApplication {
         // 삭제된 채널 확인
         System.out.println("\n=== 삭제된 채널 데이터 확인 ===");
         Channel deletedChannel = channelService.getChannel(channelId2);
-        System.out.println("Deleted Channel (Should be null): " + deletedChannel);
+        System.out.println(deletedChannel);
 
         System.out.println("\n=== 최종 채널 데이터 확인 ===");
         channelService.getAllChannels().forEach(channel ->
-                System.out.println("Channel: " + channel.getName())
+                System.out.println("채널: " + channel.getName())
         );
 
         JCFMessageService messageService = new JCFMessageService();
@@ -110,12 +111,12 @@ public class JavaApplication {
         // 메시지 단건 조회
         System.out.println("=== 메시지 단건 조회 ===");
         Message message1 = messageService.getMessage(messageId1);
-        System.out.println("Message1: " + message1.getContent());
+        System.out.println("메시지1: " + message1.getContent());
 
         // 모든 메시지 조회
-        System.out.println("\n=== 모든 채널 조회 ===");
+        System.out.println("\n=== 모든 메시지 조회 ===");
         messageService.getAllMessages().forEach(message ->
-                System.out.println("Message: " + message.getContent())
+                System.out.println("모든 메시지: " + message.getContent())
         );
 
         // 메시지 수정
@@ -125,7 +126,7 @@ public class JavaApplication {
         // 수정된 메시지 조회
         System.out.println("\n=== 수정된 메시지 조회 ===");
         Message modifiedMessage = messageService.getMessage(messageId1);
-        System.out.println("Modified Message: " + modifiedMessage);
+        System.out.println("수정된 메시지: " + modifiedMessage);
 
         // 메시지 삭제
         System.out.println("\n=== 메시지 삭제 ===");
@@ -134,11 +135,11 @@ public class JavaApplication {
         // 삭제된 메시지 확인
         System.out.println("\n=== 삭제된 메시지 확인 ===");
         Message deletedMessage = messageService.getMessage(messageId2);
-        System.out.println("Deleted Message (Should be null): " + deletedMessage);
+        System.out.println(deletedMessage);
 
         System.out.println("\n=== 최종 메시지 확인 ===");
         messageService.getAllMessages().forEach(message ->
-                System.out.println("Message: " + message.getContent())
+                System.out.println("메시지: " + message.getContent())
         );
 
     }
