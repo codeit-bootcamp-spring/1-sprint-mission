@@ -76,9 +76,7 @@ public class JCFMessageService implements MessageService {
     //다건 조회 - 내용
     @Override
     public List<Message> getMessageByContent(String content) {
-        return data.values().stream()
-                .filter(m -> m.getContent().contains(content))
-                .toList();
+        return data.values().stream().filter(m -> m.getContent().contains(content)).toList();
     }
 
     //다건 조회 - 특정 작성자
@@ -86,9 +84,7 @@ public class JCFMessageService implements MessageService {
     public List<Message> getMessageBySender(User sender) throws RuntimeException {
         try {
             User userByUUID = userService.getUserByUUID(sender.getId().toString());
-            return data.values().stream()
-                    .filter(m -> m.getSender().equals(userByUUID))
-                    .toList();
+            return data.values().stream().filter(m -> m.getSender().equals(userByUUID)).toList();
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -99,9 +95,7 @@ public class JCFMessageService implements MessageService {
     //날짜 포멧 오류 등 예외 처리 필요-검색 시 기준을 날짜로 할지
     @Override
     public List<Message> getMessageByCreatedAt(Long createdAt) {
-        return data.values().stream()
-                .filter(m -> m.getCreatedAt().equals(createdAt))
-                .toList();
+        return data.values().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
     }
 
     //다건 조회 - 특정 채널
@@ -109,9 +103,7 @@ public class JCFMessageService implements MessageService {
     public List<Message> getMessagesByChannel(Channel channel) throws RuntimeException {
         try {
             Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
-            return data.values().stream()
-                    .filter(m -> m.getChannel().equals(channelByUUID))
-                    .toList();
+            return data.values().stream().filter(m -> m.getChannel().equals(channelByUUID)).toList();
         } catch (Exception e) {
             System.out.println("Failed to get messages. Channel: " + channel.getId() + " Message: " + e.getMessage());
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
