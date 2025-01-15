@@ -74,4 +74,17 @@ public class Channel extends AbstractUUIDEntity {
         return !creator.equals(user);
     }
 
+    @Override
+    public String toString() {
+        var format =
+                String.format(
+                "channel info = [channel name = %s creator = %s, createAt = %d, updateAt = %d, status = %s]",
+                        channelName,
+                        creator.getName(),
+                        getCreateAt(),
+                        getUpdateAt().orElse(0L),
+                        getStatus().getStatus()
+        );
+        return format;
+    }
 }

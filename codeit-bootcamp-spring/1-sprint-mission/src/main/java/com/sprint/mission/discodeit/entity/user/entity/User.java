@@ -72,5 +72,20 @@ public class User extends AbstractUUIDEntity {
     public void unregister() {
         updateUnregistered();
     }
+
+    @Override
+    public String toString() {
+        var format =
+                String.format(
+                        "user info = [id : %s, status : %s, createAt = %d, updateAt = %d], participatedChannel = {%s}",
+                        getId(),
+                        getStatus().getStatus(),
+                        getCreateAt(),
+                        getUpdateAt().orElse(0L),
+                        getParticipatedChannels()
+                );
+
+        return format;
+    }
 }
 
