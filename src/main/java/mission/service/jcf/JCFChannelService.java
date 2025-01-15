@@ -56,6 +56,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteById(UUID id) {
         Channel deletingChannel = findById(id);
+        deletingChannel.removeAllUser(); // 채널이 데이터에서 사라지면 user도 사라진다면 이 코드는 필요 없음
+        de
+
         for (User user : deletingChannel.getUserList()) {
             user.getChannels().remove(deletingChannel);
         }

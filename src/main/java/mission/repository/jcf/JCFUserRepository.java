@@ -41,6 +41,7 @@ public class JCFUserRepository implements UserRepository {
     public void delete(User deletingUser) {
         // id, name, password 검증은 R.M에서 끝
         System.out.printf("닉네임 %s는 사라집니다.", deletingUser.getName());
+        deletingUser.removeAllChannel();
         data.remove(deletingUser.getId());
     }
 }

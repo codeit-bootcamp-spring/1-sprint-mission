@@ -10,9 +10,9 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private String name;
-    private String oldName;
     private final String firstId;
+
+    private String name;
     private String password;
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
@@ -43,10 +43,9 @@ public class User implements Serializable {
         firstId = id.toString().split("-")[0];
         createAt = LocalDateTime.now();
     }
-
-    public Set<Channel> getChannels() {
-        return channels;
-    }
+//    public Set<Channel> getChannels() {
+//        return channels;
+//    }
 
     // 채널 명으로 검색
     public Channel getChannelByName(String channelName) {
@@ -58,17 +57,23 @@ public class User implements Serializable {
         return null;
     }
 
-    // User가 채널 등록
-    public void addChannel(Channel channel) {
+
+    public void addChannel(Channel channel){
         channels.add(channel);
-        channel.getUserList().add(this);
+        channel.addUser(this);
     }
 
     // User가 채널 삭제
     public void removeChannel(Channel channel) {
-        // 존재하는지 검증?
         channels.remove(channel);
-        channel.getUserList().remove(this);
+        channel.removeUser(this);
+    }
+
+    public void removeAllChannel(){
+        for (Channel channel : channels) {
+            removeChannel(channel);
+            // 유저수 초기화하려면 channels.clear 로는 안되기 때문
+        }
     }
 
     public UUID getId() {
@@ -88,14 +93,6 @@ public class User implements Serializable {
 
     public LocalDateTime getCreateAt() {
         return createAt;
-    }
-
-    public String getOldName() {
-        return oldName;
-    }
-
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
     }
 
     public LocalDateTime getUpdateAt() {

@@ -9,10 +9,10 @@ public class Channel implements Serializable {
     private static final long serialVersionUID = 2L;
 
     private final UUID id;
-    private final String firstId;
+    private final String firstId; // 콘솔창 용
 
     private String name;
-    private String oldName;
+    //private String oldName;
     private Set<User> userList = new HashSet<>();
     private Set<Message> messageList = new HashSet<>();
     private Integer userCount;
@@ -37,18 +37,28 @@ public class Channel implements Serializable {
         return name;
     }
 
-    public String getOldName() {
-        return oldName;
-    }
     public Set<Message> getMessageList(){
         return messageList;
     }
 
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
+    // getUserList 없앤 이유 : 아래의 메서드로 userlist.remove 시 count를 초기화하기 위해
+    public void removeUser(User user){
+        userList.remove(user);
+        userCount = userList.size();
+        updatedAt = LocalDateTime.now();
     }
-    public Set<User> getUserList() {
-        return userList;
+
+    // 채널이
+    public void removeAllUser(){
+        for (User user : userList) {
+            removeUser(user);
+        }
+        userCount = userList.size();
+    }
+
+    public void addUser(User user){
+        userList.add(user);
+        userCount = userList.size();
     }
 
     public LocalDateTime getCreatedAt() {
