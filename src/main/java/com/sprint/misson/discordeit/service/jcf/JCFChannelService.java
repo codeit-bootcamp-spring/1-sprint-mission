@@ -110,7 +110,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
-        return ch.getUserList().stream().toList();
+        return ch.getUserList().values().stream().toList();
     }
 
     @Override
@@ -121,8 +121,8 @@ public class JCFChannelService implements ChannelService {
             Channel c = getChannelByUUID(channel.getId().toString());
             //해당 유저가 DB에 존재하는 유저인지 검사
             User u = userService.getUserByUUID(user.getId().toString());
-            //이미 있으면 false, 없다면 true 반환
-            return c.getUserList().add(u);
+            c.getUserList().put(u.getId(), u);
+            return true;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
                 System.out.println("Failed to add User in this channel. User with id " + user.getId() + " not found");
@@ -136,14 +136,17 @@ public class JCFChannelService implements ChannelService {
     @Override
     public boolean deleteUserFromChannel(Channel channel, User user) {
         //유저를 채널에서 삭제
-        //삭제되면 true, 없다면 false 반환
-        return channel.getUserList().remove(user);
+        if (channel.getUserList().containsKey(user.getId())) {
+            channel.getUserList().remove(user.getId());
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean isUserInChannel(Channel channel, User user) {
         //유저가 채널에 있는지 검사
         //있으면 true, 없으면 false 반환
-        return channel.getUserList().contains(user);
+        return channel.getUserList().containsKey(user.getId());
     }
 }

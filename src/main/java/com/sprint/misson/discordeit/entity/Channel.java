@@ -1,7 +1,6 @@
 package com.sprint.misson.discordeit.entity;
 
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 
 public class Channel {
     //객체 식별 id
@@ -19,7 +18,7 @@ public class Channel {
     private boolean isHidden;
 
     //채널에 속한 유저 목록
-    private final HashSet<User> userList;
+    private final HashMap<UUID, User> userList;
 
     //추가로 구현해볼만한 것
     //채널 그룹
@@ -33,7 +32,7 @@ public class Channel {
         this.updatedAt = createdAt;
         this.channelName = channelName;
         this.channelType = channelType;
-        this.userList = new HashSet<>();
+        this.userList = new HashMap<>();
     }
 
 
@@ -77,7 +76,7 @@ public class Channel {
         this.isHidden = isHidden;
     }
 
-    public HashSet<User> getUserList() {
+    public HashMap<UUID, User> getUserList() {
         return userList;
     }
 
