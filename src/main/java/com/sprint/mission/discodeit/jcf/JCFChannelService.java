@@ -1,8 +1,8 @@
-package com.spirnt.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.jcf;
 
-import com.spirnt.mission.discodeit.entity.Channel;
-import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 

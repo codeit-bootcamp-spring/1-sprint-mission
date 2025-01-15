@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.service;
+package com.sprint.mission.discodeit.service;
 
 import java.util.List;
 import java.util.UUID;

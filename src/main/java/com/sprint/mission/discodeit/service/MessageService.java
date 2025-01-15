@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.service;
+package com.sprint.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;

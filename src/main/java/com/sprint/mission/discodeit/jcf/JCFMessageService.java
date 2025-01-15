@@ -1,14 +1,13 @@
-package com.spirnt.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.jcf;
 
-import com.spirnt.mission.discodeit.entity.Message;
-import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.service.MessageService;
-import org.checkerframework.checker.units.qual.A;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
+    private static final String DATA_NULL_BLANK = "";
 
     public JCFMessageService(){
         this.data = new HashMap<>();
@@ -29,9 +28,9 @@ public class JCFMessageService implements MessageService {
     public List<Message> readAll() {
         data.values().forEach(message -> {
             String sender = message.getSender().getUsername();
-            String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : "" ;
+            String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : DATA_NULL_BLANK ;
 
-            if(recipient != ""){
+            if(recipient != DATA_NULL_BLANK){
                 System.out.println(sender + "님이 " + recipient + "님에게 글을 남기셨습니다.");
                 System.out.println(sender + " -> " + recipient + " : "  + message.getContent());
             }else{
@@ -51,9 +50,9 @@ public class JCFMessageService implements MessageService {
                         message.getChannel() != null && message.getChannel().getId().equals(channelId))
                 .forEach(message -> {
                     String sender = message.getSender().getUsername();
-                    String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : "";
+                    String recipient = message.getRecipient() != null ? message.getRecipient().getUsername() : DATA_NULL_BLANK;
 
-                    if (recipient != "") {
+                    if (recipient != DATA_NULL_BLANK) {
                         System.out.println(sender + " -> " + recipient + " : " + message.getContent());
                     } else {
                         System.out.println(sender + " - " + message.getContent());

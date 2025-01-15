@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.validation;
+package com.sprint.mission.discodeit.validation;
 
 public interface Validator {
     boolean emailIsValid(String email);

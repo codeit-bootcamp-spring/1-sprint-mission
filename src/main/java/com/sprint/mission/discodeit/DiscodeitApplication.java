@@ -1,13 +1,14 @@
-package com.spirnt.mission.discodeit;
+package com.sprint.mission.discodeit;
 
-import com.spirnt.mission.discodeit.entity.*;
-import com.spirnt.mission.discodeit.jcf.*;
-import com.spirnt.mission.discodeit.service.*;
-import org.checkerframework.checker.units.qual.C;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.jcf.*;
+import com.sprint.mission.discodeit.service.*;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 
 public class DiscodeitApplication {
     public static void main(String[] args) {

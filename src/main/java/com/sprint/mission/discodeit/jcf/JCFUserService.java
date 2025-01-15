@@ -1,11 +1,10 @@
-package com.spirnt.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.jcf;
 
-import com.spirnt.mission.discodeit.entity.User;
-import com.spirnt.mission.discodeit.service.UserService;
-import com.spirnt.mission.discodeit.validation.Impl.ValidatorImpl;
-import com.spirnt.mission.discodeit.validation.Validator;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
+import com.sprint.mission.discodeit.validation.Validator;
 
-import java.beans.Expression;
 import java.util.*;
 
 public class JCFUserService implements UserService {

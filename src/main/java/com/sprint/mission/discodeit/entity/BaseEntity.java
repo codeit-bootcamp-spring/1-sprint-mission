@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 

@@ -1,7 +1,7 @@
-package com.spirnt.mission.discodeit.service;
+package com.sprint.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.entity.Channel;
-import com.spirnt.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 

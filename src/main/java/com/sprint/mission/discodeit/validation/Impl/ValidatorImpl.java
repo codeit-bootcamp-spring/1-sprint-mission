@@ -1,6 +1,6 @@
-package com.spirnt.mission.discodeit.validation.Impl;
+package com.sprint.mission.discodeit.validation.Impl;
 
-import com.spirnt.mission.discodeit.validation.Validator;
+import com.sprint.mission.discodeit.validation.Validator;
 
 import java.util.Objects;
 import java.util.regex.Pattern;
