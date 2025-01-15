@@ -22,6 +22,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+    public Channel update(Channel channel) {
+        return create(channel);  // 클래스 내 메서드 활용(Map 덮어쓰기 가능)
+    }
+
+    @Override
     public Set<Channel> findAll() {
         return channelRepository.findAll();
     }
@@ -48,22 +53,9 @@ public class JCFChannelService implements ChannelService {
         return channelRepository.findById(id);
     }
 
-    @Override
-    public Channel update(Channel channel) {
-        return create(channel);  // 클래스 내 메서드 활용(Map 덮어쓰기 가능)
-    }
 
     @Override
     public void deleteById(UUID id) {
-        Channel deletingChannel = findById(id);
-        deletingChannel.removeAllUser(); // 채널이 데이터에서 사라지면 user도 사라진다면 이 코드는 필요 없음
-        de
-
-        for (User user : deletingChannel.getUserList()) {
-            user.getChannels().remove(deletingChannel);
-        }
-        // 그 채널에서 생겼던 메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
-        //List<Message> messagesInChannel = findMessageInChannel(channelId);
         channelRepository.deleteById(id);
     }
 
@@ -72,9 +64,9 @@ public class JCFChannelService implements ChannelService {
      */
     @Override
     public void validateDuplicateName(String name){
-        Set<Channel> findChannel = findAll().stream().filter(channel -> channel.getName().equals(name))
-                .collect(Collectors.toSet());
-        if (!findChannel.isEmpty()){
+        boolean isDuplicate = findAll().stream()
+                .anyMatch(channel -> channel.getName().equals(name));
+        if (isDuplicate){
             throw new DuplicateName(
                     String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
         }

@@ -49,24 +49,26 @@ public class User implements Serializable {
 
     // 채널 명으로 검색
     public Channel getChannelByName(String channelName) {
-        for (Channel channel : channels) {
-            if (channel.getName().equals(channelName)){
-                return channel;
-            }
-        }
-        return null;
+        return getChannelsImmutable().stream()
+                .filter(channel -> channel.getName().equals(channelName))
+                .findAny().orElse(null);
     }
 
+    public Set<Channel> getChannelsImmutable(){
+        return Collections.unmodifiableSet(channels);
+    }
 
     public void addChannel(Channel channel){
         channels.add(channel);
         channel.addUser(this);
+        updateAt = LocalDateTime.now();
     }
 
     // User가 채널 삭제
     public void removeChannel(Channel channel) {
         channels.remove(channel);
         channel.removeUser(this);
+        updateAt = LocalDateTime.now();
     }
 
     public void removeAllChannel(){
@@ -74,6 +76,7 @@ public class User implements Serializable {
             removeChannel(channel);
             // 유저수 초기화하려면 channels.clear 로는 안되기 때문
         }
+        updateAt = LocalDateTime.now();
     }
 
     public UUID getId() {
@@ -110,9 +113,9 @@ public class User implements Serializable {
     }
 
     public User setNamePassword(String name, String password) {
-        updateAt = LocalDateTime.now();
         this.password = password;
         this.name = name;
+        updateAt = LocalDateTime.now();
         return this;
     }
 

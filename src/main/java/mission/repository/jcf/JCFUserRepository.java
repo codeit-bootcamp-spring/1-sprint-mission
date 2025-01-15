@@ -19,10 +19,10 @@ public class JCFUserRepository implements UserRepository {
     }
 
     // 고유 ID는 훼손하지 않고 수정
-    @Override
-    public User updateUserNamePW(User user) {
-        return data.put(user.getId(), user);
-    }
+//    @Override
+//    public User updateUserNamePW(User user) {
+//        return data.put(user.getId(), user);
+//    }
 
     public Set<User> findAll() {
         return new HashSet<>(data.values());

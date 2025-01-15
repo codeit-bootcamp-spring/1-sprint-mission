@@ -33,14 +33,6 @@ public class FileUserRepository implements UserRepository {
         return user;
     }
 
-    @Override
-    public User updateUserNamePW(User updatingUser) throws IOException {
-        // 덮어쓰기
-        saveUser(updatingUser);
-        return updatingUser;
-    }
-
-
     /**
      * 조회
      */
@@ -85,7 +77,12 @@ public class FileUserRepository implements UserRepository {
         Files.delete(deletingUserPath);
     }
 
-
+//    @Override
+//    public User updateUserNamePW(User updatingUser) throws IOException {
+//        // 덮어쓰기
+//        saveUser(updatingUser);
+//        return updatingUser;
+//    }
 
 
     /**

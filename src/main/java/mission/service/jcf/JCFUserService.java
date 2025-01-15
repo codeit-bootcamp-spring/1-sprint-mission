@@ -21,7 +21,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User update(User user) {
-        return userRepository.updateUserNamePW(user);
+        return create(user);
     }
 
     @Override
@@ -46,9 +46,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findByNamePW(String name, String password) {
-        return (User) findUsersByName(name).stream()
-                .filter(user -> user.getPassword().equals(password));
-        // 패스워드도 이름도 똑같다면 컬렉션 반환인데, 그럴 가능성 없다고 가증
+        return findUsersByName(name).stream()
+                .filter(user -> user.getPassword().equals(password))
+                .findAny().orElse(null);
     }
 
     @Override

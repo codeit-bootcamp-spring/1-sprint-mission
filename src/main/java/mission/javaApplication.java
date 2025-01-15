@@ -6,6 +6,7 @@ import mission.service.jcf.ProjectManager;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class javaApplication {
@@ -30,7 +31,7 @@ public class javaApplication {
         System.out.println("findUserByN_PW = userA : " + userA.equals(findUserByN_PW));
 
         // 모두 찾는 테스트
-        List<User> users = findUsers();
+        Set<User> users = findUsers();
 
         // 닉네임 패스워드 수정
         User updateUserA = fileMainService.updateUserNamePW(userA.getId(), userA.getName(), userA.getPassword(), "유저 F", "9999");
@@ -46,8 +47,8 @@ public class javaApplication {
 
     }
 
-    private static List<User> findUsers() throws IOException {
-        List<User> users = fileMainService.findAllUser();
+    private static Set<User> findUsers() throws IOException {
+        Set<User> users = fileMainService.findAllUser();
         System.out.println("전체 유저 수 = " + users.size());
         return users;
     }

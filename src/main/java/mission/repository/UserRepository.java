@@ -9,17 +9,9 @@ import java.util.UUID;
 
 public interface UserRepository {
     User saveUser(User user) throws IOException;
-
-
-    User updateUserNamePW(User user) throws IOException;
-
     Set<User> findAll() throws IOException;
-
     User findById(UUID id) throws IOException, ClassNotFoundException;
-
-//    User updateNamePW(UUID id, String newName, String password);
-
-    //User updateUserNamePW(User user);
-
     void delete(User deletingUser) throws IOException;
+
+    //User updateUserNamePW(User user) throws IOException;
 }

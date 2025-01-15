@@ -35,11 +35,21 @@ public class FileMainService {
      * 파일 생성
      */
 
-    public User createUser(String name, String password) throws IOException {
+    public User createUser(String name, String password){
         // 중복검사 해야됨
         fileUserService.validateDuplicateName(name);
         User newbie = new User(name, password);
-        return fileUserService.create(newbie);
+
+        try {
+            return fileUserService.create(newbie);
+        } catch (IOException e) {
+            System.out.println("I/O 오류 : 생성 실패");
+            return null;
+        }
+
+        // Main에서 잡은 이유
+        // userservice에서 create메서드를 update랑 같이 쓰면서 코드 중복을 줄였는데,
+        // 생성이 실패된건지, 수정이 실패된건지 파악하기 위해 userservice의 create문에서 예외처리하지 않고 여기서 처리
     }
 
     public Channel createChannel(String channelName){
@@ -60,14 +70,25 @@ public class FileMainService {
         return fileUserService.findAll();
     }
 
+    public Set<User> findUserByName(String findName){
+        return fileUserService.findUsersByName(findName);
+    }
+
     // id 잃어버렸을 때, name과 pw로 찾기
     public User findUserByNamePW(String name, String password) throws IOException {
         // 코드 중복 줄이고 파라미터 귀찮으니 User서비스가 아닌 여기서 처리
-        Set<User> users = findAllUser();
-        return users.stream()
-                .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
-                .findFirst()
-                .orElse(null);
+        Set<User> findNameUsers = findUserByName(name);
+        if (findNameUsers.isEmpty()){
+            System.out.println("닉네임을 잘못 입력하셨습니다");
+            return null;
+        } else {
+            return findNameUsers.stream()
+                    .filter(user ->  user.getPassword().equals(password))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        System.out.println("비밀번호를 잘못 입력하셨습니다");
+                        return null;});
+        }
     }
 
 
@@ -79,29 +100,25 @@ public class FileMainService {
         // 1. id 검증   2. 입력한 닉네임,PW 검증 후 수정해서 FILEUSERSERVICE에 넘김
         // (3 선택) 여기서 newName을 검증할지 말지 결정 <= 이거까지 맡으면 main이 하는 일이 많은 것 같은데
 
-        User existingUser = findUserById(id);
-        if (existingUser == null) {
-            return null;
-        }
-
-        // 2번
+        User existingUser = findUserById(id); // file 검증 끝이라 NULL 검증 필요 X
         if (!(existingUser.getName().equals(oldName) & existingUser.getPassword().equals(password))) {
             throw new IllegalStateException(String.format("닉네임(%s) 또는 password가 잘못됐습니다", oldName));
         }
-
-        // 3번은 fileUserService에 맡김
-        existingUser.setOldName(existingUser.getName());
+        // 3. 유저 이름 중복 검증 시 사용
+        // fileUserService.validateDuplicateName(newName);
         existingUser.setNamePassword(newName, newPassword);
         return fileUserService.update(existingUser);
     }
 
     public Channel updateChannelName(UUID channelId, String oldName, String newName){
         Channel updatingChannel = fileChannelService.findById(channelId);
-        if (updatingChannel.getName() != oldName){
+        if (!updatingChannel.getName().equals(oldName)){
+            System.out.printf("(변경 전 채널명 : %s)을(를) 잘못입력했습니다.", oldName);
+            System.out.println();
             return null;
         }
 
-        updatingChannel.setOldName(updatingChannel.getName());
+        fileChannelService.validateDuplicateName(newName);
         updatingChannel.setName(newName);
         return fileChannelService.update(updatingChannel);
     }

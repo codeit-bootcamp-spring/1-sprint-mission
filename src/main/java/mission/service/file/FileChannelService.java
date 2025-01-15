@@ -22,7 +22,8 @@ public class FileChannelService implements ChannelService {
         try {
             return fileChannelRepository.register(channel);
         } catch (IOException e) {
-            throw new RuntimeException("채널 등록 실패" + e.getMessage());
+            System.out.println("채널 등록 실패" + e.getMessage());
+            return null;
         }
     }
 
@@ -31,7 +32,8 @@ public class FileChannelService implements ChannelService {
         try {
             return fileChannelRepository.findAll();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("I/O 오류 : 채널 불러오기 실패");
+            return null;
         }
     }
 
@@ -66,16 +68,12 @@ public class FileChannelService implements ChannelService {
     public void deleteById(UUID id) {
         fileChannelRepository.deleteById(id);
     }
-    // 무슨 인자를 받든 상관 없음
-//    @Override
-//    public void delete(Channel channel) {
-//        deleteById(channel.getId());
-//    }
 
     /**
      * 검증
      */
     public void validateDuplicateName(String validatingName){
+        // 맵 방식 적용
         Map<String, Channel> channelMap = findAll().stream().collect(Collectors.toMap(
                 Channel::getName,
                 Function.identity()

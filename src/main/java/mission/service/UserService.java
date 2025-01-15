@@ -3,13 +3,14 @@ package mission.service;
 
 import mission.entity.User;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public interface UserService {
     //등록
-    User create(User user);
+    User create(User user) throws IOException;
 
     //[ ] 조회(단건)
     User findById(UUID id);

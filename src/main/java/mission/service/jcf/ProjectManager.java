@@ -91,7 +91,7 @@ public class ProjectManager {
     }
 
     public Set<User> findUsersInChannel(UUID channelId) {
-        return findChannelById(channelId).getUserList();
+        return findChannelById(channelId).getUsersImmutable();
     }
 
     // Channel 찾는 것들
@@ -105,6 +105,10 @@ public class ProjectManager {
 
     public Set<Channel> findAllChannel() {
         return channelService.findAll();
+    }
+
+    public Set<Channel> findAllChannelByUser(UUID userId){
+        return findUserById(userId).getChannelsImmutable();
     }
 
     // Message 찾는 것들
@@ -154,8 +158,12 @@ public class ProjectManager {
     public void drops(UUID channel_Id, UUID droppingUser_Id) {
         Channel droppingChannel = findChannelById(channel_Id);
         User droppingUser = findUserById(droppingUser_Id);
+        droppingUser.removeChannel(droppingChannel);
+    }
 
-        droppingChannel.getUserList().remove(droppingUser);
-        droppingUser.getChannels().remove(droppingChannel);
+    // 모든 채널 탈퇴
+    public void dropsAllByUser(UUID droppingUser_Id){
+        User user = findUserById(droppingUser_Id);
+        user.removeAllChannel();
     }
 }

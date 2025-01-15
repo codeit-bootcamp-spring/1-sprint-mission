@@ -20,7 +20,6 @@ public class Channel implements Serializable {
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-
     public Channel(String name) {
         this.name = name;
         this.id = UUID.randomUUID();
@@ -39,6 +38,10 @@ public class Channel implements Serializable {
 
     public Set<Message> getMessageList(){
         return messageList;
+    }
+
+    public Set<User> getUsersImmutable(){
+        return Collections.unmodifiableSet(userList);
     }
 
     // getUserList 없앤 이유 : 아래의 메서드로 userlist.remove 시 count를 초기화하기 위해

@@ -16,21 +16,17 @@ public class FileUserService implements UserService {
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
     @Override
-    public User create(User user) {
-        // 중복 검증 하려면 User 생성 시 validateDuplicateName
-        try {
-            return fileUserRepository.saveUser(user);
-        } catch (IOException e) {
-            throw new RuntimeException("생성 실패", e);
-        }
+    public User create(User user) throws IOException {
+        return fileUserRepository.saveUser(user);
     }
 
     @Override
     public User update(User updatingUser) {
         try {
-            return fileUserRepository.updateUserNamePW(updatingUser);
+            return create(updatingUser);
         } catch (IOException e) {
-            throw new RuntimeException("수정 I/O 오류: " + e.getMessage(), e);
+            System.out.println("I/O 오류 : 수정 실패");
+            return null;
         }
     }
 
@@ -63,15 +59,6 @@ public class FileUserService implements UserService {
         }
     }
 
-    // 검증은 레포지토리까지 갈 필요도 없이 여기서 처리
-    @Override
-    public void validateDuplicateName(String name) {
-        if (findAll().contains(name)) {
-            throw new DuplicateName(
-                    String.format("%s는 이미 존재하는 닉네임입니다.", name));
-        }
-    }
-
     @Override
     public Set<User> findUsersByName(String findName) {
         return findAll().stream()
@@ -81,9 +68,25 @@ public class FileUserService implements UserService {
 
     @Override
     public User findByNamePW(String name, String password) {
-        return (User) findUsersByName(name).stream()
-                .filter(user -> user.getPassword().equals(password));
+        return findUsersByName(name).stream()
+                .filter(user -> user.getPassword().equals(password))
+                .findAny()
+                .orElse(null);
+
         // 패스워드도 이름도 똑같다면 컬렉션 반환인데, 그럴 가능성 없다고 가증
+    }
+
+    /**
+     *  검증, 디렉토리 생성
+     */
+    // 검증은 레포지토리까지 갈 필요도 없이 여기서 처리
+    @Override
+    public void validateDuplicateName(String name) {
+        boolean isDuplicate = findAll().stream()
+                .anyMatch(user -> user.getName().equals(name));
+        if (isDuplicate){
+            throw new DuplicateName(String.format("%s는 이미 존재하는 닉네임입니다.", name));
+        }
     }
 
     // 디렉토리 생성

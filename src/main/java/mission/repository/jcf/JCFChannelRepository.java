@@ -1,6 +1,7 @@
 package mission.repository.jcf;
 
 import mission.entity.Channel;
+import mission.entity.User;
 import mission.repository.ChannelRepository;
 
 import java.util.*;
@@ -30,6 +31,13 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID id) {
+        Channel deletingChannel = findById(id);
+        deletingChannel.removeAllUser(); // 채널이 데이터에서 사라지면 user도 사라진다면 이 코드는 필요 없음
+        for (User user : deletingChannel.getUsersImmutable()) {
+            user.removeChannel(deletingChannel);
+        }
+        // 그 채널에서 생겼던 메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
+        //List<Message> messagesInChannel = findMessageInChannel(channelId);
         data.remove(id);
     }
 }
