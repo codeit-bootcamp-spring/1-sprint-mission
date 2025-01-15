@@ -1,24 +1,30 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String email;
 
+    // 생성자
     public User(String name, String email) {
         super();
         this.name = name;
         this.email = email;
     }
 
-    //getter
+    // Getter
     public String getName() {
         return name;
     }
+
     public String getEmail() {
         return email;
     }
 
-    //update
+    // 업데이트 메서드
     public void updateName(String name) {
         this.name = name;
         update();
@@ -28,14 +34,10 @@ public class User extends BaseEntity {
         this.email = email;
         update();
     }
+
     @Override
     public String toString() {
-        return "User {" +
-                "name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+        return "User {id='" + getId() + "', name='" + name + "', email='" + email + "'}";
     }
-
-
 
 }
