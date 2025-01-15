@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -126,22 +127,28 @@ class ParticipatedChannelTest {
         }
 
         @Test
+        @DisplayName("유저가 참여한 채널에 존재하는 ChannelName 으로 채널 조회 시 해당 채널 반환")
+        void givenExistedChannelNameWhenFindByNameThenReturnChannel() {
+            // given
+
+            // when
+            var foundChannel = channels.findByName(addChannelName1);
+            // then
+            assertThat(foundChannel)
+                    .isNotNull();
+        }
+
+        @Test
         @DisplayName("유저가 참여한 채널에 존재하지 않는 ChannelName 으로 채널 조회시 에러")
         void givenNotExistedChannelNameWhenFindByNameThenThrowException() {
             // given
             var notExistedChannelName = "SB_999기_백재우";
 
             // when
-            var throwable = catchThrowable(() ->
-                    channels.findByName(notExistedChannelName).orElseThrow(() ->
-                            UserException.errorMessageAndChannelName(USER_NOT_PARTICIPATED_CHANNEL,
-                                    notExistedChannelName)
-                    )
-            );
+            var foundChannel = channels.findByName(notExistedChannelName);
 
             // then
-            assertThat(throwable).isInstanceOf(UserException.class)
-                    .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
+            assertThat(foundChannel.orElse(null)).isNull();
         }
 
         @Test
@@ -198,16 +205,17 @@ class ParticipatedChannelTest {
         }
 
         @Test
-        @DisplayName("채널 id 값으로 유저가 참여한 채널을 삭제하면 해당 채널의 상태가 업데이트")
-        void givenDeleteTargetIdWhenDeleteChannelThenChannelStatusIsChanged() {
+        @DisplayName("채널 id 값으로 유저가 참여한 채널을 삭제하면 유저가 참여한 채널 목록의 개수 감소")
+        void givenDeleteTargetIdWhenDeleteChannelThenParticipatedChannelIsRemove() {
             // given
+            var oldParticipatedChannelCount = channels.countParticipatedChannels();
             var deleteTargetChannelId = createdChannel2.getId();
 
             // when
-            channels.deleteChannelById(deleteTargetChannelId, USER);
+            channels.exitChannelById(deleteTargetChannelId);
 
             // then
-            assertThat(createdChannel2.getStatus()).isEqualTo(UNREGISTERED);
+            assertThat(channels.countParticipatedChannels()).isNotEqualTo(oldParticipatedChannelCount);
         }
     }
 }
