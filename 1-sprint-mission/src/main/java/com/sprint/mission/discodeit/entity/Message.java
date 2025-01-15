@@ -1,45 +1,57 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
-public class Message extends Data {
+public class Message {
 
-    private String userName;
-    private List<String> textList = new ArrayList<>();
-    private Long createdAt;
-    private Long updatedAt;
+    private final UUID messageUuid;
+    private final long createdAt;
+    private long updatedAt;
+    private String userId;
+    private String messageText;
 
-    public Message(String userName, List<String> textList) {
-        this.userName = userName;
-        this.textList = textList;
-        this.createdAt = System.currentTimeMillis(); // 생성 시간
-        this.updatedAt = this.createdAt;           // 초기 생성 시간과 동일
+    public Message(String userId, String messageText) {
+        this.messageUuid = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
+        this.userId = userId;
+        this.messageText = messageText;
     }
 
-    public String getUserName() {
-        return userName;
+    // Getters
+    public UUID getMessageUuid() {
+        return messageUuid;
     }
 
-    public List<String> getTextList() {
-        return textList;
-    }
-
-    public Long getCreatedAt() {
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+    public String getUserId() {
+        return userId;
     }
 
-    public void setTextList(List<String> textList) {
-        this.textList = textList;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+    public String getMessageText() {
+        return messageText;
+    }
+
+    // Setters
+    public void setUserId(String userId) {
+        this.userId = userId;
+        updateUpdatedAt();
+    }
+
+    public void setMessageText(String messageText) {
+        this.messageText = messageText;
+        updateUpdatedAt();
+    }
+
+    // Private Methods
+    private void updateUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }

@@ -1,73 +1,65 @@
 package com.sprint.mission.discodeit.app;
 
-import com.sprint.mission.discodeit.entity.Data;
-import com.sprint.mission.discodeit.jcf.JCFCreateService;
-import com.sprint.mission.discodeit.jcf.JCFDeleteService;
-import com.sprint.mission.discodeit.jcf.JCFSearchService;
-import com.sprint.mission.discodeit.jcf.JCFUpdateService;
-import com.sprint.mission.discodeit.service.CreateService;
-import com.sprint.mission.discodeit.service.DeleteService;
-import com.sprint.mission.discodeit.service.SearchService;
-import com.sprint.mission.discodeit.service.UpdateService;
-
-import java.util.UUID;
-
-
-
+import project.entity.Channel;
+import project.entity.Message;
+import project.entity.User;
+import project.jcf.JCFChannelService;
+import project.jcf.JCFMessageService;
+import project.jcf.JCFUserService;
 
 public class JavaApplication {
-    public static void main(String[]arg){
-        Data data = new Data();
+    public static void main(String[] args) {
+        //각 서비스의 인스턴스 생성, 의존성 연결
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance(userService);
+        JCFMessageService messageService = JCFMessageService.getInstance(userService);
 
 
+        // 사용자 생성
+        User user1 = new User("Alice", "alice123");
+        User user2 = new User("Bob", "bob456");
 
-        // Service 객체 생성
-        CreateService createService = new JCFCreateService(data);
-        SearchService searchService = new JCFSearchService(data);
-        UpdateService updateService = new JCFUpdateService(data);
-        DeleteService deleteService = new JCFDeleteService(data);
+        userService.createUser(user1);
+        userService.createUser(user2);
 
-        // 샘플 UUID 생성
-        UUID userUuid1 = UUID.randomUUID();
-        UUID userUuid2 = UUID.randomUUID();
+        // 채널 생성
+        Channel channel1 = new Channel("Tech Talks", "alice123");
+        Channel channel2 = new Channel("Cooking Show", "bob456");
 
-        // CREATE 작업
-        createService.createUser(userUuid1, "user1", "password123");
-        createService.createUser(userUuid2, "user2", "password456");
-        createService.createMessage(userUuid1, "user1", "Hello, world!");
-        createService.createChannel(userUuid2, "Tech Talk", "user2");
+        channelService.createChannel(channel1);
+        channelService.createChannel(channel2);
 
-        // SEARCH 작업(수정 전)
-        searchService.searchUserByUUID(userUuid1);
-        searchService.searchChannelByUUID(userUuid2);
-        searchService.searchMessageByUUID(userUuid1);
-        searchService.searchAllChannels();
-        searchService.searchAllUsers();
+        // 메시지 생성
+        Message message1 = new Message("alice123", "Hello, welcome to Tech Talks!");
+        Message message2 = new Message("bob456", "Today we will make pasta.");
 
-        // UPDATE 작업(수정)
-        updateService.updateUser(userUuid1, "updatedUser1", "newPassword123");
-        updateService.updateMessage(userUuid1, "Updated message content");
-        updateService.updateChannel(userUuid2, "Updated Tech Talk");
+        messageService.createMessage(message1);
+        messageService.createMessage(message2);
 
-        // 수정 후 출력
-        searchService.searchUserByUUID(userUuid1);
-        searchService.searchChannelByUUID(userUuid2);
-        searchService.searchMessageByUUID(userUuid1);
-        searchService.searchAllChannels();
-        searchService.searchAllUsers();
+        // 데이터 출력
+        System.out.println("\nAll Users:");
+        userService.readAllUsers().forEach(user ->
+                System.out.println("User: " + user.getUserName() + ", ID: " + user.getUserId()));
 
-        //DELETE 작업
-        deleteService.deleteUser(userUuid2);
-        deleteService.deleteChannel(userUuid2);
+        System.out.println("\nAll Channels:");
+        channelService.readAllChannels().forEach(channel ->
+                System.out.println("Channel: " + channel.getChannelTitle() + ", User ID: " + channel.getUserId()));
 
-//        // 최종 상태 확인
-        searchService.searchAllUsers();
-        searchService.searchAllChannels();
+        System.out.println("\nAll Messages:");
+        messageService.readAllMessages().forEach(message ->
+                System.out.println("Message: " + message.getMessageText() + ", User ID: " + message.getUserId()));
+
+        // 특정 사용자 메시지 업데이트
+        if (message1.getMessageUuid() != null) {
+            messageService.updateMessage(message1.getMessageUuid().toString(), "Updated: Welcome to our Tech Talk series!");
+        }
+
+        // 메시지 출력
+        System.out.println("\nUpdated Messages:");
+        messageService.readAllMessages().forEach(message ->
+                System.out.println("Message: " + message.getMessageText() + ", User ID: " + message.getUserId()));
+
+
 
     }
-
-
-
-
-
 }

@@ -1,42 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends Data {
+import java.util.UUID;
 
+public class Channel {
+
+    private final UUID channelUuid;
+    private final long createdAt;
+    private long updatedAt;
     private String channelTitle;
-    private String channelId;
-    private Long createdAt;
-    private Long updatedAt;
+    private String userId;
 
-    public Channel(String channelTitle) {
-        this.channelId = channelId;
+    public Channel(String channelTitle, String userId){
+        channelUuid = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
         this.channelTitle = channelTitle;
-        this.createdAt = System.currentTimeMillis(); // 생성 시간
-        this.updatedAt = this.createdAt;           // 초기 생성 시간과 동일
+        this.userId = userId;
     }
 
-    public String getChannelId() {
-        return channelId;
-    }
-
+// Get 메소드
     public String getChannelTitle() {
         return channelTitle;
     }
 
-    public Long getCreatedAt() {
+    public String getUserId() {
+        return userId;
+    }
+
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+    public UUID getChannelUuid() {
+        return channelUuid;
     }
 
-    public void setChannelTitle(String channelTitle) {
+//update 메소드
+    public void updateUserId(String userId) {
+        this.userId = userId;
+        updateUpdatedAt();
+    }
+
+    public void updateUserName(String channelTitle) {
         this.channelTitle = channelTitle;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+        updateUpdatedAt();
+    }
+
+    public void updateUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }

@@ -1,43 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends Data {
+import java.util.*;
 
+public class User {
+
+    private final UUID userUuid;
+    private final long createdAt;
+    private long updatedAt;
     private String userName;
     private String userId;
-    private Long createdAt;
-    private Long updatedAt;
+    private final List<User>userData;
 
-    public User(String userName, String userId) {
-        super();
+    public User(String userName, String userId){
+        userData = new ArrayList<>();
+        userUuid = UUID.randomUUID();
+        createdAt = System.currentTimeMillis();
         this.userName = userName;
         this.userId = userId;
-        this.createdAt = System.currentTimeMillis(); // 객체 생성 시간
-        this.updatedAt = this.createdAt;           // 초기 생성 시간과 동일
     }
 
-    public String getUserName() {
-        return userName;
+    //Getter
+    public List<User> getUserData() {
+        return userData;
+    }
+
+    public UUID getUserUuid() {
+        return userUuid;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public Long getCreatedAt() {
+    public String getUserName() {
+        return userName;
+    }
+
+    public long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+
+    //Updated 메소드
+    public void updateUserId(String userId) {
+        this.userId = userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간 갱신
+    public void updateUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void updateUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis();
     }
 }
