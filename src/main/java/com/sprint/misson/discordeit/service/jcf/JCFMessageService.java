@@ -35,9 +35,13 @@ public class JCFMessageService implements MessageService {
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
-        try{
-            User userByUUID =  userService.getUserByUUID( user. getId().toString() );
-            Channel channelByUUID = channelService.getChannelByUUID( channel.getId().toString() );
+        try {
+            User userByUUID = userService.getUserByUUID(user.getId().toString());
+            Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
+            if (channelService.isUserInChannel(channelByUUID, userByUUID)) {
+                System.out.println("User with id " + userByUUID + " not found in this channel.");
+                throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
+            }
             Message message = new Message(userByUUID, content, channelByUUID);
             data.put(message.getId(), message);
             return message;

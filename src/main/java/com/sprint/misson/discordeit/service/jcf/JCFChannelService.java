@@ -110,4 +110,10 @@ public class JCFChannelService implements ChannelService {
         }
         return ch.getUserList().stream().toList();
     }
+    @Override
+    public boolean isUserInChannel(Channel channel, User user) {
+        //유저가 채널에 있는지 검사
+        //있으면 true, 없으면 false 반환
+        return channel.getUserList().contains(user);
+    }
 }

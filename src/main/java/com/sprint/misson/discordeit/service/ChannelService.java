@@ -32,4 +32,7 @@ public interface ChannelService {
     boolean deleteChannel(Channel channel);
 
     List<User> getUsersInChannel(Channel channel);
+
+    boolean isUserInChannel(Channel channel, User user);
+
 }
