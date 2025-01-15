@@ -25,8 +25,6 @@ public class JCFChannelService implements ChannelService {
     //생성
     @Override
     public Channel CreateChannel(String name, ChannelType type) {
-        Channel channel = new Channel( name, type );
-        data.put( channel.getId(), channel );
         Channel channel = new Channel(name, type);
         data.put(channel.getId(), channel);
         return channel;
