@@ -4,7 +4,6 @@ import mission.entity.Channel;
 import mission.entity.Message;
 import mission.entity.User;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,13 +19,13 @@ public class ProjectManager {
         // 닉넴 중복 검증 필요할 경우 => userService.validateDuplicateName(name);
         // 검증에서 예외 터지면 유저 생성 X
         User user = new User(name, password);
-        return userService.create(user);
+        return userService.createOrUpdate(user);
     }
 
     // 채널명은 중복 허용 X
     public Channel createChannel(String name) {
         channelService.validateDuplicateName(name);
-        return channelService.create(new Channel(name));
+        return channelService.createOrUpdate(new Channel(name));
     }
 
     // 서비스간 의존 예시
@@ -40,9 +39,7 @@ public class ProjectManager {
      */
     public void addChannelByUser(UUID channelId, UUID userId) {
         Channel channel = findChannelById(channelId);
-        findUserById(userId).addChannel(channel);
-        // 이 기능도 포함 : channel.getUserList().add(user);
-        // 따라서 addUserByChannel 필요 없음
+        findUserById(userId).addChannel(channel); // 양방향으로 더하는 로직
     }
 
     /**
@@ -82,7 +79,13 @@ public class ProjectManager {
         return userService.findById(id);
     }
 
+    public Set<User> findUserByName(String findName){
+        return userService.findUsersByName(findName);
+    }
+
     public User findUserByNamePW(String name, String password) {
+        // Set<User> findUsersByName = findUserByName(name); => 필터링 가능
+        // 이렇게 컨트롤러에서 바로 찾을 수 있지만 userService...라는 역할..에
         return userService.findByNamePW(name, password);
     }
 

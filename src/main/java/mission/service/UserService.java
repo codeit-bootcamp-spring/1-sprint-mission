@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface UserService {
     //등록
-    User create(User user) throws IOException;
+    User createOrUpdate(User user) throws IOException;
 
     //[ ] 조회(단건)
     User findById(UUID id);

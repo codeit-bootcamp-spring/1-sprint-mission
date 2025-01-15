@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface MessageService {
     //등록
-    Message create(Message message);
+    Message createOrUpdate(Message message);
 
     // 조회 단건
     Set<Message> findMessagesInChannel(Channel channel);

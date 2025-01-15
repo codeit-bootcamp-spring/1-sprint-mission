@@ -18,13 +18,19 @@ public class FileChannelService implements ChannelService {
     private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
 
     @Override
-    public Channel create(Channel channel){
+    public Channel createOrUpdate(Channel channel){
         try {
             return fileChannelRepository.register(channel);
         } catch (IOException e) {
             System.out.println("채널 등록 실패" + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public Channel update(Channel channel) {
+        // channel 존재 검증은 앞단에서 입력할 때 완료
+        return createOrUpdate(channel);
     }
 
     @Override
@@ -56,12 +62,6 @@ public class FileChannelService implements ChannelService {
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("채널 파일(id) 찾는데 오류 발생했습니다" + e.getMessage());
         }
-    }
-
-    @Override
-    public Channel update(Channel channel) {
-        // channel 존재 검증은 앞단에서 입력할 때 완료
-        return create(channel);
     }
 
     @Override

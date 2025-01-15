@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface ChannelService {
     //등록
-    Channel create(Channel channel);
+    Channel createOrUpdate(Channel channel);
 
     Channel findByName(String name);
 

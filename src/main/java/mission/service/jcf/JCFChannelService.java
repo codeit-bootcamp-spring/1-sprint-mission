@@ -2,7 +2,6 @@ package mission.service.jcf;
 
 
 import mission.entity.Channel;
-import mission.entity.User;
 import mission.repository.jcf.JCFChannelRepository;
 import mission.service.ChannelService;
 import mission.service.exception.DuplicateName;
@@ -17,13 +16,13 @@ public class JCFChannelService implements ChannelService {
     private final JCFChannelRepository channelRepository = new JCFChannelRepository();
 
     @Override
-    public Channel create(Channel channel) {
+    public Channel createOrUpdate(Channel channel) {
         return channelRepository.register(channel);
     }
 
     @Override
     public Channel update(Channel channel) {
-        return create(channel);  // 클래스 내 메서드 활용(Map 덮어쓰기 가능)
+        return createOrUpdate(channel);  // 클래스 내 메서드 활용(Map 덮어쓰기 가능)
     }
 
     @Override

@@ -16,16 +16,16 @@ public class FileUserService implements UserService {
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
     @Override
-    public User create(User user) throws IOException {
+    public User createOrUpdate(User user) throws IOException {
         return fileUserRepository.saveUser(user);
     }
 
     @Override
     public User update(User updatingUser) {
         try {
-            return create(updatingUser);
+            return createOrUpdate(updatingUser);
         } catch (IOException e) {
-            System.out.println("I/O 오류 : 수정 실패");
+            System.out.println("I/O 오류 : 유저 수정 실패");
             return null;
         }
     }

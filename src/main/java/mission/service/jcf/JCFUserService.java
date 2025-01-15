@@ -15,13 +15,13 @@ public class JCFUserService implements UserService {
     //private final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public User create(User user) {
+    public User createOrUpdate(User user) {
         return userRepository.saveUser(user);
     }
 
     @Override
     public User update(User user) {
-        return create(user);
+        return createOrUpdate(user);
     }
 
     @Override
@@ -33,9 +33,6 @@ public class JCFUserService implements UserService {
     public User findById(UUID id) {
         return userRepository.findById(id);
     }
-
-    // 이걸 레포에서 처리해야하나....
-    // 중복허용이라 잘 안
 
     @Override
     public Set<User> findUsersByName(String findName){
@@ -58,7 +55,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public void validateDuplicateName(String name){
-        if (findUsersByName(name) != null){
+        if (!findUsersByName(name).isEmpty()){
             throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", name));
         }
     }

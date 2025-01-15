@@ -3,11 +3,8 @@ package mission.service.file;
 import mission.entity.Channel;
 import mission.entity.Message;
 import mission.entity.User;
-import mission.repository.file.FileUserRepository;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,12 +38,11 @@ public class FileMainService {
         User newbie = new User(name, password);
 
         try {
-            return fileUserService.create(newbie);
+            return fileUserService.createOrUpdate(newbie);
         } catch (IOException e) {
-            System.out.println("I/O 오류 : 생성 실패");
+            System.out.println("I/O 오류 : 유저 생성 실패");
             return null;
         }
-
         // Main에서 잡은 이유
         // userservice에서 create메서드를 update랑 같이 쓰면서 코드 중복을 줄였는데,
         // 생성이 실패된건지, 수정이 실패된건지 파악하기 위해 userservice의 create문에서 예외처리하지 않고 여기서 처리
@@ -54,7 +50,7 @@ public class FileMainService {
 
     public Channel createChannel(String channelName){
         // 중복 검증 처리 시 : fileChannelService.validateDuplicateName(channelName);
-        return fileChannelService.create(new Channel(channelName));
+        return fileChannelService.createOrUpdate(new Channel(channelName));
     }
 
 
