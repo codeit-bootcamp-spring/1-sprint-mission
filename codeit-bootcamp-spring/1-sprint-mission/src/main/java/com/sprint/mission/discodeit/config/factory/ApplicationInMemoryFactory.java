@@ -2,23 +2,29 @@ package com.sprint.mission.discodeit.config.factory;
 
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.channel.ChannelRepositoryInMemory;
+import com.sprint.mission.discodeit.db.message.MessageRepository;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.db.user.UserRepositoryInMemory;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 
 /**
- *  빈으로 관리되는 스프링과 다르게 정확히 어떻게 구현해야하는지
+ *  빈으로 관리되는 스프링과 다르게 정확히 어떻게 구현해야하는지 알기가 어려웠음
  */
 public class ApplicationInMemoryFactory implements AppFactory {
     private static ApplicationInMemoryFactory INSTANCE;
 
     private UserRepository userRepository;
+    private UserService userService;
+
     private ChannelRepository channelRepository;
     private ChannelService channelService;
-    private UserService userService;
+
+    private MessageService messageService;
+    private MessageRepository messageRepository;
 
     private ApplicationInMemoryFactory() {}
 
@@ -59,5 +65,15 @@ public class ApplicationInMemoryFactory implements AppFactory {
             channelRepository = ChannelRepositoryInMemory.getChannelRepositoryInMemory();
         }
         return channelRepository;
+    }
+
+    @Override
+    public MessageService getMessageService() {
+        return null;
+    }
+
+    @Override
+    public MessageRepository getMessageRepository() {
+        return null;
     }
 }

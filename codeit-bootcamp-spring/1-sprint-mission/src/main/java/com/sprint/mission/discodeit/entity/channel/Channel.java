@@ -17,7 +17,7 @@ public class Channel extends AbstractUUIDEntity {
     )
     private String channelName;
 
-    private final User creator; // 채널의 주인이 바뀌기도 하나..? 안돼 돌아가
+    private final User creator;
 
     private Channel(String channelName, User creator) {
         this.channelName = channelName;
