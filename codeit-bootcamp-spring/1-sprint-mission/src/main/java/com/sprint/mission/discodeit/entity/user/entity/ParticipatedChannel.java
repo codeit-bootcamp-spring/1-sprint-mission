@@ -4,6 +4,7 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PA
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.common.Status;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,15 +34,18 @@ public class ParticipatedChannel {
     public List<Channel> findAllChannels() {
         var participatedChannels =
                 this.participatedChannels.values()
-                .stream()
-                .toList();
+                        .stream()
+                        .filter(Channel::isNotUnregistered)
+                        .toList();
 
         return Collections.unmodifiableList(participatedChannels);
     }
 
     public Optional<Channel> findById(UUID channelId) {
         var foundChannel = participatedChannels.get(channelId);
-        return Optional.ofNullable(foundChannel);
+        var notRegisteredChannel =
+                foundChannel.getStatus() == Status.UNREGISTERED ? null : foundChannel;
+        return Optional.ofNullable(notRegisteredChannel);
     }
 
     // TODO 같은 이름을 가진 채널이 여러 개 있을 수 있음. 리스트로 반환 고려해야하지 않을까?
@@ -58,7 +62,8 @@ public class ParticipatedChannel {
         var foundChannel =
                 findById(channelId)
                         .orElseThrow(
-                                () -> UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL, channelId.toString()));
+                                () -> UserException.errorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL,
+                                        channelId.toString()));
 
         foundChannel.changeName(newName, user);
         participatedChannels.put(foundChannel.getId(), foundChannel);
@@ -66,7 +71,11 @@ public class ParticipatedChannel {
         return foundChannel;
     }
 
-    public void deleteChannelById(UUID channelId, User user) {
-        findById(channelId).ifPresent(channel -> channel.deleteChannel(user));
+    public void exitChannelById(UUID channelId) {
+        findById(channelId).ifPresent(foundChannel -> participatedChannels.remove(foundChannel.getId()));
+    }
+
+    public int countParticipatedChannels() {
+        return participatedChannels.size();
     }
 }

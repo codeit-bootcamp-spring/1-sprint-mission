@@ -37,7 +37,7 @@ public class User extends AbstractUUIDEntity {
      *  다른 객체에 해당 작업을 위임, 그런데 메서드 명이 영...
      *  이 부분 코드 리뷰 부탁드릴게요!
      */
-    public Channel createNewChannel(String channelName) {
+    public Channel openNewChannel(String channelName) {
         Preconditions.checkNotNull(channelName);
         var createdChannel = participatedChannels.createChannel(channelName, this);
         return createdChannel;
@@ -51,8 +51,14 @@ public class User extends AbstractUUIDEntity {
         return targetChannel;
     }
 
-    public void deleteParticipatedChannel(UUID channelId) {
-        participatedChannels.deleteChannelById(channelId, this);
+    // 참여한 채널에서 나가기
+    public void exitParticipatedChannel(UUID channelId) {
+        participatedChannels.exitChannelById(channelId);
+    }
+
+    public int countParticipatedChannels() {
+        var participatedChannelCount = participatedChannels.countParticipatedChannels();
+        return participatedChannelCount;
     }
 
     public List<Channel> getParticipatedChannels() {
