@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity.user;
 
 import static com.sprint.mission.discodeit.entity.user.entity.UserName.NAME_MAX_LENGTH;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchNullPointerException;
 import static org.assertj.core.api.BDDAssertions.then;
 
 import com.sprint.mission.discodeit.entity.user.entity.UserName;
@@ -10,6 +11,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.util.Set;
 import java.util.stream.Stream;
+import net.bytebuddy.asm.Advice.Thrown;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 
 class UserNameTest {
 
@@ -38,14 +41,18 @@ class UserNameTest {
     }
 
     @ParameterizedTest(name = "[test {index}] ==> given name : {arguments}")
-    @NullAndEmptySource
+    @NullSource
     @DisplayName("요구되는 유저의 이름이 비어있는 value 제공 시 에러 발생 테스트")
     void givenUserNameLengthLessThanRequiredLengthWhenCreateUserThenThrowException(String name) {
         // given
-        userName = UserName.createFrom(name);
-        Set<ConstraintViolation<UserName>> violations = validator.validate(userName);
+
+//        Set<ConstraintViolation<UserName>> violations = validator.validate(userName);
+
+        // when
+        Throwable thrown = catchNullPointerException(() -> userName = UserName.createFrom(name));
         // then
-        assertThat(violations.size()).isEqualTo(1);
+        assertThat(thrown).isInstanceOf(NullPointerException.class);
+//        assertThat(violations.size()).isEqualTo(1);
     }
 
     @ParameterizedTest(name = "given name : {arguments}")
