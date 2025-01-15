@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DataNotFoundException;
+import com.sprint.mission.discodeit.exception.IdNotFoundException;
+import com.sprint.mission.discodeit.exception.ValidationException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import com.sprint.mission.discodeit.validation.Validator;
@@ -21,14 +24,12 @@ public class JCFUserService implements UserService {
 
         if(!validator.emailIsValid(user.getEmail())){
             System.out.println(user.getUsername() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println("Invalid email format: " + user.getEmail());
-            return null;
+            System.out.println(new ValidationException("Invalid email format : " + user.getEmail()));
         }
 
         if(!validator.phoneNumberIsValid(user.getPhoneNumber())){
             System.out.println(user.getUsername() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println("Invalid phoneNumber format(000-0000-0000) : " + user.getPhoneNumber());
-            return null;
+            System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + user.getPhoneNumber()));
         }
 
         try {
@@ -36,48 +37,82 @@ public class JCFUserService implements UserService {
             System.out.println(user.getUsername() + "님의 사용자 등록이 완료되었습니다.");
             return user;
         }catch (Exception e){
-            System.out.println(e);
-            return null;
+            throw new RuntimeException("User creation failed: " + e.getMessage(), e);
         }
     }
 
     @Override
     public User read(UUID id) {
-        return data.get(id);
+        try{
+            Optional<User> searchUser = Optional.ofNullable(data.get(id));
+
+            if(searchUser.isPresent()) {
+                User user = searchUser.get();
+
+                System.out.println("userName : " + user.getUsername()
+                        + " | Email : " + user.getEmail()
+                        + " | phoneNumber : " + user.getPhoneNumber()
+                        + " | Address : " + user.getAddr()
+                        + " | Age : " + user.getAge()
+                        + " | Hobby : " + user.getHobby()
+                        + " | Interest : " + user.getInterest()
+                );
+                return user;
+            }else{
+                throw new DataNotFoundException("사용자가 존재하지 않습니다.");
+            }
+        } catch (DataNotFoundException e){
+            System.out.println("예외 처리 메시지 : " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<User> readAll() {
+        data.values().forEach(user -> {
+            System.out.println("username : " + user.getUsername()
+                    + " | Email : " + user.getEmail()
+                    + " | phoneNumber : " + user.getPhoneNumber()
+                    + " | Address : " + user.getAddr()
+                    + " | Age : " + user.getAge()
+                    + " | Hobby : " + user.getHobby()
+                    + " | Interest : " + user.getInterest()
+            );
+        });
         return new ArrayList<>(data.values());
     }
 
     @Override
     public User update(UUID id, User updatedUser) {
-        if(data.containsKey(id)){
-            User existingUser = data.get(id);
-            if(!validator.emailIsValid(updatedUser.getEmail())){
-                System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println("Invalid email format: " + updatedUser.getEmail());
-                return null;
-            }
+        try {
+            if(data.containsKey(id)){
+                User existingUser = data.get(id);
+                if(!validator.emailIsValid(updatedUser.getEmail())){
+                    System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
+                    System.out.println(new ValidationException("Invalid email format : " + updatedUser.getEmail()));
+                }
 
-            if(!validator.phoneNumberIsValid(updatedUser.getPhoneNumber())){
-                System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println("Invalid phoneNumber format(000-0000-0000) : " + updatedUser.getPhoneNumber());
-                return null;
-            }
+                if(!validator.phoneNumberIsValid(updatedUser.getPhoneNumber())){
+                    System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
+                    System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + updatedUser.getPhoneNumber()));
+                }
 
-            existingUser.setUsername(updatedUser.getUsername());
-            existingUser.setEmail(updatedUser.getEmail());
-            existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
-            existingUser.setAddr(updatedUser.getAddr());
-            existingUser.setAge(updatedUser.getAge());
-            existingUser.setHobby(updatedUser.getHobby());
-            existingUser.setInterest(updatedUser.getInterest());
-            updatedUser.update();
-            return existingUser;
-        }else{
-            System.out.println("저장되지 않았거나, 삭제된 아이디 입니다.");
+                existingUser.setUsername(updatedUser.getUsername());
+                existingUser.setEmail(updatedUser.getEmail());
+                existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+                existingUser.setAddr(updatedUser.getAddr());
+                existingUser.setAge(updatedUser.getAge());
+                existingUser.setHobby(updatedUser.getHobby());
+                existingUser.setInterest(updatedUser.getInterest());
+                updatedUser.update();
+
+                read(existingUser.getId());
+                return existingUser;
+            }else{
+                System.out.println(new IdNotFoundException("아이디가 존재하지 않습니다."));
+            }
+        } catch (DataNotFoundException e){
+            throw new DataNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);
         }
         return null;
     }

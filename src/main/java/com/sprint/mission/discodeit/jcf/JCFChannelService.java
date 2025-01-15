@@ -2,7 +2,10 @@ package com.sprint.mission.discodeit.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.DataNotFoundException;
+import com.sprint.mission.discodeit.exception.IdNotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
+import groovyjarjarasm.asm.tree.TryCatchBlockNode;
 
 import java.util.*;
 
@@ -27,50 +30,74 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public List<Channel> readAll() {
+        data.values().forEach(channel -> {
+            System.out.println(channel.getChannelName());
+        });
+
         return new ArrayList<>(data.values());
     }
 
     @Override
     public Channel update(UUID id, Channel updatedChannel) {
-        if(data.containsKey(id)){
-            Channel existingChannel = data.get(id);
-            existingChannel.setChannelName(updatedChannel.getChannelName());
-            existingChannel.setDescription(updatedChannel.getDescription());
-            updatedChannel.update();
-            return existingChannel;
+        try{
+            if(data.containsKey(id)){
+                Channel existingChannel = data.get(id);
+                existingChannel.setChannelName(updatedChannel.getChannelName());
+                existingChannel.setDescription(updatedChannel.getDescription());
+                updatedChannel.update();
+                return existingChannel;
+            }
+        }catch (DataNotFoundException e){
+            throw new DataNotFoundException("채널을 찾을 수 없습니다." + e);
         }
         return null;
     }
 
     @Override
     public void channelOwnerChange(UUID id, User owner){
-        if(data.containsKey(id)){
-            Channel existingChannel = data.get(id);
-            User existingOwnerName = existingChannel.getOwner();
-            existingChannel.setOwner(owner);
-            existingChannel.update();
-            System.out.println("채널 주인이 " + existingOwnerName.getUsername() + "님에서 " + owner.getUsername() + "님으로 변경되었습니다.");
+        try {
+            if(data.containsKey(id)){
+                Channel existingChannel = data.get(id);
+                User existingOwnerName = existingChannel.getOwner();
+                existingChannel.setOwner(owner);
+                existingChannel.update();
+                System.out.println("채널 주인이 " + existingOwnerName.getUsername() + "님에서 " + owner.getUsername() + "님으로 변경되었습니다.");
+            }
+        }catch (DataNotFoundException e){
+            throw new DataNotFoundException("채널을 찾을 수 없습니다." + e);
         }
     }
 
     @Override
     public boolean delete(UUID id) {
-        return data.remove(id) != null;
+        try{
+            String removeChannelName = data.get(id).getChannelName();
+            data.remove(id);
+            System.out.println(removeChannelName +" 삭제가 완료되었습니다.");
+            return true;
+        } catch (NullPointerException e){
+            System.out.println("유효하지 않은 ID 입니다..\n" + e);
+        }
+        return false;
     }
 
     @Override
     public void channelMemberJoin(UUID id, User joinUser){
-        if(data.containsKey(id)){
-            Channel joinChannel = data.get(id);
+        try {
+            if (data.containsKey(id)) {
+                Channel joinChannel = data.get(id);
 
-            List<User> members = new ArrayList<>(joinChannel.getMember());
-            if (!members.contains(joinUser)) {
-                members.add(joinUser);
-                System.out.println(joinChannel.getChannelName() + " 채널에 " + joinUser.getUsername() + "님이 등록되었습니다.");
-            } else {
-                System.out.println("User is already a member.");
+                List<User> members = new ArrayList<>(joinChannel.getMember());
+                if (!members.contains(joinUser)) {
+                    members.add(joinUser);
+                    System.out.println(joinChannel.getChannelName() + " 채널에 " + joinUser.getUsername() + "님이 등록되었습니다.");
+                } else {
+                    System.out.println("User is already a member.");
+                }
+                joinChannel.setMember(members);
             }
-            joinChannel.setMember(members);
+        }catch (DataNotFoundException e){
+            throw new DataNotFoundException("채널을 찾을 수 없습니다.");
         }
     }
 

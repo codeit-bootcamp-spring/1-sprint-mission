@@ -35,21 +35,26 @@ public class DiscodeitApplication {
 
 
         System.out.println("모든 사용자 조회:");
-        userService.readAll().forEach(user -> {
-            System.out.println("username : " + user.getUsername() + " | Email : " + user.getEmail() + " | phoneNumber : " + user.getPhoneNumber() + " | Address : " + user.getAddr() + " | Age : " + user.getAge() + " | Hobby : " + user.getHobby() + " | Interest : " + user.getInterest());
-        });
+        userService.readAll();
         System.out.println("============================");
 
 
         UUID user1Id = users.get(1).getId();
-        User searchUserId = userService.read(user1Id);
         System.out.println("단일 사용자 조회(user1):");
-        System.out.println("user1 의 userName : " + searchUserId.getUsername()  + " | Email : " + searchUserId.getEmail() + " | phoneNumber : " + searchUserId.getPhoneNumber() + " | Address : " + searchUserId.getAddr() + " | Age : " + searchUserId.getAge() + " | Hobby : " + searchUserId.getHobby() + " | Interest : " + searchUserId.getInterest());
+        userService.read(user1Id);
         System.out.println("============================");
 
-
         System.out.println("사용자 수정:");
+        userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "010-2349-9548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
+        System.out.println("============================");
+
+        System.out.println("사용자 수정(휴대폰번호 에러):");
         userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
+        System.out.println("============================");
+
+        System.out.println("사용자 수정(ID 에러):");
+        UUID errorId = UUID.randomUUID();
+        userService.update(errorId, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
         System.out.println("============================");
 
 
@@ -61,12 +66,15 @@ public class DiscodeitApplication {
 
         System.out.println("사용자 삭제:");
         userService.delete(user1Id);
+        System.out.println("============================");
+
+        System.out.println("삭제된 사용자 삭제:");
         userService.delete(user1Id);
         System.out.println("============================");
 
 
         System.out.println("삭제된 사용자 확인:");
-        System.out.println(userService.read(user1Id)); // null 또는 삭제 확인 메시지 출력
+        userService.read(user1Id); // null 또는 삭제 확인 메시지 출력
 
 
         System.out.println();
@@ -87,17 +95,19 @@ public class DiscodeitApplication {
         channels.forEach(channel -> {
             channelService.create(channel);
         });
+
         System.out.println("채널 등록 완료");
         System.out.println("================");
 
         System.out.println("전체 채널 조회 :");
-        channelService.readAll().forEach(channel -> System.out.println(channel.getChannelName()));
+        channelService.readAll();
         System.out.println("================");
 
         Channel channel1 = channels.get(1);
 
         User addUser = new User("martin", "martin@example.com", "010-5678-5678", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "computer")));
         userService.create(addUser);
+        System.out.println("================");
 
         System.out.println("채널에 새로운 맴버 추가하기 : ");
         channelService.channelMemberJoin(channel1.getId(), addUser);

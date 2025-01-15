@@ -37,6 +37,7 @@ public class JCFMessageService implements MessageService {
                 System.out.println(sender + "님이 " + message.getChannel().getChannelName() + " 채널에 글을 남기셨습니다.");
                 System.out.println(sender + " - " + message.getContent());
             }
+            System.out.println();
         });
         return new ArrayList<>(data.values());
     }
