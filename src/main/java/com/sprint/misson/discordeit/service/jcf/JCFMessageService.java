@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.service.jcf;
 
+import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.Message;
 import com.sprint.misson.discordeit.entity.User;
+import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
@@ -21,7 +23,7 @@ public class JCFMessageService implements MessageService {
     private final UserService userService;
     private final ChannelService channelService ;
 
-    public JCFMessageService() {
+    public JCFMessageService(ChannelService channelService, UserService userService) {
         this.data= new HashMap<>();
         this.userService= JCFUserService.getInstance();
         this.channelService= JCFChannelService.getInstance();
@@ -33,18 +35,26 @@ public class JCFMessageService implements MessageService {
 
     //생성
     @Override
-    public Message createMessage(User user, String content, Channel channel) {
+    public Message createMessage(User user, String content, Channel channel) throws RuntimeException {
 
-        User userByUUID = userService.getUserByUUID( user.getId().toString() );
-        Channel channelByUUID =channelService.getChannelByUUID( channel.getId().toString() );
-
-        if( userByUUID == null || content == null || content.isEmpty() || channelByUUID == null ) {
-            return null;
+        if (content == null || content.isEmpty()) {
+            throw new CustomException(ErrorCode.EMPTY_DATA,"Content is empty");
         }
 
-        Message message = new Message(user, content, channel);
-        data.put( message.getId(), message );
-        return message;
+        try{
+            User userByUUID =  userService.getUserByUUID( user. getId().toString() );
+            Channel channelByUUID = channelService.getChannelByUUID( channel.getId().toString() );
+            Message message = new Message(userByUUID, content, channelByUUID);
+            data.put( message.getId(), message );
+            return message;
+        }catch (CustomException e ){
+            if(e.getErrorCode() == ErrorCode.USER_NOT_FOUND){
+                throw new CustomException(e.getErrorCode());
+            }else if(e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND){
+                throw new CustomException(e.getErrorCode());
+            }
+            throw new CustomException(e.getErrorCode(), "Create message failed");
+        }
     }
 
     //모두 읽기
@@ -55,8 +65,12 @@ public class JCFMessageService implements MessageService {
 
     //단일 조회 - uuid
     @Override
-    public Message getMessageByUUID(String messageId) {
-        return data.get(UUID.fromString( messageId ));
+    public Message getMessageByUUID(String messageId) throws RuntimeException {
+        Message message = data.get(UUID.fromString(messageId));
+        if( message == null ) {
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", messageId));
+        }
+        return message;
     }
 
     //다건 조회 - 내용
@@ -69,10 +83,15 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 특정 작성자
     @Override
-    public List<Message> getMessageBySender(User sender) {
-        return data.values().stream()
-                .filter( m -> m.getSender().equals( sender ) )
-                .collect( Collectors.toList());
+    public List<Message> getMessageBySender(User sender) throws RuntimeException {
+        try{
+            User userByUUID = userService.getUserByUUID(sender.getId().toString());
+            return data.values().stream()
+                    .filter(m -> m.getSender().equals(userByUUID))
+                    .toList();
+        }catch (Exception e){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     //다건 조회 - 생성 날짜
@@ -83,30 +102,46 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 특정 채널
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) {
-        return data.values().stream()
-                .filter( m -> m.getChannel().equals( channel ) )
-                .collect( Collectors.toList());
+    public List<Message> getMessagesByChannel(Channel channel) throws RuntimeException {
+        try{
+            Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
+            return data.values().stream()
+                    .filter(m -> m.getChannel().equals(channelByUUID))
+                    .toList();
+        }catch (Exception e){
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+        }
     }
 
     //수정
     @Override
-    public Message updateMessage(String messageId, String newContent) {
+    public Message updateMessage(String messageId, String newContent) throws RuntimeException {
 
         Message message = data.get(UUID.fromString( messageId ));
 
-        if(message == null || message.getContent().equals(newContent) || newContent.isEmpty() ) {
-            return null;
+        if(message == null) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Message with id %s not found", messageId));
+        }
+        else if(newContent.isEmpty()){
+            throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
         message.setContent(newContent);
-        message.setUpdatedAt();
 
+        if(!message.getContent().equals(newContent)){
+            message.setUpdatedAt();
+        }
         return message;
     }
 
     @Override
-    public boolean deleteMessage(Message message) {
-        return data.remove( message.getId() ) != null;
+    public boolean deleteMessage(Message message)throws RuntimeException {
+        Message msg = data.get(UUID.fromString(message.getId().toString()));
+
+        if( msg == null ) {
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));
+        }
+        //만약 delete 한 후에도 객체가 필요하다면 반환값을 boolean 에서 Message 로 바꾸기
+        return true;
     }
 }

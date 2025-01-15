@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.service.jcf;
 
+import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
+import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 
 import java.util.ArrayList;
@@ -39,8 +41,12 @@ public class JCFChannelService implements ChannelService {
 
     //단일 조회 - UUID
     @Override
-    public Channel getChannelByUUID(String channelId) {
-        return data.get( UUID.fromString( channelId ) );
+    public Channel getChannelByUUID(String channelId) throws RuntimeException {
+        Channel channel = data.get(UUID.fromString(channelId));
+        if ( channel == null ) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
+        }
+        return channel;
     }
 
     //다건 조회 - 채널 타입
@@ -60,11 +66,14 @@ public class JCFChannelService implements ChannelService {
     }
     //수정
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO) {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws RuntimeException {
         Channel channel = data.get( UUID.fromString( channelId ) );
 
-        if ( channel == null || channelDTO == null ) {
-            return null;
+        if ( channel == null  ) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
+        }
+        else if ( channelDTO == null ) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
         //변경 여부 체크
@@ -89,15 +98,20 @@ public class JCFChannelService implements ChannelService {
         // 변경사항이 있는 경우에만 업데이트 시간 설정
         if (isUpdated) {
             channel.setUpdatedAt();
-            return channel;
         }
+        return channel;
+    }
 
         return null;
     }
 
     //삭제
     @Override
-    public boolean deleteChannel(Channel channel) {
-        return data.remove(channel.getId()) != null ;
+    public boolean deleteChannel(Channel channel) throws RuntimeException {
+        Channel ch = data.get(channel.getId());
+        if ( ch == null ) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channel.getId()));
+        }
+        return true;
     }
 }

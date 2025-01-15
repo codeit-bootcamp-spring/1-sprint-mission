@@ -1,9 +1,11 @@
 package com.sprint.misson.discordeit.service.jcf;
 
+import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.entity.UserStatus;
+import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
 import java.util.*;
@@ -23,14 +25,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User createUser(String nickname, String email) {
+    public User createUser(String nickname, String email) throws CustomException {
 
         //스트림으로 HashMap 의 value(User) 들 중 이미 존재하는 email 인지 검사
         boolean userEmailExists = data.values().stream()
                 .anyMatch( u -> u.getEmail().equals(email) );
 
         if(userEmailExists) {
-            return null;
+            throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
         User newUser = new User(nickname, email, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED );
@@ -54,17 +56,25 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserByUUID(String userId) {
-        //* get() - key 에 해당하는 값이 없어도 null 반환, 에러 x
-        return data.get( UUID.fromString(userId) );
+    public User getUserByUUID(String userId) throws RuntimeException {
+
+        User user = data.get(UUID.fromString(userId));
+
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
+        }
+        return user;
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        //스트림으로 해당 email 을 가진 User 객체 찾아서 반환
-        return data.values().stream()
-                .filter( u -> u.getEmail().equals( email ) )
-                .findFirst().orElse(null);
+    public User getUserByEmail(String email) throws RuntimeException {
+
+        User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with email %s not found", email));
+        }
+        return user;
     }
 
     @Override
@@ -89,11 +99,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO) {
+    public User updateUser(String userId, UserDTO userDTO) throws RuntimeException {
         User user = data.get( UUID.fromString(userId) );
 
-        if( user == null || userDTO == null) {
-            return null;
+        if( user == null ){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
+        } else if (userDTO==null) {
+            throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
         }
 
         boolean isUpdated = false;
@@ -123,15 +135,19 @@ public class JCFUserService implements UserService {
 
         if(isUpdated) {
             user.setUpdatedAt();
-            return user;
         }
-
-        return null;
+        return user;
     }
 
     @Override
-    public boolean deleteUser(String userId) {
-        //* remove() - key 에 해당하는 값이 없어도 null 반환, 에러 x
-        return data.remove( UUID.fromString(userId), data.get( UUID.fromString(userId)));
+    public boolean deleteUser(String userId) throws RuntimeException {
+
+        User user = data.get(UUID.fromString(userId));
+
+        if(user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
+        }
+
+        return data.remove( UUID.fromString(userId), user);
     }
 }
