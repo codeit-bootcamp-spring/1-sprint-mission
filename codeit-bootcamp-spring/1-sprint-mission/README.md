@@ -1,8 +1,5 @@
 # 스프린트 미션 1
-
-- CI 테스트 자동화를 위한 설정 파일 생성
-테스트 자동화를 위해 `github action`을 설정하며 생긴 `issue` 정리  
-  [issue git repositor](https://github.com/jaewoo9797/githubActionFlow/tree/main)
+디스코드 서비스 만들기
 
 ## 🚀 목표
 
@@ -79,7 +76,7 @@
     - [ ] 삭제
     - [ ] 조회를 통해 삭제되었는지 확인
 
-** 5️⃣기본 요구사항 커밋 태그**
+**5️⃣기본 요구사항 커밋 태그**
 
 - [ ] 여기까지 진행 후 반드시 커밋해주세요. 그리고 `sprint1-basic` 태그를 생성해주세요.
 
