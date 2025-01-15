@@ -82,6 +82,27 @@ class ChannelTest {
             assertThat(validResult).isFalse();
         }
 
+        @Test
+        @DisplayName("찾으려는 채널이름과 비교하려는 채널 객체의 이름이 같고 해지상태가 아닐 경우 true 반환")
+        void givenSameNameWhenIsStatusNotUnregisteredAndEqualsToThenTrue() {
+            // given
+            var findChannelNameRequest = CHANNEL_NAME;
+            // when
+            var isEquals = channel.isStatusNotUnregisteredAndEqualsTo(findChannelNameRequest);
+            // then
+            assertThat(isEquals).isTrue();
+        }
 
+        @Test
+        @DisplayName("찾으려는 채널이름과 비교하려는 채널 객체 이름이 같고 해지상태일 경우 false 반환")
+        void givenSameNameAndUnregisteredWhenIsStatusNotUnregisteredThenFalse() {
+            // given
+            var findChannelNameRequest = CHANNEL_NAME;
+            channel.updateUnregistered();
+            // when
+            var isEquals = channel.isStatusNotUnregisteredAndEqualsTo(findChannelNameRequest);
+            // then
+            assertThat(isEquals).isFalse();
+        }
     }
 }
