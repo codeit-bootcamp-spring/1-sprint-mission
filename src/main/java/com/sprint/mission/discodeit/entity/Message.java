@@ -47,7 +47,7 @@ public class Message {
         updatedAt = System.currentTimeMillis();
     }
 
-    public void updateContent(String updateContent){
+    public void updateContent(String updateContent) {
         this.content = updateContent;
         updateUpdatedAt();
     }

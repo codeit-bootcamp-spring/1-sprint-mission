@@ -87,7 +87,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("단건 조회");
-        Message searchMessage =  messageService.searchById(message.getId());
+        Message searchMessage = messageService.searchById(message.getId());
         messageService.printMessageInfo(searchMessage);
         System.out.println();
 

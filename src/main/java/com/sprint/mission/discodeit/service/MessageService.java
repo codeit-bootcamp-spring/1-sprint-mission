@@ -20,8 +20,9 @@ public interface MessageService {
 
     // 메세지 정보 출력
     void printMessageInfo(Message message);
+
     void printMessageListInfo(List<Message> messageList);
-    
+
     // 메세지 삭제
     void deleteMessage(Message message);
 

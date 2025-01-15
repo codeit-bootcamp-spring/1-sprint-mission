@@ -60,7 +60,7 @@ public class JCFChannelService implements ChannelService {
 
     // 채널명 업데이트
     @Override
-    public void updateTitle(Channel channel,String title){
+    public void updateTitle(Channel channel, String title) {
         if (isValidTitle(title)) {
             channel.updateTitle(title);
             System.out.println("success update");

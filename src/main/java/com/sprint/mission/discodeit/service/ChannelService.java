@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    
+
     // 채널 생성
     Channel createChannel(String title, User owner);
 
@@ -19,10 +19,11 @@ public interface ChannelService {
 
     // 채널 정보 출력
     void printChannelInfo(Channel channel);
+
     void printChannelListInfo(List<Channel> channelList);
 
     // 채널명 업데이트
-    void updateTitle(Channel channel,String title);
+    void updateTitle(Channel channel, String title);
 
     // 채널 삭제
     void deleteChannel(Channel channel);
@@ -32,6 +33,7 @@ public interface ChannelService {
 
     // 채널 멤버
     void addMember(Channel channel, User user);
+
     void deleteMember(Channel channel, User user);
 
 }

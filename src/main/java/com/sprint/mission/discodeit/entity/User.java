@@ -67,7 +67,7 @@ public class User {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "User{name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
     }
 }

@@ -16,7 +16,7 @@ public class JCFUserService implements UserService {
 
     // 유저 생성
     @Override
-    public User createUser(String name, String email){
+    public User createUser(String name, String email) {
         if (isValidName(name) && isValidEmail(email)) {
             User newUser = new User(name, email);
             data.add(newUser);
@@ -64,7 +64,7 @@ public class JCFUserService implements UserService {
     }
 
     // 유저 이름 업데이트
-    public void updateUserName(User user , String newName) {
+    public void updateUserName(User user, String newName) {
         if (isValidName(newName)) {
             user.updateName(newName);
             System.out.println("success update");
@@ -80,10 +80,10 @@ public class JCFUserService implements UserService {
         }
     }
 
-    private boolean isValidName (String name) {
+    private boolean isValidName(String name) {
         if (name.isBlank()) {
             System.out.println("the name is blank");
-        } else if (name.length() < 2){
+        } else if (name.length() < 2) {
             System.out.println("the name is too short");
         } else {
             return true;
