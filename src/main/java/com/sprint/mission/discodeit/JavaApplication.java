@@ -176,8 +176,26 @@ public class JavaApplication {
 
         // 삭제 조회
         System.out.println("=== 삭제 후 조회 ===");
-        System.out.println(userService.getUser(userId1));  // null
-        System.out.println(channelService.getChannel(channelId1));  // null
-        System.out.println(messageService.getMessage(messageId1));  // null
+
+        User deletedUser = userService.getUser(userId1);
+        if (deletedUser == null) {
+            System.out.println("유저가 존재하지 않습니다.");  // 유저가 없을 경우
+        } else {
+            System.out.println("유저: " + deletedUser.getUserName());
+        }
+
+        Channel deletedChannel = channelService.getChannel(channelId1);
+        if (deletedChannel == null) {
+            System.out.println("채널이 존재하지 않습니다.");  // 채널이 없을 경우
+        } else {
+            System.out.println("채널: " + deletedChannel.getChannelName());
+        }
+
+        Message deletedMessage = messageService.getMessage(messageId1);
+        if (deletedMessage == null) {
+            System.out.println("메시지가 존재하지 않습니다.");  // 메시지가 없을 경우
+        } else {
+            System.out.println("메시지: " + deletedMessage.getContent());
+        }
     }
 }
