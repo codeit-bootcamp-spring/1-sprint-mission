@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity.channel;
 
+import com.google.common.base.Preconditions;
 import com.sprint.mission.discodeit.common.error.ErrorMessage;
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
@@ -37,7 +38,7 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public void changeName(String newName, User user) {
-        if (!isCreator(user)) {
+        if (isNotCreator(user)) {
             throw ChannelException.ofErrorMessageAndCreatorName(
                     ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
                     user.getName()
@@ -49,7 +50,7 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public void deleteChannel(User user) {
-        if (!isCreator(user)) {
+        if (isNotCreator(user)) {
             throw ChannelException.ofErrorMessageAndCreatorName(
                     ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
                     user.getName()
@@ -67,8 +68,9 @@ public class Channel extends AbstractUUIDEntity {
         return channelName;
     }
 
-    private boolean isCreator(User user) {
-        return this.creator.equals(user);
+    private boolean isNotCreator(User user) {
+        Preconditions.checkNotNull(user);
+        return !creator.equals(user);
     }
 
 }

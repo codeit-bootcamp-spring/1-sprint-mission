@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
 
+import com.google.common.base.Preconditions;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
@@ -21,11 +22,13 @@ public class UserName {
         this.name = name;
     }
 
-    public static UserName createFrom(final String username) {
+    public static UserName createFrom(String username) {
+        Preconditions.checkNotNull(username);
         return new UserName(username);
     }
 
     public UserName changeName(String name) {
+        Preconditions.checkNotNull(name);
         return new UserName(name);
     }
 

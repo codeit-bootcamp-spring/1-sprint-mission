@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
 
+import com.google.common.base.Preconditions;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import java.util.List;
@@ -17,13 +18,15 @@ public class User extends AbstractUUIDEntity {
         this.participatedChannels = channel;
     }
 
-    public static User createFrom(final String username) {
+    public static User createFrom(String username) {
+        Preconditions.checkNotNull(username);
         var userName = UserName.createFrom(username);
         var participatedChannel = ParticipatedChannel.newDefault();
         return new User(userName, participatedChannel);
     }
 
     public void changeUserName(String newName) {
+        Preconditions.checkNotNull(newName);
         var changedName = this.name.changeName(newName);
         this.name = changedName;
         updateStatusAndUpdateAt();
@@ -35,11 +38,13 @@ public class User extends AbstractUUIDEntity {
      *  이 부분 코드 리뷰 부탁드릴게요!
      */
     public Channel createNewChannel(String channelName) {
+        Preconditions.checkNotNull(channelName);
         var createdChannel = participatedChannels.createChannel(channelName, this);
         return createdChannel;
     }
 
     public Channel changeChannelName(UUID channelId, String channelName) {
+        Preconditions.checkNotNull(channelId);
         var targetChannel =
                 participatedChannels.changeChannelNameOrThrow(channelId, channelName, this);
 

@@ -4,6 +4,7 @@ import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
 import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 
+import com.google.common.base.Preconditions;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public abstract class AbstractUUIDEntity {
     }
 
     private void updateStatus(Status status) {
+        Preconditions.checkNotNull(status);
         this.status = status;
         this.updateAt = createUnixTimestamp();
     }
