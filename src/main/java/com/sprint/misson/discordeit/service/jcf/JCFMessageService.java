@@ -38,6 +38,7 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(User user, String content, Channel channel) throws RuntimeException {
 
         if (content == null || content.isEmpty()) {
+            System.out.println("Message content is empty for User: "+user.getId()+ " Channel: "+channel.getId());
             throw new CustomException(ErrorCode.EMPTY_DATA,"Content is empty");
         }
 
@@ -48,6 +49,7 @@ public class JCFMessageService implements MessageService {
             data.put( message.getId(), message );
             return message;
         }catch (CustomException e ){
+            System.out.println("Failed to create message. User: "+user.getId()+ " Channel: "+channel.getId()+" Content: "+content);
             if(e.getErrorCode() == ErrorCode.USER_NOT_FOUND){
                 throw new CustomException(e.getErrorCode());
             }else if(e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND){
@@ -68,7 +70,8 @@ public class JCFMessageService implements MessageService {
     public Message getMessageByUUID(String messageId) throws RuntimeException {
         Message message = data.get(UUID.fromString(messageId));
         if( message == null ) {
-            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", messageId));
+            System.out.println("Message with id "+messageId+" not found");
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
         return message;
     }
@@ -113,6 +116,7 @@ public class JCFMessageService implements MessageService {
                     .filter(m -> m.getChannel().equals(channelByUUID))
                     .toList();
         }catch (Exception e){
+            System.out.println("Failed to get messages. Channel: "+channel.getId()+" Message: "+e.getMessage());
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
     }
@@ -124,7 +128,8 @@ public class JCFMessageService implements MessageService {
         Message message = data.get(UUID.fromString( messageId ));
 
         if(message == null) {
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Message with id %s not found", messageId));
+            System.out.println("Failed to update message. Message not found.");
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
         else if(newContent.isEmpty()){
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
