@@ -100,7 +100,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
-        return true;
+        return data.remove(channel.getId()) != null;
     }
 
     @Override
