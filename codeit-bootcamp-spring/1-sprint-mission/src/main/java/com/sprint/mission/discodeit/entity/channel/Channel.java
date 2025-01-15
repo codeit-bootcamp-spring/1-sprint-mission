@@ -38,24 +38,14 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public void changeName(String newName, User user) {
-        if (isNotCreator(user)) {
-            throw ChannelException.ofErrorMessageAndCreatorName(
-                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
-                    user.getName()
-            );
-        }
+        checkCreatorEqualsOrThrow(user);
 
         channelName = newName;
         updateStatusAndUpdateAt();
     }
 
     public void deleteChannel(User user) {
-        if (isNotCreator(user)) {
-            throw ChannelException.ofErrorMessageAndCreatorName(
-                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
-                    user.getName()
-            );
-        }
+        checkCreatorEqualsOrThrow(user);
 
         updateUnregistered();
     }
@@ -66,6 +56,17 @@ public class Channel extends AbstractUUIDEntity {
 
     public String getChannelName() {
         return channelName;
+    }
+
+    private void checkCreatorEqualsOrThrow(User user) {
+        var compareResult = isNotCreator(user);
+
+        if (!compareResult) {
+            throw ChannelException.ofErrorMessageAndCreatorName(
+                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
+                    user.getName()
+            );
+        }
     }
 
     private boolean isNotCreator(User user) {
