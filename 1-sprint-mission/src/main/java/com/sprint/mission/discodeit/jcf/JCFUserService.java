@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.jcf;
 
-import project.entity.User;
-import project.service.UserService;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 
 import java.util.ArrayList;

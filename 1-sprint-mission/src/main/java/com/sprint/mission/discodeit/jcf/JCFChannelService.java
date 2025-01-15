@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.jcf;
 
 
-import project.entity.Channel;
-import project.service.ChannelService;
-import project.service.UserService;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;

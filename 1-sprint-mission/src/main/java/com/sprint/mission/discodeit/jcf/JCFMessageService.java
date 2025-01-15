@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.jcf;
 
 
-import project.entity.Message;
-import project.service.MessageService;
-import project.service.UserService;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;

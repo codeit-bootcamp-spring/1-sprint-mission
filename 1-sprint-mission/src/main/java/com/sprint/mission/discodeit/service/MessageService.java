@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
-import project.entity.Message;
+
+import com.sprint.mission.discodeit.entity.Message;
+
 import java.util.List;
 
 public interface MessageService {

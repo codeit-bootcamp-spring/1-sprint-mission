@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.app;
 
-import project.entity.Channel;
-import project.entity.Message;
-import project.entity.User;
-import project.jcf.JCFChannelService;
-import project.jcf.JCFMessageService;
-import project.jcf.JCFUserService;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.jcf.JCFUserService;
 
 public class JavaApplication {
     public static void main(String[] args) {
