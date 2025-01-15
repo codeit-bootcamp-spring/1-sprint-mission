@@ -39,7 +39,7 @@ public class JCFMessageService implements MessageService {
             User userByUUID = userService.getUserByUUID(user.getId().toString());
             Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
             if (channelService.isUserInChannel(channelByUUID, userByUUID)) {
-                System.out.println("User with id " + userByUUID + " not found in this channel.");
+                System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
             }
             Message message = new Message(userByUUID, content, channelByUUID);

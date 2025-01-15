@@ -125,9 +125,9 @@ public class JCFChannelService implements ChannelService {
             return true;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-                System.out.println("Failed to add User in this channel. User with id " + user.getId() + " not found");
+                System.out.println("Failed to add User to this channel. User with id " + user.getId() + " not found");
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-                System.out.println("Failed to add User in this channel. Channel with id " + channel.getId() + " not found");
+                System.out.println("Failed to add User to this channel. Channel with id " + channel.getId() + " not found");
             }
         }
         return false;
