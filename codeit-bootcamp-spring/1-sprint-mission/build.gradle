@@ -22,6 +22,8 @@ dependencies {
     implementation 'org.hibernate.validator:hibernate-validator:8.0.2.Final'
     // https://mvnrepository.com/artifact/org.glassfish.expressly/expressly
     implementation 'org.glassfish.expressly:expressly:5.0.0'
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation 'com.google.guava:guava:33.2.1-jre'
 
 }
 
