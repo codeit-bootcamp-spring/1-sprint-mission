@@ -4,6 +4,7 @@ import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
+import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 
@@ -101,5 +102,14 @@ public class JCFChannelService implements ChannelService {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channel.getId()));
         }
         return true;
+    }
+
+    @Override
+    public List<User> getUsersInChannel(Channel channel) throws RuntimeException {
+        Channel ch = data.get(channel.getId());
+        if (ch == null) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+        }
+        return ch.getUserList().stream().toList();
     }
 }

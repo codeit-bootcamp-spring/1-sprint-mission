@@ -3,6 +3,7 @@ package com.sprint.misson.discordeit.service;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
+import com.sprint.misson.discordeit.entity.User;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface ChannelService {
 
     //삭제
     boolean deleteChannel(Channel channel);
+
+    List<User> getUsersInChannel(Channel channel);
 }
