@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.exception;
 
 public class CustomException extends RuntimeException {
 
-    private final ExceptionCode exceptionCode;
+    private final ExceptionText exceptionCode;
 
-    public CustomException(ExceptionCode exceptionCode) {
+    public CustomException(ExceptionText exceptionCode) {
         super(exceptionCode.getMessage());
         this.exceptionCode = exceptionCode;
     }

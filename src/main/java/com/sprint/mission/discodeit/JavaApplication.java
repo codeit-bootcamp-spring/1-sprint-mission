@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.factory.ServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -9,16 +10,22 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
-
+import com.sprint.mission.discodeit.factory.Factory;
 import java.util.Map;
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-
 //        userServiceTest();
 //        channelServiceTest();
-        messageServiceTest();
+//        messageServiceTest();
+        Factory factory = new ServiceFactory();
+
+        UserService userService = factory.createUserService();
+        ChannelService channelService = factory.createChannelService();
+        MessageService messageService = factory.createMessageService();
+
+
     }
 
     static void userServiceTest(){
@@ -27,7 +34,7 @@ public class JavaApplication {
 
 
         User user1 = userService.CreateUser("설유일","tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
-        User user2 = userService.CreateUser("홍길동","길동@gmail.com", "gildong","1q2w3e@");
+        User user2 = userService.CreateUser("홍길동","killDong@gmail.com", "gildong","1Q2w3e4r@");
 
         System.out.println("-------------사용자 조회---------------------");
         User printUser =  userService.getUser(user1.getuuID());
@@ -117,6 +124,10 @@ public class JavaApplication {
         System.out.println("메시지 추가 addChannelMsg ");
         Message msg1 = messageService.CreateMsg(user1, channel1, "안녕");
         Message msg2 = messageService.CreateMsg(user2, channel2, "hello");
+        //유저 서비스에 등록되지 않은 유저 테스트
+//        User notUser = new User ("테스트","test1234@gmail.com", "testtest","1Q2w3e4r@");
+//        Message msg3 = messageService.CreateMsg(notUser, channel2, "hello");
+
 
         System.out.println("-----------------조회 getMessage ------------------");
         Message printMsg =  messageService.getMessage(msg1.getMsguuId());

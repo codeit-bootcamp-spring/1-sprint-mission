@@ -11,11 +11,6 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
 
     private final HashMap<UUID, Channel> data = new HashMap<>();
-//    순환 상속상태
-//    private final MessageService messageService;
-//    public JCFChannelService(MessageService messageService){
-//        this.messageService = messageService;
-//    }
 
     public Channel createChannel(String chName){
         Channel ch1 = new Channel(chName);

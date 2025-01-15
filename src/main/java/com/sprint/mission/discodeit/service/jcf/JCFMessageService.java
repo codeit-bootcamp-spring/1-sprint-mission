@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
@@ -21,7 +21,7 @@ public class JCFMessageService implements MessageService {
 
     public Message CreateMsg(User user, Channel channel, String content) {
         if (!validationService.validateMessage(user, channel, content)){
-            throw new CustomException(ExceptionCode.MESSAGE_CREATION_FAILED);
+            throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
         }
         Message msg = new Message(user, channel, content);
         msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());

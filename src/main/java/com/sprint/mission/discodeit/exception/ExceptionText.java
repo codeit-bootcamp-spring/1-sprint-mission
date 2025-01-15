@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-public enum ExceptionCode {
+public enum ExceptionText {
 
     INVALID_EMAIL("유효하지 않은 이메일 형식입니다."),
     INVALID_PASSWORD("비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자 및 특수문자를 포함해야 합니다."),
@@ -10,9 +10,10 @@ public enum ExceptionCode {
     INVALID_MESSAGE_CONTENT("메시지 내용은 null 또는 빈 값일 수 없습니다."),
     MESSAGE_CREATION_FAILED("메시지 생성 실패"),
     USER_CREATION_FAILED("유저 생성 실패");
+
     private final String message;
 
-    ExceptionCode(String message) {
+    ExceptionText(String message) {
         this.message = message;
     }
     public String getMessage() {

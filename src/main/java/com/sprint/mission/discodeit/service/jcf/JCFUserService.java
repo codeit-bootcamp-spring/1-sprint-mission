@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
@@ -14,7 +14,7 @@ public class JCFUserService implements UserService {
     @Override
     public User CreateUser(String name, String email,String iD ,String password) {
         if (!UserValidator.validateUser(name, email, password)) {
-            throw new CustomException(ExceptionCode.USER_CREATION_FAILED);
+            throw new CustomException(ExceptionText.USER_CREATION_FAILED);
         }
         User user = new User(name, email, iD, password);
         data.put(user.getuuID(), user);

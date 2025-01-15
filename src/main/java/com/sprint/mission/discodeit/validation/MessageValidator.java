@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionCode;
+import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -22,21 +21,21 @@ public class MessageValidator {
 
     public boolean validateContent(String content) {
         if (content == null || content.trim().isEmpty()) {
-            throw new CustomException(ExceptionCode.INVALID_MESSAGE_CONTENT);
+            throw new CustomException(ExceptionText.INVALID_MESSAGE_CONTENT);
         }
         return true;
     }
 
     public boolean validateSender(UUID userId) {
         if (userService.getUser(userId) == null) {
-            throw new CustomException(ExceptionCode.USER_NOT_FOUND);
+            throw new CustomException(ExceptionText.USER_NOT_FOUND);
         }
         return true;
     }
 
     public boolean validateDestinationChannel(UUID channelId) {
         if (channelService.getChannel(channelId) == null) {
-            throw new CustomException(ExceptionCode.CHANNEL_NOT_FOUND);
+            throw new CustomException(ExceptionText.CHANNEL_NOT_FOUND);
         }
         return true;
     }

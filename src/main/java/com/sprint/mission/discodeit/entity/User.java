@@ -64,14 +64,14 @@ public class User {
     @Override
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "User{\n" +
+        return "User<\n" +
                 "UUID=" + uuID +
                 ", \ncreatedAt=" + sdf.format(new Date(createdAt)) +
                 ", \nupdatedAt=" + sdf.format(new Date(updatedAt)) +
                 ", \nname='" + name + '\'' +
                 ", \nemail='" + email + '\'' +
                 ", \nid='" + iD + '\'' +
-                '}';
+                '>';
     }
 
 
