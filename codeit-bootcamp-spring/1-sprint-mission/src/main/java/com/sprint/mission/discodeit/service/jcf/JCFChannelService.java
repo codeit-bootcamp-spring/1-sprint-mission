@@ -22,7 +22,7 @@ public class JCFChannelService implements ChannelService {
     private final UserRepository userRepository;
     private final ChannelConverter channelConverter;
 
-    public JCFChannelService(
+    private JCFChannelService(
             ChannelRepository channelRepository,
             UserRepository userRepository,
             ChannelConverter channelConverter
@@ -30,6 +30,10 @@ public class JCFChannelService implements ChannelService {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
         this.channelConverter = channelConverter;
+    }
+
+    public static ChannelService getInstance(UserRepository userRepository, ChannelRepository channelRepository) {
+        return new JCFChannelService(channelRepository, userRepository, new ChannelConverter());
     }
 
     @Override

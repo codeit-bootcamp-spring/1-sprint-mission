@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.service.channel.ChannelConverter;
+import com.sprint.mission.discodeit.service.channel.ChannelService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 class JCFChannelServiceTest {
-    private JCFChannelService channelService;
+    private ChannelService channelService;
     @Mock
     private ChannelRepository channelRepository;
     @Mock
@@ -27,7 +28,8 @@ class JCFChannelServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        channelService = new JCFChannelService(channelRepository, userRepository, channelConverter);
+
+        channelService = JCFChannelService.getInstance(userRepository, channelRepository);
     }
 
 

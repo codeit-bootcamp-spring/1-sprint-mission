@@ -28,4 +28,8 @@ public class UserRepositoryInMemory extends InMemoryCrudRepository<User, UUID> i
 
         return INSTANCE;
     }
+
+    public static UserRepository getUserRepositoryInMemory() {
+        return new UserRepositoryInMemory();
+    }
 }
