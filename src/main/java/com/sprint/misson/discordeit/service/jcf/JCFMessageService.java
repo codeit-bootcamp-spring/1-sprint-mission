@@ -16,7 +16,8 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
-    private static final JCFMessageService instance = new JCFMessageService();
+    private static final JCFMessageService instance
+            = new JCFMessageService(JCFChannelService.getInstance(), JCFUserService.getInstance());
 
     private final HashMap<UUID, Message> data;
     private final UserService userService;
@@ -24,8 +25,8 @@ public class JCFMessageService implements MessageService {
 
     public JCFMessageService(ChannelService channelService, UserService userService) {
         this.data= new HashMap<>();
-        this.userService= JCFUserService.getInstance();
-        this.channelService= JCFChannelService.getInstance();
+        this.userService= userService;
+        this.channelService= channelService;
     }
 
     public static JCFMessageService getInstance() {
