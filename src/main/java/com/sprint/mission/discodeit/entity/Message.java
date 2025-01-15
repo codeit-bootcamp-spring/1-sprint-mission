@@ -5,47 +5,47 @@ import java.util.UUID;
 public class Message {
     private final UUID id;
     private final Long createdAt;
-    private Long updatedAt;
-    private String content;
     private final User writer;
     private final Channel channel;
+    private Long updatedAt;
+    private String content;
 
-    public Message(Channel channel, User writer, String content){
+    public Message(Channel channel, User writer, String content) {
         id = UUID.randomUUID();
-        createdAt=System.currentTimeMillis();
-        updatedAt=null;
+        createdAt = System.currentTimeMillis();
+        updatedAt = null;
         this.channel = channel;
         this.writer = writer;
         this.content = content;
     }
 
-    public Long getCreatedAt(){
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt(){
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public UUID getId(){
+    public UUID getId() {
         return id;
     }
 
-    public String getContent(){
+    public String getContent() {
         return content;
     }
 
-    public User getWriter(){
+    public void setContent(String content) {
+        this.content = content;
+        updatedAt = System.currentTimeMillis();
+    }
+
+    public User getWriter() {
         return writer;
     }
 
-    public Channel getChannel(){
+    public Channel getChannel() {
         return channel;
-    }
-
-    public void setContent(String content){
-        this.content = content;
-        updatedAt = System.currentTimeMillis();
     }
 
 }

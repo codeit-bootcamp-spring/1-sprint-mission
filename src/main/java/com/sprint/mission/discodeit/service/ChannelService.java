@@ -9,10 +9,15 @@ import java.util.Map;
 public interface ChannelService {
 
     void createChannel(Channel channel);
+
     void deleteChannel(Channel channel, User admin);
+
     void updateChannel(Channel channel, String name, User admin);
+
     List<Map<String, String>> getAllChannel();
+
     List<String> getAllMember(Channel channel);
+
     boolean channelExits(Channel channel);
 
 }

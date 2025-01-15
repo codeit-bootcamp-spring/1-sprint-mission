@@ -15,9 +15,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void registerUser(User user) {
-        if(!isValidEmail(user.getEmail())) {
+        if (!isValidEmail(user.getEmail())) {
             System.out.println("올바르지 않은 이메일 형식입니다. 바꿔주세요");
-        }else{
+        } else {
             data.add(user);
         }
     }
@@ -39,9 +39,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUserEmail(User user, String newEmail) {
-        if (!isValidEmail(newEmail)){
+        if (!isValidEmail(newEmail)) {
             System.out.println("올바르지 않은 이메일 형식입니다. 바꿔주세요");
-        }else {
+        } else {
             data.stream()
                     .findFirst()
                     .ifPresentOrElse(
@@ -56,7 +56,7 @@ public class JCFUserService implements UserService {
         }
     }
 
-    private boolean isValidEmail(String email){
+    private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         return email.matches(emailRegex);
     }

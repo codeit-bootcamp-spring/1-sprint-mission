@@ -9,27 +9,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JCFChannelService implements ChannelService{
+public class JCFChannelService implements ChannelService {
     private final List<Channel> data;
 
-    public JCFChannelService(){
+    public JCFChannelService() {
         this.data = new ArrayList<>();
     }
 
     @Override
-    public void createChannel(Channel channel){
+    public void createChannel(Channel channel) {
         data.add(channel);
     }
 
     @Override
-    public boolean channelExits(Channel channel){
+    public boolean channelExits(Channel channel) {
         return data.contains(channel);
     }
 
     @Override
     public void deleteChannel(Channel channel, User admin) {
         boolean removed = data.removeIf(check -> check.equals(channel) && check.getAdmin().equals(admin));
-        if (removed){
+        if (removed) {
             channel.deleteAllMessage();
             channel.deleteAllMember();
             System.out.println("채널이 삭제되었습니다.");
@@ -40,7 +40,7 @@ public class JCFChannelService implements ChannelService{
     }
 
     @Override
-    public void updateChannel(Channel channel, String name, User admin){
+    public void updateChannel(Channel channel, String name, User admin) {
         boolean adminCheck = data.stream()
                 .filter(check -> check.equals(channel))
                 .anyMatch(check -> check.getAdmin().equals(admin));
@@ -53,7 +53,7 @@ public class JCFChannelService implements ChannelService{
     }
 
     @Override
-    public List<Map<String, String>> getAllChannel(){
+    public List<Map<String, String>> getAllChannel() {
         return data.stream()
                 .map(channel -> {
                     Map<String, String> channelInfo = new HashMap<>();
@@ -70,7 +70,6 @@ public class JCFChannelService implements ChannelService{
                 .map(User::getUserName)
                 .collect(Collectors.toList());
     }
-
 
 
 }

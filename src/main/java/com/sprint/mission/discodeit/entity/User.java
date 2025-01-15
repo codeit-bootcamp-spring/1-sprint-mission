@@ -8,52 +8,52 @@ public class User {
     private Long updatedAt;
     private String userName;
     private String email;
-    private String password;
+    private final String password;
 
-    public User(String userName, String email, String password){
+    public User(String userName, String email, String password) {
         id = UUID.randomUUID();
-        createdAt=System.currentTimeMillis();
-        updatedAt=null;
+        createdAt = System.currentTimeMillis();
+        updatedAt = null;
         this.userName = userName;
         this.email = email;
         this.password = password;
     }
 
-    public Long getCreatedAt(){
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt(){
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public UUID getId(){
+    public UUID getId() {
         return id;
     }
 
-    public String getUserName(){
+    public String getUserName() {
         return userName;
     }
 
-    public String getPassword(){
-        return password;
-    }
-
-    public String getEmail(){
-        return email;
-    }
-
-    public void setEmail(String email){
-        this.email = email;
-        updatedAt = System.currentTimeMillis();
-    }
-
-    public void setUserName(String userName){
+    public void setUserName(String userName) {
         this.userName = userName;
         updatedAt = System.currentTimeMillis();
     }
 
-    public void displayUserInfo(){
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+        updatedAt = System.currentTimeMillis();
+    }
+
+    public void displayUserInfo() {
         System.out.println("사용자 이름: " + userName + "\n이메일: " + email);
     }
 
