@@ -76,7 +76,24 @@ public class Channel {
     public void setHidden(boolean isHidden) {
         this.isHidden= isHidden;
     }
+
     public HashSet<User> getUserList() {
         return userList;
     }
+
+    public String toShortString(){
+        return "[Channel]\n id: "+id+ "\n channelName: "+channelName+ "\n channelType: "+channelType + "\n total users: "+ userList.size();
+    }
+
+    public String toFullString(){
+        return toShortString() + "\n isHidden: "+ isHidden +"\n createdAt: "+createdAt+ "\n updatedAt: "+updatedAt ;
+    }
+
+    public void displayFullInfo(){
+        System.out.println(toFullString());
+    }
+    public void displayShortInfo(){
+        System.out.println(toShortString());
+    }
+
 }

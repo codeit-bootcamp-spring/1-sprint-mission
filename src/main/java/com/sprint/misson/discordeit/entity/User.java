@@ -92,5 +92,21 @@ public class User {
         this.statusMessage=statusMessage;
     }
 
+    public String toFullString() {
+        return this.toShortString() +"\n updatedAt: " + updatedAt+ "\n accountStatus: " + accountStatus + "\n statusMessage: " + statusMessage ;
+    }
+
+    public String toShortString() {
+        return "[User]\n id: "+id + "\n nickname: " + nickname + "\n email:  " + email + "\n userStatus: " + userStatus+"\n createdAt: " + createdAt ;
+    }
+
+    public void displayShortInfo(){
+        System.out.println(toShortString());
+    }
+
+    public void displayFullInfo(){
+        System.out.println(toFullString());
+    }
+
 
 }

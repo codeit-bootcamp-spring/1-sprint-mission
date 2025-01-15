@@ -80,7 +80,7 @@ public class JCFUserService implements UserService {
     @Override
     public List<User> getUsersByNickname(String nickname) {
         return data.values().stream()
-                .filter( u -> u.getNickname().contains( nickname ))
+                .filter(u -> u.getNickname().contains(nickname))
                 .toList();
     }
 

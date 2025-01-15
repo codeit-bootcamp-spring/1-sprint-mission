@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
 
@@ -77,8 +76,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessageByContent(String content) {
         return data.values().stream()
-                .filter( m -> m.getContent().contains( content ) )
-                .collect( Collectors.toList());
+                .filter(m -> m.getContent().contains(content))
+                .toList();
     }
 
     //다건 조회 - 특정 작성자
@@ -97,7 +96,9 @@ public class JCFMessageService implements MessageService {
     //다건 조회 - 생성 날짜
     @Override
     public List<Message> getMessageByCreatedAt(Long createdAt) {
-        return List.of();
+        return data.values().stream()
+                .filter(m -> m.getCreatedAt().equals(createdAt))
+                .toList();
     }
 
     //다건 조회 - 특정 채널

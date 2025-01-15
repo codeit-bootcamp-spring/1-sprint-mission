@@ -64,4 +64,17 @@ public class Message {
     //추후에 추가할 것
     //멘션, 답장(reply)
 
+    public String toShortString(){
+        return "[Message]\n id: " + id + "\n sender: " + sender.getNickname() + "\n content: " + content + "\n channel: " + channel.getChannelName();
+    }
+    public String toFullString(){
+        return toShortString() + "\n createdAt: " + createdAt + "\n updatedAt: " + updatedAt;
+    }
+    public void displayFullInfo(){
+        System.out.println(toFullString());
+    }
+    public void displayShortInfo(){
+        System.out.println(toShortString());
+    }
+
 }

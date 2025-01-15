@@ -7,11 +7,7 @@ import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
@@ -53,16 +49,15 @@ public class JCFChannelService implements ChannelService {
     @Override
     public List<Channel> getChannelByType(ChannelType channelType) {
         return data.values().stream()
-                .filter( c -> c.getChannelType().equals( channelType ))
-                .collect( Collectors.toList());
+                .filter(c -> c.getChannelType().equals(channelType))
+                .toList();
     }
 
     //다건 조회 - 채널명
     @Override
     public List<Channel> getChannelsByName(String channelName) {
         return data.values().stream().filter(
-                c->c.getChannelName().contains( channelName )
-        ).collect( Collectors.toList());
+                c -> c.getChannelName().contains(channelName)).toList();
     }
     //수정
     @Override
@@ -100,9 +95,6 @@ public class JCFChannelService implements ChannelService {
             channel.setUpdatedAt();
         }
         return channel;
-    }
-
-        return null;
     }
 
     //삭제
