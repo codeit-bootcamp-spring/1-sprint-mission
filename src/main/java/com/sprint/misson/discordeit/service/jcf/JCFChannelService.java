@@ -49,16 +49,13 @@ public class JCFChannelService implements ChannelService {
     //다건 조회 - 채널 타입
     @Override
     public List<Channel> getChannelByType(ChannelType channelType) {
-        return data.values().stream()
-                .filter(c -> c.getChannelType().equals(channelType))
-                .toList();
+        return data.values().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
     }
 
     //다건 조회 - 채널명
     @Override
     public List<Channel> getChannelsByName(String channelName) {
-        return data.values().stream().filter(
-                c -> c.getChannelName().contains(channelName)).toList();
+        return data.values().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
     }
 
     //수정
@@ -77,9 +74,7 @@ public class JCFChannelService implements ChannelService {
 
         // 채널 이름 변경 처리
         String newChannelName = channelDTO.getChannelName();
-        if (newChannelName != null
-                && !newChannelName.isEmpty()
-                && !newChannelName.equals(channel.getChannelName())) {
+        if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(channel.getChannelName())) {
             channel.setChannelName(newChannelName);
             isUpdated = true;
         }

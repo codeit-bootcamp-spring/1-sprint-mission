@@ -21,12 +21,12 @@ public class JCFMessageService implements MessageService {
 
     private final HashMap<UUID, Message> data;
     private final UserService userService;
-    private final ChannelService channelService ;
+    private final ChannelService channelService;
 
     public JCFMessageService(ChannelService channelService, UserService userService) {
-        this.data= new HashMap<>();
-        this.userService= userService;
-        this.channelService= channelService;
+        this.data = new HashMap<>();
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     public static JCFMessageService getInstance() {
@@ -38,21 +38,21 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(User user, String content, Channel channel) throws RuntimeException {
 
         if (content == null || content.isEmpty()) {
-            System.out.println("Message content is empty for User: "+user.getId()+ " Channel: "+channel.getId());
-            throw new CustomException(ErrorCode.EMPTY_DATA,"Content is empty");
+            System.out.println("Message content is empty for User: " + user.getId() + " Channel: " + channel.getId());
+            throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
         try{
             User userByUUID =  userService.getUserByUUID( user. getId().toString() );
             Channel channelByUUID = channelService.getChannelByUUID( channel.getId().toString() );
             Message message = new Message(userByUUID, content, channelByUUID);
-            data.put( message.getId(), message );
+            data.put(message.getId(), message);
             return message;
-        }catch (CustomException e ){
-            System.out.println("Failed to create message. User: "+user.getId()+ " Channel: "+channel.getId()+" Content: "+content);
-            if(e.getErrorCode() == ErrorCode.USER_NOT_FOUND){
+        } catch (CustomException e) {
+            System.out.println("Failed to create message. User: " + user.getId() + " Channel: " + channel.getId() + " Content: " + content);
+            if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
                 throw new CustomException(e.getErrorCode());
-            }else if(e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND){
+            } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
                 throw new CustomException(e.getErrorCode());
             }
             throw new CustomException(e.getErrorCode(), "Create message failed");
@@ -69,8 +69,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message getMessageByUUID(String messageId) throws RuntimeException {
         Message message = data.get(UUID.fromString(messageId));
-        if( message == null ) {
-            System.out.println("Message with id "+messageId+" not found");
+        if (message == null) {
+            System.out.println("Message with id " + messageId + " not found");
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
         return message;
@@ -87,12 +87,12 @@ public class JCFMessageService implements MessageService {
     //다건 조회 - 특정 작성자
     @Override
     public List<Message> getMessageBySender(User sender) throws RuntimeException {
-        try{
+        try {
             User userByUUID = userService.getUserByUUID(sender.getId().toString());
             return data.values().stream()
                     .filter(m -> m.getSender().equals(userByUUID))
                     .toList();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
@@ -110,13 +110,13 @@ public class JCFMessageService implements MessageService {
     //다건 조회 - 특정 채널
     @Override
     public List<Message> getMessagesByChannel(Channel channel) throws RuntimeException {
-        try{
+        try {
             Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
             return data.values().stream()
                     .filter(m -> m.getChannel().equals(channelByUUID))
                     .toList();
-        }catch (Exception e){
-            System.out.println("Failed to get messages. Channel: "+channel.getId()+" Message: "+e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Failed to get messages. Channel: " + channel.getId() + " Message: " + e.getMessage());
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
     }
@@ -125,29 +125,28 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message updateMessage(String messageId, String newContent) throws RuntimeException {
 
-        Message message = data.get(UUID.fromString( messageId ));
+        Message message = data.get(UUID.fromString(messageId));
 
-        if(message == null) {
+        if (message == null) {
             System.out.println("Failed to update message. Message not found.");
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
-        }
-        else if(newContent.isEmpty()){
+        } else if (newContent.isEmpty()) {
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
         message.setContent(newContent);
 
-        if(!message.getContent().equals(newContent)){
+        if (!message.getContent().equals(newContent)) {
             message.setUpdatedAt();
         }
         return message;
     }
 
     @Override
-    public boolean deleteMessage(Message message)throws RuntimeException {
+    public boolean deleteMessage(Message message) throws RuntimeException {
         Message msg = data.get(UUID.fromString(message.getId().toString()));
 
-        if( msg == null ) {
+        if (msg == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));
         }
         //만약 delete 한 후에도 객체가 필요하다면 반환값을 boolean 에서 Message 로 바꾸기
