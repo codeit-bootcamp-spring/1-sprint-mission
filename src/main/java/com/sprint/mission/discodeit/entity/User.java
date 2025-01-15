@@ -3,16 +3,16 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class User {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
-    private String name;
+    private String userName;
 
-    public User(UUID id, Long createdAt, Long updatedAt, String name) {
+    public User(UUID id, Long createdAt, Long updatedAt, String userName) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.name = name;
+        this.userName = userName;
     }
 
     public UUID getId() {
@@ -27,20 +27,20 @@ public class User {
         return updatedAt;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
-    public void update(String name, Long updatedAt) {
-        this.name = name;
-        this.updatedAt = updatedAt;
+    public void update(String userName) {
+        this.userName = userName;
+        this.updatedAt = System.currentTimeMillis();
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", userName='" + userName + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

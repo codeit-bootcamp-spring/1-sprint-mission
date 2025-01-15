@@ -7,140 +7,177 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        // UserService
         JCFUserService userService = new JCFUserService();
+        JCFChannelService channelService = new JCFChannelService();
+        JCFMessageService messageService = new JCFMessageService(userService, channelService);
 
         // User 등록
+        System.out.println("=== 유저 등록 ===");
         UUID userId1 = UUID.randomUUID();
         UUID userId2 = UUID.randomUUID();
-        System.out.println("=== 유저 등록 ===");
-        userService.createUser(userId1, System.currentTimeMillis(), System.currentTimeMillis(), "Alice");
-        System.out.println(userService.getUser(userId1).getName() + " 유저가 등록되었습니다.");
-        userService.createUser(userId2, System.currentTimeMillis(), System.currentTimeMillis(), "Bob");
-        System.out.println(userService.getUser(userId2).getName() + " 유저가 등록되었습니다.");
+        UUID userId3 = UUID.randomUUID();
+
+        User user1 = new User(userId1, System.currentTimeMillis(), System.currentTimeMillis(), "Alice");
+        User user2 = new User(userId2, System.currentTimeMillis(), System.currentTimeMillis(), "Bob");
+        User user3 = new User(userId3, System.currentTimeMillis(), System.currentTimeMillis(), "Charlie");
+
+        userService.createUser(user1);
+        userService.createUser(user2);
+        userService.createUser(user3);
+
+        System.out.println(user1.getUserName() + " 유저가 등록되었습니다.");
+        System.out.println(user2.getUserName() + " 유저가 등록되었습니다.");
+        System.out.println(user3.getUserName() + " 유저가 등록되었습니다.");
+
         System.out.println();
 
-        // 사용자 단건 조회
-        System.out.println("=== 유저 단건 조회 ===");
-        User user1 = userService.getUser(userId1);
-        System.out.println("유저1: " + user1.getName());
 
-        // 모든 사용자 조회
-        System.out.println("\n=== 모든 유저 조회 ===");
-        userService.getAllUsers().forEach(user ->
-                System.out.println("유저목록: " + user.getName())
-        );
-
-        // 사용자 수정
-        System.out.println("\n=== 유저 정보 수정 ===");
-        userService.updateUser(userId1, "AliceUpdated", System.currentTimeMillis());
-
-        // 수정된 데이터 조회
-        System.out.println("\n=== 수정된 유저 데이터 조회 ===");
-        User modifiedUser = userService.getUser(userId1);
-        String modifiedUserName = modifiedUser.getName();
-        System.out.println("수정된 유저: " + modifiedUserName);
-
-        // 사용자 삭제
-        System.out.println("\n=== 유저가 삭제되었습니다 ===");
-        userService.deleteUser(userId2);
-
-        // 삭제된 유저 확인
-        System.out.println("\n=== 삭제된 유저 데이터 확인 ===");
-        User deletedUser = userService.getUser(userId2);
-        System.out.println(deletedUser);
-
-        System.out.println("\n=== 최종 유저 데이터 확인 ===");
-        userService.getAllUsers().forEach(user ->
-                System.out.println("유저: " + user.getName())
-        );
-
-        JCFChannelService channelService = new JCFChannelService();
-
-        // 채널 등록
+        // Channel 등록
+        System.out.println("=== 채널 등록 ===");
         UUID channelId1 = UUID.randomUUID();
         UUID channelId2 = UUID.randomUUID();
-        channelService.createChannel(channelId1, System.currentTimeMillis(), System.currentTimeMillis(), "Channel1");
-        channelService.createChannel(channelId2, System.currentTimeMillis(), System.currentTimeMillis(), "Channel2");
+        UUID channelId3 = UUID.randomUUID();
 
-        // 채널 단건 조회
-        System.out.println("=== 채널 단건 조회 ===");
-        Channel channel1 = channelService.getChannel(channelId1);
-        System.out.println("채널1: " + channel1.getName());
+        Channel channel1 = new Channel(channelId1, System.currentTimeMillis(), System.currentTimeMillis(), "채널1");
+        Channel channel2 = new Channel(channelId2, System.currentTimeMillis(), System.currentTimeMillis(), "채널2");
+        Channel channel3 = new Channel(channelId3, System.currentTimeMillis(), System.currentTimeMillis(), "채널3");
 
-        // 모든 채널 조회
-        System.out.println("\n=== 모든 채널 조회 ===");
-        channelService.getAllChannels().forEach(channel ->
-                System.out.println("채널: " + channel.getName())
-        );
+        channelService.createChannel(channel1);
+        channelService.createChannel(channel2);
+        channelService.createChannel(channel3);
 
-        // 채널 수정
-        System.out.println("\n=== 채널 정보 수정 ===");
-        channelService.updateChannel(channelId1, "ChannelUpdated", System.currentTimeMillis());
+        System.out.println(channel1.getChannelName() + " 채널이 등록되었습니다.");
+        System.out.println(channel2.getChannelName() + " 채널이 등록되었습니다.");
+        System.out.println(channel3.getChannelName() + " 채널이 등록되었습니다.");
 
-        // 수정된 채널 조회
-        System.out.println("\n=== 수정된 채널 데이터 조회 ===");
-        Channel modifiedChannel = channelService.getChannel(channelId1);
-        System.out.println("수정된 채널: " + modifiedChannel);
+        System.out.println();
 
-        // 채널 삭제
-        System.out.println("\n=== 채널 삭제 ===");
-        channelService.deleteChannel(channelId2);
-
-        // 삭제된 채널 확인
-        System.out.println("\n=== 삭제된 채널 데이터 확인 ===");
-        Channel deletedChannel = channelService.getChannel(channelId2);
-        System.out.println(deletedChannel);
-
-        System.out.println("\n=== 최종 채널 데이터 확인 ===");
-        channelService.getAllChannels().forEach(channel ->
-                System.out.println("채널: " + channel.getName())
-        );
-
-        JCFMessageService messageService = new JCFMessageService();
-
-        // 메시지 등록
+        // Message 등록
+        System.out.println("=== 메시지 등록 ===");
         UUID messageId1 = UUID.randomUUID();
         UUID messageId2 = UUID.randomUUID();
-        messageService.createMessage(messageId1, System.currentTimeMillis(), System.currentTimeMillis(), "MessageId1");
-        messageService.createMessage(messageId2, System.currentTimeMillis(), System.currentTimeMillis(), "MessageId2");
+        UUID messageId3 = UUID.randomUUID();
 
-        // 메시지 단건 조회
+        Message message1 = new Message(messageId1, System.currentTimeMillis(), System.currentTimeMillis(), "Hello", user1, channel1);
+        Message message2 = new Message(messageId2, System.currentTimeMillis(), System.currentTimeMillis(), "Hi", user2, channel1);
+        Message message3 = new Message(messageId3, System.currentTimeMillis(), System.currentTimeMillis(), "안녕", user1, channel1);
+
+        try {
+            messageService.createMessage(message1);
+            System.out.println(message1.getContent() + " 메시지가 등록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            messageService.createMessage(message2);
+            System.out.println(message2.getContent() + " 메시지가 등록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            messageService.createMessage(message3);
+            System.out.println(message3.getContent() + " 메시지가 등록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println();
+
+        // User 단건 조회
+        System.out.println("=== 유저 단건 조회 ===");
+        System.out.println("유저1: " + userService.getUser(userId1).getUserName());
+
+        // Channel 단건 조회
+        System.out.println("=== 채널 단건 조회 ===");
+        System.out.println("채널1: " + channelService.getChannel(channelId1).getChannelName());
+
+        // Message 단건 조회
         System.out.println("=== 메시지 단건 조회 ===");
-        Message message1 = messageService.getMessage(messageId1);
-        System.out.println("메시지1: " + message1.getContent());
+        System.out.println("메시지1: " + messageService.getMessage(messageId1).getContent());
 
-        // 모든 메시지 조회
-        System.out.println("\n=== 모든 메시지 조회 ===");
-        messageService.getAllMessages().forEach(message ->
-                System.out.println("모든 메시지: " + message.getContent())
-        );
+        System.out.println();
 
-        // 메시지 수정
-        System.out.println("\n=== 메시지 수정 ===");
-        messageService.updateMessage(messageId1, "MessageUpdated", System.currentTimeMillis());
+        // User 다건 조회
+        System.out.println("=== 유저 다건 조회 ===");
+        List<User> allUsers = userService.getAllUsers();
+        for (User user : allUsers) {
+            System.out.println("유저: " + user.getUserName());
+        }
 
-        // 수정된 메시지 조회
-        System.out.println("\n=== 수정된 메시지 조회 ===");
-        Message modifiedMessage = messageService.getMessage(messageId1);
-        System.out.println("수정된 메시지: " + modifiedMessage);
+        System.out.println();
 
-        // 메시지 삭제
-        System.out.println("\n=== 메시지 삭제 ===");
-        messageService.deleteMessage(messageId2);
+        // Channel 다건 조회
+        System.out.println("=== 채널 다건 조회 ===");
+        List<Channel> allChannels = channelService.getAllChannels();
+        for (Channel channel : allChannels) {
+            System.out.println("채널: " + channel.getChannelName());
+        }
 
-        // 삭제된 메시지 확인
-        System.out.println("\n=== 삭제된 메시지 확인 ===");
-        Message deletedMessage = messageService.getMessage(messageId2);
-        System.out.println(deletedMessage);
+        System.out.println();
+        
+        // Message 다건 조회
+        System.out.println("=== 메시지 다건 조회 ===");
+        List<Message> allMessages = messageService.getAllMessages();
+        for(Message message : allMessages) {
+            System.out.println("메시지: " + message.getContent());
+        }
 
-        System.out.println("\n=== 최종 메시지 확인 ===");
-        messageService.getAllMessages().forEach(message ->
-                System.out.println("메시지: " + message.getContent())
-        );
+        System.out.println();
 
+        // User 수정
+        userService.updateUser(userId1, "Lia");
+        System.out.println("=== 유저1 수정 ===");
+
+        // Channel 수정
+        channelService.updateChannel(channelId1, "채널11");
+        System.out.println("=== 채널1 수정 ===");
+
+        // Message 수정
+        messageService.updateMessage(messageId1, "Bye");
+        System.out.println("=== 메시지1 수정 ===");
+
+        System.out.println();
+
+        // User 수정 출력
+        System.out.println("=== 수정된 유저 ===");
+        System.out.println("유저: " + userService.getUser(userId1).getUserName());
+        
+        // Channel 수정 출력
+        System.out.println("=== 수정된 채널 ===");
+        System.out.println("채널: " + channelService.getChannel(channelId1).getChannelName());
+
+        // Message 수정 출력
+        System.out.println("=== 수정된 메시지 ===");
+        System.out.println("메시지: " + messageService.getMessage(messageId1).getContent());
+
+        System.out.println();
+
+        // User 삭제
+        userService.deleteUser(userId1);
+        System.out.println("=== 유저1 삭제 ===");
+
+        // Channel 삭제
+        channelService.deleteChannel(channelId1);
+        System.out.println("=== 채널1 삭제 ===");
+
+        // Message 삭제
+        messageService.deleteMessage(messageId1);
+        System.out.println("=== 메시지1 삭제 ===");
+
+        System.out.println();
+
+        // 삭제 조회
+        System.out.println("=== 삭제 후 조회 ===");
+        System.out.println(userService.getUser(userId1));  // null
+        System.out.println(channelService.getChannel(channelId1));  // null
+        System.out.println(messageService.getMessage(messageId1));  // null
     }
 }

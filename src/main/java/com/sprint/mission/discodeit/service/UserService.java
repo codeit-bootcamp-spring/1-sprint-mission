@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(UUID id, Long createdAt, Long updatedAt, String name);
+    void createUser(User user);
     User getUser(UUID id);
     List<User> getAllUsers();
-    User updateUser(UUID id, String name, Long updatedAt);
+    void updateUser(UUID id, String userName);
     void deleteUser(UUID id);
 }

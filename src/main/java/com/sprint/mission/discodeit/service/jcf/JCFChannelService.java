@@ -6,42 +6,33 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> data;
-
-    public JCFChannelService() {
-        this.data = new ArrayList<>();
-    }
+    private final Map<UUID, Channel> data = new HashMap<>();
 
     @Override
-    public Channel createChannel(UUID id, Long createdAt, Long updatedAt, String name) {
-        Channel channel = new Channel(id, createdAt, updatedAt, name);
-        data.add(channel);
-        return channel;
+    public void createChannel(Channel channel) {
+        data.put(channel.getId(), channel);
     }
 
     @Override
     public Channel getChannel(UUID id) {
-        return data.stream()
-                .filter(channel -> channel.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return data.get(id);
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        return new ArrayList<>(data);
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateChannel(UUID id, String name, Long updatedAt) {
-        Channel channel = getChannel(id);
+    public void updateChannel(UUID id, String channelName) {
+        Channel channel = data.get(id);
         if (channel != null) {
-            channel.update(updatedAt);
+            channel.update(channelName);
         }
     }
 
     @Override
     public void deleteChannel(UUID id) {
-        data.removeIf(channel -> channel.getId().equals(id));
+        data.remove(id);
     }
 }

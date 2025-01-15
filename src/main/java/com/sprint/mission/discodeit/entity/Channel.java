@@ -3,16 +3,16 @@ package com.sprint.mission.discodeit.entity;
 import java.util.UUID;
 
 public class Channel{
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
-    private String name;
+    private String channelName;
 
-    public Channel(UUID id, Long createdAt, Long updatedAt, String name) {
+    public Channel(UUID id, Long createdAt, Long updatedAt, String channelName) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.name = name;
+        this.channelName = channelName;
     }
 
     public UUID getId() {
@@ -27,11 +27,12 @@ public class Channel{
         return updatedAt;
     }
 
-    public String getName() {
-        return name;
+    public String getChannelName() {
+        return channelName;
     }
 
-    public void update(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void update(String channelName) {
+        this.channelName = channelName;
+        this.updatedAt = System.currentTimeMillis();
     }
 }

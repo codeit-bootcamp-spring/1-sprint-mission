@@ -6,45 +6,33 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final List<User> data;
-
-    public JCFUserService() {
-        this.data = new ArrayList<>();
-    }
+    private final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public User createUser(UUID id, Long createdAt, Long updatedAt, String name) {
-        User user = new User(id, createdAt, updatedAt, name);
-        data.add(user);
-        return user;
+    public void createUser(User user) {
+        data.put(user.getId(), user);
     }
 
     @Override
     public User getUser(UUID id) {
-        return data.stream()
-                .filter(user -> user.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+        return data.get(id);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return new ArrayList<>(data);
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public User updateUser(UUID id, String name, Long updatedAt) {
-        User user = getUser(id);
+    public void updateUser(UUID id, String userName) {
+        User user = data.get(id);
         if (user != null) {
-            user.update(name, updatedAt);
-            return user;
+            user.update(userName);
         }
-        return null;
     }
-
 
     @Override
     public void deleteUser(UUID id) {
-        data.removeIf(user -> user.getId().equals(id));
+        data.remove(id);
     }
 }
