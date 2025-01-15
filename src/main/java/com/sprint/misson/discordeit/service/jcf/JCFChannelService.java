@@ -97,7 +97,8 @@ public class JCFChannelService implements ChannelService {
     public boolean deleteChannel(Channel channel) throws RuntimeException {
         Channel ch = data.get(channel.getId());
         if (ch == null) {
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channel.getId()));
+            System.out.println("Channel with id " + channel.getId() + " not found");
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
         return true;
     }
@@ -106,6 +107,7 @@ public class JCFChannelService implements ChannelService {
     public List<User> getUsersInChannel(Channel channel) throws RuntimeException {
         Channel ch = data.get(channel.getId());
         if (ch == null) {
+            System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
         return ch.getUserList().stream().toList();
