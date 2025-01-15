@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UnregisterUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UserInfoResponse;
+import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserConverter;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.util.UUID;
@@ -18,16 +19,23 @@ public class JCFUserService implements UserService {
 
     private final UserRepository data;
     private final UserConverter converter;
+    private final ChannelService channelService;
 
-    public JCFUserService(UserRepository userRepository, UserConverter converter) {
+    public JCFUserService(
+            UserRepository userRepository,
+            UserConverter converter,
+            ChannelService channelService
+    ) {
         this.data = userRepository;
         this.converter = converter;
+        this.channelService = channelService;
     }
 
     @Override
     public UserInfoResponse register(RegisterUserRequest registerUserRequest) {
         var entity = converter.toEntity(registerUserRequest);
         var savedEntity = data.save(entity);
+
         return converter.toDto(savedEntity);
     }
 
@@ -37,6 +45,7 @@ public class JCFUserService implements UserService {
                 .filter(User::isNotUnregistered)
                 .map(converter::toDto)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
+
         return foundUser;
     }
 
@@ -60,6 +69,11 @@ public class JCFUserService implements UserService {
         data.save(foundUser);
     }
 
+    @Override
+    public void exitChannel() {
+
+    }
+
     private User findByIdOrThrow(UUID id) {
         var entity = data.findById(id)
                 .filter(User::isNotUnregistered)
@@ -67,7 +81,7 @@ public class JCFUserService implements UserService {
         return entity;
     }
 
-    public static JCFUserService getInstance(UserRepository userRepository) {
-        return new JCFUserService(userRepository, UserConverter.getInstance());
+    public static JCFUserService getInstance(UserRepository userRepository, ChannelService channelService) {
+        return new JCFUserService(userRepository, UserConverter.getInstance(), channelService);
     }
 }

@@ -29,7 +29,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void createChannelOrThrow(CreateNewChannelRequest request) {
-
+        // ==> 코드리뷰 : 메서드 내부에 다른 메서드를 호출하면서 throw가 발생가능하다는 것을 코드 블록의 메서드의 이름에 추가해야할까요?
         var findUser = findUserByIdOrThrow(request.userId());
 
         var createdChannel = findUser.openNewChannel(request.channelName());
@@ -52,7 +52,8 @@ public class JCFChannelService implements ChannelService {
     public void deleteChannelByChannelIdOrThrow(DeleteChannelRequest request) {
         var foundChannel = channelRepository.findById(request.channelId())
                 .orElseThrow(
-                        () -> ChannelException.ofErrorMessageAndNotExistChannelId(CHANNEL_NOT_FOUND,
+                        () -> ChannelException.ofErrorMessageAndNotExistChannelId(
+                                CHANNEL_NOT_FOUND,
                                 request.channelId())
                 );
 

@@ -11,11 +11,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.db.user.UserRepository;
-import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.ModifyUserInfoRequest;
 import com.sprint.mission.discodeit.entity.user.dto.RegisterUserRequest;
 import com.sprint.mission.discodeit.entity.user.dto.UnregisterUserRequest;
+import com.sprint.mission.discodeit.entity.user.entity.User;
+import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserConverter;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +30,15 @@ class JCFUserServiceTest {
     private UserRepository userRepository;
     private UserConverter userConverter;
     private JCFUserService userService;
+    private ChannelService channelService;
     private User user;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         userConverter = UserConverter.getInstance();
-        userService = new JCFUserService(userRepository, userConverter);
+        channelService = mock(ChannelService.class);
+        userService = new JCFUserService(userRepository, userConverter, channelService);
         user = User.createFrom(NAME);
     }
 
