@@ -36,10 +36,11 @@ public class JCFChannelMessageService implements ChannelMessageService {
 
     public static ChannelMessageService getInstance(
             UserRepository userRepository,
-            ChannelRepository channelRepository
+            ChannelRepository channelRepository,
+            ChannelMessageRepository channelMessageRepository
     ) {
         var converter = new ChannelMessageConverter();
-        return new JCFChannelMessageService(userRepository, channelRepository, converter);
+        return new JCFChannelMessageService(userRepository, channelRepository, channelMessageRepository, converter);
     }
 
     @Override
