@@ -30,15 +30,13 @@ class JCFUserServiceTest {
     private UserRepository userRepository;
     private UserConverter userConverter;
     private JCFUserService userService;
-    private ChannelService channelService;
     private User user;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         userConverter = UserConverter.getInstance();
-        channelService = mock(ChannelService.class);
-        userService = new JCFUserService(userRepository, userConverter, channelService);
+        userService = new JCFUserService(userRepository, userConverter);
         user = User.createFrom(NAME);
     }
 

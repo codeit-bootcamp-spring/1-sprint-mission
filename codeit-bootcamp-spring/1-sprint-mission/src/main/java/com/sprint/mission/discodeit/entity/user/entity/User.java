@@ -37,6 +37,12 @@ public class User extends AbstractUUIDEntity {
      *  다른 객체에 해당 작업을 위임, 그런데 메서드 명이 영...
      *  이 부분 코드 리뷰 부탁드릴게요!
      */
+
+    /**
+     * 유저의 참여 채널에 새로운 채널을 생성하는 메서드
+     * @param channelName
+     * @return
+     */
     public Channel openNewChannel(String channelName) {
         Preconditions.checkNotNull(channelName);
         var createdChannel = participatedChannels.createChannel(channelName, this);
@@ -51,7 +57,10 @@ public class User extends AbstractUUIDEntity {
         return targetChannel;
     }
 
-    // 참여한 채널에서 나가기
+    /**
+     * 참여한 채널에서 나가는 메서드
+     * @param channelId
+     */
     public void exitParticipatedChannel(UUID channelId) {
         participatedChannels.exitChannelById(channelId);
     }

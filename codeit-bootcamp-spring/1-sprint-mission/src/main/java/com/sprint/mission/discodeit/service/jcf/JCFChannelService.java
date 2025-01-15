@@ -8,9 +8,11 @@ import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.entity.channel.dto.ChangeChannelNameRequest;
+import com.sprint.mission.discodeit.entity.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;
 import com.sprint.mission.discodeit.entity.channel.dto.DeleteChannelRequest;
 import com.sprint.mission.discodeit.entity.user.entity.User;
+import com.sprint.mission.discodeit.service.channel.ChannelConverter;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import java.util.UUID;
 
@@ -18,17 +20,20 @@ public class JCFChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final ChannelConverter channelConverter;
 
     public JCFChannelService(
             ChannelRepository channelRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            ChannelConverter channelConverter
     ) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
+        this.channelConverter = channelConverter;
     }
 
     @Override
-    public void createChannelOrThrow(CreateNewChannelRequest request) {
+    public ChannelResponse createChannelOrThrow(CreateNewChannelRequest request) {
         // ==> 코드리뷰 : 메서드 내부에 다른 메서드를 호출하면서 throw가 발생가능하다는 것을 코드 블록의 메서드의 이름에 추가해야할까요?
         var findUser = findUserByIdOrThrow(request.userId());
 
@@ -36,6 +41,8 @@ public class JCFChannelService implements ChannelService {
 
         channelRepository.save(createdChannel);
         userRepository.save(findUser);
+
+        return channelConverter.toDto(createdChannel);
     }
 
     @Override

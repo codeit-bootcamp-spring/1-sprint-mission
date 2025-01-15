@@ -74,6 +74,10 @@ public class Channel extends AbstractUUIDEntity {
         return !creator.equals(user);
     }
 
+    public String getCreator() {
+        return creator.getName();
+    }
+
     @Override
     public String toString() {
         var format =
