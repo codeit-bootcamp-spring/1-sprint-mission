@@ -1,31 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Channel {
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
 
-    public Channel(UUID id, Long createdAt){
-        this.id = id;
-        this.createdAt = createdAt;
+    private String title;
+
+
+    public Channel(String title){
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.title = title;
     }
 
-    public UUID GetId() {
+    public UUID getId() {
         return id;
     }
-    public Long GetCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
-    public void UpdateId(UUID id) {
+    public void updateId(UUID id) {
         this.id = id;
     }
-    public void UpdateCreatedAt(Long CreatedAt) {
+    public void updateCreatedAt(Long CreatedAt) {
         this.createdAt = createdAt;
     }
 
+
+    public void updateTitle(String title) {
+        this.title = title;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+
+
     public String toString() {
-        return "Channel{id=" + id + ", createdAt='" + createdAt + "'}";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        return "Title : " + title + "/ createdAt : " + simpleDateFormat.format(createdAt) + "updatedAt : " + updatedAt;
     }
 }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.UUID;
 
 public class Message {
@@ -7,26 +9,53 @@ public class Message {
     private Long createdAt;
     private Long updatedAt;
 
-    public Message(UUID id, Long createdAt){
-        this.id = id;
-        this.createdAt = createdAt;
+    private User user;
+
+    private Channel channel;
+
+    private String content;
+
+    public Message(User user, String content, Channel channel){
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.user = user;
+        this.content = content;
+        this.channel = channel;
     }
 
-    public UUID GetId() {
+    public UUID getId() {
         return id;
     }
-    public Long GetCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public void UpdateId(UUID id) {
+    public User getUser() {
+        return user;
+    }
+
+    public void updateId(UUID id) {
         this.id = id;
     }
-    public void UpdateCreatedAt(Long CreatedAt) {
+    public void updateCreatedAt(Long CreatedAt) {
         this.createdAt = createdAt;
     }
 
+    public void updateMessage(String message){
+        this.content = message;
+        this.updatedAt = System.currentTimeMillis();
+    }
+    public Channel getChannel() {
+        return channel;
+    }
+
+    // 메세지 넣기
+
     public String toString() {
-        return "Message{id=" + id + ", createdAt='" + createdAt + "'}";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String name = user.getName();
+        return name + "/ createdAt : " + simpleDateFormat.format(createdAt) + "\n" + "[ " + content
+                +" ]";
+
     }
 }
