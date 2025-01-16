@@ -15,7 +15,7 @@ public class JCFChannelService implements ChannelService {
     public Channel createChannel(User user, String channelName) {
         Channel newChannel = new Channel(user, channelName);
         channelData.add(newChannel);
-        System.out.println("채널 생성 성공");
+        System.out.println("채널 생성 성공\n");
         return newChannel;
     }
 
@@ -24,14 +24,15 @@ public class JCFChannelService implements ChannelService {
     public void updateChannel(User user, String channelName, String modifiedChannelName) {
 
         for (Channel channel : channelData) {
-            if (channel.getUser().equals(user)&& channel.getChannelName().equals(channelName)) {
+            if (channel.getUser().equals(user) && channel.getChannelName().equals(channelName)
+                    && !channel.getChannelName().equals(modifiedChannelName)) {
                 channel.setChannelName(modifiedChannelName);
-                System.out.println("채널명 변경 성공");
+                System.out.println("채널명 변경 성공\n");
                 printChannel(channel);
                 return;
             }
         }
-        throw new IllegalArgumentException("채널을 찾을 수 없습니다.");
+        System.out.println("채널을 찾을 수 없습니다.\n");
     }
 
     // 전체 채널 조회
@@ -47,7 +48,12 @@ public class JCFChannelService implements ChannelService {
     // 유저가 속한 채널 조회
     @Override
     public void channelInfo(User user) {
-        System.out.println(channelData);
+        System.out.println("[채널 목록]");
+        for (Channel channel : channelData) {
+            if (channel.getUser().equals(user)) {
+                printChannel(channel);
+            }
+        }
     }
 
     // 채널 삭제, 채널을 찾을 수 없을 경우 예외 처리
@@ -60,12 +66,12 @@ public class JCFChannelService implements ChannelService {
                 break;
             }
         }
-        if (channelToDelete != null && channelData.contains(channelToDelete)) {
+        if (channelToDelete != null) {
             channelData.remove(channelToDelete);
             System.out.println("채널 삭제 성공");
             printChannel(channelToDelete);
         } else {
-            throw new IllegalArgumentException("채널을 찾을 수 없습니다.");
+            System.out.println("채널을 찾을 수 없습니다.\n");
         }
     }
 

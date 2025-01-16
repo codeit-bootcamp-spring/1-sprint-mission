@@ -38,5 +38,4 @@ public class User {
     public long getUpdateAt() {
         return updateAt;
     }
-
 }

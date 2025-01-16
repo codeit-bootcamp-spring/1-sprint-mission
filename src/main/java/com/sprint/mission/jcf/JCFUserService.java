@@ -15,10 +15,10 @@ public class JCFUserService implements UserService {
     // 계정 생성, 이메일 형식이 아닐 경우 예외 처리
     @Override
     public User createUser(String email) {
-        if (email.contains("@") && email.contains(".")) {
+        if (email.contains("@") && email.contains(".") && !userData.contains(email)) {
             User newUser = new User(UUID.randomUUID(), email);
             userData.add(newUser);
-            System.out.println("계정 생성 완료");
+            System.out.println("계정 생성 완료\n");
             return newUser;
         } else {
             throw new IllegalArgumentException("올바른 이메일 형식인지 확인해 주세요.");
@@ -34,7 +34,7 @@ public class JCFUserService implements UserService {
             System.out.println("이메일 변경 완료");
             printUser(user);
         } else {
-            throw new IllegalArgumentException("올바른 이메일 형식인지 확인해 주세요.");
+            System.out.println("올바른 이메일 형식인지 확인해 주세요.");
         }
     }
 
@@ -55,7 +55,7 @@ public class JCFUserService implements UserService {
             System.out.println("사용자 정보");
             printUser(user);
         } else {
-            throw new IllegalArgumentException("유저를 찾을 수 없습니다");
+            System.out.println("유저를 찾을 수 없습니다.\n");
         }
     }
 
@@ -68,7 +68,7 @@ public class JCFUserService implements UserService {
             userData.remove(user);
             printUser(user);
         } else {
-            throw new IllegalArgumentException("유저를 찾을 수 없습니다");
+            System.out.println("유저를 찾을 수 없습니다.\n");
         }
     }
     public List<User> getUserData() {

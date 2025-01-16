@@ -25,7 +25,7 @@ public class JCFMessageService implements MessageService {
         }
         Message newMessage = new Message(user, channel, message);
         messageData.add(newMessage);
-        System.out.println("메시지가 생성되었습니다.");
+        System.out.println("메시지가 생성되었습니다.\n");
         printMessage(newMessage);
         return newMessage;
     }
@@ -41,7 +41,7 @@ public class JCFMessageService implements MessageService {
                 printMessage(message);
                 return;
             } else {
-                throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+                System.out.println("메시지를 찾을 수 없습니다.\n");
             }
         }
     }
@@ -82,7 +82,7 @@ public class JCFMessageService implements MessageService {
             System.out.println("메시지가 삭제되었습니다:");
             printMessage(messageToDelete);
         } else {
-            throw new IllegalArgumentException("[오류] 메시지를 찾을 수 없습니다.");
+            System.out.println("메시지를 찾을 수 없습니다.\n");
         }
     }
     // 메시지 출력 포맷팅

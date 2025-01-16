@@ -1,6 +1,5 @@
 package com.sprint.mission.entity;
 
-import java.util.UUID;
 
 public class Message {
     private User user;
