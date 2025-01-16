@@ -90,7 +90,7 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 출력 포멧팅
     private void printChannel(Channel channel) {
-        System.out.println(" - 사용자: " + channel.getUser().getEmail());
+        System.out.println(" - 사용자: " + channel.getUser().getName());
         System.out.println(" - 채널: " + channel.getChannelName());
         System.out.println(" - 생성 시간: " + channel.getCreatedAt() + "\n");
     }

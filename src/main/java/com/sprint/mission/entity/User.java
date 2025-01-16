@@ -8,13 +8,22 @@ public class User {
     private final UUID id;
     private final long createdAt;
     private String email;
+    private String name;
 
 
-    public User (UUID id, String email){
+    public User (UUID id, String email, String name){
         this.id = id;
+        this.name = name;
         this.email = email;
         this.createdAt = System.currentTimeMillis();
         this.updateAt = this.createdAt;
+    }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 

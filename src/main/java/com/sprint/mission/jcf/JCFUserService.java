@@ -26,9 +26,9 @@ public class JCFUserService implements UserService {
 
     // 계정 생성, 이메일 형식이 아닐 경우 예외 처리
     @Override
-    public User createUser(String email) {
+    public User createUser(String email, String name) {
         if (email.contains("@") && email.contains(".") && !userData.contains(email)) {
-            User newUser = new User(UUID.randomUUID(), email);
+            User newUser = new User(UUID.randomUUID(), email, name);
             userData.add(newUser);
             System.out.println("계정 생성 완료\n");
             return newUser;
@@ -88,7 +88,7 @@ public class JCFUserService implements UserService {
     }
 
     private void printUser(User user) {
-        System.out.println(" - 사용자: " + user.getID());
+        System.out.println(" - 사용자: " + user.getName());
         System.out.println(" - 이메일: " + user.getEmail());
         System.out.println(" - 생성 시간: " + user.getCreatedAt() + "\n");
     }

@@ -17,8 +17,8 @@ public class JavaApplication {
         JCFUserService userService = JCFUserService.getInstance();
 
         // Jack, Bob 계정 생성 -> 각 유저마다 유저 객체 생성
-        User Jack = userService.createUser("codeit@codeit.com");
-        User Bob = userService.createUser("yeoksam2@codeit.com");
+        User Jack = userService.createUser("codeit@codeit.com", "Jack");
+        User Bob = userService.createUser("yeoksam2@codeit.com", "Bob");
 
         // 전체 유저 조회
         userService.getSearchAllUser();

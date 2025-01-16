@@ -2,16 +2,16 @@ package com.sprint.mission.entity;
 
 
 public class Message {
-    private User user;
+    private User name;
     private Channel channel;
     private String message;
     private long createdAt;
     private long updateAt;
 
 
-    public Message(User user, Channel channel, String message) {
+    public Message(User name, Channel channel, String message) {
         {
-            this.user = user;
+            this.name = name;
             this.channel = channel;
             this.message = message;
             this.createdAt = System.currentTimeMillis() ;
@@ -24,8 +24,8 @@ public class Message {
             return channel;
     }
 
-    public User getUser () {
-            return user;
+    public User getName () {
+            return name;
     }
 
     public String getMessage () {

@@ -28,7 +28,7 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(User user, Channel channel, String message) {
 
         for (Message existingMessage : messageData) {
-            if (existingMessage.getUser().equals(user) && existingMessage.getMessage().equals(message)) {
+            if (existingMessage.getName().equals(user) && existingMessage.getMessage().equals(message)) {
                 System.out.println("이미 메시지가 존재합니다.");
                 return null;
             }
@@ -45,7 +45,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(User user, Channel channel,String Message, String modifiedMessage) {
         for (Message message : messageData) {
-            if (!message.equals(modifiedMessage) && message.getUser().equals(user) && message.getMessage().equals(Message)) {
+            if (!message.equals(modifiedMessage) && message.getName().equals(user) && message.getMessage().equals(Message)) {
                 message.setMessage(modifiedMessage);
                 System.out.println("메시지가 변경 변경되었습니다.");
                 printMessage(message);
@@ -69,7 +69,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void printChannelMessage(User user) {
         for (Message message : messageData) {
-            if (message.getUser().equals(user)) {
+            if (message.getName().equals(user)) {
                 System.out.println("사용자의 메시지 조회");
                 printMessage(message);
             }
@@ -97,8 +97,8 @@ public class JCFMessageService implements MessageService {
     }
     // 메시지 출력 포맷팅
     private void printMessage(Message message) {
-        System.out.println(" - 사용자: " + message.getUser().getID());
-        System.out.println(" - 이메일: " + message.getUser().getEmail());
+        System.out.println(" - 사용자: " + message.getName().getName());
+        System.out.println(" - 이메일: " + message.getName().getEmail());
         System.out.println(" - 채널: " + message.getChannel().getChannelName());
         System.out.println(" - 메시지: " + message.getMessage());
         System.out.println(" - 생성 시간: " + message.getCreatedAt() + "\n");

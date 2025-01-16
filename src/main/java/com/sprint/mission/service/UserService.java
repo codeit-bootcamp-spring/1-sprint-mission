@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserService {
 
     // 유저 생성
-    User createUser(String email);
+    User createUser(String email, String name);
 
     // 이메일 변경
     void updateMail(User user, String name);
