@@ -2,12 +2,18 @@ package com.sprint.mission.discodeit.config.factory;
 
 import com.sprint.mission.discodeit.db.channel.ChannelRepository;
 import com.sprint.mission.discodeit.db.channel.ChannelRepositoryInMemory;
+import com.sprint.mission.discodeit.db.message.ChannelMessage.ChannelMessageRepository;
+import com.sprint.mission.discodeit.db.message.ChannelMessage.ChannelMessageRepositoryInMemory;
 import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepository;
+import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepositoryInMemory;
 import com.sprint.mission.discodeit.db.user.UserRepository;
 import com.sprint.mission.discodeit.db.user.UserRepositoryInMemory;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFDirectMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.message.channelMessage.ChannelMessageService;
 import com.sprint.mission.discodeit.service.message.directMessage.DirectMessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 
@@ -17,63 +23,75 @@ import com.sprint.mission.discodeit.service.user.UserService;
 public class ApplicationInMemoryFactory implements AppFactory {
     private static ApplicationInMemoryFactory INSTANCE;
 
-    private UserRepository userRepository;
-    private UserService userService;
+    private final UserRepository userRepository;
+    private final UserService userService;
 
-    private ChannelRepository channelRepository;
-    private ChannelService channelService;
+    private final ChannelRepository channelRepository;
+    private final ChannelService channelService;
 
-    private DirectMessageService messageService;
-    private DirectMessageRepository messageRepository;
+    private final DirectMessageService directMessageService;
+    private final DirectMessageRepository directMessageRepository;
 
-    private ApplicationInMemoryFactory() {}
+    private final ChannelMessageService channelMessageService;
+    private final ChannelMessageRepository channelMessageRepository;
+
+    private static class SingleInstanceHolder {
+        private static final ApplicationInMemoryFactory INSTANCE =
+                new ApplicationInMemoryFactory();
+    }
+    private ApplicationInMemoryFactory() {
+        this.userRepository = UserRepositoryInMemory.getInstance();
+        this.channelRepository = ChannelRepositoryInMemory.getChannelRepositoryInMemory();
+        this.directMessageRepository = DirectMessageRepositoryInMemory.getInstance();
+        this.channelMessageRepository = ChannelMessageRepositoryInMemory.getInstance();
+
+        this.userService = JCFUserService.getInstance(userRepository);
+        this.channelService = JCFChannelService.getInstance(userRepository, channelRepository);
+        this.directMessageService = JCFDirectMessageService.getInstance(directMessageRepository, userRepository);
+        this.channelMessageService = JCFChannelMessageService.getInstance(userRepository, channelRepository, channelMessageRepository);
+    }
 
     public static synchronized ApplicationInMemoryFactory getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ApplicationInMemoryFactory();
-        }
-        return INSTANCE;
+        return SingleInstanceHolder.INSTANCE;
     }
 
     @Override
     public UserService getUserService() {
-        if (userService == null) {
-            userService = JCFUserService.getInstance(getUserRepository());
-        }
         return userService;
     }
 
     @Override
     public ChannelService getChannelService() {
-        if (channelService == null) {
-            channelService = JCFChannelService.getInstance(getUserRepository(), getChannelRepository());
-        }
         return channelService;
     }
 
     @Override
     public UserRepository getUserRepository() {
-        if (userRepository == null) {
-            userRepository = UserRepositoryInMemory.getInstance();
-        }
         return userRepository;
     }
 
     @Override
     public ChannelRepository getChannelRepository() {
-        if (channelRepository == null) {
-            channelRepository = ChannelRepositoryInMemory.getChannelRepositoryInMemory();
-        }
         return channelRepository;
     }
 
     @Override
-    public DirectMessageService getMessageService() {
-        return null;
+    public DirectMessageService getDirectMessageService() {
+        return directMessageService;
     }
 
     @Override
-    public DirectMessageRepository getMessageRepository() {
-        return null;
+    public DirectMessageRepository getDirectMessageRepository() {
+        return directMessageRepository;
+    }
+
+    @Override
+    public ChannelMessageRepository getChannelMessageRepository() {
+        return channelMessageRepository;
+    }
+
+    @Override
+    public ChannelMessageService getChannelMessageService() {
+        return channelMessageService;
     }
 }

@@ -87,7 +87,7 @@ public class Channel extends AbstractUUIDEntity {
                         creator.getName(),
                         getCreateAt(),
                         getUpdateAt().orElse(0L),
-                        getStatus().getStatus()
+                        getStatus().toString()
         );
         return format;
     }

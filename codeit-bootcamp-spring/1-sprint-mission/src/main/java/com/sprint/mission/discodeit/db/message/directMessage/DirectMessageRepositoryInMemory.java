@@ -4,13 +4,13 @@ import com.sprint.mission.discodeit.db.common.InMemoryCrudRepository;
 import com.sprint.mission.discodeit.entity.message.DirectMessage;
 import java.util.UUID;
 
-public class MessageRepositoryInMemory extends InMemoryCrudRepository<DirectMessage, UUID>
+public class DirectMessageRepositoryInMemory extends InMemoryCrudRepository<DirectMessage, UUID>
         implements DirectMessageRepository {
 
-    private MessageRepositoryInMemory() {}
+    private DirectMessageRepositoryInMemory() {}
 
-    public static MessageRepositoryInMemory getInstance() {
-        return new MessageRepositoryInMemory();
+    public static DirectMessageRepositoryInMemory getInstance() {
+        return new DirectMessageRepositoryInMemory();
     }
 
 }

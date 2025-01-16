@@ -88,7 +88,7 @@ public class User extends AbstractUUIDEntity {
                 String.format(
                         "user info = [id : %s, status : %s, createAt = %d, updateAt = %d], participatedChannel = {%s}",
                         getId(),
-                        getStatus().getStatus(),
+                        getStatus().toString(),
                         getCreateAt(),
                         getUpdateAt().orElse(0L),
                         getParticipatedChannels()

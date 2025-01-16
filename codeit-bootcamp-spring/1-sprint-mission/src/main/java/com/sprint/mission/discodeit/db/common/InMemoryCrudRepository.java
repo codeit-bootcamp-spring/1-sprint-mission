@@ -15,14 +15,14 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     protected final Map<UUID, T> store = new HashMap<>();
 
     @Override
-    public final T save(final T entity) {
+    public final T save(T entity) {
         var id = Objects.requireNonNull(entity.getId());
         store.put(id, entity);
         return entity;
     }
 
     @Override
-    public Optional<T> findById(final ID id) {
+    public Optional<T> findById(ID id) {
         var findEntity = store.get(id);
         return Optional.ofNullable(findEntity);
     }
@@ -46,12 +46,12 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
     }
 
     @Override
-    public void deleteById(final ID id) {
+    public void deleteById(ID id) {
         store.remove(id);
     }
 
     @Override
-    public boolean isExistsById(final ID id) {
+    public boolean isExistsById(ID id) {
         var isExist = store.containsKey(id);
         return isExist;
     }
