@@ -10,7 +10,7 @@ import java.util.List;
 public interface ChannelService {
 
     //생성
-    Channel CreateChannel(String name, ChannelType type);
+    Channel createChannel(String name, ChannelType type);
 
     //모두 읽기
     List<Channel> getChannels();

@@ -47,10 +47,10 @@ public class JavaApplication {
         }
 
         System.out.println("\n\n--- Channel 등록---");
-        Channel channel1 = channelService.CreateChannel("일반1", ChannelType.TEXT);
-        Channel channel2 = channelService.CreateChannel("일반2", ChannelType.TEXT);
-        Channel channel3 = channelService.CreateChannel("공지사항", ChannelType.TEXT);
-        Channel channel4 = channelService.CreateChannel("회의실", ChannelType.VOICE);
+        Channel channel1 = channelService.createChannel("일반1", ChannelType.TEXT);
+        Channel channel2 = channelService.createChannel("일반2", ChannelType.TEXT);
+        Channel channel3 = channelService.createChannel("공지사항", ChannelType.TEXT);
+        Channel channel4 = channelService.createChannel("회의실", ChannelType.VOICE);
 
         System.out.println("> 채널 생성 결과 및 전체 채널 목록:");
         channelService.getChannels().forEach(Channel::displayShortInfo);
