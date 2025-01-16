@@ -81,6 +81,6 @@ public class JCFUserService implements UserService {
     }
 
     public static JCFUserService getInstance(UserRepository userRepository) {
-        return new JCFUserService(userRepository, UserConverter.getInstance());
+        return new JCFUserService(userRepository, new UserConverter());
     }
 }

@@ -53,10 +53,10 @@ public class ParticipatedChannel {
                         .orElseThrow(
                                 () -> ChannelException.ofErrorMessageAndNotExistChannelId(USER_NOT_PARTICIPATED_CHANNEL, channelId));
 
-        var notRegisteredChannel =
+        var unregisteredReturnNullOrFoundChannel =
                 foundChannel.getStatus() == Status.UNREGISTERED ? null : foundChannel;
 
-        return Optional.ofNullable(notRegisteredChannel);
+        return Optional.ofNullable(unregisteredReturnNullOrFoundChannel);
     }
 
     // TODO 같은 이름을 가진 채널이 여러 개 있을 수 있음. 리스트로 반환 고려해야하지 않을까?

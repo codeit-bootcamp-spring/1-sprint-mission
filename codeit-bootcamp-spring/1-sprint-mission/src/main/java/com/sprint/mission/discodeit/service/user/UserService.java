@@ -21,7 +21,6 @@ public interface UserService {
 
     void UnRegisterUser(UnregisterUserRequest request);
 
-    // TODO 유저가 참여한 채널을 나가는 기능
     void exitChannel(ExitChannelRequest request);
 
     public static UserService getJCFUserService(UserRepository userRepository) {

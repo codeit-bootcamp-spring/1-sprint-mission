@@ -63,9 +63,17 @@ public class JCFChannelMessageService implements ChannelMessageService {
         return converter.toDto(savedMessage);
     }
 
-    // 이거 중복이 많이 나오는데, 유저 서비스에 넣어서 처리하는게 좋아보임
+    /**
+     * ==> 코드리뷰 부탁드립니다. 유저 서비스에 다른 서비스에서 이용하기 위한 메서드를 넣는게 바람직한가요?
+     * ==> 제 생각은, 유저 서비스에 같은 기능으로 호출하는 기능이 필요하다면 추가하지만, 없다면 안넣는게 낫다고 생각함. 넣는다면 userRepository
+     *      그런데, 유저 서비스에서 id로만 찾는 유저를 찾는 기능이 있는가? 구현한 내용은 유저 서비스 레이어 안에서만 private 구현
+     *      코드 중복이 너무 많이 발생함, 이를 해결하기 위해 userService, userRepository 둘 중 하나에 메서드를 만드는 방법 중 어디가 좋을까요?
+     *
+     * ==> 다른 서비스 레이어를 의존하도록 해서 호출해도 괜찮을까요 ?
+     */
     private User findUserByIdOrThrow(UUID userId) {
         var foundUser = userRepository.findById(userId)
+                .filter(User::isNotUnregistered)
                 .orElseThrow(() -> UserException.ofErrorMessageAndId(
                         ErrorMessage.USER_NOT_FOUND, userId.toString()
                 ));

@@ -57,6 +57,7 @@ public class JCFDirectMessageService implements DirectMessageService {
 
     private User findUserByIdOrThrow(UUID userId) {
         var foundUser = userRepository.findById(userId)
+                .filter(User::isNotUnregistered)
                 .orElseThrow(() -> UserException.ofErrorMessageAndId(
                         ErrorMessage.USER_NOT_FOUND, userId.toString()
                 ));
