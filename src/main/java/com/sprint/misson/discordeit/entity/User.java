@@ -94,11 +94,11 @@ public class User {
     }
 
     public String toFullString() {
-        return this.toShortString() + "\n updatedAt: " + updatedAt + "\n accountStatus: " + accountStatus + "\n statusMessage: " + statusMessage;
+        return this.toShortString() + " / updatedAt: " + updatedAt + " / accountStatus: " + accountStatus + " / statusMessage: " + statusMessage;
     }
 
     public String toShortString() {
-        return "[User]\n id: " + id + "\n nickname: " + nickname + "\n email:  " + email + "\n userStatus: " + userStatus + "\n createdAt: " + createdAt;
+        return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email + " / userStatus: " + userStatus + " / createdAt: " + createdAt;
     }
 
     public void displayShortInfo() {

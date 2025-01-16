@@ -66,11 +66,11 @@ public class Message {
     //멘션, 답장(reply)
 
     public String toShortString() {
-        return "[Message]\n id: " + id + "\n sender: " + sender.getNickname() + "\n content: " + content + "\n channel: " + channel.getChannelName();
+        return "[Message] id: " + id + " / sender: " + sender.getNickname() + " / content: " + content + " / channel: " + channel.getChannelName();
     }
 
     public String toFullString() {
-        return toShortString() + "\n createdAt: " + createdAt + "\n updatedAt: " + updatedAt;
+        return toShortString() + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
     }
 
     public void displayFullInfo() {

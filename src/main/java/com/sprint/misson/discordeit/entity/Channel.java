@@ -81,11 +81,11 @@ public class Channel {
     }
 
     public String toShortString() {
-        return "[Channel]\n id: " + id + "\n channelName: " + channelName + "\n channelType: " + channelType + "\n total users: " + userList.size();
+        return "[Channel] id: " + id + " / channelName: " + channelName + " / channelType: " + channelType + " / total users: " + userList.size();
     }
 
     public String toFullString() {
-        return toShortString() + "\n isHidden: " + isHidden + "\n createdAt: " + createdAt + "\n updatedAt: " + updatedAt;
+        return toShortString() + " / isHidden: " + isHidden + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
     }
 
     public void displayFullInfo() {
