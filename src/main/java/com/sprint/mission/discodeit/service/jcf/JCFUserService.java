@@ -20,21 +20,16 @@ import java.util.stream.Collectors;
  * data load + implementation CRUD
  */
 public class JCFUserService implements UserService {
+    private static JCFUserService instance;
     private final Map<UUID, User> UserList;
-    private JCFChannelService channelService;
-    private JCFMessageService messageService;
-    //Erase User A -> erase channel (owner == A), renew participants list, erase message (writer == A)
-    //for these transactions above, composition necessary?
-
     public JCFUserService() {
         this.UserList = new HashMap<>();
     }
-
-    public void setChannelService(JCFChannelService channelService) {
-        this.channelService = channelService;
-    }
-    public void setMessageService(JCFMessageService messageService) {
-        this.messageService = messageService;
+    public static JCFUserService getInstance() {
+        if (instance == null) {
+            instance = new JCFUserService();
+        }
+        return instance;
     }
 
     @Override
@@ -84,8 +79,8 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUserById(UUID userId) {
         User user = UserList.remove(userId);
-        Map<UUID, Channel> chList = channelService.getChannelList();
-/** refactore: apply Stream API instead of for-each
+        Map<UUID, Channel> chList = JCFChannelService.getInstance().getChannelList();
+/** refactor: apply Stream API instead of for-each
         for (UUID channelId : user.getAttending()) {
 
             Channel channel = channelService.readChannelInfo(channelId);
@@ -99,7 +94,7 @@ public class JCFUserService implements UserService {
 
 
         user.getAttending().forEach(channelId -> {
-            Channel channel = channelService.readChannelInfo(channelId);
+            Channel channel = JCFChannelService.getInstance().readChannelInfo(channelId);
             if (channel != null) {
                 channel.getChannelMessageList().removeIf(msg -> msg.getWriter().equals(userId));
             }
@@ -108,9 +103,9 @@ public class JCFUserService implements UserService {
 
 
         user.getAttending().forEach(channelId -> {
-            Channel channel = channelService.readChannelInfo(channelId);
+            Channel channel = JCFChannelService.getInstance().readChannelInfo(channelId);
             if (channel != null) {
-                channel.getChannelUserList().remove(userId);
+                channel.getChannelUserList().removeIf(usr -> usr.getId().equals(userId));
             }
         }); //deletion user as participant of channel (Channel class's user related props)
 
@@ -122,7 +117,7 @@ public class JCFUserService implements UserService {
                         .equals(userId));
         //deletion user's channel.
 
-        List<Message> msgList = messageService.getMesageList();
+        List<Message> msgList = JCFMessageService.getInstance().getMesageList();
        msgList =  msgList.stream()
                 .filter(msg -> !msg
                         .getWriter()

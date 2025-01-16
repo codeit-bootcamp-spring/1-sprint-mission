@@ -88,7 +88,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return "msg created at : " + getCreatedAt() + "msg ID : " + "updated at : " + getUpdatedAt() + "msg id : "+ getId() + "msg writer : " + getWriter() + "msg from : " + getSource();
+        return "msg created at : " + getCreatedAt() + ", updated at : " + getUpdatedAt() + ", msg id : "+ getId().toString().substring(0, 5) + ", msg writer : " + getWriter() + ", contents : " + getContents() + ", from : " + getSource();
     }
 
 }

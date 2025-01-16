@@ -142,7 +142,7 @@ public class User {
     }
     @Override
     public String toString() {
-        return "User ID : " + getId() + "Alias : " + getAlias() + "created at : " + getCreatedAt() + "Updated at : " + getUpdatedAt() + "e-mail : " + getEmail() + "Attending : " + getAttending();
+        return "User ID : " + getId().toString().substring(0, 5) + ", Alias : " + getAlias() + ", created at : " + getCreatedAt() + ", Updated at : " + getUpdatedAt() + ", e-mail : " + getEmail() + ", Attending : " + getAttending();
     }
 
 

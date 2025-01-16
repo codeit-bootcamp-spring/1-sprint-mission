@@ -9,19 +9,39 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 설계의 주안점 : 1. 하나의 단위행동을 할 때, 영향력이 전파되며 일어나는 일을 직접 메소드 호출 하는것이 아닌, 근본적인 메소드 호출 하나로 최대한 해결하려고 시도
+ * ex 1) 채널 삭제 -> 채널 삭제, 채널에 속한 메시지 전부 삭제(msgDB), 채널에 참가하던 유저들에 대해, 참가중인 채널리스트에서 해당 채널 삭제(User.Attending),
+ *
+ * ex 2) 유저 삭제 -> 유저 삭제, 유저가 참여하던 채널들에 대해, 채널의 참가자 리스트에서 해당 유저 삭제(Channel.chUL),
+ * 채널의 props인 해당 채널에 작성된 메시지에서, 유저가 쓴 메시지 삭제(ch.chMsgList), 유저가 주인인 채널 삭제
+ * 메시지 리스트에서 유저가 쓴 메시지 삭제(msgDB.msgList) -> by 완전탐색
+ * (**이렇게 구현 못함(유저가 참여하던 채널들만 순회하며, 유저가 작성한
+ * 메시지 삭제(메시지리스트 완전탐색 피하기)) -> 메시지 리스트가 메시지 uuid로 만든 map이니까 이런건 불가)
+ *
+ *
+ * 2. 성능을 고려한 멤버필드 (Channel props -> channelUserList, channelMessageList)...
+ *  디스코드 서비스에서 가장 많이 사용하는게 채널입장해서 채팅 -> 채널의 유저, 메시지모음은 빨라야 할 것 같다(완탐 -> Hash)
+ * -> 독립적으로 작동하는 느낌. crud 마다 혹시 바뀌어야하는지 고민하면서 머리 아파지는 상황
+ *
+ *  설계 변화 : 1. 필요해 보이는 독립 멤버필드 마음대로 + 클래스간 연결 될 수 있는(마치 db fk처럼) 멤버필드 난립 -> 구현 난이도 너무 올라감
+ *           2. (커밋 히스토리에 순환참조 문제로 존재) 독립 멤버필드 줄이기 + composition -> 순환참조 이슈. 해결법?
+ *           3. Singleton [*]
+ *
+ * 3. 리플랙션을 통한 유지보수성 : updatable props 증가 시 리플랙션이 없다면, dbms에서 # of updateFunc == # of updatable props로 계속 업데이트 필요?
+ * 쓰면 엔티티 클래스만 유지보수하면 해결 (사실 별로 안 중요한거 같기도 한 기능)
+ */
 public class JavaApplication {
     public static void main(String[] args) throws PassWordFormatException {
-        JCFUserService userDB = new JCFUserService();
-        JCFChannelService channelDB = new JCFChannelService();
-        JCFMessageService messageDB = new JCFMessageService();
-        userDB.setChannelService(channelDB);
-        userDB.setMessageService(messageDB);
-        channelDB.setUserService(userDB);
-        channelDB.setMessageService(messageDB);
-        messageDB.setChannelService(channelDB);
+        JCFUserService userDB = JCFUserService.getInstance();
+        JCFChannelService channelDB = JCFChannelService.getInstance();
+        JCFMessageService messageDB = JCFMessageService.getInstance();
 
 
 
+        //userDB.createUser(new User.Builder().buildEmail("a@b"). ... .build()); -> 하고싶었는데, user A, B, C alias가 필요.
+        //없으면 -> sout(userDB.getUserList().~~find userA -> by traversing userList using PKable props(ex email)
+        // -> 유저리스트에서 유저 찾아서 출력하는 행동 하나조차 고생, 전통적 pk인 uuid는 user alias가 없어서 또 못씀...
         System.out.println("==========Create User and save them to userDB==========");
         User A = new User.Builder().buildAlias("Alice").buildEmail("Alice@co.kr").buildPassWord("longEnoughPassWord!").buildUpdatedAt().build();
         User B = new User.Builder().buildAlias("Bob").buildEmail("Bob@co.kr").buildPassWord("longPassWordForBob").buildUpdatedAt().build();
@@ -95,7 +115,7 @@ public class JavaApplication {
 
         System.out.println("==========Update Channel Information==========");
         channelDB.updateChannelField(channelDB.getChannelList().get(c1.getId()).getId(), "channelName", "channel_1_mod");
-        channelDB.updateChannelField(c2.getId(), "owner", F.getId());
+        channelDB.updateChannelField(c2.getId(), "owner", F);
 
         System.out.println("==========Modified Channel Information==========");
         System.out.println(channelDB.getChannelList().get(c1.getId()).toString());
@@ -141,19 +161,26 @@ public class JavaApplication {
 
         System.out.println("2. Delete c2, message of channel 2 will flush, user channel attending list related to c2 will update automatically");
         channelDB.deleteChannel(c2.getId());
-        System.out.println(channelDB.getChannelList().get(c2.getId()).getChannelMessageList().toString());
+       // System.out.println(channelDB.getChannelList().get(c2.getId()).getChannelMessageList().toString());
         System.out.println(userDB.getUserList().get(D.getId()).toString());
         System.out.println(userDB.getUserList().get(E.getId()).toString());
         System.out.println(userDB.getUserList().get(F.getId()).toString());
 
-        System.out.println("2. Delete user A, A's message will flush, channels that owner of A will disappear, channel's props(messageList of the channel, " +
-                "userList of the channel will update. Also, user A.");
+        System.out.println("3. Delete user I, I's message will flush, channels that owner of I will disappear, channel's props(messageList of the channel, " +
+                "userList of the channel will update. Also, user I.");
 
-        userDB.deleteUserById(A.getId());
+        userDB.deleteUserById(I.getId());
+        //I는 c3에 소속되어있었고, m9을 작성. c3 채널에서 참가자 목록에서 I삭제, 메시지목록에서 A가 writer인 메시지 삭제(독립 멤버필드 삭제 검증 필요)
+        //I삭제, msgDB에서 I가쓴 메시지 삭제
+        userDB.deleteUserById(G.getId()); // 고려해야 하는 상황 : Graham은 자기 소유의 채널도 있다. null 오류같은걸로 꼬였으면 메시지 삭제, 채널삭제(nested action) 겹치면서
+        //꼬일 수 있는 위험도 있는 유저. -> 통과
 
         userDB.printing();
         channelDB.printing();
         messageDB.printing();
+        System.out.println("==========Independent Field==========");
+        System.out.println(c3.getChannelMessageList());
+        System.out.println(c3.getChannelUserList());
 
 
 

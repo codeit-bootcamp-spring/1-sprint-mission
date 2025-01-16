@@ -12,31 +12,27 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * Hence Circular Reference, deprecate use JCFs as memberfield of JCF.
+ * Instead of composition, refactor JCFs using Singleton pattern.
+ */
 public class JCFChannelService implements ChannelService {
+    private static JCFChannelService instance;
     private final Map<UUID, Channel> ChannelList;
-    private JCFUserService userService;
-    private JCFMessageService messageService;
-
-    //private final Map<UUID, Message> MessageList;
-    //private final Map<UUID, HashSet<Message>> EveryMessageOfUser;
-    //private final Map<UUID, HashSet<Message>> ChannelMessage;
 
     public JCFChannelService() {
         this.ChannelList = new HashMap<>();
-
-
     }
 
-    public void setUserService(JCFUserService userService) {
-        this.userService = userService;
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            instance = new JCFChannelService();
+        }
+        return instance;
     }
-    public void setMessageService(JCFMessageService messageService) {
-        this.messageService = messageService;
-    }
-
 
     public void participateChannel(User user, UUID chId) {
-        userService.getUserList().get(user.getId()).setAttending(chId);
+        JCFUserService.getInstance().getUserList().get(user.getId()).setAttending(chId);
         ChannelList.get(chId).getChannelUserList().add(user);
     }
 
@@ -52,10 +48,11 @@ public class JCFChannelService implements ChannelService {
     }
     @Override
     public void createChannel(Channel channel) {
-        ChannelList.put(channel.getId(), channel);
-        ChannelList.get(channel.getId()).getChannelUserList().add(channel.getOwner());
-        userService.getUserList().get(channel.getOwner()).getAttending().add(channel.getId());
-        //participateChannel(userService.getUserList().get(channel.getOwner()), channel.getId());
+        ChannelList.put(channel.getId(), channel); //JCFChannelList update
+        participateChannel(channel.getOwner(), channel.getId());
+        //participate's == below two lines
+//        ChannelList.get(channel.getId()).getChannelUserList().add(channel.getOwner()); //channel's attending userList update
+//        JCFUserService.getInstance().getUserList().get(channel.getOwner()).getAttending().add(channel.getId()); //owner attending
     }
     @Override
     public Channel readChannelInfo(UUID id) {
@@ -94,18 +91,29 @@ public class JCFChannelService implements ChannelService {
 
 
 
-    @Override //erase channel : 1. erase channel. 2. erase messages source from this channel. 3. erase user's attending
+    @Override //erase channel : 1. erase channel. 2. erase messages(JCFmsgList) source from this channel. 3. erase user's attending
     public void deleteChannel(UUID idOfChannel) {
         Channel ch = ChannelList.get(idOfChannel);
-        List<Message> relatedMsg = ch.getChannelMessageList();
+        List<Message> srcMsg = ch.getChannelMessageList();
         List<User> relatedUser = ch.getChannelUserList();
+
+
+
+
+        JCFMessageService.getInstance().getMesageList().removeIf(msg -> srcMsg.contains(msg));
+
+
         ChannelList.remove(idOfChannel);
 
-        relatedMsg.stream()
-                .map(msg -> msg.getId())
-                .forEach(messageService::deleteMessage);
+//        srcMsg.stream()
+//                .map(msg -> msg.getId())
+//                .forEach(JCFMessageService.getInstance()::deleteMessage);
+        //delete messages source from this channel <- JCFMsgList
 
+        //빌트인 함수가 최적화도 잘되고, 빠르겠지만, relatedUsr수가 매우 많다면? findFirst가 일종의 break기능?
         for (User usr : relatedUser) {
+            //usr.getAttending().removeIf(ch_name -> ch_name.equals(idOfChannel));
+            //VS below
             UUID tmp = usr.getAttending().stream()
                     .filter(channel -> channel.equals(idOfChannel))
                     .findFirst().orElse(null);

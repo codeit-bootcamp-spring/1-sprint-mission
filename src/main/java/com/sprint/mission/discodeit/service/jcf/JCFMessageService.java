@@ -1,40 +1,27 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    //usually don't need direct search for message itself. HashMap -> HashMap + ArrayList -> HashMap + SET
+    private static JCFMessageService instance;
     private List<Message> messageList;
-    private JCFChannelService channelService;
-    /**
-     * deprecated
-     * private Map<UUID, List<UUID>> EveryMessageOfUser;
-     * private Map<UUID, List<UUID>> ChannelMessage;
-     */
-    //private final Map<UUID, HashSet<Message>> EveryMessageOfUser; -> deprecated
-    //private final Map<UUID, HashSet<Message>> ChannelMessage; -> Channel class's feature
 
-    /**
-     * private Map<UUID, HashSet<UUID>> VS Map<UUID, HashSet<Message>>
-     * former : In update transaction, only update MessageList. Slow in read transaction...
-     * latter : In update transaction, have to update MessageList, EveryMessageOfUser, ChannelMessage
-     * Fast in read transaction
-     */
-
-
-    public JCFMessageService() {
+    private JCFMessageService() {
         this.messageList = new ArrayList<>();
     }
 
-//        this.EveryMessageOfUser = new HashMap<>(); //syntatic sugar
-//        this.ChannelMessage = new HashMap<>();
-
-    public void setChannelService(JCFChannelService channelService) {
-        this.channelService = channelService;
+    public static JCFMessageService getInstance() {
+        if (instance == null) {
+            instance = new JCFMessageService();
+        }
+        return instance;
     }
+
 
     public List<Message> getMesageList() {
         return messageList;
@@ -43,81 +30,43 @@ public class JCFMessageService implements MessageService {
     @Override
     public void createMessage(Message message) {
         messageList.add(message);
-        channelService.getChannelList().get(message.getSource()).getChannelMessageList().add(message);
-//        EveryMessageOfUser.putIfAbsent(message.getWriter(), new HashSet<>());
-//        EveryMessageOfUser.get(message.getWriter()).add(message);
-//
-//        ChannelMessage.putIfAbsent(message.getSource(), new HashSet<>());
-//        ChannelMessage.get(message.getSource()).add(message);
+        JCFChannelService.getInstance().getChannelList().get(message.getSource()).getChannelMessageList().add(message);
     }
-//    @Override
-//    public HashSet<Message> readEveryMessageOfUser(UUID userId) {
-//        HashSet<Message> msg = EveryMessageOfUser.get(userId);
-//        return msg;
-//    }
 
 
 
-
-
-
-//    @Override
-//    public HashSet<Message> readChannelMessage(UUID channelId) {
-//        HashSet<Message> msg = ChannelMessage.get(channelId);
-//        return msg;
-//    }
     @Override
     public void updateMessageById(UUID messageId, String contents) {
-        Message msg = messageList.stream()
+        Message messageForUpdate = messageList.stream()
                 .filter(message -> message.getId().equals(messageId))
                 .findFirst()
                 .get();
-
-        msg.setContents(contents);
-        msg.setUpdatedAt();
-
-//        HashSet<Message> umsg = EveryMessageOfUser.get(msg.getWriter());
-//        Message user_msg = umsg.stream()
-//                .filter(message -> message.getId().equals(messageId))
-//                .findFirst()
-//                .get();
-//
-//        user_msg.setContents(contents);
-//        user_msg.syncUpdateAt(msg);
-//
-//        HashSet<Message> cmsg = ChannelMessage.get(msg.getSource());
-//        Message channel_msg = cmsg.stream()
-//                .filter(message -> message.getId().equals(messageId))
-//                .findFirst()
-//                .get();
-//
-//        channel_msg.setContents(contents);
-//        channel_msg.syncUpdateAt(msg);
-
+        messageForUpdate.setContents(contents);
+        messageForUpdate.setUpdatedAt();
     }
-    @Override
+    @Override //delete message -> related class : JCFMessage, channel
     public void deleteMessage(UUID messageId) {
-        Message msg = messageList.stream()
+        //messageList.removeIf(msg -> msg.getId().equals(messageId));
+
+        Message messageForDelete = messageList.stream()
                 .filter(message -> message.getId().equals(messageId))
                 .findFirst()
                 .get();
 
-        List<Message> msgList = channelService.readChannelInfo(messageId).getChannelMessageList();
 
-        Message ch_msg = msgList.stream()
+
+        List<Message> mesgList = JCFChannelService.getInstance().getChannelList().get(messageForDelete.getSource()).getChannelMessageList();
+
+        //traverse in range of msgList is better than messageList...
+        Message ch_msg = mesgList.stream()
                         .filter(message -> message.getId().equals(messageId))
                         .findFirst().orElse(null);
 
         if (ch_msg != null) {
-            msgList.remove(ch_msg);
+            mesgList.remove(ch_msg);
         }
 
-        messageList.remove(msg);
-
-
-//        EveryMessageOfUser.remove(msg.getWriter());
-//        ChannelMessage.remove(msg.getSource());
-
+        messageList.remove(messageForDelete);
     }
 
     public void printing() {

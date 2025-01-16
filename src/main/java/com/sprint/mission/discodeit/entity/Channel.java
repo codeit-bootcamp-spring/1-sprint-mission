@@ -67,7 +67,7 @@ public class Channel {
             if (owner == null) {
                 throw new IllegalArgumentException("owner is necessary");
             }
-            this.channelUserList.add(owner);
+            //this.channelUserList.add(owner);
             return new Channel(this);
         }
     }
@@ -128,7 +128,7 @@ public class Channel {
 
     @Override
     public String toString() {
-        return "Channel ID : " + getId() + "Channel Name : " + getChannelName() + "created at : " + getCreatedAt() + "Updated at : " + getUpdatedAt() + "Attendant : " + getChannelUserList() + "Chatting message : " + getChannelMessageList();
+        return "Channel ID : " + getId().toString().substring(0, 5) + " Channel Name : " + getChannelName() + " created at : " + getCreatedAt() + " Updated at : " + getUpdatedAt() + " Attendant : " + getChannelUserList() + " Chatting message : " + getChannelMessageList();
     }
 
 
