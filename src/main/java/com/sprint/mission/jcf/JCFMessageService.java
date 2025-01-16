@@ -10,8 +10,18 @@ import java.util.List;
 
 
 public class JCFMessageService implements MessageService {
-
+    private static JCFMessageService instance;
     private final List<Message> messageData = new ArrayList<>();
+
+    private JCFMessageService() {}
+
+    public static JCFMessageService getInstance() {
+        if (instance == null) {
+            instance = new JCFMessageService();
+        }
+        return instance;
+    }
+
 
     // 메시지 생성
     @Override

@@ -8,7 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JCFChannelService implements ChannelService {
+    private static JCFChannelService instance;
     private final List<Channel> channelData = new ArrayList<>();
+
+    private JCFChannelService()  {}
+
+    public static JCFChannelService getInstance() {
+        if (instance == null) {
+            instance = new JCFChannelService();
+        }
+        return instance;
+    }
+
+
+
 
     // 채널 생성
     @Override

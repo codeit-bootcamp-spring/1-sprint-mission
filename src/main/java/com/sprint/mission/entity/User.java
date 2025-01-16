@@ -24,7 +24,6 @@ public class User {
 
     public void setEmail(String email){
         this.email = email;
-        this.updateAt = System.currentTimeMillis();
     }
 
     public UUID getID(){

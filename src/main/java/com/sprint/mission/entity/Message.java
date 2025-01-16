@@ -14,7 +14,7 @@ public class Message {
             this.user = user;
             this.channel = channel;
             this.message = message;
-            this.createdAt = System.currentTimeMillis();
+            this.createdAt = System.currentTimeMillis() ;
             this.updateAt = this.createdAt;
         }
 
@@ -34,7 +34,6 @@ public class Message {
 
     public void setMessage (String message){
             this.message = message;
-            this.updateAt = System.currentTimeMillis();
     }
 
     public long getCreatedAt () {

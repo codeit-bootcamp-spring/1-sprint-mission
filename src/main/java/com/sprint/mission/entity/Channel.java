@@ -21,7 +21,6 @@ public class Channel {
 
     public void setUser(User user) {
         this.user = user;
-        this.updateAt = System.currentTimeMillis();
     }
 
     public String getChannelName() {
@@ -30,7 +29,6 @@ public class Channel {
 
     public void setChannelName(String channelName) {
         this.channelName = channelName;
-        this.updateAt = System.currentTimeMillis();
     }
     public long getCreatedAt() {
         return createdAt;

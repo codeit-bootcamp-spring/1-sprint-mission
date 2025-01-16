@@ -9,8 +9,20 @@ import java.util.List;
 import java.util.UUID;
 
 public class JCFUserService implements UserService {
-
+    private static JCFUserService instance;
     private final List<User> userData = new ArrayList<>();
+
+    // 생성자
+    private JCFUserService() {}
+
+    // 싱글톤 패턴
+    public static JCFUserService getInstance() {
+        if (instance == null) {
+            instance = new JCFUserService();
+        }
+        return instance;
+    }
+
 
     // 계정 생성, 이메일 형식이 아닐 경우 예외 처리
     @Override

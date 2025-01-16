@@ -12,8 +12,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
+
         // 계정 CRUD 구현
-        JCFUserService userService = new JCFUserService();
+        JCFUserService userService = JCFUserService.getInstance();
 
         // Jack, Bob 계정 생성 -> 각 유저마다 유저 객체 생성
         User Jack = userService.createUser("codeit@codeit.com");
@@ -32,7 +33,7 @@ public class JavaApplication {
         userService.getSearchAllUser();
 
         // 채널 CRUD 구현
-        ChannelService channelService = new JCFChannelService();
+        ChannelService channelService = JCFChannelService.getInstance();
 
         // Jack, Bob의 채널 생성 -> 각 유저마다 채널 객체 생성
         channelService.createChannel(Jack, "codeit");
@@ -51,7 +52,7 @@ public class JavaApplication {
         channelService.getAllChannelList();
 
         // 메시지 CRUD 구현
-        JCFMessageService messageService = new JCFMessageService();
+        JCFMessageService messageService = JCFMessageService.getInstance();
 
         // 메시지 생성 -> 채널에 메시지 객체 생성
         Channel channel = channelService.createChannel(Bob, "codeit2");
