@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.util.UUID;
 import java.util.logging.*;
+
+import static com.sprint.mission.discodeit.constant.ExitStatus.DIR_CREATION_ERROR;
 
 public class ServiceLogger {
     private static final Logger LOGGER   = Logger.getLogger(ServiceLogger.class.getName());
@@ -18,9 +21,15 @@ public class ServiceLogger {
 
     static {
         File logDirectory = new File(LOG_DIR);
-        if (!logDirectory.exists()) {
-            logDirectory.mkdir();
-        }
+        if (!logDirectory.exists())
+            if (!logDirectory.mkdir()) {
+                try {
+                    throw new FileSystemException(LOG_DIR);
+                } catch (FileSystemException e) {
+                    System.err.println("Failed to mkdir: " + e.getMessage());
+                    System.exit(DIR_CREATION_ERROR.ordinal());
+                }
+            }
     }
     private ServiceLogger() {
         try {

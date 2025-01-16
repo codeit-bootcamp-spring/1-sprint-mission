@@ -6,6 +6,7 @@ public enum IntegerConstant {
     MAX_NAME_LENGTH(10),
     PHONE_NUMBER_LENGTH(11),
     MAX_CONTENT_LENGTH(20),
+
     ;
 
     private final int value;
