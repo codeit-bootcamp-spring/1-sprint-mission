@@ -27,12 +27,4 @@ public interface UserService {
         return JCFUserService.getInstance(userRepository);
     }
 
-    public static UserService getUserServiceInstance(UserRepository userRepository) {
-
-        if (userRepository instanceof UserRepositoryInMemory) {
-            return JCFUserService.getInstance(userRepository);
-        }
-
-        return null;
-    }
 }
