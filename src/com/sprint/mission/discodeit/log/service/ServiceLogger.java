@@ -12,9 +12,9 @@ import static com.sprint.mission.discodeit.constant.ExitStatus.DIR_CREATION_ERRO
 
 public class ServiceLogger {
     private static final Logger LOGGER   = Logger.getLogger(ServiceLogger.class.getName());
-    private static final String LOG_EXT  = ".log";
     private static final String LOG_DIR  = "log";
     private static final String LOG_NAME = "service";
+    private static final String LOG_EXT  = ".log";
     private static final String LOG_PATH = LOG_DIR + File.separator + LOG_NAME + LOG_EXT;
     private FileHandler    fileHandler;
     private ConsoleHandler consoleHandler;
