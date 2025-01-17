@@ -1,6 +1,9 @@
 package com.sprint.mission.entity;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.UUID;
+import java.time.format.DateTimeFormatter;
 
 public class User {
 
@@ -46,4 +49,11 @@ public class User {
     public long getUpdateAt() {
         return updateAt;
     }
+
+    public String getFormattedCreatedAt() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                .withZone(ZoneId.systemDefault());
+        return formatter.format(Instant.ofEpochMilli(createdAt));
+    }
+
 }

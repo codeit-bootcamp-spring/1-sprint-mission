@@ -101,6 +101,6 @@ public class JCFMessageService implements MessageService {
         System.out.println(" - 이메일: " + message.getName().getEmail());
         System.out.println(" - 채널: " + message.getChannel().getChannelName());
         System.out.println(" - 메시지: " + message.getMessage());
-        System.out.println(" - 생성 시간: " + message.getCreatedAt() + "\n");
+        System.out.println(" - 생성 시간: " + message.getName().getFormattedCreatedAt() + "\n");
     }
 }

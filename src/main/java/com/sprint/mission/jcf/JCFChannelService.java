@@ -9,6 +9,7 @@ import java.util.List;
 
 public class JCFChannelService implements ChannelService {
     private static JCFChannelService instance;
+
     private final List<Channel> channelData = new ArrayList<>();
 
     private JCFChannelService()  {}
@@ -92,6 +93,6 @@ public class JCFChannelService implements ChannelService {
     private void printChannel(Channel channel) {
         System.out.println(" - 사용자: " + channel.getUser().getName());
         System.out.println(" - 채널: " + channel.getChannelName());
-        System.out.println(" - 생성 시간: " + channel.getCreatedAt() + "\n");
+        System.out.println(" - 생성 시간: " + channel.getUser().getFormattedCreatedAt() + "\n");
     }
 }

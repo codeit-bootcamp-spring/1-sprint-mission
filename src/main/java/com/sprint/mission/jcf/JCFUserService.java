@@ -90,7 +90,7 @@ public class JCFUserService implements UserService {
     private void printUser(User user) {
         System.out.println(" - 사용자: " + user.getName());
         System.out.println(" - 이메일: " + user.getEmail());
-        System.out.println(" - 생성 시간: " + user.getCreatedAt() + "\n");
+        System.out.println(" - 생성 시간: " + user.getFormattedCreatedAt() + "\n");
     }
 
 }

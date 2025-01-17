@@ -39,6 +39,7 @@ public class JavaApplication {
         channelService.createChannel(Jack, "codeit");
         channelService.createChannel(Bob, "codeit2");
         channelService.createChannel(Jack, "codeit3");
+        
 
         // 전체 채널 조회
         channelService.getAllChannelList();
