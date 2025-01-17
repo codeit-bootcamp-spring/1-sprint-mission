@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.notfound.NotfoundUserException;
+import com.sprint.mission.discodeit.exception.validation.InvalidMessageException;
 import com.sprint.mission.discodeit.service.BaseService;
 
 import java.util.*;
@@ -18,12 +20,7 @@ public class JCFMessageService implements BaseService<Message> {
     @Override
     public Message create(Message message) {
         User author = message.getAuthor();
-        if (message.getContent() == null || message.getContent().isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 문장입니다.");
-        }
-        if (userService.readById(author.getId()) == null) {
-            throw new IllegalArgumentException("사용자가 존재하지않아 메시지를 생성할 수 없습니다.");
-        }
+        validMessage(message, author);
         data.put(message.getId(), message);
         return message;
     }
@@ -42,14 +39,18 @@ public class JCFMessageService implements BaseService<Message> {
     public Message update(UUID id, Message message) {
         Message checkMessage = data.get(id);
         User author = message.getAuthor();
-        if (checkMessage == null  || message.getContent().isEmpty()) {
-            throw new IllegalArgumentException("유효하지 않은 문장입니다.");
-        }
-        if (userService.readById(author.getId()) == null) {
-            throw new IllegalArgumentException("사용자가 존재하지않아 메시지를 생성할 수 없습니다.");
-        }
+        validMessage(message, author);
         checkMessage.update(message.getContent());
         return checkMessage;
+    }
+
+    private void validMessage(Message message, User author) {
+        if (message.getContent() == null || message.getContent().isEmpty()) {
+            throw new InvalidMessageException("유효하지 않은 문장입니다.");
+        }
+        if (userService.readById(author.getId()) == null) {
+            throw new NotfoundUserException("사용자가 존재하지않아 메시지를 생성할 수 없습니다.");
+        }
     }
 
     @Override

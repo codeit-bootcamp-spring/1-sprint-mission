@@ -8,7 +8,7 @@ public class Channel extends BaseEntity {
 
     public Channel(String name) {
         super();
-        if (name == null){
+        if (name == null) {
             throw new NullPointerException("올바른 채널 명을 입력해 주세요.");
         }
         this.name = name;
@@ -33,14 +33,14 @@ public class Channel extends BaseEntity {
     }
 
     public void update(String name) {
-        if (name == null){
+        if (name == null) {
             throw new NullPointerException("올바른 채널 명을 입력해 주세요.");
         }
         this.name = name;
         update();
     }
 
-    public List<User> getMember(String name){
+    public List<User> getMember(String name) {
         return members;
     }
 

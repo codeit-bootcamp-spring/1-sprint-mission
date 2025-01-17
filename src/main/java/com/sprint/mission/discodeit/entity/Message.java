@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Message extends BaseEntity {
+    private final User author;
     private String content;
-    private User author;
 
     public Message(String content, User author) {
         super();

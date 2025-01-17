@@ -20,10 +20,10 @@ public class JavaApplication {
         // 1.1 유저 등록
         System.out.println("1.1 유저 등록(user1, user2):");
         User user1 = new User("user1", "user1@example.com", "01012345678");
-        try{
+        try {
             userService.create(user1);
             System.out.println(user1.getUsername() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -31,7 +31,7 @@ public class JavaApplication {
         try {
             userService.create(user2);
             System.out.println(user2.getUsername() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -41,7 +41,7 @@ public class JavaApplication {
         try {
             userService.create(usernameDuple);
             System.out.println(usernameDuple.getUsername() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -51,34 +51,34 @@ public class JavaApplication {
         try {
             userService.create(emailInvalid);
             System.out.println(emailInvalid.getEmail() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         // 1.2 채널 등록
         System.out.println("\n1.2 채널 생성:");
         Channel channel1 = new Channel("Sprint");
-        try{
+        try {
             channelService.create(channel1);
             System.out.println(channel1.getName() + " 생성 성공");
-        } catch (NullPointerException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         Channel channel2 = new Channel("codeit");
-        try{
+        try {
             channelService.create(channel2);
             System.out.println(channel2.getName() + " 생성 성공");
-        } catch (NullPointerException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         // 1.2.1 유효하지 않은 채널 등록
         System.out.println("\n1.2.1 유효하지 않은 채널 등록:");
         Channel channelInvalid = new Channel("");
-        try{
+        try {
             channelService.create(channelInvalid);
             System.out.println(channelInvalid.getName() + " 생성 성공");
-        } catch (NullPointerException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -88,14 +88,14 @@ public class JavaApplication {
         try {
             messageService.create(message1);
             System.out.println(message1.getContent() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         Message message2 = new Message("Hello java!", user2);
         try {
             messageService.create(message2);
             System.out.println(message2.getContent() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -105,7 +105,7 @@ public class JavaApplication {
         try {
             messageService.create(messageInvalid);
             System.out.println(messageInvalid.getContent() + " 생성 성공");
-        } catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -116,7 +116,7 @@ public class JavaApplication {
         try {
             Message invalidMessage = messageService.create(createMessage);
             System.out.println(messageInvalid.getContent() + " 생성 성공");
-        }catch (IllegalArgumentException e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -128,10 +128,7 @@ public class JavaApplication {
         System.out.println("찾고자하는 유저: " + user1.getUsername() + ", 조회한 유저: " + searchUser.getUsername());
 
         System.out.println("\n2.1.2 전체 유저 조회");
-        userService.readAll().stream()
-                .map(User::getUsername)
-                .sorted()
-                .forEach(username -> System.out.print(username + " "));
+        userService.readAll().stream().map(User::getUsername).sorted().forEach(username -> System.out.print(username + " "));
         System.out.println();
 
         System.out.println("\n2.2 채널 조회:");
@@ -140,10 +137,7 @@ public class JavaApplication {
         System.out.println("찾고자하는 채널: " + channel1.getName() + ", 조회한 채널: " + searchChannel.getName());
 
         System.out.println("\n2.2.2 전체 채널 조회");
-        channelService.readAll().stream()
-                .map(Channel::getName)
-                .sorted()
-                .forEach(channel -> System.out.print(channel + " "));
+        channelService.readAll().stream().map(Channel::getName).sorted().forEach(channel -> System.out.print(channel + " "));
         System.out.println();
 
         System.out.println("\n2.3 메시지 조회:");
@@ -152,10 +146,7 @@ public class JavaApplication {
         System.out.println("찾고자하는 채널: " + message1.getContent() + ", 조회한 채널: " + searchMessage.getContent());
 
         System.out.println("\n2.3.2 전체 메시지 조회");
-        messageService.readAll().stream()
-                .map(Message::getContent)
-                .sorted()
-                .forEach(message -> System.out.print(message + " "));
+        messageService.readAll().stream().map(Message::getContent).sorted().forEach(message -> System.out.print(message + " "));
         System.out.println();
 
         // 3. 수정 및 데이터 조회
@@ -180,20 +171,14 @@ public class JavaApplication {
         messageService.delete(message2.getId());
 
         System.out.print("모든 유저: ");
-        userService.readAll().stream()
-                .map(User::getUsername)
-                .forEach(username -> System.out.print(username + " "));
+        userService.readAll().stream().map(User::getUsername).forEach(username -> System.out.print(username + " "));
         System.out.println();
 
         System.out.print("모든 채널: ");
-        channelService.readAll().stream()
-                .map(Channel::getName)
-                .forEach(channel -> System.out.print(channel + " "));
+        channelService.readAll().stream().map(Channel::getName).forEach(channel -> System.out.print(channel + " "));
         System.out.println();
 
         System.out.println("모든 메시지: ");
-        messageService.readAll().stream()
-                .map(Message::getContent)
-                .forEach(System.out::println);
+        messageService.readAll().stream().map(Message::getContent).forEach(System.out::println);
     }
 }
