@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 public class Message extends BaseEntity {
     private String content;
-    private User senderUser;
+    private final User senderUser;//final로 변경
 
     public Message(String content, User senderUser) {
         super();
@@ -18,9 +18,8 @@ public class Message extends BaseEntity {
         return senderUser;
     }
 
-    public void update(String content, User senderUser) {
+    public void update(String content) {
         this.content = content;
-        this.senderUser = senderUser;
         update();
     }
 

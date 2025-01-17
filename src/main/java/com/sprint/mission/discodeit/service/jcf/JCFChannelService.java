@@ -3,45 +3,56 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.util.Validation;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> data;
+    private final Map<UUID,Channel> data; //검색 성능을 위해서 map으로 변경
+    private static volatile JCFChannelService instance;
 
     public JCFChannelService() {
-        this.data = new ArrayList<>();
+        this.data = new HashMap();
+    }
+
+    //싱글톤
+    public static JCFChannelService getInstance() {
+        if (instance==null){
+            synchronized (JCFChannelService.class){
+                if(instance==null){
+                    instance=new JCFChannelService();
+                }
+            }
+        }
+        return instance;
     }
 
     @Override
     public void createChannel(Channel channel) {
-        data.add(channel);
+        Validation.validateUserExists(channel.getCreator().getId());
+        data.put(channel.getId(), channel);
     }
 
     @Override
     public Optional<Channel> getChannelById(UUID id) {
-        return data.stream().filter(channel -> channel.getId().equals(id)).findFirst();
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public List<Channel> getAllChannels() {
-        return new ArrayList<>(data);
+        return new ArrayList<>(data.values());
     }
 
     @Override
     public void updateChannel(UUID id, Channel updatedChannel) {
-        for (int i=0; i<data.size(); i++) {
-            if (data.get(i).getId().equals(id)) {
-                // 기존 객체를 수정
-                Channel existingChannel = data.get(i);
-                existingChannel.update(updatedChannel.getChannel(), updatedChannel.getDescription());
-                break;
-            }
+        Channel existingChannel = data.get(id);
+        if (existingChannel != null) {
+            existingChannel.update(updatedChannel.getChannel(),updatedChannel.getDescription());
         }
     }
 
     @Override
     public void deleteChannel(UUID id) {
-        data.removeIf(channel -> channel.getId().equals(id));
+        data.remove(id);
     }
 }

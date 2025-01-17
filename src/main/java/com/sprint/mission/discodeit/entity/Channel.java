@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.entity;
 public class Channel extends BaseEntity {
     private String channel;
     private String description;
-    private User creator;
+    private final User creator;//final로 변경
 
     public Channel(String channel, String description, User creator) {
         super();
