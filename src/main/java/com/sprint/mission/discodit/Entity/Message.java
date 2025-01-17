@@ -4,23 +4,51 @@ import java.util.UUID;
 
 public class Message {
     private final UUID id;
-    Long createdAt, updatedAt;
-    public Message(UUID id) {
-        this.id = id;
+    private final long createdAt;
+    private long updatedAt;
+    private UUID sender;
+    private String content;
+
+    public Message(UUID sender, String content) {
+        this.id = UUID.randomUUID();
+        this.sender = sender;
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
+        this.content = content;
+    }
+    public Message() {
+        this.id = null;
+        this.createdAt = 0L;
     }
 
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
+    public long setUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis();
+        return updatedAt;
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void update(String content) {
+        this.content = content;
+        updatedAt = setUpdatedAt();
+    }
+
+    public UUID getMessageId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public UUID getSender() {
+        return sender;
     }
 
     @Override
     public String toString() {
-        return "Message{" +
-                "id=" + id +
-                '}';
+        return "Message{" + "id=" + id + ", sender=" + sender + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", content='" + content + '\'' + '}';
     }
 }

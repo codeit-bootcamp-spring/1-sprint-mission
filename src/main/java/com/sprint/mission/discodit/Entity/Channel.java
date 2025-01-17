@@ -4,23 +4,40 @@ import java.util.UUID;
 
 public class Channel {
     private final UUID id;
-    Long createdAt, updatedAt;
-    public Channel(UUID id) {
-        this.id = id;
+    private final long createdAt;
+    private long updatedAt;
+    private String name;
+
+    public Channel(String name) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = System.currentTimeMillis();
+        this.name = name;
+    }
+    public long setUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis();
+        return updatedAt;
     }
 
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
+    public void update(String name) {
+        this.name = name;
+        updatedAt = setUpdatedAt();
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public UUID getChannel() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
     }
 
     @Override
     public String toString() {
-        return "Channel{" +
-                "id=" + id +
-                '}';
+        return "Channel{" + "id=" + id + '}';
     }
 }
