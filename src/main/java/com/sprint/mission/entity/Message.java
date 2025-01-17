@@ -1,6 +1,10 @@
 package com.sprint.mission.entity;
 
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class Message {
     private User name;
     private Channel channel;
@@ -40,5 +44,11 @@ public class Message {
             return createdAt;
     }
 
+
+    @Override
+    public String toString() {
+        return  channel +
+                "\n메시지 : " + message;
+    }
 }
 

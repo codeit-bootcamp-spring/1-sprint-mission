@@ -1,6 +1,10 @@
 package com.sprint.mission.entity;
 
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 public class Channel {
     private String channelName;
     private long createdAt;
@@ -34,4 +38,10 @@ public class Channel {
         return createdAt;
     }
 
+
+    @Override
+    public String toString() {
+        return "\n채널 : " + channelName
+                + "\n유저 : " + user;
+    }
 }

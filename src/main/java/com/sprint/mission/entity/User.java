@@ -56,4 +56,10 @@ public class User {
         return formatter.format(Instant.ofEpochMilli(createdAt));
     }
 
+    @Override
+    public String toString() {
+        return  getName() +
+                "\n이메일 : " + email  +
+                "\n생성 시간 : " + getFormattedCreatedAt();
+    }
 }

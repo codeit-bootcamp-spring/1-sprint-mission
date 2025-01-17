@@ -30,10 +30,10 @@ public class JCFUserService implements UserService {
         if (email.contains("@") && email.contains(".") && !userData.contains(email)) {
             User newUser = new User(UUID.randomUUID(), email, name);
             userData.add(newUser);
-            System.out.println("계정 생성 완료\n");
+            System.out.println("\n***계정 생성 완료***");
             return newUser;
         } else {
-            throw new IllegalArgumentException("올바른 이메일 형식인지 확인해 주세요.");
+            throw new IllegalArgumentException("**올바른 이메일 형식인지 확인해 주세요.**");
         }
     }
 
@@ -43,19 +43,19 @@ public class JCFUserService implements UserService {
     public void updateMail(User user, String mail) {
         if (mail.contains("@") && mail.contains(".") &&! user.getEmail().equals(mail)){
             user.setEmail(mail);
-            System.out.println("이메일 변경 완료");
-            printUser(user);
+            System.out.println("\n***이메일 변경 완료***");
+            System.out.println(user);
         } else {
-            System.out.println("올바른 이메일 형식인지 확인해 주세요.");
+            System.out.println("**올바른 이메일 형식인지 확인해 주세요.**");
         }
     }
 
     // 모든 유저 조회
     @Override
     public List<User> getSearchAllUser() {
+        System.out.println("\n***사용자 정보 전부 조회***");
         for (User user : userData) {
-            System.out.println("사용자 정보 전부 조회");
-            printUser(user);
+            System.out.println(user);
         }
         return userData;
     }
@@ -64,10 +64,10 @@ public class JCFUserService implements UserService {
     @Override
     public void searchUser(User user) {
         if(userData.contains(user)){
-            System.out.println("사용자 정보");
-            printUser(user);
+            System.out.println("\n***[사용자 정보]***");
+            System.out.println(user);
         } else {
-            System.out.println("유저를 찾을 수 없습니다.\n");
+            System.out.println("**유저를 찾을 수 없습니다.**\n");
         }
     }
 
@@ -76,21 +76,15 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUser(User user) {
         if (userData.contains(user)) {
-            System.out.println("계정 삭제 완료");
+            System.out.println("\n***계정 삭제 완료***");
             userData.remove(user);
-            printUser(user);
+            System.out.println(user);
         } else {
-            System.out.println("유저를 찾을 수 없습니다.\n");
+            System.out.println("**유저를 찾을 수 없습니다.**\n");
         }
     }
     public List<User> getUserData() {
         return userData;
-    }
-
-    private void printUser(User user) {
-        System.out.println(" - 사용자: " + user.getName());
-        System.out.println(" - 이메일: " + user.getEmail());
-        System.out.println(" - 생성 시간: " + user.getFormattedCreatedAt() + "\n");
     }
 
 }

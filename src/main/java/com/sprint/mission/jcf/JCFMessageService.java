@@ -29,14 +29,14 @@ public class JCFMessageService implements MessageService {
 
         for (Message existingMessage : messageData) {
             if (existingMessage.getName().equals(user) && existingMessage.getMessage().equals(message)) {
-                System.out.println("이미 메시지가 존재합니다.");
+                System.out.println("**이미 메시지가 존재합니다.**");
                 return null;
             }
         }
         Message newMessage = new Message(user, channel, message);
         messageData.add(newMessage);
-        System.out.println("메시지가 생성되었습니다.\n");
-        printMessage(newMessage);
+        System.out.println("\n***메시지가 생성되었습니다.***");
+        System.out.println(newMessage);
         return newMessage;
     }
 
@@ -47,11 +47,11 @@ public class JCFMessageService implements MessageService {
         for (Message message : messageData) {
             if (!message.equals(modifiedMessage) && message.getName().equals(user) && message.getMessage().equals(Message)) {
                 message.setMessage(modifiedMessage);
-                System.out.println("메시지가 변경 변경되었습니다.");
-                printMessage(message);
+                System.out.println("\n***메시지가 변경 변경되었습니다.***");
+                System.out.println(message);
                 return;
             } else {
-                System.out.println("메시지를 찾을 수 없습니다.\n");
+                System.out.println("**메시지를 찾을 수 없습니다.**\n");
             }
         }
     }
@@ -59,9 +59,9 @@ public class JCFMessageService implements MessageService {
     // 유저의 모든 메시지 조회
     @Override
     public List<Message> getAllMessageList() {
+        System.out.println("\n***메시지 전체 조회***");
         for (Message message : messageData) {
-            System.out.println("메시지 전체 조회");
-            printMessage(message);
+            System.out.println(message);
         } return messageData;
     }
 
@@ -70,8 +70,8 @@ public class JCFMessageService implements MessageService {
     public void printChannelMessage(User user) {
         for (Message message : messageData) {
             if (message.getName().equals(user)) {
-                System.out.println("사용자의 메시지 조회");
-                printMessage(message);
+                System.out.println("\n***[사용자의 메시지 조회]***");
+                System.out.println(message);
             }
         }
     }
@@ -89,18 +89,11 @@ public class JCFMessageService implements MessageService {
 
         if (messageToDelete != null) {
             messageData.remove(messageToDelete);
-            System.out.println("메시지가 삭제되었습니다:");
-            printMessage(messageToDelete);
+            System.out.println("\n***메시지가 삭제되었습니다.***");
+            System.out.println(messageToDelete);
         } else {
-            System.out.println("메시지를 찾을 수 없습니다.\n");
+            System.out.println("**메시지를 찾을 수 없습니다.**\n");
         }
     }
-    // 메시지 출력 포맷팅
-    private void printMessage(Message message) {
-        System.out.println(" - 사용자: " + message.getName().getName());
-        System.out.println(" - 이메일: " + message.getName().getEmail());
-        System.out.println(" - 채널: " + message.getChannel().getChannelName());
-        System.out.println(" - 메시지: " + message.getMessage());
-        System.out.println(" - 생성 시간: " + message.getName().getFormattedCreatedAt() + "\n");
-    }
+
 }
