@@ -4,22 +4,18 @@ import java.util.UUID;
 
 public class Message {
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
-    private String content;
-    private UUID senderId;
-    private UUID channelId;
+    private final String content;
+    private final UUID userId;
+    private final UUID channelId;
 
-    public Message(String content, UUID senderId, UUID channelId) {
+    public Message(String content, UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
         this.content = content;
-        this.senderId = senderId;
+        this.userId = userId;
         this.channelId = channelId;
     }
 
-    // 각 필드의 Getter 함수 정의
+    // Getter 메서드 추가
     public UUID getId() {
         return id;
     }
@@ -28,25 +24,16 @@ public class Message {
         return content;
     }
 
-    // 현재는 사용하지 않는 값이지만, 확장성을 위해 모든 필드에 대해 Getter 함수 작성
-    public UUID getSenderId() {
-        return senderId;
+    public UUID getUserId() { // getUserId 메서드 추가
+        return userId;
     }
 
-    public UUID getChannelId() {
+    public UUID getChannelId() { // getChannelId 메서드 추가
         return channelId;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateContent(String newContent) {
-        this.content = newContent;
-        this.updatedAt = System.currentTimeMillis();
+        // content 필드가 final인 경우 이를 변경하려면 새로운 객체를 생성해야 합니다.
+        // 또는 content 필드를 final에서 제거하고 setter 메서드를 추가해야 합니다.
     }
 }

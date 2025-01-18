@@ -1,25 +1,26 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
-import java.util.UUID;
-
 public class JavaApplication {
 
     public static void main(String[] args) {
-        // 서비스 객체 생성
-        JCFUserService userService = new JCFUserService();
-        JCFChannelService channelService = new JCFChannelService();
-        JCFMessageService messageService = new JCFMessageService();
+        // 의존성 주입 (Dependency Injection)
+        UserService userService = new JCFUserService();
+        ChannelService channelService = new JCFChannelService();
+        MessageService messageService = new JCFMessageService(userService, channelService);
 
         // 사용자 등록
-        User user1 = new User("Kimdoil", "pw123");
-        User user2 = new User("testName", "test123");
+        User user1 = new User("Kimdoil", "pw12345678!");
+        User user2 = new User("testName", "test12345678!");
 
         userService.addUser(user1);
         userService.addUser(user2);
@@ -56,7 +57,7 @@ public class JavaApplication {
         messageService.getAllMessages().forEach(msg -> System.out.println(msg.getContent()));
 
         // 수정
-        userService.updateUser(user1.getId(), "KimdoilUpdated", "newpw123");
+        userService.updateUser(user1.getId(), "KimdoilUpdated", "newpw12345678!");
         channelService.updateChannel(channel1.getId(), "GeneralUpdated");
         messageService.updateMessage(message1.getId(), "Updated Message!");
 
