@@ -3,47 +3,55 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JcfMessageService implements MessageService {
-    private List<Message> data=new ArrayList<>();
+    private final Map<UUID, Message> data=new HashMap<>();
 
     @Override
     public void messageSave(Message message) {
-        data.add(message);
+        data.put(message.getId(),message);
     }
 
     @Override
     public Optional<Message> messageList(UUID id) {
-        for (Message message : data) {
+        return Optional.ofNullable(data.get(id));
+       /* for (Message message : data) {
             if(message.getId().equals(id)){
                 return Optional.of(message);
             }
         }
-        return Optional.empty();
+        return Optional.empty();*/
     }
 
     @Override
     public List<Message> messageAllList() {
-        return data;
+        List<Message> messageList=new ArrayList<>();
+        for (UUID uuid : data.keySet()) {
+            messageList.add(data.get(uuid));
+        }
+        return messageList;
     }
 
     @Override
     public void updateMessage(Message updateMessage) {
-        for (Message message : data)
-            if (message.getId().equals(message.getId())) {
+        if(data.containsKey(updateMessage.getId())) {
+            data.put(updateMessage.getId(),updateMessage);
+        }
+       /* for (Message message : data)
+            if (message.getId().equals(updateMessage.getId())) {
                 message.updateContent(updateMessage.getContent());
-            }
+            }*/
     }
 
     @Override
     public void deleteMessage(UUID id) {
-        for (Message message : data)
+        if(data.containsKey(id)) {
+            data.remove(id);
+        }
+       /* for (Message message : data)
             if (message.getId().equals(id)) {
                 data.remove(message);
-            }
+            }*/
     }
 }

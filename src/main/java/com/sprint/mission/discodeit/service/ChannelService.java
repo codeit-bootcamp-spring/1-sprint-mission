@@ -10,6 +10,6 @@ public interface ChannelService {
     void createChannel(Channel channel);
     Optional<Channel> channelList(UUID id);
     List<Channel> allChannelList();
-    void updateChannel(Channel channel);
+    void updateChannel(UUID id,Channel channel);
     void deleteChannel(UUID id);
 }

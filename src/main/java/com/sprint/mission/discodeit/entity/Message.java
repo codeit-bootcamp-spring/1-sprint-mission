@@ -12,7 +12,7 @@ public class Message extends Base{
         this.content = content;
         this.senderId = senderId;
         this.channelId = channelId;
-    }//생성자를 통해 만든 각 user, channel의 id니까 UUID 맞을까요?
+    }
 
     public String getContent() {
         return content;
