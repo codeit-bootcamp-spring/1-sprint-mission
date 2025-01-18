@@ -11,8 +11,12 @@ import java.util.UUID;
 
 public interface MessageService {
     void addMessage(Message message);
+
     Message getMessage(UUID id);
+
     List<Message> getAllMessages();
+
     void updateMessage(UUID id, String newContent);
+
     void deleteMessage(UUID id);
 }
