@@ -41,9 +41,4 @@ public class Messages {
     public Map<UUID, Message> asReadOnly() {
         return Collections.unmodifiableMap(messages);
     }
-
-    // 메시지 모두 순회
-    public void forEach(Consumer<Message> action) {
-        messages.values().forEach(action);
-    }
 }
