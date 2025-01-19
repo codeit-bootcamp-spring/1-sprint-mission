@@ -26,16 +26,28 @@ public class JCF_user implements UserService {
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(UUID userId) {
+        Optional<User> getUser = userSet.stream().filter(user1 -> user1.getId().equals(userId)).findFirst();
+        User user = getUser.get();
         userSet.remove(user);
 
     }
 
     @Override
-    public void update(User user, String name) {
+    public String getName(UUID userId) {
+        System.out.println(userSet);
+        Optional<User> getUser = userSet.stream()
+                    .filter(user1 -> user1.getId().equals(userId))
+                    .findFirst();
+      return getUser.map(User::getName).orElse(null);
+
+    }
+
+    @Override
+    public void update(UUID userId, String name) {
         boolean duplication = userSet.stream().anyMatch(user1 -> user1.getName().equals(name));
         userSet.forEach(users -> {
-            if (users.getId().equals(user.getId()) && !duplication) {
+            if (users.getId().equals(userId) && !duplication) {
                 users.updateName(name);
             }
         });
@@ -43,10 +55,10 @@ public class JCF_user implements UserService {
     }
 
     @Override
-    public User write(String name) {
+    public UUID write(String name) {
         Optional<User> user = userSet.stream().filter(user1 -> user1.getName().equals(name)).findFirst();
         if (user.isPresent()) {
-            return user.get();
+            return user.get().getId();
         }
         else {
             System.out.println("Name not found");

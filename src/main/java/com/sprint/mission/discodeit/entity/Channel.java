@@ -23,12 +23,15 @@ public class Channel {
     public UUID getId() {
         return id;
     }
+
     public Long getCreatedAt() {
         return createdAt;
     }
+
     public void updateId(UUID id) {
         this.id = id;
     }
+
     public void updateCreatedAt(Long CreatedAt) {
         this.createdAt = createdAt;
     }
@@ -47,6 +50,6 @@ public class Channel {
 
     public String toString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return "Title : " + title + "/ createdAt : " + simpleDateFormat.format(createdAt) + "updatedAt : " + updatedAt;
+        return "Title : " + title + "/ createdAt : " + simpleDateFormat.format(createdAt) + " / updatedAt : " + updatedAt;
     }
 }

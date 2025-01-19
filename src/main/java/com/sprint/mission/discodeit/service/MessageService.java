@@ -11,15 +11,15 @@ import java.util.UUID;
 public interface MessageService {
     public void creat(Message message);
 
-    public void delete(Message message);
+    public void delete(UUID messageId);
 
-    public void update(Message message, String updateMessage);
+    public void update(UUID messageId, String updateMessage);
 
-    public List<Message> write(User user, String title);
+    public List<Message> write(UUID userId, UUID channelId);
 
-    public List<Message> getMessage(String title);
+    public List<Message> getMessage(UUID channelId);
 
-    public void deleteUserMessage(User user);
+    public void deleteUserMessage(UUID userID);
 
-    public void deleteChannelMessage(Channel channel);
+    public void deleteChannelMessage(UUID channelId);
 }

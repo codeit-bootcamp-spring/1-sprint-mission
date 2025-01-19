@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,40 +26,41 @@ public class JCF_message implements MessageService {
     }
 
     @Override
-    public void delete(Message message) {
+    public void delete(UUID messageId) {
+        Optional<Message> getMessage = messageSet.stream().filter(message1 -> message1.getId().equals(messageId)).findFirst();
+        Message message = getMessage.get();
         messageSet.remove(message);
     }
 
     @Override
-    public void update(Message message, String updateMessage) {
-        messageSet.forEach(messageContent -> {
-            if (messageContent.getId().equals(message.getId())) {
-                messageContent.updateMessage(updateMessage);
+    public void update(UUID messageId, String updateMessage) {
+        messageSet.stream().filter(message -> message.getId().equals(messageId))
+            .forEach(messageContent -> {{messageContent.updateMessage(updateMessage);
             }
         });
     }
 
     @Override
-    public List<Message> write(User user, String title) {
+    public List<Message> write(UUID userId, UUID channelId) {
         return messageSet.stream().filter(message_id ->
-                        message_id.getUser().equals(user) && message_id.getChannel().getTitle().equals(title))
+                        message_id.isUserEqual(userId) && message_id.isChannelEqual(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<Message> getMessage(String title) {
+    public List<Message> getMessage(UUID channelId) {
         return messageSet.stream().filter(message1 ->
-                        message1.getChannel().getTitle().equals(title))
+                        message1.isChannelEqual(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteUserMessage(User user) {
-        messageSet.removeIf(message -> message.getUser().equals(user));
+    public void deleteUserMessage(UUID userId) {
+        messageSet.removeIf(message -> message.isUserEqual(userId));
     }
 
     @Override
-    public void deleteChannelMessage(Channel channel) {
-        messageSet.removeIf(message -> message.getChannel().equals(channel));
+    public void deleteChannelMessage(UUID channelId) {
+        messageSet.removeIf(message -> message.isChannelEqual(channelId));
     }
 }

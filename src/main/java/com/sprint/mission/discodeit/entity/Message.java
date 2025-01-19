@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.jcf.JCF_user;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
@@ -8,31 +9,43 @@ public class Message {
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
+    private JCF_user jcfUser = new JCF_user();
+    private String userName;
+    private UUID userId;
 
-    private User user;
-
-    private Channel channel;
+    private UUID channelId;
 
     private String content;
 
-    public Message(User user, String content, Channel channel){
+    public Message(UUID userId, String content, UUID channelId, String userName){
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
-        this.user = user;
+        this.userId = userId;
         this.content = content;
-        this.channel = channel;
+        this.channelId = channelId;
+        this.userName = userName;
     }
 
     public UUID getId() {
         return id;
     }
+
     public Long getCreatedAt() {
         return createdAt;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
+
+    public boolean isUserEqual(UUID getUser) {
+        return userId.equals(getUser);
+    }
+
+    public boolean isChannelEqual(UUID getChannel) {
+        return channelId.equals(getChannel);
+    }
+
 
     public void updateId(UUID id) {
         this.id = id;
@@ -45,16 +58,15 @@ public class Message {
         this.content = message;
         this.updatedAt = System.currentTimeMillis();
     }
-    public Channel getChannel() {
-        return channel;
+    public UUID getChannelId() {
+        return channelId;
     }
 
     // 메세지 넣기
 
     public String toString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        String name = user.getName();
-        return name + "/ createdAt : " + simpleDateFormat.format(createdAt) + "\n" + "[ " + content
+        return userName + "/ createdAt : " + simpleDateFormat.format(createdAt) + "\n" + "[ " + content
                 +" ]";
 
     }
