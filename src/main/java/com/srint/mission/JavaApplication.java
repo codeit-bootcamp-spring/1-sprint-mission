@@ -119,7 +119,7 @@ public class JavaApplication {
 
         //수정
         System.out.println("수정 - 채널이름 수정하기");
-        channelA.setChannelname("editChannelA");
+        channelA.setChannelName("editChannelA");
         channelService.update(channelA.getId(), channelA);
 
         //수정된 데이터 조회
@@ -194,7 +194,7 @@ public class JavaApplication {
 
         //수정 (메시지 수정하기)
         System.out.println("수정 - 메시지 수정하기");
-        message1.setMsg("수정된 메시지");
+        message1.setContent("수정된 메시지");
         messageService.update(message1.getId(), message1);
 
         //수정된 데이터 조회

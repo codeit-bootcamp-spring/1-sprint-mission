@@ -4,23 +4,23 @@ import java.util.UUID;
 
 public class Channel extends BaseEntity{
 
-    private String channelname;
+    private String channelName;
 
     private final UUID userId;
 
 
-    public Channel(UUID userId, String channelname) {
+    public Channel(UUID userId, String channelName) {
         super();
         this.userId = userId;
-        this.channelname = channelname;
+        this.channelName = channelName;
     }
 
-    public String getChannelname() {
-        return channelname;
+    public String getChannelName() {
+        return channelName;
     }
 
-    public void setChannelname(String channelname) {
-        this.channelname = channelname;
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
     }
 
     public UUID getUserId() {
@@ -30,7 +30,7 @@ public class Channel extends BaseEntity{
     @Override
     public String toString() {
         return "Channel{" +
-                "channelname='" + channelname + '\'' +
+                "channelname='" + channelName + '\'' +
                 ", userId=" + userId +
                 '}'+"  "+ super.toString();
     }
