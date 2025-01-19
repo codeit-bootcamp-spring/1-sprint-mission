@@ -13,7 +13,7 @@ public interface ChannelService {
 
     Optional<Channel> getChannel(UUID uuid);
 
-    Optional<Channel> addMessageToChannel(UUID uuid, Message message);
+    Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID);
 
     Optional<Channel> updateChannel(UUID uuid, String channelName);
 

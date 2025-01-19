@@ -17,12 +17,12 @@ public class JCFMessage implements MessageService {
 
     @Override
     public Message createMessage(UUID authorID, UUID channelID, String text) {
-        Message newMessage = new Message(text, authorID);
         if(jcfChannel.getChannel(channelID).isEmpty()) {
             return null;
         }
+        Message newMessage = new Message(text, authorID, channelID);
         messages.add(newMessage.getId(), newMessage);
-        jcfChannel.addMessageToChannel(channelID, newMessage);
+        jcfChannel.addMessageToChannel(channelID, newMessage.getId());
         return newMessage;
     }
 

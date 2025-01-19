@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +28,10 @@ public class JCFChannel implements ChannelService {
     }
 
     @Override
-    public Optional<Channel> addMessageToChannel(UUID uuid, Message message) {
-        Channel channel = channels.get(uuid);
+    public Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
+        Channel channel = channels.get(channelUUID);
         if (channel != null) {
-            channel.addMessage(message);
+            channel.addMessageToChannel(messageUUID);
             return Optional.of(channel);
         }
         return Optional.empty();

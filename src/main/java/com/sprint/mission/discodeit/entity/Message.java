@@ -11,6 +11,7 @@ public class Message {
 
     private String text;
     private final UUID authorId;
+    private final UUID channelId;
 
     public void updateText(String text) {
         this.text = text;
@@ -36,8 +37,9 @@ public class Message {
         return "\nuuid: "+ id + " text: " + text + " authorId: " + authorId;
     }
 
-    public Message(String text, UUID authorId){
+    public Message(String text, UUID authorId, UUID channelId){
         this.authorId = authorId;
+        this.channelId = channelId;
         this.id = UUID.randomUUID();
         this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         this.updatedAt = createdAt;
@@ -46,5 +48,9 @@ public class Message {
 
     public UUID getAuthorId() {
         return authorId;
+    }
+
+    public UUID getChannelId() {
+        return channelId;
     }
 }
