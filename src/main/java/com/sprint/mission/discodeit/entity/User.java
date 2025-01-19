@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class User {
-    private final UUID id;
+public class User extends Entity{
+    //private final UUID id;
     private final long createdAt;
     private long updatedAt;
     private final List<Channel> channelList;
@@ -14,16 +14,17 @@ public class User {
 
     //생성자
     public User(String userName, String userEmail) {
-        id = UUID.randomUUID();
+        //id = UUID.randomUUID();
+        super();
         createdAt = System.currentTimeMillis();
         channelList = new ArrayList<>();
         this.userName = userName;
         this.userEmail = userEmail;
     }
 
-    public UUID getId() {
+   /* public UUID getId() {
         return id;
-    }
+    }*/
 
     public String getName() {
         return userName;

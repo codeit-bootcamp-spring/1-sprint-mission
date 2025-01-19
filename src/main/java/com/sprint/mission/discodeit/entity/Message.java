@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message {
-    private final UUID id;
+public class Message extends Entity{
+    //private final UUID id;
     private final Channel channel;
     private final User user;
     private final long createdAt;
@@ -11,15 +11,16 @@ public class Message {
     private String content;
 
     public Message(Channel channel, User user, String content) {
-        id = UUID.randomUUID();
+        super();
+        //id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.channel = channel;
         this.user = user;
         this.content = content;
     }
-    public UUID getId() {
+   /* public UUID getId() {
         return id;
-    }
+    }*/
 
     public long getCreatedAt() {
         return createdAt;

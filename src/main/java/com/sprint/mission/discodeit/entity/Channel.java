@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-        public class Channel {
-            private final UUID id;
+        public class Channel extends Entity {
+            //private final UUID id;
             private final User owner;
             private final List<Message> messageList;
             private final List<User> memberList;
@@ -15,7 +15,8 @@ import java.util.UUID;
 
             //생성자
             public Channel(String title, User owner) {
-                id = UUID.randomUUID();
+                super();
+               // id = UUID.randomUUID();
                 createdAt = System.currentTimeMillis();
                 this.title = title;
                 this.owner = owner;
@@ -25,9 +26,9 @@ import java.util.UUID;
             }
 
             //getter 메소드
-            public UUID getId() {
-                return id;
-            }
+           // public UUID getId() {
+             //   return id;
+           // }
 
             public long getCreatedAt() {
                 return createdAt;
