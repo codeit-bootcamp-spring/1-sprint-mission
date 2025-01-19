@@ -1,7 +1,7 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.collection;
 
+import com.sprint.mission.discodeit.entity.Message;
 import java.util.*;
-import java.util.function.Consumer;
 
 public class Messages {
     private final Map<UUID, Message> messages = new HashMap<>();
