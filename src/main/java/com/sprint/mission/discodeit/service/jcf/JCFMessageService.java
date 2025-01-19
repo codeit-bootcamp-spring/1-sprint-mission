@@ -5,15 +5,14 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    private final List<Message> data;
+    private final Map<UUID,Message> data;
 
     public JCFMessageService() {
-        data = new ArrayList<>();
+        data = new HashMap<>();
     }
 
     // Create Message
@@ -21,7 +20,7 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(Channel channel, User writer, String content) {
         if (isContent(content)) {
             Message newMessage = new Message(channel, writer, content);
-            data.add(newMessage);
+            data.put(newMessage.getId(),newMessage);
             System.out.println(channel.getTitle() + " channel: " + writer.getName() + " 님께서 새로운 메시지를 보내셨습니다.");
             return newMessage;
         }
@@ -31,19 +30,17 @@ public class JCFMessageService implements MessageService {
     // Read all message
     @Override
     public List<Message> getAllMessageList() {
-        return data;
+        return data.values().stream().collect(Collectors.toList());
     }
 
     // id 받아서 -> Read that message
     @Override
     public Message searchById(UUID messageId) {
-        for (Message message : data) {
-            if (message.getId().equals(messageId)) {
-                return message;
-            }
+        Message message = data.get(messageId);
+        if(message == null) {
+            System.out.println("메세지가 없습니다.");
         }
-        System.out.println("message가 존재하지 않습니다.");
-        return null;
+        return message;
     }
 
     //message 정보 출력하기
@@ -52,7 +49,7 @@ public class JCFMessageService implements MessageService {
         System.out.println(message);
     }
 
-    //message정보 리스트로 출력하기
+    //message 정보 리스트로 출력하기
     @Override
     public void printMessageListInfo(List<Message> messageList) {
         for (Message message : messageList) {

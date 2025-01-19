@@ -4,15 +4,14 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private final List<Channel> data;
+    private final Map<UUID, Channel> data;
 
     public JCFChannelService() {
-        data = new ArrayList<>();
+        data = new HashMap<>();
     }
 
     // 채널 생성
@@ -20,7 +19,7 @@ public class JCFChannelService implements ChannelService {
     public Channel createChannel(String channelName, User owner) {
         if (correctTitle(channelName)) {
             Channel newChannel = new Channel(channelName, owner);
-            data.add(newChannel);
+            data.put(newChannel.getId(), newChannel);
             System.out.println(owner.getName() + "님께서 새로운 채널을 생성했습니다.");
             return newChannel;
         }
@@ -30,19 +29,17 @@ public class JCFChannelService implements ChannelService {
     // 모든 채널 조회
     @Override
     public List<Channel> getAllChannelList() {
-        return data;
+        return data.values().stream().collect(Collectors.toList());
     }
 
     // 채널id로 조회
     @Override
     public Channel searchById(UUID channelId) {
-        for (Channel channel : data) {
-            if (channel.getId().equals(channelId)) {
-                return channel;
-            }
+        Channel channel = data.get(channelId);
+        if (channel == null) {
+            System.out.println("해당 채널이 없습니다.");
         }
-        System.out.println("채널이 존재하지 않습니다.");
-        return null;
+        return channel;
     }
 
     //채널 정보 출력
@@ -71,7 +68,7 @@ public class JCFChannelService implements ChannelService {
     // Delete Channel
     @Override
     public void deleteChannel(Channel channel) {
-        data.remove(channel);
+        data.remove(channel.getId());
     }
 
     // 모든 User 출력하기

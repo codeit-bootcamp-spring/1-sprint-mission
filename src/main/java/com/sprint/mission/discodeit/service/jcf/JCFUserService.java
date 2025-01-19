@@ -3,15 +3,14 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
-    private final List<User> data;
+    private final Map<UUID,User> data;
 
     public JCFUserService() {
-        data = new ArrayList<>();
+        data = new HashMap<>();
     }
 
     // Create User
@@ -19,7 +18,7 @@ public class JCFUserService implements UserService {
     public User createUser(String name, String email) {
         if (correctName(name) && correctEmail(email)) {
             User newUser = new User(name, email);
-            data.add(newUser);
+            data.put(newUser.getId(),newUser);
             System.out.println("환영합니다! " + newUser.getName() + "님 반갑습니다.");
             return newUser;
         }
@@ -29,19 +28,17 @@ public class JCFUserService implements UserService {
     // 모든 유저 조회
     @Override
     public List<User> getAllUserList() {
-        return data;
+        return data.values().stream().collect(Collectors.toList());
     }
 
     // ID으로 유저찾기
     @Override
     public User searchById(UUID userId) {
-        for (User user : data) {
-            if (user.getId().equals(userId)) {
-                return user;
-            }
-        }
-        System.out.println("해당하는 사용자가 없습니다.");
-        return null;
+        User user = data.get(userId);
+       if (user == null) {
+           System.out.println("해당 사용자가 존재하지 않습니다.");
+       }
+        return user;
     }
 
     // 유저 삭제

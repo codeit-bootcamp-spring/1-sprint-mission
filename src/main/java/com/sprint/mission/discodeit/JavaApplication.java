@@ -91,7 +91,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.print("Read one Message : ");
-        Message searchMessage =  messageService.searchById(message.getId());
+        Message searchMessage = messageService.searchById(message.getId());
         messageService.printMessageInfo(searchMessage);
         System.out.println();
 
