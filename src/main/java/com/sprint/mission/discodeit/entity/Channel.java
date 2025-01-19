@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class Channel {
@@ -12,17 +12,17 @@ public class Channel {
     private Long updatedAt;
 
     private String channelName;
-    private List<Message> messages;
+    private Map<UUID, Message> messages;
 
-    public List<Message> getMessages() {
+    public Map<UUID, Message> getMessages() {
         return messages;
     }
 
     public Message addMessage(Message message) {
         if (messages == null) {
-            messages = new ArrayList<>();
+            messages = new HashMap<>();
         } else {
-            messages.add(message);
+            messages.put(message.getId(), message);
         }
         return message;
     }
@@ -58,6 +58,6 @@ public class Channel {
         this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         this.updatedAt = createdAt;
         this.channelName = channelName;
-        this.messages = new ArrayList<>();
+        this.messages = new HashMap<>();
     }
 }

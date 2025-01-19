@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessage implements MessageService {
-    private final List<Message> messages = new ArrayList<>();
+    private final Map<UUID, Message> messages = new HashMap<>();
     private final JCFChannel jcfChannel;
 
     public JCFMessage(JCFChannel jcfChannel) {
@@ -18,7 +18,7 @@ public class JCFMessage implements MessageService {
     @Override
     public Message createMessage(UUID authorID, String text) {
         Message newMessage = new Message(text, authorID);
-        messages.add(newMessage);
+        messages.put(newMessage.getId(), newMessage);
         return newMessage;
     }
 
@@ -28,45 +28,34 @@ public class JCFMessage implements MessageService {
         if(jcfChannel.getChannel(channelID).isEmpty()) {
             return null;
         }
-        messages.add(newMessage);
+        messages.put(newMessage.getId(), newMessage);
         jcfChannel.addMessageToChannel(channelID, newMessage);
         return newMessage;
     }
 
     @Override
-    public List<Message> getMessages() {
+    public Map<UUID, Message> getMessages() {
         return messages;
     }
 
     @Override
     public Optional<Message> getMessage(UUID uuid) {
-        for (Message message : messages) {
-            if (message.getId().equals(uuid)) {
-                return Optional.of(message);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(messages.get(uuid));
     }
 
     @Override
     public Optional<Message> updateMessage(UUID uuid, String text) {
-        for (Message message : messages) {
-            if (message.getId().equals(uuid)) {
-                message.updateText(text);
-                return Optional.of(message);
-            }
+        Message updatedMessage = messages.get(uuid);
+        if(updatedMessage != null) {
+            updatedMessage.updateText(text);
+            return Optional.of(updatedMessage);
         }
         return Optional.empty();
     }
 
     @Override
     public Optional<Message> deleteMessage(UUID uuid) {
-        for (Message message : messages) {
-            if (message.getId().equals(uuid)) {
-                messages.remove(message);
-                return Optional.of(message);
-            }
-        }
-        return Optional.empty();
+        Message deletedMessage = messages.remove(uuid);
+        return Optional.ofNullable(deletedMessage);
     }
 }

@@ -3,65 +3,57 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannel implements ChannelService {
-    private final List<Channel> channels = new ArrayList<>();
+    private final Map<UUID, Channel> channels = new HashMap<UUID, Channel>();
 
     @Override
     public Channel createChannel(String channelName) {
         Channel newChannel = new Channel(channelName);
-        channels.add(newChannel);
+        channels.put(newChannel.getId(), newChannel);
         return newChannel;
     }
 
     @Override
-    public List<Channel> getChannels() {
+    public Map<UUID, Channel> getChannels() {
         return channels;
     }
 
     @Override
     public Optional<Channel> getChannel(UUID uuid) {
-        for (Channel channel : channels) {
-            if (channel.getId().equals(uuid)) {
-                return Optional.of(channel);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(channels.get(uuid));
     }
 
     @Override
     public Optional<Channel> addMessageToChannel(UUID uuid, Message message) {
-        for (Channel channel : channels) {
-            if (channel.getId().equals(uuid)) {
-                channel.addMessage(message);
-                return Optional.of(channel);
-            }
+        Channel channel = channels.get(uuid);
+        if (channel != null) {
+            channel.addMessage(message);
+            return Optional.of(channel);
         }
         return Optional.empty();
     }
 
     @Override
     public Optional<Channel> updateChannel(UUID uuid, String channelName) {
-        for (Channel channel : channels) {
-            if (channel.getId().equals(uuid)) {
-                channel.updateChannelName(channelName);
-                return Optional.of(channel);
-            }
+        Channel channel = channels.get(uuid);
+        if (channel != null) {
+            channel.updateChannelName(channelName);
+            return Optional.of(channel);
         }
         return Optional.empty();
     }
 
     @Override
     public Optional<Channel> deleteChannel(UUID uuid) {
-        for (Channel channel : channels) {
-            if (channel.getId().equals(uuid)) {
-                channels.remove(channel);
-                return Optional.of(channel);
-            }
+        Channel channel = channels.get(uuid);
+        if (channel != null) {
+            channels.remove(channel);
+            return Optional.of(channel);
         }
         return Optional.empty();
     }

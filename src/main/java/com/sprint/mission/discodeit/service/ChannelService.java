@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
     Channel createChannel(String channelName);
 
-    List<Channel> getChannels();
+    Map<UUID, Channel> getChannels();
 
     Optional<Channel> getChannel(UUID uuid);
 

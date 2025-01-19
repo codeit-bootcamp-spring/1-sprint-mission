@@ -2,55 +2,43 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUser implements UserService {
-    private final List<User> users = new ArrayList<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
     @Override
     public User createUser(String username) {
         User newUser = new User(username);
-        users.add(newUser);
+        users.put(newUser.getId(), newUser);
         return newUser;
     }
 
     @Override
-    public List<User> getUsers() {
+    public Map<UUID, User> getUsers() {
         return users;
     }
 
     @Override
     public Optional<User> getUser(UUID uuid) {
-        for (User user : users) {
-            if (user.getId().equals(uuid)) {
-                return Optional.of(user);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(users.get(uuid));
     }
 
     @Override
     public Optional<User> updateUser(UUID uuid, String username) {
-        for (User user : users) {
-            if (user.getId().equals(uuid)) {
-                user.updateUsername(username);
-                return Optional.of(user);
-            }
+        User updatedUser = users.get(uuid);
+        if (updatedUser != null) {
+            updatedUser.updateUsername(username);
         }
-        return Optional.empty();
+        return Optional.ofNullable(users.get(uuid));
     }
 
     @Override
     public Optional<User> deleteUser(UUID uuid) {
-        for (User user : users) {
-            if (user.getId().equals(uuid)) {
-                users.remove(user);
-                return Optional.of(user);
-            }
-        }
-        return Optional.empty();
+        User deletedUser = users.remove(uuid);
+        return Optional.ofNullable(deletedUser);
     }
 }

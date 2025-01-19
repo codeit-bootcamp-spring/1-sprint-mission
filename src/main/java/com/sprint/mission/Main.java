@@ -37,7 +37,7 @@ public class Main {
         foundChannel.ifPresent(c -> System.out.println("채널 조회 단건: " + c.getChannelName()));
 
         // 채널 다건 조회
-        channelService.getChannels().forEach(c -> System.out.println("채널 조회 다건: " + c.getChannelName()));
+        channelService.getChannels().values().forEach(c -> System.out.println("채널 조회 다건: " + c.getChannelName()));
 
         // 채널 수정
         channelService.updateChannel(channel1.getId(), "KBS Updated");
@@ -52,7 +52,7 @@ public class Main {
 
         // 삭제 여부 확인
         System.out.println("조회를 통해 삭제되었는지 확인");
-        channelService.getChannels().forEach(c -> System.out.println("채널 조회 다건: " + c.toString()));
+        channelService.getChannels().values().forEach(c -> System.out.println("채널 조회 다건: " + c.toString()));
     }
 
     private static void messageServiceTest() {
@@ -75,7 +75,7 @@ public class Main {
         foundMessage.ifPresent(m -> System.out.println("메시지 조회 단건: " + m.toString()));
 
         // 메시지 조회 다건
-        messageService.getMessages().forEach(m -> System.out.println("메시지 조회 다건: " + m.toString()));
+        messageService.getMessages().values().forEach(m -> System.out.println("메시지 조회 다건: " + m.toString()));
 
         // 메시지 수정
         messageService.updateMessage(message1.getId(), "Hello Updated");
@@ -90,7 +90,9 @@ public class Main {
 
         // 삭제 여부 확인
         System.out.println("조회를 통해 삭제되었는지 확인");
-        messageService.getMessages().forEach(m -> System.out.println("메시지 조회 다건: " + m.getText()));
+        messageService.getMessages().values().forEach(m ->
+                System.out.println("메시지 조회 다건: " + m.getText())
+        );
     }
 
     private static void userServiceTest() {
@@ -105,7 +107,7 @@ public class Main {
         Optional<User> foundUser = userService.getUser(user1.getId());
         foundUser.ifPresent(u -> System.out.println("유저 조회 단건: " + u.getUsername()));
         // 유저 조회 다건
-        userService.getUsers().forEach(u -> System.out.println("유저 조회 다건: " + u.getUsername()));
+        userService.getUsers().values().forEach(u -> System.out.println("유저 조회 다건: " + u.getUsername()));
         // 유저 수정
         userService.updateUser(user1.getId(), "11");
         System.out.println("유저 수정");
@@ -117,6 +119,6 @@ public class Main {
         deletedUser.ifPresent(u -> System.out.println("유저 삭제 성공: " + u.getUsername()));
 
         System.out.println("조회를 통해 삭제되었는지 확인");
-        userService.getUsers().forEach(u -> System.out.println("유저 조회 다건: " + u.getUsername()));
+        userService.getUsers().values().forEach(u -> System.out.println("유저 조회 다건: " + u.getUsername()));
     }
 }
