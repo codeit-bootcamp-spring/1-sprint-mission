@@ -16,13 +16,6 @@ public class JCFMessage implements MessageService {
     }
 
     @Override
-    public Message createMessage(UUID authorID, String text) {
-        Message newMessage = new Message(text, authorID);
-        messages.put(newMessage.getId(), newMessage);
-        return newMessage;
-    }
-
-    @Override
     public Message createMessage(UUID authorID, UUID channelID, String text) {
         Message newMessage = new Message(text, authorID);
         if(jcfChannel.getChannel(channelID).isEmpty()) {
