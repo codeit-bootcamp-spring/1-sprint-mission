@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.db.common;
+package com.sprint.mission.discodeit.repository.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;

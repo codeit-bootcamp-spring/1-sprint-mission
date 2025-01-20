@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.db.common;
+package com.sprint.mission.discodeit.repository.common;
 
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import java.util.Collections;

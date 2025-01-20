@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.Status;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ParticipatedChannel {
+public class ParticipatedChannel implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -2880824194029612128L;
 
     private final Map<UUID, Channel> participatedChannels;
 

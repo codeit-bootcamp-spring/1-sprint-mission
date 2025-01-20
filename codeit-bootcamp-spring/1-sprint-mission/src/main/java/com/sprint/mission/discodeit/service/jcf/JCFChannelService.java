@@ -5,8 +5,8 @@ import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FO
 
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
-import com.sprint.mission.discodeit.db.channel.ChannelRepository;
-import com.sprint.mission.discodeit.db.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.channel.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.entity.channel.dto.ChangeChannelNameRequest;
 import com.sprint.mission.discodeit.entity.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;

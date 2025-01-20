@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.common.error.ErrorMessage;
 import com.sprint.mission.discodeit.common.error.user.UserException;
-import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepository;
-import com.sprint.mission.discodeit.db.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.message.directMessage.DirectMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.entity.message.DirectMessage;
 import com.sprint.mission.discodeit.entity.message.dto.DirectMessageInfoResponse;
 import com.sprint.mission.discodeit.entity.message.dto.SendDirectMessageRequest;

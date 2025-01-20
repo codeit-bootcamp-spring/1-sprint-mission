@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.testdummy;
 
-import com.sprint.mission.discodeit.db.user.UserRepository;
-import com.sprint.mission.discodeit.db.user.UserRepositoryInMemory;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.JCFUserRepositoryInMemory;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class TestDummyFactory {
 
 
     public static UserRepository getUserRepository() {
-        var userRepository = UserRepositoryInMemory.getInstance();
+        var userRepository = JCFUserRepositoryInMemory.getInstance();
         users.forEach(userRepository::save);
         return userRepository;
     }

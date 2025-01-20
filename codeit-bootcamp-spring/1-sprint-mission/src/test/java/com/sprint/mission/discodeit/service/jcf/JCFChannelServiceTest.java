@@ -4,8 +4,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sprint.mission.discodeit.db.channel.ChannelRepository;
-import com.sprint.mission.discodeit.db.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.channel.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;
 import com.sprint.mission.discodeit.entity.user.entity.User;

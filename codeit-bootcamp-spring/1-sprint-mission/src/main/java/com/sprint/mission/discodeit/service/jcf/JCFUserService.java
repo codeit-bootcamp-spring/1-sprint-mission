@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FOUND;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
-import com.sprint.mission.discodeit.db.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.entity.user.dto.ExitChannelRequest;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import com.sprint.mission.discodeit.entity.user.dto.FindUserRequest;

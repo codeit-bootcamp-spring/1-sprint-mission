@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.db.channel;
+package com.sprint.mission.discodeit.repository.jcf.channel;
 
-import com.sprint.mission.discodeit.db.common.CrudRepository;
+import com.sprint.mission.discodeit.repository.common.CrudRepository;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import java.util.UUID;
 

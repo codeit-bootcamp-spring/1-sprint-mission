@@ -1,5 +1,6 @@
-package com.sprint.mission.discodeit.db.common;
+package com.sprint.mission.discodeit.repository.common;
 
+import java.io.FileNotFoundException;
 import java.util.Optional;
 
 public interface CrudRepository<T, ID> extends Repository<T, ID> {
