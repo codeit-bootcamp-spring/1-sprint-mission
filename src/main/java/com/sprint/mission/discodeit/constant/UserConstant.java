@@ -10,4 +10,6 @@ public class UserConstant {
   public static final String ERROR_USERNAME_LENGTH = "Username must be between " + USERNAME_MIN_LENGTH + " and " + USERNAME_MAX_LENGTH + " characters.";
   public static final String ERROR_PASSWORD_LENGTH = "Password must be between " + PASSWORD_MIN_LENGTH + " and " + PASSWORD_MAX_LENGTH + " characters.";
   public static final String ERROR_INVALID_EMAIL = "Invalid email format.";
+  public static final String NO_MATCHING_USER = "사용자를 찾을 수 없습니다.";
+  public static final String PASSWORD_MATCH_ERROR = "비밀번호가 일치하지 않습니다.";
 }

@@ -8,15 +8,6 @@ import com.sprint.mission.discodeit.service.UserService;
 
 public class ChannelFactory {
 
-//    private final UserService userService;
-//    private final MessageServiceV2 messageServiceV2;
-//
-//    public ChannelFactory(UserService userService, MessageServiceV2 messageServiceV2) {
-//        this.userService = userService;
-//        this.messageServiceV2 = messageServiceV2;
-//    }
-
-
   public ChatChannel createChatChannel(
       String serverUUID,
       String categoryUUID,

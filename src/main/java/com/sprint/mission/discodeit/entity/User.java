@@ -6,9 +6,14 @@ import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private String UUID;
   private String username;
   private String password;
@@ -97,5 +102,18 @@ public class User {
         ", createdAt=" + createdAt +
         ", updatedAt=" + updatedAt +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    User user = (User) o;
+    return Objects.equals(UUID, user.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

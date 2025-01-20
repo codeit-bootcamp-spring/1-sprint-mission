@@ -3,11 +3,15 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
-public abstract class BaseChannel {
+public abstract class BaseChannel implements Serializable{
+  private static final long serialVersionUID = 1L;
+
   private final String UUID;
   private final String ServerUUID;
   private final String CategoryUUID;
@@ -33,7 +37,7 @@ public abstract class BaseChannel {
     this.updatedAt = LocalDateTime.now();
   }
 
-  public static abstract class BaseChannelBuilder<T extends BaseChannelBuilder<T>> {
+  public static abstract class BaseChannelBuilder<T extends BaseChannelBuilder<T>>{
     private String serverUUID;
     private String categoryUUID;
     private String channelName;
@@ -96,5 +100,18 @@ public abstract class BaseChannel {
         ", updatedAt=" + updatedAt +
         ", isPrivate=" + isPrivate +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BaseChannel that = (BaseChannel) o;
+    return Objects.equals(UUID, that.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

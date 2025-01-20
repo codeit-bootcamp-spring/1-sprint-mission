@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.exception;
 
-public class UserValidationException extends Exception {
+public class UserValidationException extends IllegalArgumentException {
   public UserValidationException() {
     super("사용자 생성에 실패했습니다.");
   }

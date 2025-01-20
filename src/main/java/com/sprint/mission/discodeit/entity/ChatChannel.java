@@ -18,6 +18,7 @@ public class ChatChannel extends BaseChannel {
     }
   }
 
+
   @Override
   public String toString() {
     return "채팅채널입니다: " + super.toString();

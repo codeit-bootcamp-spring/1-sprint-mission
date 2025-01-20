@@ -11,25 +11,51 @@ import com.sprint.mission.discodeit.factory.ChannelFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.io.File;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static com.sprint.mission.discodeit.constant.FileConstant.*;
+
 public class JavaApplication {
-  static ChannelService channelService = JCFChannelService.getInstance();
-  static UserService userService = JCFUserService.getInstance();
-  static MessageServiceV2 messageServiceV2 = JCFMessageServiceV2.getInstance(userService);
+  static ChannelService channelService = FileChannelService.getInstance();
+  static UserService userService = FileUserService.getInstance();
+  static MessageServiceV2 messageServiceV2 = FileMessageService.getInstance(userService);
   static ChannelFactory channelFactory;
+
+  private static void setup() {
+    File file = new File(MESSAGE_FILE);
+    File file2 = new File(USER_FILE);
+    File file3 = new File(CHANNEL_FILE);
+
+    if (file.exists()) {
+      file.delete();
+    }
+    if (file2.exists()) {
+      file2.delete();
+    }
+    if (file3.exists()) {
+      file3.delete();
+    }
+  }
 
   public static void main(String[] args) {
     channelFactory = new ChannelFactory();
+
+    setup();
+
     userSimulation();
     channelSimulation2();
     messageSimulation2();
+
   }
 
   static void userSimulation() {
@@ -58,6 +84,7 @@ public class JavaApplication {
     } catch (UserValidationException e) {
       System.out.println(e.getMessage());
     }
+
     userService.createUser(user);
     userService.createUser(user2);
 
@@ -71,6 +98,7 @@ public class JavaApplication {
     List<User> users = userService.readAllUsers();
 
     System.out.println("\n=== 여러 유저 조회 ===");
+
     for (User u : users) {
       System.out.println(u);
     }
@@ -89,9 +117,13 @@ public class JavaApplication {
 
     userService.updateUser(userId, updateDto, "examplePwd");
 
-    // 업데이트 유저 출력, 동등성
+    // 업데이트 유저 출력
+
     User updatedUser = userService.readUserById(userId).get();
+
+    System.out.println("USERs : " + userService.readAllUsers().size());
     System.out.println(fetchedUser);
+
     System.out.println(fetchedUser == updatedUser);
 
     System.out.println("\n=== 유저 데이터 조작 비밀번호 오류 ===");
@@ -116,7 +148,7 @@ public class JavaApplication {
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
-
+    System.out.println("USERs : " + userService.readAllUsers().size());
     System.out.println(userService.readUserById(userId).isEmpty());
   }
 

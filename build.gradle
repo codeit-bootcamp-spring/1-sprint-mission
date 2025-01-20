@@ -25,6 +25,8 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core:3.24.2'
     implementation 'org.mindrot:jbcrypt:0.4'
+    implementation 'org.apache.commons:commons-collections4:4.4'
+
 
 }
 
