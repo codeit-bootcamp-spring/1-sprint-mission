@@ -17,4 +17,6 @@ public interface ChannelService {
     void addMember(String channelid, User member);
 
     void removeMember(String channelid, User member);
+
+    List<Channel> readAllChannel();
 }

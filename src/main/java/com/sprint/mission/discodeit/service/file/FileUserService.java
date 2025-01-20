@@ -30,9 +30,6 @@ public class FileUserService implements UserService {
     private void saveAllUsers(List<User> users) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
             oos.writeObject(users);
-            // 디버깅 출력 제거
-            // System.out.println("저장된 사용자 목록:");
-            // users.forEach(user -> System.out.println("User ID: " + user.getId()));
         } catch (IOException e) {
             throw new RuntimeException("사용자 목록 저장 중 오류 발생", e);
         }

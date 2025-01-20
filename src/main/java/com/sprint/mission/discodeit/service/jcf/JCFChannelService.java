@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
     private final Map<String, Channel> channels = new HashMap<>();
@@ -56,5 +57,7 @@ public class JCFChannelService implements ChannelService {
         channel.removeMember(member);
         System.out.println("멤버가 삭제되었습니다. " + member.getName());
     }
-
+    public List<Channel> readAllChannel() {
+        return channels.values().stream().collect(Collectors.toList());
+    };
 }

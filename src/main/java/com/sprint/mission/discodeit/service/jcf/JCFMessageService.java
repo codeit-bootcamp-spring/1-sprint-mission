@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JCFMessageService implements MessageService {
@@ -44,6 +45,10 @@ public class JCFMessageService implements MessageService {
         System.out.println("메세지가 삭제되었습니다. " + id);
     }
 
+    @Override
+    public List<Message> readAllMessages() {
+        return List.of();
+    }
 
 
 }
