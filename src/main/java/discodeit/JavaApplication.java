@@ -10,70 +10,90 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
+import java.util.List;
+import java.util.UUID;
+
 public class JavaApplication {
+    static void userCRUDTest(UserService userService) {
+        // 생성
+        User user = userService.create("철수", "abc@gmail.com", "12345");
+        System.out.println("유저 생성: " + user.getId());
+        // 조회
+        User foundUser = userService.find(user.getId());
+        System.out.println("유저 조회(단건): " + foundUser.getId());
+        List<User> foundUsers = userService.findAll();
+        System.out.println("유저 조회(다건): " + foundUsers.size());
+        // 수정
+        User updatedUser = userService.update(user.getId(), "영희", "efgqwe@naver.com", "123");
+        System.out.println("유저 수정: " + updatedUser);
+        // 삭제
+        userService.delete(updatedUser.getId());
+        List<User> users = userService.findAll();
+        System.out.println("유저 삭제: " + users.size());
+    }
+    static void channelCRUDTest(ChannelService channelService) {
+        // 생성
+        Channel channel = channelService.create("코드잇", "스프린트", ChannelType.PUBLIC);
+        System.out.println("채널 생성: " + channel.getId());
+        // 조회
+        Channel foundChannel = channelService.find(channel.getId());
+        System.out.println("채널 조회(단건): " + foundChannel.getId());
+        List<Channel> foundChannels = channelService.findAll();
+        System.out.println("채널 조회(다건): " + foundChannels.size());
+        // 수정
+        Channel updatedChannel = channelService.update(channel.getId(), "코드잇2", "스프린트2", ChannelType.PRIVATE);
+        System.out.println("채널 수정: " + updatedChannel);
+        // 삭제
+        channelService.delete(updatedChannel.getId());
+        List<Channel> channels = channelService.findAll();
+        System.out.println("채널 삭제: " + channels.size());
+
+    }
+    static void messageCRUDTest(MessageService messageService) {
+        // 생성
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        Message message = messageService.create("안녕하세요.", channelId, authorId);
+        System.out.println("메시지 생성: " + message.getId());
+        // 조회
+        Message foundMessage = messageService.find(message.getId());
+        System.out.println("메시지 조회(단건): " + foundMessage.getId());
+        List<Message> foundMessages = messageService.findAll();
+        System.out.println("메시지 조회(다건): " + foundMessages.size());
+        // 수정
+        Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
+        System.out.println("메시지 수정: " + updatedMessage.getContent());
+        // 삭제
+        messageService.delete(message.getId());
+        List<Message> messages = messageService.findAll();
+        System.out.println("메시지 삭제: " + messages.size());
+    }
+
+    static User setupUser(UserService userService) {
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create("공지", "공지 채널입니다", ChannelType.PUBLIC);
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
+
     public static void main(String[] args) {
+        // 서비스 초기화
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
+        MessageService messageService = new JCFMessageService(channelService, userService);
 
-        // Create
-        System.out.println("<등록>");
-        User user1 = new User("철수", "chulsoo@gmail.com");
-        User user2 = new User("영희", "yeonghee@naver.com");
-        userService.create(user1);
-        userService.create(user2);
-        Channel channel1 = new Channel("코드잇");
-        Channel channel2 = new Channel("스프린트");
-        channelService.create(channel1);
-        channelService.create(channel2);
-        Message message1 = new Message("안녕하세요.", user1, channel1);
-        Message message2 = new Message("Test Message", user1, channel2);
-        messageService.create(message1);
-        messageService.create(message2);
-
-        System.out.println();
-
-        // Read - 단일
-        System.out.println("<단일 조회>");
-        userService.read(user1.getId());
-        channelService.read(channel1.getId());
-        messageService.read(message1.getId());
-
-        System.out.println();
-
-        // Read - 전체
-        System.out.println("<전체 조회>");
-        System.out.println(userService.readAll());
-        System.out.println(channelService.readAll());
-        System.out.println(messageService.readAll());
-
-        System.out.println();
-
-        // Update
-        System.out.println("<수정>");
-        userService.update(user1.getId(), "철수2");
-        userService.read(user1.getId());
-        channelService.update(channel2.getId(), "부트캠프");
-        channelService.read(channel2.getId());
-        messageService.update(message1.getId(), "변경된 메시지입니다.");
-        messageService.read(message1.getId());
-
-        System.out.println();
-
-        // Delete
-        System.out.println("<삭제>");
-        userService.delete(user2.getId());
-        userService.read(user2.getId());
-        channelService.delete(channel2.getId());
-        channelService.read(channel2.getId());
-        messageService.delete(message2.getId());
-        messageService.read(message2.getId());
-
-        // 의존성 검증 - Message 생성 시 User나 Channel이 존재하지 않는다면 생성 X
-        try {
-            Message illegalMessage = new Message("It will be not create", null, channel2);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        // 테스트
+        messageCreateTest(messageService, channel, user);
     }
 }

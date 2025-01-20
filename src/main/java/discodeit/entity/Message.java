@@ -1,49 +1,41 @@
 package discodeit.entity;
 
 
+import java.util.UUID;
+
 public class Message extends Base {
     private String content;
-    private User sender;
-    private Channel channel;
+    private UUID channelId;
+    private UUID authorId;
 
     // 생성자
-    public Message(String content, User sender, Channel channel) {
-        super();
-        if(sender == null || channel == null) {
-            throw new IllegalArgumentException("Sender and channel cannot be null");
-        }
+    public Message(String content, UUID channelId, UUID authorId) {
         this.content = content;
-        this.sender = sender;
-        this.channel = channel;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
     // Getter
     public String getContent() {
         return content;
     }
-    public User getSender() {
-        return sender;
+    public UUID getChannelId() {
+        return channelId;
     }
-    public Channel getChannel() {
-        return channel;
+    public UUID getAuthorId() {
+        return authorId;
     }
 
     // Update
-    public void updateContent(String content) {
-        this.content = content;
-    }
-    public void updateSender(User sender) {
-        this.sender = sender;
-    }
-    public void updateChannel(Channel channel) {
-        this.channel = channel;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if(newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", sender=" + sender +
-                '}';
+        if(anyValueUpdated) {
+            this.updateUpdatedAt();
+        }
     }
 }

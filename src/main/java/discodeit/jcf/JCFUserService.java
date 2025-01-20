@@ -13,43 +13,41 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void create(User user) {
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
         data.put(user.getId(), user);
-        System.out.println("User created: " + user.getUsername());
+
+        return user;
     }
 
     @Override
-    public User read(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("User not found");
-            return null;
-        }
-        System.out.println("User read: " + data.get(id).getUsername());
-        return data.get(id);
+    public User find(UUID userId) {
+        User userNullable = data.get(userId);
+
+        return Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public List<User> readAll() {
-        return new ArrayList<>(data.values());
+    public List<User> findAll() {
+        return data.values().stream().toList();
     }
 
     @Override
-    public void update(UUID id, String username) {
-        User user = data.get(id);
-        if(user != null) {
-            System.out.print("User updated: " + user.getUsername());
-            user.updateUpdatedAt();
-            user.updateUsername(username);
-            System.out.println(" -> " + user.getUsername());
-        }
+    public User update(UUID userId, String username, String email, String password) {
+        User userNullable = data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(username, email, password);
+
+        return user;
     }
 
     @Override
     public void delete(UUID id) {
         if(!data.containsKey(id)) {
-            System.out.println("User not found for delete");
+            throw new NoSuchElementException("User with id " + id + " not found");
         }
         data.remove(id);
-        System.out.println("User removed");
     }
 }

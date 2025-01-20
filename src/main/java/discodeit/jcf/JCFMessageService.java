@@ -1,54 +1,67 @@
 package discodeit.jcf;
 
 import discodeit.entity.Message;
+import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
+import discodeit.service.UserService;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
 
-    public JCFMessageService() {
+    private final UserService userService;
+    private final ChannelService channelService;
+
+    public JCFMessageService(ChannelService channelService, UserService userService) {
         data = new HashMap<>();
+        this.userService = userService;
+        this.channelService = channelService;
     }
+
     @Override
-    public void create(Message message) {
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch(NoSuchElementException e) {
+            throw e;
+        }
+
+        Message message = new Message(content, channelId, authorId);
         data.put(message.getId(), message);
-        System.out.println("Message created: " + message.getContent());
+
+        return message;
     }
 
     @Override
-    public Message read(UUID id) {
-        if (!data.containsKey(id)) {
-            System.out.println("Message not found");
-            return null;
+    public Message find(UUID messageId) {
+        Message messageNullable = data.get(messageId);
+
+        return Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> findAll() {
+        return data.values().stream().toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if(!data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        System.out.println("Message read: " + data.get(id).getContent());
-        return data.get(id);
-    }
-
-    @Override
-    public List<Message> readAll() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void update(UUID id, String content) {
-        Message message = data.get(id);
-        if (message != null) {
-            System.out.print("Message updated: " + message.getContent());
-            message.updateContent(content);
-            message.updateUpdatedAt();
-            System.out.println(" -> " + message.getContent());
-        }
-    }
-
-    @Override
-    public void delete(UUID id) {
-        if(!data.containsKey(id)) {
-            System.out.println("Message not found for delete");
-        }
-        data.remove(id);
-        System.out.println("Message deleted");
+        data.remove(messageId);
     }
 }

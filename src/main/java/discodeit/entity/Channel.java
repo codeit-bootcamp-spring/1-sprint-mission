@@ -1,49 +1,63 @@
 package discodeit.entity;
 
+import discodeit.ChannelType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Channel extends Base {
-    private String channelName;
-    private List<User> members;
-    private List<Message> messages;
+    private String name;
+    private String description;
+    private ChannelType type;
 
     // 생성자
-    public Channel(String channelName) {
-        super();
-        this.channelName = channelName;
-        members = new ArrayList<>();
-        messages = new ArrayList<>();
+    public Channel(String name, String description, ChannelType type) {
+        this.name = name;
+        this.description = description;
+        this.type = type;
     }
 
     // Getter
-    public String getChannelName() {
-        return channelName;
+    public String getName() {
+        return name;
     }
-    public List<User> getUsers() {
-        return members;
+
+    public String getDescription() {
+        return description;
     }
-    public List<Message> getMessages() {
-        return messages;
+
+    public ChannelType getType() {
+        return type;
     }
 
     // Update
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-    public void updateUsers(List<User> users) {
-        this.members = users;
-    }
-    public void updateMessages(List<Message> messages) {
-        this.messages = messages;
+    public void update(String newName, String newDescription, ChannelType newType) {
+        boolean anyValueUpdated = false;
+
+        if(newName != null && !newName.equals(name)) {
+            name = newName;
+            anyValueUpdated = true;
+        }
+        if(newDescription != null && !newDescription.equals(description)) {
+            description = newDescription;
+            anyValueUpdated = true;
+        }
+        if(newType != null && !newType.equals(type)) {
+            type = newType;
+            anyValueUpdated = true;
+        }
+
+        if(anyValueUpdated) {
+            this.updateUpdatedAt();
+        }
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "channelName='" + channelName + '\'' +
-                ", members=" + members +
-                ", messages=" + messages +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
                 '}';
     }
 }
