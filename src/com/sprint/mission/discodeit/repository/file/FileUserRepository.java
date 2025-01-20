@@ -33,18 +33,21 @@ public class FileUserRepository implements UserRepository {
      */
     @Override
     public User createUser(User userInfoToCreate) {
-        User userToCreate = new User.Builder(
-                userInfoToCreate.getName(), userInfoToCreate.getEmail())
-                .id(userInfoToCreate.getId())
-                .phoneNumber(userInfoToCreate.getPhoneNumber())
-                .build();
-
-        Path filePath = FILE_DIR.resolve(userToCreate.getId().toString().concat(FILE_EXT));
+        Path filePath = getFilePath(userInfoToCreate.getId());
+        if (Files.exists(filePath)) {
+            return User.createEmptyUser();
+        }
 
         try (
                 FileOutputStream   fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
+            User userToCreate = new User.Builder(
+                    userInfoToCreate.getName(), userInfoToCreate.getEmail())
+                    .id(userInfoToCreate.getId())
+                    .phoneNumber(userInfoToCreate.getPhoneNumber())
+                    .build();
+
             oos.writeObject(userToCreate);
             return userToCreate;
         } catch (IOException e) {
@@ -56,7 +59,10 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findUserById(UUID key) {
-        Path filePath = FILE_DIR.resolve(key.toString().concat(FILE_EXT));
+        Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return User.createEmptyUser();
+        }
 
         try (
                 FileInputStream   fis = new FileInputStream(filePath.toFile());
@@ -75,20 +81,23 @@ public class FileUserRepository implements UserRepository {
      */
     @Override
     public User updateUserById(UUID key, User userInfoToUpdate) {
+        Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return User.createEmptyUser();
+        }
+
         User exsitingUser = findUserById(key);
-        User userToUpdate = new User.Builder(
-                userInfoToUpdate.getName(), userInfoToUpdate.getEmail())
-                .id(key)
-                .createAt(exsitingUser.getCreateAt())
-                .phoneNumber(userInfoToUpdate.getPhoneNumber())
-                .build();
-
-        Path filePath = FILE_DIR.resolve(key.toString().concat(FILE_EXT));
-
         try (
                 FileOutputStream   fis = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream ois = new ObjectOutputStream(fis);
         ) {
+            User userToUpdate = new User.Builder(
+                    userInfoToUpdate.getName(), userInfoToUpdate.getEmail())
+                    .id(key)
+                    .createAt(exsitingUser.getCreateAt())
+                    .phoneNumber(userInfoToUpdate.getPhoneNumber())
+                    .build();
+
             ois.writeObject(userToUpdate);
             return userToUpdate;
         } catch (IOException e) {
@@ -100,10 +109,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User deleteUserById(UUID key) {
+        Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return User.createEmptyUser();
+        }
+
         User exsitingUser = findUserById(key);
-
-        Path filePath = FILE_DIR.resolve(key.toString().concat(FILE_EXT));
-
         try {
             Files.delete(filePath);
             return exsitingUser;
@@ -112,5 +123,9 @@ public class FileUserRepository implements UserRepository {
         }
 
         return User.createEmptyUser();
+    }
+
+    private Path getFilePath(UUID key) {
+        return FILE_DIR.resolve(key.toString().concat(FILE_EXT));
     }
 }

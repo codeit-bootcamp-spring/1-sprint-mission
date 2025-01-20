@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.log.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
@@ -33,17 +34,20 @@ public class FileMessageRepository implements MessageRepository {
      */
     @Override
     public Message createMessage(Message messageInfoToCreate) {
-        Message messageToCreate = Message.createMessage(
-                messageInfoToCreate.getId(),
-                messageInfoToCreate.getContent()
-        );
-
-        Path filePath = getFilePath(messageToCreate.getId());
+        Path filePath = getFilePath(messageInfoToCreate.getId());
+        if (Files.exists(filePath)) {
+            return Message.createEmptyMessage();
+        }
 
         try (
                 FileOutputStream   fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
+            Message messageToCreate = Message.createMessage(
+                    messageInfoToCreate.getId(),
+                    messageInfoToCreate.getContent()
+            );
+
             oos.writeObject(messageToCreate);
             return messageToCreate;
         } catch (IOException e) {
@@ -56,6 +60,9 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public Message findMessageById(UUID key) {
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Message.createEmptyMessage();
+        }
 
         try (
                 FileInputStream   fis = new FileInputStream(filePath.toFile());
@@ -74,19 +81,22 @@ public class FileMessageRepository implements MessageRepository {
      */
     @Override
     public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
-        Message existingMessage = findMessageById(key);
-        Message messageToUpdate = Message.createMessage(
-                key,
-                existingMessage.getCreateAt(),
-                messageInfoToUpdate.getContent()
-        );
-
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Message.createEmptyMessage();
+        }
 
+        Message existingMessage = findMessageById(key);
         try (
                 FileOutputStream   fis = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream ois = new ObjectOutputStream(fis);
         ) {
+            Message messageToUpdate = Message.createMessage(
+                    key,
+                    existingMessage.getCreateAt(),
+                    messageInfoToUpdate.getContent()
+            );
+
             ois.writeObject(messageToUpdate);
             return messageToUpdate;
         } catch (IOException e) {
@@ -98,10 +108,12 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message deleteMessageById(UUID key) {
-        Message exsitingMessage = findMessageById(key);
-
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Message.createEmptyMessage();
+        }
 
+        Message exsitingMessage = findMessageById(key);
         try {
             Files.delete(filePath);
             return exsitingMessage;

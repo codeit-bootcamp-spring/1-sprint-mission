@@ -35,17 +35,20 @@ public class FileChannelRepository implements ChannelRepository {
      */
     @Override
     public Channel createChannel(Channel channelInfoToCreate) {
-        Channel channelToCreate = Channel.createChannel(
-                channelInfoToCreate.getId(),
-                channelInfoToCreate.getName()
-        );
-
-        Path filePath = getFilePath(channelToCreate.getId());
+        Path filePath = getFilePath(channelInfoToCreate.getId());
+        if (Files.exists(filePath)) {
+            return Channel.createEmptyChannel();
+        }
 
         try (
                 FileOutputStream   fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
+            Channel channelToCreate = Channel.createChannel(
+                    channelInfoToCreate.getId(),
+                    channelInfoToCreate.getName()
+            );
+
             oos.writeObject(channelToCreate);
             return channelToCreate;
         } catch (IOException e) {
@@ -58,6 +61,9 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel findChannelById(UUID key) {
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Channel.createEmptyChannel();
+        }
 
         try (
                 FileInputStream   fis = new FileInputStream(filePath.toFile());
@@ -76,19 +82,22 @@ public class FileChannelRepository implements ChannelRepository {
      */
     @Override
     public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) {
-        Channel existingChannel = findChannelById(key);
-        Channel channelToUpdate = Channel.createChannel(
-                key,
-                existingChannel.getCreateAt(),
-                channelInfoToUpdate.getName()
-        );
-
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Channel.createEmptyChannel();
+        }
 
+        Channel existingChannel = findChannelById(key);
         try (
                 FileOutputStream   fis = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream ois = new ObjectOutputStream(fis);
         ) {
+            Channel channelToUpdate = Channel.createChannel(
+                    key,
+                    existingChannel.getCreateAt(),
+                    channelInfoToUpdate.getName()
+            );
+
             ois.writeObject(channelToUpdate);
             return channelToUpdate;
         } catch (IOException e) {
@@ -100,10 +109,12 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel deleteChannelById(UUID key) {
-        Channel exsitingChannel = findChannelById(key);
-
         Path filePath = getFilePath(key);
+        if (!Files.exists(filePath)) {
+            return Channel.createEmptyChannel();
+        }
 
+        Channel exsitingChannel = findChannelById(key);
         try {
             Files.delete(filePath);
             return exsitingChannel;
