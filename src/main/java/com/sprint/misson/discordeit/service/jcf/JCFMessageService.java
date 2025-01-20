@@ -28,7 +28,7 @@ public class JCFMessageService implements MessageService {
 
     //생성
     @Override
-    public Message createMessage(User user, String content, Channel channel) throws RuntimeException {
+    public Message createMessage(User user, String content, Channel channel) throws CustomException {
 
         if (content == null || content.isEmpty()) {
             System.out.println("Message content is empty for User: " + user.getId() + " Channel: " + channel.getId());
@@ -64,7 +64,7 @@ public class JCFMessageService implements MessageService {
 
     //단일 조회 - uuid
     @Override
-    public Message getMessageByUUID(String messageId) throws RuntimeException {
+    public Message getMessageByUUID(String messageId) throws CustomException {
         Message message = data.get(UUID.fromString(messageId));
         if (message == null) {
             System.out.println("Message with id " + messageId + " not found");
@@ -81,7 +81,7 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 특정 작성자
     @Override
-    public List<Message> getMessageBySender(User sender) throws RuntimeException {
+    public List<Message> getMessageBySender(User sender) throws CustomException {
         try {
             User userByUUID = userService.getUserByUUID(sender.getId().toString());
             return data.values().stream().filter(m -> m.getSender().equals(userByUUID)).toList();
@@ -100,7 +100,7 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 특정 채널
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) throws RuntimeException {
+    public List<Message> getMessagesByChannel(Channel channel) throws CustomException {
         try {
             Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
             return data.values().stream().filter(m -> m.getChannel().equals(channelByUUID)).toList();
@@ -112,7 +112,7 @@ public class JCFMessageService implements MessageService {
 
     //수정
     @Override
-    public Message updateMessage(String messageId, String newContent) throws RuntimeException {
+    public Message updateMessage(String messageId, String newContent) throws CustomException {
 
         Message message = data.get(UUID.fromString(messageId));
 
@@ -132,7 +132,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public boolean deleteMessage(Message message) throws RuntimeException {
+    public boolean deleteMessage(Message message) throws CustomException {
         Message msg = data.get(UUID.fromString(message.getId().toString()));
 
         if (msg == null) {

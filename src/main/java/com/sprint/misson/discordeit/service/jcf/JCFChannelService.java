@@ -37,7 +37,7 @@ public class JCFChannelService implements ChannelService {
 
     //단일 조회 - UUID
     @Override
-    public Channel getChannelByUUID(String channelId) throws RuntimeException {
+    public Channel getChannelByUUID(String channelId) throws CustomException {
         Channel channel = data.get(UUID.fromString(channelId));
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
@@ -59,7 +59,7 @@ public class JCFChannelService implements ChannelService {
 
     //수정
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws RuntimeException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws CustomException {
         Channel channel = data.get(UUID.fromString(channelId));
 
         if (channel == null) {
@@ -94,7 +94,7 @@ public class JCFChannelService implements ChannelService {
 
     //삭제
     @Override
-    public boolean deleteChannel(Channel channel) throws RuntimeException {
+    public boolean deleteChannel(Channel channel) throws CustomException {
         Channel ch = data.get(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
@@ -104,7 +104,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<User> getUsersInChannel(Channel channel) throws RuntimeException {
+    public List<User> getUsersInChannel(Channel channel) throws CustomException {
         Channel ch = data.get(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
@@ -114,7 +114,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean addUserToChannel(Channel channel, User user) throws RuntimeException {
+    public boolean addUserToChannel(Channel channel, User user) throws CustomException {
         //유저를 채널에 추가
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사

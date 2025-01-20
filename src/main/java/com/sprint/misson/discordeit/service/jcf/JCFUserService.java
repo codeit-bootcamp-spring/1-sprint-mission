@@ -50,7 +50,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserByUUID(String userId) throws RuntimeException {
+    public User getUserByUUID(String userId) throws CustomException {
 
         User user = data.get(UUID.fromString(userId));
 
@@ -61,7 +61,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) throws RuntimeException {
+    public User getUserByEmail(String email) throws CustomException {
 
         User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
 
@@ -93,7 +93,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO) throws RuntimeException {
+    public User updateUser(String userId, UserDTO userDTO) throws CustomException {
         User user = data.get(UUID.fromString(userId));
 
         if (user == null) {
@@ -134,7 +134,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean deleteUser(String userId) throws RuntimeException {
+    public boolean deleteUser(String userId) throws CustomException {
 
         User user = data.get(UUID.fromString(userId));
 
