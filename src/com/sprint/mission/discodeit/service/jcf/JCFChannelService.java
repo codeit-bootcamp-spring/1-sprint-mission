@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.proxy.ChannelRepositoryProxy;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
@@ -11,12 +14,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data; // assume that it is repository
-    private final ChannelValidator channelValidator;
+    private final ChannelRepository channelRepository;
+    private final ChannelValidator  channelValidator;
 
     public JCFChannelService() {
-        data = new HashMap<>();
-        channelValidator = ChannelValidator.getInstance();
+        channelRepository = new ChannelRepositoryProxy(new JCFChannelRepository());
+        channelValidator  = ChannelValidator.getInstance();
     }
 
     /**
@@ -26,20 +29,12 @@ public class JCFChannelService implements ChannelService {
     public Channel createChannel(Channel channelInfoToCreate) throws InvalidFormatException {
         validateFormat(channelInfoToCreate);
 
-        Channel channelToCreate = Channel.createChannel(
-                channelInfoToCreate.getId(),
-                channelInfoToCreate.getName()
-        );
-
-        return Optional.ofNullable(data.putIfAbsent(channelToCreate.getId(), channelToCreate))
-                .map(existingChannel -> Channel.createEmptyChannel())
-                .orElse(channelToCreate);
+        return channelRepository.createChannel(channelInfoToCreate);
     }
 
     @Override
     public Channel findChannelById(UUID key) {
-        return Optional.ofNullable(data.get(key))
-                .orElse(Channel.createEmptyChannel());
+        return channelRepository.findChannelById(key);
     }
 
     /**
@@ -49,16 +44,7 @@ public class JCFChannelService implements ChannelService {
     public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) throws InvalidFormatException {
         validateFormat(channelInfoToUpdate);
 
-        Channel existingChannel = findChannelById(key);
-        Channel channelToUpdate = Channel.createChannel(
-                key,
-                existingChannel.getCreateAt(),
-                channelInfoToUpdate.getName()
-        );
-
-        return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, channel) -> channelToUpdate))
-                .orElse(Channel.createEmptyChannel());
+        return channelRepository.updateChannelById(key, channelInfoToUpdate);
     }
 
     private void validateFormat(Channel channelInfoToUpdate)  throws InvalidFormatException {
@@ -70,7 +56,6 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel deleteChannelById(UUID key) {
-        return Optional.ofNullable(data.remove(key))
-                .orElse(Channel.createEmptyChannel());
+        return channelRepository.deleteChannelById(key);
     }
 }

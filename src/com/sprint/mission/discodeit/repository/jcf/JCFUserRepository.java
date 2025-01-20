@@ -11,7 +11,7 @@ import java.util.UUID;
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
-    private JCFUserRepository() {
+    public JCFUserRepository() {
         data = new HashMap<>();
     }
 

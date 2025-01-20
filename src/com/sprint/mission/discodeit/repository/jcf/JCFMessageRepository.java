@@ -14,6 +14,7 @@ public class JCFMessageRepository implements MessageRepository {
     public JCFMessageRepository() {
         data = new HashMap<>();
     }
+
     /**
      * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from {@code messageInfoToCreate}
      */

@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.proxy.MessageRepositoryProxy;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
@@ -11,12 +14,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data; // assume that it is repository
-    private final MessageValidator messageValidator;
+    private final MessageRepository messageRepository;
+    private final MessageValidator  messageValidator;
 
     public JCFMessageService() {
-        data = new HashMap<>();
-        messageValidator = MessageValidator.getInstance();
+        messageRepository = new MessageRepositoryProxy(new JCFMessageRepository());
+        messageValidator  = MessageValidator.getInstance();
     }
 
     /**
@@ -26,20 +29,12 @@ public class JCFMessageService implements MessageService {
     public Message createMessage(Message messageInfoToCreate) throws InvalidFormatException {
         validateFormat(messageInfoToCreate);
 
-        Message messageToCreate = Message.createMessage(
-                messageInfoToCreate.getId(),
-                messageInfoToCreate.getContent()
-        );
-
-        return Optional.ofNullable(data.putIfAbsent(messageToCreate.getId(), messageToCreate))
-                .map(existingMessage -> Message.createEmptyMessage())
-                .orElse(messageToCreate);
+        return messageRepository.createMessage(messageInfoToCreate);
     }
 
     @Override
     public Message findMessageById(UUID key) {
-        return Optional.ofNullable(data.get(key))
-                .orElse(Message.createEmptyMessage());
+        return messageRepository.findMessageById(key);
     }
 
     /**
@@ -49,16 +44,7 @@ public class JCFMessageService implements MessageService {
     public Message updateMessageById(UUID key, Message messageInfoToUpdate) throws InvalidFormatException {
         validateFormat(messageInfoToUpdate);
 
-        Message existingMessage = findMessageById(key);
-        Message messageToUpdate = Message.createMessage(
-                key,
-                existingMessage.getCreateAt(),
-                messageInfoToUpdate.getContent()
-        );
-
-        return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, message) -> messageToUpdate))
-                .orElse(Message.createEmptyMessage());
+        return messageRepository.updateMessageById(key, messageInfoToUpdate);
     }
 
     private void validateFormat(Message messageInfoToUpdate) throws InvalidFormatException {
@@ -70,7 +56,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message deleteMessageById(UUID key) {
-        return Optional.ofNullable(data.remove(key))
-                .orElse(Message.createEmptyMessage());
+        return messageRepository.deleteMessageById(key);
     }
 }

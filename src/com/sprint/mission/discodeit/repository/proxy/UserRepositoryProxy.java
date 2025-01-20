@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.log.ServiceLogger;
+import com.sprint.mission.discodeit.log.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.UUID;
 
 public class UserRepositoryProxy implements UserRepository {
-    private final ServiceLogger logger;
-    private final UserRepository userRepository;
+    private final RepositoryLogger logger;
+    private final UserRepository   userRepository;
 
     public UserRepositoryProxy(UserRepository userRepository) {
         this.userRepository = userRepository;
-        logger = ServiceLogger.getInstance();
+        logger = RepositoryLogger.getInstance();
     }
 
     @Override

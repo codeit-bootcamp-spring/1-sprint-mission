@@ -14,6 +14,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public JCFChannelRepository() {
         data = new HashMap<>();
     }
+
     /**
      * Create the Channel while ignoring the {@code createAt} and {@code updateAt} fields from {@code channelInfoToCreate}
      */

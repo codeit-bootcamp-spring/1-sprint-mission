@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.log.ServiceLogger;
+import com.sprint.mission.discodeit.log.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.UUID;
 
 public class ChannelRepositoryProxy implements ChannelRepository {
-    private final ServiceLogger logger;
+    private final RepositoryLogger  logger;
     private final ChannelRepository channelRepository;
 
     public ChannelRepositoryProxy(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
-        logger = ServiceLogger.getInstance();
+        logger = RepositoryLogger.getInstance();
     }
 
     @Override
