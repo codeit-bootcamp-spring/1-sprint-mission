@@ -1,18 +1,32 @@
-//import com.sprint.mission.discodeit.dto.UserUpdateDto;
-//import com.sprint.mission.discodeit.entity.User;
-//import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-//import com.sprint.mission.discodeit.util.PasswordEncryptor;
-//import org.assertj.core.api.Assertions;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
-//
-//public class UserTest {
+import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.util.PasswordEncryptor;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class UserTest {
+  @Test
+    void run() throws UserValidationException {
+        String username = "kiki1875";
+        String pwd = "123456789";
+
+
+        User user = new User.UserBuilder(username, pwd,"kevinheo0413@gmail.com").build();
+
+        assertThat(user.getUsername()).isEqualTo(username);
+    }
+}
+//}
 //
 //
 //    @BeforeEach

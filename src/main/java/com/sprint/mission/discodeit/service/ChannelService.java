@@ -9,16 +9,23 @@ import java.util.Optional;
 
 public interface ChannelService {
 
-    BaseChannel createChannel(BaseChannel channel);
-    Optional<BaseChannel> getChannelById(String channelId);
-    List<BaseChannel> getAllChannels();
-    List<BaseChannel> getChannelsByCategory(String categoryId);
-    void updateChannel(String channelId, ChannelUpdateDto updatedChannel);
-    void deleteChannel(String channelId);
-    String generateInviteCode(BaseChannel channel);
-    void setPrivate(BaseChannel channel);
-    void setPublic(BaseChannel channel);
+  BaseChannel createChannel(BaseChannel channel);
 
+  Optional<BaseChannel> getChannelById(String channelId);
+
+  List<BaseChannel> getAllChannels();
+
+  List<BaseChannel> getChannelsByCategory(String categoryId);
+
+  void updateChannel(String channelId, ChannelUpdateDto updatedChannel);
+
+  void deleteChannel(String channelId);
+
+  String generateInviteCode(BaseChannel channel);
+
+  void setPrivate(BaseChannel channel);
+
+  void setPublic(BaseChannel channel);
 
 
 }
