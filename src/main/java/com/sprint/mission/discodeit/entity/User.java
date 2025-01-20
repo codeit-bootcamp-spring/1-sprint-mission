@@ -6,11 +6,12 @@ import java.util.UUID;
 
 public class User {
     private final UUID id;
-    private final long createdAt;
-    private final List<Channel> channelList; // 참가중인 채널
+    private long createdAt;
     private long updatedAt;
     private String name;
     private String email;
+    private String password;
+    private List<Channel> channelList;
 
     public User(String name, String email) {
         id = UUID.randomUUID();
@@ -68,6 +69,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
+        return "User{id:" + id + ",name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
     }
 }

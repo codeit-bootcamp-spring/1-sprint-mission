@@ -9,15 +9,13 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message createMessage(Channel channel, User writer, String content);
+    Message createMessage(UUID channelId, UUID writerId, String content);
 
     List<Message> getAllMessageList();
 
     Message searchById(UUID messageId);
 
-    void printMessageInfo(Message message);
-    void printMessageListInfo(List<Message> messageList);
+    void updateMessage(UUID messageId, String content);
 
-    void deleteMessage(Message message);
-    void updateMessage(Message message, String content);
+    void deleteMessage(UUID messageId);
 }

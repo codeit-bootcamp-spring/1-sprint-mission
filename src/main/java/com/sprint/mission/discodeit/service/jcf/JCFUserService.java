@@ -2,19 +2,16 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.validation.ChannelValidator;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final List<User> data;
+    private final Map<UUID,User> data;
     private final UserValidator userValidator = new UserValidator();
 
     public JCFUserService() {
-        data = new ArrayList<>();
+        data = new HashMap<>();
     }
 
     // 유저 생성
@@ -22,8 +19,8 @@ public class JCFUserService implements UserService {
     public User createUser(String name, String email) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
             User newUser = new User(name, email);
-            data.add(newUser);
-            System.out.println("user create: " + newUser.getName());
+            data.put(newUser.getId(),newUser);
+            System.out.println("user create: " + newUser.getId());
             return newUser;
         }
         return null;
@@ -32,54 +29,48 @@ public class JCFUserService implements UserService {
     // 모든 유저 조회
     @Override
     public List<User> getAllUserList() {
-        return data;
+        return data.values().stream().toList();
     }
 
     // ID으로 유저찾기
     @Override
     public User searchById(UUID userId) {
-        for (User user : data) {
-            if (user.getId().equals(userId)) {
-                return user;
-            }
+        if (data.containsKey(userId)) { // 데이터 조회를 repository랑 분리하면 괜찮을 것 같음...?
+            return data.get(userId);
+        } else {
+            System.out.println("user dose not exist");
+            return null;
         }
-        System.out.println("user dose not exist");
-        return null;
     }
 
     // 유저 삭제
     @Override
-    public void deleteUser(User deleteUser) {
-        data.remove(deleteUser);
-        System.out.println("success delete");
-    }
-
-    @Override
-    public void printUserInfo(User user) {
-        System.out.println(user);
-    }
-
-    @Override
-    public void printUserListInfo(List<User> userList) {
-        for (User user : userList) {
-            printUserInfo(user);
+    public void deleteUser(UUID userId) {
+        if (data.containsKey(userId)) {
+            data.remove(userId);
+            System.out.println("success delete");
         }
     }
 
     // 유저 이름 업데이트
-    public void updateUserName(User user, String newName) {
-        if (userValidator.isValidName(newName)) {
-            user.updateName(newName);
-            System.out.println("success update");
+    @Override
+    public void updateUserName(UUID userId, String newName) {
+        if (data.containsKey(userId)) {
+            if (userValidator.isValidName(newName)) {
+                searchById(userId).updateName(newName);
+                System.out.println("success update");
+            }
         }
     }
 
     // 유저 이메일 업데이트
     @Override
-    public void updateUserEmail(User user, String newEmail) {
-        if (userValidator.isValidEmail(newEmail)) {
-            user.updateEmail(newEmail);
-            System.out.println("success update");
+    public void updateUserEmail(UUID userId, String newEmail) {
+        if (data.containsKey(userId)) {
+            if (userValidator.isValidEmail(newEmail)) {
+                searchById(userId).updateEmail(newEmail);
+                System.out.println("success update");
+            }
         }
     }
 }

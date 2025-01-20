@@ -15,8 +15,8 @@ import java.util.List;
 public class JavaApplication {
     public static void main(String[] args) {
         UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
+        ChannelService channelService = new JCFChannelService(userService);
+        MessageService messageService = new JCFMessageService(userService, channelService);
 
         System.out.println("=== [User] ===");
         System.out.println("유저 생성");
@@ -26,80 +26,92 @@ public class JavaApplication {
 
         System.out.println("전체 조회");
         List<User> getAllUser = userService.getAllUserList();
-        userService.printUserListInfo(getAllUser);
+        for (User user : getAllUser) {
+            System.out.println(user);
+        }
         System.out.println();
 
         System.out.println("단건 조회");
         User searchUser = userService.searchById(userBob.getId());
-        userService.printUserInfo(searchUser);
+        System.out.println(searchUser);
         System.out.println();
 
         System.out.println("유저 이메일 수정 후 확인");
-        userService.updateUserEmail(userBob, "bob@gmail.com");
-        userService.printUserInfo(userBob);
+        userService.updateUserEmail(userBob.getId(), "bob@gmail.com");
+        System.out.println(userBob);
         System.out.println();
 
         System.out.println("유저 삭제 후 전체 조회");
-        userService.deleteUser(userJackson);
+        userService.deleteUser(userJackson.getId());
         List<User> getAllUser2 = userService.getAllUserList();
-        userService.printUserListInfo(getAllUser2);
+        for (User user : getAllUser2) {
+            System.out.println(user);
+        }
         System.out.println();
 
 
         System.out.println("=== [Channel] ===");
         System.out.println("채널 생성");
-        Channel studyChannel = channelService.createChannel("Study", userBob);
-        Channel bookChannel = channelService.createChannel("Book", userBob);
+        Channel studyChannel = channelService.createChannel("Study","Study room",userBob.getId());
+        Channel bookChannel = channelService.createChannel("Book","book room", userBob.getId());
         System.out.println();
 
         System.out.println("전체 조회");
         List<Channel> channelList = channelService.getAllChannelList();
-        channelService.printChannelListInfo(channelList);
+        for (Channel channel : channelList) {
+            System.out.println(channel);
+        }
         System.out.println();
 
         System.out.println("단일 조회");
         Channel searchChannel = channelService.searchById(studyChannel.getId());
-        channelService.printChannelInfo(searchChannel);
+        System.out.println(searchChannel);
         System.out.println();
 
         System.out.println("채널 수정 후 확인");
-        channelService.updateTitle(studyChannel, "Running");
-        channelService.printChannelInfo(studyChannel);
+        channelService.updateTitle(studyChannel.getId(), "Running");
+        System.out.println(studyChannel);
         System.out.println();
 
         System.out.println("채널 삭제 후 확인");
-        channelService.deleteChannel(bookChannel);
+        channelService.deleteChannel(bookChannel.getId());
         List<Channel> channelList2 = channelService.getAllChannelList();
-        channelService.printChannelListInfo(channelList2);
+        for (Channel channel : channelList2) {
+            System.out.println(channel);
+        }
         System.out.println();
 
 
         System.out.println("=== [Message] ===");
         System.out.println("메세지 생성");
-        Message message = messageService.createMessage(studyChannel, userBob, "gooood!");
-        Message message2 = messageService.createMessage(studyChannel, userBob, "yes!");
-        Message message3 = messageService.createMessage(bookChannel, userBob, "run");
+        Message message1 = messageService.createMessage(studyChannel.getId(), userBob.getId(), "gooood!");
+        Message message2 = messageService.createMessage(studyChannel.getId(), userBob.getId(), "yes!");
+        Message message3 = messageService.createMessage(bookChannel.getId(), userBob.getId(), "run");
         System.out.println();
 
         System.out.println("전체 조회");
         List<Message> messageList = messageService.getAllMessageList();
-        messageService.printMessageListInfo(messageList);
+        for (Message message : messageList) {
+            System.out.println(message);
+        }
         System.out.println();
 
         System.out.println("단건 조회");
-        Message searchMessage = messageService.searchById(message.getId());
-        messageService.printMessageInfo(searchMessage);
+        Message searchMessage = messageService.searchById(message1.getId());
+        System.out.println(message2);
         System.out.println();
 
         System.out.println("메세지 내용 수정 후 확인");
-        messageService.updateMessage(message2, "no!");
-        messageService.printMessageInfo(message2);
+        messageService.updateMessage(message2.getId(), "no!");
+        System.out.println(message2);
         System.out.println();
 
         System.out.println("메세지 삭제 후 확인");
-        messageService.deleteMessage(message);
+        messageService.deleteMessage(message1.getId());
         List<Message> messageList2 = messageService.getAllMessageList();
-        messageService.printMessageListInfo(messageList2);
+        for (Message message : messageList2) {
+            System.out.println(message);
+        }
         System.out.println();
 
     }

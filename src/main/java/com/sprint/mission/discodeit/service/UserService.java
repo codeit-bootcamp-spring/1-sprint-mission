@@ -9,15 +9,13 @@ public interface UserService {
 
     User createUser(String name, String email);
 
-    void updateUserName(User user, String name);
-    void updateUserEmail(User user, String email);
-
     List<User> getAllUserList();
+
     User searchById(UUID userId);
 
-    void printUserInfo(User user);
-    void printUserListInfo(List<User> userList);
+    void updateUserName(UUID userId, String newName);
 
-    void deleteUser(User user);
+    void updateUserEmail(UUID userId, String newEmail);
 
+    void deleteUser(UUID userId);
 }

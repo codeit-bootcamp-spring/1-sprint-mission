@@ -6,17 +6,19 @@ import java.util.UUID;
 
 public class Channel {
     private final UUID id;
-    private final User owner;
-    private final List<Message> messageList;
-    private final List<User> memberList;
-    private final long createdAt;
+    private long createdAt;
     private long updatedAt;
     private String title;
+    private String description;
+    private User owner;
+    private List<Message> messageList;
+    private List<User> memberList;
 
-    public Channel(String title, User owner) {
+    public Channel(String title, String description, User owner) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.title = title;
+        this.description = description;
         this.owner = owner;
         messageList = new ArrayList<>();
         memberList = new ArrayList<>();
@@ -43,6 +45,8 @@ public class Channel {
         return owner;
     }
 
+    public String getDescription() { return description;}
+
     public List<Message> getMessageList() {
         return messageList;
     }
@@ -57,6 +61,11 @@ public class Channel {
 
     public void updateTitle(String title) {
         this.title = title;
+        updateUpdatedAt();
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
         updateUpdatedAt();
     }
 
@@ -80,7 +89,7 @@ public class Channel {
 
     @Override
     public String toString() {
-        return "Channel{title:" + title + ",owner:" + owner.getName() + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Channel{id:" + id + ",title:" + title + ",owner:" + owner.getName() + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 
 }

@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.validation;
 
 public class UserValidator {
+    private static final String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
     public boolean isValidName(String name) {
         if (name.isBlank()) {
             System.out.println("the name is blank");
@@ -13,7 +15,6 @@ public class UserValidator {
     }
 
     public boolean isValidEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         if (!email.matches(emailRegex)) {
             System.out.println("email format does not match");
         }
