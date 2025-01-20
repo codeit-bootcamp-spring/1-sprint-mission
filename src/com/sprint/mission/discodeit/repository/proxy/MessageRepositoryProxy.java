@@ -1,32 +1,25 @@
-package com.sprint.mission.discodeit.service.proxy;
+package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.log.ServiceLogger;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.UUID;
 
-public class MessageServiceProxy implements MessageService {
+public class MessageRepositoryProxy implements MessageRepository {
     private final ServiceLogger logger;
-    private final MessageService messageService;
+    private final MessageRepository messageRepository;
 
-    public MessageServiceProxy(MessageService messageService) {
-        this.messageService = messageService;
+    public MessageRepositoryProxy(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
         logger = ServiceLogger.getInstance();
     }
 
     @Override
     public Message createMessage(Message messageInfoToCreate) {
-        Message creation   = Message.createEmptyMessage();
+        Message creation   = messageRepository.createMessage(messageInfoToCreate);
         String  logMessage = "Message creation failed";
         UUID    messageId  = messageInfoToCreate.getId();
-
-        try {
-            creation = messageService.createMessage(messageInfoToCreate);
-        } catch (InvalidFormatException e) {
-            logger.warning(e.getErrorCode(), logMessage, messageId);
-        }
 
         if (creation == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, messageId);
@@ -37,7 +30,7 @@ public class MessageServiceProxy implements MessageService {
 
     @Override
     public Message findMessageById(UUID key) {
-        Message find = messageService.findMessageById(key);
+        Message find = messageRepository.findMessageById(key);
 
         if (find == Message.EMPTY_MESSAGE) {
             logger.warning("Message find failed", key);
@@ -48,14 +41,8 @@ public class MessageServiceProxy implements MessageService {
 
     @Override
     public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
-        Message updated    = Message.createEmptyMessage();
+        Message updated    = messageRepository.updateMessageById(key, messageInfoToUpdate);
         String  logMessage = "Message update failed";
-
-        try {
-            updated = messageService.updateMessageById(key, messageInfoToUpdate);
-        } catch (InvalidFormatException e) {
-            logger.warning(e.getErrorCode(), logMessage, key);
-        }
 
         if (updated == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, key);
@@ -66,7 +53,7 @@ public class MessageServiceProxy implements MessageService {
 
     @Override
     public Message deleteMessageById(UUID key) {
-        Message deletion = messageService.deleteMessageById(key);
+        Message deletion = messageRepository.deleteMessageById(key);
 
         if (deletion == Message.EMPTY_MESSAGE) {
             logger.warning("Message deletion failed", key);
@@ -75,3 +62,4 @@ public class MessageServiceProxy implements MessageService {
         return deletion;
     }
 }
+

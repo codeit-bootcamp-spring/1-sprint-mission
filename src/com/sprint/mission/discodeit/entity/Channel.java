@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -7,7 +9,10 @@ import static com.sprint.mission.discodeit.constant.IntegerConstant.EMPTY_TIME;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
 import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
 
-public class Channel {
+public class Channel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 5112808545762685190L;
+
     public static final Channel EMPTY_CHANNEL;
     private final UUID   id;
     private final Long   createAt;
