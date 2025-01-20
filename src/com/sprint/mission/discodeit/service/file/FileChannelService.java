@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.proxy.ChannelRepositoryProxy;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
@@ -14,9 +12,9 @@ public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator  channelValidator;
 
-    public FileChannelService() {
-        channelRepository = new ChannelRepositoryProxy(new FileChannelRepository());
-        channelValidator  = ChannelValidator.getInstance();
+    public FileChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
+        channelValidator       = ChannelValidator.getInstance();
     }
 
     /**

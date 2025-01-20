@@ -17,9 +17,9 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository;
     private final UserValidator  userValidator;
 
-    public JCFUserService() {
-        userRepository = new UserRepositoryProxy(new JCFUserRepository());
-        userValidator  = UserValidator.getInstance();
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+        userValidator       = UserValidator.getInstance();
     }
 
     /**

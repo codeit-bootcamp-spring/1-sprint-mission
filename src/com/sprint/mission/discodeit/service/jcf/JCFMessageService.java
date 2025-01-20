@@ -17,9 +17,9 @@ public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageValidator  messageValidator;
 
-    public JCFMessageService() {
-        messageRepository = new MessageRepositoryProxy(new JCFMessageRepository());
-        messageValidator  = MessageValidator.getInstance();
+    public JCFMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+        messageValidator       = MessageValidator.getInstance();
     }
 
     /**

@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.*;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.proxy.UserRepositoryProxy;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -18,19 +21,12 @@ public class JavaApplication {
                 .phoneNumber("010-1234-5678")
                 .build();
 
-        UserService userService = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService();
-        System.out.println("---------------------------------");
-        System.out.println("userService.createUser()");
-        System.out.println("pass User 'frog'! " + System.lineSeparator() + "User info: " + userService.createUser(frog));
-        System.out.println();
-        System.out.println("pass User 'baek'! " + System.lineSeparator() + "User info: " + userService.createUser(baek));
-        System.out.println();
-        System.out.println("pass User 'frog(already exist)'! " + System.lineSeparator() + "User info: " + userService.createUser(baek));
-        System.out.println();
-        System.out.println();
+        UserRepository userRepository = UserRepositoryFactory.JCF_USER_REPOSITORY_FACTORY.createUserRepository();
+        UserService    userService    = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService(userRepository);
 
-        System.out.println("---------------------------------");
-        System.out.println("userService.findUserById()");
+
+
+
         UUID frogKey = frog.getId();
         UUID baekKey = baek.getId();
         System.out.println("pass UUID 'frogKey'! " + System.lineSeparator() + "User info: " + userService.findUserById(frogKey));

@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.proxy.UserRepositoryProxy;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
@@ -14,9 +12,9 @@ public class FileUserService implements UserService {
     private final UserRepository userRepository;
     private final UserValidator  userValidator;
 
-    public FileUserService() {
-        userRepository = new UserRepositoryProxy(new FileUserRepository());
-        userValidator  = UserValidator.getInstance();
+    public FileUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+        userValidator       = UserValidator.getInstance();
     }
 
     /**

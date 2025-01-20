@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.proxy.MessageRepositoryProxy;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
@@ -14,9 +12,9 @@ public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageValidator  messageValidator;
 
-    public FileMessageService() {
-        messageRepository = new MessageRepositoryProxy(new FileMessageRepository());
-        messageValidator  = MessageValidator.getInstance();
+    public FileMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+        messageValidator       = MessageValidator.getInstance();
     }
 
     /**

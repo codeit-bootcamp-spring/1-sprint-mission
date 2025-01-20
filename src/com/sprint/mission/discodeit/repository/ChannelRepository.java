@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    Channel createChannel(Channel channelToCreate);
+    Channel createChannel(Channel channelInfoToCreate);
     Channel findChannelById(UUID key);
-    Channel updateChannelById(UUID key, Channel channelToUpdate);
+    Channel updateChannelById(UUID key, Channel channelInfoToUpdate);
     Channel deleteChannelById(UUID key);
 }

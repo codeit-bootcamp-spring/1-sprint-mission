@@ -15,6 +15,7 @@ build/
 *.ipr
 out/
 log/
+file/
 !**/src/main/**/out/
 !**/src/test/**/out/
 

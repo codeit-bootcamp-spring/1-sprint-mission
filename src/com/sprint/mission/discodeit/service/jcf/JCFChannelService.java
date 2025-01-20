@@ -17,9 +17,9 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator  channelValidator;
 
-    public JCFChannelService() {
-        channelRepository = new ChannelRepositoryProxy(new JCFChannelRepository());
-        channelValidator  = ChannelValidator.getInstance();
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
+        channelValidator       = ChannelValidator.getInstance();
     }
 
     /**
