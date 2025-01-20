@@ -3,11 +3,13 @@ package com.sprint.misson;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.*;
+import com.sprint.misson.discordeit.factory.FileServiceFactory;
 import com.sprint.misson.discordeit.factory.JCFServiceFactory;
 import com.sprint.misson.discordeit.factory.ServiceFactory;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
+import com.sprint.misson.discordeit.service.file.FileService;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,9 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-        ServiceFactory serviceFactory = new JCFServiceFactory();
+        FileService.deleteDataDirectory();
+        //ServiceFactory serviceFactory = JCFServiceFactory.getInstance();
+        ServiceFactory serviceFactory = FileServiceFactory.getInstance();
 
         UserService userService = serviceFactory.createUserService();
         ChannelService channelService = serviceFactory.createChannelService();
