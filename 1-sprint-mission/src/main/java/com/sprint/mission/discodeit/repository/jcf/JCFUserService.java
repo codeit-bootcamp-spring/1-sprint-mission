@@ -1,22 +1,20 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService{
+public class JCFUserService implements UserService {
 
-    private final Map<UUID,User> userList=new TreeMap<>();
+    protected  Map<UUID,User> userList=new TreeMap<>();
 
     @Override
     public void CreateUserDefault(String name) {
-        if(find_user(name).isEmpty()){
-            User new_user=User.createDefaultUser(name);
-            userList.put(new_user.getId(),new_user);
-        }
-        else{
-            System.out.println("이미 존재하는 이름입니다.");
-        }
+        User new_user=User.createDefaultUser(name);
+        userList.put(new_user.getId(),new_user);
+
+
     }
 
     @Override
@@ -57,30 +55,30 @@ public class JCFUserService implements UserService{
     @Override
     public boolean UpdateUserName(String name,String changeName) {
         TreeMap<UUID,User> instance = find_user(name);
-        return updateUserNameInfo(instance,changeName);
+        return UpdateUserNameInfo(instance,changeName);
     }
 
     @Override
     public boolean UpdateUserName(UUID id,String changeName) {
         TreeMap<UUID,User> instance = find_user(id);
-        return updateUserNameInfo(instance,changeName);
+        return UpdateUserNameInfo(instance,changeName);
     }
 
     @Override
     public boolean DeleteUser(UUID id) {
         TreeMap<UUID,User> instance = find_user(id);
-        return deleteUserInfo(instance);
+        return DeleteUserInfo(instance);
     }
 
 
     @Override
     public boolean DeleteUser(String name) {
         TreeMap<UUID,User> instance = find_user(name);
-        return deleteUserInfo(instance);
+        return DeleteUserInfo(instance);
     }
 
 
-    private TreeMap<UUID,User> find_user(String name){
+    protected TreeMap<UUID,User> find_user(String name){
         TreeMap<UUID,User> findUser=new TreeMap<>();
         for (User user : userList.values()) {
             if (user.getName().equals(name)) {
@@ -90,13 +88,13 @@ public class JCFUserService implements UserService{
         return findUser;
     }
 
-    private TreeMap<UUID,User> find_user(UUID id){
+    protected TreeMap<UUID,User> find_user(UUID id){
         TreeMap<UUID,User> findUser=new TreeMap<>();
         findUser.put(id,userList.get(id));
         return findUser;
     }
 
-    private boolean deleteUserInfo(TreeMap<UUID,User> instance){
+    protected boolean DeleteUserInfo(TreeMap<UUID,User> instance){
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 유저가 없습니다.");
             return false;
@@ -113,7 +111,7 @@ public class JCFUserService implements UserService{
         }
     }
 
-    private boolean updateUserNameInfo(TreeMap<UUID,User> instance, String changeName) {
+    protected boolean UpdateUserNameInfo(TreeMap<UUID,User> instance, String changeName) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 유저가 없습니다.");
             return false;

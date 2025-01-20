@@ -25,6 +25,13 @@ public class Channel {
         this.updatedAt=null;
         this.channelName=channelName;
     };
+    public Channel(UUID id,Long createdAt,Long updatedAt,String channelName){
+        this.id = id;
+        existChannelIdCheck.add(id);
+        this.createdAt= createdAt;
+        this.updatedAt=updatedAt;
+        this.channelName=channelName;
+    };
     public static Channel CreateDefaultChannel(String channelName){
         return new Channel(channelName);
     }

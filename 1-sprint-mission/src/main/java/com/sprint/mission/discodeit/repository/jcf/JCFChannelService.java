@@ -1,12 +1,13 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
-public class JCEFChannelService implements ChannelService{
+public class JCFChannelService implements ChannelService {
 
-    private final Map<UUID,Channel> channelList=new TreeMap<>();
+    protected Map<UUID,Channel> channelList=new TreeMap<>();
 
     @Override
     public void CreateChannelDefault(String name) {
@@ -56,26 +57,26 @@ public class JCEFChannelService implements ChannelService{
     @Override
     public boolean UpdateChannelName(UUID id, String name) {
         TreeMap<UUID,Channel> instance = find_Channel(id);
-        return updateChannel(instance,name);
+        return UpdateChannel(instance,name);
     }
     public boolean UpdateChannelName(String ChannelName, String name) {
         TreeMap<UUID,Channel> instance = find_Channel(ChannelName);
-        return updateChannel(instance,name);
+        return UpdateChannel(instance,name);
     }
     @Override
     public boolean DeleteChannel(UUID id) {
         TreeMap<UUID,Channel> instance = find_Channel(id);
-        return deleteChannel(instance);
+        return DeleteChannel(instance);
     }
 
     @Override
     public boolean DeleteChannel(String Name) {
         TreeMap<UUID,Channel> instance = find_Channel(Name);
-        return deleteChannel(instance);
+        return DeleteChannel(instance);
     }
 
 
-    private TreeMap<UUID,Channel> find_Channel(String name) {
+    protected TreeMap<UUID,Channel> find_Channel(String name) {
         TreeMap<UUID,Channel> findChannel=new TreeMap<>();
         for(Channel channel:channelList.values()){
             if(channel.getChannelName().equals(name)){
@@ -86,14 +87,14 @@ public class JCEFChannelService implements ChannelService{
     }
 
 
-    private TreeMap<UUID,Channel> find_Channel(UUID ID) {
+    protected TreeMap<UUID,Channel> find_Channel(UUID ID) {
         TreeMap<UUID,Channel> findChannel=new TreeMap<>();
         findChannel.put(ID,channelList.get(ID));
         return findChannel;
     }
 
 
-    private boolean deleteChannel(TreeMap<UUID,Channel> instance) {
+    protected boolean DeleteChannel(TreeMap<UUID,Channel> instance) {
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 채널이 없습니다.");
             return false;
@@ -109,7 +110,7 @@ public class JCEFChannelService implements ChannelService{
         }
     }
 
-    private boolean updateChannel(TreeMap<UUID,Channel> instance, String changeName) {
+    protected boolean UpdateChannel(TreeMap<UUID,Channel> instance, String changeName) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 채널이 없습니다.");
             return false;

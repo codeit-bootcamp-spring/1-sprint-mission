@@ -1,0 +1,12 @@
+{
+  "2616f5b7-96f7-421a-9ded-2e89a46cf2b3" : {
+    "channelName" : "구황작물",
+    "createdAt" : 1737359212038,
+    "updatedAt" : 0
+  },
+  "76ed6456-5ea8-43b5-b1d6-1e32b8c62147" : {
+    "channelName" : "튀기면 맛있는 작물",
+    "createdAt" : 1737359212049,
+    "updatedAt" : 0
+  }
+}

@@ -1,11 +1,14 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.UUID;
 
-public class JCFMessageService implements MessageService{
-    private final Map<UUID,Message> messageList=new TreeMap<>();
+public class JCFMessageService implements MessageService {
+    protected Map<UUID, Message> messageList=new TreeMap<>();
 
     @Override
     public void CreateMessageDefault(String title,String body) {
@@ -89,7 +92,7 @@ public class JCFMessageService implements MessageService{
     }
 
 
-    private boolean DeleteMessageInfo(TreeMap<UUID, Message> instance) {
+    protected boolean DeleteMessageInfo(TreeMap<UUID, Message> instance) {
         if (instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
@@ -105,14 +108,14 @@ public class JCFMessageService implements MessageService{
         }
     }
 
-    private TreeMap<UUID,Message> find_Message(UUID id) {
+    protected TreeMap<UUID,Message> find_Message(UUID id) {
         TreeMap<UUID, Message> findMessage = new TreeMap<>();
         findMessage.put(id,messageList.get(id));
         return findMessage;
     }
 
 
-    private TreeMap<UUID,Message> find_Message(String title) {
+    protected TreeMap<UUID,Message> find_Message(String title) {
         TreeMap<UUID, Message> findMessage = new TreeMap<>();
         for(Message message:messageList.values()){
             if(message.getTitle().equals(title)){
@@ -124,7 +127,7 @@ public class JCFMessageService implements MessageService{
 
 
 
-    private boolean ChangeMessageTitle(TreeMap<UUID, Message> instance, String changetitle) {
+    protected boolean ChangeMessageTitle(TreeMap<UUID, Message> instance, String changetitle) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
@@ -138,7 +141,7 @@ public class JCFMessageService implements MessageService{
         return false;
     }
 
-    private boolean ChangeMessageBody(TreeMap<UUID, Message> instance, String changeBody) {
+    protected boolean ChangeMessageBody(TreeMap<UUID, Message> instance, String changeBody) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;

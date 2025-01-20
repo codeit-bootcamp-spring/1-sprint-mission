@@ -9,7 +9,7 @@ public class User {
     final  private Long createdAt;
     private Long updatedAt;
     private String name;
-    private static final Set<UUID> existUserIdCheck = new HashSet<>();
+    public static final Set<UUID> existUserIdCheck = new HashSet<>();
 
 
     public User(String name){
@@ -25,10 +25,21 @@ public class User {
         this.name=name;
     };
 
+    public User(UUID id, Long createdAt, Long updatedAt, String name){
+        this.id=id;
+        existUserIdCheck.add(id);
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
+        this.name=name;
+
+    }
+
     public static User createDefaultUser(String name){
         return new User(name);
     }
-
+    public static User createUserAll(UUID id, Long createdAt, Long updatedAt, String name){
+        return new User(id,createdAt,updatedAt,name);
+    }
     public UUID getId() {
         return id;
     }
@@ -58,7 +69,7 @@ public class User {
     @Override
     public String toString(){
         return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+
-                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
+                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))+"\n";
     }
 
 

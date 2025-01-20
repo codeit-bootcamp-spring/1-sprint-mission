@@ -1,3 +1,9 @@
+import com.sprint.mission.discodeit.repository.file.FileChannelService;
+import com.sprint.mission.discodeit.repository.file.FileMessageService;
+import com.sprint.mission.discodeit.repository.file.FileUserServiece;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +20,7 @@ public class MainTest {
     @Test
     public void testUserService() {
         UserService userService=new JCFUserService();
+        //UserService userService=new FileUserServiece();
         assertEquals("등록된 유저가 없습니다.", userService.ReadUserAll(), "실패1.");
 
         userService.CreateUserDefault("고구마");
@@ -33,6 +40,7 @@ public class MainTest {
     @Test
     public void testMessageService() {
         MessageService messageService=new JCFMessageService();
+        //MessageService messageService=new FileMessageService();
         assertEquals("등록된 메세지가 없습니다.", messageService.ReadMessageAll(), "실패.");
         messageService.CreateMessageDefault("안녕하세요","감자입니다");
         assertNotNull(messageService.ReadMessageAll(), "실패");
@@ -51,7 +59,8 @@ public class MainTest {
 
     @Test
     public void testChannelService(){
-        ChannelService channelService=new JCEFChannelService();
+        ChannelService channelService=new JCFChannelService();
+        //ChannelService channelService=new FileChannelService();
         assertEquals("등록된 채널이 없습니다.", channelService.ReadChannelAll(), "실패.");
         channelService.CreateChannelDefault("탄수화물");
         assertNotNull(channelService.ReadChannelAll(), "실패");

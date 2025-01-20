@@ -35,6 +35,23 @@ public class Message {
         this.receiverId =null;
 
     };
+    public Message(UUID ID,Long createdAt,Long updatedAt,String title,String messageBody,
+                   String senderName,String receiverName, UUID senderId, UUID receiverId ){
+
+        this.id=ID;
+        existMessageIdCheck.add(ID);
+
+        this.createdAt= createdAt;
+        this.updatedAt=updatedAt;
+        this.title=title;
+        this.messageBody=messageBody;
+        this.senderName=senderName;
+        this.receiverName =receiverName;
+        this.senderId=senderId;
+        this.receiverId =receiverId;
+
+    };
+
     public static Message CreateDefaultMessage(String title,String messageBody){
         return new Message(title,messageBody);
     }

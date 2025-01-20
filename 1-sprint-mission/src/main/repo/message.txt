@@ -1,0 +1,22 @@
+{
+  "97f7f137-3ccd-45a9-89e7-98d57ef6d5ed" : {
+    "createdAt" : 1737359212006,
+    "messageBody" : "저 맛탕 되었어요",
+    "receiverId" : null,
+    "receiverName" : "",
+    "senderId" : null,
+    "senderName" : "",
+    "title" : "잘 지내세요?",
+    "updatedAt" : 0
+  },
+  "74dfb17f-1cee-47d6-b754-7ef64cbe9949" : {
+    "createdAt" : 1737359212017,
+    "messageBody" : "달달해요",
+    "receiverId" : null,
+    "receiverName" : "",
+    "senderId" : null,
+    "senderName" : "",
+    "title" : "마지막으로?",
+    "updatedAt" : 0
+  }
+}
