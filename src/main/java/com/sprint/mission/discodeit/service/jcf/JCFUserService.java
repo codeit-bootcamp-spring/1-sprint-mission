@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
+import com.sprint.mission.discodeit.validation.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +11,7 @@ import java.util.UUID;
 
 public class JCFUserService implements UserService {
     private final List<User> data;
+    private final UserValidator userValidator = new UserValidator();
 
     public JCFUserService() {
         data = new ArrayList<>();
@@ -17,7 +20,7 @@ public class JCFUserService implements UserService {
     // 유저 생성
     @Override
     public User createUser(String name, String email) {
-        if (isValidName(name) && isValidEmail(email)) {
+        if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
             User newUser = new User(name, email);
             data.add(newUser);
             System.out.println("user create: " + newUser.getName());
@@ -65,7 +68,7 @@ public class JCFUserService implements UserService {
 
     // 유저 이름 업데이트
     public void updateUserName(User user, String newName) {
-        if (isValidName(newName)) {
+        if (userValidator.isValidName(newName)) {
             user.updateName(newName);
             System.out.println("success update");
         }
@@ -74,28 +77,9 @@ public class JCFUserService implements UserService {
     // 유저 이메일 업데이트
     @Override
     public void updateUserEmail(User user, String newEmail) {
-        if (isValidEmail(newEmail)) {
+        if (userValidator.isValidEmail(newEmail)) {
             user.updateEmail(newEmail);
             System.out.println("success update");
         }
-    }
-
-    private boolean isValidName(String name) {
-        if (name.isBlank()) {
-            System.out.println("the name is blank");
-        } else if (name.length() < 2) {
-            System.out.println("the name is too short");
-        } else {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        if (!email.matches(emailRegex)) {
-            System.out.println("email format does not match");
-        }
-        return email.matches(emailRegex);
     }
 }

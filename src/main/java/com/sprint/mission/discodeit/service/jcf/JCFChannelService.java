@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
+import com.sprint.mission.discodeit.validation.UserValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
     private final List<Channel> data;
+    private final ChannelValidator channelValidator = new ChannelValidator();
 
     public JCFChannelService() {
         data = new ArrayList<>();
@@ -19,7 +22,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(String title, User owner) {
         // title 검사하기
-        if (isValidTitle(title)) {
+        if (channelValidator.isValidTitle(title)) {
             Channel newChannel = new Channel(title, owner);
             data.add(newChannel);
             System.out.println(owner.getName() + " create new channel");
@@ -61,7 +64,7 @@ public class JCFChannelService implements ChannelService {
     // 채널명 업데이트
     @Override
     public void updateTitle(Channel channel, String title) {
-        if (isValidTitle(title)) {
+        if (channelValidator.isValidTitle(title)) {
             channel.updateTitle(title);
             System.out.println("success update");
         }
@@ -101,13 +104,5 @@ public class JCFChannelService implements ChannelService {
         } else {
             System.out.println("member does not exist");
         }
-    }
-
-    private boolean isValidTitle(String title) {
-        if (title.isBlank()) {
-            System.out.println("title must not be blank");
-            return false;
-        }
-        return true;
     }
 }

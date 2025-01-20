@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private final List<Message> data;
+    private final MessageValidator messageValidator = new MessageValidator();
 
     public JCFMessageService() {
         data = new ArrayList<>();
@@ -19,7 +21,7 @@ public class JCFMessageService implements MessageService {
     // 메세지 생성
     @Override
     public Message createMessage(Channel channel, User writer, String content) {
-        if (inValidContent(content)) {
+        if (messageValidator.inValidContent(content)) {
             Message newMessage = new Message(channel, writer, content);
             data.add(newMessage);
             System.out.println(channel.getTitle() + " channel: " + writer.getName() + " send new message");
@@ -61,7 +63,7 @@ public class JCFMessageService implements MessageService {
     // 메세지 수정
     @Override
     public void updateMessage(Message message, String content) {
-        if (inValidContent(content)) {
+        if (messageValidator.inValidContent(content)) {
             message.updateContent(content);
             System.out.println("success update");
         }
@@ -72,14 +74,5 @@ public class JCFMessageService implements MessageService {
     public void deleteMessage(Message message) {
         data.remove(message);
         System.out.println("success delete");
-    }
-
-    // 메세지 검사
-    private boolean inValidContent(String content) {
-        if (content.isBlank()) {
-            System.out.println("content must not be blank");
-            return false;
-        }
-        return true;
     }
 }
