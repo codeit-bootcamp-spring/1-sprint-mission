@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.proxy.ChannelServiceProxy;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public enum ChannelServiceFactory {
     JCF_CHANNEL_SERVICE_FACTORY((channelRepository) -> new ChannelServiceProxy(new JCFChannelService(channelRepository))),

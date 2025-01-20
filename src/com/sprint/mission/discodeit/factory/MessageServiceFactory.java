@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.proxy.MessageServiceProxy;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public enum MessageServiceFactory {
     JCF_MESSAGE_SERVICE_FACTORY((messageRepository) -> new MessageServiceProxy(new JCFMessageService(messageRepository))),
