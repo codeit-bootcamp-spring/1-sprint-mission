@@ -285,10 +285,8 @@ public class JavaApplication {
         System.out.println("\n> msg1 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
         msg1.displayFullInfo();
 
-        messageService.updateMessage(msg1.getId().toString(), "수다방 채널입니다!");
-
         System.out.println("\n> 수정 결과:");
-        msg1.displayFullInfo();
+        messageService.updateMessage(msg1.getId().toString(), "수다방 채널입니다!").displayFullInfo();
 
         // 4. 삭제 테스트
         System.out.println("\n\n=== 4. 삭제 테스트 ===");
