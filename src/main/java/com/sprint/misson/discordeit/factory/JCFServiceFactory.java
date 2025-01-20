@@ -9,14 +9,23 @@ import com.sprint.misson.discordeit.service.jcf.JCFUserService;
 
 public class JCFServiceFactory implements ServiceFactory {
 
+    private static JCFServiceFactory instance;
+
     private UserService userService;
     private ChannelService channelService;
     private MessageService messageService;
 
-    public JCFServiceFactory() {
+    private JCFServiceFactory() {
         this.userService = createUserService();
         this.channelService = createChannelService();
         this.messageService = createMessageService();
+    }
+
+    public static JCFServiceFactory getInstance() {
+        if (instance == null) {
+            instance = new JCFServiceFactory();
+        }
+        return instance;
     }
 
     @Override
