@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
     private final Map<String, Channel> channels = new HashMap<>();
+
     @Override
     public void createChannel(Channel channel) {
         if (channels.containsKey(channel.getId().toString())) {
