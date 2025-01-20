@@ -28,22 +28,12 @@ public class UserServiceProxy implements UserService {
             logger.warning(e.getErrorCode(), logMessage, userId);
         }
 
-        if (creation == User.EMPTY_USER) {
-            logger.warning(logMessage, userId);
-        }
-
         return creation;
     }
 
     @Override
     public User findUserById(UUID key) {
-        User find = userService.findUserById(key);
-
-        if (find == User.EMPTY_USER) {
-            logger.warning("User find failed", key);
-        }
-
-        return find;
+        return userService.findUserById(key);
     }
 
     @Override
@@ -57,21 +47,11 @@ public class UserServiceProxy implements UserService {
             logger.warning(e.getErrorCode(), logMessage, key);
         }
 
-        if (update == User.EMPTY_USER) {
-            logger.warning(logMessage, key);
-        }
-
         return update;
     }
 
     @Override
     public User deleteUserById(UUID key) {
-        User deletion = userService.deleteUserById(key);
-
-        if (deletion == User.EMPTY_USER) {
-            logger.warning("User deletion failed", key);
-        }
-
-        return deletion;
+        return userService.deleteUserById(key);
     }
 }

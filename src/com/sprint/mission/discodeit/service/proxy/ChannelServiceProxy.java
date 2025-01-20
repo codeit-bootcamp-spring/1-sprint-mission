@@ -28,22 +28,12 @@ public class ChannelServiceProxy implements ChannelService {
             logger.warning(e.getErrorCode(), logMessage, channelId);
         }
 
-        if (creation == Channel.EMPTY_CHANNEL) {
-            logger.warning(logMessage, channelId);
-        }
-
         return creation;
     }
 
     @Override
     public Channel findChannelById(UUID key) {
-        Channel find = channelService.findChannelById(key);
-
-        if (find == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel find failed", key);
-        }
-
-        return find;
+        return channelService.findChannelById(key);
     }
 
     @Override
@@ -57,21 +47,11 @@ public class ChannelServiceProxy implements ChannelService {
             logger.warning(e.getErrorCode(), logMessage, key);
         }
 
-        if (updated == Channel.EMPTY_CHANNEL) {
-            logger.warning(logMessage, key);
-        }
-
         return updated;
     }
 
     @Override
     public Channel deleteChannelById(UUID key) {
-        Channel deletion = channelService.deleteChannelById(key);
-
-        if (deletion == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel deletion failed", key);
-        }
-
-        return deletion;
+        return channelService.deleteChannelById(key);
     }
 }

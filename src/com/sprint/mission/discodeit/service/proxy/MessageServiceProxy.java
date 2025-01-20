@@ -28,22 +28,12 @@ public class MessageServiceProxy implements MessageService {
             logger.warning(e.getErrorCode(), logMessage, messageId);
         }
 
-        if (creation == Message.EMPTY_MESSAGE) {
-            logger.warning(logMessage, messageId);
-        }
-
         return creation;
     }
 
     @Override
     public Message findMessageById(UUID key) {
-        Message find = messageService.findMessageById(key);
-
-        if (find == Message.EMPTY_MESSAGE) {
-            logger.warning("Message find failed", key);
-        }
-
-        return find;
+        return messageService.findMessageById(key);
     }
 
     @Override
@@ -57,21 +47,11 @@ public class MessageServiceProxy implements MessageService {
             logger.warning(e.getErrorCode(), logMessage, key);
         }
 
-        if (updated == Message.EMPTY_MESSAGE) {
-            logger.warning(logMessage, key);
-        }
-
         return updated;
     }
 
     @Override
     public Message deleteMessageById(UUID key) {
-        Message deletion = messageService.deleteMessageById(key);
-
-        if (deletion == Message.EMPTY_MESSAGE) {
-            logger.warning("Message deletion failed", key);
-        }
-
-        return deletion;
+        return messageService.deleteMessageById(key);
     }
 }
