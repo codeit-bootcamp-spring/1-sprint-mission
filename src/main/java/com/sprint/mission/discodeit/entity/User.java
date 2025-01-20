@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.service.ChannelService;
+
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
@@ -11,16 +13,20 @@ public class User {
 
     // 추가적으로 필요한 필드값들은 메소드 만들면서 추가하도록 하자.
     // 지금 넣어봤자 계속 바뀔 것 같다.
-    String userNickName; // 유저의 닉네임.
-    String userEmail; // 유저의 이메일. 로그인할때 사용하도록 하자.
-    String password; // 로그인시 필요한 비밀번호
+    private String userNickName; // 유저의 닉네임.
+    private String userEmail; // 유저의 이메일. 로그인할때 사용하도록 하자.
+    private String password; // 로그인시 필요한 비밀번호
 
-    public User(String userEmail, String userNickName, String password) {
+    private User(String userEmail, String userNickName, String password) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.userNickName = userNickName;
         this.userEmail = userEmail;
         this.password = password;
+    }
+
+    public static User createUser(String userEmail, String userNickName, String password) {
+        return new User(userEmail, userNickName, password);
     }
 
     public UUID getId() {
