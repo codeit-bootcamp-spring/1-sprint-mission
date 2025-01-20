@@ -118,3 +118,5 @@ fabric.properties
 
 /codeit-bootcamp-spring/1-sprint-mission/.idea
 .idea
+/.idea/
+/codeit-bootcamp-spring/.idea/
