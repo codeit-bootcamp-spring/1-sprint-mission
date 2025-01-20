@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.entity;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Channel {
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
     //객체 식별 id
     private final UUID id;
     //채널명

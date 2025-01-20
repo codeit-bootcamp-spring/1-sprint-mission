@@ -1,6 +1,8 @@
 package com.sprint.misson.discordeit.entity;
 
-public enum ChannelType {
+import java.io.Serializable;
+
+public enum ChannelType implements Serializable {
     TEXT,
     VOICE
 }

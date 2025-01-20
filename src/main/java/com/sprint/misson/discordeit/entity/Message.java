@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
     //객체 식별 id
     private final UUID id;
     //생성 날짜 - 유닉스 타임스탬프

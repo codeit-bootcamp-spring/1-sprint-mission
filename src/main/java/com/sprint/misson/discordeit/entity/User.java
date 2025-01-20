@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
     //객체 식별용 id
     private final UUID id;
     //닉네임
