@@ -4,7 +4,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://C:/github.com/codeit-bootcamp-spring/1-sprint-mission" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_23" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
     <output url="file://$APPLICATION_HOME_DIR$/bin/github.com/codeit-bootcamp-spring/1-sprint-mission/out" />
   </component>
 </project>
