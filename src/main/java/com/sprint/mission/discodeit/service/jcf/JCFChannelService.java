@@ -1,12 +1,11 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.util.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
@@ -19,13 +18,15 @@ public class JCFChannelService implements ChannelService {
 
 
     @Override
-    public void createChannel(Channel channel) {
+    public Channel createChannel(String name) {
+        Channel channel = new Channel(name);
         channeldata.add(channel);
-        System.out.println(" 채널명: " + channel.getChName() + " 채널이 추가되었습니다.");
+        System.out.println(" 채널명: " + channel.getChannelName() + " 채널이 추가되었습니다.");
+        return channel;
     }
 
     @Override
-    public Channel readChannel(String id) { //
+    public Channel readChannel(UUID id) { //
 
         return
                 this.channeldata.stream()
@@ -43,18 +44,18 @@ public class JCFChannelService implements ChannelService {
 
     //이름 및 시간 업데이트?
     @Override
-    public void modifyChannel(String id, String name) {
+    public Channel modifyChannel(UUID id, String name) { //null 방어
         Channel target = readChannel(id);
-        String oriName=target.getChName();
+        String oriName=target.getChannelName();
         target.updateName(name);
         target.updateUpdatedAt(); //시간 업데이트
         System.out.println("채널이름 변경: " + oriName+ " -> " + name );
-
+        return target;
     }
 
     @Override
-    public void deleteChannel(String id) {
-        String name= readChannel(id).getChName();
+    public void deleteChannel(UUID id) {
+        String name= readChannel(id).getChannelName();
         boolean isDeleted = this.channeldata.removeIf(ch -> ch.getChId().equals(id));
         
         if(isDeleted) {
@@ -64,9 +65,5 @@ public class JCFChannelService implements ChannelService {
         }
     }
 
-    @Override
-    public void addUser(Channel channel, User user) {
-        channel.getUserList().add(user); //해당 채널에 유저 추가
-    }
 
 }

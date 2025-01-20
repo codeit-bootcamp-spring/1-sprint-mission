@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     final List<Message> messagedata;
@@ -14,14 +15,20 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createMessage(Message message) {
+    public Message createMessage(UUID userId, UUID channelId, String content) {
+        Message message = new Message(userId, channelId, content);
         messagedata.add(message);
-        message.getUser().addMessage(message);
+
+        return message;
+
 
     }
 
     @Override
-    public Message readMessage(String msgID) {
+    public Message readMessage(UUID msgID) {
+        //id가 있는지 검증
+
+
         return
                 this.messagedata.stream()
                         .filter(msg -> msg.getMsgId().equals(msgID))
@@ -36,31 +43,24 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void modifyMessage(String msgID, String content) {
+    public Message modifyMessage(UUID msgID, String content) {
         Message msg = readMessage(msgID);
         String oriMsg=msg.getContent();
         msg.updateContent(content);
         msg.updateUpdatedAt();
-        System.out.println(msg.getUser().getUserName() + "님의 메시지 변경: \""+ oriMsg + "\" -> \"" +
+        System.out.println(msg.getUserID() + "님의 메시지 변경: \""+ oriMsg + "\" -> \"" +
                 content+  "\"");
+
+        return msg;
     }
 
     @Override
-    public void deleteMessage(String msgID) {
-        String uname= readMessage(msgID).getUser().getUserName();
+    public void deleteMessage(UUID msgID) {
         String name= readMessage(msgID).getContent();
-        //boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID)); //메시지삭제
-        boolean isDeleted = this.messagedata.removeIf(msg -> {
-            if (msg.getMsgId().equals(msgID)) {
-                // 유저의 메시지리스트에서삭제
-                msg.getUser().getMsgList().removeIf(m -> m.getMsgId().equals(msgID));
-                return true; // 삭제 조건을 만족할 때 삭제
-            }
-            return false;
-        });
-        if(isDeleted) {
+        boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID)); //메시지삭제
 
-            System.out.println(uname + "님의 \"" + name + "\" 메시지가 삭제되었습니다.");
+        if(isDeleted) {
+            System.out.println(name + "님의 메시지가 삭제되었습니다.");
 
         }else{
             System.out.println(" 메시지 삭제 실패하였습니다.");

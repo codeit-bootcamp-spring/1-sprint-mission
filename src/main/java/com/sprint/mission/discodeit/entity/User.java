@@ -5,21 +5,19 @@ import java.util.UUID;
 
 
 public class User {
-    private List<Message> msgList;
-    private String id ;
+    private UUID id ;
     private String userName;
-    private long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
 
     public User(String userName){
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.userName = userName;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
-        this.msgList = new ArrayList<>();// 메시지 리스트 초기화
     }
 
     //get
-    public String getUserId(){
+    public UUID getUserId(){
         return this.id;
     }
     public String getUserName(){
@@ -31,9 +29,6 @@ public class User {
     public long getUpdatedAt(){
         return this.updatedAt;
     }
-    public List<Message> getMsgList(){
-        return this.msgList;
-    }
 
     //update
     public void updateUpdatedAt(){
@@ -44,7 +39,4 @@ public class User {
     }
 
 
-    public void addMessage(Message message) {
-        this.msgList.add(message);
-    }
 }

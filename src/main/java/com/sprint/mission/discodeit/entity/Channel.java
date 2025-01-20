@@ -5,25 +5,23 @@ import java.util.UUID;
 
 public class Channel {
 
-    List<User> userList;
-    String id ;
-    String chName;
-    long createdAt;
-    long updatedAt;
+    private UUID id ;
+    private String channelName;
+    private final Long createdAt;
+    private Long updatedAt;
 
-    public Channel(String chName){
-        this.id = UUID.randomUUID().toString();
-        this.chName = chName;
+    public Channel(String channelName){
+        this.id = UUID.randomUUID();
+        this.channelName = channelName;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
-        this.userList= new ArrayList<>();
     }
 
     //get
-    public String getChId(){
+    public UUID getChId(){
         return this.id;
     }
-    public String getChName(){
-        return this.chName;
+    public String getChannelName(){
+        return this.channelName;
     }
     public long getCreatedAt(){
         return this.createdAt;
@@ -31,13 +29,10 @@ public class Channel {
     public long getUpdatedAt(){
         return this.updatedAt;
     }
-    public List<User> getUserList(){
-        return userList;
-    }
 
     //update
     public void updateName(String name){
-        this.chName=name;
+        this.channelName=name;
     }
     public void updateUpdatedAt(){
         this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
