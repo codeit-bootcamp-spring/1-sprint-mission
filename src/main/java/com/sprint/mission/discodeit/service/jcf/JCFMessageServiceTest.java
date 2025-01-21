@@ -3,7 +3,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.impl.InMemoryMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -18,7 +18,7 @@ public class JCFMessageServiceTest {
         Channel channel = new Channel(user, "TestChannel");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         JCFMessageService messageService = new JCFMessageService(messageRepository, mockInputHandler);
 
@@ -32,7 +32,7 @@ public class JCFMessageServiceTest {
         Channel channel = new Channel(user, "TestChannel");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         JCFMessageService messageService = new JCFMessageService(messageRepository, mockInputHandler);
 
@@ -47,7 +47,7 @@ public class JCFMessageServiceTest {
         Channel channel = new Channel(user, "TestChannel");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         JCFMessageService messageService = new JCFMessageService(messageRepository, mockInputHandler);
 
@@ -62,7 +62,7 @@ public class JCFMessageServiceTest {
 
         // Mockito로 InputHandler mock 생성
         InputHandler mockInputHandler = mock(InputHandler.class);
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getNewInput()).thenReturn("Changed Test Message content");
@@ -83,7 +83,7 @@ public class JCFMessageServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         JCFMessageService messageService = new JCFMessageService(messageRepository, mockInputHandler);
 
@@ -104,7 +104,7 @@ public class JCFMessageServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
-        MessageRepository messageRepository = new InMemoryMessageRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
         JCFMessageService messageService = new JCFMessageService(messageRepository, mockInputHandler);
 

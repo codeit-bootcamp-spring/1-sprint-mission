@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.io.InputHandler;
 
 
 public class JCFUserService implements UserService {
-    //Scanner sc = new Scanner(System.in);
+    // Scanner sc = new Scanner(System.in);
     // private final HashMap<String, User> Users;
 
     private final UserRepository userRepository;

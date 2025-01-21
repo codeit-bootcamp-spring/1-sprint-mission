@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.impl.InMemoryChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -15,7 +15,7 @@ public class JCFChannelServiceTest {
     void testCreateChannel(){
         User user = new User("TestUser");
         InputHandler mockInputHandler = mock(InputHandler.class);
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
 
@@ -28,7 +28,7 @@ public class JCFChannelServiceTest {
         User user = new User("TestUser");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
         channelService.createChannel(user, "TestChannel ReadAll 1");
@@ -42,7 +42,7 @@ public class JCFChannelServiceTest {
         User user = new User("TestUser");
 
         InputHandler mockInputHandler = mock(InputHandler.class);
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
         UUID id = channelService.createChannel(user,"TestChannel ReadChannel");
@@ -57,7 +57,7 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getNewInput()).thenReturn("Changed Test channel name");
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
         UUID id = channelService.createChannel(user,"TestChannel Update channelName");
@@ -73,7 +73,7 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
@@ -92,7 +92,7 @@ public class JCFChannelServiceTest {
         InputHandler mockInputHandler = mock(InputHandler.class);
         // mockInputHandler의 메서드가 호출될 때마다 미리 지정된 값 반환
         when(mockInputHandler.getYesNOInput()).thenReturn("y");
-        ChannelRepository channelRepository = new InMemoryChannelRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
 
         JCFChannelService channelService = new JCFChannelService(channelRepository, mockInputHandler);
         UUID id = channelService.createChannel(user,"testUserDeleteUser");

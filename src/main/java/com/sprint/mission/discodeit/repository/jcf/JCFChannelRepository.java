@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.impl;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class InMemoryChannelRepository implements ChannelRepository {
+public class JCFChannelRepository implements ChannelRepository {
     Map<UUID, Channel> channels;
-    public InMemoryChannelRepository(){
+    public JCFChannelRepository(){
         this.channels = new HashMap<>();
     }
     public void saveChannel(Channel channel){
