@@ -1,17 +1,12 @@
 {
-  "a2c680bb-9d32-493e-be0b-e7ef5c41c215" : {
-    "createdAt" : 1737359211761,
+  "b4c09c59-be46-40a3-a552-3161d43fb251" : {
+    "createdAt" : 1737434165428,
     "name" : "감자",
-    "updatedAt" : 1737359211989
+    "updatedAt" : 1737434165659
   },
-  "37edd863-20f5-4613-b616-519c5a6d1f21" : {
-    "createdAt" : 1737359211977,
+  "724b7e9a-1d85-4f84-a650-2ef83c895c22" : {
+    "createdAt" : 1737434165645,
     "name" : "우유",
-    "updatedAt" : 0
-  },
-  "3f713b7c-a980-4ae9-825a-a32058adea51" : {
-    "createdAt" : 1737359222901,
-    "name" : "감자",
-    "updatedAt" : 1737359222951
+    "updatedAt" : null
   }
 }

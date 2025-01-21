@@ -13,12 +13,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-public class FileUserServiece extends JCFUserService implements Serializable, UserRepository {
+public class FileUserService extends JCFUserService implements Serializable, UserRepository {
     private static final long serialVersionUID = 1L;
     private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\user.txt";
 
 
-    public FileUserServiece(){
+    public FileUserService(){
         userList=LoadUserTxt();
     }
 

@@ -1,6 +1,3 @@
-import com.sprint.mission.discodeit.repository.file.FileChannelService;
-import com.sprint.mission.discodeit.repository.file.FileMessageService;
-import com.sprint.mission.discodeit.repository.file.FileUserServiece;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserService;

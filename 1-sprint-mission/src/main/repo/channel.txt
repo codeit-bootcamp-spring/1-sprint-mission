@@ -1,12 +1,12 @@
 {
-  "2616f5b7-96f7-421a-9ded-2e89a46cf2b3" : {
-    "channelName" : "구황작물",
-    "createdAt" : 1737359212038,
+  "33a7f442-f8bb-4968-b50d-09cfa62d6269" : {
+    "channelName" : "튀기면 맛있는 작물",
+    "createdAt" : 1737434165734,
     "updatedAt" : 0
   },
-  "76ed6456-5ea8-43b5-b1d6-1e32b8c62147" : {
-    "channelName" : "튀기면 맛있는 작물",
-    "createdAt" : 1737359212049,
+  "5dd02e20-a941-4c9e-9df4-95069b9206ea" : {
+    "channelName" : "구황작물",
+    "createdAt" : 1737434165716,
     "updatedAt" : 0
   }
 }
