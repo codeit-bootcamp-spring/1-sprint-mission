@@ -42,7 +42,7 @@ public class Message {
         return userId.equals(getUser);
     }
 
-    public boolean isChannelEqual(UUID getChannel) {
+    public boolean isChannelEqual(UUID channelId) {
         return channelId.equals(getChannel);
     }
 
