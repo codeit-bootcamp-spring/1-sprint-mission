@@ -49,7 +49,7 @@ public class JCF_channel implements ChannelService {
 
 
     @Override
-    public UUID write(String title) {
+    public UUID get(String title) {
         Optional<Channel> channel = channelSet.stream().filter(channel_id -> channel_id.getTitle().equals(title)).findFirst();
 
         if(channel.isPresent()){
