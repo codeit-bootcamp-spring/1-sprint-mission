@@ -7,20 +7,18 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
 
     private final UserValidator validator;
-    private final List<User> users;
+    private final Map<UUID, User> users;
     private ChannelService jcfChannelService;
     private MessageService jcfMessageService;;
 
     private JCFUserService() {
         validator = new UserValidator();
-        users = new ArrayList<>();
+        users = new HashMap<>();
     }
 
     private static class JCFUserServiceHolder {
@@ -46,9 +44,9 @@ public class JCFUserService implements UserService {
         validator.validate(name, email, phoneNumber);
         isDuplicateEmail(email);
         isDuplicatePhoneNumber(phoneNumber);
-        User newUser = new User(name, email, phoneNumber, password);
-        users.add(newUser);
-        return newUser;
+        User user = new User(name, email, phoneNumber, password);
+        users.put(user.getId() ,user);
+        return user;
     }
 
     @Override
