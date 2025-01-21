@@ -127,11 +127,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public void isDuplicateEmail(String email) {
-        users.stream().forEach(user -> user.isDuplicateEmail(email));
+        users.values().forEach(user -> user.isDuplicateEmail(email));
     }
 
     @Override
     public void isDuplicatePhoneNumber(String phoneNumber) {
-        users.stream().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
+        users.values().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }
