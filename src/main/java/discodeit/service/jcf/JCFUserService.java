@@ -50,20 +50,16 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID id) {
-        User findUser = findUser(id);
-        if (findUser == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
-        }
-        return findUser;
+    public User find(UUID userId) {
+        User user = users.get(userId);
+
+        return Optional.ofNullable(user)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
     @Override
-    public User findUser(UUID id) {
-        return users.stream()
-                .filter(user -> user.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
+    public List<User> findAll() {
+        return List.of();
     }
 
     @Override

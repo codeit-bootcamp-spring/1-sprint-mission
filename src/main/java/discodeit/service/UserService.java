@@ -3,14 +3,15 @@ package discodeit.service;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
     void updateChannelService(ChannelService channelService);
     void updateMessageService(MessageService messageService);
     User createUser(String name, String email, String phoneNumber, String password);
-    User findById(UUID id);
-    User findUser(UUID id);
+    User find(UUID userId);
+    List<User> findAll();
     String getInfo(User user);
     void updateName(User user, String name);
     void updateEmail(User user, String email);
