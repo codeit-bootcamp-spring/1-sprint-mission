@@ -1,0 +1,32 @@
+plugins {
+    id 'groovy'
+    id 'checkstyle'
+}
+
+group 'com.sprint.mission'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.14'
+    implementation 'org.projectlombok:lombok:1.18.30' // 최신 버전 사용
+    annotationProcessor 'org.projectlombok:lombok:1.18.30' // Lombok 애노테이션 프로세서 추가
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation 'com.google.guava:guava:33.2.1-jre'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion = '1.0' // Checkstyle 버전
+    configFile = rootProject.file('config/checkstyle.xml') // Checkstyle 설정 파일 경로
+}
