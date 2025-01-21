@@ -49,8 +49,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String content) {
-        Message message = Optional.ofNullable(data.get(messageId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 message입니다."));
+        Message message = readMessage(messageId);
         message.updateContent(content);
     }
 

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -24,8 +25,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String name) {
-        Channel channel = Channel.from(name);
+    public Channel createChannel(ChannelDto channelDto) {
+        Channel channel = Channel.of(channelDto.getName(), channelDto.getDescription());
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -42,23 +43,21 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateName(UUID channelId, String name) {
-        Channel channel = Optional.ofNullable(data.get(channelId))
-                        .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
-        channel.updateName(name);
+    public void updateChannel(UUID channelId, ChannelDto channelDto) {
+        Channel channel = readChannel(channelId);
+        channel.updateName(channelDto.getName());
+        channel.updateDescription(channelDto.getDescription());
     }
 
     @Override
     public void addUser(UUID channelId, UUID userId) {
-        Channel channel = Optional.ofNullable(data.get(channelId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
+        Channel channel = readChannel(channelId);
         channel.addUser(userService.readUser(userId));
     }
 
     @Override
     public void deleteUser(UUID channelId, UUID userId) {
-        Channel channel = Optional.ofNullable(data.get(channelId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
+        Channel channel = readChannel(channelId);
         channel.deleteUser(userId);
     }
 

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.*;
 
 
@@ -15,22 +16,29 @@ public class Channel {
     private Long updatedAt;
 
     private String name;
+    private String description;
     private Map<UUID, User> users;
 
-    private Channel(String name) {
+    private Channel(String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.name = name;
+        this.description = description;
         users = new HashMap<>(100);
     }
 
-    public static Channel from(String name) {
-        return new Channel(name);
+    public static Channel of(String name, String description) {
+        return new Channel(name, description);
     }
 
     public void updateName(String name) {
         this.name = name;
+        updatedAt = System.currentTimeMillis();
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
         updatedAt = System.currentTimeMillis();
     }
 

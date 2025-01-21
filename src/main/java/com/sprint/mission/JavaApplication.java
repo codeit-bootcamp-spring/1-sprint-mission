@@ -1,5 +1,6 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -54,15 +55,15 @@ public class JavaApplication {
         System.out.println("===== channelServiceTest =====\n");
 
         System.out.println("===== channel 생성 =====");
-        Channel codeit = channelService.createChannel("codeit");
-        Channel spring = channelService.createChannel("spring");
+        Channel codeit = channelService.createChannel(ChannelDto.of("codeit", "codeit channel"));
+        Channel spring = channelService.createChannel(ChannelDto.of("spring", "spring channel"));
 
         System.out.println("===== 생성된 channel =====");
         channelService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
         System.out.println("===== codeit channel 이름 변경 =====");
-        channelService.updateName(codeit.getId(), "newCodeit");
+        channelService.updateChannel(codeit.getId(), ChannelDto.of("codeit", "codeit channel"));
         System.out.println(channelService.readChannel(codeit.getId()));
         System.out.println();
 

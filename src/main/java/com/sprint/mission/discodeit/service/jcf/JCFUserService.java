@@ -24,18 +24,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(UserDto userDto) {
-        StringBuilder builder = new StringBuilder();
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] digest = md.digest(userDto.getPassword().getBytes());
-
-            for (byte b : digest) {
-                builder.append(String.format("%02x", b));
-            }
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException("비밀번호 암호화 오류");
-        }
-        String hashedPassword = builder.toString();
+        String hashedPassword = generatePassword(userDto.getPassword());
 
         User user = User.of(userDto.getName(), userDto.getLoginId(), hashedPassword);
         data.put(user.getId(), user);
@@ -55,16 +44,30 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
-        User user = Optional.ofNullable(data.get(userId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
+        User user = readUser(userId);
 
         user.updateLoginId(userDto.getLoginId());
-        user.updatePassword(userDto.getPassword());
+        user.updatePassword(generatePassword(userDto.getPassword()));
         user.updateName(userDto.getName());
     }
 
     @Override
     public void deleteUser(UUID userId) {
         data.remove(userId);
+    }
+
+    private String generatePassword(String password) {
+        StringBuilder builder = new StringBuilder();
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(password.getBytes());
+
+            for (byte b : digest) {
+                builder.append(String.format("%02x", b));
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("비밀번호 암호화 오류");
+        }
+        return builder.toString();
     }
 }
