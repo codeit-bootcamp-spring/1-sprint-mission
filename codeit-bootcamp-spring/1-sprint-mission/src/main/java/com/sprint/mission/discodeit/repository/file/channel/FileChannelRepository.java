@@ -14,7 +14,7 @@ public class FileChannelRepository extends FileAbstractRepository<Channel, UUID>
         store.putAll(loadFile());
     }
 
-    public ChannelRepository getInstance() {
+    public static ChannelRepository getInstance() {
         if (FILE_USER_REPOSITORY_INSTANCE == null) {
             FILE_USER_REPOSITORY_INSTANCE = new FileChannelRepository();
         }

@@ -40,6 +40,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/build/reports/
+
+
+/build
 /build/test-results/
 /build/reports/

@@ -15,7 +15,7 @@ public class FileDirectMessageRepository extends FileAbstractRepository<DirectMe
         store.putAll(loadFile());
     }
 
-    public DirectMessageRepository getInstance() {
+    public static DirectMessageRepository getInstance() {
         if (FILE_DIRECT_REPOSITORY_INSTANCE == null) {
             FILE_DIRECT_REPOSITORY_INSTANCE = new FileDirectMessageRepository();
         }
