@@ -20,7 +20,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message read(UUID id) {
+    public Message readOne(UUID id) {
         return data.get(id);
     }
 
@@ -34,7 +34,7 @@ public class JCFMessageService implements MessageService {
                 System.out.println(sender + "님이 " + recipient + "님에게 글을 남기셨습니다.");
                 System.out.println(sender + " -> " + recipient + " : "  + message.getContent());
             }else{
-                System.out.println(sender + "님이 " + message.getChannel().getChannelName() + " 채널에 글을 남기셨습니다.");
+                System.out.println(sender + "님이 " + message.getChannel().getName() + " 채널에 글을 남기셨습니다.");
                 System.out.println(sender + " - " + message.getContent());
             }
             System.out.println();

@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.validation.Validator;
-import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @Getter @Setter
-public class User extends BaseEntity{
-    private final Validator validator = new ValidatorImpl();
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String username;
     private String email;
     private String phoneNumber;

@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.file;
 
 import java.util.List;
 
 public interface FileService<T> {
-    List<T> readFromFile();
-    void writeToFile(List<T> data);
+    List<T> loadFromFile();
+    boolean saveToFile(List<T> data);
 }

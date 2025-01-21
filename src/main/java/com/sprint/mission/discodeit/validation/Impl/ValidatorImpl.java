@@ -11,7 +11,7 @@ public class ValidatorImpl implements Validator {
     private static final Pattern PHONE_REGEX = Pattern.compile("^(01[0-9])-(\\d{3,4})-(\\d{4})$", Pattern.CASE_INSENSITIVE);
 
     @Override
-    public boolean emailIsValid(String email) {
+    public boolean isValidEmail(String email) {
         if(Objects.isNull(email) || email.isEmpty()){
             return false;
         }else{
@@ -20,7 +20,7 @@ public class ValidatorImpl implements Validator {
     }
 
     @Override
-    public boolean phoneNumberIsValid(String phoneNumber){
+    public boolean isValidPhoneNumber(String phoneNumber){
         if(Objects.isNull(phoneNumber) || phoneNumber.isEmpty()){
             return false;
         }else{

@@ -142,7 +142,7 @@ fabric.properties
 .gradle
 **/build/
 !src/**/build/
-
+gradlew
 # Ignore Gradle GUI config
 gradle-app.setting
 

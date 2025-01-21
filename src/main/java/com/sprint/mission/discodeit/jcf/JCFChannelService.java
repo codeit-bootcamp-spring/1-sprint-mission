@@ -19,19 +19,19 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel create(Channel channel) {
         data.put(channel.getId(), channel);
-        System.out.println(channel.getChannelName() + " 채널이 오픈되었습니다.");
+        System.out.println(channel.getName() + " 채널이 오픈되었습니다.");
         return channel;
     }
 
     @Override
-    public Channel read(UUID id) {
+    public Channel readOne(UUID id) {
         return data.get(id);
     }
 
     @Override
     public List<Channel> readAll() {
         data.values().forEach(channel -> {
-            System.out.println(channel.getChannelName());
+            System.out.println(channel.getName());
         });
 
         return new ArrayList<>(data.values());
@@ -42,7 +42,7 @@ public class JCFChannelService implements ChannelService {
         try{
             if(data.containsKey(id)){
                 Channel existingChannel = data.get(id);
-                existingChannel.setChannelName(updatedChannel.getChannelName());
+                existingChannel.setName(updatedChannel.getName());
                 existingChannel.setDescription(updatedChannel.getDescription());
                 updatedChannel.update();
                 return existingChannel;
@@ -71,9 +71,9 @@ public class JCFChannelService implements ChannelService {
     @Override
     public boolean delete(UUID id) {
         try{
-            String removeChannelName = data.get(id).getChannelName();
+            String removename = data.get(id).getName();
             data.remove(id);
-            System.out.println(removeChannelName +" 삭제가 완료되었습니다.");
+            System.out.println(removename +" 삭제가 완료되었습니다.");
             return true;
         } catch (NullPointerException e){
             System.out.println("유효하지 않은 ID 입니다..\n" + e);
@@ -90,7 +90,7 @@ public class JCFChannelService implements ChannelService {
                 List<User> members = new ArrayList<>(joinChannel.getMember());
                 if (!members.contains(joinUser)) {
                     members.add(joinUser);
-                    System.out.println(joinChannel.getChannelName() + " 채널에 " + joinUser.getUsername() + "님이 등록되었습니다.");
+                    System.out.println(joinChannel.getName() + " 채널에 " + joinUser.getUsername() + "님이 등록되었습니다.");
                 } else {
                     System.out.println("User is already a member.");
                 }
