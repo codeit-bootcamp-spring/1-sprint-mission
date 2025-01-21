@@ -18,8 +18,8 @@ public class JCFChannelService implements ChannelService {
     private MessageService jcfMessageService;
 
     private JCFChannelService() {
-        validator = new ChannelValidator();
-        channels = new HashMap<>();
+        this.validator = new ChannelValidator();
+        this.channels = new HashMap<>();
     }
 
     private static class JCFChannelServiceHolder {

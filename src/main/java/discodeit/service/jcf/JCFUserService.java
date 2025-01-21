@@ -17,8 +17,8 @@ public class JCFUserService implements UserService {
     private MessageService jcfMessageService;;
 
     private JCFUserService() {
-        validator = new UserValidator();
-        users = new HashMap<>();
+        this.validator = new UserValidator();
+        this.users = new HashMap<>();
     }
 
     private static class JCFUserServiceHolder {
