@@ -18,7 +18,7 @@ public class JavaApplication {
         JCFMessageService jcfMessageService = new JCFMessageService();
 
         //UserTest
-        System.out.println("userTest\n\n");
+        System.out.println("userTest\n\n\n");
 
         //등록
         UUID id1 = jcfUserService.create("user1", "111@naver.com","abc123");
@@ -70,7 +70,7 @@ public class JavaApplication {
 
         //ChannelTest
         //등록
-        System.out.println("ChannelTest\n\n");
+        System.out.println("ChannelTest\n\n\n");
         User user3 = jcfUserService.findOne(id3);
         UUID cid1 = jcfChannelService.create("channel1", user3);
 
@@ -143,7 +143,7 @@ public class JavaApplication {
         jcfChannelService.joinChannel(cid11, user12);
 
         //MessageTest
-        System.out.println("MessageTest\n\n");
+        System.out.println("MessageTest\n\n\n");
         //등록
         UUID mid1 = jcfMessageService.create("메시지1", user10, channel10);
         UUID mid2 = jcfMessageService.create("메시지2", user10, channel10);
