@@ -50,20 +50,16 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findById(UUID id) {
-        Channel findChannel = findChannel(id);
-        if (findChannel == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
-        return findChannel;
+    public Channel find(UUID channelId) {
+        Channel channel = channels.get(channelId);
+
+        return Optional.ofNullable(channel)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
     }
 
     @Override
-    public Channel findChannel(UUID id) {
-        return channels.stream()
-                .filter(channel -> channel.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
+    public List<Channel> findAll() {
+        return channels.values().stream().toList();
     }
 
     @Override
