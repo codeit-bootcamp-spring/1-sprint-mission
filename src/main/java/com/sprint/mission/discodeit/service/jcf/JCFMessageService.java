@@ -13,19 +13,19 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     //< 채널 UUID < 메시지 UUID, 매시지 객체 >>
-    private final MessageRepository messageRepository;
+    private final Map<UUID, Map<UUID, Message>> data = new HashMap<>();
     private final MessageValidator validationService;
 
-    public JCFMessageService(MessageValidator validationService, MessageRepository messageRepository) {
+    public JCFMessageService(MessageValidator validationService) {
         this.validationService = validationService;
-        this.messageRepository = messageRepository;
     }
 
     @Override
     public Message createMsg(User user, Channel channel, String content) {
         if (validationService.validateMessage(user, channel, content)){
             Message msg = new Message(user, channel, content);
-            messageRepository.save(msg);
+            data.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
+            data.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
             return msg;
         }
         throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
@@ -33,28 +33,44 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getMessage(UUID msgUuid) {
-        return messageRepository.findById(msgUuid);
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            if (channelMessages.containsKey(msgUuid)) {
+                return channelMessages.get(msgUuid);
+            }
+        }
+        System.out.println("Message with ID " + msgUuid + " not found.");
+        return null;
     }
 
     @Override
     public Map<UUID, Map<UUID, Message>> getAllMsg() {
-        return messageRepository.findAll();
+        return  new HashMap<>(data);
     }
 
     @Override
-    public void updateMsg(UUID msgId, String newContent) {
-        Message msg = messageRepository.findById(msgId);
+    public void updateMsg(UUID msgUuid, String newContent) {
+        Message msg = getMessage(msgUuid);
         msg.update(newContent);
         System.out.println("Message content has been updated --> ("+ newContent + ")");
     }
 
     @Override
     public void deleteMsg(UUID msgUuid) {
-        messageRepository.delete(msgUuid);
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            if (channelMessages.containsKey(msgUuid)) {
+                channelMessages.remove(msgUuid);
+                System.out.println("Message " + msgUuid + " deleted.");
+            }
+        }
+        System.out.println("Message not found: " + msgUuid);
     }
 
     @Override
     public void deleteAllMessagesForChannel(UUID channelUuid) {
-        messageRepository.deleteAllMessagesForChannel(channelUuid);
+        if (!data.containsKey(channelUuid)) {
+            System.out.println("No messages found for channel ID");
+        }
+        data.remove(channelUuid);
+        System.out.println("All messages for channel "+ "'" + channelUuid +"'" +" have been deleted.");
     }
 }

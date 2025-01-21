@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 public class FileUserRepository implements UserRepository {
 
     private final HashMap<UUID, User> data = new HashMap<>();
-
     private static final Logger LOGGER = Logger.getLogger(FileUserRepository.class.getName());
     private final Path directory = Paths.get(System.getProperty("user.dir"), "Data/user_data");
     private final String fileName = "user_data.ser";

@@ -22,73 +22,55 @@ public class JavaApplication {
         //UserService 인스턴스 생성
         factoryService.createFileUserRepository();
         factoryService.createUserValidator();
-        UserService fileUserService = factoryService.createFileUserService();
+        UserService basicUserService = factoryService.createBasicUserService();
 
         //ChannelService 인스턴스 생성
         factoryService.createFileChannelRepository();
         factoryService.createChannelValidator();
-        ChannelService fileChannelService = factoryService.createFileChannelService();
+        ChannelService basicChannelService = factoryService.createBasicChannelService();
 
         //MessageService 인스턴스 생성
         factoryService.createMessageValidator();
         factoryService.createFileMessageRepository();
-        MessageService fileMessageService = factoryService.createFileMessageService();
+        MessageService basicMessageService = factoryService.createBasicMessageService();
         factoryService.createObserverManager();
         factoryService.createChannelObserver();
 
 
-//        User user1 = fileUserService.CreateUser("코드일","codeit1234@codeit.com","codeit1234","1Q2w3e4r@");
-//        User user2 = fileUserService.CreateUser("코드이","code1234@codeit.com","codeit1234","1q2W3e4r@");
+//        User user1 = basicUserService.CreateUser("코드일","codeit1234@codeit.com","codeit1234","1Q2w3e4r@");
+//        User user2 = basicUserService.CreateUser("코드이","code1234@codeit.com","codeit1234","1q2W3e4r@");
 //
-//        Channel ch1 = fileChannelService.createChannel("CH.1");
-//        Channel ch2 = fileChannelService.createChannel("CH.2");
-//
-//        Message msg1 = fileMessageService.createMsg(user1,ch1,"user1이 보내는 첫번째 테스트 메시지");
-//        Message msg2 = fileMessageService.createMsg(user1,ch1,"user1이 보내는 두번째 테스트 메시지");
-//        Message msg3 = fileMessageService.createMsg(user1,ch1,"user1이 보내는 세번째 테스트 메시지");
-//        Message msg4 = fileMessageService.createMsg(user2,ch2,"user2이 보내는 첫번째 테스트 메시지");
-//        Message msg5 = fileMessageService.createMsg(user2,ch2,"user2이 보내는 두번째 테스트 메시지");
-//
-//        fileMessageService.deleteMsg(msg1.getMsguuId());
+        System.out.println("----------------모든 사용자 조회--------------");
+        Map<UUID, User> allPrintUser = basicUserService.getAllUsers();
+        for(User user  : allPrintUser.values()){
+            System.out.println(user);
+            System.out.println("-----------------------------------------------");
+        }
+
+//        Channel ch1 = basicChannelService.createChannel("CH.1");
+//        Channel ch2 = basicChannelService.createChannel("CH.2");
+
+        Map<UUID, Channel> allprintChannel = basicChannelService.getAllChannels();
+        for(Channel channel : allprintChannel.values()){
+            System.out.println(channel);
+            System.out.println("-----------------------------------------------");
+        }
+
+//        Message msg1 = basicMessageService.createMsg(user1,ch1,"user1이 보내는 첫번째 테스트 메시지");
+//        Message msg2 = basicMessageService.createMsg(user1,ch1,"user1이 보내는 두번째 테스트 메시지");
+//        Message msg3 = basicMessageService.createMsg(user1,ch1,"user1이 보내는 세번째 테스트 메시지");
+//        Message msg4 = basicMessageService.createMsg(user2,ch2,"user2이 보내는 첫번째 테스트 메시지");
+//        Message msg5 = basicMessageService.createMsg(user2,ch2,"user2이 보내는 두번째 테스트 메시지");
 
         System.out.println("-----------------모든 메시지 조회 getAllMsg()------------------");
-        Map<UUID, Map<UUID, Message>> allMessages = fileMessageService.getAllMsg();
+        Map<UUID, Map<UUID, Message>> allMessages = basicMessageService.getAllMsg();
+
         for (Map<UUID, Message> channelMessages : allMessages.values()) {
             for (Message message : channelMessages.values()) {
                 System.out.println(message);
                 System.out.println("===============================================");
             }
         }
-
-//        fileChannelService.deleteChannel(ch2.getuuId());
-//        System.out.println("-----------------ch2 삭제한후의 모든 메시지 출력------------------");
-//
-//        allMessages = fileMessageService.getAllMsg();
-//        for (Map<UUID, Message> channelMessages : allMessages.values()) {
-//            for (Message message : channelMessages.values()) {
-//                System.out.println(message);
-//                System.out.println("===============================================");
-//            }
-//        }
-
-
-
-//        System.out.println("----------------모든 사용자 조회--------------");
-//        Map<UUID, User> allPrintUser = fileUserService.getAllUsers();
-//        for(User user  : allPrintUser.values()){
-//            System.out.println(user.toString());
-//            System.out.println("-----------------------------------------------");
-//        }
-
-
-//        System.out.println("----------------모든 채널 조회-------------------");
-//        Map<UUID, Channel> allPrintCh = fileChannelService.getAllChannels();
-//        for (Channel channel : allPrintCh.values()) {
-//            System.out.println(channel);
-//            System.out.println("===============================================");
-//
-//        }
-
 
     }
 
@@ -97,9 +79,9 @@ public class JavaApplication {
 
         Factory factory = new FactoryService();
 
-        UserService userService = factory.createUserService();
-        ChannelService channelService = factory.createChannelService();
-        MessageService messageService = factory.createMessageService();
+        UserService userService = factory.createJCFUserService();
+        ChannelService channelService = factory.createJCFChannelService();
+        MessageService messageService = factory.createJCFMessageService();
 
         User user1 = userService.CreateUser("설유일","tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
         User user2 = userService.CreateUser("홍길동","killDong@gmail.com", "killdong","1Q2w3e4r@");
@@ -139,9 +121,9 @@ public class JavaApplication {
 
         Factory factory = new FactoryService();
 
-        UserService userService = factory.createUserService();
-        ChannelService channelService = factory.createChannelService();
-        MessageService messageService = factory.createMessageService();
+        UserService userService = factory.createJCFUserService();
+        ChannelService channelService = factory.createJCFChannelService();
+        MessageService messageService = factory.createJCFMessageService();
 
         User user1 = userService.CreateUser("설유일", "tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
         User user2 = userService.CreateUser("홍길동", "killDong@gmail.com", "killdong", "1Q2w3e4r@");
@@ -183,9 +165,9 @@ public class JavaApplication {
     static void messageServiceTest(){
         Factory factory = new FactoryService();
 
-        UserService userService = factory.createUserService();
-        ChannelService channelService = factory.createChannelService();
-        MessageService messageService = factory.createMessageService();
+        UserService userService = factory.createJCFUserService();
+        ChannelService channelService = factory.createJCFChannelService();
+        MessageService messageService = factory.createJCFMessageService();
 
         User user1 = userService.CreateUser("설유일", "tjf7894@gmail.com", "tjf7894", "1Q2w3e4r@");
         User user2 = userService.CreateUser("홍길동", "killDong@gmail.com", "killdong", "1Q2w3e4r@");

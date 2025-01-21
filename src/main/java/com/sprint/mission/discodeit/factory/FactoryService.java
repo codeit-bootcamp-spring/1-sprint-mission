@@ -13,6 +13,9 @@ import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -27,22 +30,27 @@ import com.sprint.mission.discodeit.validation.UserValidator;
 
 public class FactoryService implements Factory{
 
-    private static UserService userServiceInstance;
+    private static UserService jcfUserServiceInstance;
     private static UserService fileUserServiceInstance;
+    private static UserService basicUserServiceInstance;
 
-    private static ChannelService channelServiceInstance;
+    private static ChannelService JCFChannelServiceInstance;
     private static ChannelService fileChannelServiceInstance;
+    private static ChannelService basicChannelServiceInstance;
 
-    private static MessageService messageServiceInstance;
+    private static MessageService JCFMessageServiceInstance;
     private static MessageService fileMessageServiceInstance;
+    private static MessageService basicMessageServiceInstance;
+
+
     //repository(User)
-    private static UserRepository userRepositoryInstance;
+    private static UserRepository jcfUserRepositoryInstance;
     private static FileUserRepository fileUserRepositoryInstance;
     //repository(Channel)
-    private static ChannelRepository channelRepositoryInstance;
-    private static FileChannelRepository fileChannelRepositoryInstance;
+    private static ChannelRepository jcfChannelRepositoryInstance;
+    private static ChannelRepository fileChannelRepositoryInstance;
     //repository(Message)
-    private static MessageRepository messageRepositoryInstance;
+    private static MessageRepository jcfMessageRepositoryInstance;
     private static MessageRepository fileMessageRepositoryInstance;
     //validation 패키지 객체를
     private static MessageValidator messageValidatorInstance;
@@ -55,76 +63,100 @@ public class FactoryService implements Factory{
 
     //유저 서비스
     @Override
-    public synchronized UserService  createUserService() {
-        if(userServiceInstance == null){
-            userServiceInstance = new JCFUserService(userRepositoryInstance,userValidatorInstance);
+    public synchronized UserService  createJCFUserService() {
+        if(jcfUserServiceInstance == null){
+            jcfUserServiceInstance = new JCFUserService(userValidatorInstance);
         }
-        return userServiceInstance;
+        return jcfUserServiceInstance;
     }
 
     @Override
     public synchronized UserService  createFileUserService() {
         if(fileUserServiceInstance == null){
-            fileUserServiceInstance = new FileUserService(fileUserRepositoryInstance,userValidatorInstance);
+            fileUserServiceInstance = new FileUserService(userValidatorInstance);
 
         }
 
         return fileUserServiceInstance;
     }
 
+    @Override
+    public synchronized UserService createBasicUserService(){
+        if(basicUserServiceInstance ==null){
+            basicUserServiceInstance = new BasicUserService(fileUserRepositoryInstance, userValidatorInstance);
+        }
+        return basicUserServiceInstance;
+    }
+
+
     //채널 서비스
     @Override
-    public synchronized ChannelService createChannelService() {
-        if(channelServiceInstance == null){
-            channelServiceInstance
-                    = new JCFChannelService(createObserverManager(),channelValidatorInstance,channelRepositoryInstance);
+    public synchronized ChannelService createJCFChannelService() {
+        if(JCFChannelServiceInstance == null){
+            JCFChannelServiceInstance
+                    = new JCFChannelService(createObserverManager(),channelValidatorInstance);
         }
-        return channelServiceInstance;
+        return JCFChannelServiceInstance;
     }
 
     @Override
     public synchronized ChannelService createFileChannelService() {
         if(fileChannelServiceInstance == null){
             fileChannelServiceInstance
-                    = new FileChannelService(createObserverManager(),channelValidatorInstance,fileChannelRepositoryInstance);
+                    = new FileChannelService(createObserverManager(),channelValidatorInstance);
         }
         return fileChannelServiceInstance ;
     }
 
-
-    //현재는 옵저버가 감지하는게 deleteChannel 메소드 작동만 감지해서 클라이언트에서 테스트시
-    //일일이 객체 생성하기 번거로워서 일단 넣었습니다.
-    // but: createMessageService() 메서드의 동작이 단순히 MessageService 객체 생성이 아니라 observerService,
-    //      MessageValidator 객체를 생성하는 흐름이, 동작을 모르는 사람이 사용 시 혼동??을 줄 수 있지 않을까...요??
-    //      만약 그렇다면 어떻게 하는게 좋을지..(-_-)...
-    //-------------------> 결론 따로 분리합시다.. <----------------------
     @Override
-    public synchronized MessageService createMessageService() {
-        if(messageServiceInstance == null){
-            messageServiceInstance = new JCFMessageService(messageValidatorInstance, messageRepositoryInstance);
+    public synchronized ChannelService createBasicChannelService() {
+        if(basicChannelServiceInstance ==null){
+            basicChannelServiceInstance = new BasicChannelService(createObserverManager(),channelValidatorInstance, fileChannelRepositoryInstance );
         }
-        return messageServiceInstance;
+        return basicChannelServiceInstance;
+    }
+
+    //메시지 서비스
+    @Override
+    public synchronized MessageService createJCFMessageService() {
+        if(JCFMessageServiceInstance == null){
+            JCFMessageServiceInstance = new JCFMessageService(messageValidatorInstance);
+        }
+        return JCFMessageServiceInstance;
 
     }
 
     @Override
     public synchronized MessageService createFileMessageService() {
         if(fileMessageServiceInstance == null){
-            fileMessageServiceInstance = new FileMessageService(messageValidatorInstance,fileMessageRepositoryInstance);
+            fileMessageServiceInstance = new FileMessageService(messageValidatorInstance);
         }
         return fileMessageServiceInstance;
 
     }
 
+    @Override
+    public synchronized MessageService createBasicMessageService(){
+        if(basicMessageServiceInstance == null){
+            basicMessageServiceInstance = new BasicMessageService(messageValidatorInstance,fileMessageRepositoryInstance);
+        }
+        return basicMessageServiceInstance;
+    }
+
+
+
     //observer
     @Override
     public synchronized Observer createChannelObserver() {
         if ( channelObserverInstance == null) {
-            if(messageServiceInstance == null){
+            if(JCFMessageServiceInstance == null && fileMessageServiceInstance == null){
+                channelObserverInstance = new ChannelObserver(basicMessageServiceInstance);
+                observerManagerInstance.addObserver(channelObserverInstance);
+            }else if(JCFMessageServiceInstance == null){
                 channelObserverInstance = new ChannelObserver(fileMessageServiceInstance);
                 observerManagerInstance.addObserver(channelObserverInstance);
             }else{
-                channelObserverInstance = new ChannelObserver(messageServiceInstance);
+                channelObserverInstance = new ChannelObserver(JCFMessageServiceInstance);
                 observerManagerInstance.addObserver(channelObserverInstance);
             }
         }
@@ -141,11 +173,11 @@ public class FactoryService implements Factory{
 
     //repository(User)
     @Override
-    public synchronized UserRepository createUserRepository(){
-        if(userRepositoryInstance == null){
-            userRepositoryInstance = new JCFUserRepository();
+    public synchronized UserRepository createJCFUserRepository(){
+        if(jcfUserRepositoryInstance == null){
+            jcfUserRepositoryInstance = new JCFUserRepository();
         }
-        return userRepositoryInstance;
+        return jcfUserRepositoryInstance;
     }
 
     @Override
@@ -158,11 +190,11 @@ public class FactoryService implements Factory{
 
     //repository(Channel)
     @Override
-    public synchronized ChannelRepository createChannelRepository(){
-        if(channelRepositoryInstance == null){
-            channelRepositoryInstance = new JCFChannelRepository();
+    public synchronized ChannelRepository createJCFChannelRepository(){
+        if(jcfChannelRepositoryInstance == null){
+            jcfChannelRepositoryInstance = new JCFChannelRepository();
         }
-        return channelRepositoryInstance;
+        return jcfChannelRepositoryInstance;
     }
 
     @Override
@@ -175,11 +207,11 @@ public class FactoryService implements Factory{
 
     //repository(Message)
     @Override
-    public synchronized MessageRepository createMessageRepository(){
-        if(messageRepositoryInstance == null){
-            messageRepositoryInstance = new JCFMessageReplsitory();
+    public synchronized MessageRepository createJCFMessageRepository(){
+        if(jcfMessageRepositoryInstance == null){
+            jcfMessageRepositoryInstance = new JCFMessageReplsitory();
         }
-        return messageRepositoryInstance;
+        return jcfMessageRepositoryInstance;
     }
 
     @Override
@@ -197,10 +229,12 @@ public class FactoryService implements Factory{
     @Override
     public synchronized MessageValidator createMessageValidator(){
         if(messageValidatorInstance == null) {
-            if (userServiceInstance == null) {
+            if (jcfUserServiceInstance == null && fileChannelServiceInstance == null) {
+                messageValidatorInstance = new MessageValidator(basicChannelServiceInstance, basicUserServiceInstance);
+            } else if(jcfUserServiceInstance == null){
                 messageValidatorInstance = new MessageValidator(fileChannelServiceInstance, fileUserServiceInstance);
-            } else {
-                messageValidatorInstance = new MessageValidator(channelServiceInstance, userServiceInstance);
+            } else{
+                messageValidatorInstance = new MessageValidator(JCFChannelServiceInstance, jcfUserServiceInstance);
             }
         }
         return messageValidatorInstance;

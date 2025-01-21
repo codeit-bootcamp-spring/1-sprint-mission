@@ -12,36 +12,44 @@ import com.sprint.mission.discodeit.validation.MessageValidator;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
 public interface Factory {
+    //UserService
+    UserService createJCFUserService();
 
-    UserService createUserService();
+    UserService createFileUserService();
 
-    UserService  createFileUserService();
-
-    ChannelService createChannelService();
+    UserService createBasicUserService();
+    //ChannelService
+    ChannelService createJCFChannelService();
 
     ChannelService createFileChannelService();
 
-    MessageService createMessageService();
+    ChannelService createBasicChannelService();
+
+    //MessageService
+    MessageService createJCFMessageService();
 
     MessageService createFileMessageService();
 
+    MessageService createBasicMessageService();
+    //Validator
     UserValidator createUserValidator();
 
     ChannelValidtor createChannelValidator();
 
     MessageValidator createMessageValidator();
 
-
-    UserRepository createUserRepository();
+    //repository(User)
+    UserRepository createJCFUserRepository();
 
     UserRepository createFileUserRepository();
 
-
+    //repository(Channel)
     ChannelRepository createFileChannelRepository();
 
-    ChannelRepository createChannelRepository();
+    ChannelRepository createJCFChannelRepository();
 
-    MessageRepository createMessageRepository();
+    //repository(Message)
+    MessageRepository createJCFMessageRepository();
 
     MessageRepository createFileMessageRepository();
 
