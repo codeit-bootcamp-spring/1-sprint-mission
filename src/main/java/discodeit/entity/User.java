@@ -19,15 +19,15 @@ public class User {
 
     public User(String name, String email, String phoneNumber, String password) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
-        id = UUID.randomUUID();
-        createdAt = currentUnixTime;
-        updatedAt = currentUnixTime;
+        this.id = UUID.randomUUID();
+        this.createdAt = currentUnixTime;
+        this.updatedAt = currentUnixTime;
 
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
-        joinedChannels = new ArrayList<>();
+        this.joinedChannels = new ArrayList<>();
     }
 
     public UUID getId() {

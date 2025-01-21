@@ -11,9 +11,9 @@ public class Message {
 
     public Message(String content, User sender) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
-        id = UUID.randomUUID();
-        createdAt = currentUnixTime;
-        updatedAt = currentUnixTime;
+        this.id = UUID.randomUUID();
+        this.createdAt = currentUnixTime;
+        this.updatedAt = currentUnixTime;
 
         this.content = content;
         this.sender = sender;

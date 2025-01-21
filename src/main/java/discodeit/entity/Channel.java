@@ -16,15 +16,15 @@ public class Channel {
 
     public Channel(String name, String introduction, User owner) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
-        id = UUID.randomUUID();
-        createdAt = currentUnixTime;
-        updatedAt = currentUnixTime;
+        this.id = UUID.randomUUID();
+        this.createdAt = currentUnixTime;
+        this.updatedAt = currentUnixTime;
 
         this.name = name;
         this.introduction = introduction;
         this.owner = owner;
-        participants = new ArrayList<>();
-        messages = new ArrayList<>();
+        this.participants = new ArrayList<>();
+        this.messages = new ArrayList<>();
     }
 
     public void updateUpdatedAt() {
