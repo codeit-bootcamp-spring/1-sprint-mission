@@ -51,9 +51,9 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID channelId) {
-        Channel channel = channels.get(channelId);
+        Channel foundChannel = channels.get(channelId);
 
-        return Optional.ofNullable(channel)
+        return Optional.ofNullable(foundChannel)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
     }
 

@@ -51,9 +51,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public User find(UUID userId) {
-        User user = users.get(userId);
+        User foundUser = users.get(userId);
 
-        return Optional.ofNullable(user)
+        return Optional.ofNullable(foundUser)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
     }
 
