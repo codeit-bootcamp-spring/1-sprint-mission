@@ -40,10 +40,9 @@ public class JCF_channel implements ChannelService {
 
     @Override
     public void update(UUID channelId, String title) {
-        channelSet.stream().filter(channel -> channel.getId().equals(channelId))
-            .forEach(channel -> {{channel.updateTitle(title);
-            }
-            });
+        channelSet.stream()
+                .filter(channel -> channel.getId().equals(channelId))
+                .forEach(channel -> channel.updateTitle(title));
 
     }
 
