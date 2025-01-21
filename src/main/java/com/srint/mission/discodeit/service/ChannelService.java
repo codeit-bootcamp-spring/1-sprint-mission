@@ -20,7 +20,7 @@ public interface ChannelService {
     UUID create(String channelName, User channelOwner);
     Channel read(UUID id);
     List<Channel> readAll();
-    Channel updateChannelName(UUID id, String channelName);
+    Channel updateChannelName(UUID id, User user, String channelName);
 
     Channel joinChannel(UUID id, User user);
 

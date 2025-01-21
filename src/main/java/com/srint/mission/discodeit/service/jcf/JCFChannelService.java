@@ -11,8 +11,8 @@ public class JCFChannelService implements ChannelService {
 
     private final Map<UUID, Channel> data;
 
-    public JCFChannelService(Map<UUID, Channel> data) {
-        this.data = data;
+    public JCFChannelService() {
+        data = new HashMap<>();
     }
 
     //db 로직
@@ -24,7 +24,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel findOne(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("조회할 Channel을 찾지 못했습니다.");
         }
         return data.get(id);
@@ -40,7 +40,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public UUID delete(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");
         }
         data.remove(id);
@@ -66,8 +66,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannelName(UUID id, String channelName) {
+    public Channel updateChannelName(UUID id, User user,String channelName) {
         Channel findChannel = findOne(id);
+        if(!findChannel.getChannelOwner().userCompare(user)){
+            throw new IllegalStateException("채널 수정 권한이 없습니다.");
+        }
         findChannel.setChannelName(channelName);
         return findChannel;
     }
@@ -97,6 +100,6 @@ public class JCFChannelService implements ChannelService {
         }
         findChannel.getJoinedUsers().forEach(
                 u -> u.deleteMyChannels(findChannel));
-        return findChannel.getId();
+        return delete(id);
     }
 }

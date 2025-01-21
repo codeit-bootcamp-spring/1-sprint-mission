@@ -92,5 +92,16 @@ public class Channel {
         //user.getMyChannels().remove(this);
     }
 
-
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", channelName='" + channelName + '\'' +
+                ", channelOwner=" + channelOwner +"\n"+
+                ", joinedUsers=" + joinedUsers +
+                ", messages=" + messages +
+                '}';
+    }
 }

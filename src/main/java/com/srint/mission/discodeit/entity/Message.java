@@ -20,9 +20,6 @@ public class Message{
         this.content = content;
         this.user = user;
         this.channel = channel;
-
-        //여기서 연관관계를 맺는 것이 맞을까?
-        channel.getMessages().add(this);
     }
 
     public UUID getId() {
@@ -62,4 +59,14 @@ public class Message{
         setUpdatedAt();
     }
 
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", content='" + content + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }

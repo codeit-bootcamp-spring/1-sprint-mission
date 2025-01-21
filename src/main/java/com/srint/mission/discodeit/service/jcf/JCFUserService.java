@@ -24,7 +24,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findOne(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("조회할 User을 찾지 못했습니다.");
         }
         return data.get(id);
@@ -40,7 +40,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public UUID delete(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("삭제할 User를 찾지 못했습니다.");
         }
         data.remove(id);
@@ -99,9 +99,12 @@ public class JCFUserService implements UserService {
     }
 
     private void validateDuplicateUser(String email) {
-        List<User> users = findAll();
-        if (users.stream().anyMatch(user-> email.equals((user.getEmail())))){
-            throw new IllegalStateException("이미 존재하는 이메일 입니다.");
+        if(!data.isEmpty()){
+            List<User> users = findAll();
+            if (users.stream().anyMatch(user-> email.equals((user.getEmail())))){
+                throw new IllegalStateException("이미 존재하는 이메일 입니다.");
+            }
         }
+
     }
 }

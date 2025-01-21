@@ -13,8 +13,8 @@ public class JCFMessageService implements MessageService {
 
     private final Map<UUID, Message> data;
 
-    public JCFMessageService(Map<UUID, Message> data) {
-        this.data = data;
+    public JCFMessageService() {
+        data = new HashMap<>();
     }
 
     @Override
@@ -25,7 +25,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message findOne(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("조회할 Message을 찾지 못했습니다.");
         }
         return data.get(id);
@@ -41,7 +41,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public UUID delete(UUID id) {
-        if(data.containsKey(id)){
+        if(!data.containsKey(id)){
             throw new IllegalArgumentException("삭제할 Message를 찾지 못했습니다.");
         }
         data.remove(id);
