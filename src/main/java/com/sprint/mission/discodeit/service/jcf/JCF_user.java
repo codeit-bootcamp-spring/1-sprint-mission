@@ -46,8 +46,13 @@ public class JCF_user implements UserService {
     @Override
     public void update(UUID userId, String name) {
         boolean duplication = userSet.stream().anyMatch(user1 -> user1.getName().equals(name));
+        if (duplication) {
+            System.out.println("name duplication!");
+            return;
+        }
+        
         userSet.forEach(users -> {
-            if (users.getId().equals(userId) && !duplication) {
+            if (users.getId().equals(userId)) {
                 users.updateName(name);
             }
         });
