@@ -66,4 +66,16 @@ public class Channel extends BaseEntity {
                 ", messageCount=" + ((messageList != null) ? messageList.size() : 0) +
                 '}';
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Channel channel = (Channel) o;
+        return getId().equals(channel.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }
