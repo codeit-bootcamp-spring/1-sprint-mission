@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCF_channel implements ChannelService {
-    private final List<Channel> channelSet;
+    private final List<Channel> channelList;
 
     public JCF_channel() {
         this.channelSet = new ArrayList<>();
