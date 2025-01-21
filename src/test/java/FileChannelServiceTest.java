@@ -29,16 +29,14 @@ public class FileChannelServiceTest {
 
   @Test
   void saveAndGetFromFile(){
-    VoiceChannel vc = new VoiceChannel.VoiceChannelBuilder()
+    VoiceChannel vc = new VoiceChannel.VoiceChannelBuilder("voice")
         .serverUUID("exampleServerUUID")
         .categoryUUID("exampleCategoryUUID")
-        .channelName("exampleChannelName")
         .build();
 
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat")
         .serverUUID("exampleServerUUID2")
         .categoryUUID("exampleCategoryUUID2")
-        .channelName("exampleChannelName2")
         .build();
     channelService.createChannel(vc);
     channelService.createChannel(cc);
@@ -48,26 +46,22 @@ public class FileChannelServiceTest {
 
   @Test
   void getAllChannels(){
-    VoiceChannel vc = new VoiceChannel.VoiceChannelBuilder()
+    VoiceChannel vc = new VoiceChannel.VoiceChannelBuilder("voice")
         .serverUUID("exampleServerUUID")
         .categoryUUID("exampleCategoryUUID")
-        .channelName("exampleChannelName")
         .build();
-    VoiceChannel vc2 = new VoiceChannel.VoiceChannelBuilder()
+    VoiceChannel vc2 = new VoiceChannel.VoiceChannelBuilder("voice")
         .serverUUID("exampleServerUUID2")
         .categoryUUID("exampleCategoryUUID2")
-        .channelName("exampleChannelName2")
         .build();
 
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat")
         .serverUUID("exampleServerUUID3")
         .categoryUUID("exampleCategoryUUID3")
-        .channelName("exampleChannelName3")
         .build();
-    ChatChannel cc2 = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc2 = new ChatChannel.ChatChannelBuilder("chat2")
         .serverUUID("exampleServerUUID4")
         .categoryUUID("exampleCategoryUUID4")
-        .channelName("exampleChannelName4")
         .build();
 
     channelService.createChannel(cc);
@@ -85,10 +79,9 @@ public class FileChannelServiceTest {
   void updateChannel(){
 
 
-    VoiceChannel vc = (VoiceChannel) channelService.createChannel(new VoiceChannel.VoiceChannelBuilder()
+    VoiceChannel vc = (VoiceChannel) channelService.createChannel(new VoiceChannel.VoiceChannelBuilder("voice")
         .serverUUID("exampleServerUUID")
         .categoryUUID("exampleCategoryUUID")
-        .channelName("exampleChannelName")
         .build());
 
     ChannelUpdateDto updateDto = new ChannelUpdateDto(
@@ -106,10 +99,9 @@ public class FileChannelServiceTest {
 
   @Test
   void deleteChannel(){
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat")
         .serverUUID("exampleServerUUID3")
         .categoryUUID("exampleCategoryUUID3")
-        .channelName("exampleChannelName3")
         .build();
 
     channelService.createChannel(cc);

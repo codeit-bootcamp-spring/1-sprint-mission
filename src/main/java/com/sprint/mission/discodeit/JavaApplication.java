@@ -8,9 +8,18 @@ import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -26,9 +35,13 @@ import java.util.Optional;
 import static com.sprint.mission.discodeit.constant.FileConstant.*;
 
 public class JavaApplication {
-  static ChannelService channelService = FileChannelService.getInstance();
-  static UserService userService = FileUserService.getInstance();
-  static MessageServiceV2 messageServiceV2 = FileMessageService.getInstance(userService);
+
+  static UserRepository userRepository;
+  static ChannelRepository channelRepository;
+  static MessageRepository messageRepository;
+  static ChannelService channelService;
+  static UserService userService;
+  static MessageServiceV2<ChatChannel> messageServiceV2;
   static ChannelFactory channelFactory;
 
   private static void setup() {
@@ -48,6 +61,15 @@ public class JavaApplication {
   }
 
   public static void main(String[] args) {
+
+    userRepository = new FileUserRepository();
+    channelRepository = new FileChannelRepository();
+    messageRepository = new FileMessageRepository();
+
+    userService = BasicUserService.getInstance(userRepository);
+    channelService = BasicChannelService.getInstance(channelRepository);
+    messageServiceV2 = BasicMessageService.getInstance(messageRepository, userRepository, channelRepository);
+    
     channelFactory = new ChannelFactory();
 
     setup();
@@ -337,7 +359,7 @@ public class JavaApplication {
           "false"
       ).build();
       messageServiceV2.createMessage(falseUserUUID, falseUserMessage, chatChannel);
-    } catch (IllegalArgumentException | MessageValidationException e) {
+    } catch (MessageValidationException e) {
       System.out.println(e.getMessage());
     }
   }

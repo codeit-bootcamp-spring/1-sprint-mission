@@ -50,18 +50,10 @@ public class User implements Serializable {
     public UserBuilder(String username, String password, String email) throws UserValidationException {
       this.username = username;
       this.password = password;
-      if (!email.matches(UserConstant.EMAIL_REGEX)) {
-        throw new UserValidationException(UserConstant.ERROR_INVALID_EMAIL);
-      }
       this.email = email;
     }
 
     public UserBuilder nickname(String nickname) throws UserValidationException {
-
-      if (nickname.length() <= UserConstant.USERNAME_MIN_LENGTH
-          || nickname.length() > UserConstant.USERNAME_MAX_LENGTH) {
-        throw new UserValidationException(UserConstant.ERROR_USERNAME_LENGTH);
-      }
 
       this.nickname = nickname;
       return this;

@@ -46,10 +46,9 @@ public class FileMessageServiceTest {
 
   @Test
   void saveAndReadMessage(){
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat")
         .serverUUID("exampleServerUUID3")
         .categoryUUID("exampleCategoryUUID3")
-        .channelName("exampleChannelName3")
         .build();
     channelService.createChannel(cc);
 
@@ -79,10 +78,9 @@ public class FileMessageServiceTest {
 
   @Test
   void updateMessage(){
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat2")
         .serverUUID("exampleServerUUID3")
         .categoryUUID("exampleCategoryUUID3")
-        .channelName("exampleChannelName3")
         .build();
     channelService.createChannel(cc);
 
@@ -119,16 +117,14 @@ public class FileMessageServiceTest {
   @Test
   void getMessagesByChannel(){
 
-    ChatChannel cc = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc = new ChatChannel.ChatChannelBuilder("chat")
         .serverUUID("exampleServerUUID3")
         .categoryUUID("exampleCategoryUUID3")
-        .channelName("exampleChannelName3")
         .build();
 
-    ChatChannel cc2 = new ChatChannel.ChatChannelBuilder()
+    ChatChannel cc2 = new ChatChannel.ChatChannelBuilder("chat2")
         .serverUUID("exampleServerUUID55")
         .categoryUUID("exampleCategoryUUID55")
-        .channelName("exampleChannelName55")
         .build();
     channelService.createChannel(cc2);
     channelService.createChannel(cc);

@@ -7,6 +7,10 @@ public class VoiceChannel extends BaseChannel {
 
   public static class VoiceChannelBuilder extends BaseChannelBuilder<VoiceChannelBuilder> {
 
+    public VoiceChannelBuilder(String channelName) {
+      super(channelName);
+    }
+
     @Override
     protected VoiceChannelBuilder self() {
       return this;

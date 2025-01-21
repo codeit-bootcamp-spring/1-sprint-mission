@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,9 +24,7 @@ public abstract class BaseChannel implements Serializable{
   private Boolean isPrivate;
 
   BaseChannel(BaseChannelBuilder<?> builder) {
-    if (builder.serverUUID == null || builder.categoryUUID == null || builder.channelName == null) {
-      throw new IllegalArgumentException("Required fields cannot be null");
-    }
+
     this.UUID = java.util.UUID.randomUUID().toString();
     this.ServerUUID = builder.serverUUID;
     this.CategoryUUID = builder.categoryUUID;
@@ -45,6 +44,13 @@ public abstract class BaseChannel implements Serializable{
     private String tag = "default";
     private Boolean isPrivate = false;
 
+    public BaseChannelBuilder(String channelName){
+      if(channelName == null || channelName.isEmpty()){
+        throw new ChannelValidationException();
+      }
+      this.channelName = channelName;
+    }
+
     public T serverUUID(String serverUUID) {
       this.serverUUID = serverUUID;
       return self();
@@ -52,11 +58,6 @@ public abstract class BaseChannel implements Serializable{
 
     public T categoryUUID(String categoryUUID) {
       this.categoryUUID = categoryUUID;
-      return self();
-    }
-
-    public T channelName(String channelName) {
-      this.channelName = channelName;
       return self();
     }
 

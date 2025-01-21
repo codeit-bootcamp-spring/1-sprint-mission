@@ -12,10 +12,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.io.*;
 import java.util.*;
 
-import static com.sprint.mission.discodeit.constant.ChannelConstant.CHAT;
-import static com.sprint.mission.discodeit.constant.ChannelConstant.VOICE;
 import static com.sprint.mission.discodeit.constant.FileConstant.CHANNEL_FILE;
-import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
 public class FileChannelService implements ChannelService {
 
