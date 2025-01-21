@@ -31,6 +31,10 @@ public class Channel {
         updatedAt = System.currentTimeMillis() / 1000;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }

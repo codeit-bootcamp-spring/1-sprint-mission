@@ -8,20 +8,18 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
     private final ChannelValidator validator;
-    private final List<Channel> channels;
+    private final Map<UUID, Channel> channels;
     private UserService jcfUserService;
     private MessageService jcfMessageService;
 
     private JCFChannelService() {
         validator = new ChannelValidator();
-        channels = new ArrayList<>();
+        channels = new HashMap<>();
     }
 
     private static class JCFChannelServiceHolder {
@@ -45,10 +43,10 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel createChannel(String name, String introduction, User owner) {
         validator.validate(name, introduction);
-        Channel newChannel = new Channel(name, introduction, owner);
-        channels.add(newChannel);
-        jcfUserService.updateJoinedChannels(owner, newChannel);
-        return newChannel;
+        Channel channel = new Channel(name, introduction, owner);
+        channels.put(channel.getId(), channel);
+        jcfUserService.updateJoinedChannels(owner, channel);
+        return channel;
     }
 
     @Override
