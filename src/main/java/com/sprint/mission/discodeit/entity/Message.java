@@ -38,7 +38,7 @@ public class Message {
         return userId;
     }
 
-    public boolean isUserEqual(UUID getUser) {
+    public boolean isUserEqual(UUID userId) {
         return userId.equals(getUser);
     }
 
