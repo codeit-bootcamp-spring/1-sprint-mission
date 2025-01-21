@@ -15,7 +15,7 @@ public interface MessageService {
 
     public void update(UUID messageId, String updateMessage);
 
-    public List<Message> write(UUID userId, UUID channelId);
+    List<Message> write(UUID userId, UUID channelId);
 
     public List<Message> getMessage(UUID channelId);
 
