@@ -41,7 +41,7 @@ public class User {
 
     public String toString() {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return name + "/ createdAt = " + simpleDateFormat.format(createdAt) + "/ updatedAt=" + updatedAt;
+        return name + "/ createdAt = " + simpleDateFormat.format(createdAt) + "/ updatedAt=" + simpleDateFormat.format(updatedAt);
 
     }
 }
