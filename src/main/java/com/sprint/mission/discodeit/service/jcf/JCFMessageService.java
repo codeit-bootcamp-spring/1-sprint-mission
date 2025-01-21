@@ -11,7 +11,7 @@ import com.sprint.mission.discodeit.validation.MessageValidator;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID,Message> data;
+    private final Map<UUID, Message> data;
     private final MessageValidator messageValidator = new MessageValidator();
     private final UserService userService;
     private final ChannelService channelService;

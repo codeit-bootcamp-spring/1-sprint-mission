@@ -1,22 +1,21 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.file.*;
+import com.sprint.mission.discodeit.service.jcf.*;
 
 import java.util.List;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService(userService);
-        MessageService messageService = new JCFMessageService(userService, channelService);
+//        UserService userService = new JCFUserService();
+//        ChannelService channelService = new JCFChannelService(userService);
+//        MessageService messageService = new JCFMessageService(userService, channelService);
+
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService(userService);
+        MessageService messageService = new FileMessageService(userService, channelService);
 
         System.out.println("=== [User] ===");
         System.out.println("유저 생성");
@@ -38,7 +37,8 @@ public class JavaApplication {
 
         System.out.println("유저 이메일 수정 후 확인");
         userService.updateUserEmail(userBob.getId(), "bob@gmail.com");
-        System.out.println(userBob);
+        User searchUser2 = userService.searchById(userBob.getId());
+        System.out.println(searchUser2);
         System.out.println();
 
         System.out.println("유저 삭제 후 전체 조회");
@@ -52,8 +52,8 @@ public class JavaApplication {
 
         System.out.println("=== [Channel] ===");
         System.out.println("채널 생성");
-        Channel studyChannel = channelService.createChannel("Study","Study room",userBob.getId());
-        Channel bookChannel = channelService.createChannel("Book","book room", userBob.getId());
+        Channel studyChannel = channelService.createChannel("Study", "Study room", userBob.getId());
+        Channel bookChannel = channelService.createChannel("Book", "book room", userBob.getId());
         System.out.println();
 
         System.out.println("전체 조회");
@@ -70,7 +70,8 @@ public class JavaApplication {
 
         System.out.println("채널 수정 후 확인");
         channelService.updateTitle(studyChannel.getId(), "Running");
-        System.out.println(studyChannel);
+        Channel searchChannel2 = channelService.searchById(studyChannel.getId());
+        System.out.println(searchChannel2);
         System.out.println();
 
         System.out.println("채널 삭제 후 확인");
@@ -81,12 +82,10 @@ public class JavaApplication {
         }
         System.out.println();
 
-
         System.out.println("=== [Message] ===");
         System.out.println("메세지 생성");
         Message message1 = messageService.createMessage(studyChannel.getId(), userBob.getId(), "gooood!");
         Message message2 = messageService.createMessage(studyChannel.getId(), userBob.getId(), "yes!");
-        Message message3 = messageService.createMessage(bookChannel.getId(), userBob.getId(), "run");
         System.out.println();
 
         System.out.println("전체 조회");
@@ -97,13 +96,14 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("단건 조회");
-        Message searchMessage = messageService.searchById(message1.getId());
-        System.out.println(message2);
+        Message searchMessage = messageService.searchById(message2.getId());
+        System.out.println(searchMessage);
         System.out.println();
 
         System.out.println("메세지 내용 수정 후 확인");
         messageService.updateMessage(message2.getId(), "no!");
-        System.out.println(message2);
+        Message searchMessage2 = messageService.searchById(message2.getId());
+        System.out.println(searchMessage2);
         System.out.println();
 
         System.out.println("메세지 삭제 후 확인");

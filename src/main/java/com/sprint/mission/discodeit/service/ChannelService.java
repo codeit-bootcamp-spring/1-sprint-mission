@@ -16,13 +16,14 @@ public interface ChannelService {
 
     void updateTitle(UUID channelId, String title);
 
+    void updateDescription(UUID channelId, String description);
+
     void deleteChannel(UUID channelId);
 
-    void addMember(Channel channel, User user);
-    void deleteMember(Channel channel, User user);
-    List<User> getAllMemberList(Channel channel);
+    void addMember(UUID channelId, UUID userId);
 
+    void deleteMember(UUID channelId, UUID userId);
 
-
+    List<User> getAllMemberList(UUID channelId);
 
 }

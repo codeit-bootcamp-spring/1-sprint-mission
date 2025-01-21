@@ -4,10 +4,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID,User> data;
+    private final Map<UUID, User> data;
     private final UserValidator userValidator = new UserValidator();
 
     public JCFUserService() {
@@ -19,7 +22,7 @@ public class JCFUserService implements UserService {
     public User createUser(String name, String email) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
             User newUser = new User(name, email);
-            data.put(newUser.getId(),newUser);
+            data.put(newUser.getId(), newUser);
             System.out.println("user create: " + newUser.getId());
             return newUser;
         }
