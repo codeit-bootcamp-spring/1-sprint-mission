@@ -7,18 +7,16 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
-    private final List<Message> messages;
+    private final Map<UUID, Message> messages;
     private UserService jcfUserService;
     private ChannelService jcfChannelService;
 
     private JCFMessageService() {
-        messages = new ArrayList<>();
+        messages = new HashMap<>();
     }
 
     private static class JCFMessageServiceHolder {
@@ -41,10 +39,10 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message createMessage(Channel channel, String content, User sender) {
-        Message newMessage = new Message(content, sender);
-        messages.add(newMessage);
-        jcfChannelService.updateMessages(channel, newMessage);
-        return newMessage;
+        Message message = new Message(content, sender);
+        messages.put(message.getId(), message);
+        jcfChannelService.updateMessages(channel, message);
+        return message;
     }
 
     @Override

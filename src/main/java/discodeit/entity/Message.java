@@ -19,6 +19,10 @@ public class Message {
         this.sender = sender;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public void updateUpdatedAt() {
         updatedAt = System.currentTimeMillis() / 1000;
     }
