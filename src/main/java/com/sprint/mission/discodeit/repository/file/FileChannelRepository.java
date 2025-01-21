@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
-    private static final String FILE_PATH = "channels.data";
+    private static final String FILE_PATH = "channels.ser";
 
     @Override
     public void saveAll(List<Channel> channels) {

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileMessageService implements MessageService {
-    private static final String FILE_PATH = "messages.data";
+    private static final String FILE_PATH = "messages.ser";
 
     public FileMessageService() {
         File file = new File(FILE_PATH);

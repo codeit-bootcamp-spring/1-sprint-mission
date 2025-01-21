@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "users.data";
+    private static final String FILE_PATH = "users.ser";
 
     @Override
     public void saveAll(List<User> users) {

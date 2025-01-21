@@ -44,9 +44,9 @@ public class JavaApplication {
         System.out.println("특정 사용자 삭제");
         userService.deleteUser(user1.getId().toString());
         userService.readAllUsers().forEach(System.out::println);
+
+
 //
-
-
 //        FileMessageService messageService = new FileMessageService();
 //
 //        messageService.resetFile();
@@ -75,9 +75,9 @@ public class JavaApplication {
 //        System.out.println("특정 메세지 삭제");
 //        messageService.deleteMessage(message1.getId().toString());
 //        messageService.readAllMessages().forEach(System.out::println);
-
-
-
+//
+//
+//
 //        FileChannelService channelService = new FileChannelService();
 //
 //        // 파일 초기화
@@ -95,8 +95,8 @@ public class JavaApplication {
 //
 //        System.out.println("\n멤버 추가 및 제거 테스트");
 //        // 멤버 생성
-//        User user1 = new User("Alice", "alice@example.com");
-//        User user2 = new User("Bob", "bob@example.com");
+////        User user1 = new User("Alice", "alice@example.com");
+////        User user2 = new User("Bob", "bob@example.com");
 //
 //        // 멤버 추가
 //        System.out.println("\n멤버 추가: Alice, Bob -> General Chat");

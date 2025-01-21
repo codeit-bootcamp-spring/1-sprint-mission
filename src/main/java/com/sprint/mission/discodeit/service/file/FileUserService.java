@@ -7,7 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserService implements UserService {
-    private static final String FILE_PATH = "users.data";
+    private static final String FILE_PATH = "users.ser";
 
     public FileUserService() {
         // 초기화 로직을 여기서 수행

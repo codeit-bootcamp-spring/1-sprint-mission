@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
-    private static final String FILE_PATH = "Channles.data";
+    private static final String FILE_PATH = "Channles.ser";
 
 
     public void FileChannel() {
