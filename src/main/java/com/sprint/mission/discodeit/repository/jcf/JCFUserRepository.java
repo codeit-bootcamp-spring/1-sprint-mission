@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.impl;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class InMemoryUserRepository implements UserRepository {
+public class JCFUserRepository implements UserRepository {
     Map<UUID, User> users;
-    public InMemoryUserRepository(){
+    public JCFUserRepository(){
         this.users = new HashMap<>();
     }
     public void saveUser(User user){

@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serial;
 import java.util.UUID;
 
 public class BaseEntity {
@@ -13,6 +14,7 @@ public class BaseEntity {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
     }
+
     public UUID getId(){return id;}
     // id, createdAt 상수로 변경
     // public void setId(UUID id){ this.id = id;}
@@ -27,3 +29,4 @@ public class BaseEntity {
         this.updatedAt = updatedAt;
     }
 }
+

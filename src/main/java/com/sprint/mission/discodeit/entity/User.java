@@ -1,6 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity{
+import java.io.Serial;
+import java.io.Serializable;
+
+public class User extends BaseEntity implements Serializable {
+    // 직렬화하려는 클래스가 Serializable 인터페이스를 구현해야 한다.
+    @Serial
+    private static final long serialVersionUID = 1L;
     private String nickname;
 
     public User(String nickname){
