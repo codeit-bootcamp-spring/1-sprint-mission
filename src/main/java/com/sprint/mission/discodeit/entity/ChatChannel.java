@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 public class ChatChannel extends BaseChannel {
 
+  private final boolean isChat = true;
   private ChatChannel(ChatChannelBuilder builder) {
     super(builder);
   }
