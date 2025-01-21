@@ -13,6 +13,7 @@ public class User {
     public User(String name){
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.name = name;
     }
 
