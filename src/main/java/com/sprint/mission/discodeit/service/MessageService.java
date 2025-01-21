@@ -10,7 +10,7 @@ public interface MessageService {
 
     Message createMessage(MessageDto messageDto);
 
-    Message readMessage(UUID id);
+    Message readMessage(UUID messageId);
 
     List<Message> readAll();
 

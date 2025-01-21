@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -23,9 +24,9 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("===== user 생성 =====");
-        User user1 = userService.createUser(new UserDto("test1", "test1", "허원재"));
-        User user2 = userService.createUser(new UserDto("test2", "test2", "이규석"));
-        User user3 = userService.createUser(new UserDto("test3", "test3", "임수빈"));
+        User user1 = userService.createUser(UserDto.of("test1", "test1", "허원재"));
+        User user2 = userService.createUser(UserDto.of("test2", "test2", "이규석"));
+        User user3 = userService.createUser(UserDto.of("test3", "test3", "임수빈"));
 
         System.out.println("===== 생성된 user =====");
         userService.readAll().stream().forEach(System.out::println);
@@ -36,7 +37,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("===== user1의 loginId와 password를 변경 =====");
-        userService.updateUser(user1.getId(), new UserDto("asdf", "qwer", "허원재"));
+        userService.updateUser(user1.getId(), UserDto.of("asdf", "qwer", "허원재"));
         user1 = userService.readUser(user1.getId());
         System.out.println(user1);
         System.out.println();
@@ -87,8 +88,8 @@ public class JavaApplication {
         System.out.println("===== messageServiceTest =====\n");
 
         System.out.println("===== message 생성 =====");
-        Message message1 = messageService.createMessage(new MessageDto(user1, "hi", spring));
-        Message message2 = messageService.createMessage(new MessageDto(user1, "world", spring));
+        Message message1 = messageService.createMessage(MessageDto.of(user1, "hi", spring));
+        Message message2 = messageService.createMessage(MessageDto.of(user1, "world", spring));
         System.out.println("===== 등록된 message =====");
         messageService.readAll().stream().forEach(System.out::println);
         System.out.println();
@@ -96,8 +97,8 @@ public class JavaApplication {
         System.out.println("===== 등록되지 않은 user거나 보내는 channel에 등록되지 않은 유저면 exception 발생 =====");
         System.out.println("===== createMessage(new MessageDto(user2, \"hello\", spring)) =====");
         try {
-            Message message3 = messageService.createMessage(new MessageDto(user2, "hello", spring));
-        } catch (RuntimeException e) {
+            Message message3 = messageService.createMessage(MessageDto.of(user2, "hello", spring));
+        } catch (NotFoundException e) {
             System.out.println(e);
         }
         System.out.println();

@@ -1,7 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.NotFoundException;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.*;
 
+
+@Getter
+@ToString
 public class Channel {
     private UUID id;
     private Long createdAt;
@@ -10,12 +17,16 @@ public class Channel {
     private String name;
     private Map<UUID, User> users;
 
-    public Channel(String name) {
+    private Channel(String name) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.name = name;
-        users = new HashMap<>();
+        users = new HashMap<>(100);
+    }
+
+    public static Channel from(String name) {
+        return new Channel(name);
     }
 
     public void updateName(String name) {
@@ -33,42 +44,8 @@ public class Channel {
         updatedAt = System.currentTimeMillis();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public User getUser(UUID userId) {
-        User user = users.get(userId);
-        if (user == null) {
-            throw new RuntimeException("현재 channel에 등록되지 않은 user입니다.");
-        }
-        return user;
-    }
-
-    public Map<UUID, User> getUsers() {
-        return users;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + id.toString().substring(0, 8) +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", name='" + name + '\'' +
-                ",\n                users=" + users +
-                '}';
+        return Optional.ofNullable(users.get(userId))
+                .orElseThrow(() -> new NotFoundException("현재 channel에 등록되지 않은 user입니다."));
     }
 }

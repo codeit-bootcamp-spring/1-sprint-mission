@@ -1,23 +1,33 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.ToString;
+
 import java.util.UUID;
 
+
+@Getter
+@ToString
 public class User {
-    private UUID id;
-    private Long createdAt;
+    private final UUID id;
+    private final Long createdAt;
     private Long updatedAt;
 
     private String name;
     private String loginId;
     private String password;
 
-    public User(String name, String loginId, String password) {
+    private User(String name, String loginId, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+    }
+
+    public static User of(String name, String loginId, String password) {
+        return new User(name, loginId, password);
     }
 
     public void updateLoginId(String loginId) {
@@ -33,41 +43,5 @@ public class User {
     public void updateName(String name) {
         this.name = name;
         this.updatedAt = System.currentTimeMillis();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getLoginId() {
-        return loginId;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id.toString().substring(0, 8) +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", name='" + name + '\'' +
-                ", loginId='" + loginId + '\'' +
-                ", password='" + password + '\'' +
-                '}';
     }
 }

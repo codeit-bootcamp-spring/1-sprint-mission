@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -14,7 +15,7 @@ public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
 
     private JCFChannelService() {
-        this.data = new HashMap<>();
+        this.data = new HashMap<>(1000);
         userService = JCFUserService.getInstance();
     }
 
@@ -24,18 +25,15 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(String name) {
-        Channel channel = new Channel(name);
+        Channel channel = Channel.from(name);
         data.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
     public Channel readChannel(UUID channelId) {
-        Channel channel = data.get(channelId);
-        if (channel == null) {
-            throw new RuntimeException("등록되지 않은 channel입니다.");
-        }
-        return channel;
+        return Optional.ofNullable(data.get(channelId))
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
     }
 
     @Override
@@ -45,28 +43,22 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void updateName(UUID channelId, String name) {
-        Channel channel = data.get(channelId);
-        if (channel == null) {
-            throw new RuntimeException("등록되지 않은 channel입니다.");
-        }
+        Channel channel = Optional.ofNullable(data.get(channelId))
+                        .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
         channel.updateName(name);
     }
 
     @Override
     public void addUser(UUID channelId, UUID userId) {
-        Channel channel = data.get(channelId);
-        if (channel == null) {
-            throw new RuntimeException("등록되지 않은 channel입니다.");
-        }
+        Channel channel = Optional.ofNullable(data.get(channelId))
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
         channel.addUser(userService.readUser(userId));
     }
 
     @Override
     public void deleteUser(UUID channelId, UUID userId) {
-        Channel channel = data.get(channelId);
-        if (channel == null) {
-            throw new RuntimeException("등록되지 않은 channel입니다.");
-        }
+        Channel channel = Optional.ofNullable(data.get(channelId))
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
         channel.deleteUser(userId);
     }
 

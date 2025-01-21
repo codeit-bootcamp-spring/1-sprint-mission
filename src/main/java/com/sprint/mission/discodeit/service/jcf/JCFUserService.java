@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class JCFUserService implements UserService {
@@ -12,7 +15,7 @@ public class JCFUserService implements UserService {
     private final Map<UUID, User> data;
 
     private JCFUserService() {
-        this.data = new HashMap<>();
+        this.data = new HashMap<>(1000);
     }
 
     public static JCFUserService getInstance() {
@@ -21,18 +24,28 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createUser(UserDto userDto) {
-        User user = new User(userDto.getName(), userDto.getLoginId(), userDto.getPassword());
+        StringBuilder builder = new StringBuilder();
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] digest = md.digest(userDto.getPassword().getBytes());
+
+            for (byte b : digest) {
+                builder.append(String.format("%02x", b));
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException("비밀번호 암호화 오류");
+        }
+        String hashedPassword = builder.toString();
+
+        User user = User.of(userDto.getName(), userDto.getLoginId(), hashedPassword);
         data.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User readUser(UUID userId) {
-        User user = data.get(userId);
-        if (user == null) {
-            throw new RuntimeException("등록되지 않은 user입니다.");
-        }
-        return user;
+        return Optional.ofNullable(data.get(userId))
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
     }
 
     @Override
@@ -42,10 +55,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
-        User user = data.get(userId);
-        if (user == null) {
-            throw new RuntimeException("등록되지 않은 user입니다.");
-        }
+        User user = Optional.ofNullable(data.get(userId))
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
+
         user.updateLoginId(userDto.getLoginId());
         user.updatePassword(userDto.getPassword());
         user.updateName(userDto.getName());
