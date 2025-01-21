@@ -4,15 +4,15 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.UUID;
 
-public class ObserverService implements Observer{
+public class ChannelObserver implements Observer{
     private final MessageService messageService;
 
-    public ObserverService(MessageService messageService){
+    public ChannelObserver(MessageService messageService){
         this.messageService = messageService;
     }
 
     @Override
-    public void update(UUID channeluuId) {
-        messageService.deleteMessagesByChannel(channeluuId);
+    public void update(UUID uuid) {
+        messageService.deleteAllMessagesForChannel(uuid);
     }
 }

@@ -9,11 +9,11 @@ public interface UserService {
 
     User CreateUser(String name, String email,String iD ,String password);
 
-    User getUser(UUID id);
+    User getUser(UUID uuid);
 
     HashMap<UUID, User> getAllUsers();
 
-    void updateUser(UUID uuID, String email, String iD, String password);
+    void updateUser(UUID uuid, String email, String iD, String password);
 
-    void deleteUser(UUID useruuId);
+    void deleteUser(UUID uuid);
 }

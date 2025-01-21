@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message CreateMsg(User user1, Channel channel1, String content);
+    Message createMsg(User user1, Channel channel1, String content);
 
     Message getMessage(UUID msgId);
 
@@ -19,5 +19,5 @@ public interface MessageService {
 
     void deleteMsg(UUID msgId);
 
-    void deleteMessagesByChannel(UUID channelId);
+    void deleteAllMessagesForChannel(UUID channelId);
 }

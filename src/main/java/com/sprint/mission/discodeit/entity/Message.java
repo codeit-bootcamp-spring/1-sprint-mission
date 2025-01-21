@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Message {
+public class Message implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID msguuId;
     private final Channel destinationCh;
     private final Long createdAt;

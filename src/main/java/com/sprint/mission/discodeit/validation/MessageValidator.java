@@ -26,15 +26,15 @@ public class MessageValidator {
         return true;
     }
 
-    public boolean validateSender(UUID userId) {
-        if (userService.getUser(userId) == null) {
+    public boolean validateSender(UUID uuid) {
+        if (userService.getUser(uuid) == null) {
             throw new CustomException(ExceptionText.USER_NOT_FOUND);
         }
         return true;
     }
 
-    public boolean validateDestinationChannel(UUID channelId) {
-        if (channelService.getChannel(channelId) == null) {
+    public boolean validateDestinationChannel(UUID uuid) {
+        if (channelService.getChannel(uuid) == null) {
             throw new CustomException(ExceptionText.CHANNEL_NOT_FOUND);
         }
         return true;

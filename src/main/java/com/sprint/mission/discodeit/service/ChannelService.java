@@ -10,14 +10,14 @@ public interface ChannelService {
     Channel createChannel(String channel);
 
 
-    Channel getChannel(UUID id);
+    Channel getChannel(UUID uuid);
 
 
     Map<UUID, Channel> getAllChannels();
 
 
-    void updateChannel(UUID id, String name );
+    void updateChannel(UUID uuid, String newName);
 
 
-    void deleteChannel(UUID id);
+    void deleteChannel(UUID uuid);
 }

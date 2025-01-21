@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.validation;
 
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class UserValidator {
@@ -13,28 +16,37 @@ public class UserValidator {
     private static final String PASSWORD_REGEX = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,}";
     private static final int MIN_NAME_LENGTH = 2;
 
-    public static boolean isValidEmail(String email) {
+    private boolean isValidEmail(String email) {
         if (email == null || !Pattern.matches(EMAIL_REGEX, email)) {
             throw new CustomException(ExceptionText.INVALID_EMAIL);
         }
         return true;
     }
 
-    public static boolean isValidPassword(String password) {
+    private boolean isValidPassword(String password) {
         if (password == null || !Pattern.matches(PASSWORD_REGEX, password)) {
             throw new CustomException(ExceptionText.INVALID_PASSWORD);
         }
         return true;
     }
 
-    public static boolean isValidName(String name) {
+    private boolean isValidName(String name) {
         if (name == null || name.length() < MIN_NAME_LENGTH) {
             throw new CustomException(ExceptionText.INVALID_NAME);
         }
         return true;
     }
 
-    public static boolean validateUser(String name, String email, String password) {
-        return isValidName(name) && isValidEmail(email) && isValidPassword(password);
+    private boolean isUniqueName(String name, Map<UUID, User> users) {
+        if (users.values().stream().anyMatch(user -> user.getName().equals(name))) {
+            throw new CustomException(ExceptionText.DUPLICATE_NAME);
+        }
+        return true;// 중복 이름 예외
+    }
+
+
+
+    public boolean validateUser(String name, String email, String password, Map<UUID, User> users) {
+        return isValidName(name) && isValidEmail(email) && isValidPassword(password) && isUniqueName(name, users);
     }
 }

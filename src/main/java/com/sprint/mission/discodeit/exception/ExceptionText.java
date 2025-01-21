@@ -10,7 +10,9 @@ public enum ExceptionText {
     INVALID_MESSAGE_CONTENT("메시지 내용은 null 또는 빈 값일 수 없습니다."),
     MESSAGE_CREATION_FAILED("메시지 생성 실패"),
     USER_CREATION_FAILED("유저 생성 실패"),
-    MESSAGE_NOT_FOUND("등록된 메시지가 없습니다.");
+    MESSAGE_NOT_FOUND("등록된 메시지가 없습니다."),
+    DUPLICATE_NAME("이미 동일한 이름이 존재합니다. "),
+    CHANNEL_CREATION_FAILED("채널 생성 실패");
 
     private final String message;
 

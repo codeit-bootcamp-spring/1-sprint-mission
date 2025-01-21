@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID channeluuId;
     private final Long createdAt;
     private Long updatedAt;
@@ -38,6 +42,10 @@ public class Channel {
     public void update(String channelName) {
         this.channelName = channelName;
         this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
+    }
+
+    public String getName(){
+        return channelName;
     }
 
     @Override

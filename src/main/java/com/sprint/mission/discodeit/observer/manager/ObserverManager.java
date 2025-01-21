@@ -18,9 +18,9 @@ public class ObserverManager {
         observers.remove(observer);
     }
 
-    public void channelDeletionEvent(UUID channeluuId) {
+    public void channelDeletionEvent(UUID uuid) {
         for (Observer observer : observers) {
-            observer.update(channeluuId);
+            observer.update(uuid);
         }
     }
 }
