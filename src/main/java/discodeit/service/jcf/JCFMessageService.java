@@ -46,20 +46,16 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message findById(UUID id) {
-        Message findMessage = findMessage(id);
-        if (findMessage == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
-        }
-        return findMessage;
+    public Message find(UUID messageId) {
+        Message foundMessage = messages.get(messageId);
+
+        return Optional.ofNullable(foundMessage)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
     }
 
     @Override
-    public Message findMessage(UUID id) {
-        return messages.stream()
-                .filter(message -> message.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
+    public List<Message> findAll() {
+        return messages.values().stream().toList();
     }
 
     @Override
