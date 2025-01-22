@@ -23,37 +23,37 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public void CreateUserDefault(String name) {
-        userService.CreateUserDefault(name);
+    public void createNewUser(String name) {
+        userService.createNewUser(name);
     }
 
     @Override
-    public <T> String ReadUser(T user) {
-        return userService.ReadUser(user);
+    public <T> String readUser(T user) {
+        return userService.readUser(user);
     }
 
     @Override
-    public String ReadUserAll() {
-        return userService.ReadUserAll();
+    public String readUserAll() {
+        return userService.readUserAll();
     }
 
     @Override
-    public boolean UpdateUserName(String name, String change) {
-        return userService.UpdateUserName(name,change);
+    public boolean updateUserName(String name, String change) {
+        return userService.updateUserName(name,change);
     }
 
     @Override
-    public boolean UpdateUserName(UUID id, String changeName) {
-        return userService.UpdateUserName(id,changeName);
+    public boolean updateUserName(UUID id, String changeName) {
+        return userService.updateUserName(id,changeName);
     }
 
     @Override
-    public boolean DeleteUser(UUID id) {
-        return userService.DeleteUser(id);
+    public boolean deleteUser(UUID id) {
+        return userService.deleteUser(id);
     }
 
     @Override
-    public boolean DeleteUser(String name) {
-        return userService.DeleteUser(name);
+    public boolean deleteUser(String name) {
+        return userService.deleteUser(name);
     }
 }

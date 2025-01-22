@@ -13,61 +13,61 @@ public class BasicMessageService implements MessageService {
     public BasicMessageService(){
         this.messageService= new FileMessageService();
     }
-    public void SetUpJfcMessage(){
+    public void setUpJfcMessage(){
         this.messageService= new JCFMessageService();
     }
 
-    public void SetUpFileMessage(){
+    public void setUpFileMessage(){
         this.messageService= new FileMessageService();
     }
 
     @Override
-    public void CreateMessageDefault(String title, String body) {
-        messageService.CreateMessageDefault(title,body);
+    public void createNewMessage(String title, String body) {
+        messageService.createNewMessage(title,body);
     }
 
     @Override
-    public <T> String ReadMessage(T key) {
-        return messageService.ReadMessage(key);
+    public <T> String readMessage(T key) {
+        return messageService.readMessage(key);
     }
 
     @Override
-    public String ReadMessageAll() {
-        return messageService.ReadMessageAll();
+    public String readMessageAll() {
+        return messageService.readMessageAll();
     }
 
     @Override
-    public boolean UpdateMessageTitle(UUID ID, String change) {
-        return messageService.UpdateMessageTitle(ID,change);
+    public boolean updateMessageTitle(UUID ID, String change) {
+        return messageService.updateMessageTitle(ID,change);
     }
 
     @Override
-    public boolean UpdateMessageTitle(String name, String change) {
-        return messageService.UpdateMessageTitle(name,change);
+    public boolean updateMessageTitle(String name, String change) {
+        return messageService.updateMessageTitle(name,change);
     }
 
     @Override
-    public boolean UpdateMessageBody(UUID ID, String change) {
-        return messageService.UpdateMessageTitle(ID,change);
+    public boolean updateMessageBody(UUID ID, String change) {
+        return messageService.updateMessageBody(ID,change);
     }
 
     @Override
-    public boolean UpdateMessageBody(String name, String change) {
-        return messageService.UpdateMessageTitle(name,change);
+    public boolean updateMessageBody(String name, String change) {
+        return messageService.updateMessageBody(name,change);
     }
 
     @Override
-    public boolean DeleteMessage(UUID id) {
-        return messageService.DeleteMessage(id);
+    public boolean deleteMessage(UUID id) {
+        return messageService.deleteMessage(id);
     }
 
     @Override
-    public boolean DeleteMessage(String title) {
-        return messageService.DeleteMessage(title);
+    public boolean deleteMessage(String title) {
+        return messageService.deleteMessage(title);
     }
 
     @Override
-    public void AddMessage(Message m) {
-        messageService.AddMessage(m);
+    public void addMessage(Message m) {
+        messageService.addMessage(m);
     }
 }

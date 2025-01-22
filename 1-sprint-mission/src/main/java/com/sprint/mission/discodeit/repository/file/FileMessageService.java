@@ -10,89 +10,58 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class FileMessageService extends JCFMessageService implements MessageService, MessageRepository {
 
     private static final String fileName = ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\message.txt";
 
     public FileMessageService(){
-        messageList=LoadMessageTxt();
+        messageList=loadMessageTxt();
     }
 
     @Override
-    public void CreateMessageDefault(String title, String body) {
-        messageList=LoadMessageTxt();
-        if (find_Message(title).isEmpty()) {
-            Message new_Message=Message.CreateDefaultMessage(title,body);
-            messageList.put(new_Message.getId(),new_Message);
-        } else {
-            System.out.println("이미 존재하는 제목입니다.");
-        }
-        SaveMessageTxt();
+    public void createNewMessage(String title, String body) {
+        super.createNewMessage(title,body);
+        saveMessageTxt();
     }
 
 
     @Override
-    public void AddMessage(Message m) {
-        messageList.put(m.getId(),m);
-        SaveMessageTxt();
+    public void addMessage(Message m) {
+        super.addMessage(m);
+        saveMessageTxt();
     }
 
     @Override
-    protected boolean DeleteMessageInfo(TreeMap<UUID, Message> instance) {
-        if (instance.isEmpty()) {
-            System.out.println( "해당하는 메세지가가 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.deleteExistMessageId();
-            messageList.remove(find.getId());
-            SaveMessageTxt();
-            System.out.println("성공적으로 삭제했습니다.");
-            return true;
-        } else {
-            System.out.println("중복된 메세지가 있습니다.");
-            return false;
-        }
-    }
-    @Override
-    protected boolean ChangeMessageTitle(TreeMap<UUID, Message> instance, String changetitle) {
-        if (instance==null||instance.isEmpty()) {
-            System.out.println( "해당하는 메세지가가 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.setTitle(changetitle);
-            find.setUpdatedAt();
-            SaveMessageTxt();
-            System.out.println("성공적으로 바꿨습니다.");
-            return true;
-        }
-        return false;
-    }
-    @Override
-    protected boolean ChangeMessageBody(TreeMap<UUID, Message> instance, String changeBody) {
-        if (instance==null||instance.isEmpty())  {
-            System.out.println( "해당하는 메세지가가 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.setMessageBody(changeBody);
-            find.setUpdatedAt();
-            SaveMessageTxt();
-            System.out.println("성공적으로 바꿨습니다.");
+    protected boolean deleteMessageInfo(LinkedHashMap<UUID, Message> instance) {
+        if(super.deleteMessageInfo(instance)){
+            saveMessageTxt();
             return true;
         }else{
             return false;
         }
-
     }
     @Override
-    public Map<UUID,Message> LoadMessageTxt(){
+    protected boolean changeMessageTitle(LinkedHashMap<UUID, Message> instance, String changetitle) {
+        if(super.changeMessageTitle(instance,changetitle)){
+            saveMessageTxt();
+            return true;
+        }else{
+            return false;
+        }
+    }
+    @Override
+    protected boolean changeMessageBody(LinkedHashMap<UUID, Message> instance, String changeBody) {
+        if(super.changeMessageBody(instance,changeBody)){
+            saveMessageTxt();
+            return true;
+        }else {
+            return false;
+        }
+    }
+    @Override
+    public Map<UUID,Message> loadMessageTxt(){
         Map<UUID,Message> loadTxt=new TreeMap<>();
         File file = new File(fileName);
         if (!file.exists()) {
@@ -146,8 +115,9 @@ public class FileMessageService extends JCFMessageService implements MessageServ
                     receiverId = UUID.fromString(messageData.get("receiverId").asText());
                 }
 
-                Message message = new Message(id, createdAt, updatedAt, title,
+                Message message = Message.createChannelAll(id, createdAt, updatedAt, title,
                         messageBody,senderName,receiverName,senderId,receiverId);
+                existMessageIdCheck.add(message.getId());
 
 
                 loadTxt.put(id, message);
@@ -159,7 +129,7 @@ public class FileMessageService extends JCFMessageService implements MessageServ
         return loadTxt;
     }
     @Override
-    public void SaveMessageTxt() {
+    public void saveMessageTxt() {
         ObjectMapper objectMapper = new ObjectMapper();
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8))) {

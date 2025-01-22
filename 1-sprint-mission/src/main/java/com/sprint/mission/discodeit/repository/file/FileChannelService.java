@@ -10,33 +10,24 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelService extends JCFChannelService implements ChannelService, ChannelRepository {
 
     private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\channel.txt";
 
     public FileChannelService(){
-        channelList=LoadChannelTxt();
+        channelList=loadChannelTxt();
     }
 
     @Override
-    public void CreateChannelDefault(String name) {
-        channelList=LoadChannelTxt();
-        if(find_Channel(name).isEmpty()){
-            Channel new_channel=Channel.CreateDefaultChannel(name);
-            channelList.put(new_channel.getId(),new_channel);
-        }else {
-            System.out.println("이미 존재하는 채널입니다.");
-        }
-        SaveChannelTxt();
+    public void createNewChannel(String name) {
+        super.createNewChannel(name);
+        saveChannelTxt();
     }
 
     @Override
-    public Map<UUID, Channel> LoadChannelTxt(){
+    public Map<UUID, Channel> loadChannelTxt(){
         Map<UUID, Channel> loadTxt=new TreeMap<>();
         File file = new File(fileName);
         if (!file.exists()) {
@@ -77,7 +68,8 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
                 long updatedAt = channelData.has("updatedAt") ? channelData.get("updatedAt").asLong() : 0;
                 String channelName = channelData.get("channelName").asText();
 
-                Channel message = new Channel(id,createdAt,updatedAt,channelName);
+                Channel message = Channel.createChannelAll(id,createdAt,updatedAt,channelName);
+                existChannelIdCheck.add(id);
                 loadTxt.put(id, message);
 
             }
@@ -88,7 +80,7 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
     }
 
     @Override
-    public void SaveChannelTxt(){
+    public void saveChannelTxt(){
         ObjectMapper objectMapper = new ObjectMapper();
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8))) {
@@ -117,37 +109,23 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
     }
 
     @Override
-    protected boolean DeleteChannel(TreeMap<UUID,Channel> instance) {
-        if (instance==null||instance.isEmpty()) {
-            System.out.println("해당하는 채널이 없습니다.");
-            return false;
-        }else if(instance.size()==1){
-            Channel find=instance.firstEntry().getValue();
-            find.deleteExistChannelId();
-            channelList.remove(find.getId());
-            SaveChannelTxt();
-            System.out.println("성공적으로 삭제했습니다.");
+    protected boolean deleteChannelInfo(LinkedHashMap<UUID,Channel> instance) {
+        if(super.deleteChannelInfo(instance)){
+            saveChannelTxt();
             return true;
-        }else{
-            System.out.println("중복된 채널이 있습니다.");
+        }
+        else{
             return false;
         }
     }
 
     @Override
-    protected boolean UpdateChannel(TreeMap<UUID,Channel> instance, String changeName) {
-        if (instance==null||instance.isEmpty())  {
-            System.out.println( "해당하는 채널이 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            Channel find = instance.firstEntry().getValue();
-            find.setChannelName(changeName);
-            find.setUpdatedAt();
-            SaveChannelTxt();
-            System.out.println("성공적으로 바꿨습니다.");
+    protected boolean updateChannelInfo(LinkedHashMap<UUID,Channel> instance, String changeName) {
+        if(super.updateChannelInfo(instance,changeName)){
+            saveChannelTxt();
             return true;
-        }else{
-            System.out.println("중복된 채널이 있습니다.");
+        }
+        else{
             return false;
         }
 

@@ -7,28 +7,30 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    protected Map<UUID,Channel> channelList=new TreeMap<>();
+    protected Map<UUID,Channel> channelList=new LinkedHashMap<>();
+    protected static final Set<UUID> existChannelIdCheck = new HashSet<>();
 
     @Override
-    public void CreateChannelDefault(String name) {
-        if(find_Channel(name).isEmpty()){
-            Channel new_channel=Channel.CreateDefaultChannel(name);
-            channelList.put(new_channel.getId(),new_channel);
-        }else {
-            System.out.println("이미 존재하는 채널입니다.");
-        }
+    public void createNewChannel(String name) {
+        Channel newChannel;
+        do{
+            newChannel=Channel.createDefaultChannel(name);
+        }while(existChannelIdCheck.contains(newChannel.getId()));
+
+        channelList.put(newChannel.getId(),newChannel);
+        existChannelIdCheck.add(newChannel.getId());
 
     }
 
 
     @Override
-    public <T>String ReadChannel(T key) {
+    public <T>String readChannel(T key) {
         StringBuilder list= new StringBuilder();
-        TreeMap<UUID,Channel> foundChannel=new TreeMap<>();
+        LinkedHashMap<UUID,Channel> foundChannel=new LinkedHashMap<>();
         if (key instanceof String) {
-            foundChannel = find_Channel((String) key);
+            foundChannel = findChannel((String) key);
         } else if (key instanceof UUID) {
-            foundChannel = find_Channel((UUID) key);
+            foundChannel = findChannel((UUID) key);
         }
 
         for(Channel val:foundChannel.values()){
@@ -42,7 +44,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public String ReadChannelAll() {
+    public String readChannelAll() {
         StringBuilder list= new StringBuilder();
         for(Channel val:channelList.values()){
             list.append(val.toString());
@@ -55,29 +57,29 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean UpdateChannelName(UUID id, String name) {
-        TreeMap<UUID,Channel> instance = find_Channel(id);
-        return UpdateChannel(instance,name);
+    public boolean updateChannelName(UUID id, String name) {
+        LinkedHashMap<UUID,Channel> instance = findChannel(id);
+        return updateChannelInfo(instance,name);
     }
-    public boolean UpdateChannelName(String ChannelName, String name) {
-        TreeMap<UUID,Channel> instance = find_Channel(ChannelName);
-        return UpdateChannel(instance,name);
+    public boolean updateChannelName(String ChannelName, String name) {
+        LinkedHashMap<UUID,Channel> instance = findChannel(ChannelName);
+        return updateChannelInfo(instance,name);
     }
     @Override
-    public boolean DeleteChannel(UUID id) {
-        TreeMap<UUID,Channel> instance = find_Channel(id);
-        return DeleteChannel(instance);
+    public boolean deleteChannel(UUID id) {
+        LinkedHashMap<UUID,Channel> instance = findChannel(id);
+        return deleteChannelInfo(instance);
     }
 
     @Override
-    public boolean DeleteChannel(String Name) {
-        TreeMap<UUID,Channel> instance = find_Channel(Name);
-        return DeleteChannel(instance);
+    public boolean deleteChannel(String Name) {
+        LinkedHashMap<UUID,Channel> instance = findChannel(Name);
+        return deleteChannelInfo(instance);
     }
 
 
-    protected TreeMap<UUID,Channel> find_Channel(String name) {
-        TreeMap<UUID,Channel> findChannel=new TreeMap<>();
+    protected LinkedHashMap<UUID,Channel> findChannel(String name) {
+        LinkedHashMap<UUID,Channel> findChannel=new LinkedHashMap<>();
         for(Channel channel:channelList.values()){
             if(channel.getChannelName().equals(name)){
                 findChannel.put(channel.getId(),channel);
@@ -87,21 +89,21 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-    protected TreeMap<UUID,Channel> find_Channel(UUID ID) {
-        TreeMap<UUID,Channel> findChannel=new TreeMap<>();
+    protected LinkedHashMap<UUID,Channel> findChannel(UUID ID) {
+        LinkedHashMap<UUID,Channel> findChannel=new LinkedHashMap<>();
         findChannel.put(ID,channelList.get(ID));
         return findChannel;
     }
 
 
-    protected boolean DeleteChannel(TreeMap<UUID,Channel> instance) {
+    protected boolean deleteChannelInfo(LinkedHashMap<UUID,Channel> instance) {
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 채널이 없습니다.");
             return false;
         }else if(instance.size()==1){
-            Channel find=instance.firstEntry().getValue();
-            find.deleteExistChannelId();
-            channelList.remove(find.getId());
+            Channel firstChannel=instance.entrySet().iterator().next().getValue();
+            existChannelIdCheck.remove(firstChannel.getId());
+            channelList.remove(firstChannel.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
         }else{
@@ -110,14 +112,14 @@ public class JCFChannelService implements ChannelService {
         }
     }
 
-    protected boolean UpdateChannel(TreeMap<UUID,Channel> instance, String changeName) {
+    protected boolean updateChannelInfo(LinkedHashMap<UUID,Channel> instance, String changeName) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 채널이 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Channel find = instance.firstEntry().getValue();
-            find.setChannelName(changeName);
-            find.setUpdatedAt();
+            Channel firstChannel = instance.entrySet().iterator().next().getValue();
+            firstChannel.updateChannelName(changeName);
+            firstChannel.updateUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
             return true;
         }else{

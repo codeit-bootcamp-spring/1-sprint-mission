@@ -9,34 +9,28 @@ import com.sprint.mission.discodeit.repository.jcf.JCFUserService;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
+
+import static com.sprint.mission.discodeit.entity.User.createUserAll;
+
 public class FileUserService extends JCFUserService implements Serializable, UserRepository {
     private static final long serialVersionUID = 1L;
     private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\user.txt";
 
 
     public FileUserService(){
-        userList=LoadUserTxt();
+
+        userList=loadUserTxt();
     }
 
     @Override
-    public void CreateUserDefault(String name) {
-        userList=LoadUserTxt();
-        if(find_user(name).isEmpty()){
-            User new_user=User.createDefaultUser(name);
-            userList.put(new_user.getId(),new_user);
-        }
-        else{
-            System.out.println("이미 존재하는 이름입니다.");
-        }
-        SaveUserTxt();
+    public void createNewUser(String name) {
+        super.createNewUser(name);
+        saveUserTxt();
     }
 
     @Override
-    public Map<UUID, User> LoadUserTxt() {
+    public Map<UUID, User> loadUserTxt() {
         Map<UUID, User> loadTxt = new TreeMap<>();
         File file = new File(fileName);
 
@@ -78,10 +72,11 @@ public class FileUserService extends JCFUserService implements Serializable, Use
                 long updatedAt = userData.has("updatedAt") ? userData.get("updatedAt").asLong() : 0;
 
                 UUID id = UUID.fromString(key);
-                User user = new User(id, createdAt, updatedAt, name);
+                User user =  createUserAll(id, createdAt, updatedAt, name);
 
 
                 loadTxt.put(id, user);
+                existUserIdCheck.add(id);
 
             }
         } catch (IOException e) {
@@ -93,7 +88,7 @@ public class FileUserService extends JCFUserService implements Serializable, Use
 
 
     @Override
-    public void SaveUserTxt() {
+    public void saveUserTxt() {
         ObjectMapper objectMapper = new ObjectMapper();
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream( fileName), StandardCharsets.UTF_8))) {
@@ -120,36 +115,22 @@ public class FileUserService extends JCFUserService implements Serializable, Use
     }
 
     @Override
-    protected boolean DeleteUserInfo(TreeMap<UUID,User> instance){
-        if (instance==null||instance.isEmpty()) {
-            System.out.println("해당하는 유저가 없습니다.");
-            return false;
-        }else if(instance.size()==1){
-            User find = instance.firstEntry().getValue();
-            find.deleteExistUserId();
-            userList.remove(find.getId());
-            System.out.println("성공적으로 삭제했습니다.");
-            SaveUserTxt();
+    protected boolean deleteUserInfo(LinkedHashMap<UUID,User> instance){
+        if(super.deleteUserInfo(instance)){
+            saveUserTxt();
             return true;
         }
         else{
-            System.out.println("중복된 유저가 있습니다.");
             return false;
         }
     }
     @Override
-    protected boolean UpdateUserNameInfo(TreeMap<UUID,User> instance, String changeName) {
-        if (instance==null||instance.isEmpty()) {
-            System.out.println( "해당하는 유저가 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            User find = instance.firstEntry().getValue();
-            find.setName(changeName);
-            find.setUpdatedAt();
-            System.out.println("성공적으로 바꿨습니다.");
-            SaveUserTxt();
+    protected boolean updateUserNameInfo(LinkedHashMap<UUID,User> instance, String changeName) {
+        if(super.updateUserNameInfo(instance,changeName)){
+            saveUserTxt();
             return true;
-        }else{
+        }
+        else{
             return false;
         }
 

@@ -3,34 +3,34 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    protected Map<UUID, Message> messageList=new TreeMap<>();
+    protected Map<UUID, Message> messageList=new LinkedHashMap<>();
+    protected static final Set<UUID> existMessageIdCheck=new HashSet<>();
 
     @Override
-    public void CreateMessageDefault(String title,String body) {
-        if (find_Message(title).isEmpty()) {
-            Message new_Message=Message.CreateDefaultMessage(title,body);
-            messageList.put(new_Message.getId(),new_Message);
-        } else {
-            System.out.println("이미 존재하는 제목입니다.");
-        }
+    public void createNewMessage(String title, String body) {
+        Message newMessage;
+        do{
+            newMessage=Message.createDefaultMessage(title,body);
+        }while(existMessageIdCheck.contains(newMessage.getId()));
+        messageList.put(newMessage.getId(),newMessage);
+        existMessageIdCheck.add(newMessage.getId());
+
 
     }
 
     @Override
-    public <T>String ReadMessage(T key) {
+    public <T>String readMessage(T key) {
         StringBuilder list= new StringBuilder();
 
-        TreeMap<UUID,Message> foundMessage=new TreeMap<>();
+        LinkedHashMap<UUID,Message> foundMessage=new LinkedHashMap<>();
 
         if (key instanceof String) {
-            foundMessage = find_Message((String) key);
+            foundMessage = findMessage((String) key);
         } else if (key instanceof UUID) {
-            foundMessage = find_Message((UUID) key);
+            foundMessage = findMessage((UUID) key);
         }
 
         for (Message val : foundMessage.values()) {
@@ -45,7 +45,7 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public String ReadMessageAll() {
+    public String readMessageAll() {
         StringBuilder list= new StringBuilder();
         for (Message val : messageList.values()) {
             list.append(val.toString());
@@ -57,48 +57,48 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public boolean UpdateMessageTitle(UUID ID, String change) {
-        TreeMap<UUID,Message> instance = find_Message(ID);
-        return ChangeMessageTitle(instance,change);
+    public boolean updateMessageTitle(UUID ID, String change) {
+        LinkedHashMap<UUID,Message> instance = findMessage(ID);
+        return changeMessageTitle(instance,change);
     }
 
     @Override
-    public boolean UpdateMessageTitle(String title, String change) {
-        TreeMap<UUID,Message> instance = find_Message(title);
-        return ChangeMessageTitle(instance,change);
+    public boolean updateMessageTitle(String title, String change) {
+        LinkedHashMap<UUID,Message> instance = findMessage(title);
+        return changeMessageTitle(instance,change);
     }
     @Override
-    public boolean UpdateMessageBody(UUID ID, String change) {
-        TreeMap<UUID,Message> instance = find_Message(ID);
-        return ChangeMessageBody(instance,change);
-    }
-
-    @Override
-    public boolean UpdateMessageBody(String title, String change) {
-        TreeMap<UUID,Message> instance = find_Message(title);
-        return ChangeMessageBody(instance,change);
+    public boolean updateMessageBody(UUID ID, String change) {
+        LinkedHashMap<UUID,Message> instance = findMessage(ID);
+        return changeMessageBody(instance,change);
     }
 
     @Override
-    public boolean DeleteMessage(UUID id) {
-        TreeMap<UUID, Message> instance = find_Message(id);
-        return DeleteMessageInfo(instance);
+    public boolean updateMessageBody(String title, String change) {
+        LinkedHashMap<UUID,Message> instance = findMessage(title);
+        return changeMessageBody(instance,change);
     }
 
     @Override
-    public boolean DeleteMessage(String title) {
-        TreeMap<UUID, Message> instance = find_Message(title);
-        return DeleteMessageInfo(instance);
+    public boolean deleteMessage(UUID id) {
+        LinkedHashMap<UUID, Message> instance = findMessage(id);
+        return deleteMessageInfo(instance);
+    }
+
+    @Override
+    public boolean deleteMessage(String title) {
+        LinkedHashMap<UUID, Message> instance = findMessage(title);
+        return deleteMessageInfo(instance);
     }
 
 
-    protected boolean DeleteMessageInfo(TreeMap<UUID, Message> instance) {
+    protected boolean deleteMessageInfo(LinkedHashMap<UUID, Message> instance) {
         if (instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.deleteExistMessageId();
+            Message find = instance.entrySet().iterator().next().getValue();
+            existMessageIdCheck.remove(find.getId());
             messageList.remove(find.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
@@ -108,15 +108,15 @@ public class JCFMessageService implements MessageService {
         }
     }
 
-    protected TreeMap<UUID,Message> find_Message(UUID id) {
-        TreeMap<UUID, Message> findMessage = new TreeMap<>();
+    protected LinkedHashMap<UUID,Message> findMessage(UUID id) {
+        LinkedHashMap<UUID, Message> findMessage = new LinkedHashMap<>();
         findMessage.put(id,messageList.get(id));
         return findMessage;
     }
 
 
-    protected TreeMap<UUID,Message> find_Message(String title) {
-        TreeMap<UUID, Message> findMessage = new TreeMap<>();
+    protected LinkedHashMap<UUID,Message> findMessage(String title) {
+        LinkedHashMap<UUID, Message> findMessage = new LinkedHashMap<>();
         for(Message message:messageList.values()){
             if(message.getTitle().equals(title)){
                 findMessage.put(message.getId(),message);
@@ -127,28 +127,28 @@ public class JCFMessageService implements MessageService {
 
 
 
-    protected boolean ChangeMessageTitle(TreeMap<UUID, Message> instance, String changetitle) {
+    protected boolean changeMessageTitle(LinkedHashMap<UUID, Message> instance, String changetitle) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.setTitle(changetitle);
-            find.setUpdatedAt();
+            Message firstMessage = instance.entrySet().iterator().next().getValue();
+            firstMessage.setTitle(changetitle);
+            firstMessage.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
             return true;
         }
         return false;
     }
 
-    protected boolean ChangeMessageBody(TreeMap<UUID, Message> instance, String changeBody) {
+    protected boolean changeMessageBody(LinkedHashMap<UUID, Message> instance, String changeBody) {
         if (instance==null||instance.isEmpty())  {
             System.out.println( "해당하는 메세지가가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            Message find = instance.firstEntry().getValue();
-            find.setMessageBody(changeBody);
-            find.setUpdatedAt();
+            Message firstMessage = instance.entrySet().iterator().next().getValue();
+            firstMessage.setMessageBody(changeBody);
+            firstMessage.setUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
             return true;
         }else{
@@ -158,7 +158,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void AddMessage(Message m) {
+    public void addMessage(Message m) {
         messageList.put(m.getId(),m);
     }
 
