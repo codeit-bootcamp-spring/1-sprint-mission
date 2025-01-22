@@ -34,11 +34,7 @@ public class FileUserService implements UserService{
         return fileUserRepository.getAllUsers().size();
     }
     public User getUserById(UUID id){
-        //System.out.println("getUserById   매개변수를 통해 들어옴    " + id);
-        User user = fileUserRepository.findUserById(id);
-        //System.out.println("getUserById  findUserById(id) and that id      " + user.getId());
-
-        return user;
+        return fileUserRepository.findUserById(id).orElse(null);
     }
 
     // Update : 특정 유저 닉네임 변경
@@ -58,7 +54,7 @@ public class FileUserService implements UserService{
         fileUserRepository.saveUser(user);
         //System.out.println("5             " +id);
 
-        User updatedUser = fileUserRepository.findUserById(id);
+        User updatedUser = fileUserRepository.findUserById(id).orElse(null);
         System.out.println("Updated User: " + updatedUser);
     }
 

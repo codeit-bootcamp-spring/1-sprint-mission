@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
@@ -63,8 +64,8 @@ public class FileChannelRepository implements ChannelRepository {
         saveFile(Path.of(CHANNELS_PATH + channel.getId().toString() + ".ser"), channel);
     }
     @Override// 읽기
-    public Channel findChannelById(UUID id){
-        return loadFile(Path.of(CHANNELS_PATH +  id.toString() + ".ser"));
+    public Optional<Channel> findChannelById(UUID id){
+        return Optional.ofNullable(loadFile(Path.of(CHANNELS_PATH +  id.toString() + ".ser")));
     }
     @Override
     public  Map<UUID, Channel> getAllChannels(){
@@ -78,7 +79,7 @@ public class FileChannelRepository implements ChannelRepository {
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         // fromString 문자열 -> UUID
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        channelMap.put(id, findChannelById(id));
+                        channelMap.put(id, findChannelById(id).orElse(null));
                     }
                 }
             }

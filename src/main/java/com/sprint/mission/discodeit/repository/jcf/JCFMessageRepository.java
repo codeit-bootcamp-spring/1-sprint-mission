@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -14,8 +15,8 @@ public class JCFMessageRepository implements MessageRepository {
     public void saveMessage(Message message){
         messages.put(message.getId(), message);
     }
-    public Message findMessageById(UUID id){
-        return messages.get(id);
+    public Optional<Message> findMessageById(UUID id){
+        return Optional.ofNullable(messages.get(id));
     }
     public Map<UUID, Message> findAllMessages() {
         return messages;

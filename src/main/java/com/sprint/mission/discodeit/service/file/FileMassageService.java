@@ -36,7 +36,7 @@ public class FileMassageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID id) {
-        return fileMessageRepository.findMessageById(id);
+        return fileMessageRepository.findMessageById(id).orElse(null);
     }
 
     @Override

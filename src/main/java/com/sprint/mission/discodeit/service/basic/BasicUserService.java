@@ -58,9 +58,9 @@ public class BasicUserService implements UserService {
     @Override
     public void updateUserNickname(UUID id) {
         String newNickname = inputHandler.getNewInput();
-        userRepository.findUserById(id).setNickname(newNickname);
+        userRepository.findUserById(id).ifPresent( user -> user.setNickname(newNickname));
         // 수정 시간 업데이트를 위해
-        userRepository.findUserById(id).setUpdateAt(System.currentTimeMillis());
+        userRepository.findUserById(id).ifPresent( user -> user.refreshUpdateAt(System.currentTimeMillis()));
     }
 
     @Override

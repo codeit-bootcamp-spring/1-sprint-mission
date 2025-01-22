@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.mockito.internal.matchers.Null;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
@@ -66,8 +68,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findMessageById(UUID id) {
-        return loadFile(Path.of(MESSAGES_PATH + id.toString() + ".ser"));
+    public Optional<Message> findMessageById(UUID id) {
+        return Optional.ofNullable(loadFile(Path.of(MESSAGES_PATH + id.toString() + ".ser")));
     }
 
     @Override
@@ -80,7 +82,7 @@ public class FileMessageRepository implements MessageRepository {
                 for(File file : files){
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        messageMap.put(id, findMessageById(id));
+                        messageMap.put(id, findMessageById(id).orElse(null));
                     }
                 }
             }

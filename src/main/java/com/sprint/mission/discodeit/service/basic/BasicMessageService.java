@@ -45,20 +45,18 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID id) {
-        if(messageRepository.findMessageById(id) == null ){
-            System.out.println("Message does not exist\n");
-            return null;
-        }else{
-            System.out.println(messageRepository.findMessageById(id).toString());
-            return messageRepository.findMessageById(id);
-        }
+        return messageRepository.findMessageById(id)
+                .orElseGet( () -> {
+                    System.out.println(" No  + " + id.toString() + " Message exists.\n");
+                    return null;
+                });
     }
 
     @Override
     public void updateMessageText(UUID id) {
         String messageText = inputHandler.getNewInput();
-        messageRepository.findMessageById(id).setMessageText(messageText);
-        messageRepository.findMessageById(id).setUpdateAt(System.currentTimeMillis());
+        messageRepository.findMessageById(id).ifPresent( message -> message.setMessageText(messageText));
+        messageRepository.findMessageById(id).ifPresent( message -> message.refreshUpdateAt(System.currentTimeMillis()));
     }
 
     @Override
