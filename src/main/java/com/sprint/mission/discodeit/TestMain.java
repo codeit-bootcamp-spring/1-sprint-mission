@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JcfChannelService;
 import com.sprint.mission.discodeit.service.jcf.JcfMessageService;
 import com.sprint.mission.discodeit.service.jcf.JcfUserService;
@@ -11,7 +10,6 @@ import com.sprint.mission.discodeit.service.jcf.JcfUserService;
 public class TestMain {
     public static void main(String[] args) {
         JcfUserService jcfUserService = new JcfUserService();
-//        FileUserService fileUserService = new FileUserService();
         JcfMessageService jcfMessageService = new JcfMessageService();
         JcfChannelService jcfChannelService = new JcfChannelService();
 
@@ -21,24 +19,16 @@ public class TestMain {
         jcfUserService.createUser(alice);
         jcfUserService.createUser(hyun);
         jcfUserService.createUser(yull);
-       /* fileUserService.createUser(alice);
-        fileUserService.createUser(hyun);
-        fileUserService.createUser(yull);*/
         System.out.println("일부 사용자 조회:" + jcfUserService.findUser(hyun.getId()));
-//        System.out.println("일부 사용자 조회:" + fileUserService.findUser(hyun.getId()));
         System.out.println("전체 사용자 조회: " + jcfUserService.findAllUsers());
-//        System.out.println("전체 사용자 조회: " + fileUserService.findAllUsers());
         System.out.println();
 
         jcfUserService.updateUserName(alice.getId(),"AliceUpdate");
         jcfUserService.updateUserEmail(alice.getId(),"alice_update@example.com");
         System.out.println("업데이트 후 사용자 조회: " + jcfUserService.findAllUsers());
-//        System.out.println("업데이트 후 사용자 조회: " + fileUserService.findAllUsers());
 
         jcfUserService.deleteUser(alice.getId());
-//        fileUserService.deleteUser(alice.getId());
         System.out.println("삭제 후 사용자 조회: " + jcfUserService.findAllUsers());
-//        System.out.println("삭제 후 사용자 조회: " + fileUserService.findAllUsers());
         System.out.println();
 
         Channel hiChannel = new Channel("Hi", "Introduce");
