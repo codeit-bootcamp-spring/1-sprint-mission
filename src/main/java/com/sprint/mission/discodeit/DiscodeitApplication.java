@@ -10,9 +10,7 @@ import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import org.w3c.dom.ls.LSOutput;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -29,6 +27,7 @@ public class DiscodeitApplication {
         );
 
         for (User user : users) {
+            System.out.println(user.getId());
             userService.create(user);
         }
         return users;
@@ -44,7 +43,7 @@ public class DiscodeitApplication {
 
         System.out.println("================");
         System.out.println("JCF 유저 셋팅");
-        setupUser(userService);
+        List<User> setUserList = setupUser(userService);
 
         System.out.println("================");
         System.out.println("JCF 유저 모두 읽기");
@@ -95,115 +94,124 @@ public class DiscodeitApplication {
 
         System.out.println("================");
         System.out.println("File 유저 셋팅");
+//        for(User user : setUserList){
+//            userService.create(user);
+//        }
         setupUser(userService);
 
-        List<User> fileUserList = userService.readAll();
-        fileUserList.forEach(user -> {
-            System.out.println("userName : " + user.getUsername()
-                    + " | Email : " + user.getEmail()
-                    + " | phoneNumber : " + user.getPhoneNumber()
-                    + " | Address : " + user.getAddr()
-                    + " | Age : " + user.getAge()
-                    + " | Hobby : " + user.getHobby()
-                    + " | Interest : " + user.getInterest()
-            );
-        });
+//        List<User> fileUserList = userService.readAll();
+//        fileUserList.forEach(user -> {
+//            System.out.println("user Id : " + user.getId()
+//                    + " | userName : " + user.getUsername()
+//                    + " | Email : " + user.getEmail()
+//                    + " | phoneNumber : " + user.getPhoneNumber()
+//                    + " | Address : " + user.getAddr()
+//                    + " | Age : " + user.getAge()
+//                    + " | Hobby : " + user.getHobby()
+//                    + " | Interest : " + user.getInterest()
+//            );
+//        });
+//
+//        System.out.println("================");
+//        System.out.println("File User 'Bob' search");
+//        User fileUserOne = fileUserList.stream()
+//                .filter(user -> user.getUsername().equals("Bob"))
+//                .findFirst()
+//                .orElse(null);
+//
+//        System.out.println("userName : " + fileUserOne.getUsername()
+//                + " | Email : " + fileUserOne.getEmail()
+//                + " | phoneNumber : " + fileUserOne.getPhoneNumber()
+//                + " | Address : " + fileUserOne.getAddr()
+//                + " | Age : " + fileUserOne.getAge()
+//                + " | Hobby : " + fileUserOne.getHobby()
+//                + " | Interest : " + fileUserOne.getInterest()
+//        );
+//
+//        System.out.println(fileUserOne.getId());
+//        System.out.println("================");
+//        System.out.println("File User 'Bob' update");
+//        userService.update(fileUserOne.getId(), new User("Bob", "updated_user1@example.com", "010-2349-9548", "Seoul, Korea", 35, "Reading2", new ArrayList<>(List.of("Construction","Technology", "Gaming"))));
+//        fileUserOne = userService.searchByUserId(fileUserOne.getId());
+//
+//        System.out.println("userName : " + fileUserOne.getUsername()
+//                + " | Email : " + fileUserOne.getEmail()
+//                + " | phoneNumber : " + fileUserOne.getPhoneNumber()
+//                + " | Address : " + fileUserOne.getAddr()
+//                + " | Age : " + fileUserOne.getAge()
+//                + " | Hobby : " + fileUserOne.getHobby()
+//                + " | Interest : " + fileUserOne.getInterest()
+//        );
+//
+//        userService.delete(fileUserOne.getId());
+//        fileUserList = userService.readAll();
+//        fileUserList.forEach(user -> {
+//            System.out.println("user Id : " + user.getId()
+//                    + " | userName : " + user.getUsername()
+//                    + " | Email : " + user.getEmail()
+//                    + " | phoneNumber : " + user.getPhoneNumber()
+//                    + " | Address : " + user.getAddr()
+//                    + " | Age : " + user.getAge()
+//                    + " | Hobby : " + user.getHobby()
+//                    + " | Interest : " + user.getInterest()
+//            );
+//        });
 
-        System.out.println("================");
-        System.out.println("File User 'Bob' search");
-        User fileUserOne = fileUserList.stream()
-                .filter(user -> user.getUsername().equals("Bob"))
-                .findFirst()
-                .orElse(null);
 
-        System.out.println("userName : " + fileUserOne.getUsername()
-                + " | Email : " + fileUserOne.getEmail()
-                + " | phoneNumber : " + fileUserOne.getPhoneNumber()
-                + " | Address : " + fileUserOne.getAddr()
-                + " | Age : " + fileUserOne.getAge()
-                + " | Hobby : " + fileUserOne.getHobby()
-                + " | Interest : " + fileUserOne.getInterest()
-        );
+//        System.out.println("사용자 등록 시작");
+//
+//
+//
+//        System.out.println("사용자 등록 완료.");
+//        System.out.println("============================");
+//
+//
+//        System.out.println("모든 사용자 조회:");
+//        userService.searchByUser();
+//        System.out.println("============================");
+//
+//
+//        UUID user1Id = users.get(1).getId();
+//        System.out.println("단일 사용자 조회(user1):");
+//        userService.searchByUserId(user1Id);
+//        System.out.println("============================");
+//
+//        System.out.println("사용자 수정:");
+//        userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "010-2349-9548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
+//        System.out.println("============================");
+//
+//        System.out.println("사용자 수정(휴대폰번호 에러):");
+//        userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
+//        System.out.println("============================");
+//
+//        System.out.println("사용자 수정(ID 에러):");
+//        UUID errorId = UUID.randomUUID();
+//        userService.update(errorId, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
+//        System.out.println("============================");
+//
+//
+//        System.out.println("수정된 사용자 조회:");
+//        User modifyUser = userService.read(user1Id);
+//        System.out.println(modifyUser.getUsername() + " | " + modifyUser.getEmail() + " | " + modifyUser.getPhoneNumber() + " | " + modifyUser.getAddr() + " | " + modifyUser.getAge() + " | " + modifyUser.getHobby() + " | " + modifyUser.getInterest() + " | " + modifyUser.getCreatedAt() + " | " + modifyUser.getUpdatedAt());
+//        System.out.println("============================");
+//
+//
+//        System.out.println("사용자 삭제:");
+//        userService.delete(user1Id);
+//        System.out.println("============================");
+//
+//        System.out.println("삭제된 사용자 삭제:");
+//        userService.delete(user1Id);
+//        System.out.println("============================");
+//
+//
+//        System.out.println("삭제된 사용자 확인:");
+//        userService.read(user1Id); // null 또는 삭제 확인 메시지 출력
 
-        System.out.println(fileUserOne.getId());
-        System.out.println("================");
-        System.out.println("File User 'Bob' update");
-        userService.update(fileUserOne.getId(), new User("Bob", "updated_user1@example.com", "010-2349-9548", "Seoul, Korea", 35, "Reading2", new ArrayList<>(List.of("Construction","Technology", "Gaming"))));
-        fileUserOne = userService.searchByUserId(fileUserOne.getId());
-
-        System.out.println("userName : " + fileUserOne.getUsername()
-                + " | Email : " + fileUserOne.getEmail()
-                + " | phoneNumber : " + fileUserOne.getPhoneNumber()
-                + " | Address : " + fileUserOne.getAddr()
-                + " | Age : " + fileUserOne.getAge()
-                + " | Hobby : " + fileUserOne.getHobby()
-                + " | Interest : " + fileUserOne.getInterest()
-        );
-
-//        System.out.println("++++bob++++");
-//        List<User> userBob = fileUserList.stream()
-//                .filter(user -> user.getUsername() == "JohnDoe")
-//                .collect(Collectors.toList());
-
-//        System.out.println(userBob.get(0).getId());
-
-        /*
         ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
 
-        System.out.println("사용자 등록 시작");
-
-
-
-        System.out.println("사용자 등록 완료.");
-        System.out.println("============================");
-
-
-        System.out.println("모든 사용자 조회:");
-        userService.searchByUser();
-        System.out.println("============================");
-
-
-        UUID user1Id = users.get(1).getId();
-        System.out.println("단일 사용자 조회(user1):");
-        userService.searchByUserId(user1Id);
-        System.out.println("============================");
-
-        System.out.println("사용자 수정:");
-        userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "010-2349-9548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
-        System.out.println("============================");
-
-        System.out.println("사용자 수정(휴대폰번호 에러):");
-        userService.update(user1Id, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
-        System.out.println("============================");
-
-        System.out.println("사용자 수정(ID 에러):");
-        UUID errorId = UUID.randomUUID();
-        userService.update(errorId, new User("JohnDoe", "updated_user1@example.com", "01023499548", "Seoul, Korea", 30, "Reading", new ArrayList<>(List.of("Technology", "Gaming"))));
-        System.out.println("============================");
-
-
-        System.out.println("수정된 사용자 조회:");
-        User modifyUser = userService.read(user1Id);
-        System.out.println(modifyUser.getUsername() + " | " + modifyUser.getEmail() + " | " + modifyUser.getPhoneNumber() + " | " + modifyUser.getAddr() + " | " + modifyUser.getAge() + " | " + modifyUser.getHobby() + " | " + modifyUser.getInterest() + " | " + modifyUser.getCreatedAt() + " | " + modifyUser.getUpdatedAt());
-        System.out.println("============================");
-
-
-        System.out.println("사용자 삭제:");
-        userService.delete(user1Id);
-        System.out.println("============================");
-
-        System.out.println("삭제된 사용자 삭제:");
-        userService.delete(user1Id);
-        System.out.println("============================");
-
-
-        System.out.println("삭제된 사용자 확인:");
-        userService.read(user1Id); // null 또는 삭제 확인 메시지 출력
-*/
-
-//        System.out.println();
-//        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>Channel>>>>>>>>>>>>>>>>>>>>>>>");
+        System.out.println();
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>Channel>>>>>>>>>>>>>>>>>>>>>>>");
 //        List<Channel> channels = List.of(
 //                new Channel("SB_1_Sprint", "JAVA Spring BackEnd Developer discode",
 //                        new ArrayList<>(List.of(users.get(0), users.get(1))), users.get(1)),
@@ -241,8 +249,8 @@ public class DiscodeitApplication {
 //        System.out.println("채널 주인장 변경하기 :");
 //        channelService.channelOwnerChange(channel1.getId(), users.get(1));
 //        System.out.println("================");
-//
-//
+
+        MessageService messageService = new JCFMessageService();
 //        System.out.println();
 //        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>Message>>>>>>>>>>>>>>>>>>>>>>>");
 //
