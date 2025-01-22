@@ -63,10 +63,7 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public Message getMessageByUUID(String messageId) throws CustomException {
-        //todo - 반환값 통일
-        //null이면 못찾은걸로 하고 윗단에서 처리하게 하던지 - JCF랑도 비교해서 고려해보기
-        //예외 발생시키던지
-        Message message = getMessages().stream().filter(m -> m.getId().toString().equals(messageId)).findFirst().orElse(null);
+        Message message = getMessages().stream().filter(m -> m.getId().equals(messageId)).findFirst().orElse(null);
         if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", messageId));
         }
@@ -95,6 +92,9 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public Message updateMessage(String messageId, String newContent) {
+        //todo - 모든 필드 검사해서 업데이트 해줘야하나?
+        //아니, 유저랑 채널 바뀌면 얘도 업데이트해야하는 문제 발생.
+        //그럴바엔 그냥 user도 id로 저장하는 방향이 나을 것 같다.
 
         Message message = getMessageByUUID(messageId);
 

@@ -3,7 +3,6 @@ package com.sprint.misson.discordeit.service.file;
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
-import com.sprint.misson.discordeit.entity.ChannelSort;
 import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.exception.CustomException;
@@ -60,6 +59,8 @@ public class FileChannelService extends FileService implements ChannelService {
         return getChannels().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
     }
 
+    // todo
+    // 변경사항 체크 로직 따로 뺄 수 있는지 확인
     @Override
     public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws CustomException {
         Channel channel = getChannelByUUID(channelId);
