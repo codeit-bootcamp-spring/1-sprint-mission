@@ -10,7 +10,7 @@ public interface MessageService {
 
 
     //생성
-    Message createMessage(User user, String content, Channel channel);
+    Message create(String content, String channelId, String userId);
 
     //모두 읽기
     List<Message> getMessages();

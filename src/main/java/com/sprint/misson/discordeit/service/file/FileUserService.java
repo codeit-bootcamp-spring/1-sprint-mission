@@ -22,7 +22,7 @@ public class FileUserService extends FileService implements UserService {
     }
 
     @Override
-    public User createUser(String nickname, String email) {
+    public User create(String nickname, String email, String password) {
 
         //스트림으로 HashMap 의 value(User) 들 중 이미 존재하는 email 인지 검사
         boolean userEmailExists = getUsers().stream().anyMatch(u -> u.getEmail().equals(email));
@@ -31,9 +31,9 @@ public class FileUserService extends FileService implements UserService {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
-        User newUser = new User(nickname, email, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
+        User newUser = new User(nickname, email, password, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
 
-        Path newUserPath = userDirectory.resolve(newUser.getId().toString().concat(".ser"));
+        Path newUserPath = userDirectory.resolve(newUser.getId().concat(".ser"));
         save(newUserPath, newUser);
 
         return newUser;
@@ -41,12 +41,12 @@ public class FileUserService extends FileService implements UserService {
 
     @Override
     public List<User> getUsers() {
-        return FileService.<User>load(userDirectory);
+        return load(userDirectory);
     }
 
     @Override
     public User getUserByUUID(String userId) throws CustomException {
-        User user = getUsers().stream().filter(u -> u.getId().toString().equals(userId)).findFirst().orElse(null);
+        User user = getUsers().stream().filter(u -> u.getId().equals(userId)).findFirst().orElse(null);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
@@ -122,7 +122,7 @@ public class FileUserService extends FileService implements UserService {
             user.setUpdatedAt();
             //todo - 고민
             //덮어씌우게 될까?
-            Path userPath = userDirectory.resolve(user.getId().toString().concat(".ser"));
+            Path userPath = userDirectory.resolve(user.getId().concat(".ser"));
             save(userPath, user);
         }
 
@@ -137,6 +137,6 @@ public class FileUserService extends FileService implements UserService {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
 
-        return delete(userDirectory.resolve(user.getId().toString()));
+        return delete(userDirectory.resolve(user.getId()));
     }
 }

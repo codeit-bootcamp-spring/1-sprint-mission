@@ -12,14 +12,14 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    private final HashMap<UUID, User> data;
+    private final HashMap<String, User> data;
 
     public JCFUserService() {
         this.data = new HashMap<>();
     }
 
     @Override
-    public User createUser(String nickname, String email) throws CustomException {
+    public User create(String nickname, String email, String password) throws CustomException {
 
         //스트림으로 HashMap 의 value(User) 들 중 이미 존재하는 email 인지 검사
         boolean userEmailExists = data.values().stream()
@@ -29,7 +29,7 @@ public class JCFUserService implements UserService {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
-        User newUser = new User(nickname, email, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
+        User newUser = new User(nickname, email, password, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
 
         //TODO - 추가 구현할만 한 기능
         //이메일 인증
@@ -52,7 +52,7 @@ public class JCFUserService implements UserService {
     @Override
     public User getUserByUUID(String userId) throws CustomException {
 
-        User user = data.get(UUID.fromString(userId));
+        User user = data.get(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
@@ -94,7 +94,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User updateUser(String userId, UserDTO userDTO) throws CustomException {
-        User user = data.get(UUID.fromString(userId));
+        User user = data.get(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
@@ -136,12 +136,12 @@ public class JCFUserService implements UserService {
     @Override
     public boolean deleteUser(String userId) throws CustomException {
 
-        User user = data.get(UUID.fromString(userId));
+        User user = data.get(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
 
-        return data.remove(UUID.fromString(userId), user);
+        return data.remove(userId, user);
     }
 }

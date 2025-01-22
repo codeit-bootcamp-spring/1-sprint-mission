@@ -26,27 +26,27 @@ public class FileMessageService extends FileService implements MessageService {
     }
 
     @Override
-    public Message createMessage(User user, String content, Channel channel) throws CustomException {
+    public Message create(String content, String channelId, String userId) throws CustomException {
         if (content == null || content.isEmpty()) {
-            System.out.println("Message content is empty for User: " + user.getId() + " Channel: " + channel.getId());
+            System.out.println("Message content is empty for User: " + userId + " Channel: " + channelId);
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
         try {
-            User userByUUID = userService.getUserByUUID(user.getId().toString());
-            Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
+            User userByUUID = userService.getUserByUUID(userId);
+            Channel channelByUUID = channelService.getChannelByUUID(channelId);
             if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
                 System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
             }
 
             Message message = new Message(userByUUID, content, channelByUUID);
-            Path newMessagePath = messageDirectory.resolve(message.getId().toString().concat(".ser"));
+            Path newMessagePath = messageDirectory.resolve(message.getId().concat(".ser"));
             save(newMessagePath, message);
 
             return message;
         } catch (CustomException e) {
-            System.out.println("Failed to create message. User: " + user.getId() + " Channel: " + channel.getId() + " Content: " + content);
+            System.out.println("Failed to create message. User: " + userId + " Channel: " + channelId + " Content: " + content);
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
                 throw e;
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
@@ -58,7 +58,7 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public List<Message> getMessages() {
-        return FileService.<Message>load(messageDirectory);
+        return FileService.load(messageDirectory);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public List<Message> getMessageBySender(User sender) {
-        return getMessages().stream().filter(m-> m.getSender().getId().equals(sender.getId())).toList();
+        return getMessages().stream().filter(m-> m.getSenderId().equals(sender.getId())).toList();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public List<Message> getMessagesByChannel(Channel channel) {
-        return getMessages().stream().filter(m-> m.getChannel().getId().equals(channel.getId())).toList();
+        return getMessages().stream().filter(m-> m.getChannelId().equals(channel.getId())).toList();
     }
 
     @Override
@@ -108,7 +108,7 @@ public class FileMessageService extends FileService implements MessageService {
         if (!message.getContent().equals(newContent)) {
             message.setUpdatedAt();
             message.setContent(newContent);
-            Path messagePath = messageDirectory.resolve(message.getId().toString().concat(".ser"));
+            Path messagePath = messageDirectory.resolve(messageId.concat(".ser"));
             save(messagePath, message);
         }
         return message;
@@ -116,12 +116,12 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public boolean deleteMessage(Message message) {
-        Message msg = getMessageByUUID(message.getId().toString());
+        Message msg = getMessageByUUID(message.getId());
 
         if (msg == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));
         }
-        Path messagePath = messageDirectory.resolve(message.getId().toString().concat(".ser"));
+        Path messagePath = messageDirectory.resolve(message.getId().concat(".ser"));
         return delete(messagePath);
     }
 }

@@ -13,7 +13,7 @@ import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
-    private final HashMap<UUID, Channel> data;
+    private final HashMap<String, Channel> data;
     private final UserService userService;
 
     public JCFChannelService(UserService userService) {
@@ -23,8 +23,8 @@ public class JCFChannelService implements ChannelService {
 
     //생성
     @Override
-    public Channel createChannel(String name, ChannelType type) {
-        Channel channel = new Channel(name, type);
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(name, type, description);
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -32,13 +32,13 @@ public class JCFChannelService implements ChannelService {
     //모두 조회
     @Override
     public List<Channel> getChannels() {
-        return new ArrayList<>(data.values());
+        return data.values().stream().toList();
     }
 
     //단일 조회 - UUID
     @Override
     public Channel getChannelByUUID(String channelId) throws CustomException {
-        Channel channel = data.get(UUID.fromString(channelId));
+        Channel channel = data.get(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
         }
@@ -60,7 +60,7 @@ public class JCFChannelService implements ChannelService {
     //수정
     @Override
     public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws CustomException {
-        Channel channel = data.get(UUID.fromString(channelId));
+        Channel channel = data.get(channelId);
 
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
@@ -78,10 +78,10 @@ public class JCFChannelService implements ChannelService {
             isUpdated = true;
         }
 
-        // hidden 상태 변경 처리
-        boolean newHiddenStatus = channelDTO.isHidden();
-        if (channel.isHidden() != newHiddenStatus) {
-            channel.setHidden(newHiddenStatus);
+        // 상태 변경 처리
+        ChannelType newChannelType = channelDTO.getChannelType();
+        if (channel.getChannelType() != newChannelType) {
+            channel.setChannelType(newChannelType);
             isUpdated = true;
         }
 
@@ -114,20 +114,20 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean addUserToChannel(Channel channel, User user) throws CustomException {
+    public boolean addUserToChannel(String channelId, String userId) throws CustomException {
         //유저를 채널에 추가
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사
-            Channel c = getChannelByUUID(channel.getId().toString());
+            Channel c = getChannelByUUID(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
-            User u = userService.getUserByUUID(user.getId().toString());
+            User u = userService.getUserByUUID(userId);
             c.getUserList().put(u.getId(), u);
             return true;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-                System.out.println("Failed to add User to this channel. User with id " + user.getId() + " not found");
+                System.out.println("Failed to add User to this channel. User with id " + userId + " not found");
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-                System.out.println("Failed to add User to this channel. Channel with id " + channel.getId() + " not found");
+                System.out.println("Failed to add User to this channel. Channel with id " + channelId + " not found");
             }
         }
         return false;

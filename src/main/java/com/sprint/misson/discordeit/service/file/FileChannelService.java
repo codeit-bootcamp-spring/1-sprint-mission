@@ -3,6 +3,7 @@ package com.sprint.misson.discordeit.service.file;
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.entity.Channel;
+import com.sprint.misson.discordeit.entity.ChannelSort;
 import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.exception.CustomException;
@@ -24,9 +25,9 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String name, ChannelType type) {
-        Channel channel = new Channel(name, type);
-        String channelId = channel.getId().toString();
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(name, type, description);
+        String channelId = channel.getId();
         //저장
         Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
         save(channelPath, channel);
@@ -41,7 +42,7 @@ public class FileChannelService extends FileService implements ChannelService {
 
     @Override
     public Channel getChannelByUUID(String channelId) throws CustomException {
-        Channel ch = getChannels().stream().filter(channel -> channel.getId().toString().equals(channelId)).findFirst().orElse(null);
+        Channel ch = getChannels().stream().filter(channel -> channel.getId().equals(channelId)).findFirst().orElse(null);
 
         if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -51,7 +52,7 @@ public class FileChannelService extends FileService implements ChannelService {
 
     @Override
     public List<Channel> getChannelsByName(String channelName) {
-        return getChannels().stream().filter(channel -> channel.getChannelName().toString().contains(channelName)).toList();
+        return getChannels().stream().filter(channel -> channel.getChannelName().contains(channelName)).toList();
     }
 
     @Override
@@ -80,10 +81,10 @@ public class FileChannelService extends FileService implements ChannelService {
             isUpdated = true;
         }
 
-        // hidden 상태 변경 처리
-        boolean newHiddenStatus = channelDTO.isHidden();
-        if (channel.isHidden() != newHiddenStatus) {
-            channel.setHidden(newHiddenStatus);
+        // 상태 변경 처리
+        ChannelType newChannelType = channelDTO.getChannelType();
+        if (channel.getChannelType() != newChannelType) {
+            channel.setChannelType(newChannelType);
             isUpdated = true;
         }
 
@@ -99,17 +100,17 @@ public class FileChannelService extends FileService implements ChannelService {
 
     @Override
     public boolean deleteChannel(Channel channel) {
-        Channel ch = getChannelByUUID(channel.getId().toString());
+        Channel ch = getChannelByUUID(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
-        return delete(channelDirectory.resolve(ch.getId().toString()));
+        return delete(channelDirectory.resolve(ch.getId()));
     }
 
     @Override
     public List<User> getUsersInChannel(Channel channel) {
-        Channel ch = getChannelByUUID(channel.getId().toString());
+        Channel ch = getChannelByUUID(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -118,22 +119,22 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public boolean addUserToChannel(Channel channel, User user) throws CustomException {
+    public boolean addUserToChannel(String channelId, String userId) throws CustomException {
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사
-            Channel c = getChannelByUUID(channel.getId().toString());
+            Channel c = getChannelByUUID(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
-            User u = userService.getUserByUUID(user.getId().toString());
+            User u = userService.getUserByUUID(userId);
             c.getUserList().put(u.getId(), u);
 
-            Path channelPath = channelDirectory.resolve(c.getId().toString().concat(".ser"));
+            Path channelPath = channelDirectory.resolve(c.getId().concat(".ser"));
             save(channelPath, c);
             return true;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-                System.out.println("Failed to add User to this channel. User with id " + user.getId() + " not found");
+                System.out.println("Failed to add User to this channel. User with id " + userId + " not found");
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-                System.out.println("Failed to add User to this channel. Channel with id " + channel.getId() + " not found");
+                System.out.println("Failed to add User to this channel. Channel with id " + channelId + " not found");
             }
         }
         return false;
@@ -143,7 +144,7 @@ public class FileChannelService extends FileService implements ChannelService {
     public boolean deleteUserFromChannel(Channel channel, User user) {
         if (channel.getUserList().containsKey(user.getId())) {
             channel.getUserList().remove(user.getId());
-            Path channelPath = channelDirectory.resolve(channel.getId().toString().concat(".ser"));
+            Path channelPath = channelDirectory.resolve(channel.getId().concat(".ser"));
             save(channelPath, channel);
             return true;
         }

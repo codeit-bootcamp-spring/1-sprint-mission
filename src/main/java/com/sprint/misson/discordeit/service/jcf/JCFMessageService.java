@@ -9,14 +9,12 @@ import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
-    private final HashMap<UUID, Message> data;
+    private final HashMap<String, Message> data;
     private final UserService userService;
     private final ChannelService channelService;
 
@@ -28,16 +26,16 @@ public class JCFMessageService implements MessageService {
 
     //생성
     @Override
-    public Message createMessage(User user, String content, Channel channel) throws CustomException {
+    public Message create(String content, String channelId, String userId) throws CustomException {
 
         if (content == null || content.isEmpty()) {
-            System.out.println("Message content is empty for User: " + user.getId() + " Channel: " + channel.getId());
+            System.out.println("Message content is empty for User: " + userId + " Channel: " + channelId);
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
         try {
-            User userByUUID = userService.getUserByUUID(user.getId().toString());
-            Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
+            User userByUUID = userService.getUserByUUID(userId);
+            Channel channelByUUID = channelService.getChannelByUUID(channelId);
             if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
                 System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
@@ -46,7 +44,7 @@ public class JCFMessageService implements MessageService {
             data.put(message.getId(), message);
             return message;
         } catch (CustomException e) {
-            System.out.println("Failed to create message. User: " + user.getId() + " Channel: " + channel.getId() + " Content: " + content);
+            System.out.println("Failed to create message. User: " + userId + " Channel: " + channelId + " Content: " + content);
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
                 throw new CustomException(e.getErrorCode());
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
@@ -59,13 +57,13 @@ public class JCFMessageService implements MessageService {
     //모두 읽기
     @Override
     public List<Message> getMessages() {
-        return new ArrayList<>(data.values());
+        return data.values().stream().toList();
     }
 
     //단일 조회 - uuid
     @Override
     public Message getMessageByUUID(String messageId) throws CustomException {
-        Message message = data.get(UUID.fromString(messageId));
+        Message message = data.get(messageId);
         if (message == null) {
             System.out.println("Message with id " + messageId + " not found");
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
@@ -83,7 +81,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessageBySender(User sender) throws CustomException {
         try {
-            User userByUUID = userService.getUserByUUID(sender.getId().toString());
+            User userByUUID = userService.getUserByUUID(sender.getId());
             return data.values().stream().filter(m -> m.getSender().equals(userByUUID)).toList();
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -102,8 +100,8 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessagesByChannel(Channel channel) throws CustomException {
         try {
-            Channel channelByUUID = channelService.getChannelByUUID(channel.getId().toString());
-            return data.values().stream().filter(m -> m.getChannel().equals(channelByUUID)).toList();
+            Channel channelByUUID = channelService.getChannelByUUID(channel.getId());
+            return data.values().stream().filter(m -> m.getChannelId().equals(channelByUUID.getId())).toList();
         } catch (Exception e) {
             System.out.println("Failed to get messages. Channel: " + channel.getId() + " Message: " + e.getMessage());
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -114,7 +112,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message updateMessage(String messageId, String newContent) throws CustomException {
 
-        Message message = data.get(UUID.fromString(messageId));
+        Message message = data.get(messageId);
 
         if (message == null) {
             System.out.println("Failed to update message. Message not found.");
@@ -133,7 +131,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean deleteMessage(Message message) throws CustomException {
-        Message msg = data.get(UUID.fromString(message.getId().toString()));
+        Message msg = data.get(message.getId());
 
         if (msg == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));

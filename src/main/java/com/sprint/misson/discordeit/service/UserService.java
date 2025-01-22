@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserService {
 
     //생성
-    User createUser(String nickname, String email);
+    User create(String nickname, String email, String password);
 
     //모두 읽기
     List<User> getUsers();
