@@ -91,7 +91,7 @@ public class FileUserService implements UserService {
     public void updateUser(UUID userId, UserDto userDto) {
         User user = readUser(userId);
         user.updateName(userDto.getName());
-        user.updatePassword(userDto.getPassword());
+        user.updatePassword(generatePassword(userDto.getPassword()));
         user.updateLoginId(userDto.getLoginId());
         writeUserToFile(user);
     }
