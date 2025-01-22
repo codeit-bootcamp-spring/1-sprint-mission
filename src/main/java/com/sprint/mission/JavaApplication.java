@@ -7,20 +7,42 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
 
-    private static UserService userService = JCFUserService.getInstance();
-    private static ChannelService channelService = JCFChannelService.getInstance();
-    private static MessageService messageService = JCFMessageService.getInstance();
+    private static UserService userService;
+    private static ChannelService channelService;
+    private static MessageService messageService;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void setJCFRepository() {
+        userService = new BasicUserService(JCFUserRepository.getInstance());
+        channelService = new BasicChannelService(JCFUserRepository.getInstance(), JCFChannelRepository.getInstance());
+        messageService = new BasicMessageService(JCFChannelRepository.getInstance(), JCFMessageRepository.getInstance());
+    }
+
+    public static void setFileRepository() {
+        userService = new BasicUserService(FileUserRepository.getInstance());
+        channelService = new BasicChannelService(FileUserRepository.getInstance(), FileChannelRepository.getInstance());
+        messageService = new BasicMessageService(FileChannelRepository.getInstance(), FileMessageRepository.getInstance());
+    }
+
+    public static void main(String[] args) {
+
+        setJCFRepository();
+//        setFileRepository();
+
         System.out.println("===== userServiceTest ====");
         System.out.println();
 
@@ -29,7 +51,7 @@ public class JavaApplication {
         User user2 = userService.createUser(UserDto.of("test2", "test2", "이규석"));
         User user3 = userService.createUser(UserDto.of("test3", "test3", "임수빈"));
 
-        System.out.println("===== 생성된 user =====");
+        System.out.println("===== 등록된 user =====");
         userService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
@@ -58,12 +80,12 @@ public class JavaApplication {
         Channel codeit = channelService.createChannel(ChannelDto.of("codeit", "codeit channel"));
         Channel spring = channelService.createChannel(ChannelDto.of("spring", "spring channel"));
 
-        System.out.println("===== 생성된 channel =====");
+        System.out.println("===== 등록된 channel =====");
         channelService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
         System.out.println("===== codeit channel 이름 변경 =====");
-        channelService.updateChannel(codeit.getId(), ChannelDto.of("codeit", "codeit channel"));
+        channelService.updateChannel(codeit.getId(), ChannelDto.of("newCodeit", "codeit channel"));
         System.out.println(channelService.readChannel(codeit.getId()));
         System.out.println();
 
@@ -111,7 +133,7 @@ public class JavaApplication {
 
         System.out.println("===== 메세지 삭제 =====");
         messageService.deleteMessage(message1.getId());
-        System.out.println("===== 현재 등록된 message =====");
+        System.out.println("===== 등록된 message =====");
         messageService.readAll().stream().forEach(System.out::println);
         System.out.println();
     }
