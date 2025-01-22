@@ -25,17 +25,50 @@ class FileUserServiceTest {
         fileUserRepository = new FileUserRepository();
         inputHandler = mock(InputHandler.class);
         fileUserService = new FileUserService(fileUserRepository, inputHandler);
+    }
 
-        // 기존 사용자의 ID 유지 (미리 저장)
-        User testUser = new User("OldNickname");
-        fileUserRepository.saveUser(testUser);
-        testUserId = testUser.getId();  // 생성된 유저의 ID를 저장
+    @Test
+    @DisplayName("유저 생성 테스트")
+    void testCreateUser(){
+        UUID id = fileUserService.createUser("TestUserCreate");
+        assertNotNull(fileUserService.getUserById(id));
+    }
+
+    @Test
+    @DisplayName("모든 유저 보기 테스트")
+    void testshowAllUsers(){
+        fileUserService.createUser("TestUserCreate");
+        assertEquals(1, fileUserService.showAllUsers());
+    }
+    @Test
+    @DisplayName("특정 유저 보기 테스트")
+    void testGetUserById(){
+        UUID id = fileUserService.createUser("TestUserReadAll");
+        assertNotNull(fileUserService.getUserById(id));
+    }
+    @Test
+    @DisplayName("모든 유저 삭제 테스트")
+    void testClearAllUsers(){
+        fileUserService.createUser("testUserDeleteAll");
+        fileUserService.clearAllUsers();
+        assertEquals(0, fileUserService.showAllUsers());
+    }
+    @Test
+    @DisplayName("특정 유저 삭제 테스트")
+    void testRemoveUserById(){
+        UUID id = fileUserService.createUser("testRemoveUserById");
+        fileUserService.removeUserById(id);
+        assertNull(fileUserService.getUserById(id));
     }
 
 
     @Test
-    @DisplayName("닉네임 업데이트 테스트")
+    @DisplayName("유저 닉네임 업데이트 테스트")
     void testUpdateUserNickname() {
+        User testUser = new User("OldNickname");
+        fileUserRepository.saveUser(testUser);
+        testUserId = testUser.getId();  // 생성된 유저의 ID를 저장
+
         // 새로운 닉네임 설정 모킹
         String newNickname = "NewNickname";
         when(inputHandler.getNewInput()).thenReturn(newNickname);
@@ -51,10 +84,10 @@ class FileUserServiceTest {
 
     @AfterEach
     void tearDown() {
-//        // 테스트 후 생성된 파일 삭제
-//        File testFile = new File(USERS_PATH + testUserId + ".ser");
-//        if (testFile.exists()) {
-//            assertTrue(testFile.delete(), "Test user file should be deleted");
-//        }
+        // 테스트 후 생성된 파일 삭제
+        File testFile = new File(USERS_PATH + testUserId + ".ser");
+        if (testFile.exists()) {
+            assertTrue(testFile.delete(), "Test user file should be deleted");
+        }
     }
 }
