@@ -39,13 +39,14 @@
   - [X]  JCF*Repository  구현체를 활용하여 테스트해보세요.
   - [X]  File*Repository 구현체를 활용하여 테스트해보세요.
 - [X] 이전에 작성했던 코드(JCF*Service 또는 File*Service)와 비교해 어떤 차이가 있는지 정리해보세요.
-- JCF*Service, File*Service 둘다 Basic*Service의 조건으로 
+- JCF*Service, File*Service 둘다 Basic*Service의 조건으로 만들었습니다.
 
 ## 주요 변경사항
 
 ## 스크린샷
 
 ## 멘토에게
+
 !!!! 멘토님 이 부분이 가장 도움이 필요합니다 !!!!
 아래 글은 강사님과 FileUserRepository에 있는 findUserById(UUID id) 메서드의 버그를 고친 내용입니다.
 

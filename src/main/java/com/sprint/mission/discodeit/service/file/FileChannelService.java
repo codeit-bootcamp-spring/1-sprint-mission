@@ -32,7 +32,7 @@ public class FileChannelService implements ChannelService {
     }
 
     public Channel getChannelById(UUID id){
-        return fileChannelRepository.findChannelById(id);
+        return fileChannelRepository.findChannelById(id).orElse(null);
     }
 
     // Update : 특정 채널 이름 변경

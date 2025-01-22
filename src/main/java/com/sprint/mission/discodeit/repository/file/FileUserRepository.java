@@ -43,7 +43,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     // FileIO를 통해서 load
-    public User findUserById(UUID id){
+    public Optional<User> findUserById(UUID id){
         String filePath = USERS_PATH + id + ".ser";
         //System.out.println("Loading user from: " + filePath); // 로드 경로 로그 추가
 
@@ -63,7 +63,7 @@ public class FileUserRepository implements UserRepository {
             //System.out.println("Deserialized User ID: " + user.getId());
             //System.out.println("Deserialized User Nickname: " + user.getNickname());
             //System.out.println( "findUserById   역직렬화 이후  user.getId()   : " + user.getId());
-            return user; // 역직렬화된 객체는 User 타입으로 반환
+            return Optional.ofNullable(user); // 역직렬화된 객체는 User 타입으로 반환
         } catch (IOException | ClassNotFoundException e){ // 만약 예외가 발생하면 null을 반환하고, 예외를 처리합니다.
             e.printStackTrace();
             return null;
@@ -86,7 +86,7 @@ public class FileUserRepository implements UserRepository {
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         // fromString 문자열 -> UUID
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        userMap.put(id, findUserById(id));
+                        userMap.put(id, findUserById(id).orElse(null));
                     }
                 }
             }

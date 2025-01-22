@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import org.mockito.internal.matchers.Null;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
@@ -46,21 +48,20 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel getChannelById(UUID id) {
         // 특정 채널을 불러오기
-        if(channelRepository.findChannelById(id) == null ){
-            System.out.println("Channel does not exist\n");
-            return null;
-        }else{
-            System.out.println(channelRepository.findChannelById(id).toString());
-            return channelRepository.findChannelById(id);
-        }
+        System.out.println(channelRepository.findChannelById(id).toString());
+        return channelRepository.findChannelById(id)
+                .orElseGet( () -> {
+                    System.out.println(" No  " + id.toString() + "  exists.\n");
+                    return null;
+                });
     }
 
     @Override
     public void updateChannelName(UUID id) {
         System.out.println("new ChannelName :");
-        channelRepository.findChannelById(id).setChannelName(inputHandler.getNewInput());
+        channelRepository.findChannelById(id).ifPresent( channel -> channel.setChannelName(inputHandler.getNewInput()));
         // 수정 시간 업데이트를 위해
-        channelRepository.findChannelById(id).setUpdateAt(System.currentTimeMillis());
+        channelRepository.findChannelById(id).ifPresent( channel -> channel.refreshUpdateAt(System.currentTimeMillis()));
     }
 
     @Override

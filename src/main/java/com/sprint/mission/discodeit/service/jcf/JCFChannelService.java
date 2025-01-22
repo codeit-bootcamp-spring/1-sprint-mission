@@ -45,20 +45,19 @@ public class JCFChannelService implements ChannelService {
     }
     public Channel getChannelById(UUID id){
         // 특정 채널을 불러오기
-        if(channelRepository.findChannelById(id) == null ){
-            System.out.println("Channel does not exist\n");
-            return null;
-        }else{
-            System.out.println(channelRepository.findChannelById(id).toString());
-            return channelRepository.findChannelById(id);
-        }
+        System.out.println(channelRepository.findChannelById(id).toString());
+        return channelRepository.findChannelById(id)
+                .orElseGet( () -> {
+                    System.out.println(" No  + " + id.toString() + " Channel exists.\n");
+                    return null;
+                });
     }
 
     public void updateChannelName(UUID id){
         System.out.println("new ChannelName :");
-        channelRepository.findChannelById(id).setChannelName(inputHandler.getNewInput());
+        channelRepository.findChannelById(id).ifPresent( channel -> channel.setChannelName(inputHandler.getNewInput()));
         // 수정 시간 업데이트를 위해
-        channelRepository.findChannelById(id).setUpdateAt(System.currentTimeMillis());
+        channelRepository.findChannelById(id).ifPresent(channel -> channel.refreshUpdateAt(System.currentTimeMillis()));
     }
 
     public void deleteAllChannels(){

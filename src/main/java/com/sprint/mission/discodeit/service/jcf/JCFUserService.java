@@ -45,23 +45,20 @@ public class JCFUserService implements UserService {
         }
         return userRepository.getAllUsers().size();
     }
+
     public User getUserById(UUID id){
-        if(userRepository.getAllUsers().get(id) == null ){
-            System.out.println(userRepository.getAllUsers().get(id) + " does not exist\n");
-        }else{
-            System.out.println( userRepository.getAllUsers().get(id).toString());
-//            System.out.println("User name is " + userRepository.getAllUsers().get(id).getNickname());
-//            System.out.println("User ID is " + userRepository.getAllUsers().get(id).getId());
-//            System.out.println("You created this account at: " + userRepository.getAllUsers().get(id).getCreatedAt());
-        }
-        return userRepository.getAllUsers().get(id);
+        return userRepository.findUserById(id)
+                .orElseGet( () -> {
+                    System.out.println(" No  + " + id.toString() + " User exists.\n");
+                    return null;
+                });
     }
 
     public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
-        userRepository.findUserById(id).setNickname(newNickname);
+        userRepository.findUserById(id).ifPresent( user -> user.setNickname(newNickname));
         // 수정 시간 업데이트를 위해
-        userRepository.findUserById(id).setUpdateAt(System.currentTimeMillis());
+        userRepository.findUserById(id).ifPresent(user -> user.refreshUpdateAt(System.currentTimeMillis()));
     }
 
     public void clearAllUsers(){

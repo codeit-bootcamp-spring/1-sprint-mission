@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
@@ -15,8 +16,8 @@ public class JCFUserRepository implements UserRepository {
     public void saveUser(User user){
         users.put(user.getId(), user);
     }
-    public User findUserById(UUID id){
-        return users.get(id);
+    public Optional<User> findUserById(UUID id){
+        return Optional.ofNullable(users.get(id));
     }
     public Map<UUID, User> getAllUsers() {
         return users;
