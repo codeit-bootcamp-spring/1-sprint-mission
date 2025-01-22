@@ -1,17 +1,25 @@
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
@@ -133,42 +141,65 @@ public class JavaApplication {
 //        System.out.println("\n특정 채널 삭제");
 //        channelService.deleteChannel(channel1.getId().toString());
 //        channelService.readAllChannel().forEach(System.out::println);
-        UserRepository userRepository = new JCFUserRepository(); // JCF 기반
-        // UserRepository userRepository = new FileUserRepository(); // 파일 기반
+//        UserRepository userRepository = new JCFUserRepository(); // JCF 기반
+//         UserRepository userRepository = new FileUserRepository(); // 파일 기반
+//
+//
+//            userRepository.reset(); // 저장소 초기화
+//        // BasicUserService 초기화
+//        UserService userService = new BasicUserService(userRepository);
+//
+//        // 테스트 데이터 생성
+//        User user1 = new User("Alice", "alice@example.com");
+//        User user2 = new User("Bob", "bob@example.com");
+//
+//        System.out.println("\n[CREATE USER]");
+//        userService.createUser(user1);
+//        userService.createUser(user2);
+//
+//        System.out.println("\n[READ ALL USERS]");
+//        userService.readAllUsers().forEach(System.out::println);
+//
+//            System.out.println("\n[READ USER BY ID]");
+//            User fetchedUser = userService.readUser(user1.getId().toString());
+//            System.out.println("Fetched User: " + fetchedUser);
+//
+//            System.out.println("\n[UPDATE USER]");
+//            user1.updateName("Alice Updated");
+//            userService.updateUser(user1);
+//            userService.readAllUsers().forEach(System.out::println);
+//
+//            System.out.println("\n[DELETE USER]");
+//            userService.deleteUser(user2.getId().toString());
+//            userService.readAllUsers().forEach(System.out::println);
 
-        // BasicUserService 초기화
-        UserService userService = new BasicUserService(userRepository);
+        MessageRepository messageRepository = new JCFMessageRepository();
+        ChannelService channelService = new JCFChannelService();
+        UserService userService = new JCFUserService();
 
-        // 테스트 데이터 생성
-        User user1 = new User("Alice", "alice@example.com");
-        User user2 = new User("Bob", "bob@example.com");
+        // BasicMessageService 초기화
+        MessageService messageService = new BasicMessageService(messageRepository, channelService, userService);
 
-        System.out.println("\n[CREATE USER]");
-        userService.createUser(user1);
-        userService.createUser(user2);
+        // 채널 및 사용자 생성
+        User user = new User("Alice", "alice@example.com");
+        userService.createUser(user);
 
-        System.out.println("\n[READ ALL USERS]");
-        userService.readAllUsers().forEach(System.out::println);
+        Channel channel = new Channel("general", "General discussion", false, List.of());
+        channelService.createChannel(channel);
 
-        System.out.println("\n[READ USER BY ID]");
-        User fetchedUser = userService.readUser(user1.getId().toString());
-        System.out.println("Fetched User: " + fetchedUser);
+        // 메시지 생성
+        Message message = new Message("Hello, World!", user.getId().toString(), channel.getId().toString());
+        messageService.createMessage(message);
 
-        System.out.println("\n[UPDATE USER]");
-        user1.updateName("Alice Updated");
-        userService.updateUser(user1);
-        userService.readAllUsers().forEach(System.out::println);
+        // 모든 메시지 읽기
+        System.out.println("\n[READ ALL MESSAGES]");
+        messageService.readAllMessages().forEach(System.out::println);
 
-        System.out.println("\n[DELETE USER]");
-        userService.deleteUser(user2.getId().toString());
-        userService.readAllUsers().forEach(System.out::println);
+        // 메시지 업데이트
+        message.updateContent("Updated Message Content");
+        messageService.updateMessage(message);
 
-        System.out.println("\n[RESET TEST (Only for FileUserRepository)]");
-        if (userRepository instanceof FileUserRepository) {
-            ((FileUserRepository) userRepository).reset();
-            userService.readAllUsers().forEach(System.out::println);
-        }
+        // 메시지 삭제
+        messageService.deleteMessage(message.getId().toString());
     }
-
-
 }

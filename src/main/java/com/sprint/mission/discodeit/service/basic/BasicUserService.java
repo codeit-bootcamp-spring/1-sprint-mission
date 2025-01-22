@@ -6,18 +6,10 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 
-/**
- * BasicUserService는 UserService 인터페이스의 기본 구현체입니다.
- * 저장 로직은 UserRepository 인터페이스를 통해 처리합니다.
- */
+
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
-    /**
-     * BasicUserService 생성자.
-     *
-     * @param userRepository UserRepository 구현체
-     */
     public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

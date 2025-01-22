@@ -1,30 +1,32 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
 
-/**
- * BasicMessageService는 MessageService 인터페이스의 기본 구현체입니다.
- * 저장 로직은 MessageRepository 인터페이스를 통해 처리합니다.
- */
+
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final ChannelService channelService;
+    private final UserService userService;
 
-    /**
-     * BasicMessageService 생성자.
-     *
-     * @param messageRepository MessageRepository 구현체
-     */
-    public BasicMessageService(MessageRepository messageRepository) {
+    public BasicMessageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
         this.messageRepository = messageRepository;
+        this.channelService = channelService;
+        this.userService = userService;
     }
+
 
     @Override
     public void createMessage(Message message) {
+        validateMessage(message); // 유효성 검사
         List<Message> messages = messageRepository.loadAll(); // 저장소에서 모든 메시지 로드
         messages.add(message); // 새로운 메시지 추가
         messageRepository.saveAll(messages); // 저장소에 저장
@@ -47,6 +49,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(Message message) {
+        validateMessage(message);
+
         List<Message> messages = messageRepository.loadAll(); // 저장소에서 모든 메시지 로드
         boolean updated = false;
         for (int i = 0; i < messages.size(); i++) {
@@ -71,5 +75,19 @@ public class BasicMessageService implements MessageService {
         }
         messageRepository.saveAll(messages); // 저장소에 저장
         System.out.println("메시지가 삭제되었습니다: " + id);
+    }
+
+    private void validateMessage(Message message) {
+        // 채널 유효성 검증
+        Channel channel = channelService.readChannel(message.getChannel());
+        if (channel == null) {
+            throw new IllegalArgumentException("유효하지 않은 채널 ID입니다: " + message.getChannel());
+        }
+
+        // 사용자 유효성 검증
+        User user = userService.readUser(message.getAuthor());
+        if (user == null) {
+            throw new IllegalArgumentException("유효하지 않은 사용자 ID입니다: " + message.getAuthor());
+        }
     }
 }
