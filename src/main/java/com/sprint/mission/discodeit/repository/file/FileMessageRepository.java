@@ -12,6 +12,23 @@ import java.util.Optional;
 import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
 
 public class FileMessageRepository implements MessageRepository {
+
+  private static FileMessageRepository instance;
+
+  private FileMessageRepository() {
+  }
+
+  public static FileMessageRepository getInstance() {
+    if (instance == null) {
+      synchronized (FileMessageRepository.class) {
+        if (instance == null) {
+          instance = new FileMessageRepository();
+        }
+      }
+    }
+    return instance;
+  }
+
   @Override
   public Message create(Message message) {
     List<Message> messages = FileUtil.loadAllFromFile(MESSAGE_FILE, Message.class);

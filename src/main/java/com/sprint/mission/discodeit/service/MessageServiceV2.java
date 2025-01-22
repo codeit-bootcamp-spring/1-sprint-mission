@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MessageServiceV2<T extends BaseChannel> {
-  //TODO : channel 지우고 message entity로 조회
   Message createMessage(String userId, Message message, T channel) throws MessageValidationException;
 
   Optional<Message> getMessageById(String messageId, T channel);

@@ -5,14 +5,27 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class JCFMessageRepository implements MessageRepository {
 
+  private static volatile JCFMessageRepository instance;
+
   private final Map<String, Message> data;
 
+  private JCFMessageRepository() {
+    this.data = new ConcurrentHashMap<>();
+  }
 
-  public JCFMessageRepository() {
-    this.data = new HashMap<>();
+  public static JCFMessageRepository getInstance() {
+    if (instance == null) {
+      synchronized (JCFMessageRepository.class) {
+        if (instance == null) {
+          instance = new JCFMessageRepository();
+        }
+      }
+    }
+    return instance;
   }
 
   @Override

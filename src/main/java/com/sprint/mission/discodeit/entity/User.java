@@ -82,17 +82,12 @@ public class User implements Serializable {
 
   @Override
   public String toString() {
-    return "User{" +
-        "UUID='" + UUID + '\'' +
+    return
         ", username='" + username + '\'' +
         ", password='" + password + '\'' +
         ", email='" + email + '\'' +
         ", nickname='" + nickname + '\'' +
         ", phoneNumber='" + phoneNumber + '\'' +
-        ", profilePictureURL='" + profilePictureURL + '\'' +
-        ", description='" + description + '\'' +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
         '}';
   }
 

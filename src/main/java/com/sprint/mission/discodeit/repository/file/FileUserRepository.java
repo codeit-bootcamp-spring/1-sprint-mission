@@ -14,6 +14,22 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
 public class FileUserRepository implements UserRepository {
 
+  private static FileUserRepository instance;
+
+  private FileUserRepository() {
+  }
+
+  public static FileUserRepository getInstance() {
+    if (instance == null) {
+      synchronized (FileUserRepository.class) {
+        if (instance == null) {
+          instance = new FileUserRepository();
+        }
+      }
+    }
+    return instance;
+  }
+
   @Override
   public User create(User user) {
     List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
@@ -59,7 +75,7 @@ public class FileUserRepository implements UserRepository {
   }
 
   @Override
-  public void clear(){
+  public void clear() {
     File file = new File(USER_FILE);
     if (file.exists()) {
       file.delete();

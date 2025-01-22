@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class BasicUserServiceTest {
 
-  UserRepository userRepository = new FileUserRepository();
+  UserRepository userRepository = FileUserRepository.getInstance();
   UserService userService = BasicUserService.getInstance(userRepository);
 
   @BeforeEach

@@ -25,9 +25,9 @@ import java.util.Optional;
 
 public class BasicMessageServiceTest {
 
-  UserRepository userRepository = new FileUserRepository();
-  ChannelRepository channelRepository = new FileChannelRepository();
-  MessageRepository messageRepository = new FileMessageRepository();
+  UserRepository userRepository = FileUserRepository.getInstance();
+  ChannelRepository channelRepository = FileChannelRepository.getInstance();
+  MessageRepository messageRepository = FileMessageRepository.getInstance();
   UserService userService = BasicUserService.getInstance(userRepository);
   ChannelService channelService = BasicChannelService.getInstance(channelRepository);
   MessageServiceV2<ChatChannel> messageService = BasicMessageService.getInstance(messageRepository, userRepository, channelRepository);

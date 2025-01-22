@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.config.ApplicationBuilder;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.UserUpdateDto;
@@ -8,24 +9,10 @@ import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+
 
 import java.io.File;
 import java.util.List;
@@ -36,13 +23,11 @@ import static com.sprint.mission.discodeit.constant.FileConstant.*;
 
 public class JavaApplication {
 
-  static UserRepository userRepository;
-  static ChannelRepository channelRepository;
-  static MessageRepository messageRepository;
   static ChannelService channelService;
   static UserService userService;
   static MessageServiceV2<ChatChannel> messageServiceV2;
   static ChannelFactory channelFactory;
+
 
   private static void setup() {
     File file = new File(MESSAGE_FILE);
@@ -62,14 +47,12 @@ public class JavaApplication {
 
   public static void main(String[] args) {
 
-    userRepository = new FileUserRepository();
-    channelRepository = new FileChannelRepository();
-    messageRepository = new FileMessageRepository();
+    ApplicationBuilder builder = new ApplicationBuilder();
 
-    userService = BasicUserService.getInstance(userRepository);
-    channelService = BasicChannelService.getInstance(channelRepository);
-    messageServiceV2 = BasicMessageService.getInstance(messageRepository, userRepository, channelRepository);
-    
+    channelService = builder.getChannelService();
+    userService = builder.getUserService();
+    messageServiceV2 = builder.getMessageService();
+
     channelFactory = new ChannelFactory();
 
     setup();
@@ -87,7 +70,7 @@ public class JavaApplication {
 
     System.out.println("=== 유저 생성 및 조회 ===");
     try {
-      user = new User.UserBuilder("exampleUserName", "examplePwd", "example@gmail.com")
+      user = new User.UserBuilder("user1", "examplePwd", "example@gmail.com")
           .nickname("exampleNickname")
           .phoneNumber("01012345678")
           .profilePictureURL("https://example-url.com")
@@ -98,7 +81,7 @@ public class JavaApplication {
     }
 
     try {
-      user2 = new User.UserBuilder("exampleU2", "examplePwd2", "example2@gmail.com")
+      user2 = new User.UserBuilder("user2", "examplePwd2", "example2@gmail.com")
           .nickname("exampleNick2")
           .phoneNumber("01013345678")
           .description("this is example description2")
@@ -323,7 +306,7 @@ public class JavaApplication {
     try {
       messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
           user.getUUID(),
-          chatChannel.getUUID(),
+          chatChannel2.getUUID(),
           "this is second channel first Chat"
       ).build(), chatChannel2);
     } catch (MessageValidationException e) {

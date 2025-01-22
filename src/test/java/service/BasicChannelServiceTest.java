@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class BasicChannelServiceTest {
 
-  ChannelRepository channelRepository = new FileChannelRepository();
+  ChannelRepository channelRepository = FileChannelRepository.getInstance();
   ChannelService channelService = BasicChannelService.getInstance(channelRepository);
 
   @BeforeEach

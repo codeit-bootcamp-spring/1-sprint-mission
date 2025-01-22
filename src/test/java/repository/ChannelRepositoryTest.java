@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ChannelRepositoryTest {
-  private final ChannelRepository repository = new FileChannelRepository();
+  private final ChannelRepository repository = FileChannelRepository.getInstance();
 
   @BeforeEach
   void beforeEach(){

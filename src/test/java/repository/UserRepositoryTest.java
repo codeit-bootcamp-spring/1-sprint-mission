@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 public class UserRepositoryTest {
-  private final UserRepository userRepository = new FileUserRepository();
+  private final UserRepository userRepository = FileUserRepository.getInstance();
 
   @BeforeEach
   void beforeEach(){

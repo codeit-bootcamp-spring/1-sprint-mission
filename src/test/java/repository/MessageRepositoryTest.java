@@ -11,7 +11,7 @@ import java.util.List;
 
 public class MessageRepositoryTest {
 
-  private final MessageRepository repository = new FileMessageRepository();
+  private final MessageRepository repository = FileMessageRepository.getInstance();
 
   @BeforeEach
   void beforeEach(){

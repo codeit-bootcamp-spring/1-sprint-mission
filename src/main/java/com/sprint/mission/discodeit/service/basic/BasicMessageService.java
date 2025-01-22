@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.VoiceChannel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -14,6 +15,8 @@ import com.sprint.mission.discodeit.service.MessageServiceV2;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_AVAILABLE_FOR_MESSAGE;
 
 public class BasicMessageService implements MessageServiceV2<ChatChannel> {
 
@@ -43,18 +46,19 @@ public class BasicMessageService implements MessageServiceV2<ChatChannel> {
     return instance;
   }
 
-  private void isChannelChat(String channelId){
+  private void isChannelChat(String channelId) {
     Optional<BaseChannel> baseChannel = channelRepository.findById(channelId);
-    if(baseChannel.isPresent()){
-      if(baseChannel.get() instanceof VoiceChannel) throw new IllegalArgumentException("음성 채널은 메시지를 보낼 수 없습니다.");
-    }else{
+    if (baseChannel.isPresent()) {
+      if (baseChannel.get() instanceof VoiceChannel) throw new IllegalArgumentException(CHANNEL_NOT_AVAILABLE_FOR_MESSAGE);
+    } else {
       throw new ChannelNotFoundException();
     }
   }
+
   @Override
   public Message createMessage(String userId, Message message, ChatChannel channel) throws MessageValidationException {
     if (userRepository.findById(userId).isEmpty()) throw new MessageValidationException();
-    if (channelRepository.findById(channel.getUUID()).isEmpty())throw new MessageValidationException();
+    if (channelRepository.findById(channel.getUUID()).isEmpty()) throw new MessageValidationException();
     isChannelChat(channel.getUUID());
     messageRepository.create(message);
     return message;
@@ -75,13 +79,19 @@ public class BasicMessageService implements MessageServiceV2<ChatChannel> {
   @Override
   public Message updateMessage(ChatChannel channel, String messageId, MessageUpdateDto updatedMessage) {
     isChannelChat(channel.getUUID());
-    Optional<Message> message = messageRepository.findById(messageId);
-    if(message.isEmpty()) throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
-    Message originalMessage = message.get();
+
+    Message originalMessage = returnMessageIfExists(messageId);
+
     updatedMessage.getContent().ifPresent(originalMessage::setContent);
     updatedMessage.getContent().ifPresent(originalMessage::setContentImage);
     messageRepository.update(originalMessage);
     return originalMessage;
+  }
+
+  private Message returnMessageIfExists(String messageId) {
+    Optional<Message> message = messageRepository.findById(messageId);
+    if (message.isEmpty()) throw new MessageNotFoundException();
+    return message.get();
   }
 
   @Override
