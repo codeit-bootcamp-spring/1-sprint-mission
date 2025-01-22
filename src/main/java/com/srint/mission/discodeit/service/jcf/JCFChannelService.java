@@ -16,13 +16,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     //db 로직
-    @Override
     public UUID save(Channel channel) {
-        data.put(channel.getId(), channel);
+        if(!data.containsKey(channel.getId())){
+            data.put(channel.getId(), channel);
+        }
         return(channel.getId());
     }
 
-    @Override
     public Channel findOne(UUID id) {
         if(!data.containsKey(id)){
             throw new IllegalArgumentException("조회할 Channel을 찾지 못했습니다.");
@@ -30,15 +30,13 @@ public class JCFChannelService implements ChannelService {
         return data.get(id);
     }
 
-    @Override
     public List<Channel> findAll() {
         if(data.isEmpty()){
-            throw new IllegalArgumentException("Channel이 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return data.values().stream().toList();
     }
 
-    @Override
     public UUID delete(UUID id) {
         if(!data.containsKey(id)){
             throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");
@@ -72,6 +70,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalStateException("채널 수정 권한이 없습니다.");
         }
         findChannel.setChannelName(channelName);
+        save(findChannel);
         return findChannel;
     }
 
@@ -79,6 +78,7 @@ public class JCFChannelService implements ChannelService {
     public Channel joinChannel(UUID id, User user) {
         Channel findChannel = findOne(id);
         findChannel.setJoinedUsers(user);
+        save(findChannel);
         return findChannel;
     }
 
@@ -88,6 +88,7 @@ public class JCFChannelService implements ChannelService {
         Channel findChannel = findOne(id);
         findChannel.deleteJoinedUser(user);
         user.deleteMyChannels(findChannel);
+        save(findChannel);
         return findChannel.getId();
     }
 
@@ -98,8 +99,7 @@ public class JCFChannelService implements ChannelService {
         if(!findChannel.getChannelOwner().userCompare(user)){
             throw new IllegalStateException("채널 삭제 권한이 없습니다.");
         }
-        findChannel.getJoinedUsers().forEach(
-                u -> u.deleteMyChannels(findChannel));
+        findChannel.getJoinedUsers().forEach(u -> u.deleteMyChannels(findChannel));
         return delete(id);
     }
 }

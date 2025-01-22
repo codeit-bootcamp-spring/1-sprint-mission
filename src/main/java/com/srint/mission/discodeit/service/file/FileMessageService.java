@@ -66,14 +66,14 @@ public class FileMessageService implements MessageService {
         }
     }
 
-    @Override
     public UUID save(Message message) {
-        data.put(message.getId(), message);
+        if(!data.containsKey(message.getId())){
+            data.put(message.getId(), message);
+        }
         saveDataToFile();
         return message.getId();
     }
 
-    @Override
     public Message findOne(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("조회할 Message를 찾지 못했습니다.");
@@ -81,15 +81,13 @@ public class FileMessageService implements MessageService {
         return data.get(id);
     }
 
-    @Override
     public List<Message> findAll() {
         if (data.isEmpty()) {
-            throw new IllegalArgumentException("Message가 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
     }
 
-    @Override
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 Message를 찾지 못했습니다.");
@@ -103,9 +101,7 @@ public class FileMessageService implements MessageService {
     public UUID create(String content, User user, Channel channel) {
         Message message = new Message(content, user, channel);
         message.setMessageChannel();
-        UUID id = save(message);
-        saveDataToFile();
-        return id;
+        return save(message);
     }
 
     @Override
@@ -125,7 +121,7 @@ public class FileMessageService implements MessageService {
             throw new IllegalStateException("Message 변경 권한이 없습니다.");
         }
         findMessage.setContent(message);
-        saveDataToFile();
+        save(findMessage);
         return findMessage;
     }
 
@@ -136,8 +132,6 @@ public class FileMessageService implements MessageService {
             throw new IllegalStateException("Message 삭제 권한이 없습니다.");
         }
         findMessage.getChannel().deleteMessage(findMessage);
-        data.remove(id);
-        saveDataToFile();
-        return id;
+        return delete(findMessage.getId());
     }
 }

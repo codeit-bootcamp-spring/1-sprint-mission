@@ -63,14 +63,12 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    @Override
     public UUID save(Channel channel) {
         data.put(channel.getId(), channel);
         saveDataToFile();
         return channel.getId();
     }
 
-    @Override
     public Channel findOne(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("조회할 Channel을 찾지 못했습니다.");
@@ -78,15 +76,13 @@ public class FileChannelRepository implements ChannelRepository {
         return data.get(id);
     }
 
-    @Override
     public List<Channel> findAll() {
         if (data.isEmpty()) {
-            throw new IllegalArgumentException("Channel이 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
     }
 
-    @Override
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");

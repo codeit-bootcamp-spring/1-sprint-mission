@@ -63,14 +63,14 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    @Override
     public UUID save(Message message) {
-        data.put(message.getId(), message);
+        if(!data.containsKey(message.getId())){
+            data.put(message.getId(), message);
+        }
         saveDataToFile();
         return message.getId();
     }
 
-    @Override
     public Message findOne(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("조회할 Message를 찾지 못했습니다.");
@@ -78,15 +78,13 @@ public class FileMessageRepository implements MessageRepository {
         return data.get(id);
     }
 
-    @Override
     public List<Message> findAll() {
         if (data.isEmpty()) {
-            throw new IllegalArgumentException("Message가 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
     }
 
-    @Override
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 Message를 찾지 못했습니다.");

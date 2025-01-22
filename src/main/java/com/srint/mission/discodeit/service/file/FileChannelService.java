@@ -64,14 +64,12 @@ public class FileChannelService implements ChannelService {
         }
     }
 
-    @Override
     public UUID save(Channel channel) {
         data.put(channel.getId(), channel);
         saveDataToFile();
         return channel.getId();
     }
 
-    @Override
     public Channel findOne(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("조회할 Channel을 찾지 못했습니다.");
@@ -79,15 +77,13 @@ public class FileChannelService implements ChannelService {
         return data.get(id);
     }
 
-    @Override
     public List<Channel> findAll() {
         if (data.isEmpty()) {
-            throw new IllegalArgumentException("Channel이 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
     }
 
-    @Override
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");
@@ -100,9 +96,7 @@ public class FileChannelService implements ChannelService {
     @Override
     public UUID create(String channelName, User channelOwner) {
         Channel channel = new Channel(channelName, channelOwner);
-        UUID id = save(channel);
-        saveDataToFile();
-        return id;
+        return save(channel);
     }
 
     @Override
@@ -122,7 +116,7 @@ public class FileChannelService implements ChannelService {
             throw new IllegalStateException("채널 수정 권한이 없습니다.");
         }
         findChannel.setChannelName(channelName);
-        saveDataToFile();
+        save(findChannel);
         return findChannel;
     }
 
@@ -130,7 +124,7 @@ public class FileChannelService implements ChannelService {
     public Channel joinChannel(UUID id, User user) {
         Channel findChannel = findOne(id);
         findChannel.setJoinedUsers(user);
-        saveDataToFile();
+        save(findChannel);
         return findChannel;
     }
 
@@ -139,7 +133,7 @@ public class FileChannelService implements ChannelService {
         Channel findChannel = findOne(id);
         findChannel.deleteJoinedUser(user);
         user.deleteMyChannels(findChannel);
-        saveDataToFile();
+        save(findChannel);
         return findChannel.getId();
     }
 
@@ -150,9 +144,7 @@ public class FileChannelService implements ChannelService {
             throw new IllegalStateException("채널 삭제 권한이 없습니다.");
         }
         findChannel.getJoinedUsers().forEach(u -> u.deleteMyChannels(findChannel));
-        UUID deletedId = delete(id);
-        saveDataToFile();
-        return deletedId;
+        return  delete(id);
     }
 
 }

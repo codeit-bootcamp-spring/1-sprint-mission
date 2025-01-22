@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.*;
 
 public class FileUserRepository implements UserRepository {
+
     private static final String FILE_PATH = "userData.ser";
     private Map<UUID, User> data;
 
@@ -63,14 +64,14 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    @Override
     public UUID save(User user) {
-        data.put(user.getId(), user);
+        if(!data.containsKey(user.getId())){
+            data.put(user.getId(), user);
+        }
         saveDataToFile();
         return user.getId();
     }
 
-    @Override
     public User findOne(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("조회할 User를 찾지 못했습니다.");
@@ -78,15 +79,13 @@ public class FileUserRepository implements UserRepository {
         return data.get(id);
     }
 
-    @Override
     public List<User> findAll() {
         if (data.isEmpty()) {
-            throw new IllegalArgumentException("User가 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
     }
 
-    @Override
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 User를 찾지 못했습니다.");

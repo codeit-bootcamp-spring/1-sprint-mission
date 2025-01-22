@@ -15,8 +15,14 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        //jcfServiceTest();
+        jcfServiceTest();
         fileServiceTest();
+
+    }
+
+    public static void basicServiceTest(){
+
+
     }
 
     public static void fileServiceTest(){
