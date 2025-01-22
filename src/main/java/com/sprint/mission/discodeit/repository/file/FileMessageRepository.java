@@ -1,17 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.mockito.internal.matchers.Null;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
     /**
@@ -73,8 +68,9 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Map<UUID, Message> findAllMessages() {
-        Map<UUID, Message> messageMap = new HashMap<>();
+    public Collection<Message> findAllMessages() {
+        //Map<UUID, Message> messageMap = new HashMap<>();
+        List<Message> MessageList = new ArrayList<>();
         File messageDir = new File("messages");
         if(messageDir.exists() && messageDir.isDirectory()){
             File[] files = messageDir.listFiles();
@@ -82,12 +78,13 @@ public class FileMessageRepository implements MessageRepository {
                 for(File file : files){
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        messageMap.put(id, findMessageById(id).orElse(null));
+                        //messageMap.put(id, findMessageById(id).orElse(null));
+                        MessageList.add(findMessageById(id).orElse(null));
                     }
                 }
             }
         }
-        return messageMap;
+        return MessageList;
     }
 
     @Override

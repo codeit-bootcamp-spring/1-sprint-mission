@@ -70,10 +70,9 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    // 스프린트 미션 1, 피드백 이후 인터페이스를 제작했었습니다(그래서 추상 클래스 반환이 Map으로 설정돼있음)
-    // 시간 문제 상 변경이 어려워서 전달만 Map으로 합니다
-    public Map<UUID, User> getAllUsers(){
-        Map<UUID, User> userMap = new HashMap<>();
+    public Collection<User> getAllUsers(){
+        // Map<UUID, User> userMap = new HashMap<>();
+        List<User> userList = new ArrayList<>();
         // USERS_PATH 아래 모든 파일 들고오기
         // findUserById 로 User을 들고와야 한다.
         File userDir = new File("users");
@@ -86,12 +85,13 @@ public class FileUserRepository implements UserRepository {
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         // fromString 문자열 -> UUID
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        userMap.put(id, findUserById(id).orElse(null));
+                        //userMap.put(id, findUserById(id).orElse(null));
+                        userList.add(findUserById(id).orElse(null));
                     }
                 }
             }
         }
-        return userMap;
+        return userList;
     }
 
     // 삭제

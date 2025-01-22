@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
     Map<UUID, Channel> channels;
@@ -20,8 +17,8 @@ public class JCFChannelRepository implements ChannelRepository {
         // nullable 한 Optional 로 감싸서 null-safety를 보장
         return Optional.ofNullable(channels.get(id));
     }
-    public Map<UUID,Channel> getAllChannels(){
-        return channels;
+    public Collection<Channel> getAllChannels(){
+        return channels.values();
     }
     public void deleteAllChannels(){
         channels.clear();
