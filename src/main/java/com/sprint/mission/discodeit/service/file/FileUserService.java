@@ -27,18 +27,6 @@ public class FileUserService implements UserService{
         return user.getId();
     }
 
-//    // save
-//    public UUID save(User user){
-//        // FileIO + 객체 직렬화를 통한 데이터 저장
-//        // 개별로 아무데나 하지말고, 폴더 생성 후 저장하기
-//
-//    }
-
-//    // load
-//    public User load(UUID id){
-//
-//    }
-
     // Read : 전체 유저 조회, 특정 유저 조회
     public int showAllUsers(){
         // users/ 아래 저장된 모든 파일을 불러온다.
@@ -46,9 +34,9 @@ public class FileUserService implements UserService{
         return fileUserRepository.getAllUsers().size();
     }
     public User getUserById(UUID id){
-        System.out.println("getUserById   매개변수를 통해 들어옴    " + id);
+        //System.out.println("getUserById   매개변수를 통해 들어옴    " + id);
         User user = fileUserRepository.findUserById(id);
-        System.out.println("getUserById  findUserById(id) and that id      " + user.getId());
+        //System.out.println("getUserById  findUserById(id) and that id      " + user.getId());
 
         return user;
     }

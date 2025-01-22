@@ -1,53 +1,58 @@
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
 
-//        // [ ] Application에서 서비스 구현체를 File*Service로 바꾸어 테스트해보세요.
-//
-//        // FileUserService 초기화
-//        InputHandler inputHandler = new InputHandler();  // 필요 시 InputHandler 구현 필요
-//        FileUserService fileUserService = new FileUserService(inputHandler);
-//
-//        // 1. 유저 생성
-//        String nickname = "Winter";
-//        UUID userId = fileUserService.createUser(nickname);
-//        System.out.println("User created with ID: " + userId);
-//
-//        System.out.println("--------------------------------------------------------");
-//
-//        // 2. 생성된 유저 로드
-//        User user = fileUserService.load(userId);
-//        System.out.println("Loaded user: " + user);
-//
-//        System.out.println("--------------------------------------------------------");
-//
-//        // 3. 유저 닉네임 업데이트
-//        String newNickname = "Spring";
-//        fileUserService.updateUserNickname(userId);
-//        System.out.println("asdfasdffsd " + userId);
-//        User updatedUser = fileUserService.load(userId);
-//        System.out.println("asdfas1564dffsd " + userId);
-//        System.out.println("Updated user nickname: " + updatedUser.getNickname());
-//
-//
-//        System.out.println("--------------------------------------------------------");
-//
-//        // 4. 유저 삭제
-//        fileUserService.removeUserById(userId);
-//        System.out.println("User with ID " + userId + " deleted.");
-//
-//
-//        System.out.println("--------------------------------------------------------");
-//
-//        // 5. 사용자 파일 삭제 확인
-//        User deletedUser = fileUserService.load(userId);
-//        if (deletedUser == null) {
-//            System.out.println("User not found, as expected.");
-//        }
+        // 서비스 초기화
+        // TODO Basic*Service 구현체를 초기화하세요.
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository);
+
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(user, channelService);
+
+        // 테스트
+        messageCreateTest(messageService, channel, user);
+    }
+
+    static User setupUser(UserService userService) {
+        //User user = userService.createUser("woody", "woody@codeit.com", "woody1234");
+        UUID userId = userService.createUser("woody");
+        return userService.getUserById(userId);
+    }
+
+    static Channel setupChannel(User owner, ChannelService channelService) {
+        //Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        UUID channelId = channelService.createChannel(owner, "공지 채널");
+        return channelService.getChannelById(channelId);
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        //Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+        UUID messageId = messageService.createMessage(channel, "안녕하세요.");
+        System.out.println("메시지 생성: " + messageService.getMessageById(messageId));
     }
 }

@@ -1,6 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends BaseEntity{
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Channel extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private User owner;
     private String channelName;
     public Channel(User owner, String channelName){
