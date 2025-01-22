@@ -6,9 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.io.*;
 import java.util.*;
 
-/**
- * 파일 기반의 MessageRepository 구현체. 데이터를 파일에 저장합니다.
- */
+
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "messages.ser";
 

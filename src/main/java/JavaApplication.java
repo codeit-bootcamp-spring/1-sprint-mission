@@ -1,7 +1,12 @@
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -11,39 +16,39 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        FileUserService userService = new FileUserService();
-
-//         파일 초기화
-        userService.resetFile();
-
-//         사용자 추가
-        User user1 = new User("Alice", "alice@example.com");
-        User user2 = new User("Bob", "bob@example.com");
-        User user3 = new User("Charlie", "charlie@example.com");
-        userService.createUser(user1);
-        userService.createUser(user2);
-        userService.createUser(user3);
-
-        // 저장 후 데이터 확인
-        System.out.println("파일 저장 후 사용자 목록:");
-        userService.readAllUsers().forEach(System.out::println);
-
-        // 특정 사용자 검색
-        try {
-            System.out.println("ID 1 사용자: " + userService.readUser(user2.getId().toString()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // 특정 사용자 업데이트
-        System.out.println("\n 업데이트 : alice의 이름 변경");
-        user1.updateEmail("alice@newemail.com");
-        userService.updateUser(user1);
-        userService.readAllUsers().forEach(System.out::println);
-
-        // 특정 사용자 삭제
-        System.out.println("특정 사용자 삭제");
-        userService.deleteUser(user1.getId().toString());
-        userService.readAllUsers().forEach(System.out::println);
+//        FileUserService userService = new FileUserService();
+//
+////         파일 초기화
+//        userService.resetFile();
+//
+////         사용자 추가
+//        User user1 = new User("Alice", "alice@example.com");
+//        User user2 = new User("Bob", "bob@example.com");
+//        User user3 = new User("Charlie", "charlie@example.com");
+//        userService.createUser(user1);
+//        userService.createUser(user2);
+//        userService.createUser(user3);
+//
+//        // 저장 후 데이터 확인
+//        System.out.println("파일 저장 후 사용자 목록:");
+//        userService.readAllUsers().forEach(System.out::println);
+//
+//        // 특정 사용자 검색
+//        try {
+//            System.out.println("ID 1 사용자: " + userService.readUser(user2.getId().toString()));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        // 특정 사용자 업데이트
+//        System.out.println("\n 업데이트 : alice의 이름 변경");
+//        user1.updateEmail("alice@newemail.com");
+//        userService.updateUser(user1);
+//        userService.readAllUsers().forEach(System.out::println);
+//
+//        // 특정 사용자 삭제
+//        System.out.println("특정 사용자 삭제");
+//        userService.deleteUser(user1.getId().toString());
+//        userService.readAllUsers().forEach(System.out::println);
 
 
 //
@@ -128,7 +133,41 @@ public class JavaApplication {
 //        System.out.println("\n특정 채널 삭제");
 //        channelService.deleteChannel(channel1.getId().toString());
 //        channelService.readAllChannel().forEach(System.out::println);
+        UserRepository userRepository = new JCFUserRepository(); // JCF 기반
+        // UserRepository userRepository = new FileUserRepository(); // 파일 기반
 
+        // BasicUserService 초기화
+        UserService userService = new BasicUserService(userRepository);
+
+        // 테스트 데이터 생성
+        User user1 = new User("Alice", "alice@example.com");
+        User user2 = new User("Bob", "bob@example.com");
+
+        System.out.println("\n[CREATE USER]");
+        userService.createUser(user1);
+        userService.createUser(user2);
+
+        System.out.println("\n[READ ALL USERS]");
+        userService.readAllUsers().forEach(System.out::println);
+
+        System.out.println("\n[READ USER BY ID]");
+        User fetchedUser = userService.readUser(user1.getId().toString());
+        System.out.println("Fetched User: " + fetchedUser);
+
+        System.out.println("\n[UPDATE USER]");
+        user1.updateName("Alice Updated");
+        userService.updateUser(user1);
+        userService.readAllUsers().forEach(System.out::println);
+
+        System.out.println("\n[DELETE USER]");
+        userService.deleteUser(user2.getId().toString());
+        userService.readAllUsers().forEach(System.out::println);
+
+        System.out.println("\n[RESET TEST (Only for FileUserRepository)]");
+        if (userRepository instanceof FileUserRepository) {
+            ((FileUserRepository) userRepository).reset();
+            userService.readAllUsers().forEach(System.out::println);
+        }
     }
 
 
