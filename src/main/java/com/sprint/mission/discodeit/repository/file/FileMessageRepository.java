@@ -84,7 +84,7 @@ public class FileMessageRepository implements MessageRepository {
                 }
             }
         }
-        return MessageList;
+        return MessageList.isEmpty() ? null : MessageList;
     }
 
     @Override

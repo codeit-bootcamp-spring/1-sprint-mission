@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ public class FileUserService implements UserService{
         this.inputHandler = inputHandler;
     }
 
+    @Override
     public UUID createUser(String nickname){
         User user = new User(nickname);
         fileUserRepository.saveUser(user);
@@ -28,16 +30,20 @@ public class FileUserService implements UserService{
     }
 
     // Read : 전체 유저 조회, 특정 유저 조회
-    public int showAllUsers(){
+    @Override
+    public Collection<User> showAllUsers(){
         // users/ 아래 저장된 모든 파일을 불러온다.
         // fileUserRepository.getAllUsers();
-        return fileUserRepository.getAllUsers().size();
+        return fileUserRepository.getAllUsers();
     }
+
+    @Override
     public User getUserById(UUID id){
         return fileUserRepository.findUserById(id).orElse(null);
     }
 
     // Update : 특정 유저 닉네임 변경
+    @Override
     public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
         // id 로 찾아와서, 레포지토리의 load하는 메서드를 거쳐서
@@ -60,9 +66,12 @@ public class FileUserService implements UserService{
 
 
     // Delete : 전체 유저 삭제, 특정 유저 삭제
+    @Override
     public void clearAllUsers(){
         fileUserRepository.deleteAllUsers();
     }
+
+    @Override
     public void removeUserById(UUID id){
         fileUserRepository.deleteUserById(id);
     }

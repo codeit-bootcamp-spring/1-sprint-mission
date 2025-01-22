@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
@@ -36,24 +37,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public int showAllUsers() {
+    public Collection<User> showAllUsers() {
         // 전체 유저 조희
         if (userRepository.getAllUsers().isEmpty()) {
             System.out.println("No users exists.\n");
+            return null;
         }else{
             System.out.println(userRepository.getAllUsers().toString());
+            return userRepository.getAllUsers();
         }
-        return userRepository.getAllUsers().size();
     }
 
     @Override
     public User getUserById(UUID id) {
-        if(userRepository.getAllUsers().get(id) == null ){
-            System.out.println(userRepository.getAllUsers().get(id) + " does not exist\n");
-        }else{
-            System.out.println( userRepository.getAllUsers().get(id).toString());
-        }
-        return userRepository.getAllUsers().get(id);
+        return userRepository.findUserById(id)
+                .orElseGet( () -> {
+                    System.out.println(" No  + " + id.toString() + " User exists.\n");
+                    return null;
+                });
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class FileMassageService implements MessageService {
@@ -30,8 +31,8 @@ public class FileMassageService implements MessageService {
     }
 
     @Override
-    public int showAllMessages() {
-        return fileMessageRepository.findAllMessages().size();
+    public Collection<Message> showAllMessages() {
+        return fileMessageRepository.findAllMessages();
     }
 
     @Override

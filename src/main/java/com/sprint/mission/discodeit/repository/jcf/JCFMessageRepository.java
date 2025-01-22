@@ -9,17 +9,22 @@ public class JCFMessageRepository implements MessageRepository {
     public JCFMessageRepository(){
         this.messages = new HashMap<>();
     }
+    @Override
     public void saveMessage(Message message){
         messages.put(message.getId(), message);
     }
+    @Override
     public Optional<Message> findMessageById(UUID id){
         return Optional.ofNullable(messages.get(id));
     }
+    @Override
     public Collection<Message> findAllMessages() {
         return messages.values();
     }
+    @Override
     public void deleteMessageById(UUID id){
         messages.remove(id);
     }
+    @Override
     public void deleteAllMessages(){ messages.clear(); };
 }

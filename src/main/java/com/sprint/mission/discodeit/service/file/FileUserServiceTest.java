@@ -30,35 +30,35 @@ class FileUserServiceTest {
     @Test
     @DisplayName("유저 생성 테스트")
     void testCreateUser(){
-        UUID id = fileUserService.createUser("TestUserCreate");
-        assertNotNull(fileUserService.getUserById(id));
+        testUserId = fileUserService.createUser("TestUserCreate");
+        assertNotNull(fileUserService.getUserById(testUserId));
     }
 
     @Test
     @DisplayName("모든 유저 보기 테스트")
     void testshowAllUsers(){
-        fileUserService.createUser("TestUserCreate");
-        assertEquals(1, fileUserService.showAllUsers());
+        testUserId = fileUserService.createUser("TestUserCreate");
+        assertNotNull(fileUserService.showAllUsers());
     }
     @Test
     @DisplayName("특정 유저 보기 테스트")
     void testGetUserById(){
-        UUID id = fileUserService.createUser("TestUserReadAll");
-        assertNotNull(fileUserService.getUserById(id));
+        testUserId = fileUserService.createUser("TestUserReadAll");
+        assertNotNull(fileUserService.getUserById(testUserId));
     }
     @Test
     @DisplayName("모든 유저 삭제 테스트")
     void testClearAllUsers(){
         fileUserService.createUser("testUserDeleteAll");
         fileUserService.clearAllUsers();
-        assertEquals(0, fileUserService.showAllUsers());
+        assertNull(fileUserService.showAllUsers());
     }
     @Test
     @DisplayName("특정 유저 삭제 테스트")
     void testRemoveUserById(){
-        UUID id = fileUserService.createUser("testRemoveUserById");
-        fileUserService.removeUserById(id);
-        assertNull(fileUserService.getUserById(id));
+        testUserId = fileUserService.createUser("testRemoveUserById");
+        fileUserService.removeUserById(testUserId);
+        assertNull(fileUserService.getUserById(testUserId));
     }
 
 
