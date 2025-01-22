@@ -6,34 +6,36 @@ import java.util.UUID;
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     //객체 식별 id
-    private final UUID id;
+    private final String id;
     //생성 날짜 - 유닉스 타임스탬프
     private final Long createdAt;
     //수정 시간
     private Long updatedAt;
     //메세지 작성자
-    private final User sender;
+    private final String senderId;
     //메세지 내용
     private String content;
     //메세지가 생성된 채널
-    private final Channel channel;
+    private final String channelId;
 
     public Message(User sender, String content, Channel channel) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID().toString();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
-        this.sender = sender;
+        this.senderId = sender.getId();
         this.content = content;
-        this.channel = channel;
+        this.channelId = channel.getId();
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
-
+    public String getSender() {
+        return senderId;
+    }
     //메세지가 생성된 이후, 보낸 사람을 변경할 수 없으므로 update 미구현
-    public User getSender() {
-        return sender;
+    public String getSenderId() {
+        return senderId;
     }
 
     public String getContent() {
@@ -59,8 +61,8 @@ public class Message implements Serializable {
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
-    public Channel getChannel() {
-        return channel;
+    public String getChannelId() {
+        return channelId;
     }
 
 
@@ -68,7 +70,7 @@ public class Message implements Serializable {
     //멘션, 답장(reply)
 
     public String toShortString() {
-        return "[Message] id: " + id + " / sender: " + sender.getNickname() + " / content: " + content + " / channel: " + channel.getChannelName();
+        return "[Message] id: " + id + " / sender: " + senderId + " / content: " + content + " / channelId: " + channelId;
     }
 
     public String toFullString() {
