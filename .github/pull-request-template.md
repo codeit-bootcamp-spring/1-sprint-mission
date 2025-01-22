@@ -58,3 +58,10 @@ BaseEntity에서 id를 final로 쓰고 있었기 때문에덮어씌워지지 않
 ===>
 
 BaseEntity(도메인 모델) 에서 id의 final(11줄 : transient로 변경)을 변경하고, getId() 메서드에 로직을 추가하는 것으로 해결했습니다.
+
+~~~~~~~
+
+강사님 말씀으론, 이제 getId 부분도 로직이 추가됐으니까 일반적이지 않고 꼬여있는 부분이 있다고 합니다. 제가 아직 그런 부분들이 파악이 잘 안 되는데, 앞으로 어떻게 개선해야할까요?
+
+[주로 봐야하는 파일들
+FileUserRepository(레포지토리) - FileUserService(서비스 로직) - User(도메인 모델) - BaseEntity(도메인 모델) ]
