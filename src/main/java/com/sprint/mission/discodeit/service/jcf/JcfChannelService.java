@@ -5,27 +5,31 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
+import static com.sprint.mission.discodeit.util.MyLogger.log;
+
 public class JcfChannelService implements ChannelService {
 
     private final Map<UUID,Channel> data=new HashMap<>();
     @Override
     public void createChannel(Channel channel) {
+        if (channel.getChannelName().trim().isEmpty()) {
+            log("채널 이름을 입력해주세요.");
+            return;
+        }
+        if (channel.getDescription().trim().isEmpty()) {
+            log("채널 설명을 입력해주세요.");
+            return;
+        }
         data.put(channel.getId(),channel);
     }
 
     @Override
-    public Optional<Channel> channelList(UUID id) {
+    public Optional<Channel> findChannel(UUID id) {
         return Optional.ofNullable(data.get(id));
-        /*for (Channel channel : data) {
-            if(channel.getId().equals(id)){
-                return Optional.of(channel);
-            }
-        }
-        return Optional.empty();*/
     }
 
     @Override
-    public List<Channel> allChannelList() {
+    public List<Channel> findAllChannels() {
         List<Channel> channelList=new ArrayList<>();
         for (UUID uuid : data.keySet()) {
             channelList.add(data.get(uuid));
@@ -34,9 +38,9 @@ public class JcfChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID id, Channel updateChannel) {
+    public void updateChannelName(UUID id, String channelName) {
         if(data.containsKey(id)) {
-            data.put(id,updateChannel);
+            data.get(id).updateChannelName(channelName);
         }
         /*for (Channel channel : data) {
             if(channel.getId().equals(updateChannel.getId())){
@@ -44,6 +48,11 @@ public class JcfChannelService implements ChannelService {
                 channel.updateDescription(updateChannel.getDescription());
             }
         }*/
+    }
+    public void updateChannelDescription(UUID id, String channelContent) {
+        if (data.containsKey(id)) {
+            data.get(id).updateDescription(channelContent);
+        }
     }
 
     @Override

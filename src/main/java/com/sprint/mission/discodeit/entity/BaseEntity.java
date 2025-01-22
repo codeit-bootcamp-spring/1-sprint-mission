@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public abstract class Base {
+public abstract class BaseEntity {
    private final UUID id;
    private final Long createdAt;
    private Long updatedAt;
 
-    public Base() {
+    public BaseEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;//처음에는 생성시간과 같기 때문에 설정

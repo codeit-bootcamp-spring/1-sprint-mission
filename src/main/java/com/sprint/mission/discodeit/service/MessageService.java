@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface MessageService {
     void messageSave(Message message);
-    Optional<Message> messageList(UUID id);
-    List<Message> messageAllList();
-    void updateMessage(Message message);
+    Optional<Message> findMessage(UUID id);
+    List<Message> findAllMessages();
+    void updateMessage(UUID id,String updateMessage);
     void deleteMessage(UUID id);
 }

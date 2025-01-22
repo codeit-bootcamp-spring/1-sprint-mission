@@ -5,53 +5,57 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
+import static com.sprint.mission.discodeit.util.MyLogger.log;
+
 public class JcfMessageService implements MessageService {
     private final Map<UUID, Message> data=new HashMap<>();
+//    private final List<Message> data=new ArrayList<>();
 
     @Override
     public void messageSave(Message message) {
+        if (message.getContent().trim().isEmpty()) {
+            log("메세지 내용을 입력해주세요.");
+            return;
+        }
         data.put(message.getId(),message);
     }
 
     @Override
-    public Optional<Message> messageList(UUID id) {
+    public Optional<Message> findMessage(UUID id) {
         return Optional.ofNullable(data.get(id));
-       /* for (Message message : data) {
-            if(message.getId().equals(id)){
-                return Optional.of(message);
-            }
-        }
-        return Optional.empty();*/
     }
 
     @Override
-    public List<Message> messageAllList() {
-        List<Message> messageList=new ArrayList<>();
+    public List<Message> findAllMessages() {
+        Message copyMessage=null;
+        List<Message> newMessageList=new ArrayList<>();
+       //깊은복사
         for (UUID uuid : data.keySet()) {
-            messageList.add(data.get(uuid));
+            copyMessage=data.get(uuid);
+            newMessageList.add(copyMessage);
         }
-        return messageList;
+        return newMessageList;
     }
 
     @Override
-    public void updateMessage(Message updateMessage) {
-        if(data.containsKey(updateMessage.getId())) {
-            data.put(updateMessage.getId(),updateMessage);
+    public void updateMessage(UUID id,String updateMessage) {
+        if(data.containsKey(id)) {
+            data.get(id).updateMessage(updateMessage);
+            log("메세지 업데이트 완료");
+        }else {
+            log("메세지 ID가 유효하지 않습니다");
         }
-       /* for (Message message : data)
-            if (message.getId().equals(updateMessage.getId())) {
-                message.updateContent(updateMessage.getContent());
-            }*/
     }
+
 
     @Override
     public void deleteMessage(UUID id) {
         if(data.containsKey(id)) {
             data.remove(id);
         }
-       /* for (Message message : data)
-            if (message.getId().equals(id)) {
-                data.remove(message);
-            }*/
+    }
+    private static Message copyMessage(Message message) {
+        Message copyMessage = new Message(message);
+        return copyMessage;
     }
 }
