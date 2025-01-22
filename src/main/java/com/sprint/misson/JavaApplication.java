@@ -3,9 +3,8 @@ package com.sprint.misson;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.*;
-import com.sprint.misson.discordeit.factory.FileServiceFactory;
-import com.sprint.misson.discordeit.factory.JCFServiceFactory;
-import com.sprint.misson.discordeit.factory.ServiceFactory;
+import com.sprint.misson.discordeit.factory.service.BasicServiceFactory;
+import com.sprint.misson.discordeit.factory.service.ServiceFactory;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
@@ -19,12 +18,15 @@ public class JavaApplication {
     public static void main(String[] args) {
 
         FileService.deleteDataDirectory();
-        //ServiceFactory serviceFactory = JCFServiceFactory.getInstance();
-        ServiceFactory serviceFactory = FileServiceFactory.getInstance();
+        // ServiceFactory serviceFactory = JCFServiceFactory.getInstance();
+        // ServiceFactory serviceFactory = FileServiceFactory.getInstance();
 
-        UserService userService = serviceFactory.createUserService();
-        ChannelService channelService = serviceFactory.createChannelService();
-        MessageService messageService = serviceFactory.createMessageService();
+        // mode 만 "file"또는 "jcf"로 변경하면 모드에 맞는 repository 로 변경됨
+        ServiceFactory serviceFactory = BasicServiceFactory.getInstance("file");
+
+        UserService userService = serviceFactory.getUserService();
+        ChannelService channelService = serviceFactory.getChannelService();
+        MessageService messageService = serviceFactory.getMessageService();
 
 
         //1. 등록
