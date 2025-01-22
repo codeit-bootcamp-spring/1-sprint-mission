@@ -43,8 +43,8 @@ public class FileMassageServiceTest {
     @Test
     @DisplayName("모든 메세지 보기 테스트")
     void TestShowAllMessages(){
-        fileMessageService.createMessage(channel, "TestMessageText");
-        assertEquals(1, fileMessageService.showAllMessages());
+        testMessageId = fileMessageService.createMessage(channel, "TestMessageText");
+        assertNotNull(fileMessageService.showAllMessages());
     }
     @Test
     @DisplayName("특정 메세지 보기 테스트")
@@ -57,7 +57,7 @@ public class FileMassageServiceTest {
     void TestDeleteAllMessages(){
         fileMessageService.createMessage(channel, "TestMessageText");
         fileMessageService.deleteAllMessages();
-        assertEquals(0, fileMessageService.showAllMessages());
+        assertNull( fileMessageService.showAllMessages());
     }
     @Test
     @DisplayName( "특정 메세지 삭제 테스트")

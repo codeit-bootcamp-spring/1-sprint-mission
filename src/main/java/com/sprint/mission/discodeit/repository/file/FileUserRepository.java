@@ -27,6 +27,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     // FileIO를 통해서 save
+    @Override
     public void saveUser(User user){
         //System.out.println("3             " + user.getId());
         String filePath = USERS_PATH + user.getId() + ".ser";
@@ -43,6 +44,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     // FileIO를 통해서 load
+    @Override
     public Optional<User> findUserById(UUID id){
         String filePath = USERS_PATH + id + ".ser";
         //System.out.println("Loading user from: " + filePath); // 로드 경로 로그 추가
@@ -70,6 +72,7 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
+    @Override
     public Collection<User> getAllUsers(){
         // Map<UUID, User> userMap = new HashMap<>();
         List<User> userList = new ArrayList<>();
@@ -91,10 +94,11 @@ public class FileUserRepository implements UserRepository {
                 }
             }
         }
-        return userList;
+        return userList.isEmpty() ? null : userList;
     }
 
     // 삭제
+    @Override
     public void deleteAllUsers(){
         File file = new File("users/");
         File[] fileList = file.listFiles();
@@ -103,6 +107,8 @@ public class FileUserRepository implements UserRepository {
         }
         System.out.println("deleteAllUsers 삭제 완료");
     }
+
+    @Override
     public void deleteUserById(UUID id){
         String fileName = "users/" + id + ".ser";
         File userFile = new File(fileName);

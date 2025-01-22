@@ -40,8 +40,8 @@ public class FileChannelServiceTest {
     @Test
     @DisplayName("모든 채널 보기 테스트")
     void TestShowAllChannels(){
-        fileChannelService.createChannel(user,"TestShowAllChannels");
-        assertEquals(1, fileChannelService.showAllChannels());
+        testChannelId = fileChannelService.createChannel(user,"TestShowAllChannels");
+        assertNotNull(fileChannelService.showAllChannels());
     }
     @Test
     @DisplayName("특정 채널 보기 테스트")
@@ -54,7 +54,7 @@ public class FileChannelServiceTest {
     void TestDeleteAllChannels(){
         fileChannelService.createChannel(user,"TestShowAllChannels");
         fileChannelService.deleteAllChannels();
-        assertEquals(0, fileChannelService.showAllChannels());
+        assertNull(fileChannelService.showAllChannels());
     }
     @Test
     @DisplayName( "특정 채널 삭제 테스트")

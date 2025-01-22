@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.mockito.internal.matchers.Null;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,13 +38,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public int showAllChannels(){
+    public Collection<Channel> showAllChannels(){
         if (channelRepository.getAllChannels().isEmpty()) {
             System.out.println("No Channels exists.\n");
+            return null;
         }else{
             System.out.println(channelRepository.getAllChannels().toString());
+            return channelRepository.getAllChannels();
         }
-        return channelRepository.getAllChannels().size();
     }
 
     @Override

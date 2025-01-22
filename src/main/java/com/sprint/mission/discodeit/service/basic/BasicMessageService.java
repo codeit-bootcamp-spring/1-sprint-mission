@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
@@ -35,13 +36,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public int showAllMessages() {
+    public Collection<Message> showAllMessages() {
         if (messageRepository.findAllMessages().isEmpty()) {
             System.out.println("No Message exists.\n");
+            return null;
         }else{
             System.out.println(messageRepository.findAllMessages().toString());
+            return messageRepository.findAllMessages();
         }
-        return messageRepository.findAllMessages().size();
     }
 
     @Override

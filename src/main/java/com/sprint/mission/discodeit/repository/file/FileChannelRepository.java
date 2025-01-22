@@ -83,7 +83,7 @@ public class FileChannelRepository implements ChannelRepository {
                 }
             }
         }
-        return channelList;
+        return channelList.isEmpty() ? null : channelList;
     }
     // 삭제
     @Override

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
+import java.util.Collection;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -30,6 +31,7 @@ public class JCFUserService implements UserService {
         this.inputHandler = inputHandler;
     }
 
+    @Override
     public UUID createUser(String nickname){
         User user = new User(nickname);
         // 인터페이스 구현체의 메서드 saveUser(User user) 이용
@@ -37,16 +39,19 @@ public class JCFUserService implements UserService {
         return user.getId();
     }
 
-    public int showAllUsers(){
+    @Override
+    public Collection<User> showAllUsers(){
         // 전체 유저 조희
         if (userRepository.getAllUsers().isEmpty()) {
             System.out.println("No users exists.\n");
+            return null;
         }else{
             System.out.println(userRepository.getAllUsers().toString());
+            return userRepository.getAllUsers();
         }
-        return userRepository.getAllUsers().size();
     }
 
+    @Override
     public User getUserById(UUID id){
         return userRepository.findUserById(id)
                 .orElseGet( () -> {
@@ -55,6 +60,7 @@ public class JCFUserService implements UserService {
                 });
     }
 
+    @Override
     public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
         userRepository.findUserById(id).ifPresent( user -> user.setNickname(newNickname));
@@ -62,12 +68,15 @@ public class JCFUserService implements UserService {
         userRepository.findUserById(id).ifPresent(BaseEntity::refreshUpdateAt);
     }
 
+    @Override
     public void clearAllUsers(){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             userRepository.deleteAllUsers();
         }
     }
+
+    @Override
     public void removeUserById(UUID id){
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){

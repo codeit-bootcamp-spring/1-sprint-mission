@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
@@ -18,6 +19,7 @@ public class FileChannelService implements ChannelService {
         this.inputHandler = inputHandler;
     }
 
+    @Override
     public UUID createChannel(User user, String channelName){
         // Channel 생성
         Channel channel = new Channel(user, channelName);
@@ -26,16 +28,19 @@ public class FileChannelService implements ChannelService {
     }
 
     // Read : 전체 채널 조회, 특정 채널 조회
-    public int showAllChannels(){
+    @Override
+    public Collection<Channel> showAllChannels(){
         System.out.println(fileChannelRepository.getAllChannels());
-        return fileChannelRepository.getAllChannels().size();
+        return fileChannelRepository.getAllChannels();
     }
 
+    @Override
     public Channel getChannelById(UUID id){
         return fileChannelRepository.findChannelById(id).orElse(null);
     }
 
     // Update : 특정 채널 이름 변경
+    @Override
     public void updateChannelName(UUID id){
         String newNickname = inputHandler.getNewInput();
 
@@ -46,9 +51,11 @@ public class FileChannelService implements ChannelService {
     }
 
     // Delete : 전체 채널 삭제, 특정 채널 삭제
+    @Override
     public void deleteAllChannels(){
         fileChannelRepository.deleteAllChannels();
     }
+    @Override
     public void deleteChannelById(UUID id){
         fileChannelRepository.deleteChannelById(id);
     }

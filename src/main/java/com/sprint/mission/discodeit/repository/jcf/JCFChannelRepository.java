@@ -10,19 +10,24 @@ public class JCFChannelRepository implements ChannelRepository {
     public JCFChannelRepository(){
         this.channels = new HashMap<>();
     }
+    @Override
     public void saveChannel(Channel channel){
         channels.put(channel.getId(), channel);
     }
+    @Override
     public Optional<Channel> findChannelById(UUID id){
         // nullable 한 Optional 로 감싸서 null-safety를 보장
         return Optional.ofNullable(channels.get(id));
     }
+    @Override
     public Collection<Channel> getAllChannels(){
         return channels.values();
     }
+    @Override
     public void deleteAllChannels(){
         channels.clear();
     }
+    @Override
     public void deleteChannelById(UUID id){
         channels.remove(id);
     }
