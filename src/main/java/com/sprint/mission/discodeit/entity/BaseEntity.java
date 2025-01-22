@@ -34,8 +34,8 @@ public class BaseEntity implements Serializable {
     }
     
     // setUpdateAt -> 의도 파악이 어려워 refreshUpdateAt로 변경
-    public void refreshUpdateAt(Long updatedAt){
-        this.updatedAt = updatedAt;
+    public void refreshUpdateAt(){
+        this.updatedAt = System.currentTimeMillis();
     }
 }
 

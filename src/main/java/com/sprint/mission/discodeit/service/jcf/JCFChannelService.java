@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -57,7 +58,7 @@ public class JCFChannelService implements ChannelService {
         System.out.println("new ChannelName :");
         channelRepository.findChannelById(id).ifPresent( channel -> channel.setChannelName(inputHandler.getNewInput()));
         // 수정 시간 업데이트를 위해
-        channelRepository.findChannelById(id).ifPresent(channel -> channel.refreshUpdateAt(System.currentTimeMillis()));
+        channelRepository.findChannelById(id).ifPresent(BaseEntity::refreshUpdateAt);
     }
 
     public void deleteAllChannels(){
