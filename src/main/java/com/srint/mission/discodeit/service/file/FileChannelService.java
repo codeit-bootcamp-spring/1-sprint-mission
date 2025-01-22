@@ -42,6 +42,28 @@ public class FileChannelService implements ChannelService {
         }
     }
 
+    //파일 삭제
+    public void deleteFile() {
+        File file = new File(FILE_PATH);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (!deleted) {
+                System.out.println("파일 삭제에 실패했습니다.");
+            }
+        }
+    }
+
+    // 파일을 빈 파일로 만드는 메서드
+    public void clearFile() {
+        File file = new File(FILE_PATH);
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            // 파일을 비우는 방법
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public UUID save(Channel channel) {
         data.put(channel.getId(), channel);
