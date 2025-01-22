@@ -26,16 +26,15 @@ public class BaseEntity implements Serializable {
             id = UUID.fromString(idString);
         }
         return id;}
-    // id, createdAt 상수로 변경
-    // public void setId(UUID id){ this.id = id;}
     public Long getCreatedAt(){
         return createdAt;
     }
-    // public void setCreatedAt(Long createdAt){this.createdAt = createdAt;}
     public Long getUpdatedAt(){
         return updatedAt;
     }
-    public void setUpdateAt(Long updatedAt){
+    
+    // setUpdateAt -> 의도 파악이 어려워 refreshUpdateAt로 변경
+    public void refreshUpdateAt(Long updatedAt){
         this.updatedAt = updatedAt;
     }
 }
