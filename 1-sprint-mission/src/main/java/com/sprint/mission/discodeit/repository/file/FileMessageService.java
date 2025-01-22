@@ -14,7 +14,7 @@ import java.util.*;
 
 public class FileMessageService extends JCFMessageService implements MessageService, MessageRepository {
 
-    private static final String fileName = ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\message.txt";
+    private static final String fileName = ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\message.json";
 
     public FileMessageService(){
         messageList=loadMessageTxt();

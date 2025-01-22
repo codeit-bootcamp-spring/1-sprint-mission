@@ -15,7 +15,7 @@ import static com.sprint.mission.discodeit.entity.User.createUserAll;
 
 public class FileUserService extends JCFUserService implements Serializable, UserRepository {
     private static final long serialVersionUID = 1L;
-    private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\user.txt";
+    private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\user.json";
 
 
     public FileUserService(){

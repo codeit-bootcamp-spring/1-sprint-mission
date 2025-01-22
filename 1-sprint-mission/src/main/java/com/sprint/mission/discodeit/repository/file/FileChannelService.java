@@ -14,7 +14,7 @@ import java.util.*;
 
 public class FileChannelService extends JCFChannelService implements ChannelService, ChannelRepository {
 
-    private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\channel.txt";
+    private static final String fileName =  ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\channel.json";
 
     public FileChannelService(){
         channelList=loadChannelTxt();
