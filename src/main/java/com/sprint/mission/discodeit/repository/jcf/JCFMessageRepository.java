@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
     Map<UUID, Message> messages;
@@ -18,8 +15,8 @@ public class JCFMessageRepository implements MessageRepository {
     public Optional<Message> findMessageById(UUID id){
         return Optional.ofNullable(messages.get(id));
     }
-    public Map<UUID, Message> findAllMessages() {
-        return messages;
+    public Collection<Message> findAllMessages() {
+        return messages.values();
     }
     public void deleteMessageById(UUID id){
         messages.remove(id);

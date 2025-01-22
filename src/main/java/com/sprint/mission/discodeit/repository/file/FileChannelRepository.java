@@ -7,10 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
     /**
@@ -68,8 +65,9 @@ public class FileChannelRepository implements ChannelRepository {
         return Optional.ofNullable(loadFile(Path.of(CHANNELS_PATH +  id.toString() + ".ser")));
     }
     @Override
-    public  Map<UUID, Channel> getAllChannels(){
-        Map<UUID, Channel> channelMap = new HashMap<>();
+    public Collection<Channel> getAllChannels(){
+        //Map<UUID, Channel> channelMap = new HashMap<>();
+        List<Channel> channelList = new ArrayList<>();
         File channelDir = new File("channels");
         if(channelDir.exists() && channelDir.isDirectory()){
             File[] files = channelDir.listFiles(); // 모든 파일의 주소 반환
@@ -79,12 +77,13 @@ public class FileChannelRepository implements ChannelRepository {
                     if(file.isFile() && file.getName().endsWith(".ser")){
                         // fromString 문자열 -> UUID
                         UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        channelMap.put(id, findChannelById(id).orElse(null));
+                        //channelMap.put(id, findChannelById(id).orElse(null));
+                        channelList.add(findChannelById(id).orElse(null));
                     }
                 }
             }
         }
-        return channelMap;
+        return channelList;
     }
     // 삭제
     @Override
@@ -94,13 +93,13 @@ public class FileChannelRepository implements ChannelRepository {
         for(File fileName : fileList){
             fileName.delete();
         }
-        System.out.println(" deleteAllChannels 삭제 완료");
+        System.out.println(" deleteAllChannels 삭제 완료 ");
     }
     @Override
     public void deleteChannelById(UUID id){
         String fileName = CHANNELS_PATH + id.toString() + ".ser";
         File channelFile = new File(fileName);
         channelFile.delete();
-        System.out.println(" deleteChannelById 삭제 완료");
+        System.out.println(" deleteChannelById 삭제 완료 ");
     }
 }
