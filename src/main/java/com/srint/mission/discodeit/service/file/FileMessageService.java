@@ -34,7 +34,7 @@ public class FileMessageService implements MessageService {
         }
     }
 
-    // 데이터 파일 저장
+    // 데이터 파일 쓰기
     private void saveDataToFile() {
         try (FileOutputStream fos = new FileOutputStream(FILE_PATH);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
