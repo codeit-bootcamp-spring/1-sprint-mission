@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.ServiceFactory;
-import com.sprint.mission.discodeit.factory.file.FileServiceFactory;
 import com.sprint.mission.discodeit.factory.jcf.JCFServiceFactory;
+import com.sprint.mission.discodeit.factory.jcf.JCFServiceFactoryBackup;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -17,7 +17,7 @@ import java.util.*;
 public class JavaApplication {
     public static void main(String[] args) throws FileNotFoundException {
         // 팩토리 생성
-        ServiceFactory factory = new FileServiceFactory();
+        ServiceFactory factory = new JCFServiceFactory();
 
         //서비스 객체 생성
         UserService userService = factory.createUserService();

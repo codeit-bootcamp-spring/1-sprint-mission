@@ -8,8 +8,6 @@ import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 
-import java.io.FileNotFoundException;
-
 
 public class FileServiceFactory implements ServiceFactory {
 
@@ -18,7 +16,7 @@ public class FileServiceFactory implements ServiceFactory {
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public FileServiceFactory() throws FileNotFoundException {
+    public FileServiceFactory() {
         this.userService = createUserService();
         this.channelService = createChannelService();
         this.messageService = createMessageService();
