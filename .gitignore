@@ -1,0 +1,22 @@
+# Default ignored files
+/shelf/
+
+*.iml
+*.ipr
+*.iws
+
+/.idea/
+
+*.class
+
+/build/
+/target/
+*.jar
+*.war
+*.ear
+
+*.log
+*.tmp
+*.swp
+
+.gradle/
