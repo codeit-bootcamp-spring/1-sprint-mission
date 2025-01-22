@@ -1,4 +1,4 @@
-package com.sprint.misson.discordeit.factory;
+package com.sprint.misson.discordeit.factory.service;
 
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
@@ -14,6 +14,18 @@ public class JCFServiceFactory implements ServiceFactory {
     private UserService userService;
     private ChannelService channelService;
     private MessageService messageService;
+
+    public UserService getUserService() {
+        return userService;
+    }
+
+    public ChannelService getChannelService() {
+        return channelService;
+    }
+
+    public MessageService getMessageService() {
+        return messageService;
+    }
 
     private JCFServiceFactory() {
         this.userService = createUserService();

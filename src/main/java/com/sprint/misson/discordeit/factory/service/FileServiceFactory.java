@@ -1,4 +1,4 @@
-package com.sprint.misson.discordeit.factory;
+package com.sprint.misson.discordeit.factory.service;
 
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
@@ -49,6 +49,21 @@ public class FileServiceFactory implements ServiceFactory {
         if (messageService == null) {
             messageService = new FileMessageService(userService, channelService);
         }
+        return messageService;
+    }
+
+    @Override
+    public UserService getUserService() {
+        return userService;
+    }
+
+    @Override
+    public ChannelService getChannelService() {
+        return channelService;
+    }
+
+    @Override
+    public MessageService getMessageService() {
         return messageService;
     }
 }
