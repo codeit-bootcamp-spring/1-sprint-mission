@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -58,7 +59,7 @@ public class JCFUserService implements UserService {
         String newNickname = inputHandler.getNewInput();
         userRepository.findUserById(id).ifPresent( user -> user.setNickname(newNickname));
         // 수정 시간 업데이트를 위해
-        userRepository.findUserById(id).ifPresent(user -> user.refreshUpdateAt(System.currentTimeMillis()));
+        userRepository.findUserById(id).ifPresent(BaseEntity::refreshUpdateAt);
     }
 
     public void clearAllUsers(){

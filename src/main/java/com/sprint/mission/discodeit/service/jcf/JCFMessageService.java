@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.service.jcf;
+import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -49,7 +50,7 @@ public class JCFMessageService implements MessageService {
     public void updateMessageText(UUID id){
         String messageText = inputHandler.getNewInput();
         messageRepository.findMessageById(id).ifPresent( message -> message.setMessageText(messageText));
-        messageRepository.findMessageById(id).ifPresent( message -> message.refreshUpdateAt(System.currentTimeMillis()));
+        messageRepository.findMessageById(id).ifPresent(BaseEntity::refreshUpdateAt);
     }
 
     // Delete : 전체 메세지 삭제, 특정 메세지 삭제
