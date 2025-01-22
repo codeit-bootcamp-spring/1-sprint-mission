@@ -1,0 +1,32 @@
+name: sprint mission 1 PR Test
+
+on:
+  push:
+    branches:
+      - 'part1-백재우-sprint1'
+  pull_request:
+    branches:
+      - 'part1-백재우'
+    paths:
+      - 'codeit-bootcamp-spring/1-sprint-mission/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ☕ JDK 17 세팅
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+
+      - name: ☕ gradlew 실행 권한 설정
+        run: find . -name "gradlew" -exec chmod +x {} \;
+
+      - name: 🚀 테스트 진행
+        run: cd codeit-bootcamp-spring/1-sprint-mission && ./gradlew --info test
