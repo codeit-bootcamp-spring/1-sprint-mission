@@ -18,8 +18,8 @@ public class JavaApplication {
         JCFMessageService messageService = new JCFMessageService();
 
         // 사용자 등록
-        User user1 = new User("Kimdoil", "pw123");
-        User user2 = new User("testName", "test123");
+        User user1 = new User("Kimdoil", "pw12345678");
+        User user2 = new User("testName", "test12345678");
 
         userService.addUser(user1);
         userService.addUser(user2);
@@ -56,7 +56,7 @@ public class JavaApplication {
         messageService.getAllMessages().forEach(msg -> System.out.println(msg.getContent()));
 
         // 수정
-        userService.updateUser(user1.getId(), "KimdoilUpdated", "newpw123");
+        userService.updateUser(user1.getId(), "KimdoilUpdated", "newpw12345678");
         channelService.updateChannel(channel1.getId(), "GeneralUpdated");
         messageService.updateMessage(message1.getId(), "Updated Message!");
 

@@ -19,7 +19,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public User getUser(UUID id) {
-        return data.get(id);
+        User user = data.get(id);
+        if (user == null) {
+            throw new NoSuchElementException("해당 ID를 가진 사용자가 존재하지 않습니다: " + id);
+        }
+        return user;
     }
 
     @Override
@@ -38,6 +42,11 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteUser(UUID id) {
-        data.remove(id);
+        User removedUser = data.remove(id);
+        if (removedUser != null) {
+            System.out.println("삭제된 사용자: " + removedUser.getUsername() + " (ID: " + removedUser.getId() + ")");
+        } else {
+            System.out.println("삭제 실패: 해당 ID를 가진 사용자가 존재하지 않습니다. ID: " + id);
+        }
     }
 }

@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import java.util.List;
 import java.util.UUID;
 /*
-*  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 구현한 인터페이스
+*  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 선언한 인터페이스
 * */
 public interface ChannelService {
     void addChannel(Channel channel);

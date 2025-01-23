@@ -10,6 +10,17 @@ public class User {
     private String password;
 
     public User(String username, String password) {
+        // 유효성 검사 추가
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("사용자 이름이 비어있습니다.");
+        }
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("비밀번호가 비어있습니다.");
+        }
+        if (password.length() < 10) {
+            throw new IllegalArgumentException("비밀번호는 10자리 이상이어야 합니다.");
+        }
+
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
@@ -20,17 +31,27 @@ public class User {
     // 각 필드의 Getter 함수 정의
     public UUID getId() { return id; }
     public String getUsername() { return username; }
-    // 현재는 사용하지 않는 값이지만, 확장성을 위해 모든 필드에 대해 Getter 함수 작성
     public long getCreatedAt() { return createdAt; }
     public long getUpdatedAt() { return updatedAt; }
     public String getPassword() { return password; }
 
     public void updateUsername(String newUsername) {
+        // 업데이트 시에도 유효성 검사 추가
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            throw new IllegalArgumentException("새 사용자 이름이 비어있습니다.");
+        }
         this.username = newUsername;
         this.updatedAt = System.currentTimeMillis();
     }
 
     public void updatePassword(String newPassword) {
+        // 업데이트 시에도 유효성 검사 추가
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException("새 비밀번호가 비어 있습니다.");
+        }
+        if (newPassword.length() < 10) {
+            throw new IllegalArgumentException("새 비밀번호는 10자리 이상이어야 합니다.");
+        }
         this.password = newPassword;
         this.updatedAt = System.currentTimeMillis();
     }
