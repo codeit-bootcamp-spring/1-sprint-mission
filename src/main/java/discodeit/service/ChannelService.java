@@ -14,8 +14,7 @@ public interface ChannelService {
     Channel find(UUID channelId);
     List<Channel> findAll();
     String getInfo(Channel channel);
-    void updateName(Channel channel, String name, User user);
-    void updateIntroduction(Channel channel, String introduction, User user);
+    void update(UUID channelId, String name, String introduction);
     void updateParticipants(Channel channel, User user);
     void updateMessages(Channel channel, Message message);
     void deleteChannel(Channel channel, User user);

@@ -64,7 +64,7 @@ public class JavaApplication {
         // 유저 삭제 후 채널 조회 (참가자 목록에서 제거 되었는지 확인)
         // 채널 정보 수정
         jcfUserService.deleteUser(user2);
-        jcfChannelService.updateIntroduction(channel1, "채널 설명 수정했습니다.", user1);
+//        jcfChannelService.updateIntroduction(channel1, "채널 설명 수정했습니다.", user1);
 
         System.out.println("***** 유저2 회원 탈퇴, 채널 소개 수정 *****");
         System.out.println(jcfChannelService.getInfo(channel1) + System.lineSeparator());

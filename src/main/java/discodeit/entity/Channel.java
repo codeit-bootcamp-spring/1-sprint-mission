@@ -39,18 +39,27 @@ public class Channel {
         return name;
     }
 
-    public void updateName(String name, User user) {
-        if (!owner.isEqualTo(user)) {
-            throw new IllegalArgumentException("채널 소개 수정은 방장만 가능합니다.");
+    public void update(String name, String introduction) {
+        boolean updated = updateName(name) || updateIntroduction(introduction);
+        if (updated) {
+            updateUpdatedAt();
         }
-        this.name = name;
     }
 
-    public void updateIntroduction(String introduction, User user) {
-        if (!owner.isEqualTo(user)) {
-            throw new IllegalArgumentException("채널 소개 수정은 방장만 가능합니다.");
+    public boolean updateName(String name) {
+        if (this.name.equals(name)) {
+            return false;
+        }
+        this.name = name;
+        return true;
+    }
+
+    public boolean updateIntroduction(String introduction) {
+        if (this.introduction.equals(introduction)) {
+            return false;
         }
         this.introduction = introduction;
+        return true;
     }
 
     public void updateParticipants(User user) {
