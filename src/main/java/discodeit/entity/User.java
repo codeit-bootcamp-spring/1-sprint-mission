@@ -46,16 +46,35 @@ public class User {
         return joinedChannels;
     }
 
-    public void updateName(String name) {
+    public void update(String name, String email, String phoneNumber) {
+        boolean updated = updateName(name) || updateEmail(email) || updatePhoneNumber(phoneNumber);
+        if (updated) {
+            updateUpdatedAt();
+        }
+    }
+
+    public boolean updateName(String name) {
+        if (this.name.equals(name)) {
+            return false;
+        }
         this.name = name;
+        return true;
     }
 
-    public void updateEmail(String email) {
+    public boolean updateEmail(String email) {
+        if (this.email.equals(email)) {
+            return false;
+        }
         this.email = email;
+        return true;
     }
 
-    public void updatePhoneNumber(String phoneNumber) {
+    public boolean updatePhoneNumber(String phoneNumber) {
+        if (this.phoneNumber.equals(phoneNumber)) {
+            return false;
+        }
         this.phoneNumber = phoneNumber;
+        return true;
     }
 
     public void updatePassword(String originalPassword, String newPassword) {

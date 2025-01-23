@@ -29,7 +29,6 @@ public class JCFServiceFactory implements ServiceFactory {
 
     private void setDependencies() {
         jcfUserService.updateChannelService(jcfChannelService);
-        jcfUserService.updateMessageService(jcfMessageService);
 
         jcfChannelService.updateUserService(jcfUserService);
         jcfChannelService.updateMessageService(jcfMessageService);

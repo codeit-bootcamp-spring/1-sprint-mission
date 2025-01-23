@@ -29,7 +29,7 @@ public class JavaApplication {
         System.out.println(jcfUserService.getInfo(user3) + System.lineSeparator());
 
         // 유저 정보 수정 후 조회
-        jcfUserService.updateName(user3, "유저3");
+//        jcfUserService.updateName(user3, "유저3");
 
         System.out.println("***** 유저3 이름 수정 *****");
         System.out.println(jcfUserService.getInfo(user3) + System.lineSeparator());

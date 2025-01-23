@@ -8,14 +8,11 @@ import java.util.UUID;
 
 public interface UserService {
     void updateChannelService(ChannelService channelService);
-    void updateMessageService(MessageService messageService);
     User createUser(String name, String email, String phoneNumber, String password);
     User find(UUID userId);
     List<User> findAll();
     String getInfo(User user);
-    void updateName(User user, String name);
-    void updateEmail(User user, String email);
-    void updatePhoneNumber(User user, String phoneNumber);
+    void update(UUID userId, String name, String email, String phoneNumber);
     void updatePassword(User user, String originalPassword, String newPassword);
     void updateJoinedChannels(User user, Channel channel);
     void deleteUser(User user);

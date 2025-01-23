@@ -4,7 +4,6 @@ import discodeit.Validator.UserValidator;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
-import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
 import java.util.*;
@@ -14,7 +13,6 @@ public class JCFUserService implements UserService {
     private final UserValidator validator;
     private final Map<UUID, User> users;
     private ChannelService jcfChannelService;
-    private MessageService jcfMessageService;;
 
     private JCFUserService() {
         this.validator = new UserValidator();
@@ -32,11 +30,6 @@ public class JCFUserService implements UserService {
     @Override
     public void updateChannelService(ChannelService jcfChannelService) {
         this.jcfChannelService = jcfChannelService;
-    }
-
-    @Override
-    public void updateMessageService(MessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
     }
 
     @Override
@@ -68,26 +61,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateName(User user, String name) {
+    public void update(UUID userId, String name, String email, String phoneNumber) {
+        User user = find(userId);
         validator.validateName(name);
-        user.updateName(name);
-        user.updateUpdatedAt();
-    }
-
-    @Override
-    public void updateEmail(User user, String email) {
         validator.validateEmail(email);
-        isDuplicateEmail(email);
-        user.updateEmail(email);
-        user.updateUpdatedAt();
-    }
-
-    @Override
-    public void updatePhoneNumber(User user, String phoneNumber) {
         validator.validatePhoneNumber(phoneNumber);
-        isDuplicatePhoneNumber(phoneNumber);
-        user.updatePhoneNumber(phoneNumber);
-        user.updateUpdatedAt();
+
+        user.update(name, email, phoneNumber);
     }
 
     @Override
