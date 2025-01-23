@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -36,10 +36,10 @@ public class JCFUserService implements UserService {
     public void createUser(User user) {
         UserList.put(user.getId(), user);
     }
-      /*
-       * To Maximize advantage of HashMap,
-       * Using get method is appropriate.
-       */
+    /*
+     * To Maximize advantage of HashMap,
+     * Using get method is appropriate.
+     */
     @Override // Read Information of User using UUID
     public User readUserById(UUID userId) {
         return UserList.get(userId);
@@ -82,15 +82,15 @@ public class JCFUserService implements UserService {
         User user = UserList.remove(userId);
         Map<UUID, Channel> chList = JCFChannelService.getInstance().getChannelList();
 /** refactor: apply Stream API instead of for-each
-        for (UUID channelId : user.getAttending()) {
+ for (UUID channelId : user.getAttending()) {
 
-            Channel channel = channelService.readChannelInfo(channelId);
-            if (channel != null) {
-                chList.remove(userId);
-            }
-        } //channel attendance deletion
+ Channel channel = channelService.readChannelInfo(channelId);
+ if (channel != null) {
+ chList.remove(userId);
+ }
+ } //channel attendance deletion
 
-      */
+ */
 
 
 
@@ -119,12 +119,12 @@ public class JCFUserService implements UserService {
         //deletion user's channel.
 
         List<Message> msgList = JCFMessageService.getInstance().getMesageList();
-       msgList =  msgList.stream()
+        msgList =  msgList.stream()
                 .filter(msg -> !msg
                         .getWriter()
                         .equals(userId)
-                        ).collect(Collectors.toList());
-       //deletion user's message
+                ).collect(Collectors.toList());
+        //deletion user's message
 
 
     }
