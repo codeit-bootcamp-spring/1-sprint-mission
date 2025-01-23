@@ -84,7 +84,6 @@ public class User implements Serializable {
   public String toString() {
     return
         ", username='" + username + '\'' +
-        ", password='" + password + '\'' +
         ", email='" + email + '\'' +
         ", nickname='" + nickname + '\'' +
         ", phoneNumber='" + phoneNumber + '\'' +

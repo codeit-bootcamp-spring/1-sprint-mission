@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.config.ApplicationBuilder;
+import com.sprint.mission.discodeit.config.ApplicationConfig;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.UserUpdateDto;
@@ -9,9 +9,13 @@ import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
+import com.sprint.mission.discodeit.factory.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.util.ServiceType;
+import com.sprint.mission.discodeit.util.StorageType;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.io.File;
@@ -21,6 +25,7 @@ import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.*;
 
+@Slf4j
 public class JavaApplication {
 
   static ChannelService channelService;
@@ -47,11 +52,18 @@ public class JavaApplication {
 
   public static void main(String[] args) {
 
-    ApplicationBuilder builder = new ApplicationBuilder();
+    ApplicationConfig ac = new ApplicationConfig.ApplicationConfigBuilder()
+        .channelServiceType(ServiceType.BASIC)
+        .channelStorageType(StorageType.JCF)
+        .userServiceType(ServiceType.BASIC)
+        .userStorageType(StorageType.JCF)
+        .messageServiceType(ServiceType.BASIC)
+        .messageStorageType(StorageType.JCF)
+        .build();
 
-    channelService = builder.getChannelService();
-    userService = builder.getUserService();
-    messageServiceV2 = builder.getMessageService();
+    channelService = ServiceFactory.createChannelService(ac);
+    userService = ServiceFactory.createUserService(ac);
+    messageServiceV2 = ServiceFactory.createMessageService(ac, userService, channelService);
 
     channelFactory = new ChannelFactory();
 
@@ -60,7 +72,6 @@ public class JavaApplication {
     userSimulation();
     channelSimulation2();
     messageSimulation2();
-
   }
 
   static void userSimulation() {

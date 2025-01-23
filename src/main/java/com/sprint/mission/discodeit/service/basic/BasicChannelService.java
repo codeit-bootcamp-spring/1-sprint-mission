@@ -6,13 +6,14 @@ import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NAME_MAX_LENGTH;
-import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NAME_MIN_LENGTH;
+import static com.sprint.mission.discodeit.constant.ChannelConstant.*;
 
+@Slf4j
 public class BasicChannelService implements ChannelService {
 
   private static volatile BasicChannelService instance;
@@ -36,13 +37,15 @@ public class BasicChannelService implements ChannelService {
   @Override
   public BaseChannel createChannel(BaseChannel channel) {
     //TODO: exception tuning, other validations
-    if(!validChannelName(channel.getChannelName())) throw new ChannelValidationException();
+    if(!validChannelName(channel.getChannelName())) throw new ChannelValidationException(CHANNEL_NAME_LENGTH_NOT_VALID);
     channelRepository.save(channel);
     return channel;
   }
 
   private boolean validChannelName(String channelName){
-    if(channelName.length() < CHANNEL_NAME_MIN_LENGTH || channelName.length() > CHANNEL_NAME_MAX_LENGTH) return false;
+    if(channelName.length() < CHANNEL_NAME_MIN_LENGTH || channelName.length() > CHANNEL_NAME_MAX_LENGTH){
+      return false;
+    }
     return true;
   }
 
@@ -50,7 +53,6 @@ public class BasicChannelService implements ChannelService {
   public Optional<BaseChannel> getChannelById(String channelId) {
     Optional<BaseChannel> channel = channelRepository.findById(channelId);
     if(channel.isEmpty()) throw new ChannelNotFoundException();
-    //TODO: Optional 삭제
     return channel;
   }
 
@@ -70,15 +72,16 @@ public class BasicChannelService implements ChannelService {
 
     if(channel.isEmpty()) throw new ChannelNotFoundException();
     BaseChannel originalChannel = channel.get();
-    updatedChannel.getChannelName().ifPresent(name -> {
-      validChannelName(name);
-      originalChannel.setChannelName(name);
-    });
 
-    updatedChannel.getTag().ifPresent(originalChannel::setTag);
-    updatedChannel.getMaxNumberOfPeople().ifPresent(originalChannel::setMaxNumberOfPeople);
-    updatedChannel.getIsPrivate().ifPresent(originalChannel::setIsPrivate);
-
+    synchronized (originalChannel) {
+      updatedChannel.getChannelName().ifPresent(name -> {
+        validChannelName(name);
+        originalChannel.setChannelName(name);
+      });
+      updatedChannel.getTag().ifPresent(originalChannel::setTag);
+      updatedChannel.getMaxNumberOfPeople().ifPresent(originalChannel::setMaxNumberOfPeople);
+      updatedChannel.getIsPrivate().ifPresent(originalChannel::setIsPrivate);
+    }
     channelRepository.update(originalChannel);
   }
 

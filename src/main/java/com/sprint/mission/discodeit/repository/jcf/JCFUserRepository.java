@@ -34,7 +34,7 @@ public class JCFUserRepository implements UserRepository {
 
   @Override
   public Optional<User> findById(String id) {
-    return Optional.of(data.get(id));
+    return Optional.ofNullable(data.get(id));
   }
 
   @Override

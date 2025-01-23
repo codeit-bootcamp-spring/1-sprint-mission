@@ -83,11 +83,12 @@ public class FileChannelService implements ChannelService {
 
     BaseChannel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
 
-    updatedChannel.getChannelName().ifPresent(channel::setChannelName);
-    updatedChannel.getMaxNumberOfPeople().ifPresent(channel::setMaxNumberOfPeople);
-    updatedChannel.getTag().ifPresent(channel::setTag);
-    updatedChannel.getIsPrivate().ifPresent(channel::updatePrivate);
-
+    synchronized (channel) {
+      updatedChannel.getChannelName().ifPresent(channel::setChannelName);
+      updatedChannel.getMaxNumberOfPeople().ifPresent(channel::setMaxNumberOfPeople);
+      updatedChannel.getTag().ifPresent(channel::setTag);
+      updatedChannel.getIsPrivate().ifPresent(channel::updatePrivate);
+    }
     saveChannelToFile(channels);
   }
 

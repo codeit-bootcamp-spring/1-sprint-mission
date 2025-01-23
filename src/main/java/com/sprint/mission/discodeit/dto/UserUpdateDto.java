@@ -18,7 +18,7 @@ public class UserUpdateDto {
     this.email = email;
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
-    this.profilePictureURL = profilePictureURL;
+    this.profilePictureURL = profilePictureURL.isPresent() ? profilePictureURL : Optional.of("defaulturl.com");
     this.description = description;
   }
 

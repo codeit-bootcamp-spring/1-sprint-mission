@@ -56,17 +56,17 @@ public class JCFUserService implements UserService {
       throw new IllegalArgumentException("비밀번호가 틀립니다.");
     }
     User originalUser = data.get(id);
+    synchronized (originalUser) {
+      updatedUser.getUsername().ifPresent(originalUser::setUsername);
+      updatedUser.getPassword().map(PasswordEncryptor::hashPassword).ifPresent(originalUser::setPassword);
+      updatedUser.getEmail().ifPresent(originalUser::setEmail);
+      updatedUser.getNickname().ifPresent(originalUser::setNickname);
+      updatedUser.getPhoneNumber().ifPresent(originalUser::setPhoneNumber);
+      updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
+      updatedUser.getDescription().ifPresent(originalUser::setDescription);
 
-    updatedUser.getUsername().ifPresent(originalUser::setUsername);
-    updatedUser.getPassword().map(PasswordEncryptor::hashPassword).ifPresent(originalUser::setPassword);
-    updatedUser.getEmail().ifPresent(originalUser::setEmail);
-    updatedUser.getNickname().ifPresent(originalUser::setNickname);
-    updatedUser.getPhoneNumber().ifPresent(originalUser::setPhoneNumber);
-    updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
-    updatedUser.getDescription().ifPresent(originalUser::setDescription);
-
-    originalUser.setUpdatedAt(System.currentTimeMillis());
-
+      originalUser.setUpdatedAt(System.currentTimeMillis());
+    }
     data.put(id, originalUser);
   }
 

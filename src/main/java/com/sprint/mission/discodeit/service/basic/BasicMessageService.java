@@ -8,16 +8,19 @@ import com.sprint.mission.discodeit.entity.VoiceChannel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
+import com.sprint.mission.discodeit.exception.NotChatChannelException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_AVAILABLE_FOR_MESSAGE;
 
+@Slf4j
 public class BasicMessageService implements MessageServiceV2<ChatChannel> {
 
   private static volatile BasicMessageService instance;
@@ -49,16 +52,22 @@ public class BasicMessageService implements MessageServiceV2<ChatChannel> {
   private void isChannelChat(String channelId) {
     Optional<BaseChannel> baseChannel = channelRepository.findById(channelId);
     if (baseChannel.isPresent()) {
-      if (baseChannel.get() instanceof VoiceChannel) throw new IllegalArgumentException(CHANNEL_NOT_AVAILABLE_FOR_MESSAGE);
+      if (baseChannel.get() instanceof VoiceChannel) throw new NotChatChannelException();
     } else {
       throw new ChannelNotFoundException();
     }
   }
 
   @Override
-  public Message createMessage(String userId, Message message, ChatChannel channel) throws MessageValidationException {
-    if (userRepository.findById(userId).isEmpty()) throw new MessageValidationException();
-    if (channelRepository.findById(channel.getUUID()).isEmpty()) throw new MessageValidationException();
+  public Message createMessage(String userId, Message message, ChatChannel channel){
+    if (userRepository.findById(userId).isEmpty()) {
+      log.error("user not valid={}", userId);
+      throw new MessageValidationException();
+    }
+    if (channelRepository.findById(channel.getUUID()).isEmpty()){
+      log.error("user not valid={}", channel);
+      throw new MessageValidationException();
+    }
     isChannelChat(channel.getUUID());
     messageRepository.create(message);
     return message;
@@ -82,8 +91,11 @@ public class BasicMessageService implements MessageServiceV2<ChatChannel> {
 
     Message originalMessage = returnMessageIfExists(messageId);
 
-    updatedMessage.getContent().ifPresent(originalMessage::setContent);
-    updatedMessage.getContent().ifPresent(originalMessage::setContentImage);
+    synchronized (originalMessage) {
+      updatedMessage.getContent().ifPresent(originalMessage::setContent);
+      updatedMessage.getContent().ifPresent(originalMessage::setContentImage);
+    }
+
     messageRepository.update(originalMessage);
     return originalMessage;
   }

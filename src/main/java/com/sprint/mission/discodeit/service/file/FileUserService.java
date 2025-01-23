@@ -85,16 +85,17 @@ public class FileUserService implements UserService {
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
     }
 
-    updatedUser.getUsername().ifPresent(targetUser::setUsername);
-    updatedUser.getPassword().map(PasswordEncryptor::hashPassword).ifPresent(targetUser::setPassword);
-    updatedUser.getEmail().ifPresent(targetUser::setEmail);
-    updatedUser.getNickname().ifPresent(targetUser::setNickname);
-    updatedUser.getPhoneNumber().ifPresent(targetUser::setPhoneNumber);
-    updatedUser.getProfilePictureURL().ifPresent(targetUser::setProfilePictureURL);
-    updatedUser.getDescription().ifPresent(targetUser::setDescription);
+    synchronized (targetUser) {
+      updatedUser.getUsername().ifPresent(targetUser::setUsername);
+      updatedUser.getPassword().map(PasswordEncryptor::hashPassword).ifPresent(targetUser::setPassword);
+      updatedUser.getEmail().ifPresent(targetUser::setEmail);
+      updatedUser.getNickname().ifPresent(targetUser::setNickname);
+      updatedUser.getPhoneNumber().ifPresent(targetUser::setPhoneNumber);
+      updatedUser.getProfilePictureURL().ifPresent(targetUser::setProfilePictureURL);
+      updatedUser.getDescription().ifPresent(targetUser::setDescription);
 
-    targetUser.setUpdatedAt(System.currentTimeMillis());
-
+      targetUser.setUpdatedAt(System.currentTimeMillis());
+    }
     saveUserToFile(users);
   }
 

@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Getter
 @Setter
-public abstract class BaseChannel implements Serializable{
+public abstract class BaseChannel implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final String UUID;
@@ -24,7 +24,6 @@ public abstract class BaseChannel implements Serializable{
   private Boolean isPrivate;
 
   BaseChannel(BaseChannelBuilder<?> builder) {
-
     this.UUID = java.util.UUID.randomUUID().toString();
     this.ServerUUID = builder.serverUUID;
     this.CategoryUUID = builder.categoryUUID;
@@ -36,7 +35,7 @@ public abstract class BaseChannel implements Serializable{
     this.updatedAt = LocalDateTime.now();
   }
 
-  public static abstract class BaseChannelBuilder<T extends BaseChannelBuilder<T>>{
+  public static abstract class BaseChannelBuilder<T extends BaseChannelBuilder<T>> {
     private String serverUUID;
     private String categoryUUID;
     private String channelName;
@@ -44,8 +43,8 @@ public abstract class BaseChannel implements Serializable{
     private String tag = "default";
     private Boolean isPrivate = false;
 
-    public BaseChannelBuilder(String channelName){
-      if(channelName == null || channelName.isEmpty()){
+    public BaseChannelBuilder(String channelName) {
+      if (channelName == null || channelName.isEmpty()) {
         throw new ChannelValidationException();
       }
       this.channelName = channelName;

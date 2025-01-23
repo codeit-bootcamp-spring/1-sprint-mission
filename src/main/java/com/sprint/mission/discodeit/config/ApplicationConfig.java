@@ -7,14 +7,14 @@ import lombok.Getter;
 @Getter
 public class ApplicationConfig {
 
-  private ServiceType channelServiceType;
-  private StorageType channelStorageType;
+  private final ServiceType channelServiceType;
+  private final StorageType channelStorageType;
 
-  private ServiceType userServiceType;
-  private StorageType userStorageType;
+  private final ServiceType userServiceType;
+  private final StorageType userStorageType;
 
-  private ServiceType messageServiceType;
-  private StorageType messageStorageType;
+  private final ServiceType messageServiceType;
+  private final StorageType messageStorageType;
 
   private ApplicationConfig(ApplicationConfigBuilder builder) {
     this.channelServiceType = builder.channelServiceType;
@@ -24,7 +24,6 @@ public class ApplicationConfig {
     this.messageServiceType = builder.messageServiceType;
     this.messageStorageType = builder.messageStorageType;
   }
-
 
   public static class ApplicationConfigBuilder {
     private ServiceType channelServiceType;

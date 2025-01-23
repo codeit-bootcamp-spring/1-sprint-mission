@@ -19,6 +19,7 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
 
   private BasicUserService(UserRepository userRepository) {
+    System.out.println("created BasicUserService -> " + userRepository.getClass());
     this.userRepository = userRepository;
   }
 
@@ -82,22 +83,24 @@ public class BasicUserService implements UserService {
 
     if(!PasswordEncryptor.checkPassword(originalPassword, originalUser.getPassword())) throw new UserValidationException(PASSWORD_MATCH_ERROR);
 
-    updatedUser.getNickname().ifPresent(nickname -> {
-      validNickname(nickname);
-      originalUser.setNickname(nickname);
-    });
-    updatedUser.getEmail().ifPresent(email -> {
-      validEmail(email);
-      originalUser.setEmail(email);
-    });
-    updatedUser.getPhoneNumber().ifPresent(phone -> {
-      validPhone(phone);
-      originalUser.setPhoneNumber(phone);
-    });
-    updatedUser.getUsername().ifPresent(originalUser::setUsername);
-    updatedUser.getDescription().ifPresent(originalUser::setDescription);
-    updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
+    synchronized (originalUser) {
+      updatedUser.getNickname().ifPresent(nickname -> {
+        validNickname(nickname);
+        originalUser.setNickname(nickname);
+      });
+      updatedUser.getEmail().ifPresent(email -> {
+        validEmail(email);
+        originalUser.setEmail(email);
+      });
+      updatedUser.getPhoneNumber().ifPresent(phone -> {
+        validPhone(phone);
+        originalUser.setPhoneNumber(phone);
+      });
+      updatedUser.getUsername().ifPresent(originalUser::setUsername);
+      updatedUser.getDescription().ifPresent(originalUser::setDescription);
+      updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
 
+    }
     userRepository.update(originalUser);
   }
 

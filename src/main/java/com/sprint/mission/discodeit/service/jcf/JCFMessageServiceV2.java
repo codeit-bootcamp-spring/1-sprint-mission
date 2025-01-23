@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -13,18 +14,20 @@ public class JCFMessageServiceV2 implements MessageServiceV2<ChatChannel> {
 
   private static volatile JCFMessageServiceV2 messageRepository;
   private UserService userService;
+  private ChannelService channelService;
   private final Map<String, List<Message>> data;
 
-  private JCFMessageServiceV2(UserService userService) {
+  private JCFMessageServiceV2(UserService userService, ChannelService channelService) {
     this.userService = userService;
+    this.channelService = channelService;
     data = new HashMap<>();
   }
 
-  public static JCFMessageServiceV2 getInstance(UserService userService) {
+  public static JCFMessageServiceV2 getInstance(UserService userService, ChannelService channelService) {
     if (messageRepository == null) {
       synchronized (JCFMessageServiceV2.class) {
         if (messageRepository == null) {
-          messageRepository = new JCFMessageServiceV2(userService);
+          messageRepository = new JCFMessageServiceV2(userService, channelService);
         }
       }
     }
@@ -34,9 +37,14 @@ public class JCFMessageServiceV2 implements MessageServiceV2<ChatChannel> {
   @Override
   public Message createMessage(String userId, Message message, ChatChannel chatChannel) throws MessageValidationException {
     if (!checkUserExists(userId)) throw new MessageValidationException();
+    if (!checkChannelExists(chatChannel)) throw new MessageValidationException();
     data.putIfAbsent(chatChannel.getUUID(), new ArrayList<>());
     data.get(chatChannel.getUUID()).add(message);
     return message;
+  }
+
+  private boolean checkChannelExists(ChatChannel chatChannel){
+    return channelService.getChannelById(chatChannel.getUUID()).isPresent();
   }
 
   private boolean checkUserExists(String userId) {
@@ -64,9 +72,11 @@ public class JCFMessageServiceV2 implements MessageServiceV2<ChatChannel> {
         .filter(m -> m.getUUID().equals(messageId))
         .findFirst()
         .map(m -> {
-          updatedMessage.getContent().ifPresent(m::setContent);
-          updatedMessage.getContentUrl().ifPresent(m::setContentImage);
-          m.setIsEdited();
+          synchronized (m) {
+            updatedMessage.getContent().ifPresent(m::setContent);
+            updatedMessage.getContentUrl().ifPresent(m::setContentImage);
+            m.setIsEdited();
+          }
           return m;
         }).orElse(null);
   }

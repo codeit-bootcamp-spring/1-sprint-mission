@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -19,16 +20,18 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 public class FileMessageService implements MessageServiceV2<ChatChannel> {
   private static volatile FileMessageService messageRepository;
   private UserService userService;
+  private ChannelService channelService;
 
-  private FileMessageService(UserService userService) {
+  private FileMessageService(UserService userService, ChannelService channelService) {
     this.userService = userService;
+    this.channelService = channelService;
   }
 
-  public static FileMessageService getInstance(UserService userService) {
+  public static FileMessageService getInstance(UserService userService, ChannelService channelService) {
     if (messageRepository == null) {
       synchronized (FileMessageService.class) {
         if (messageRepository == null) {
-          messageRepository = new FileMessageService(userService);
+          messageRepository = new FileMessageService(userService, channelService);
           initFile();
         }
       }
@@ -50,9 +53,14 @@ public class FileMessageService implements MessageServiceV2<ChatChannel> {
   @Override
   public Message createMessage(String userId, Message message, ChatChannel channel) throws MessageValidationException {
     if(!checkUserExists(userId)) throw new MessageValidationException();
+    if(!checkChannelExists(channel)) throw new MessageValidationException();
     message.setChannelUUID(channel.getUUID());
     saveMessageToFile(message);
     return message;
+  }
+
+  private boolean checkChannelExists(ChatChannel channel){
+    return channelService.getChannelById(channel.getUUID()).isPresent();
   }
 
   @Override
@@ -71,9 +79,10 @@ public class FileMessageService implements MessageServiceV2<ChatChannel> {
     List<Message> messages = loadAllMessages();
     Message message = messages.stream().filter(m -> m.getUUID().equals(messageId)).findFirst().get();
 
-    updatedMessage.getContentUrl().ifPresent(message::setContentImage);
-    updatedMessage.getContent().ifPresent(message::setContent);
-
+    synchronized (message) {
+      updatedMessage.getContentUrl().ifPresent(message::setContentImage);
+      updatedMessage.getContent().ifPresent(message::setContent);
+    }
     saveMessageToFile(messages);
 
     return message;

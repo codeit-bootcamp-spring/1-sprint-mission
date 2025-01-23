@@ -1,12 +1,14 @@
-import com.sprint.mission.discodeit.config.ApplicationBuilder;
-import com.sprint.mission.discodeit.entity.BaseChannel;
+import com.sprint.mission.discodeit.config.ApplicationConfig;
 import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
+import com.sprint.mission.discodeit.factory.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.util.ServiceType;
+import com.sprint.mission.discodeit.util.StorageType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,15 +24,20 @@ public class ApplicationTest {
   static UserService userService;
   static MessageServiceV2<ChatChannel> messageServiceV2;
   static ChannelFactory channelFactory;
-  static ApplicationBuilder builder;
-
   @BeforeAll
   static void setupClass() {
-    builder = new ApplicationBuilder();
+    ApplicationConfig ac = new ApplicationConfig.ApplicationConfigBuilder()
+        .channelServiceType(ServiceType.BASIC)
+        .channelStorageType(StorageType.JCF)
+        .userServiceType(ServiceType.BASIC)
+        .userStorageType(StorageType.JCF)
+        .messageServiceType(ServiceType.BASIC)
+        .messageStorageType(StorageType.JCF)
+        .build();
 
-    channelService = builder.getChannelService();
-    userService = builder.getUserService();
-    messageServiceV2 = builder.getMessageService();
+    channelService = ServiceFactory.createChannelService(ac);
+    userService = ServiceFactory.createUserService(ac);
+    messageServiceV2 = ServiceFactory.createMessageService(ac, userService, channelService);
 
     channelFactory = new ChannelFactory();
   }
