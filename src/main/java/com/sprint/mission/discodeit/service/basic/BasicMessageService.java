@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
 
-    private static final BasicMessageService basicMessageSerivce = new BasicMessageService();
+    private static final BasicMessageService basicMessageService = new BasicMessageService();
 
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
@@ -26,7 +26,7 @@ public class BasicMessageService implements MessageService {
     }
 
     public static BasicMessageService getInstance() {
-        return basicMessageSerivce;
+        return basicMessageService;
     }
 
     @Override
