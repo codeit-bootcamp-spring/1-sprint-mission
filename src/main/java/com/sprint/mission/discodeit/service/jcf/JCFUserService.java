@@ -32,7 +32,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public Optional<User> getUserById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        User userNullable=this.data.get(id);
+        return Optional.ofNullable(Optional.ofNullable(userNullable)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + id + " not fount")));
     }
 
     @Override
@@ -44,12 +46,15 @@ public class JCFUserService implements UserService {
     public void updateUser(UUID id, User updateUser) {
         User existingUser = data.get(id);
         if (existingUser != null) {
-            existingUser.update(updateUser.getName(),updateUser.getPassword());
+            existingUser.update(updateUser.getName(), updateUser.getEmail(), updateUser.getPassword());
         }
     }
 
     @Override
     public void deleteUser(UUID id) {
+        if(!this.data.containsKey(id)){
+            throw new NoSuchElementException("User with id " + id + " not fount");
+        }
         data.remove(id);
     }
 }

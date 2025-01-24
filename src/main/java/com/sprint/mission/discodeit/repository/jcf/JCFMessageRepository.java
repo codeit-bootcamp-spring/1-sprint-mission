@@ -1,34 +1,19 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.util.Validation;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
 
-public class JCFMessageService implements MessageService {
-    private final Map<UUID,Message> data;//검색을 위해서 map으로 변경
-    private static volatile JCFMessageService instance;
+public class JCFMessageRepository implements MessageRepository {
+    private final Map<UUID,Message> data;
 
-    public JCFMessageService() {
-        this.data = new HashMap<>();
-    }
-
-    //싱글톤
-    public static JCFMessageService getInstance() {
-        if (instance==null){
-            synchronized (JCFChannelService.class){
-                if(instance==null){
-                    instance=new JCFMessageService();
-                }
-            }
-        }
-        return instance;
+    public JCFMessageRepository() {
+        this.data = Collections.synchronizedMap(new HashMap<>());
     }
 
     @Override
     public void createMessage(Message message) {
-        Validation.validateUserExists(message.getSenderUser().getId());
         data.put(message.getId(),message);
     }
 

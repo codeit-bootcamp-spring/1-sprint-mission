@@ -1,35 +1,20 @@
-package com.sprint.mission.discodeit.service.jcf;
-
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.util.Validation;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
 
-public class JCFChannelService implements ChannelService {
-    private final Map<UUID,Channel> data; //검색 성능을 위해서 map으로 변경
-    private static volatile JCFChannelService instance;
+public class JCFChannelRepository implements ChannelRepository {
 
-    public JCFChannelService() {
-        this.data = new HashMap();
-    }
+    private final Map<UUID,Channel> data;
 
-    //싱글톤
-    public static JCFChannelService getInstance() {
-        if (instance==null){
-            synchronized (JCFChannelService.class){
-                if(instance==null){
-                    instance=new JCFChannelService();
-                }
-            }
-        }
-        return instance;
+    public JCFChannelRepository() {
+        this.data = Collections.synchronizedMap(new HashMap<>());
     }
 
     @Override
     public void createChannel(Channel channel) {
-        Validation.validateUserExists(channel.getCreator().getId());
         data.put(channel.getId(), channel);
     }
 

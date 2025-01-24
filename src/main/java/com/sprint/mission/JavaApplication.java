@@ -3,58 +3,54 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMassageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class JavaApplication {
-    public static void main(String[] args) throws InterruptedException {
-        //가독성을 위해 수정
+    public static void main(String[] args) {
         // 서비스 초기화
-        UserService userService = ServiceFactory.getUserService();
-        ChannelService channelService = ServiceFactory.getChannelService();
-        MessageService messageService = ServiceFactory.getMessageService();
+        UserRepository userRepository = new JCFUserRepository();
+        ChannelRepository channelRepository = new JCFChannelRepository();
+        MessageRepository messageRepository = new JCFMessageRepository();
+
+//        UserRepository userRepository = new FileUserRepository();
+//        ChannelRepository channelRepository = new FileChannelRepository();
+//        MessageRepository messageRepository = new FileMessageRepository();
+
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMassageService(messageRepository);
 
         // 사용자, 채널, 메시지 등록
         System.out.println("등록");
-        User userTest = new User("Alice", "12345");
+        User userTest = new User("Alice", "alice@naver.com", "12345");
         userService.createUser(userTest);
-        displayUserDetails(userService, userTest);
+        displayEntityDetails(userService, userTest);
 
         Channel channelTest = new Channel("testChannel", "test_description", userTest);
         channelService.createChannel(channelTest);
-        displayChannelDetails(channelService, channelTest);
+        displayEntityDetails(channelService, channelTest);
 
-        Message messageTest = new Message("test_message", userTest);
+        Message messageTest = new Message("test_message", channelTest, userTest);
         messageService.createMessage(messageTest);
-        displayMessageDetails(messageService, messageTest);
+        displayEntityDetails(messageService, messageTest);
         System.out.println();
-
-        // 사용자 검증 실패 테스트
-        System.out.println("사용자 검증 실패 테스트");
-        try {
-            User invalidUser = new User("InvalidUser", "12345");
-            Channel invalidChannel = new Channel("invalidChannel", "description", invalidUser);
-            channelService.createChannel(invalidChannel);  // 예외 발생 예상
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] " + e.getMessage());  // 예외 메시지 출력
-        }
-
-        // 메시지 검증 실패 테스트
-        try {
-            User invalidSender = new User("InvalidUser", "12345");
-            Message invalidMessage = new Message("invalid_message", invalidSender);
-            messageService.createMessage(invalidMessage);  // 예외 발생 예상
-        } catch (IllegalArgumentException e) {
-            System.out.println("[ERROR] " + e.getMessage());  // 예외 메시지 출력
-        }
-
 
         // 데이터 추가 및 전체 조회
         System.out.println("데이터 추가 및 전체 조회");
@@ -63,29 +59,11 @@ public class JavaApplication {
         System.out.println();
 
         // 데이터 업데이트
-        Thread.sleep(2000); // 업데이트 시간 차이 확인용 딜레이
-        System.out.println("업데이트");
-
-        updateUser(userService, userTest, "UpdatedAlice", "1234567");
+        updateEntity(userService, userTest, "UpdatedAlice", "alice@naver.com", "1234567");
+        updateEntity(channelService, channelTest, "updateChannel", "update_test_description", userTest);
+        updateEntity(messageService, messageTest, "update_message", userTest, channelTest);
         System.out.println();
 
-        System.out.println("업데이트 후 조회");
-        displayUserDetails(userService, userTest);
-        displayChannelDetails(channelService, channelTest);
-        displayMessageDetails(messageService, messageTest);
-        System.out.println();
-
-        updateChannel(channelService, channelTest, "updateChannel", "update_test_description", userTest);
-        displayUserDetails(userService, userTest);
-        displayChannelDetails(channelService, channelTest);
-        displayMessageDetails(messageService, messageTest);
-        System.out.println();
-
-        updateMessage(messageService, messageTest, "update_message", userTest);
-        displayUserDetails(userService, userTest);
-        displayChannelDetails(channelService, channelTest);
-        displayMessageDetails(messageService, messageTest);
-        System.out.println();
         // 데이터 삭제 및 결과 확인
         userService.deleteUser(userTest.getId());
         channelService.deleteChannel(channelTest.getId());
@@ -93,38 +71,17 @@ public class JavaApplication {
 
         System.out.println("삭제 후 전체 조회");
         displayAllData(userService, channelService, messageService);
-        System.out.println();
     }
 
-    private static void displayUserDetails(UserService userService, User user) {
-        Optional<User> userById = userService.getUserById(user.getId());
-        userById.ifPresent(u -> {
-            System.out.println("User: " + u.getName());
-            System.out.println("Created At: " + formatDate(u.getCreatedAt()));
-        });
-    }
-
-    private static void displayChannelDetails(ChannelService channelService, Channel channel) {
-        Optional<Channel> channelById = channelService.getChannelById(channel.getId());
-        channelById.ifPresent(c -> {
-            System.out.println("Channel: " + c.getChannel());
-            System.out.println("Created By: " + c.getCreator());
-            System.out.println("Created At: " + formatDate(c.getCreatedAt()));
-        });
-    }
-
-    private static void displayMessageDetails(MessageService messageService, Message message) {
-        Optional<Message> messageById = messageService.getMessageById(message.getId());
-        messageById.ifPresent(m -> {
-            System.out.println("Message: " + m.getContent());
-            System.out.println("Sent By: " + m.getSenderUser());
-            System.out.println("Created At: " + formatDate(m.getCreatedAt()));
-        });
+    // 공통된 엔티티 출력 로직을 한 메서드로 통합
+    private static <T> void displayEntityDetails(Object service, T entity) {
+        String entityDetails = entity.toString();  // entity에 대한 기본 출력 (필요 시 추가로 포맷 가능)
+        System.out.println(entityDetails);
     }
 
     private static void addTestData(UserService userService, ChannelService channelService, MessageService messageService) {
-        User user2 = new User("Bob", "12345");
-        User user3 = new User("James", "12345");
+        User user2 = new User("Bob", "bob@naver.com", "12345");
+        User user3 = new User("James", "james@naver.com", "12345");
 
         userService.createUser(user2);
         userService.createUser(user3);
@@ -135,45 +92,35 @@ public class JavaApplication {
         channelService.createChannel(channel2);
         channelService.createChannel(channel3);
 
-        Message message2 = new Message("test_message2", user2);
-        Message message3 = new Message("test_message3", user3);
+        Message message2 = new Message("test_message2", channel2, user2);
+        Message message3 = new Message("test_message3", channel3, user3);
 
         messageService.createMessage(message2);
         messageService.createMessage(message3);
     }
 
     private static void displayAllData(UserService userService, ChannelService channelService, MessageService messageService) {
-        List<User> allUsers = userService.getAllUsers();
-        System.out.println("All Users: " + allUsers);
-
-        List<Channel> allChannels = channelService.getAllChannels();
-        System.out.println("All Channels: " + allChannels);
-
-        List<Message> allMessages = messageService.getAllMessage();
-        System.out.println("All Messages: " + allMessages);
+        System.out.println("All Users: " + userService.getAllUsers());
+        System.out.println("All Channels: " + channelService.getAllChannels());
+        System.out.println("All Messages: " + messageService.getAllMessage());
     }
 
-    private static void updateUser(UserService userService, User user, String newName, String newPassword) {
-        User updatedUser = new User(newName, newPassword);
-        userService.updateUser(user.getId(), updatedUser);
-        System.out.println("Updated User: " + updatedUser.getName());
-        System.out.println("Updated At: " + formatDate(updatedUser.getUpdatedAt()));
+    private static void updateEntity(UserService userService, User user, String newName, String newEmail, String newPassword) {
+        userService.updateUser(user.getId(), new User(newName, newEmail, newPassword));
+        System.out.println("Updated User: " + newName);
     }
 
-    private static void updateChannel(ChannelService channelService, Channel channel, String newChannelName, String newDescription, User newCreator) {
-        Channel updatedChannel = new Channel(newChannelName, newDescription, newCreator);
-        channelService.updateChannel(channel.getId(), updatedChannel);
-        System.out.println("Updated Channel: " + updatedChannel.getChannel());
-        System.out.println("Updated At: " + formatDate(updatedChannel.getUpdatedAt()));
+    private static void updateEntity(ChannelService channelService, Channel channel, String newChannelName, String newDescription, User newCreator) {
+        channelService.updateChannel(channel.getId(), new Channel(newChannelName, newDescription, newCreator));
+        System.out.println("Updated Channel: " + newChannelName);
     }
 
-    private static void updateMessage(MessageService messageService, Message message, String newContent, User newSender) {
-        Message updatedMessage = new Message(newContent, newSender);
-        messageService.updateMessage(message.getId(), updatedMessage);
-        System.out.println("Updated Message: " + updatedMessage.getContent());
-        System.out.println("Updated At: " + formatDate(updatedMessage.getUpdatedAt()));
+    private static void updateEntity(MessageService messageService, Message message, String newContent, User newSender, Channel newChannel) {
+        messageService.updateMessage(message.getId(), new Message(newContent, newChannel, newSender));
+        System.out.println("Updated Message: " + newContent);
     }
 
+    // 포맷된 날짜 출력
     private static String formatDate(long timestamp) {
         Date date = new Date(timestamp);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
-public class User extends BaseEntity {
-    private String name;
-    private String password;
+import java.io.Serializable;
 
-    public User(String name, String password) {
+public class User extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String name;
+    private String email;
+    private transient String password;
+
+    public User(String name,String email, String password) {
         super();
         this.name = name;
+        this.email=email;
         this.password = password;
     }
 
@@ -14,14 +19,31 @@ public class User extends BaseEntity {
         return name;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public String getPassword() {
         return password;
     }
 
-    public void update(String name, String password) {
-        this.name = name;
-        this.password = password;
-        update();
+    public void update(String name,String email ,String password) {
+        boolean flag=false;
+        if(name!=null&&!name.equals(this.name)){
+            this.name = name;
+            flag=true;
+        }
+        if(email!=null&&!email.equals(this.email)){
+            this.email = email;
+            flag=true;
+        }
+        if (password!=null&&!password.equals(this.password)){
+            this.password = password;
+            flag=true;
+        }
+        if(flag){
+            update();
+        }
     }
 
     @Override
