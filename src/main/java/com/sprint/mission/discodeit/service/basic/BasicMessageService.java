@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
@@ -13,12 +15,18 @@ import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
 
+    private static final BasicMessageService basicMessageSerivce = new BasicMessageService();
+
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
 
-    public BasicMessageService(ChannelRepository channelRepository, MessageRepository messageRepository) {
-        this.channelRepository = channelRepository;
-        this.messageRepository = messageRepository;
+    private BasicMessageService() {
+        this.channelRepository = FileChannelRepository.getInstance();
+        this.messageRepository = FileMessageRepository.getInstance();
+    }
+
+    public static BasicMessageService getInstance() {
+        return basicMessageSerivce;
     }
 
     @Override

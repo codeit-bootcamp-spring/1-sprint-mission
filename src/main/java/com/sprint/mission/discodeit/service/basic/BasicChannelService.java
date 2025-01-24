@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
@@ -11,12 +13,18 @@ import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
 
+    private static final BasicChannelService basicChannelService = new BasicChannelService();
+
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(UserRepository userRepository, ChannelRepository channelRepository) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
+    private BasicChannelService() {
+        this.userRepository = FileUserRepository.getInstance();
+        this.channelRepository = FileChannelRepository.getInstance();
+    }
+
+    public static BasicChannelService getInstance() {
+        return basicChannelService;
     }
 
     @Override

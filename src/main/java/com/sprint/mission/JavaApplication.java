@@ -22,26 +22,11 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
 
-    private static UserService userService;
-    private static ChannelService channelService;
-    private static MessageService messageService;
-
-    public static void setJCFRepository() {
-        userService = new BasicUserService(JCFUserRepository.getInstance());
-        channelService = new BasicChannelService(JCFUserRepository.getInstance(), JCFChannelRepository.getInstance());
-        messageService = new BasicMessageService(JCFChannelRepository.getInstance(), JCFMessageRepository.getInstance());
-    }
-
-    public static void setFileRepository() {
-        userService = new BasicUserService(FileUserRepository.getInstance());
-        channelService = new BasicChannelService(FileUserRepository.getInstance(), FileChannelRepository.getInstance());
-        messageService = new BasicMessageService(FileChannelRepository.getInstance(), FileMessageRepository.getInstance());
-    }
+    private static final UserService userService = BasicUserService.getInstance();
+    private static final ChannelService channelService = BasicChannelService.getInstance();
+    private static final MessageService messageService = BasicMessageService.getInstance();
 
     public static void main(String[] args) {
-
-        setJCFRepository();
-//        setFileRepository();
 
         System.out.println("===== userServiceTest ====");
         System.out.println();
