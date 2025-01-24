@@ -25,7 +25,7 @@ public class FileMessageServiceTest {
 
   ChannelService channelService = FileChannelService.getInstance();
   UserService userService = FileUserService.getInstance();
-  MessageServiceV2<ChatChannel> messageService = FileMessageService.getInstance(userService);
+  MessageServiceV2<ChatChannel> messageService = FileMessageService.getInstance(userService, channelService);
 
   @BeforeEach
   void setUp() {

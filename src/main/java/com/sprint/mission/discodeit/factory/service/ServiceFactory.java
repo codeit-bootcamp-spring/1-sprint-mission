@@ -40,8 +40,16 @@ public class ServiceFactory {
 
   public static MessageServiceV2<ChatChannel> createMessageService(ApplicationConfig ac, UserService userService, ChannelService channelService) {
     return switch (ac.getMessageServiceType()) {
-      case JCF -> JCFMessageServiceV2.getInstance(userService, channelService);
-      case FILE -> FileMessageService.getInstance(userService, channelService);
+      //case JCF -> JCFMessageServiceV2.getInstance(userService, channelService);
+      case JCF -> JCFMessageServiceV2.getInstance(
+          ServiceFactory.createUserService(ac),
+          ServiceFactory.createChannelService(ac)
+      );
+//      case FILE -> FileMessageService.getInstance(userService, channelService);
+      case FILE -> FileMessageService.getInstance(
+          ServiceFactory.createUserService(ac),
+          ServiceFactory.createChannelService(ac)
+      );
       case BASIC -> BasicMessageService.getInstance(
           RepositoryFactory.createMessageRepository(ac.getMessageStorageType()),
           RepositoryFactory.createUserRepository(ac.getUserStorageType()),
