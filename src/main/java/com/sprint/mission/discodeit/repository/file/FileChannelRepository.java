@@ -20,7 +20,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "channels");
-        createDirectory();
+        FileManager.createDirectory(filePath);
     }
 
     private FileChannelRepository() {
@@ -29,16 +29,6 @@ public class FileChannelRepository implements ChannelRepository {
 
     public static FileChannelRepository getInstance() {
         return fileChannelRepository;
-    }
-
-    private static void createDirectory() {
-        if (!Files.exists(FileChannelRepository.filePath)) {
-            try {
-                Files.createDirectories(FileChannelRepository.filePath);
-            } catch (IOException e) {
-                throw new FileIOException("저장 디렉토리 생성 실패: " + filePath);
-            }
-        }
     }
 
     @Override

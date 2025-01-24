@@ -19,23 +19,13 @@ public class FileUserRepository implements UserRepository {
 
     static {
         filePath = Paths.get(System.getProperty("user.dir"), "users");
-        createDirectory();
+        FileManager.createDirectory(filePath);
     }
 
     private FileUserRepository() {}
 
     public static FileUserRepository getInstance() {
         return fileUserRepository;
-    }
-
-    private static void createDirectory() {
-        if (!Files.exists(FileUserRepository.filePath)) {
-            try {
-                Files.createDirectories(FileUserRepository.filePath);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
@@ -96,5 +86,4 @@ public class FileUserRepository implements UserRepository {
             }
         }
     }
-
 }

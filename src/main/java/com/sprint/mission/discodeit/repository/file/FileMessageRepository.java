@@ -14,14 +14,13 @@ import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
 
-
     private static final FileMessageRepository fileMessageRepository = new FileMessageRepository();
     private static final Path filePath;
     private final ChannelRepository channelRepository;
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "messages");
-        createDirectory();
+        FileManager.createDirectory(filePath);
     }
 
     private FileMessageRepository() {
@@ -32,15 +31,6 @@ public class FileMessageRepository implements MessageRepository {
         return fileMessageRepository;
     }
 
-    private static void createDirectory() {
-        if (!Files.exists(FileMessageRepository.filePath)) {
-            try {
-                Files.createDirectories(FileMessageRepository.filePath);
-            } catch (IOException e) {
-                throw new FileIOException("저장 디렉토리 생성 실패: " + filePath);
-            }
-        }
-    }
     @Override
     public Message save(Message message) {
         Path path = filePath.resolve(message.getId().toString().concat(".ser"));
