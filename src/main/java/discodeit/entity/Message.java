@@ -8,8 +8,9 @@ public class Message {
     private long updatedAt;
     private String content;
     private User sender;
+    private UUID channelId;
 
-    public Message(String content, User sender) {
+    public Message(String content, User sender, UUID channelId) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
         this.id = UUID.randomUUID();
         this.createdAt = currentUnixTime;
@@ -17,6 +18,7 @@ public class Message {
 
         this.content = content;
         this.sender = sender;
+        this.channelId = channelId;
     }
 
     public UUID getId() {
@@ -28,7 +30,10 @@ public class Message {
     }
 
     public void updateContent(String content) {
-        this.content = content;
+        if (!this.content.equals(content)) {
+            this.content = content;
+            updateUpdatedAt();
+        }
     }
 
     public void checkSender(User user) {

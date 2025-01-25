@@ -38,10 +38,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(Channel channel, String content, User sender) {
-        Message message = new Message(content, sender);
+    public Message createMessage(String content, User sender, UUID channelId) {
+        jcfUserService.find(sender.getId());
+        jcfChannelService.find(channelId);
+
+        Message message = new Message(content, sender, channelId);
         messages.put(message.getId(), message);
-        jcfChannelService.updateMessages(channel, message);
         return message;
     }
 
@@ -64,21 +66,16 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void updateContent(Message message, String content) {
+    public void update(UUID messageId, String content) {
+        Message message = find(messageId);
         message.updateContent(content);
-        message.updateUpdatedAt();
     }
 
     @Override
-    public void deleteMessage(Message message, Channel channel, User user) {
-        channel.deleteMessage(message, user);
-        messages.remove(message);
-    }
-
-    @Override
-    public void deleteAllMessages(List<Message> deleteMessages) {
-        for (Message deleteMessage : deleteMessages) {
-            messages.remove(deleteMessage);
+    public void deleteMessage(UUID messageId) {
+        if (!messages.containsKey(messageId)) {
+            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
         }
+        messages.remove(messageId);
     }
 }
