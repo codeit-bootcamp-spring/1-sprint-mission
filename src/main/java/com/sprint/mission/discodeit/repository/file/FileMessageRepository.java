@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final Path filePath = Paths.get(System.getProperty("user.dir"), "tmp/message.ser");
+    private static final String FILEPATH = "tmp/message.ser";
+    private final FileManager<Message> fileManager =  new FileManager<>(FILEPATH);
 
     public Message save(Message message) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
@@ -26,7 +24,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     public List<Message> findAll() {
-        return loadMessageMapToFile().values().stream().toList();
+        return loadMessageListToFile();
     }
 
     public void delete(UUID messageId) {
@@ -37,36 +35,19 @@ public class FileMessageRepository implements MessageRepository {
 
     private void saveMessageMapToFile(Map<UUID, Message> saveMessageMap) {
         List<Message> saveMessageList = saveMessageMap.values().stream().toList();
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile(),false);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            for (Message message : saveMessageList) {
-                oos.writeObject(message);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fileManager.saveListToFile(saveMessageList);
+    }
+
+    private List<Message> loadMessageListToFile() {
+        return fileManager.loadListToFile();
     }
 
     private Map<UUID, Message> loadMessageMapToFile() {
-        Map<UUID, Message> data = new HashMap<>();
-        if(!Files.exists(filePath)) {
-            return data;
+        List<Message> loadMessageList = loadMessageListToFile();
+        if (loadMessageList.isEmpty()) {
+            return new HashMap<>();
         }
-        try (
-                FileInputStream fis = new FileInputStream(filePath.toFile());
-                ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                Message serMessage = (Message) ois.readObject();
-                data.put(serMessage.getId(), serMessage);
-            }
-        } catch (EOFException e) {
-//            System.out.println("read all objects");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return data;
+        return loadMessageList.stream()
+                .collect(Collectors.toMap(Message::getId, Function.identity()));
     }
 }

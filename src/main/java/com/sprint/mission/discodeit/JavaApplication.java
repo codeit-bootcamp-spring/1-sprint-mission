@@ -39,11 +39,13 @@ public class JavaApplication {
     public static void main(String[] args) {
 
         // jcf
+//        System.out.println("===Use JCF Repository===");
 //        UserRepository userRepository = new JCFUserRepository();
 //        ChannelRepository channelRepository = new JCFChannelRepository();
 //        MessageRepository messageRepository = new JCFMessageRepository();
 
         // file
+        System.out.println("===Use File Repository===");
         UserRepository userRepository = new FileUserRepository();
         ChannelRepository channelRepository = new FileChannelRepository();
         MessageRepository messageRepository = new FileMessageRepository();

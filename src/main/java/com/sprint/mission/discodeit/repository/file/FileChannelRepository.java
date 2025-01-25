@@ -3,14 +3,13 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class FileChannelRepository implements ChannelRepository {
-    private static final Path filePath = Paths.get(System.getProperty("user.dir"), "tmp/channel.ser");
+    private static final String FILEPATH = "tmp/channel.ser";
+    private final FileManager<Channel> fileManager =  new FileManager<>(FILEPATH);
 
     @Override
     public Channel save(Channel channel) {
@@ -28,7 +27,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return loadChannelMapToFile().values().stream().toList();
+        return loadChannelListToFile();
     }
 
     @Override
@@ -40,36 +39,19 @@ public class FileChannelRepository implements ChannelRepository {
 
     private void saveChannelMapToFile(Map<UUID, Channel> saveChannelMap) {
         List<Channel> saveChannelList = saveChannelMap.values().stream().toList();
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile(),false);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            for (Channel channel : saveChannelList) {
-                oos.writeObject(channel);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fileManager.saveListToFile(saveChannelList);
+    }
+
+    private List<Channel> loadChannelListToFile() {
+        return fileManager.loadListToFile();
     }
 
     private Map<UUID, Channel> loadChannelMapToFile() {
-        Map<UUID, Channel> data = new HashMap<>();
-        if(!Files.exists(filePath)) {
-            return data;
+        List<Channel> loadChannelList = loadChannelListToFile();
+        if (loadChannelList.isEmpty()) {
+            return new HashMap<>();
         }
-        try (
-                FileInputStream fis = new FileInputStream(filePath.toFile());
-                ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            while (true) {
-                Channel serChannel = (Channel) ois.readObject();
-                data.put(serChannel.getId(), serChannel);
-            }
-        } catch (EOFException e) {
-//            System.out.println("read all objects");
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return data;
+        return loadChannelList.stream()
+                .collect(Collectors.toMap(Channel::getId, Function.identity()));
     }
 }
