@@ -15,6 +15,13 @@ public class JCFChannelService implements ChannelService {
 
     private final JCFChannelRepository channelRepository = new JCFChannelRepository();
 
+    private static JCFChannelService jcfChannelService;
+    private JCFChannelService(){}
+    public static JCFChannelService getInstance(){
+        if (jcfChannelService == null) return jcfChannelService = new JCFChannelService();
+        else return jcfChannelService;
+    }
+
     @Override
     public Channel createOrUpdate(Channel channel) {
         validateDuplicateName(channel.getName());

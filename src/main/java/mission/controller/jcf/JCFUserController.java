@@ -12,12 +12,14 @@ import java.util.UUID;
 public class JCFUserController {
 
     private final JCFUserService userService = new JCFUserService();
-    private final JCFMessageService messageService = new JCFMessageService();
     private final JCFChannelService channelService = new JCFChannelService();
+    private mission.controller.jcf.JCFMessageController JCFMessageController;
 
     public User createUser(String name, String password) {
         User user = new User(name, password);
+
         return userService.createOrUpdate(user);
+
     }
 
     // User 개인정보 변경
@@ -57,7 +59,7 @@ public class JCFUserController {
      * 삭제
      */
     public void deleteUser(UUID id, String nickName, String password) {
-        User deletingUser = findUserById(id); // 이 메서드에서 id 검증
+        User deletingUser = userService.findById(id); // 이 메서드에서 id 검증
         if (!(deletingUser.getName().equals(nickName) && deletingUser.getPassword().equals(password))) {
             System.out.println("닉네임 or 비밀번호가 틀렸습니다.");
             // 이 메서드에서 닉넴, 비번 검증

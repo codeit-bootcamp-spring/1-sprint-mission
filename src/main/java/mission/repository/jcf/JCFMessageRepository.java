@@ -45,6 +45,7 @@ public class JCFMessageRepository implements MessageRepository {
 
         data.get(findChannel).remove(deletingMessage);
         deletingMessage.removeMessage();
+
         // 아무메시지도 없으면 key값 없애기
         if (data.get(findChannel) == null){
             data.remove(findChannel);

@@ -25,8 +25,6 @@ public interface UserService {
 
     Set<User> findUsersByName(String findName);
 
-    User findByNamePW(String name, String password);
-
     //[ ] 삭제
     void delete(User user);
 

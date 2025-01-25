@@ -14,6 +14,15 @@ public class JCFUserService implements UserService {
     private final JCFUserRepository userRepository = new JCFUserRepository();
     //private final Map<UUID, User> data = new HashMap<>();
 
+    public static JCFUserService jcfUserService;
+
+    private JCFUserService() {}
+
+    public static JCFUserService getInstance(){
+        if (jcfUserService == null) return jcfUserService = new JCFUserService();
+        else return jcfUserService;
+    }
+
     @Override
     public User createOrUpdate(User user) {
         // validateDuplicateName(user.getName());
@@ -44,13 +53,6 @@ public class JCFUserService implements UserService {
                 .collect(Collectors.toSet());
     }
 
-//    @Override
-//    public User findByNamePW(String name, String password) {
-//        return findUsersByName(name).stream()
-//                .filter(user -> user.getPassword().equals(password))
-//                .findAny().orElse(null);
-//    }
-
     @Override
     public void delete(User user) {
         userRepository.delete(user);
@@ -62,4 +64,6 @@ public class JCFUserService implements UserService {
             throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", name));
         }
     }
+
+
 }

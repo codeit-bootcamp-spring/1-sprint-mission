@@ -13,17 +13,27 @@ import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
 
-
     private final FileMessageRepository fileMessageRepository = new FileMessageRepository();
 
     @Override
-    public Message create(Message message) {
+    public Message createOrUpdate(Message message) {
         try {
             return fileMessageRepository.createMessage(message);
         } catch (IOException e) {
             throw new RuntimeException("Message파일 생성을 실패했습니다" + e.getMessage());
         }
     }
+
+    /**
+     * 업테이트
+     */
+    @Override
+    public Message update(UUID messageId, String newMassage) {
+        Message updatingMessage = findById(messageId);
+        updatingMessage.setMessage(newMassage);
+        return fileMessageRepository.createMessage(message);
+    }
+
 
     @Override
     public Set<Message> findAll() {
@@ -59,14 +69,6 @@ public class FileMessageService implements MessageService {
 
     public Message findMessageById(UUID id){
         return fileMessageRepository.findMessageById(id);
-    }
-
-    /**
-     * 업테이트
-     */
-    @Override
-    public Message update(Message message) {
-        return fileMessageRepository.updateMessage(message);
     }
 
     /**

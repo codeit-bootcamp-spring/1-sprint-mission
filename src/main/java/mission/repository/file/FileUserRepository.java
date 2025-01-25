@@ -2,11 +2,13 @@ package mission.repository.file;
 
 import mission.entity.User;
 import mission.repository.UserRepository;
+import mission.service.exception.NotFoundId;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,17 +21,17 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User saveUser(User user) throws IOException {
-        // 이름 중복검사는 메인 서비스에서
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
 
-        //        // 존재하지 않으면 저장 (나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할거같음)
+        // 파일 존재하지 않으면(나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할것 같음
         if (!Files.exists(filePath)) {
             Files.createFile(filePath);
         }
 
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                Files.newOutputStream(filePath))) {
             oos.writeObject(user);
-        } //oos.close(); << 이거 줄이려고 try   +  나중에 예외처리 할 때 편하려고 try
+        } //oos.close(); << 이거 줄이려고 try   +  나중에 리펙토링 시 예외처리 여기서 할 때 편하려고 try
         return user;
     }
 
@@ -40,6 +42,7 @@ public class FileUserRepository implements UserRepository {
     public Set<User> findAll(){
         try {
             if (!Files.exists(USER_DIRECT_PATH)) {
+                System.out.println("USER 디렉토리가 존재하지 않습니다");
                 return new HashSet<>();
             } else {
                 return Files.list(USER_DIRECT_PATH)
@@ -54,27 +57,39 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID id) throws IOException, ClassNotFoundException {
+    public User findById(UUID id) {
         // 1. id로 filePath 얻기
         Path userFilePath = getUserFilePath(id);
 
         // 2. 1에서 얻은 filePath가 유효한지 테스트
         if (!Files.exists(userFilePath)) {
-            System.out.println("주어진 id의 유저파일이 존재하지 않습니다.");
-            return null;
+            throw new NotFoundId();
         }
 
         // 3. 읽기
-        ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(userFilePath));
-        return (User) ois.readObject(); // 저장 성공
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(userFilePath))){
+            return (User) ois.readObject();
+        } catch (IOException e) {
+            throw new RuntimeException("파일 읽기 오류" + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("입력한 id에 해당하는 파일이 없습니다", e);
+        }
     }
 
     @Override
-    public void delete(User user) throws IOException {
-        Path deletingUserPath = getUserFilePath(user.getId());
+    public void delete(User user) {
+        try {
+            Files.delete(getUserFilePath(user.getId()));
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException(String.format(
+                    "[%s] %s의 파일은 존재하지 않습니다", user.getFirstId(), user.getName()), e);
+        } catch (IOException e) {
+            System.out.println("User 파일 삭제 중 오류 발생");
+            e.printStackTrace();
+        }
+
         System.out.printf("%s 파일 삭제 완료", user.getName());
         System.out.println();
-        Files.delete(deletingUserPath);
     }
 
 //    @Override
@@ -101,7 +116,9 @@ public class FileUserRepository implements UserRepository {
         return USER_DIRECT_PATH.resolve(userId.toString() + ".ser");
     }
 
-    // 파일 생성
+
+
+    // 테스트 시 파일 디렉토리 세팅을 위한 메서드
     public void createUserDirectory() throws IOException {
         // 존재하면 안의 파일 전부 삭제
         if (Files.exists(USER_DIRECT_PATH)){

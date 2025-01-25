@@ -12,6 +12,13 @@ public class JCFMessageService implements MessageService {
 
     private final JCFMessageRepository messageRepository = new JCFMessageRepository();
 
+    private static JCFMessageService jcfMessageService;
+    private JCFMessageService(){}
+    public static JCFMessageService getInstance(){
+        if(jcfMessageService == null) return jcfMessageService = new JCFMessageService();
+        else return jcfMessageService;
+    }
+
     @Override
     public Message createOrUpdate(Message message) {
         messageRepository.createOrUpdateMessage(message);

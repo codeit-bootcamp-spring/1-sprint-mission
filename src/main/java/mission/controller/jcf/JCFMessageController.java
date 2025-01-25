@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 public class JCFMessageController {
 
-    private final JCFUserService userService = new JCFUserService();
-    private final JCFMessageService messageService = new JCFMessageService();
+    public final JCFUserService userService = new JCFUserService();
+    public final JCFMessageService messageService = new JCFMessageService();
     private final JCFChannelService channelService = new JCFChannelService();
 
     // 서비스간 의존 多
