@@ -43,6 +43,11 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
+    // !!! 이쯤에서 질문있습니다 !!!
+    // 길어서 pull-request-template 쪽에 작성했으니 확인해주세요!
+    // save 기능과 load 기능을 Message, Channel에서는 분리했는데
+    // 이쪽은 제가 겪었던 오류가 있어서, 확인받고 싶어 우선은 수정하지 않고 제출합니다.
+
     // FileIO를 통해서 load
     @Override
     public Optional<User> findUserById(UUID id){
@@ -55,13 +60,11 @@ public class FileUserRepository implements UserRepository {
         }else{
             //System.out.println(filePath);
         }
-
         try(FileInputStream fis = new FileInputStream(filePath); // FileInputStream을 사용하여 파일을 읽고
             ObjectInputStream ois = new ObjectInputStream(fis)){ // ObjectInputStream을 사용하여 직렬화된 객체를 역직렬화
             // 여기서 무슨 일이 벌어지는 거 같은데?
             // 역직렬화 후 객체의 상태를 출력하여 확인
             User user = (User) ois.readObject();
-
             //System.out.println("Deserialized User ID: " + user.getId());
             //System.out.println("Deserialized User Nickname: " + user.getNickname());
             //System.out.println( "findUserById   역직렬화 이후  user.getId()   : " + user.getId());
