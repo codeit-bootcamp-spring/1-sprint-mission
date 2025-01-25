@@ -9,14 +9,18 @@ public class Message{
     private String content;
     private final User user;
     private final Channel channel;
+    private UUID authorId;
+    private UUID channelId;
 
-    public Message(UUID id, Long createdAt, Long updatedAt, String content, User user, Channel channel) {
+    public Message(UUID id, Long createdAt, Long updatedAt, String content, User user, Channel channel, UUID authorId, UUID channelId) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.content = content;
         this.user = user;
         this.channel = channel;
+        this.authorId = authorId;
+        this.channelId = channelId;
     }
 
     public UUID getId() {
@@ -42,6 +46,10 @@ public class Message{
     public Channel getChannel() {
         return channel;
     }
+
+    public UUID getAuthorId() { return authorId; }
+
+    public UUID getChannelId() { return channelId; }
 
     public void update(String content) {
         this.content = content;

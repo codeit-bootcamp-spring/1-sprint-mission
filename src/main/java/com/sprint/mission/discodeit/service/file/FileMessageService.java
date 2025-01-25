@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.io.*;
@@ -18,6 +20,22 @@ public class FileMessageService implements MessageService {
         saveMessages(messages);
     }
 
+    @Override
+    public Message create(String content, UUID channelId, UUID authorId) {
+        // UUID로 유저와 채널을 생성 (유저와 채널이 실제로 존재한다고 가정)
+        long currentTime = System.currentTimeMillis();
+        Channel channel = new Channel(channelId, System.currentTimeMillis(), System.currentTimeMillis(), "ChannelName", "description"); // Dummy 채널
+        User user = new User(authorId, currentTime, currentTime, "AuthorName", "email@example.com", "password"); // Dummy 유저
+
+        // 메시지 생성
+        UUID messageId = UUID.randomUUID();
+        Message message = new Message(messageId, currentTime, currentTime, content, user, channel, authorId, channelId);
+
+        // 메시지를 저장
+        createMessage(message);
+        return message;
+    }
+    
     @Override
     public Message getMessage(UUID id) {
         List<Message> messages = getAllMessages();
