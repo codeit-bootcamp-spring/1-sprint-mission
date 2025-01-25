@@ -1,15 +1,24 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.util.time.SystemTimeProvider;
+import com.sprint.mission.discodeit.util.time.TimeProvider;
+
 import java.util.UUID;
 
 public abstract class BaseEntity{
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
+    private final TimeProvider timeProvider;
 
-    public BaseEntity() {
+    public BaseEntity(){
+        this(new SystemTimeProvider());
+    }
+
+    public BaseEntity(TimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = timeProvider.getCurrentTimeMillis();
         this.updatedAt = this.createdAt;
     }
 
@@ -26,7 +35,7 @@ public abstract class BaseEntity{
     }
 
     public void updateTimeStamp() {
-        updatedAt = System.currentTimeMillis();
+        updatedAt = timeProvider.getCurrentTimeMillis();
     }
 
     @Override
