@@ -8,19 +8,12 @@ import java.util.*;
 
 public class JCFUserService implements UserService {
     private final Map<UUID, User> userData;
-    private MessageService messageService;
-    private ChannelService channelService;
 
     //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
     public JCFUserService(Map<UUID, User> userData) {
         this.userData = userData;
     }
 
-    @Override
-    public void setDependencies(MessageService messageService, ChannelService channelService) {
-        this.messageService = messageService;
-        this.channelService = channelService;
-    }
 
     @Override
     public User createUser(User user){
@@ -67,18 +60,6 @@ public class JCFUserService implements UserService {
             return false;
         }
         System.out.println(user.toString());
-
-        //사용자 삭제 시 관련 메세지 삭제
-        messageService.deleteMessageByUser(user);
-
-        //사용자 삭제 시 모든 채널에서 해당 사용자 삭제
-        channelService.readAllChannels().forEach(channel -> {
-            if (channel.getParticipants().contains(user)) {
-                channel.getParticipants().remove(user);
-                System.out.println("채널 '"+ channel.getName() + "'에서 사용자" +
-                        "'"+user.getUsername()+ "' 제거 완료");
-            }
-        });
         userData.remove(user.getId());
         return true;
     }

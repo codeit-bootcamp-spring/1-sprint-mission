@@ -15,12 +15,8 @@ public class JCFMessageService implements MessageService {
     private ChannelService channelService;
 
     //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
-    public JCFMessageService(Map<UUID, Message> messageData) {
+    public JCFMessageService(Map<UUID, Message> messageData,UserService userService, ChannelService channelService) {
         this.messageData = messageData;
-    }
-
-    @Override
-    public void setDependencies(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -32,17 +28,14 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Author and Channel cannot be null");
         }
         // User가 실제로 존재하는지 확인
-        if(!userService.readUser(message.getAuthor()).isPresent()) {
-            throw new IllegalArgumentException("Author does not exist " + message.getAuthor().getId());
-        }
+        User author = userService.readUser(message.getAuthor())
+                .orElseThrow(() -> new IllegalArgumentException("Author does not exist: "
+                        + message.getAuthor().getId()));
         //Channel이 실제로 존재하는지 확인
-        Optional<Channel> existingChannel = channelService.readChannel(message.getChannel());
-        if (existingChannel.isEmpty()) {
-            throw new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId());
-        }
+        Channel channel = channelService.readChannel(message.getChannel().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId()));
         // 채널에 해당 사용자가 있는지 확인
-        Channel channel = existingChannel.get();
-        if (!channel.getParticipants().contains(message.getAuthor())) {
+        if (!channel.getParticipants().containsKey(message.getAuthor())) {
             throw new IllegalArgumentException("Author is not a participant of the channel: " + message.getChannel().getId());
         }
         messageData.put(message.getId(), message);

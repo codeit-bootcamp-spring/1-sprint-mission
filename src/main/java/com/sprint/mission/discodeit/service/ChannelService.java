@@ -9,11 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    void setDependencies(UserService userService, MessageService messageService);
     Channel createChannel(Channel channel);
     void addParticipantToChannel(Channel channel, User user);
-    Optional<Channel> readChannel(Channel channel);
+    Optional<Channel> readChannel(UUID channelId);
     List<Channel> readAllChannels();
-    Channel updateChannel(Channel existChannel, Channel updateChannel);
+    Channel updateChannel(UUID channelId, Channel updateChannel);
     boolean deleteChannel(Channel channel);
 }

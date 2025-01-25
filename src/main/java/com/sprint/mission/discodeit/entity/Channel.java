@@ -5,11 +5,11 @@ import java.util.*;
 public class Channel extends BaseEntity {
     private String name;
     private String description;
-    private Set<User> participants;
+    private HashMap<UUID,User> participants;
     private List<Message> messageList;
     private ChannelType channelType;
 
-    public Channel(String name, String description, Set<User> participants, List<Message> messageList, ChannelType channelType) {
+    public Channel(String name, String description, HashMap<UUID,User> participants, List<Message> messageList, ChannelType channelType) {
         super();
         this.name = name;
         this.description = description;
@@ -34,11 +34,11 @@ public class Channel extends BaseEntity {
         this.description = description;
     }
 
-    public Set<User> getParticipants() {
+    public HashMap<UUID,User> getParticipants() {
         return participants;
     }
 
-    public void updateParticipants(Set<User> participants) {
+    public void updateParticipants(HashMap<UUID,User> participants) {
         this.participants = participants;
     }
 
@@ -62,7 +62,7 @@ public class Channel extends BaseEntity {
         return "Channel{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", participants=[" + participants + "]" +
+                ", participants=[" + participants.values() + "]" +
                 ", messageCount=" + ((messageList != null) ? messageList.size() : 0) +
                 '}';
     }
