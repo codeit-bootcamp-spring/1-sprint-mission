@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
     private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
@@ -35,9 +36,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public Optional<User> readUser(User user) {
+    public Optional<User> readUser(UUID existUserId) {
         return readAllUsers().stream()
-                .filter(u -> u.getId().equals(user.getId()))
+                .filter(u -> u.getId().equals(existUserId))
                 .findFirst();
     }
 
@@ -47,14 +48,14 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User updateUser(User existUser, User updateUser) {
+    public User updateUser(UUID existUserId, User updateUser) {
         List<User> users = readAllUsers();
         Optional<User> userToUpdate = users.stream()
-                .filter(u -> u.getId().equals(existUser.getId()))
+                .filter(u -> u.getId().equals(existUserId))
                 .findFirst();
 
         if (userToUpdate.isEmpty()) {
-            throw new NoSuchElementException("User not found");
+            throw new NoSuchElementException("User not found: " + existUserId);
         }
 
         User user = userToUpdate.get();
@@ -66,20 +67,20 @@ public class FileUserService implements UserService {
         user.updateUserEmail(updateUser.getEmail());
 
         fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
+
         System.out.println("수정 유저= " + user);
         return user;
     }
 
     @Override
-    public boolean deleteUser(User user) {
+    public boolean deleteUser(UUID userId) {
         List<User> users = readAllUsers();
-        boolean removed = users.removeIf(u -> u.getId().equals(user.getId()));
+        boolean removed = users.removeIf(u -> u.getId().equals(userId));
 
-        if(!removed) {
-            return false;
+        if (removed) {
+            fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
+            System.out.println("Deleted user: " + userId);
         }
-        System.out.println(user);
-        fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
-        return true;
+        return removed;
     }
 }

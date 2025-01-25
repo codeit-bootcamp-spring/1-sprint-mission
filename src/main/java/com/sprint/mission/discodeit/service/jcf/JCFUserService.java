@@ -55,12 +55,11 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean deleteUser(User user){
-        if (!userData.containsKey(user.getId())) {
+    public boolean deleteUser(UUID userId){
+        if (!userData.containsKey(userId)) {
             return false;
         }
-        System.out.println(user.toString());
-        userData.remove(user.getId());
+        userData.remove(userId);
         return true;
     }
 }

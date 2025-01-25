@@ -23,7 +23,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message createMessage(Message message) {
-        // User와 Channel이 null인지 확인
+        // User와 Channel이 null인지 확인 이러한 부분도 .orElseThrow를 사용하여 null을 처리하는부분을 줄여야될까...?
         if (message.getAuthor() == null || message.getChannel() == null) {
             throw new IllegalArgumentException("Author and Channel cannot be null");
         }
@@ -49,12 +49,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> readAll(){
+    public List<Message> readAllMessages() {
         return new ArrayList<>(messageData.values());
     }
 
     @Override
-    public Message updateByAuthor(UUID existUserId, Message updatedMessage){
+    public Message updateByAuthor(UUID existUserId, Message updateMessage){
         Optional<Message> existingMessage = messageData.values().stream()
                 .filter(message -> message.getAuthor().equals(existUserId))
                 .findFirst();
@@ -63,8 +63,8 @@ public class JCFMessageService implements MessageService {
        }
         Message existMessage = existingMessage.get();
         System.out.println("수정 전 메시지 = "+existMessage.getContent());
-        existMessage.updateContent(updatedMessage.getContent());
-        existMessage.updateChannel(updatedMessage.getChannel());
+        existMessage.updateContent(updateMessage.getContent());
+        existMessage.updateChannel(updateMessage.getChannel());
         existMessage.updateTime();
         messageData.put(existMessage.getId(), existMessage);
         System.out.println("수정 후 메시지 = "+existMessage.getContent());
@@ -72,11 +72,11 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public boolean deleteMessage(Message message) {
-        if (!messageData.containsKey(message.getId())) {
+    public boolean deleteMessage(UUID messageId) {
+        if (!messageData.containsKey(messageId)) {
             return false;
         }
-        messageData.remove(message.getId());
+        messageData.remove(messageId);
         return true;
     }
 }

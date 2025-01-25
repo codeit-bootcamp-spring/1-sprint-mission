@@ -30,21 +30,20 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void addParticipantToChannel(Channel channel, User user) {
-        if(!channelData.containsKey(channel.getId())) {
-            throw new IllegalArgumentException("Channel does not exists: " + channel.getId());
-        }
+    public void addParticipantToChannel(UUID channelId, UUID userId) {
+        Channel channel = this.readChannel(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("No channel found with id: " + channelId));
         //optional로 구현했던 부분 수정
-        User existUser = userService.readUser(user.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("User does not exists: " + user.getId()));
+        User existUser = userService.readUser(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User does not exists: " + userId));
         channel.getParticipants().put(existUser.getId(),existUser);
         System.out.println(channel.toString());
-        System.out.println(channel.getName() + " 채널에 " + user.getUsername() + " 유저 추가 완료\n");
+        System.out.println(channel.getName() + " 채널에 " + existUser.getUsername() + " 유저 추가 완료\n");
     }
 
     @Override
-    public Optional<Channel> readChannel(UUID channelId) {
-        return Optional.ofNullable(channelData.get(channelId));
+    public Optional<Channel> readChannel(UUID existChannelId) {
+        return Optional.ofNullable(channelData.get(existChannelId));
     }
 
     @Override
@@ -70,11 +69,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean deleteChannel(Channel channel) {
-        if (!channelData.containsKey(channel.getId())) {
+    public boolean deleteChannel(UUID channelId) {
+        if (!channelData.containsKey(channelId)) {
             return false;
         }
-        channelData.remove(channel.getId());
+        channelData.remove(channelId);
         return true;
     }
 

@@ -14,24 +14,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
+
 public class FileChannelService implements ChannelService {
     private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
     private static final String CHANNEL_FILE = "channel.ser";
     private UserService userService;
-    private MessageService messageService;
     private FileStorage<Channel> fileStorage;
 
-    public FileChannelService(UserService userService, MessageService messageService) {
+    public FileChannelService(UserService userService) {
         this.userService = userService;
-        this.messageService = messageService;
         this.fileStorage = new SerializableFileStorage<>(Channel.class);
         fileStorage.init(ROOT_DIR);
-    }
-
-    @Override
-    public void setDependencies(UserService userService, MessageService messageService) {
-        this.userService = userService;
-        this.messageService = messageService;
     }
 
     @Override
@@ -47,31 +41,25 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void addParticipantToChannel(Channel channel, User user) {
+    public void addParticipantToChannel(UUID channelId, UUID userId) {
         List<Channel> channels = readAllChannels();
-        Optional<Channel> existingChannel = channels.stream()
-                .filter(c -> c.getId().equals(channel.getId()))
-                .findFirst();
+        Channel existingChannel = channels.stream()
+                .filter(c -> c.getId().equals(channelId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + channelId));
 
-        if (existingChannel.isEmpty()) {
-            throw new IllegalArgumentException("Channel does not exist: " + channel.getId());
-        }
+        User existUser = userService.readUser(userId)
+                .orElseThrow(() -> new NoSuchElementException("User does not exist: " + userId));
 
-        Optional<User> existUser = userService.readUser(user);
-        if (existUser.isEmpty()) {
-            throw new IllegalArgumentException("User does not exist: " + user.getUsername());
-        }
-
-        Channel foundChannel = existingChannel.get();
-        foundChannel.getParticipants().add(existUser.get());
+        existingChannel.getParticipants().put(existUser.getId(), existUser);
         fileStorage.save(ROOT_DIR.resolve(CHANNEL_FILE), channels);
-        System.out.println(foundChannel.getName() + " 채널에 " + user.getUsername() + " 유저 추가 완료\n");
+        System.out.println(existingChannel.getName() + " 채널에 " + existUser.getUsername() + " 유저 추가 완료\n");
     }
 
     @Override
-    public Optional<Channel> readChannel(Channel channel) {
+    public Optional<Channel> readChannel(UUID existChannelId) {
         return readAllChannels().stream()
-                .filter(c -> c.getId().equals(channel.getId()))
+                .filter(c -> c.getId().equals(existChannelId))
                 .findFirst();
     }
 
@@ -81,40 +69,35 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(Channel existChannel, Channel updateChannel) {
+    public Channel updateChannel(UUID existChannelId, Channel updateChannel) {
         List<Channel> channels = readAllChannels();
-        Optional<Channel> channelToUpdate = channels.stream()
-                .filter(c -> c.getId().equals(existChannel.getId()))
-                .findFirst();
+        Channel existChannel = channels.stream()
+                .filter(c -> c.getId().equals(existChannelId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Channel does not exist: " + existChannelId));
 
-        if (channelToUpdate.isEmpty()) {
-            throw new NoSuchElementException("Channel not found");
-        }
+        System.out.println("업데이트 이전 채널 = " + existChannel);
 
-        Channel channel = channelToUpdate.get();
-        System.out.println("업데이트 이전 채널 = " + channel);
-
-        channel.updateName(updateChannel.getName());
-        channel.updateDescription(updateChannel.getDescription());
-        channel.updateParticipants(updateChannel.getParticipants());
-        channel.updateMessageList(updateChannel.getMessageList());
-        channel.updateTime();
+        existChannel.updateName(updateChannel.getName());
+        existChannel.updateDescription(updateChannel.getDescription());
+        existChannel.updateParticipants(updateChannel.getParticipants());
+        existChannel.updateMessageList(updateChannel.getMessageList());
+        existChannel.updateTime();
 
         fileStorage.save(ROOT_DIR.resolve(CHANNEL_FILE), channels);
-        System.out.println("업데이트 이후 채널 = " + channel);
-        return channel;
+        System.out.println("업데이트 이후 채널 = " + existChannel);
+        return existChannel;
     }
 
     @Override
-    public boolean deleteChannel(Channel channel) {
+    public boolean deleteChannel(UUID channelId) {
         List<Channel> channels = readAllChannels();
-        boolean removed = channels.removeIf(c -> c.getId().equals(channel.getId()));
+        boolean removed = channels.removeIf(c -> c.getId().equals(channelId));
 
         if (!removed) {
             return false;
         }
 
-        messageService.deleteMessageByChannel(channel);
         fileStorage.save(ROOT_DIR.resolve(CHANNEL_FILE), channels);
         return true;
     }

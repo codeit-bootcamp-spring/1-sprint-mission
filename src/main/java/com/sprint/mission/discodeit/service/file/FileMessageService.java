@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FileMessageService implements MessageService {
@@ -30,40 +31,26 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void setDependencies(UserService userService, ChannelService channelService) {
-        this.userService = userService;
-        this.channelService = channelService;
-    }
-
-    @Override
     public Message createMessage(Message message) {
         if (message.getAuthor() == null || message.getChannel() == null) {
             throw new IllegalArgumentException("Author and Channel cannot be null");
         }
 
         // 사용자 검증
-        Optional<User> existingUser = userService.readUser(message.getAuthor());
-        if (existingUser.isEmpty()) {
-            throw new IllegalArgumentException("Author does not exist: " + message.getAuthor().getId());
-        }
+        User existingUser = userService.readUser(message.getAuthor().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Author does not exist: " + message.getAuthor().getId()));
 
         // 채널 검증
-        Optional<Channel> existingChannel = channelService.readChannel(message.getChannel());
-        if (existingChannel.isEmpty()) {
-            throw new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId());
-        }
-
-        Channel channel = existingChannel.get();
+        Channel existingChannel = channelService.readChannel(message.getChannel().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId()));
 
         // 참가자 검증 - ID 기반 비교
-        boolean isParticipant = channel.getParticipants().stream()
-                .anyMatch(participant -> participant.getId().equals(message.getAuthor().getId()));
-
-        if (!isParticipant) {
-            throw new IllegalArgumentException("Author is not a participant of the channel: " + channel.getId());
+        if (!existingChannel.getParticipants().containsKey(existingUser.getId())) {
+            throw new IllegalArgumentException("Author is not a participant of the channel: "
+                    + existingChannel.getId());
         }
 
-        List<Message> messages = readAll();
+        List<Message> messages = readAllMessages();
         messages.add(message);
         fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
         System.out.println(message + "\n메시지 생성 완료\n");
@@ -71,43 +58,39 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Optional<Message> readMessage(Message message) {
-        return readAll().stream()
-                .filter(m -> m.getId().equals(message.getId()))
+    public Optional<Message> readMessage(UUID existMessageId) {
+        return readAllMessages().stream()
+                .filter(m -> m.getId().equals(existMessageId))
                 .findFirst();
     }
 
     @Override
-    public List<Message> readAll() {
+    public List<Message> readAllMessages() {
         return fileStorage.load(ROOT_DIR);
     }
 
     @Override
-    public Message updateByAuthor(User user, Message updatedMessage) {
-        List<Message> messages = readAll();
-        Optional<Message> existingMessage = messages.stream()
-                .filter(message -> message.getAuthor().equals(user))
-                .findFirst();
+    public Message updateByAuthor(UUID existUserId, Message updatedMessage) {
+        List<Message> messages = readAllMessages();
+        Message existingMessage = messages.stream()
+                .filter(message -> message.getAuthor().equals(existUserId))
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No message found for the given user : "+ existUserId));
 
-        if(existingMessage.isEmpty()) {
-            throw new NoSuchElementException("No message found for the given User");
-        }
-
-        Message message = existingMessage.get();
-        System.out.println("수정 전 메시지 = " + message.getContent());
-        message.updateContent(updatedMessage.getContent());
-        message.updateChannel(updatedMessage.getChannel());
-        message.updateTime();
+        System.out.println("수정 전 메시지 = " + existingMessage.getContent());
+        existingMessage.updateContent(updatedMessage.getContent());
+        existingMessage.updateChannel(updatedMessage.getChannel());
+        existingMessage.updateTime();
 
         fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
-        System.out.println("수정 후 메시지 = " + message.getContent());
-        return message;
+        System.out.println("수정 후 메시지 = " + existingMessage.getContent());
+        return existingMessage;
     }
 
     @Override
-    public boolean deleteMessage(Message message) {
-        List<Message> messages = readAll();
-        boolean removed = messages.removeIf(m -> m.getId().equals(message.getId()));
+    public boolean deleteMessage(UUID messageId) {
+        List<Message> messages = readAllMessages();
+        boolean removed = messages.removeIf(m -> m.getId().equals(messageId));
 
         if (!removed) {
             return false;
@@ -115,19 +98,5 @@ public class FileMessageService implements MessageService {
 
         fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
         return true;
-    }
-
-    @Override
-    public void deleteMessageByChannel(Channel channel) {
-        List<Message> messages = readAll();
-        messages.removeIf(message -> message.getChannel().equals(channel));
-        fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
-    }
-
-    @Override
-    public void deleteMessageByUser(User user) {
-        List<Message> messages = readAll();
-        messages.removeIf(message -> message.getAuthor().equals(user));
-        fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
     }
 }

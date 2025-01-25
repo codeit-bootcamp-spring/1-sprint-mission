@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface MessageService {
     Message createMessage(Message message);
     Optional<Message> readMessage(UUID existMessageId);
-    List<Message> readAll();
-    Message updateByAuthor(UUID existUserId, Message message);
-    boolean deleteMessage(Message message);
+    List<Message> readAllMessages();
+    Message updateByAuthor(UUID existUserId, Message updateMessage);
+    boolean deleteMessage(UUID messageId);
 }
