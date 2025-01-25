@@ -15,7 +15,6 @@ public class User {
     private String email;
     private String phoneNumber;
     private String password;
-    private List<Channel> joinedChannels;
 
     public User(String name, String email, String phoneNumber, String password) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
@@ -27,7 +26,6 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
-        this.joinedChannels = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -40,10 +38,6 @@ public class User {
 
     public String getName() {
         return name;
-    }
-
-    public List<Channel> getJoinedChannels() {
-        return joinedChannels;
     }
 
     public void update(String name, String email, String phoneNumber) {
@@ -84,17 +78,6 @@ public class User {
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
 
-    public void updateJoinedChannels(Channel channel) {
-        joinedChannels.add(channel);
-    }
-
-    public void deleteJoinedChannel(Channel channel) {
-        if (!joinedChannels.contains(channel)) {
-            throw new IllegalArgumentException("가입되지 않은 채널입니다.");
-        }
-        joinedChannels.remove(channel);
-    }
-
     public boolean isEqualTo(User user) {
         return id.equals(user.getId());
     }
@@ -121,7 +104,6 @@ public class User {
         this.email = null;
         this.phoneNumber = null;
         this.password = null;
-        joinedChannels = null;
     }
 
     @Override
@@ -131,10 +113,6 @@ public class User {
                         + "Name: " + name + System.lineSeparator()
                         + "Email: " + email + System.lineSeparator()
                         + "Phone number: " + phoneNumber + System.lineSeparator()
-                        + "Joined Channels: "
-                        + String.join(", ", joinedChannels.stream()
-                        .map(Channel::getName)
-                        .toList())
         );
     }
 }

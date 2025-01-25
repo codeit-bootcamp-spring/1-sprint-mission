@@ -11,7 +11,7 @@ import discodeit.service.jcf.JCFServiceFactory;
 
 public class JavaApplication {
     public static void main(String[] args) {
-
+/*
         // 서비스 객체 초기화
         ServiceFactory serviceFactory = JCFServiceFactory.getInstance();
         UserService jcfUserService = serviceFactory.getUserService();
@@ -75,5 +75,6 @@ public class JavaApplication {
         System.out.println("***** 채널 삭제 후 유저들의 참여 채널 목록에서 정상 삭제 여부 조회 *****");
         System.out.println(jcfUserService.getInfo(user1) + System.lineSeparator());
         System.out.println(jcfUserService.getInfo(user3));
+        */
     }
 }
