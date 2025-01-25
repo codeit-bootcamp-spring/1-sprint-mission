@@ -9,6 +9,7 @@ import java.util.List;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        // Todo : enum 추가, 멤버추가 삭제 부분, 매개변수 순서, 파일 저장 부분 제너릭 쓰기
 //        UserService userService = new JCFUserService();
 //        ChannelService channelService = new JCFChannelService(userService);
 //        MessageService messageService = new JCFMessageService(userService, channelService);
