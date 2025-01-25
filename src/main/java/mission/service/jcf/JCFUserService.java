@@ -12,27 +12,27 @@ import java.util.stream.Collectors;
 public class JCFUserService implements UserService {
 
     private final JCFUserRepository userRepository = new JCFUserRepository();
-    //private final Map<UUID, User> data = new HashMap<>();
 
     public static JCFUserService jcfUserService;
-
     private JCFUserService() {}
-
     public static JCFUserService getInstance(){
         if (jcfUserService == null) return jcfUserService = new JCFUserService();
         else return jcfUserService;
     }
 
-    @Override
-    public User createOrUpdate(User user) {
-        // validateDuplicateName(user.getName());
-        // 닉네임 중복 허용
-        return userRepository.saveUser(user);
+    @Override // 닉네임 중복 허용
+    public void createOrUpdate(User user) {
+        userRepository.saveUser(user);
     }
 
     @Override
-    public User update(User user) {
-        return createOrUpdate(user);
+    public void update(User user) {
+        createOrUpdate(user);
+    }
+
+    @Override
+    public User findById(UUID id) {
+        return userRepository.findById(id);  // null 위험 없음
     }
 
     @Override
@@ -41,29 +41,15 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID id) {
-        // null 위험 없어짐
-        return userRepository.findById(id);
-    }
-
-    @Override
-    public Set<User> findUsersByName(String findName) {
-        return findAll().stream()
-                .filter(user -> user.getName().equals(findName))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
     public void delete(User user) {
         userRepository.delete(user);
     }
-
-    @Override
-    public void validateDuplicateName(String name) {
-        if (!findUsersByName(name).isEmpty()) {
-            throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", name));
-        }
-    }
-
-
+//
+//    @Override 닉네임 중복 허용 안할 시
+//    public void validateDuplicateName(String name) {
+//
+//        if (!findUsersByName(name).isEmpty()) {
+//            throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", name));
+//        }
+//    }
 }

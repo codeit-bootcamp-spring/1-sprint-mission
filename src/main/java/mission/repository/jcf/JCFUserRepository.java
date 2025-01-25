@@ -9,16 +9,14 @@ import java.util.stream.Collectors;
 
 public class JCFUserRepository implements UserRepository {
 
-    // ID 별 저장 소
     private final Map<UUID, User> data = new HashMap<>();
-    //private final Map<String, List<USER>> userNames = new HashSet<>();
 
     @Override
-    public User saveUser(User user) {
-        // 유저이름 중복에 대한 확인을 하고 싶으면 앞단에서 USER 생성 시 검증 메서드 사용 ㄱ
-        return data.put(user.getId(), user);
+    public void saveUser(User user) {
+        data.put(user.getId(), user);
     }
 
+    @Override
     public Set<User> findAll() {
         return new HashSet<>(data.values());
     }

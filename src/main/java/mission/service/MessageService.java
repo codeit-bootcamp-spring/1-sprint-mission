@@ -11,22 +11,11 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface MessageService {
-    //등록
-    Message createOrUpdate(Message message) throws IOException;
-
-    // 조회 단건
+    void createOrUpdate(Message message) throws IOException;
+    void update(UUID messageId, String newMassage);
     Message findById(UUID messageId);
-    //[ ] 조회(다건)
-    Set<Message> findMessagesInChannel(Channel channel);
     Set<Message> findAll();
-
-    //[ ] 수정
-    Message update(UUID messageId, String newMassage);
- //   Message update(Message message);
-
-    //[ ] 삭제
- //   void delete(Message message);
-
+    Set<Message> findMessagesInChannel(Channel channel);
+    Set<Message> findContainingMessageInChannel(Channel channel, String writedString);
     void delete(UUID messageId);
-    //    void delete(UUID id, String message);
 }

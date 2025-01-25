@@ -1,8 +1,8 @@
 package mission.controller.jcf;
 
+import mission.controller.ChannelController;
 import mission.entity.Channel;
 import mission.entity.Message;
-import mission.entity.User;
 import mission.service.jcf.JCFChannelService;
 import mission.service.jcf.JCFMessageService;
 import mission.service.jcf.JCFUserService;
@@ -10,44 +10,45 @@ import mission.service.jcf.JCFUserService;
 import java.util.Set;
 import java.util.UUID;
 
-public class JCFChannelController {
+public class JCFChannelController implements ChannelController {
 
     private final JCFUserService userService = JCFUserService.getInstance();
     private final JCFChannelService channelService = JCFChannelService.getInstance();
     private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     // 채널명은 중복 허용 X
-    public Channel createChannel(String name) {
-        return channelService.createOrUpdate(new Channel(name)).or(null);
+    @Override
+    public Channel create(String name) {
+        return channelService.createOrUpdate(new Channel(name));
     }
 
-    // Channel 이름 변경
+    @Override
     public Channel updateChannelName(UUID channelId, String newName) {
-        return channelService.update(findChannelById(channelId), newName);
+        return channelService.update(findById(channelId), newName);
     }
 
-    /**
-     * Channel 조회 메서드들
-     */
-    public Channel findChannelById(UUID id) {
+    @Override
+    public Channel findById(UUID id) {
         return channelService.findById(id);
     }
 
+    @Override
+    public Set<Channel> findAll() {
+        return channelService.findAll();
+    }
+
+    @Override
     public Channel findChannelByName(String channelName) {
         return channelService.findByName(channelName);
     }
 
-    public Set<Channel> findAllChannel() {
-        return channelService.findAll();
-    }
-
+    @Override
     public Set<Channel> findAllChannelByUser(UUID userId) {
         return userService.findById(userId).getChannelsImmutable();
     }
-    /**
-     * 삭제
-     */
-    public void deleteChannel(UUID channelId) {
+
+    @Override
+    public void delete(UUID channelId) {
         channelService.deleteById(channelId);
     }
 
@@ -55,27 +56,28 @@ public class JCFChannelController {
      * 유저와의 관계
      */
     // 채널에 유저 등록
-    public void addChannelByUser(UUID channelId, UUID userId) {
-        findChannelById(channelId).addUser(userService.findById(userId));
+    @Override
+    public void addUserByChannel(UUID channelId, UUID userId) {
+        findById(channelId).addUser(userService.findById(userId));
         System.out.println("유저 등록 성공");
         // if(updatingChannel != null){
     }
 
     // 강퇴
+    @Override
     public void drops(UUID channel_Id, UUID droppingUser_Id) {
-        findChannelById(channel_Id).removeUser(userService.findById(droppingUser_Id));
+        findById(channel_Id).removeUser(userService.findById(droppingUser_Id));
     }
 
     /**
      * 메시지와
      */
-
-    // 채널주인이 삭제 (개인이 삭제하는거는 보류)
-    public void deleteMessage(UUID messageId, UUID channelId) {
-        Message deletingMessage = findMessageByC_M_Id(channelId, messageId);
-        messageService.delete(deletingMessage);
-    }
-
+//
+//    // 채널주인이 삭제 (개인이 삭제하는거는 보류)
+//    public void deleteMessage(UUID messageId, UUID channelId) {
+//
+//    }
+//
 
 
 }

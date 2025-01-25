@@ -1,5 +1,6 @@
 package mission.controller.jcf;
 
+import mission.controller.UserController;
 import mission.entity.Channel;
 import mission.entity.User;
 import mission.service.jcf.JCFChannelService;
@@ -8,56 +9,54 @@ import mission.service.jcf.JCFUserService;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class JCFUserController {
+public class JCFUserController implements UserController {
 
     private final JCFUserService userService = JCFUserService.getInstance();
     private final JCFChannelService channelService = JCFChannelService.getInstance();
     private final JCFMessageService messageService = JCFMessageService.getInstance();
 
-    public User createUser(String name, String password) {
-        User user = new User(name, password);
-
-        return userService.createOrUpdate(user);
-
+    @Override
+    public void create(String name, String password) {
+        userService.createOrUpdate(new User(name, password));
     }
 
-    // User 개인정보 변경
-    public User updateUserNamePW(UUID id, String newName, String password) {
-        User updatingUser = userService.findById(id);
-        updatingUser.setNamePassword(newName, password);
-        return userService.update(updatingUser);
+    @Override
+    public void updateUserNamePW(UUID id, String newName, String password) {
+        userService.update(userService.findById(id).setNamePassword(newName, password));
     }
 
-    /**
-     * 조회
-     */
-    public User findUserById(UUID id) {
+    @Override
+    public User findById(UUID id) {
         return userService.findById(id);
     }
 
-    public Set<User> findUsersByName(String findName){
-        return userService.findUsersByName(findName);
-    }
-
-    public User findUserByNamePW(String name, String password) {
-        return findUsersByName(name).stream()
-                .filter(user -> user.getPassword().equals(password))
-                .findAny().orElse(null);
-    }
-
-    public Set<User> findAllUsers() {
+    @Override
+    public Set<User> findAll() {
         return userService.findAll();
     }
 
+    @Override
+    public Set<User> findUsersByName(String findName){
+        return userService.findAll().stream()
+                .filter(user -> user.getName().equals(findName))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public User findUserByNamePW(String name, String password) {
+        return userService.findAll().stream()
+                .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
+                .findAny().orElse(null);
+    }
+
+    @Override
     public Set<User> findUsersInChannel(UUID channelId) {
         return channelService.findById(channelId).getUsersImmutable();
     }
 
-
-    /**
-     * 삭제
-     */
+    @Override
     public void deleteUser(UUID id, String nickName, String password) {
         User deletingUser = userService.findById(id); // 이 메서드에서 id 검증
         if (!(deletingUser.getName().equals(nickName) && deletingUser.getPassword().equals(password))) {
@@ -68,31 +67,23 @@ public class JCFUserController {
         }
     }
 
-    /**
-     *  채널과 연계
-     */
-
-    // 강퇴 및 채널 탈퇴
+    @Override
     public void drops(UUID channel_Id, UUID droppingUser_Id) {
-        Channel droppingChannel = channelService.findById(channel_Id);
-        User droppingUser = findUserById(droppingUser_Id);
-        droppingUser.removeChannel(droppingChannel);
+        findById(droppingUser_Id).removeChannel(channelService.findById(channel_Id));
         // removeChannel 양방향 설정
     }
 
-    // 모든 채널 탈퇴
+    @Override  // 모든 채널 탈퇴
     public void dropsAllByUser(UUID droppingUser_Id){
-        User user = findUserById(droppingUser_Id);
-        user.removeAllChannel();
+        findById(droppingUser_Id).removeAllChannel();
     }
 
-    // 채널 등록
+    @Override
     public void addChannelByUser(UUID channelId, UUID userId) {
-        findUserById(userId).addChannel(channelService.findById(channelId));
+        findById(userId).addChannel(channelService.findById(channelId));
     }
 
     /**
      * 메시지와 연계
      */
-
 }

@@ -20,7 +20,7 @@ public class FileUserRepository implements UserRepository {
     private static final Path USER_DIRECT_PATH = Path.of("userDirectory");
 
     @Override
-    public User saveUser(User user) throws IOException {
+    public void saveUser(User user) throws IOException {
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
 
         // 파일 존재하지 않으면(나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할것 같음
@@ -32,7 +32,6 @@ public class FileUserRepository implements UserRepository {
                 Files.newOutputStream(filePath))) {
             oos.writeObject(user);
         } //oos.close(); << 이거 줄이려고 try   +  나중에 리펙토링 시 예외처리 여기서 할 때 편하려고 try
-        return user;
     }
 
     /**

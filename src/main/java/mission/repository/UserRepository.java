@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface UserRepository {
-    User saveUser(User user) throws IOException;
+    void saveUser(User user) throws IOException;
     Set<User> findAll() throws IOException;
     User findById(UUID id) throws IOException, ClassNotFoundException;
     void delete(User deletingUser) throws IOException;

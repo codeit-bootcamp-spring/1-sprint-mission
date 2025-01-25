@@ -13,6 +13,7 @@ public class JCFMessageRepository implements MessageRepository {
     // TreeSet 선택 1. 모든 채널의 메시지는 무수히 많을 것 2. 시간 순서 필요
     private final Map<Channel, TreeSet<Message>> data = new HashMap<>();
 
+    @Override
     public void createOrUpdateMessage(Message message){
         Channel writedChannel = message.getWritedAt();
 
@@ -23,22 +24,26 @@ public class JCFMessageRepository implements MessageRepository {
         messageSet.add(message);
     }
 
+    @Override
     public Set<Message> findAll(){
         return data.values().stream()
                 .flatMap(Set::stream)
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
+    @Override
     public Message findById(UUID id){
         return findAll().stream()
                 .filter(message -> message.getId().equals(id))
                 .findAny().orElseThrow(() -> new NotFoundId());
     }
 
+    @Override
     public Set<Message> findMessagesInChannel(Channel channel){
         return data.get(channel);
     }
 
+    @Override
     public void delete(UUID messageId) {
         Message deletingMessage = findById(messageId);
         Channel findChannel = deletingMessage.getWritedAt();
