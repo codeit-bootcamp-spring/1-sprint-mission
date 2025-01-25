@@ -15,6 +15,13 @@ public class FileUserService implements UserService {
 
     private final FileUserRepository fileUserRepository = new FileUserRepository();
 
+    private static FileUserService fileUserService;
+    private FileUserService(){}
+    public static FileUserService getInstance(){
+        if (fileUserService == null) return fileUserService = new FileMessageService();
+        else return fileUserService;
+    }
+
     @Override
     public User createOrUpdate(User user) throws IOException {
         return fileUserRepository.saveUser(user);

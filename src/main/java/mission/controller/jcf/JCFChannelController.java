@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public class JCFChannelController {
 
-    private final JCFUserService userService = new JCFUserService();
-    private final JCFMessageService messageService = new JCFMessageService();
-    private final JCFChannelService channelService = new JCFChannelService();
+    private final JCFUserService userService = JCFUserService.getInstance();
+    private final JCFChannelService channelService = JCFChannelService.getInstance();
+    private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     // 채널명은 중복 허용 X
     public Channel createChannel(String name) {

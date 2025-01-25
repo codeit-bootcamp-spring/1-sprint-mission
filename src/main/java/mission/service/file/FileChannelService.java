@@ -17,6 +17,14 @@ public class FileChannelService implements ChannelService {
 
     private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
 
+    private static FileChannelService fileChannelService;
+    private FileChannelService(){}
+    public static FileChannelService getInstance(){
+        if (fileChannelService == null) return fileChannelService = new FileChannelService();
+        else return fileChannelService;
+    }
+
+
     // 생성 수정 오류 메시지 다르게 처리하기위해 오류 던지기
     @Override
     public Channel createOrUpdate(Channel channel) throws IOException {

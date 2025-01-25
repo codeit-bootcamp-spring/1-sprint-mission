@@ -14,6 +14,13 @@ import java.util.stream.Collectors;
 public class FileMessageService implements MessageService {
 
     private final FileMessageRepository fileMessageRepository = new FileMessageRepository();
+    private static FileMessageService fileMessageService;
+    private FileMessageService(){}
+    public static FileMessageService getInstance(){
+        if (fileMessageService == null) return fileMessageService = new FileMessageService();
+        else return fileMessageService;
+    }
+
 
     @Override
     public Message createOrUpdate(Message message) {

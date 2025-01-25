@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public class JCFUserController {
 
-    private final JCFUserService userService = new JCFUserService();
-    private final JCFChannelService channelService = new JCFChannelService();
-    private mission.controller.jcf.JCFMessageController JCFMessageController;
+    private final JCFUserService userService = JCFUserService.getInstance();
+    private final JCFChannelService channelService = JCFChannelService.getInstance();
+    private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     public User createUser(String name, String password) {
         User user = new User(name, password);

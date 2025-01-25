@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public class JCFMessageController {
 
-    public final JCFUserService userService = new JCFUserService();
-    public final JCFMessageService messageService = new JCFMessageService();
-    private final JCFChannelService channelService = new JCFChannelService();
+    private final JCFUserService userService = JCFUserService.getInstance();
+    private final JCFChannelService channelService = JCFChannelService.getInstance();
+    private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     // 서비스간 의존 多
     public Message createMessage(UUID channelId, UUID userId, String message) {
