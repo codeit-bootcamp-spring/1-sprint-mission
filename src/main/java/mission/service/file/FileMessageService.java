@@ -14,21 +14,21 @@ import java.util.stream.Collectors;
 public class FileMessageService implements MessageService {
 
     private final FileMessageRepository fileMessageRepository = new FileMessageRepository();
+
     private static FileMessageService fileMessageService;
-    private FileMessageService(){}
-    public static FileMessageService getInstance(){
+
+    private FileMessageService() {
+    }
+
+    public static FileMessageService getInstance() {
         if (fileMessageService == null) return fileMessageService = new FileMessageService();
         else return fileMessageService;
     }
 
 
     @Override
-    public Message createOrUpdate(Message message) {
-        try {
-            return fileMessageRepository.createMessage(message);
-        } catch (IOException e) {
-            throw new RuntimeException("Message파일 생성을 실패했습니다" + e.getMessage());
-        }
+    public Message createOrUpdate(Message message) throws IOException {
+        return fileMessageRepository.createMessage(message);
     }
 
     /**
@@ -38,9 +38,13 @@ public class FileMessageService implements MessageService {
     public Message update(UUID messageId, String newMassage) {
         Message updatingMessage = findById(messageId);
         updatingMessage.setMessage(newMassage);
-        return fileMessageRepository.createMessage(message);
-    }
 
+        try {
+            return fileMessageRepository.createMessage(updatingMessage);
+        } catch (IOException e) {
+            throw new RuntimeException("I/O 오류 : 수정 실패");
+        }
+    }
 
     @Override
     public Set<Message> findAll() {
@@ -57,7 +61,7 @@ public class FileMessageService implements MessageService {
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
-    public List<Message> findMessagesInChannelByUser(Channel channel, User user){
+    public List<Message> findMessagesInChannelByUser(Channel channel, User user) {
         return findMessagesInChannel(channel).stream()
                 .filter(message -> message.getWriter().equals(user))
                 .collect(Collectors.toList());
@@ -70,11 +74,11 @@ public class FileMessageService implements MessageService {
     }
 
     // 전체 메시지 조회
-    public Set<Message> findMessageByString(String writedMessage){
+    public Set<Message> findMessageByString(String writedMessage) {
         return fileMessageRepository.findMessageByString(writedMessage);
     }
 
-    public Message findMessageById(UUID id){
+    public Message findMessageById(UUID id) {
         return fileMessageRepository.findMessageById(id);
     }
 
@@ -82,33 +86,11 @@ public class FileMessageService implements MessageService {
      * 삭제
      */
     @Override
-    public void delete(Message message) {
+    public void delete(UUID messageId) {
         try {
-            fileMessageRepository.delete(message);
+            fileMessageRepository.delete(findById(messageId));
         } catch (IOException e) {
-            throw new RuntimeException("파일 삭제 실패: ",e);
+            throw new RuntimeException("파일 삭제 실패: ", e);
         }
     }
 }
-
-//    public Message findMessage(User writer, String writedMessage){
-//        for (Message message : writer.getMessages()) {
-//            if (message.getMessage().equals(writedMessage)){
-//                return message;
-//            }
-//        }
-//        return null
-//
-//    public Message findMessageById(Channel channel, UUID messageId){
-//        Map<UUID, Message> messageMap = findMessagesInChannel(channel).stream()
-//                .collect(Collectors.toMap(
-//                        Message::getId,  // Message객체 id를 키
-//                        Function.identity()  // 파라미터 -> 반환값
-//                ));
-//        try {
-//            return messageMap.get(messageId);
-//        } catch (Exception e){
-//            throw new NullPointerException("MessageId를 잘못 입력했습니다");
-//        }
-//    }
-

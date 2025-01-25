@@ -30,7 +30,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void deleteById(Channel deletingChannel) {
+    public void deleteById(UUID id) {
+        Channel deletingChannel = findById(id);
         deletingChannel.removeAllUser();
         System.out.printf("채널명 %s는 사라집니다.", deletingChannel.getName());
 

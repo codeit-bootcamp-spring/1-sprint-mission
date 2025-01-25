@@ -16,7 +16,7 @@ public class FileMessageRepository {
 
     private static final Path MS_DIRECT_PATH = Path.of("MS_Directory");
 
-    // 수정, 생성이 스는 메서드
+    // 수정, 생성이 쓰는 메서드
     // 수정, 생성 오류 메시지 따로 설정하기 위해 throws
     public Message createMessage(Message message) throws IOException {
         Path msDirectPath = getMsDirectPath(message.getId());
@@ -58,11 +58,6 @@ public class FileMessageRepository {
         return new HashSet<>(writedMessageMap.get(writedMessage));
     }
 
-//    public Message findMessageInChannelByString(UUID id) {
-//        return Files.exists(getMsDirectPath(id))
-//                ? readMessageFromFile(getMsDirectPath(id))
-//                : null;
-//    }
 
     public Message updateMessage(Message message) {
         try {
@@ -76,6 +71,9 @@ public class FileMessageRepository {
         Path deletingMS_Path = getMsDirectPath(message.getId());
         Files.delete(deletingMS_Path);
     }
+
+
+    public void
 
     /**
      * 편의 메서드
@@ -93,6 +91,8 @@ public class FileMessageRepository {
             throw new RuntimeException(e);
         }
     }
+
+
 
 
 }

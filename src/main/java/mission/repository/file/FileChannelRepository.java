@@ -29,19 +29,9 @@ public class FileChannelRepository implements ChannelRepository {
         return channel;
     }
 
-    @Override
-    public Set<Channel> findAll() throws IOException {
-        return Files.exists(CHANNEL_DIRECT_PATH)
-                ? Files.list(CHANNEL_DIRECT_PATH)
-                .filter(path -> path.toString().endsWith(".ser"))
-                .map(this::readChannelFromFile)
-                .collect(Collectors.toCollection(HashSet::new))
-
-                : new HashSet<>();
-    }
 
     @Override
-    public Optional<Channel> findById(UUID id) throws IOException, ClassNotFoundException {
+    public Channel findById(UUID id) throws IOException, ClassNotFoundException {
         Path channelPath = getChannelDirectPath(id);
         if (!Files.exists(channelPath)) {
             System.out.println("주어진 id의 채널파일이 존재하지 않습니다.");
@@ -51,6 +41,17 @@ public class FileChannelRepository implements ChannelRepository {
             return (Channel) ois.readObject();
         }
     }
+
+    @Override
+    public Set<Channel> findAll() throws IOException {
+        return Files.exists(CHANNEL_DIRECT_PATH)
+                ? Files.list(CHANNEL_DIRECT_PATH)
+                .filter(path -> path.toString().endsWith(".ser"))
+                .map(this::readChannelFromFile)
+                .collect(Collectors.toCollection(HashSet::new))
+                : new HashSet<>(); // 삼항 연산
+    }
+
 
     @Override
     public void deleteById(UUID id) {

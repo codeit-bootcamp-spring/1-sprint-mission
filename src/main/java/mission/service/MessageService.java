@@ -5,13 +5,14 @@ import mission.entity.Channel;
 import mission.entity.Message;
 import mission.entity.User;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public interface MessageService {
     //등록
-    Message createOrUpdate(Message message);
+    Message createOrUpdate(Message message) throws IOException;
 
     // 조회 단건
     Message findById(UUID messageId);

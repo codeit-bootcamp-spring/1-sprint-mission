@@ -12,5 +12,5 @@ public interface ChannelRepository {
     Set<Channel> findAll() throws IOException;
     Channel findById(UUID id) throws IOException, ClassNotFoundException;
     //Channel updateChannelName(Channel updatingChannel);
-    void deleteById(Channel channel);
+    void deleteById(UUID id);
 }

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class FileUserController {
 
-    private final FileUserService fileUserService = new FileUserService();
+    private final FileUserService fileUserService = FileUserService.getInstance();
 
     public void create(String userName, String password){
         fileUserService.validateDuplicateName(userName);
@@ -28,6 +28,21 @@ public class FileUserController {
         User user = fileUserService.findById(userId);
         user.setName(newName);
         fileUserService.update(user);
+    }
+
+    public User updateUserNamePW(UUID id, String oldName, String password, String newName, String newPassword) throws IOException {
+        // 1. id 검증   2. 입력한 닉네임,PW 검증 후 수정해서 FILEUSERSERVICE에 넘김
+        // (3 선택) 여기서 newName을 검증할지 말지 결정 <= 이거까지 맡으면 main이 하는 일이 많은 것 같은데
+
+        User existingUser = fileUserService.findById(id); // file 검증 끝이라 NULL 검증 필요 X
+        if (!(existingUser.getName().equals(oldName) & existingUser.getPassword().equals(password))) {
+            throw new IllegalStateException(String.format("닉네임(%s) 또는 password가 잘못됐습니다", oldName));
+        }
+
+        // 3. 유저 이름 중복 검증 시 사용
+        // fileUserService.validateDuplicateName(newName);
+        existingUser.setNamePassword(newName, newPassword);
+        return fileUserService.update(existingUser);
     }
 
     /**
@@ -61,5 +76,12 @@ public class FileUserController {
         } else {
             fileUserService.delete(deletingUser);
         }
+    }
+
+    /**
+     * 디렉토리 생성
+     */
+    public void createUserDirectory() throws IOException {
+        fileUserService.createUserDirectory();
     }
 }
