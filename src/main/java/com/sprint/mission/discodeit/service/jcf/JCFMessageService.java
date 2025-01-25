@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private static volatile JCFMessageService instance;
