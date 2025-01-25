@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    void updateChannelService(ChannelService channelService);
     User create(String name, String email, String phoneNumber, String password);
     User find(UUID userId);
     List<User> findAll();

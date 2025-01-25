@@ -4,8 +4,6 @@ import discodeit.Validator.ChannelValidator;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
-import discodeit.service.MessageService;
-import discodeit.service.UserService;
 
 import java.util.*;
 
@@ -13,8 +11,6 @@ public class JCFChannelService implements ChannelService {
 
     private final ChannelValidator validator;
     private final Map<UUID, Channel> channels;
-    private UserService jcfUserService;
-    private MessageService jcfMessageService;
 
     private JCFChannelService() {
         this.validator = new ChannelValidator();
@@ -27,16 +23,6 @@ public class JCFChannelService implements ChannelService {
 
     public static ChannelService getInstance() {
         return JCFChannelServiceHolder.INSTANCE;
-    }
-
-    @Override
-    public void updateUserService(UserService jcfUserService) {
-        this.jcfUserService = jcfUserService;
-    }
-
-    @Override
-    public void updateMessageService(MessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
     }
 
     @Override

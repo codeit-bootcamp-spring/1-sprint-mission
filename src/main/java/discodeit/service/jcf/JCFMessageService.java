@@ -12,8 +12,8 @@ import java.util.*;
 public class JCFMessageService implements MessageService {
 
     private final Map<UUID, Message> messages;
-    private UserService jcfUserService;
-    private ChannelService jcfChannelService;
+    private UserService userService;
+    private ChannelService channelService;
 
     private JCFMessageService() {
         messages = new HashMap<>();
@@ -28,19 +28,19 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void updateUserService(UserService jcfUserService) {
-        this.jcfUserService = jcfUserService;
+    public void updateUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
-    public void updateChannelService(ChannelService jcfChannelService) {
-        this.jcfChannelService = jcfChannelService;
+    public void updateChannelService(ChannelService channelService) {
+        this.channelService = channelService;
     }
 
     @Override
     public Message createMessage(String content, User sender, UUID channelId) {
-        jcfUserService.find(sender.getId());
-        jcfChannelService.find(channelId);
+        userService.find(sender.getId());
+        channelService.find(channelId);
 
         Message message = new Message(content, sender, channelId);
         messages.put(message.getId(), message);
