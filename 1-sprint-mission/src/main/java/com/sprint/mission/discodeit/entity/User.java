@@ -5,8 +5,8 @@ import java.util.*;
 public class User {
 
     private final UUID userUuid;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private String userName;
     private String userId;
     private final List<User>userData;

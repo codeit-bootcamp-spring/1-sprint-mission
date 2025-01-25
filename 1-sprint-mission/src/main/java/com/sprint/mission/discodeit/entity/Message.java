@@ -5,8 +5,8 @@ import java.util.UUID;
 public class Message {
 
     private final UUID messageUuid;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private String userId;
     private String messageText;
 

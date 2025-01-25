@@ -5,8 +5,8 @@ import java.util.UUID;
 public class Channel {
 
     private final UUID channelUuid;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private String channelTitle;
     private String userId;
 
