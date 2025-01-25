@@ -14,15 +14,18 @@ public interface MessageService {
     Message createOrUpdate(Message message);
 
     // 조회 단건
-    Set<Message> findMessagesInChannel(Channel channel);
-
+    Message findById(UUID messageId);
     //[ ] 조회(다건)
+    Set<Message> findMessagesInChannel(Channel channel);
     Set<Message> findAll();
 
     //[ ] 수정
-    Message update(Message message);
+    Message update(UUID messageId, String newMassage);
+ //   Message update(Message message);
 
     //[ ] 삭제
-    void delete(Message message);
+ //   void delete(Message message);
+
+    void delete(UUID messageId);
     //    void delete(UUID id, String message);
 }

@@ -71,6 +71,17 @@ public class Channel implements Serializable {
         }
     }
 
+    public void addMessage(Message message){
+        messageList.add(message);
+        //updatedAt = LocalDateTime.now();
+    }
+
+    public void deleteMessage(Message message){
+        messageList.remove(message);
+        //updatedAt = LocalDateTime.now();
+    }
+
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }

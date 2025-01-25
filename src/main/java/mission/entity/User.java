@@ -17,18 +17,13 @@ public class User implements Serializable {
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-    private final Set<Channel> channels = new HashSet<>();
-    private final Set<Message> messages = new HashSet<>();
+    private final Set<Channel> channelList = new HashSet<>();
+    private final Set<Message> messageList = new TreeSet<>();
 
-    // 이 User가 입력한 모든 메시지
-    public Set<Message> getMessages() {
-        return messages;
-    }
-
-    //  전송된 메시지 취소
-    public UUID deleteMessage(Message message){
-        messages.remove(message);
-        return message.getId();
+    //  메시지 삭제
+    public void deleteMessage(Message message){
+        messageList.remove(message);
+        updateAt = LocalDateTime.now();
     }
 
     // User가 메시지 수정
@@ -45,38 +40,65 @@ public class User implements Serializable {
     }
 
     public Set<Channel> getChannelsImmutable(){
-        return Collections.unmodifiableSet(channels);
+        return Collections.unmodifiableSet(channelList);
     }
 
     public void addChannel(Channel channel){
-        if(!channels.contains(channel)){
-            channels.add(channel);
+        if(!channelList.contains(channel)){
+            channelList.add(channel);
             channel.addUser(this);
             updateAt = LocalDateTime.now();
         }
         // 굳이 if 문 만든 이유 : 불필요한 updateAt 초기화 없애기 위해
     }
 
+    public void addMessage(Message message){
+        messageList.add(message);
+        updateAt = LocalDateTime.now();
+    }
+
     public void removeChannel(Channel channel) {
-        if(channels.contains(channel)){
-            channels.remove(channel);
+        if(channelList.contains(channel)){
+            channelList.remove(channel);
             channel.removeUser(this);
             updateAt = LocalDateTime.now();
         }
     }
 
     public void removeAllChannel(){
-        for (Channel channel : channels) {
+        for (Channel channel : channelList) {
             removeChannel(channel);
             // 유저수 초기화하려면 channels.clear 로는 안되기 때문
         }
         updateAt = LocalDateTime.now();
     }
 
+
+    public void setName(String name) {
+        updateAt = LocalDateTime.now();
+        this.name = name;
+    }
+
+    public void setPassword(String password) {
+        updateAt = LocalDateTime.now();
+        this.password = password;
+    }
+
+    public User setNamePassword(String name, String password) {
+        this.password = password;
+        this.name = name;
+        updateAt = LocalDateTime.now();
+        return this;
+    }
+
     public UUID getId() {
         return id;
     }
 
+    // 이 User가 입력한 모든 메시지
+    public Set<Message> getMessagesImmutable() {
+        return Collections.unmodifiableSet(messageList);
+    }
     public String getName() {
         return name;
     }
@@ -96,22 +118,6 @@ public class User implements Serializable {
         return updateAt;
     }
 
-    public void setName(String name) {
-        updateAt = LocalDateTime.now();
-        this.name = name;
-    }
-
-    public void setPassword(String password) {
-        updateAt = LocalDateTime.now();
-        this.password = password;
-    }
-
-    public User setNamePassword(String name, String password) {
-        this.password = password;
-        this.name = name;
-        updateAt = LocalDateTime.now();
-        return this;
-    }
 
     @Override
     public boolean equals(Object o) {

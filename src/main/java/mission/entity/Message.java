@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Message implements Serializable {
+public class Message implements Serializable, Comparable<Message> {
 
     private static final long serialVersionUID = 1L;
 
@@ -18,7 +18,6 @@ public class Message implements Serializable {
 
     private final LocalDateTime createAt;
     private LocalDateTime updateAt;
-
 
     public Channel getWritedAt() {
         return writedAt;
@@ -40,9 +39,20 @@ public class Message implements Serializable {
         Message mess = new Message(message);
         mess.setWriter(user);
         mess.setWritedAt(channel);
-        user.getMessages().add(mess);
-        channel.getMessageList().add(mess);
+        mess.setMessage(message);
+        user.addMessage(mess);
+        channel.addMessage(mess);
         return mess;
+    }
+
+    public void removeMessage(){
+        writer.deleteMessage(this);
+        writedAt.deleteMessage(this);
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+        updateAt = LocalDateTime.now();
     }
 
     public User getWriter() {
@@ -69,11 +79,6 @@ public class Message implements Serializable {
         return updateAt;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-        updateAt = LocalDateTime.now();
-    }
-
     @Override
     public String toString() {
         return "[" + firstId + "]" + "Message{" +
@@ -90,5 +95,11 @@ public class Message implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, message, createAt, updateAt);
+    }
+
+    @Override
+    public int compareTo(Message otherMessage) {
+        // createdAt기준으로 정렬
+        return this.createAt.compareTo(otherMessage.createAt);
     }
 }
