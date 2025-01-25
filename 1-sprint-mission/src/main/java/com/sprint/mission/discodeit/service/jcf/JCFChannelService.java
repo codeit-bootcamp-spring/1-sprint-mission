@@ -12,61 +12,74 @@ import java.util.List;
 
 public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private static JCFChannelService instance; // 싱글톤 인스턴스
-    private final UserService userService; // 의존성 주입
+    private static JCFChannelService instance;
 
-    private JCFChannelService(ChannelRepository channelRepository,UserService userService) {
+
+    private JCFChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
-        this.userService = userService;
+
     }
 
     public static synchronized JCFChannelService getInstance(ChannelRepository channelRepository, UserService userService) {
         if (instance == null) {
-            instance = new JCFChannelService(channelRepository, userService);
+            instance = new JCFChannelService(channelRepository);
         }
         return instance;
     }
 
     @Override
     public void createChannel(Channel channel) {
-        if(userService.readUser(channel.getUserId()) == null){
-            System.out.println("Cannot create channel. User with ID" + channel.getUserId() + " does not exist.");
-            return;
+        try {
+            channelRepository.save(channel);
+            System.out.println("Channel created: " + channel.getChannelTitle() + " (UUID: " + channel.getChannelUuid() + ")");
+        }catch (IllegalArgumentException e){
+            System.out.println("Cannot found User. User with ID " + channel.getUserId() + " does not exist.");
         }
-        List<Channel>existingChannels = channelRepository.findAll();
-        for(Channel existingChannel : existingChannels){
-            if(existingChannel.getChannelTitle().equals(channel.getChannelTitle())){
-                System.out.println("Channel title '" + channel.getChannelTitle() +"' already exists.");
-            }
-        }
-        channelRepository.save(channel);
-        System.out.println("Channel created: " + channel.getChannelTitle() + " (UUID: " + channel.getChannelUuid() + ")");
-
     }
     @Override
     public Channel readChannel(String channelUuid) {
-        return channelRepository.findByUuid(channelUuid);
+        try {
+            return channelRepository.findByUuid(channelUuid);
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to Read Channel >>>> " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<Channel> readAllChannels() {
-        return channelRepository.findAll();
+        try {
+            List<Channel> channels = channelRepository.findAll();
+            if (channels.isEmpty()) {
+                throw new IllegalStateException("No channels found in the system.");
+            }
+            return channels;
+        }catch (IllegalStateException e){
+            System.out.println("Failed to Read All Channels >>>> " + e.getMessage());
+            return List.of();
+        }
     }
 
     @Override
     public void updateChannel(String channelUuid, String newChannelTitle) {
         Channel channel = channelRepository.findByUuid(channelUuid);
-        if(channel != null){
+        try {
             channel.setChannelTitle(newChannelTitle);
-            System.out.println("Channel updated: " + channel.getChannelTitle());
-        }else{
-            System.out.println("Channel with UUID " + channelUuid + "not found.");
+            channelRepository.delete(channelUuid);
+            channelRepository.save(channel);
+            System.out.println("Channel updated: " + channel.getChannelTitle() + " (UUID: " + channelUuid + ")");
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to Update Channel >>>> " + e.getMessage());
         }
     }
 
     @Override
     public void deleteChannel(String channelUuid) {
-        channelRepository.delete(channelUuid);
-        System.out.println("Channel deleted: " + channelUuid);
+        try {
+            channelRepository.delete(channelUuid);
+            System.out.println("Channel deleted: UUID " + channelUuid);
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to Delete Channel >>>> " + e.getMessage());
+        }
     }
 }

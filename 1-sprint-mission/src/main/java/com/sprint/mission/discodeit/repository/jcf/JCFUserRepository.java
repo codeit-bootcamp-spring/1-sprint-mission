@@ -27,7 +27,7 @@ public class JCFUserRepository implements UserRepository {
         return userList.stream()
                 .filter(user -> user.getUserId().equals(userId))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException("User with ID " +userId + " not found."));
     }
 
     @Override
@@ -46,8 +46,7 @@ public class JCFUserRepository implements UserRepository {
             System.out.println("User ID with UUID " + userId + " not found.");
         }
     }
-    public List<User> getUserList(){
-        return userList;
-    }
+
+
 
 }

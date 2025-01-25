@@ -24,9 +24,9 @@ public class JCFMessageRepository implements MessageRepository {
             throw new IllegalArgumentException(" Channel cannot be null or empty. ");
         }
         return messageList.stream()
-                .filter(message -> message.getMessageUuid().toString().equals(messageUuid))
+                .filter(message -> message.getMessageUuid().equals(messageUuid))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(()->new IllegalArgumentException("Message with UUID " +messageUuid + " not found."));
     }
 
     @Override
@@ -37,12 +37,12 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void delete(String messageUuid) {
         boolean removed = messageList.removeIf(channel ->
-                channel.getMessageUuid().toString().equals(messageUuid));
+                channel.getMessageUuid().equals(messageUuid));
 
         if (removed) {
-            System.out.println("Channel with UUID " + messageUuid + " was deleted.");
+            System.out.println("Message with UUID " + messageUuid + " was deleted.");
         } else {
-            System.out.println("Channel with UUID " + messageUuid + " not found.");
+            System.out.println("Message with UUID " + messageUuid + " not found.");
         }
     }
 }

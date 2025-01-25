@@ -22,46 +22,58 @@ public class JCFUserService implements UserService {
         return instance;
     }
 
-
     @Override
     public void createUser(User user) {
-        for (User existingUser : userRepository.findAll()) {
-            if (existingUser.getUserId().equals(user.getUserId())) {
-                System.out.println("User with ID " + user.getUserId() + " already exists.");
-                return;
-            }
-
+        try {
+            userRepository.save(user);
+            System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to create user: " + e.getMessage());
         }
-        userRepository.save(user);
-        System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
     }
-
 
     @Override
     public User readUser(String userId) {
-       return userRepository.findById(userId);
+        try {
+            return userRepository.findById(userId);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to Read user: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<User> readAllUsers() {
-        return userRepository.findAll();
+        try {
+            List<User> users = userRepository.findAll();
+            if (users.isEmpty()) {
+                throw new IllegalStateException("No users found in the system.");
+            }
+            return users;
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to read all users: " + e.getMessage());
+            return List.of();
+        }
     }
 
     @Override
     public void updateUser(String userId, String newUserName) {
-        User user = userRepository.findById(userId);
-        if (user != null) {
-            user.setUserName(newUserName);
-            System.out.println("User updated: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
-        } else {
-            System.out.println("User with ID " + userId + " not found.");
+        try {
+            userRepository.delete(userId);
+            userRepository.save(new User(userId, newUserName));
+            System.out.println("User updated: " + newUserName + " (ID: " + userId + ")");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to update user: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteUser(String userId) {
-        userRepository.delete(userId);
-        System.out.println("User deleted : " + userId);
-
+        try {
+            userRepository.delete(userId);
+            System.out.println("User deleted: " + userId);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to delete user: " + e.getMessage());
+        }
     }
 }

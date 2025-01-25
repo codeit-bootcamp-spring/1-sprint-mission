@@ -26,9 +26,9 @@ public class JCFChannelRepository implements ChannelRepository {
             throw new IllegalArgumentException(" Channel cannot be null or empty. ");
         }
         return channelList.stream()
-                .filter(channel -> channel.getChannelUuid().toString().equals(channelUuid))
+                .filter(channel -> channel.getChannelUuid().equals(channelUuid))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() ->new IllegalArgumentException("Channel with UUID " +channelUuid + " not found."));
     }
 
     @Override
@@ -39,7 +39,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void delete(String channelUuid) {
         boolean removed = channelList.removeIf(channel ->
-                channel.getChannelUuid().toString().equals(channelUuid));
+                channel.getChannelUuid().equals(channelUuid));
 
         if (removed) {
             System.out.println("Channel with UUID " + channelUuid + " was deleted.");

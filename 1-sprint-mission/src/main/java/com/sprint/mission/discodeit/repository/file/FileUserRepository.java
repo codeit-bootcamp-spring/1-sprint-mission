@@ -44,6 +44,9 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void delete(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty.");
+        }
         userList.removeIf(user -> user.getUserId().equals(userId));
         saveToFile();
     }
