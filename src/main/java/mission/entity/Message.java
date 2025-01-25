@@ -16,6 +16,10 @@ public class Message implements Serializable {
     private User writer;
     private Channel writedAt;
 
+    private final LocalDateTime createAt;
+    private LocalDateTime updateAt;
+
+
     public Channel getWritedAt() {
         return writedAt;
     }
@@ -24,11 +28,8 @@ public class Message implements Serializable {
         this.writedAt = writedAt;
     }
 
-    private final LocalDateTime createAt;
-    private LocalDateTime updateAt;
-
     // 무조건 메시지는 CREATE로 생성하도록
-    private Message(String message) {
+    protected Message(String message) {
         this.message = message;
         id = UUID.randomUUID();
         firstId = id.toString().split("-")[0];
@@ -48,7 +49,7 @@ public class Message implements Serializable {
         return writer;
     }
 
-    public void setWriter(User writer) {
+    private void setWriter(User writer) {
         this.writer = writer;
     }
 

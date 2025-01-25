@@ -13,8 +13,8 @@ public class Channel implements Serializable {
 
     private String name;
     //private String oldName;
-    private Set<User> userList = new HashSet<>();
-    private Set<Message> messageList = new HashSet<>();
+    private final Set<User> userList = new HashSet<>();
+    private final Set<Message> messageList = new HashSet<>();
     private Integer userCount;
 
     private final LocalDateTime createdAt;
@@ -61,6 +61,7 @@ public class Channel implements Serializable {
 
     public void addUser(User user){
         userList.add(user);
+        user.addChannel(this);
         userCount = userList.size();
     }
 

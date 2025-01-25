@@ -5,10 +5,10 @@ public class DuplicateName extends RuntimeException {
     super();
   }
 
+
   public DuplicateName(String message) {
         super(message);
     }
-
   public DuplicateName(String message, Throwable cause) {
     super(message, cause);
   }

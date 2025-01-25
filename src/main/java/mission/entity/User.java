@@ -31,7 +31,7 @@ public class User implements Serializable {
         return message.getId();
     }
 
-    // 메시지 수정 ==> d이거는 근데.... Message에서해야하나
+    // User가 메시지 수정
     public void updateMessage(Message message, String updateMessage){
         message.setMessage(updateMessage);
     }
@@ -44,15 +44,13 @@ public class User implements Serializable {
         createAt = LocalDateTime.now();
     }
 //    public Set<Channel> getChannels() {
-//        return channels;
-//    }
 
-    // 채널 명으로 검색
-    public Channel getChannelByName(String channelName) {
-        return getChannelsImmutable().stream()
-                .filter(channel -> channel.getName().equals(channelName))
-                .findAny().orElse(null);
-    }
+    // 채널 명으로 검색 ///이거 그냥 이름 찾는건 외부에서하는게 나을 듯
+//    public Channel getChannel(String channelName) {
+//        return getChannelsImmutable().stream()
+//                .filter(channel -> channel.getName().equals(channelName))
+//                .findAny().orElse(null);
+//    }
 
     public Set<Channel> getChannelsImmutable(){
         return Collections.unmodifiableSet(channels);

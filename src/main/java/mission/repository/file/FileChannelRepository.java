@@ -77,7 +77,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     /**
-     * 디렉토리 생성
+     * 디렉토리 생성 - 기존 디렉토리의 파일들 삭제 (테스트용)
      */
     public void createChannelDirectory() throws IOException {
 
