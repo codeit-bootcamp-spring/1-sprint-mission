@@ -55,7 +55,7 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public List<Message> getUserMessage(User author) {
+    public List<Message> getUserMessages(User author) {
         validateUser(author.getId());
         return data.values().stream()
                 .filter(message -> message.getAuthor().equals(author))
@@ -100,6 +100,6 @@ public class JCFMessageService implements MessageService {
 
     private void validateUser(UUID userId) {
         userService.getUserDetails(userId)
-                .orElseThrow(() ->  new IllegalArgumentException("채널 id : " + userId + " **존재하지 않는 채널입니다!**"));
+                .orElseThrow(() -> new IllegalArgumentException("채널 id : " + userId + " **존재하지 않는 채널입니다!**"));
     }
 }

@@ -11,7 +11,7 @@ public interface MessageService {
 
     List<Message> getChannelMessages(UUID channelId);
 
-    List<Message> getUserMessage(User author);
+    List<Message> getUserMessages(User author);
 
     boolean editMessage(UUID id, String content);
 

@@ -163,7 +163,7 @@ public class JavaApplication {
         System.out.println("채널에 등록된 메시지 수: " + channelMessages.size());
 
         System.out.println("\n작성자 메시지 조회");
-        List<Message> userMessages = messageService.getUserMessage(author);
+        List<Message> userMessages = messageService.getUserMessages(author);
         System.out.println(author.getName() + "님이 작성한 메시지 수 : " + userMessages.size());
 
         System.out.println("\n메시지 수정");
