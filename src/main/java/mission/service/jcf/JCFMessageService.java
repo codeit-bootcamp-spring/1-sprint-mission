@@ -47,13 +47,6 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Set<Message> findContainingMessageInChannel(Channel channel, String findMessage){
-        return findMessagesInChannel(channel).stream()
-                .filter(message -> message.getMessage().contains(findMessage))
-                .collect(Collectors.toCollection(TreeSet::new));
-    }
-
-    @Override
     public void delete(UUID messageId) {
         messageRepository.delete(messageId);
     }

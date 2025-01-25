@@ -38,24 +38,6 @@ public class FileUserRepository implements UserRepository {
      * 조회
      */
     @Override
-    public Set<User> findAll(){
-        try {
-            if (!Files.exists(USER_DIRECT_PATH)) {
-                System.out.println("USER 디렉토리가 존재하지 않습니다");
-                return new HashSet<>();
-            } else {
-                return Files.list(USER_DIRECT_PATH)
-                        .filter(path -> path.toString().endsWith(".ser"))
-                        .map(this::readUserFromFile)
-                        // 역직렬화
-                        .collect(Collectors.toCollection(HashSet::new));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("전체 조회 I/O 오류 발생: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
     public User findById(UUID id) {
         // 1. id로 filePath 얻기
         Path userFilePath = getUserFilePath(id);
@@ -72,6 +54,24 @@ public class FileUserRepository implements UserRepository {
             throw new RuntimeException("파일 읽기 오류" + e.getMessage(), e);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("입력한 id에 해당하는 파일이 없습니다", e);
+        }
+    }
+
+    @Override
+    public Set<User> findAll(){
+        try {
+            if (!Files.exists(USER_DIRECT_PATH)) {
+                System.out.println("USER 디렉토리가 존재하지 않습니다");
+                return new HashSet<>();
+            } else {
+                return Files.list(USER_DIRECT_PATH)
+                        .filter(path -> path.toString().endsWith(".ser"))
+                        .map(this::readUserFromFile)
+                        // 역직렬화
+                        .collect(Collectors.toCollection(HashSet::new));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("전체 조회 I/O 오류 발생: " + e.getMessage(), e);
         }
     }
 

@@ -3,12 +3,15 @@ package mission.controller.jcf;
 import mission.controller.ChannelController;
 import mission.entity.Channel;
 import mission.entity.Message;
+import mission.service.UserService;
 import mission.service.jcf.JCFChannelService;
 import mission.service.jcf.JCFMessageService;
 import mission.service.jcf.JCFUserService;
 
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class JCFChannelController implements ChannelController {
 
@@ -39,7 +42,18 @@ public class JCFChannelController implements ChannelController {
 
     @Override
     public Channel findChannelByName(String channelName) {
-        return channelService.findByName(channelName);
+        // 변환후 조회 vs filter => 어떤게 빠를까
+        Channel findChannel = channelService.findAll().stream()
+                .collect(Collectors.toMap(
+                        Channel::getName,
+                        Function.identity()
+                ))
+                .get(channelName);
+        if (findChannel == null) {
+            throw new IllegalArgumentException(String.format(
+                    "%s는 없는 채널명입니다.", channelName));
+        }
+        return findChannel;
     }
 
     @Override

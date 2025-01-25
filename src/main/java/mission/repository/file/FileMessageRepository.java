@@ -31,6 +31,16 @@ public class FileMessageRepository implements MessageRepository {
         oos.writeObject(message);
     }
 
+
+    @Override
+    public Message findById(UUID id) {
+        try {
+            return readMessageFromFile(getMsDirectPath(id));
+        } catch (Exception e) {
+            throw new NotFoundId();
+        }
+    }
+
     // 너무 많이 활용해서 여기서 바로 오류 catch
     @Override
     public Set<Message> findAll() {
@@ -43,32 +53,21 @@ public class FileMessageRepository implements MessageRepository {
 
                     : new HashSet<>();
         } catch (IOException e) {
-            throw new RuntimeException("findAll => 입출력 오류 발생: ", e);
-        }
-    }
-
-    @Override
-    public Message findById(UUID id) {
-        try {
-            return readMessageFromFile(getMsDirectPath(id));
-        } catch (Exception e) {
-            throw new NotFoundId();
+            throw new RuntimeException("findAll => I/O 오류 발생: ", e);
         }
     }
 
     @Override
     public Set<Message> findMessagesInChannel(Channel channel){
-        Set<Message> messageSet = findAll();
-        return messageSet.stream()
+        return findAll().stream()
                 .filter(message -> message.getWritedAt().equals(channel))
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
     @Override
     public void delete(UUID messageId){
-        Path deletingMS_Path = getMsDirectPath(messageId);
         try {
-            Files.delete(deletingMS_Path);
+            Files.delete(getMsDirectPath(messageId));
         } catch (IOException e) {
             System.out.println("파일 삭제 실패");
         }

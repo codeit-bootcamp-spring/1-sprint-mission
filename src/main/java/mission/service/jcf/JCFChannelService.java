@@ -37,30 +37,13 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Set<Channel> findAll() {
-        return channelRepository.findAll();
-    }
-
-    @Override
-    public Channel findByName(String channelName) {
-        // 변환후 조회 vs filter => 어떤게 빠를까
-        Channel findChannel = findAll().stream()
-                .collect(Collectors.toMap(
-                        Channel::getName,
-                        Function.identity()
-                ))
-                .get(channelName);
-
-        if (findChannel == null) {
-            throw new IllegalArgumentException(String.format(
-                    "%s는 없는 채널명입니다.", channelName));
-        }
-        return findChannel;
-    }
-
-    @Override
     public Channel findById(UUID id) {
         return channelRepository.findById(id);
+    }
+
+    @Override
+    public Set<Channel> findAll() {
+        return channelRepository.findAll();
     }
 
     @Override

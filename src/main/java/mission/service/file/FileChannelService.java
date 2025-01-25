@@ -24,7 +24,6 @@ public class FileChannelService implements ChannelService {
         else return fileChannelService;
     }
 
-
     // 생성 수정 오류 메시지 다르게 처리하기위해 오류 던지기
     @Override
     public Channel createOrUpdate(Channel channel) throws IOException {
@@ -51,18 +50,6 @@ public class FileChannelService implements ChannelService {
             System.out.println("I/O 오류 : 채널 불러오기 실패");
             return null;
         }
-    }
-
-    @Override
-    public Channel findByName(String channelName) {
-        Channel findChannel = findAll().stream().collect(Collectors.toMap(
-                Channel::getName, Function.identity())).get(channelName);
-
-        if (findChannel == null){
-            System.out.printf("%s는 없는 채널명입니다.", channelName);
-            System.out.println();
-        }
-        return findChannel;
     }
 
     @Override

@@ -16,6 +16,5 @@ public interface MessageService {
     Message findById(UUID messageId);
     Set<Message> findAll();
     Set<Message> findMessagesInChannel(Channel channel);
-    Set<Message> findContainingMessageInChannel(Channel channel, String writedString);
     void delete(UUID messageId);
 }

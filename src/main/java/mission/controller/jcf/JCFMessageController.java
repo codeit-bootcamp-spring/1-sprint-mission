@@ -1,6 +1,7 @@
 package mission.controller.jcf;
 
 import mission.controller.MessageController;
+import mission.entity.Channel;
 import mission.entity.Message;
 import mission.service.jcf.JCFChannelService;
 import mission.service.jcf.JCFMessageService;
@@ -8,6 +9,7 @@ import mission.service.jcf.JCFUserService;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,7 +41,7 @@ public class JCFMessageController implements MessageController {
     }
 
     @Override
-    public Set<Message> findMessagesByUser(UUID userId) {
+    public Set<Message> findMessagesByUserId(UUID userId) {
         return userService.findById(userId).getMessagesImmutable();
     }
 
@@ -50,11 +52,11 @@ public class JCFMessageController implements MessageController {
 
     @Override
     public Set<Message> findContainingMessageInChannel(UUID channelId, String writedMessage) {
-        return findMessagesInChannel(channelId).stream()
+        Channel writedChannel = channelService.findById(channelId);
+        return messageService.findMessagesInChannel(writedChannel).stream()
                 .filter(message -> message.getMessage().contains(writedMessage))
-                .collect(Collectors.toCollection(HashSet::new));
+                .collect(Collectors.toCollection(TreeSet::new));
     }
-
 
     @Override
     public void delete(UUID messageId){

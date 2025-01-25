@@ -16,10 +16,6 @@ public class JCFUserRepository implements UserRepository {
         data.put(user.getId(), user);
     }
 
-    @Override
-    public Set<User> findAll() {
-        return new HashSet<>(data.values());
-    }
 
     @Override
     public User findById(UUID userId) {
@@ -28,6 +24,11 @@ public class JCFUserRepository implements UserRepository {
         else return findUser;
         // 다른 메서드가 findById를 많이 활용하는데 그걸 대비해서 null 예외처리 여기서 잡기
         // 여기서 null 처리 안하고 Optional쓰면 다른 곳에서 코드가 지저분해짐
+    }
+
+    @Override
+    public Set<User> findAll() {
+        return new HashSet<>(data.values());
     }
 
     @Override

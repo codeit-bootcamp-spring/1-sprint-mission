@@ -65,7 +65,7 @@ public class FileUserController implements UserController {
 
     @Override
     public Set<User> findUsersInChannel(UUID channelId) {
-        return Set.of();
+        return fileChannelService.findById(channelId).getUsersImmutable();
     }
 
     /**

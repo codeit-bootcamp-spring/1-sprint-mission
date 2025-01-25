@@ -54,13 +54,6 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Set<Message> findContainingMessageInChannel(Channel channel, String writedString) {
-        return findMessagesInChannel(channel).stream()
-                .filter(message -> message.getMessage().contains(writedString))
-                .collect(Collectors.toCollection(HashSet::new));
-    }
-
-    @Override
     public void delete(UUID messageId) {
         fileMessageRepository.delete(messageId);
     }

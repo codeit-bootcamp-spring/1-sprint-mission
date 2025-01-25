@@ -18,16 +18,16 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Set<Channel> findAll() {
-        return new HashSet<>(data.values());
-    }
-
-    @Override
     public Channel findById(UUID id) {
         // null 예외처리 여기서 확실히 잡기 : 다른 메서드가 findById 활용을 많이 함
         Channel findChannel = data.get(id);
         if (findChannel == null) throw new NotFoundId();
         else return findChannel;
+    }
+
+    @Override
+    public Set<Channel> findAll() {
+        return new HashSet<>(data.values());
     }
 
     @Override

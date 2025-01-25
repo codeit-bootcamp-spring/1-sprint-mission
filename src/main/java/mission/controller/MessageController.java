@@ -12,7 +12,7 @@ public interface MessageController {
     void update(UUID messageId, String newString);
     Message findById(UUID messageId);
     Set<Message> findAll();
-    Set<Message> findMessagesByUser(UUID userId);
+    Set<Message> findMessagesByUserId(UUID userId);
     Set<Message> findMessagesInChannel(UUID channelId);
     Set<Message> findContainingMessageInChannel(UUID userId, String writedMessage);
     void delete(UUID messageId);

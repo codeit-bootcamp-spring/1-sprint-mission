@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface MessageRepository {
     void createOrUpdateMessage(Message message) throws IOException;
-    Set<Message> findAll();
     Message findById(UUID id);
+    Set<Message> findAll();
     Set<Message> findMessagesInChannel(Channel channel);
 
     void delete(UUID messageId);

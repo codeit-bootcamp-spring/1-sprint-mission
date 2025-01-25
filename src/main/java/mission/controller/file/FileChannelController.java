@@ -11,9 +11,9 @@ import mission.service.file.FileUserService;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-// 처음 : 컨트롤러에서 서로 연관된 메서드를 활용해서 서비스 레이어의 코드를 줄이려함
-// 나중 : 나중에 도입할 API 통신을 고려하면 컨트롤러의 각 메서드는 최대한 서로 안 건드는게 나을거라고 판단(단점 : 서비스 계층 코드 증가)
 public class FileChannelController implements ChannelController {
 
     private final FileChannelService fileChannelService = FileChannelService.getInstance();
@@ -46,7 +46,16 @@ public class FileChannelController implements ChannelController {
 
     @Override
     public Channel findChannelByName(String channelName) {
-        return fileChannelService.findByName(channelName);
+        Channel findChannel = fileChannelService.findAll().stream().collect(Collectors.toMap(
+                Channel::getName, Function.identity())).get(channelName);
+
+        if (findChannel == null) {
+            System.out.printf("%s는 없는 채널명입니다.", channelName);
+            System.out.println();
+            return null;
+        } else {
+            return findChannel;
+        }
     }
 
     @Override

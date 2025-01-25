@@ -25,17 +25,17 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Set<Message> findAll(){
-        return data.values().stream()
-                .flatMap(Set::stream)
-                .collect(Collectors.toCollection(TreeSet::new));
-    }
-
-    @Override
     public Message findById(UUID id){
         return findAll().stream()
                 .filter(message -> message.getId().equals(id))
                 .findAny().orElseThrow(() -> new NotFoundId());
+    }
+
+    @Override
+    public Set<Message> findAll(){
+        return data.values().stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     @Override
@@ -56,6 +56,4 @@ public class JCFMessageRepository implements MessageRepository {
             data.remove(findChannel);
         }
     }
-
-    //throw new NoSuchElementException("메시지 id가 틀렸습니다.");
 }

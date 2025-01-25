@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,9 +46,8 @@ public class FileMessageController implements MessageController {
     }
 
     @Override
-    public Set<Message> findMessagesByUser(UUID userId){
-        User writer = fileUserService.findById(userId);
-        return writer.getMessagesImmutable();
+    public Set<Message> findMessagesByUserId(UUID userId){
+        return fileUserService.findById(userId).getMessagesImmutable();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class FileMessageController implements MessageController {
     public Set<Message> findContainingMessageInChannel(UUID channelId, String writedMessage) {
         return findMessagesInChannel(channelId).stream()
                 .filter(message -> message.getMessage().contains(writedMessage))
-                .collect(Collectors.toCollection(HashSet::new));
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     @Override
