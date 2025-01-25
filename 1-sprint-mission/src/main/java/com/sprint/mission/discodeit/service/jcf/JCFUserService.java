@@ -1,23 +1,23 @@
-package com.sprint.mission.discodeit.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class JCFUserService implements UserService {
+    private final UserRepository userRepository;
     private static JCFUserService instance;
-    private final List<User> userList;
 
-    public JCFUserService() {
-        this.userList = new ArrayList<>();
+    public JCFUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    public static synchronized JCFUserService getInstance() {
+    public static synchronized JCFUserService getInstance(UserRepository userRepository) {
         if (instance == null) {
-            instance = new JCFUserService();
+            instance = new JCFUserService(userRepository);
         }
         return instance;
     }
@@ -25,34 +25,33 @@ public class JCFUserService implements UserService {
 
     @Override
     public void createUser(User user) {
-        for (User existingUser : userList) {
+        for (User existingUser : userRepository.findAll()) {
             if (existingUser.getUserId().equals(user.getUserId())) {
                 System.out.println("User with ID " + user.getUserId() + " already exists.");
                 return;
             }
+
         }
-        userList.add(user);
+        userRepository.save(user);
         System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
     }
 
+
     @Override
     public User readUser(String userId) {
-        return userList.stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+       return userRepository.findById(userId);
     }
 
     @Override
     public List<User> readAllUsers() {
-        return new ArrayList<>(userList);
+        return userRepository.findAll();
     }
 
     @Override
     public void updateUser(String userId, String newUserName) {
-        User user = readUser(userId);
+        User user = userRepository.findById(userId);
         if (user != null) {
-            user.updateUserName(newUserName);
+            user.setUserName(newUserName);
             System.out.println("User updated: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
         } else {
             System.out.println("User with ID " + userId + " not found.");
@@ -61,12 +60,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void deleteUser(String userId) {
-        User user = readUser(userId);
-        if (user != null) {
-            userList.remove(user);
-            System.out.println("User with ID " + userId + " deleted.");
-        } else {
-            System.out.println("User with ID " + userId + " not found.");
-        }
+        userRepository.delete(userId);
+        System.out.println("User deleted : " + userId);
+
     }
 }
