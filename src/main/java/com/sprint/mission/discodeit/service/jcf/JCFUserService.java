@@ -15,7 +15,7 @@ public class JCFUserService implements UserService {
         this.data = new ConcurrentHashMap<>();
     }
 
-    public static JCFUserService getInstance() {
+    protected static JCFUserService getInstance() {
         if (instance == null) {
             synchronized (JCFUserService.class) {
                 if (instance == null) {

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFServiceFactory;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.Arrays;
@@ -15,10 +16,9 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
-
+        UserService userService = JCFServiceFactory.getUserService();
+        ChannelService channelService = JCFServiceFactory.getChannelService();
+        MessageService messageService = JCFServiceFactory.getMessageService();
         System.out.println("============================================================== 사용자 서비스 테스트 ==============================================================");
         testUserService(userService);
 

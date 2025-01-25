@@ -21,7 +21,7 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+    protected static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
         if (instance == null) {
             synchronized (JCFMessageService.class) {
                 if (instance == null) {
