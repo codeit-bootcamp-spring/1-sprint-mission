@@ -3,9 +3,7 @@ package discodeit.service.file;
 import discodeit.entity.User;
 import discodeit.service.UserService;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,12 +29,21 @@ public class FileUserService implements UserService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return user;
     }
 
     @Override
     public User find(UUID userId) {
-        return null;
+        Path filePath = directory.resolve(userId + ".ser");
+        try (
+            FileInputStream fis = new FileInputStream(filePath.toFile());
+            ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (User) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
