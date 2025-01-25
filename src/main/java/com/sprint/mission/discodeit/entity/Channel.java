@@ -12,19 +12,18 @@ public class Channel implements Serializable {
     private long updatedAt;
     private String title;
     private String description;
-    private User owner;
+    private ChannelType channelType;
     private List<Message> messageList;
     private List<User> memberList;
 
-    public Channel(String title, String description, User owner) {
+    public Channel(ChannelType channelType, String title, String description) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.title = title;
         this.description = description;
-        this.owner = owner;
+        this.channelType = channelType;
         messageList = new ArrayList<>();
         memberList = new ArrayList<>();
-        memberList.add(owner);
     }
 
     public UUID getId() {
@@ -41,10 +40,6 @@ public class Channel implements Serializable {
 
     public String getTitle() {
         return title;
-    }
-
-    public User getOwner() {
-        return owner;
     }
 
     public String getDescription() {
@@ -93,7 +88,7 @@ public class Channel implements Serializable {
 
     @Override
     public String toString() {
-        return "Channel{id:" + id + ",title:" + title + ",owner:" + owner.getName() + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Channel{id:" + id + ",title:" + title +  ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 
 }

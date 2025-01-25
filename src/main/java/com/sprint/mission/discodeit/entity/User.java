@@ -12,15 +12,16 @@ public class User implements Serializable {
     private long updatedAt;
     private String name;
     private String email;
-    private transient  String password;
+    private transient String password;
     private List<Channel> channelList;
 
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         channelList = new ArrayList<>();
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {
@@ -58,6 +59,11 @@ public class User implements Serializable {
 
     public void updateEmail(String email) {
         this.email = email;
+        updateUpdatedAt();
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
         updateUpdatedAt();
     }
 

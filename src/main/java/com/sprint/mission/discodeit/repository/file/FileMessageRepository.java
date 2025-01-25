@@ -16,6 +16,7 @@ public class FileMessageRepository implements MessageRepository {
     public Message save(Message message) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
         savedMessageList.put(message.getId(), message);
+        saveMessageMapToFile(savedMessageList);
         return message;
     }
 

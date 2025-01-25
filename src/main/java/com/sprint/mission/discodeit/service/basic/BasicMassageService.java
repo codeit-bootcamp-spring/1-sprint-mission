@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.UUID;
 
 public class BasicMassageService implements MessageService {
@@ -20,22 +19,22 @@ public class BasicMassageService implements MessageService {
     private final UserService userService;
     private final ChannelService channelService;
 
-    public BasicMassageService(MessageRepository messageRepository, MessageValidator messageValidator, UserService userService, ChannelService channelService) {
+    public BasicMassageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+        this.messageValidator = new MessageValidator();
         this.messageRepository = messageRepository;
-        this.messageValidator = messageValidator;
         this.userService = userService;
         this.channelService = channelService;
     }
 
     @Override
-    public Message createMessage(UUID channelId, UUID writerId, String content) {
+    public Message createMessage(String content, UUID channelId, UUID writerId) {
         Channel channel = channelService.searchById(channelId);
         User user = userService.searchById(writerId);
 
         if (messageValidator.inValidContent(content)) {
             Message newMessage = new Message(channel, user, content);
             messageRepository.save(newMessage);
-            System.out.println(channel.getTitle() + " channel: " + user.getName() + " send new message");
+            System.out.println("create message: " + content);
             return newMessage;
         }
         return null;

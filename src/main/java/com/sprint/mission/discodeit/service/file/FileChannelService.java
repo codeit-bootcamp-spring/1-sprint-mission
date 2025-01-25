@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -25,14 +26,13 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String title, String description, UUID userId) {
-        User getUser = userService.searchById(userId);
-        if (!Objects.isNull(getUser) && channelValidator.isValidTitle(title)) {
-            Channel newChannel = new Channel(title, description, getUser);
+    public Channel createChannel(ChannelType channelType, String title, String description) {
+        if (channelValidator.isValidTitle(title)) {
+            Channel newChannel = new Channel(channelType, title, description);
             List<Channel> saveChannelList = loadChannelListToFile();
             saveChannelList.add(newChannel);
             saveChannelToFile(saveChannelList);
-            System.out.println(getUser.getName() + " create new channel");
+            System.out.println("create new channel: " + newChannel.getTitle());
             return newChannel;
         }
         return null;

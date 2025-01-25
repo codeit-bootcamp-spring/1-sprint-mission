@@ -29,7 +29,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(UUID channelId, UUID writerId, String content) {
+    public Message createMessage(String content, UUID channelId, UUID writerId) {
         Channel getChannel = channelService.searchById(channelId);
         User getWriter = userService.searchById(writerId);
 

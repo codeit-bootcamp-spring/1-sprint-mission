@@ -24,7 +24,7 @@ public class JCFMessageService implements MessageService {
 
     // 메세지 생성
     @Override
-    public Message createMessage(UUID channelId, UUID writerId, String content) {
+    public Message createMessage(String content, UUID channelId, UUID writerId) {
         Channel getChannel = channelService.searchById(channelId);
         User getWriter = userService.searchById(writerId);
 

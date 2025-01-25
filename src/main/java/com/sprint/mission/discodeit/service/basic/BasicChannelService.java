@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -17,19 +18,18 @@ public class BasicChannelService implements ChannelService {
     private final ChannelValidator channelValidator;
     private final UserService userService;
 
-    public BasicChannelService(ChannelRepository channelRepository, ChannelValidator channelValidator, UserService userService) {
+    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
+        this.channelValidator = new ChannelValidator();
         this.channelRepository = channelRepository;
-        this.channelValidator = channelValidator;
         this.userService = userService;
     }
 
     @Override
-    public Channel createChannel(String title, String description, UUID userId) {
-        User user = userService.searchById(userId);
+    public Channel createChannel(ChannelType channelType, String title, String description) {
         if (channelValidator.isValidTitle(title)) {
-            Channel newChannel = new Channel(title, description, user);
+            Channel newChannel = new Channel(channelType, title, description);
             channelRepository.save(newChannel);
-            System.out.println(user.getName() + "create new channel");
+            System.out.println("create channel: " + newChannel.getTitle());
             return newChannel;
         }
         return null;

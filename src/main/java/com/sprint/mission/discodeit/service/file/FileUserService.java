@@ -15,9 +15,9 @@ public class FileUserService implements UserService {
     private final UserValidator userValidator = new UserValidator();
 
     @Override
-    public User createUser(String name, String email) {
+    public User createUser(String name, String email, String password) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
-            User newUser = new User(name, email);
+            User newUser = new User(name, email, password);
             List<User> saveUserList = loadUserListToFile();
             saveUserList.add(newUser);
             saveUserToFile(saveUserList);

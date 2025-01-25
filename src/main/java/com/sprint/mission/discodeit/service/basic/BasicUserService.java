@@ -11,17 +11,17 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
 
-    public BasicUserService(UserRepository userRepository, UserValidator userValidator) {
+    public BasicUserService(UserRepository userRepository) {
+        this.userValidator = new UserValidator();
         this.userRepository = userRepository;
-        this.userValidator = userValidator;
     }
 
     @Override
-    public User createUser(String name, String email) {
+    public User createUser(String name, String email, String password) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
-            User newUser = new User(name, email);
+            User newUser = new User(name, email, password);
             userRepository.save(newUser);
-            System.out.println("user create: " + newUser.getId());
+            System.out.println("create user: " + newUser.getName());
             return newUser;
         }
         return null;

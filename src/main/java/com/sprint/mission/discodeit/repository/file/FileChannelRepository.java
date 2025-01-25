@@ -16,6 +16,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         Map<UUID, Channel> savedChannelMap = loadChannelMapToFile();
         savedChannelMap.put(channel.getId(), channel);
+        saveChannelMapToFile(savedChannelMap);
         return channel;
     }
 

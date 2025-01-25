@@ -19,9 +19,9 @@ public class JCFUserService implements UserService {
 
     // 유저 생성
     @Override
-    public User createUser(String name, String email) {
+    public User createUser(String name, String email, String password) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
-            User newUser = new User(name, email);
+            User newUser = new User(name, email, password);
             data.put(newUser.getId(), newUser);
             System.out.println("user create: " + newUser.getId());
             return newUser;
