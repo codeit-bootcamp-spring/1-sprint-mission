@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
@@ -51,6 +51,7 @@ public class FileMessageRepository implements MessageRepository {
             return messageToCreate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Message.createEmptyMessage();
@@ -70,6 +71,7 @@ public class FileMessageRepository implements MessageRepository {
             return (Message) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Message.createEmptyMessage();
@@ -100,6 +102,7 @@ public class FileMessageRepository implements MessageRepository {
             return messageToUpdate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Message.createEmptyMessage();
@@ -118,6 +121,7 @@ public class FileMessageRepository implements MessageRepository {
             return exsitingMessage;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Message.createEmptyMessage();

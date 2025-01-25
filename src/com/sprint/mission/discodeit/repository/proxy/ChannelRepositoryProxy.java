@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.UUID;
@@ -23,6 +23,7 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (creation == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, channelId);
+            System.err.println(logMessage + ", ID: " + channelId);
         }
 
         return creation;
@@ -30,10 +31,12 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
     @Override
     public Channel findChannelById(UUID key) {
-        Channel find = channelRepository.findChannelById(key);
+        Channel find       = channelRepository.findChannelById(key);
+        String  logMessage = "Channel find failed";
 
         if (find == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel find failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -46,6 +49,7 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (updated == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
@@ -53,10 +57,12 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
     @Override
     public Channel deleteChannelById(UUID key) {
-        Channel deletion = channelRepository.deleteChannelById(key);
+        Channel deletion  = channelRepository.deleteChannelById(key);
+        String logMessage = "Channel deletion failed";
 
         if (deletion == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel deletion failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

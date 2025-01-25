@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.UUID;
@@ -23,6 +23,7 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (creation == User.EMPTY_USER) {
             logger.warning(logMessage, userId);
+            System.err.println(logMessage + ", ID: " + userId);
         }
 
         return creation;
@@ -31,9 +32,11 @@ public class UserRepositoryProxy implements UserRepository {
     @Override
     public User findUserById(UUID key) {
         User find = userRepository.findUserById(key);
+        String logMessage = "User find failed";
 
         if (find == User.EMPTY_USER) {
-            logger.warning("User find failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -46,6 +49,7 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (update == User.EMPTY_USER) {
             logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return update;
@@ -54,9 +58,11 @@ public class UserRepositoryProxy implements UserRepository {
     @Override
     public User deleteUserById(UUID key) {
         User deletion = userRepository.deleteUserById(key);
+        String logMessage = "User deletion failed";
 
         if (deletion == User.EMPTY_USER) {
-            logger.warning("User deletion failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

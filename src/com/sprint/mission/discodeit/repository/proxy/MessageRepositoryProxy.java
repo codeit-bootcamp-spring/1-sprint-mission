@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.UUID;
@@ -23,6 +23,7 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (creation == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, messageId);
+            System.err.println(logMessage + ", ID: " + messageId);
         }
 
         return creation;
@@ -30,10 +31,12 @@ public class MessageRepositoryProxy implements MessageRepository {
 
     @Override
     public Message findMessageById(UUID key) {
-        Message find = messageRepository.findMessageById(key);
+        Message find       = messageRepository.findMessageById(key);
+        String  logMessage = "Message find failed";
 
         if (find == Message.EMPTY_MESSAGE) {
-            logger.warning("Message find failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -46,6 +49,7 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (updated == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
@@ -53,10 +57,12 @@ public class MessageRepositoryProxy implements MessageRepository {
 
     @Override
     public Message deleteMessageById(UUID key) {
-        Message deletion = messageRepository.deleteMessageById(key);
+        Message deletion   = messageRepository.deleteMessageById(key);
+        String  logMessage = "Message deletion failed";
 
         if (deletion == Message.EMPTY_MESSAGE) {
-            logger.warning("Message deletion failed", key);
+            logger.warning(logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

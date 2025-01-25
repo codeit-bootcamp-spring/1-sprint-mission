@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
@@ -51,6 +51,7 @@ public class FileChannelRepository implements ChannelRepository {
             return channelToCreate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Channel.createEmptyChannel();
@@ -70,6 +71,7 @@ public class FileChannelRepository implements ChannelRepository {
             return (Channel) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Channel.createEmptyChannel();
@@ -100,6 +102,7 @@ public class FileChannelRepository implements ChannelRepository {
             return channelToUpdate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Channel.createEmptyChannel();
@@ -118,6 +121,7 @@ public class FileChannelRepository implements ChannelRepository {
             return exsitingChannel;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return Channel.createEmptyChannel();

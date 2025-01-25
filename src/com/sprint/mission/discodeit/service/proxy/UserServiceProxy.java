@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.service.proxy;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.log.ServiceLogger;
+import com.sprint.mission.discodeit.log.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.UUID;
 
 public class UserServiceProxy implements UserService {
     private final ServiceLogger logger;
-    private final UserService userService;
+    private final UserService   userService;
 
     public UserServiceProxy(UserService userService) {
         this.userService = userService;
@@ -26,6 +26,7 @@ public class UserServiceProxy implements UserService {
             creation = userService.createUser(userInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, userId);
+            System.err.println(logMessage + ", ID: " + userId);
         }
 
         return creation;
@@ -45,6 +46,7 @@ public class UserServiceProxy implements UserService {
             update = userService.updateUserById(key, userInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return update;

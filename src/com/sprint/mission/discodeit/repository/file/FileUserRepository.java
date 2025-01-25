@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.log.RepositoryLogger;
+import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
@@ -52,6 +52,7 @@ public class FileUserRepository implements UserRepository {
             return userToCreate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -71,6 +72,7 @@ public class FileUserRepository implements UserRepository {
             return (User) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -102,6 +104,7 @@ public class FileUserRepository implements UserRepository {
             return userToUpdate;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -120,6 +123,7 @@ public class FileUserRepository implements UserRepository {
             return exsitingUser;
         } catch (IOException e) {
             logger.severe(e);
+            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();

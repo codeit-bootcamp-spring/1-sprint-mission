@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.service.proxy;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.log.ServiceLogger;
+import com.sprint.mission.discodeit.log.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.UUID;
 
 public class ChannelServiceProxy implements ChannelService {
-    private final ServiceLogger logger;
+    private final ServiceLogger  logger;
     private final ChannelService channelService;
 
     public ChannelServiceProxy(ChannelService channelService) {
@@ -26,6 +26,7 @@ public class ChannelServiceProxy implements ChannelService {
             creation = channelService.createChannel(channelInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, channelId);
+            System.err.println(logMessage + ", ID: " + channelId);
         }
 
         return creation;
@@ -45,6 +46,7 @@ public class ChannelServiceProxy implements ChannelService {
             updated = channelService.updateChannelById(key, channelInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;

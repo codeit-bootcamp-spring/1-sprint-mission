@@ -2,13 +2,13 @@ package com.sprint.mission.discodeit.service.proxy;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.log.ServiceLogger;
+import com.sprint.mission.discodeit.log.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.UUID;
 
 public class MessageServiceProxy implements MessageService {
-    private final ServiceLogger logger;
+    private final ServiceLogger  logger;
     private final MessageService messageService;
 
     public MessageServiceProxy(MessageService messageService) {
@@ -26,6 +26,7 @@ public class MessageServiceProxy implements MessageService {
             creation = messageService.createMessage(messageInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, messageId);
+            System.err.println(logMessage + ", ID: " + messageId);
         }
 
         return creation;
@@ -45,6 +46,7 @@ public class MessageServiceProxy implements MessageService {
             updated = messageService.updateMessageById(key, messageInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
