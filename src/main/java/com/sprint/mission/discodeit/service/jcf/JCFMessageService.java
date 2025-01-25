@@ -10,13 +10,12 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> messageData;
+    private final Map<UUID, Message> messageData= new HashMap<>();
     private UserService userService;
     private ChannelService channelService;
 
     //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
-    public JCFMessageService(Map<UUID, Message> messageData,UserService userService, ChannelService channelService) {
-        this.messageData = messageData;
+    public JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -55,13 +54,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message updateByAuthor(UUID existUserId, Message updateMessage){
-        Optional<Message> existingMessage = messageData.values().stream()
+        Message existMessage = messageData.values().stream()
                 .filter(message -> message.getAuthor().equals(existUserId))
-                .findFirst();
-        if(existingMessage.isEmpty()){
-           throw new NoSuchElementException("No message found for the given User");
-       }
-        Message existMessage = existingMessage.get();
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Author does not exist: " + existUserId));
+
         System.out.println("수정 전 메시지 = "+existMessage.getContent());
         existMessage.updateContent(updateMessage.getContent());
         existMessage.updateChannel(updateMessage.getChannel());

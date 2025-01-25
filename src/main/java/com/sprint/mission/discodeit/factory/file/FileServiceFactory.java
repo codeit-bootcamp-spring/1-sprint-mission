@@ -17,23 +17,23 @@ public class FileServiceFactory implements ServiceFactory {
     private final MessageService messageService;
 
     public FileServiceFactory() {
-        this.userService = createUserService();
-        this.channelService = createChannelService();
-        this.messageService = createMessageService();
+        this.userService = new FileUserService();
+        this.channelService = new FileChannelService(userService);
+        this.messageService = new FileMessageService(userService, channelService);
     }
 
     @Override
     public UserService createUserService() {
-        return new FileUserService(messageService,channelService);
+        return userService;
     }
 
     @Override
     public ChannelService createChannelService() {
-        return new FileChannelService(userService,messageService);
+        return channelService;
     }
 
     @Override
     public MessageService createMessageService() {
-        return new FileMessageService(userService,channelService);
+        return messageService;
     }
 }

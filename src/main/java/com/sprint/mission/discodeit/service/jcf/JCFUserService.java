@@ -7,12 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> userData;
-
-    //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
-    public JCFUserService(Map<UUID, User> userData) {
-        this.userData = userData;
-    }
+    private final Map<UUID, User> userData = new HashMap<>();
 
 
     @Override

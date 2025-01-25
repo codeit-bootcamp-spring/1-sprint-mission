@@ -8,11 +8,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messageData;
-
-    public JCFMessageRepository(Map<UUID, Message> messageData) {
-        this.messageData = messageData;
-    }
+    private final Map<UUID, Message> messageData = new HashMap<>();
 
     @Override
     public Message save(Message message) {

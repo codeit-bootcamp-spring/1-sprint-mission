@@ -9,12 +9,11 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final HashMap<UUID, Channel> channelData;
+    private final HashMap<UUID, Channel> channelData= new HashMap<>();
     private UserService userService;
 
     //팩토리 패턴으로 인하여 private이면 serviceFactory에서 접근이 불가하므로 public으로 변경
-    public JCFChannelService(HashMap<UUID, Channel> channelData,UserService userService) {
-        this.channelData = channelData;
+    public JCFChannelService(UserService userService) {
         this.userService = userService;
     }
 
@@ -23,7 +22,6 @@ public class JCFChannelService implements ChannelService {
         if (channelData.containsKey(channel.getId())) {
             throw new IllegalArgumentException("Channel Id already exists: " + channel.getId());
         }
-
         channelData.put(channel.getId(), channel);
         System.out.println(channel.toString());
         return channel;

@@ -6,11 +6,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userData;
+    private final Map<UUID, User> userData = new HashMap<>();
 
-    public JCFUserRepository(Map<UUID, User> userData) {
-        this.userData = userData;
-    }
 
     @Override
     public User save(User user) {
