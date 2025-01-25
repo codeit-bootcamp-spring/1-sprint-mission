@@ -18,18 +18,17 @@ public class JCFChannelController {
 
     // 채널명은 중복 허용 X
     public Channel createChannel(String name) {
-        channelService.validateDuplicateName(name);
-        return channelService.createOrUpdate(new Channel(name));
+        return channelService.createOrUpdate(new Channel(name)).or(null);
     }
 
     // Channel 이름 변경
     public Channel updateChannelName(UUID channelId, String newName) {
-        Channel updatingChannel = findChannelById(channelId);
-        return channelService.update(updatingChannel, newName);
+        return channelService.update(findChannelById(channelId), newName);
     }
 
-
-    // Channel 찾는 것들
+    /**
+     * Channel 조회 메서드들
+     */
     public Channel findChannelById(UUID id) {
         return channelService.findById(id);
     }
@@ -42,15 +41,34 @@ public class JCFChannelController {
         return channelService.findAll();
     }
 
-    public Set<Channel> findAllChannelByUser(UUID userId){
-        return findUserById(userId).getChannelsImmutable();
+    public Set<Channel> findAllChannelByUser(UUID userId) {
+        return userService.findById(userId).getChannelsImmutable();
+    }
+    /**
+     * 삭제
+     */
+    public void deleteChannel(UUID channelId) {
+        channelService.deleteById(channelId);
     }
 
-    // 채널 가입
+    /**
+     * 유저와의 관계
+     */
+    // 채널에 유저 등록
     public void addChannelByUser(UUID channelId, UUID userId) {
-        Channel channel = findChannelById(channelId);
-        findUserById(userId).addChannel(channel); // 양방향으로 더하는 로직
+        findChannelById(channelId).addUser(userService.findById(userId));
+        System.out.println("유저 등록 성공");
+        // if(updatingChannel != null){
     }
+
+    // 강퇴
+    public void drops(UUID channel_Id, UUID droppingUser_Id) {
+        findChannelById(channel_Id).removeUser(userService.findById(droppingUser_Id));
+    }
+
+    /**
+     * 메시지와
+     */
 
     // 채널주인이 삭제 (개인이 삭제하는거는 보류)
     public void deleteMessage(UUID messageId, UUID channelId) {
@@ -58,16 +76,6 @@ public class JCFChannelController {
         messageService.delete(deletingMessage);
     }
 
-    // 강퇴 및 채널 탈퇴
-    public void drops(UUID channel_Id, UUID droppingUser_Id) {
-        Channel droppingChannel = findChannelById(channel_Id);
-        User droppingUser = findUserById(droppingUser_Id);
-        droppingUser.removeChannel(droppingChannel);
-    }
-
-    public void deleteChannel(UUID channelId) {
-        channelService.deleteById(channelId);
-    }
 
 
 }

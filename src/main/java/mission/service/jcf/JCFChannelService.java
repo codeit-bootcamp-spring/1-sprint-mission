@@ -17,6 +17,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createOrUpdate(Channel channel) {
+        validateDuplicateName(channel.getName());
         return channelRepository.create(channel);
     }
 
@@ -43,32 +44,31 @@ public class JCFChannelService implements ChannelService {
                 ))
                 .get(channelName);
 
-        if (findChannel == null){
-            System.out.printf("%s는 없는 채널명입니다.", channelName);
-            System.out.println();
+        if (findChannel == null) {
+            throw new IllegalArgumentException(String.format(
+                    "%s는 없는 채널명입니다.", channelName));
         }
         return findChannel;
     }
 
     @Override
     public Channel findById(UUID id) {
-        return channelRepository.findById(id).orElse(null);
+        return channelRepository.findById(id);
     }
-
 
     @Override
     public void deleteById(UUID id) {
-        channelRepository.deleteById(id);
+        channelRepository.deleteById(findById(id));
     }
 
     /**
      * 중복 검증
      */
     @Override
-    public void validateDuplicateName(String name){
+    public void validateDuplicateName(String name) {
         boolean isDuplicate = findAll().stream()
                 .anyMatch(channel -> channel.getName().equals(name));
-        if (isDuplicate){
+        if (isDuplicate) {
             throw new DuplicateName(
                     String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
         }

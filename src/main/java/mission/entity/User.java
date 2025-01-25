@@ -57,7 +57,6 @@ public class User implements Serializable {
         // 굳이 if 문 만든 이유 : 불필요한 updateAt 초기화 없애기 위해
     }
 
-    // User가 채널 삭제
     public void removeChannel(Channel channel) {
         if(channels.contains(channel)){
             channels.remove(channel);

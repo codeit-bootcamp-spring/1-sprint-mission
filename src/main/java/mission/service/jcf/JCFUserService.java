@@ -16,6 +16,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public User createOrUpdate(User user) {
+        // validateDuplicateName(user.getName());
+        // 닉네임 중복 허용
         return userRepository.saveUser(user);
     }
 
@@ -31,22 +33,23 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findById(UUID id) {
+        // null 위험 없어짐
         return userRepository.findById(id);
     }
 
     @Override
-    public Set<User> findUsersByName(String findName){
+    public Set<User> findUsersByName(String findName) {
         return findAll().stream()
                 .filter(user -> user.getName().equals(findName))
                 .collect(Collectors.toSet());
     }
 
-    @Override
-    public User findByNamePW(String name, String password) {
-        return findUsersByName(name).stream()
-                .filter(user -> user.getPassword().equals(password))
-                .findAny().orElse(null);
-    }
+//    @Override
+//    public User findByNamePW(String name, String password) {
+//        return findUsersByName(name).stream()
+//                .filter(user -> user.getPassword().equals(password))
+//                .findAny().orElse(null);
+//    }
 
     @Override
     public void delete(User user) {
@@ -54,8 +57,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void validateDuplicateName(String name){
-        if (!findUsersByName(name).isEmpty()){
+    public void validateDuplicateName(String name) {
+        if (!findUsersByName(name).isEmpty()) {
             throw new DuplicateName(String.format("%s(은)는 이미 존재하는 닉네임입니다", name));
         }
     }
