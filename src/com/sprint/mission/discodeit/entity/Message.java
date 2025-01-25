@@ -13,6 +13,7 @@ public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1549358720773946438L;
 
+    /** Field: {@code EMPTY_MESSAGE} is literally empty static Message object */
     public static final Message EMPTY_MESSAGE;
     private final UUID   id;
     private final Long   createAt;
@@ -70,6 +71,7 @@ public class Message implements Serializable {
     public static Message createMessage(UUID id, Long createAt, Long updateAt, String content) {
         return new Message(id, createAt, updateAt, content);
     }
+    /** Returns: {@code EMPTY_MESSAGE} which is literally empty static Message object */
     public static Message createEmptyMessage() {
         return EMPTY_MESSAGE;
     }

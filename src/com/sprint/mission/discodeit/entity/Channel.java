@@ -13,6 +13,7 @@ public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 5112808545762685190L;
 
+    /** Field: {@code EMPTY_CHANNEL} is literally empty static Channel object */
     public static final Channel EMPTY_CHANNEL;
     private final UUID   id;
     private final Long   createAt;
@@ -70,6 +71,7 @@ public class Channel implements Serializable {
     public static Channel createChannel(UUID id, Long createAt, Long updateAt, String name) {
         return new Channel(id, createAt, updateAt, name);
     }
+    /** Returns: {@code EMPTY_CHANNEL} which is literally empty static Channel object */
     public static Channel createEmptyChannel() {
         return EMPTY_CHANNEL;
     }

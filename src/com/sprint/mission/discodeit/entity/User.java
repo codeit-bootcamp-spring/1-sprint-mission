@@ -13,6 +13,7 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = -936608933295057318L;
 
+    /** Field: {@code EMPTY_USER} is literally empty static User object */
     public static final User EMPTY_USER;
     private final UUID   id;
     private final Long   createAt;
@@ -39,6 +40,7 @@ public class User implements Serializable {
         phoneNumber = builder.phoneNumber;
     }
 
+    /** Returns: {@code EMPTY_USER} which is literally empty static User object */
     public static User createEmptyUser() {
         return EMPTY_USER;
     }
