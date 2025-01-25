@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Message extends BaseEntity{
+
+    // 추가할 수 있는 것 : Channel 도메인에 채널에 소속(참가)된 사용자가 추가된 이후,
+    // 채널에 소속된 사용자 중 "누가" message를 보냈는지 지정하기
+
     private Channel channel;
     private String messageText;
     public Message(Channel channel, String messageText){

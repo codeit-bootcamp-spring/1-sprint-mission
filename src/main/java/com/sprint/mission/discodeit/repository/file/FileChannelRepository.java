@@ -93,6 +93,8 @@ public class FileChannelRepository implements ChannelRepository {
         for(File fileName : fileList){
             fileName.delete();
         }
+        // 추가적으로 구현할 수 있는 로직 : Channel이 message를 가지고 있다면,
+        // Channel의 하위 메세지도 삭제하기
         System.out.println(" deleteAllChannels 삭제 완료 ");
     }
     @Override
@@ -100,6 +102,8 @@ public class FileChannelRepository implements ChannelRepository {
         String fileName = CHANNELS_PATH + id.toString() + ".ser";
         File channelFile = new File(fileName);
         channelFile.delete();
+        // 추가적으로 구현할 수 있는 로직 : Channel이 message를 가지고 있다면,
+        // Channel의 하위 메세지도 삭제하기
         System.out.println(" deleteChannelById 삭제 완료 ");
     }
 }
