@@ -16,15 +16,15 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     // 생성과 수정 2개 기능을 함
-    public Channel register(Channel channel) throws IOException {
+    public Channel create(Channel channel) throws IOException {
         Path channelPath = getChannelDirectPath(channel.getId());
 
         if (!Files.exists(channelPath)) {
             Files.createFile(channelPath);
         }
 
-        try (ObjectOutputStream ois = new ObjectOutputStream(Files.newOutputStream(channelPath))) {
-            ois.writeObject(channel);
+        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(channelPath))) {
+            oos.writeObject(channel);
         }
         return channel;
     }
@@ -41,7 +41,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID id) throws IOException, ClassNotFoundException {
+    public Optional<Channel> findById(UUID id) throws IOException, ClassNotFoundException {
         Path channelPath = getChannelDirectPath(id);
         if (!Files.exists(channelPath)) {
             System.out.println("주어진 id의 채널파일이 존재하지 않습니다.");

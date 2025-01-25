@@ -1,11 +1,10 @@
 package mission;
 
 import mission.entity.User;
-import mission.service.file.FileMainService;
-import mission.service.jcf.ProjectManager;
+import mission.controller.FileMainService;
+import mission.controller.ProjectManager;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 

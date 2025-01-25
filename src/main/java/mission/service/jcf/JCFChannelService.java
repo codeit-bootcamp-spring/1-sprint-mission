@@ -17,12 +17,15 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createOrUpdate(Channel channel) {
-        return channelRepository.register(channel);
+        return channelRepository.create(channel);
     }
 
     @Override
-    public Channel update(Channel channel) {
-        return createOrUpdate(channel);  // 클래스 내 메서드 활용(Map 덮어쓰기 가능)
+    public Channel update(Channel updatingChannel, String newName) {
+        validateDuplicateName(newName);
+        updatingChannel.setName(newName);
+        return createOrUpdate(updatingChannel);
+        // 클래스 내 메서드 활용(레포지토리 Map 덮어쓰기 가능)
     }
 
     @Override
@@ -49,7 +52,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel findById(UUID id) {
-        return channelRepository.findById(id);
+        return channelRepository.findById(id).orElse(null);
     }
 
 

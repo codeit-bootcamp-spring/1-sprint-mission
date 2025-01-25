@@ -43,30 +43,27 @@ public class User implements Serializable {
         firstId = id.toString().split("-")[0];
         createAt = LocalDateTime.now();
     }
-//    public Set<Channel> getChannels() {
-
-    // 채널 명으로 검색 ///이거 그냥 이름 찾는건 외부에서하는게 나을 듯
-//    public Channel getChannel(String channelName) {
-//        return getChannelsImmutable().stream()
-//                .filter(channel -> channel.getName().equals(channelName))
-//                .findAny().orElse(null);
-//    }
 
     public Set<Channel> getChannelsImmutable(){
         return Collections.unmodifiableSet(channels);
     }
 
     public void addChannel(Channel channel){
-        channels.add(channel);
-        channel.addUser(this);
-        updateAt = LocalDateTime.now();
+        if(!channels.contains(channel)){
+            channels.add(channel);
+            channel.addUser(this);
+            updateAt = LocalDateTime.now();
+        }
+        // 굳이 if 문 만든 이유 : 불필요한 updateAt 초기화 없애기 위해
     }
 
     // User가 채널 삭제
     public void removeChannel(Channel channel) {
-        channels.remove(channel);
-        channel.removeUser(this);
-        updateAt = LocalDateTime.now();
+        if(channels.contains(channel)){
+            channels.remove(channel);
+            channel.removeUser(this);
+            updateAt = LocalDateTime.now();
+        }
     }
 
     public void removeAllChannel(){

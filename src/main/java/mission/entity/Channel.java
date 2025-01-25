@@ -46,9 +46,12 @@ public class Channel implements Serializable {
 
     // getUserList 없앤 이유 : 아래의 메서드로 userlist.remove 시 count를 초기화하기 위해
     public void removeUser(User user){
-        userList.remove(user);
-        userCount = userList.size();
-        updatedAt = LocalDateTime.now();
+        if(userList.contains(user)){
+            userList.remove(user);
+            user.removeChannel(this);
+            userCount = userList.size();
+            updatedAt = LocalDateTime.now();
+        }
     }
 
     // 채널이
@@ -60,9 +63,12 @@ public class Channel implements Serializable {
     }
 
     public void addUser(User user){
-        userList.add(user);
-        user.addChannel(this);
-        userCount = userList.size();
+        if(!userList.contains(user)){
+            userList.add(user);
+            user.addChannel(this);
+            userCount = userList.size();
+            updatedAt = LocalDateTime.now();
+        }
     }
 
     public LocalDateTime getCreatedAt() {

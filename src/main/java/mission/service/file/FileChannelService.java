@@ -17,20 +17,22 @@ public class FileChannelService implements ChannelService {
 
     private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
 
+    // 생성 수정 오류 메시지 다르게 처리하기위해 오류 던지기
     @Override
-    public Channel createOrUpdate(Channel channel){
-        try {
-            return fileChannelRepository.register(channel);
-        } catch (IOException e) {
-            System.out.println("채널 등록 실패" + e.getMessage());
-            return null;
-        }
+    public Channel createOrUpdate(Channel channel) throws IOException {
+        validateDuplicateName(channel.getName());
+        return fileChannelRepository.create(channel);
     }
 
     @Override
-    public Channel update(Channel channel) {
-        // channel 존재 검증은 앞단에서 입력할 때 완료
-        return createOrUpdate(channel);
+    public Channel update(Channel updatingChannel, String newName) {
+        validateDuplicateName(newName);
+        try {
+            updatingChannel.setName(newName);
+            return createOrUpdate(updatingChannel);
+        } catch (Exception e){
+            throw new RuntimeException("채널 이름 수정 실패" + e.getMessage());
+        }
     }
 
     @Override

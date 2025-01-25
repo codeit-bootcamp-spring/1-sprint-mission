@@ -3,13 +3,14 @@ package mission.service;
 
 import mission.entity.Channel;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public interface ChannelService {
     //등록
-    Channel createOrUpdate(Channel channel);
+    Channel createOrUpdate(Channel channel) throws IOException;
 
     Channel findByName(String name);
 
@@ -19,7 +20,7 @@ public interface ChannelService {
 
     //[ ] 수정
 
-    Channel update(Channel channel);
+    Channel update(Channel channel, String newName);
     //[ ] 삭제
     void deleteById(UUID id);
 

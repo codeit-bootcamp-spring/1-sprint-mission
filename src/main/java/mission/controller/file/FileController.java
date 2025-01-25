@@ -1,18 +1,20 @@
-package mission.service.file;
+package mission.controller.file;
 
 import mission.entity.Channel;
 import mission.entity.Message;
 import mission.entity.User;
+import mission.service.file.FileChannelService;
+import mission.service.file.FileMessageService;
+import mission.service.file.FileUserService;
 
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
 // 많은 일은 안하지만 그래도 생성, 업데이트 시 id, name, PW 검사정도만
-// 이 검사를 뚫어야 (user or channel or message)service가 시작되게 설계
-public class FileMainService {
+// 이 검사를 뚫어야 (user or channel or message) service가 시작되게 설계
+public class FileController {
 
-    // 지금은 간단한 CRUD 기능이지만 Channel, Message, User 서비스간 의존이 늘어나면 이렇게 Main 클래스 필요
     private final FileChannelService fileChannelService = new FileChannelService();
     private final FileUserService fileUserService = new FileUserService();
     private final FileMessageService fileMessageService = new FileMessageService();
@@ -49,8 +51,12 @@ public class FileMainService {
     }
 
     public Channel createChannel(String channelName){
-        // 중복 검증 처리 시 : fileChannelService.validateDuplicateName(channelName);
-        return fileChannelService.createOrUpdate(new Channel(channelName));
+        try {
+            return fileChannelService.createOrUpdate(new Channel(channelName));
+        } catch (IOException e) {
+            throw new RuntimeException("채널 등록 중 오류 발생: " + e.getMessage());
+        }
+
     }
 
 
@@ -112,11 +118,9 @@ public class FileMainService {
             System.out.printf("(변경 전 채널명 : %s)을(를) 잘못입력했습니다.", oldName);
             System.out.println();
             return null;
-        }
+        } // 이건 빼고 oldName 넣는 파라미터 없애도 상관 x
 
-        fileChannelService.validateDuplicateName(newName);
-        updatingChannel.setName(newName);
-        return fileChannelService.update(updatingChannel);
+        return fileChannelService.update(updatingChannel, newName);
     }
 
     public Message updateMessage(UUID messageId, String newMessage){
