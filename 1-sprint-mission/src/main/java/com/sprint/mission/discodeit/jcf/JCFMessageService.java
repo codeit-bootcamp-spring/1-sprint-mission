@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.jcf;
 
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
@@ -12,15 +13,18 @@ public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;
     private final List<Message> messageList;
     private final UserService userService;
+    private final ChannelService channelService;
 
-    public JCFMessageService(UserService userService) {
+    public JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.messageList = new ArrayList<>();
+        this.channelService = channelService;
     }
 
-    public static synchronized JCFMessageService getInstance(UserService userService){
+
+    public static synchronized JCFMessageService getInstance(UserService userService, ChannelService channelService){
         if(instance ==null){
-            instance = new JCFMessageService(userService);
+            instance = new JCFMessageService(userService, channelService);
         }
         return instance;
     }
@@ -35,6 +39,10 @@ public class JCFMessageService implements MessageService {
                 return;
             }
         }
+        if(userService.readUser(message.getUserId()) == null){
+            throw new IllegalArgumentException("Invalid User: User does not exist or is null.");
+        }
+
         messageList.add(message);
         System.out.println("Message created: " + message.getMessageText() + " (UUID: " + message.getMessageUuid() + ")");
     }

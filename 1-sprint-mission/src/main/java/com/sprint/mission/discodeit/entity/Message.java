@@ -7,8 +7,9 @@ public class Message extends BaseEntity{
     private final UUID messageUuid;
     private final Long createdAt;
     private Long updatedAt;
-    private String userId;
+    private final String userId;
     private String messageText;
+
 
     public Message(String userId, String messageText) {
         this.messageUuid = UUID.randomUUID();
@@ -34,12 +35,12 @@ public class Message extends BaseEntity{
     }
 
     // Setters
-    public void setUserId(String userId) {
-        this.userId = userId;
-        updateUpdatedAt();
-    }
+
 
     public void setMessageText(String messageText) {
+        if(messageText == null || messageText.isEmpty()){
+            throw new IllegalArgumentException("messageText cannot be null or empty");
+        }
         this.messageText = messageText;
         updateUpdatedAt();
     }

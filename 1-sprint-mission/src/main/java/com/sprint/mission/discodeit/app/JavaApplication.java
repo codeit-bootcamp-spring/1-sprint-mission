@@ -13,7 +13,7 @@ public class JavaApplication {
         //각 서비스의 인스턴스 생성, 의존성 연결
         JCFUserService userService = JCFUserService.getInstance();
         JCFChannelService channelService = JCFChannelService.getInstance(userService);
-        JCFMessageService messageService = JCFMessageService.getInstance(userService);
+        JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
 
 
         // 사용자 생성

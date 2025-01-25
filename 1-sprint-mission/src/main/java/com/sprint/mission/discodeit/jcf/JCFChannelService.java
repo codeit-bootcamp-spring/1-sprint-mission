@@ -31,8 +31,8 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void createChannel(Channel channel) {
         for (Channel existingChannel : channelList) {
-            if (existingChannel.getChannelUuid().equals(channel.getChannelUuid())) {
-                System.out.println("Channel with UUID " + channel.getChannelUuid() + " already exists.");
+            if (existingChannel.getChannelTitle().equals(channel.getChannelTitle())) {
+                System.out.println("Channel with title " + channel.getChannelTitle() + " already exists.");
                 return;
             }
         }
