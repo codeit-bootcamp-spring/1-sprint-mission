@@ -4,6 +4,7 @@ import discodeit.entity.User;
 import discodeit.service.UserService;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -48,7 +49,24 @@ public class FileUserService implements UserService {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        try {
+            List<User> users = Files.list(directory)
+                    .map(path -> {
+                        try(
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (User) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return users;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
