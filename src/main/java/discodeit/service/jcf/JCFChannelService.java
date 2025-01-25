@@ -2,7 +2,6 @@ package discodeit.service.jcf;
 
 import discodeit.Validator.ChannelValidator;
 import discodeit.entity.Channel;
-import discodeit.entity.Message;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
@@ -45,7 +44,6 @@ public class JCFChannelService implements ChannelService {
         validator.validate(name, introduction);
         Channel channel = new Channel(name, introduction, owner);
         channels.put(channel.getId(), channel);
-        jcfUserService.updateJoinedChannels(owner, channel);
         return channel;
     }
 
@@ -76,32 +74,8 @@ public class JCFChannelService implements ChannelService {
         channel.update(name, introduction);
     }
 
-    // 유저의 채널 가입은 이 메서드에서만 실행
     @Override
-    public void updateParticipants(Channel channel, User user) {
-        channel.updateParticipants(user);
-        jcfUserService.updateJoinedChannels(user, channel);
-        channel.updateUpdatedAt();
-    }
-
-    @Override
-    public void updateMessages(Channel channel, Message message) {
-        channel.updateMessages(message);
-    }
-
-    @Override
-    public void deleteChannel(Channel channel, User user) {
-        channel.deleteAllParticipants(user);
-        jcfMessageService.deleteAllMessages(channel.getMessages());
-        channel.deleteAllMessages();
-        channels.remove(channel);
-    }
-
-    @Override
-    public void deleteParticipant(Channel channel, User user) {
-        channel.deleteParticipant(user);
-        user.deleteJoinedChannel(channel);
-        channel.updateUpdatedAt();
-        user.updateUpdatedAt();
+    public void deleteChannel(Channel channel) {
+        channels.remove(channel.getId());
     }
 }
