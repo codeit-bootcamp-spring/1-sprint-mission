@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.proxy;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.log.repository.RepositoryLogger;
+import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.UUID;

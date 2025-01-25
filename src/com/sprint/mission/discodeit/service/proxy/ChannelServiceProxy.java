@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.proxy;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
-import com.sprint.mission.discodeit.log.service.ServiceLogger;
+import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.UUID;
