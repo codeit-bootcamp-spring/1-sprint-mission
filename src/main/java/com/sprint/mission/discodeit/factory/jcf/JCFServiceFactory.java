@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class JCFServiceFactory implements ServiceFactory {
     private final Map<UUID, User> userData = new HashMap<>();
-    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final HashMap<UUID, Channel> channelData = new HashMap<>();
     private final Map<UUID, Message> messageData = new HashMap<>();
 
     private final UserRepository userRepository;
@@ -44,11 +44,6 @@ public class JCFServiceFactory implements ServiceFactory {
         this.userService = new BasicJCFUserService(userRepository);
         this.channelService = new BasicJCFChannelService(channelRepository);
         this.messageService = new BasicJCFMessageService(messageRepository);
-
-        // 의존성 주입
-        userService.setDependencies(messageService, channelService);
-        channelService.setDependencies(userService, messageService);
-        messageService.setDependencies(userService, channelService);
     }
 
     @Override

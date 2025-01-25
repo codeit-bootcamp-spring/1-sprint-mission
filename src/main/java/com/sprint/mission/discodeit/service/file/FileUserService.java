@@ -15,21 +15,11 @@ import java.util.Optional;
 public class FileUserService implements UserService {
     private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
     private static final String USER_FILE = "user.ser";
-    private MessageService messageService;
-    private ChannelService channelService;
     private FileStorage<User> fileStorage;
 
-    public FileUserService(MessageService messageService, ChannelService channelService) {
-        this.messageService = messageService;
-        this.channelService = channelService;
+    public FileUserService() {
         this.fileStorage = new SerializableFileStorage<>(User.class);
         fileStorage.init(ROOT_DIR);
-    }
-
-    @Override
-    public void setDependencies(MessageService messageService, ChannelService channelService) {
-        this.messageService = messageService;
-        this.channelService = channelService;
     }
 
     @Override
@@ -88,21 +78,7 @@ public class FileUserService implements UserService {
         if(!removed) {
             return false;
         }
-
         System.out.println(user);
-
-        // 사용자 삭제 시 관련 메시지 삭제
-        messageService.deleteMessageByUser(user);
-
-        // 사용자 삭제 시 모든 채널에서 해당 사용자 삭제
-        channelService.readAllChannels().forEach(channel -> {
-            if (channel.getParticipants().contains(user)) {
-                channel.getParticipants().remove(user);
-                System.out.println("채널 '" + channel.getName() + "'에서 사용자" +
-                        "'" + user.getUsername() + "' 제거 완료");
-            }
-        });
-
         fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
         return true;
     }

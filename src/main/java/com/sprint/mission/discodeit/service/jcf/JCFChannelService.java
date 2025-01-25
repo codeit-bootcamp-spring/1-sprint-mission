@@ -35,7 +35,7 @@ public class JCFChannelService implements ChannelService {
             throw new IllegalArgumentException("Channel does not exists: " + channel.getId());
         }
         //optional로 구현했던 부분 수정
-        User existUser = userService.readUser(user)
+        User existUser = userService.readUser(user.getId())
                         .orElseThrow(() -> new IllegalArgumentException("User does not exists: " + user.getId()));
         channel.getParticipants().put(existUser.getId(),existUser);
         System.out.println(channel.toString());

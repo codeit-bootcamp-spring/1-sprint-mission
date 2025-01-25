@@ -28,14 +28,14 @@ public class JCFMessageService implements MessageService {
             throw new IllegalArgumentException("Author and Channel cannot be null");
         }
         // User가 실제로 존재하는지 확인
-        User author = userService.readUser(message.getAuthor())
+        User author = userService.readUser(message.getAuthor().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Author does not exist: "
                         + message.getAuthor().getId()));
         //Channel이 실제로 존재하는지 확인
         Channel channel = channelService.readChannel(message.getChannel().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId()));
         // 채널에 해당 사용자가 있는지 확인
-        if (!channel.getParticipants().containsKey(message.getAuthor())) {
+        if (!channel.getParticipants().containsKey(author)) {
             throw new IllegalArgumentException("Author is not a participant of the channel: " + message.getChannel().getId());
         }
         messageData.put(message.getId(), message);
@@ -44,9 +44,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Optional<Message> readMessage(Message message) {
-        System.out.println(message.toString());
-        return Optional.ofNullable(messageData.get(message.getId()));
+    public Optional<Message> readMessage(UUID existMessageId) {
+        return Optional.ofNullable(messageData.get(existMessageId));
     }
 
     @Override
@@ -55,21 +54,21 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message updateByAuthor(User user, Message updatedMessage){
+    public Message updateByAuthor(UUID existUserId, Message updatedMessage){
         Optional<Message> existingMessage = messageData.values().stream()
-                .filter(message -> message.getAuthor().equals(user))
+                .filter(message -> message.getAuthor().equals(existUserId))
                 .findFirst();
         if(existingMessage.isEmpty()){
            throw new NoSuchElementException("No message found for the given User");
        }
-        Message message = existingMessage.get();
-        System.out.println("수정 전 메시지 = "+message.getContent());
-        message.updateContent(updatedMessage.getContent());
-        message.updateChannel(updatedMessage.getChannel());
-        message.updateTime();
-        messageData.put(message.getId(), message);
-        System.out.println("수정 후 메시지 = "+message.getContent());
-        return message;
+        Message existMessage = existingMessage.get();
+        System.out.println("수정 전 메시지 = "+existMessage.getContent());
+        existMessage.updateContent(updatedMessage.getContent());
+        existMessage.updateChannel(updatedMessage.getChannel());
+        existMessage.updateTime();
+        messageData.put(existMessage.getId(), existMessage);
+        System.out.println("수정 후 메시지 = "+existMessage.getContent());
+        return existMessage;
     }
 
     @Override
@@ -79,17 +78,5 @@ public class JCFMessageService implements MessageService {
         }
         messageData.remove(message.getId());
         return true;
-    }
-
-    // 채널 삭제 시 해당 채널의 메시지도 같이 삭제
-    @Override
-    public void deleteMessageByChannel(Channel channel) {
-        messageData.values().removeIf(message -> message.getChannel().equals(channel));
-    }
-
-    //사용자 삭제 시 해당 사용자가 작성한 메시지 삭제
-    @Override
-    public void deleteMessageByUser(User user) {
-        messageData.values().removeIf(message -> message.getAuthor().equals(user));
     }
 }

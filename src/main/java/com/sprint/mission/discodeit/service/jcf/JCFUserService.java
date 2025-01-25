@@ -26,9 +26,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Optional<User> readUser(User user) {
-        System.out.println(user.toString());
-        return Optional.ofNullable(userData.get(user.getId()));
+    public Optional<User> readUser(UUID existUserId) {
+        return Optional.ofNullable(userData.get(existUserId));
     }
 
     @Override
@@ -37,7 +36,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User updateUser(User existUser, User updateUser){
+    public User updateUser(UUID existUserId, User updateUser){
+        User existUser = userData.get(existUserId);
         if (!userData.containsKey(existUser.getId())) {
             throw new NoSuchElementException("User not found");
         }

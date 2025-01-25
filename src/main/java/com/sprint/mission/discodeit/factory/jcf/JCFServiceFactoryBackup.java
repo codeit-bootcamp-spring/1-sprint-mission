@@ -16,7 +16,7 @@ import java.util.UUID;
 
 public class JCFServiceFactoryBackup implements ServiceFactory {
     private final Map<UUID, User> userData = new HashMap<>();
-    private final Map<UUID, Channel> channelData = new HashMap<>();
+    private final HashMap<UUID, Channel> channelData = new HashMap<>();
     private final Map<UUID, Message> messageData = new HashMap<>();
 
     private UserService userService;
@@ -26,13 +26,8 @@ public class JCFServiceFactoryBackup implements ServiceFactory {
     public JCFServiceFactoryBackup() {
         //서비스 객체 생성
         this.userService = new JCFUserService(userData);
-        this.channelService = new JCFChannelService(channelData);
-        this.messageService = new JCFMessageService(messageData);
-
-        //의존성 주입
-        userService.setDependencies(messageService, channelService);
-        channelService.setDependencies(userService, messageService);
-        messageService.setDependencies(userService, channelService);
+        this.channelService = new JCFChannelService(channelData,userService);
+        this.messageService = new JCFMessageService(messageData,userService,channelService);
     }
     @Override
     public UserService createUserService() {
