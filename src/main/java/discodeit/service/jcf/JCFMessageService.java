@@ -38,7 +38,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMessage(String content, User sender, UUID channelId) {
+    public Message create(String content, User sender, UUID channelId) {
         userService.find(sender.getId());
         channelService.find(channelId);
 
@@ -72,7 +72,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
+    public void delete(UUID messageId) {
         if (!messages.containsKey(messageId)) {
             throw new NoSuchElementException("존재하지 않는 메시지입니다.");
         }

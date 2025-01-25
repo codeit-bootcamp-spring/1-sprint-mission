@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel createChannel(String name, String introduction, User owner);
+    Channel create(String name, String introduction, User owner);
     Channel find(UUID channelId);
     List<Channel> findAll();
     String getInfo(Channel channel);
     void update(UUID channelId, String name, String introduction);
-    void deleteChannel(Channel channel);
+    void delete(Channel channel);
 }

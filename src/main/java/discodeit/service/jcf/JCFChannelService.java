@@ -26,7 +26,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String name, String introduction, User owner) {
+    public Channel create(String name, String introduction, User owner) {
         validator.validate(name, introduction);
         Channel channel = new Channel(name, introduction, owner);
         channels.put(channel.getId(), channel);
@@ -61,7 +61,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(Channel channel) {
+    public void delete(Channel channel) {
         channels.remove(channel.getId());
     }
 }
