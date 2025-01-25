@@ -71,7 +71,6 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(User user) {
         users.remove(user.getId());
-        user.withdraw();
     }
 
     @Override

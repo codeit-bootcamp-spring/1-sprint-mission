@@ -23,16 +23,16 @@ public class Channel {
         this.owner = owner;
     }
 
-    public void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis() / 1000;
-    }
-
     public UUID getId() {
         return id;
     }
 
     public String getName() {
         return name;
+    }
+
+    public void updateUpdatedAt() {
+        updatedAt = System.currentTimeMillis() / 1000;
     }
 
     public void update(String name, String introduction) {
@@ -56,10 +56,6 @@ public class Channel {
         }
         this.introduction = introduction;
         return true;
-    }
-
-    public boolean isIdEqualTo(UUID id) {
-        return this.id.equals(id);
     }
 
     @Override

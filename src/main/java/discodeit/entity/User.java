@@ -32,12 +32,12 @@ public class User {
         return id;
     }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis() / 1000;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public void updateUpdatedAt() {
+        this.updatedAt = System.currentTimeMillis() / 1000;
     }
 
     public void update(String name, String email, String phoneNumber) {
@@ -78,14 +78,6 @@ public class User {
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
 
-    public boolean isEqualTo(User user) {
-        return id.equals(user.getId());
-    }
-
-    public boolean isIdEqualTo(UUID id) {
-        return this.id.equals(id);
-    }
-
     public void isDuplicateEmail(String email) {
         if (this.email.equals(email)) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -96,14 +88,6 @@ public class User {
         if (this.phoneNumber.equals(phoneNumber)) {
             throw new IllegalArgumentException("이미 존재하는 번호입니다.");
         }
-    }
-
-    public void withdraw() {
-        this.id = null;
-        this.name = "(알 수 없음)";
-        this.email = null;
-        this.phoneNumber = null;
-        this.password = null;
     }
 
     @Override

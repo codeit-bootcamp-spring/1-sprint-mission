@@ -36,16 +36,6 @@ public class Message {
         }
     }
 
-    public void checkSender(User user) {
-        if (!sender.isIdEqualTo(user.getId())) {
-            throw new IllegalArgumentException("자신의 메시지만 삭제할 수 있습니다.");
-        }
-    }
-
-    public boolean isIdEqualTo(UUID id) {
-        return this.id.equals(id);
-    }
-
     @Override
     public String toString() {
         return String.format(sender.getName() + ": " + content);
