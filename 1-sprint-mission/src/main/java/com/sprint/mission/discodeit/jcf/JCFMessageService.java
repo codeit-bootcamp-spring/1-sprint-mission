@@ -55,7 +55,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void updateMessage(String messageUuid, String newMessageText) {
         Message message = readMessage(messageUuid);
-        if (message != null) {
+        if (message != null && message.getMessageUuid() != null) {
             message.setMessageText(newMessageText);
             System.out.println("Message updated: " + message.getMessageText() + " (UUID: " + message.getMessageUuid() + ")");
         } else {

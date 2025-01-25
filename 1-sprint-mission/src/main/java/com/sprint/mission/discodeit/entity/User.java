@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.*;
 
-public class User {
+public class User extends BaseEntity{
 
     private final UUID userUuid;
     private final Long createdAt;
@@ -36,13 +36,6 @@ public class User {
         return userName;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
 
     //Updated 메소드
@@ -54,7 +47,5 @@ public class User {
         this.userName = userName;
     }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-    }
+
 }

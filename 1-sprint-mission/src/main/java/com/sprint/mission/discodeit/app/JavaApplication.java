@@ -51,9 +51,8 @@ public class JavaApplication {
                 System.out.println("Message: " + message.getMessageText() + ", User ID: " + message.getUserId()));
 
         // 특정 사용자 메시지 업데이트
-        if (message1.getMessageUuid() != null) {
-            messageService.updateMessage(message1.getMessageUuid().toString(), "Updated: Welcome to our Tech Talk series!");
-        }
+        messageService.updateMessage(message1.getMessageUuid().toString(), "Updated: Welcome to our Tech Talk series!");
+
 
         // 메시지 출력
         System.out.println("\nUpdated Messages:");

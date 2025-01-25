@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message {
+public class Message extends BaseEntity{
 
     private final UUID messageUuid;
     private final Long createdAt;
@@ -23,13 +23,7 @@ public class Message {
         return messageUuid;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
     public String getUserId() {
         return userId;
@@ -50,8 +44,4 @@ public class Message {
         updateUpdatedAt();
     }
 
-    // Private Methods
-    private void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-    }
 }
