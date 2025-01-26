@@ -25,6 +25,7 @@ public class FileUserService implements UserRepository {
             boolean isContain = false;
             String line;
             while ((line = br.readLine()) != null) {
+
                 String[] split = line.split(",");
                 if (split[1].equals(user.getUserEmail())) {
                     System.out.println("해당 E-mail은 이미 저장되어 있습니다.");
@@ -47,15 +48,16 @@ public class FileUserService implements UserRepository {
         try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data[2].equals(id)) {
-                    System.out.println("User UUID= " + data[0]);
-                    System.out.println("User Email= " + data[1]);
-                    System.out.println("User NickName= " + data[2]);
-                    System.out.println("User Password= " + data[3]);
-                    System.out.println("User Created At= " + data[4]);
-                    System.out.println("User Updated At= " + data[5]);
+                if (data[1].equals(id)) {
+                    System.out.println("========= 조회 성공 =========");
+                    System.out.println("해당 사용자의 UUID= " + data[0]);
+                    System.out.println("해당 사용자의 Email= " + data[1]);
+                    System.out.println("해당 사용자의 NickName= " + data[2]);
+                    System.out.println("해당 사용자의 Password= " + data[3]);
+                    System.out.println("해당 사용자의 Created At= " + data[4]);
+                    System.out.println("해당 사용자의 Updated At= " + data[5]);
+                    return line;
                 }
-                return line;
             }
         } catch (IOException e){
             throw new RuntimeException(e);

@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 public class JavaApplicationV2 {
     private static Scanner sc = new Scanner(System.in);
+    private static final UserRepository userRepository = new FileUserService();
 
     public static void main(String[] args) {
         showMainDisplay();
@@ -31,6 +32,7 @@ public class JavaApplicationV2 {
                 moveSavePage();
                 break;
             case "2":
+                moveFindByIdPage();
                 break;
             case "3":
                 break;
@@ -57,6 +59,7 @@ public class JavaApplicationV2 {
         System.out.println("= (1). 새로운 유저 저장                                =");
         System.out.println("= (2). 나가기                                         =");
         System.out.println("======================================================");
+        System.out.print("입력: ");
         String usrChoosenInUserSavePage = sc.nextLine();
             switch (usrChoosenInUserSavePage) {
                 case "1":
@@ -78,4 +81,32 @@ public class JavaApplicationV2 {
         }
 
     }
+
+    private static void moveFindByIdPage() {
+
+        System.out.println("\n\n");
+        while (true) {
+            System.out.println("======================================================");
+            System.out.println("=                 유저 조회(E-mail)                   =");
+            System.out.println("======================================================");
+            System.out.println("= (1). 유저 조회하기                                   =");
+            System.out.println("= (2). 나가기                                         =");
+            System.out.println("======================================================");
+            System.out.print("입력: ");
+            String usrChoosenInFindByIdPage = sc.nextLine();
+            switch (usrChoosenInFindByIdPage) {
+            case "1":
+                System.out.println("======================================================");
+                System.out.print("조회하고 싶은 유저의 E-mail:");
+                String emailForSearching = sc.nextLine();
+                userRepository.findById(emailForSearching);
+                break;
+            case "2":
+                showMainDisplay();
+                return;
+            default:
+                System.out.println("똑바로 입력하시오.");
+            }
+        }
+        }
 }
