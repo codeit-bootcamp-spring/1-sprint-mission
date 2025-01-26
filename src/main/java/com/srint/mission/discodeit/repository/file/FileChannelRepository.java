@@ -83,6 +83,12 @@ public class FileChannelRepository implements ChannelRepository {
         return new ArrayList<>(data.values());
     }
 
+    @Override
+    public UUID update(Channel channel) {
+        data.put(channel.getId(), channel);
+        saveDataToFile();
+        return channel.getId();    }
+
     public UUID delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");

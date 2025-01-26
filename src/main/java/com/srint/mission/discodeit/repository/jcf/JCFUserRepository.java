@@ -15,9 +15,7 @@ public class JCFUserRepository implements UserRepository {
 
     //DB 로직
     public UUID save(User user) {
-        if(!data.containsKey(user.getId())){
-            data.put(user.getId(), user);
-        }
+        data.put(user.getId(), user);
         return user.getId();
     }
 
@@ -33,6 +31,12 @@ public class JCFUserRepository implements UserRepository {
             return Collections.emptyList(); // 빈 리스트 반환
         }
         return data.values().stream().toList();
+    }
+
+    @Override
+    public UUID update(User user) {
+        data.put(user.getId(), user);
+        return user.getId();
     }
 
     public UUID delete(UUID id) {

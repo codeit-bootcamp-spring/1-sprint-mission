@@ -41,7 +41,7 @@ public class BasicMessageService implements MessageService {
             throw new IllegalStateException("message 변경 권한이 없습니다.");
         }
         findMessage.setContent(message);
-        messageRepository.save(findMessage);
+        messageRepository.update(findMessage);
         return findMessage;
     }
 

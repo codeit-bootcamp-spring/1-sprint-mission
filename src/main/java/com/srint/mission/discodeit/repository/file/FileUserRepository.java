@@ -65,9 +65,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     public UUID save(User user) {
-        if(!data.containsKey(user.getId())){
-            data.put(user.getId(), user);
-        }
+        data.put(user.getId(), user);
         saveDataToFile();
         return user.getId();
     }
@@ -84,6 +82,13 @@ public class FileUserRepository implements UserRepository {
             return Collections.emptyList(); // 빈 리스트 반환
         }
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public UUID update(User user) {
+        data.put(user.getId(), user);
+        saveDataToFile();
+        return user.getId();
     }
 
     public UUID delete(UUID id) {

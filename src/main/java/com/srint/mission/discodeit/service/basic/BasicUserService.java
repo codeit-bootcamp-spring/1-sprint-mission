@@ -37,7 +37,7 @@ public class BasicUserService implements UserService {
     public User updateUserName(UUID id, String name) {
         User findUser = userRepository.findOne(id);
         findUser.setUsername(name);
-        userRepository.save(findUser);
+        userRepository.update(findUser);
         return findUser;
     }
 
@@ -45,7 +45,7 @@ public class BasicUserService implements UserService {
     public User updateEmail(UUID id, String email) {
         User findUser = userRepository.findOne(id);
         findUser.setEmail(email);
-        userRepository.save(findUser);
+        userRepository.update(findUser);
         return findUser;
     }
 
@@ -53,7 +53,7 @@ public class BasicUserService implements UserService {
     public User updatePassword(UUID id, String password) {
         User findUser = userRepository.findOne(id);
         findUser.setPassword(password);
-        userRepository.save(findUser);
+        userRepository.update(findUser);
         return findUser;
     }
 

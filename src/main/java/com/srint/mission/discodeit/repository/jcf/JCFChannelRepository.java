@@ -15,9 +15,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     //db 로직
     public UUID save(Channel channel) {
-        if(!data.containsKey(channel.getId())){
-            data.put(channel.getId(), channel);
-        }
+        data.put(channel.getId(), channel);
         return(channel.getId());
     }
 
@@ -33,6 +31,12 @@ public class JCFChannelRepository implements ChannelRepository {
             return Collections.emptyList(); // 빈 리스트 반환
         }
         return data.values().stream().toList();
+    }
+
+    @Override
+    public UUID update(Channel channel) {
+        data.put(channel.getId(), channel);
+        return(channel.getId());
     }
 
     public UUID delete(UUID id) {

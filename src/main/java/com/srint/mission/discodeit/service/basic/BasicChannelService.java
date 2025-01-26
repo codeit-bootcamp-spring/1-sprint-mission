@@ -48,7 +48,7 @@ public class BasicChannelService implements ChannelService {
     public Channel joinChannel(UUID id, User user) {
         Channel findChannel = channelRepository.findOne(id);
         findChannel.setJoinedUsers(user);
-        channelRepository.save(findChannel);
+        channelRepository.update(findChannel);
         return findChannel;
     }
 
@@ -58,7 +58,7 @@ public class BasicChannelService implements ChannelService {
         Channel findChannel = channelRepository.findOne(id);
         findChannel.deleteJoinedUser(user);
         user.deleteMyChannels(findChannel);
-        channelRepository.save(findChannel);
+        channelRepository.update(findChannel);
         return findChannel.getId();
     }
 

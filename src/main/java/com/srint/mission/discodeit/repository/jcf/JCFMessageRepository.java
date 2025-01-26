@@ -14,9 +14,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     public UUID save(Message message) {
-        if(!data.containsKey(message.getId())){
-            data.put(message.getId(), message);
-        }
+        data.put(message.getId(), message);
         return message.getId();
     }
 
@@ -32,6 +30,12 @@ public class JCFMessageRepository implements MessageRepository {
             return Collections.emptyList(); // 빈 리스트 반환
         }
         return data.values().stream().toList();
+    }
+
+    @Override
+    public UUID update(Message message) {
+        data.put(message.getId(), message);
+        return message.getId();
     }
 
     public UUID delete(UUID id) {
