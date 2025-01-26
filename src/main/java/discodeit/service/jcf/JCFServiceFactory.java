@@ -16,20 +16,15 @@ public class JCFServiceFactory implements ServiceFactory {
     private final MessageService messageService;
 
     private JCFServiceFactory() {
-        userService = JCFUserService.getInstance();
-        channelService = JCFChannelService.getInstance();
-        messageService = JCFMessageService.getInstance();
+        this.userService = JCFUserService.getInstance();
+        this.channelService = JCFChannelService.getInstance();
 
-        setDependencies();
+        JCFMessageService.initialize(userService, channelService);
+        this.messageService = JCFMessageService.getInstance();
     }
 
     public static ServiceFactory getInstance() {
         return  JCFServiceFactoryHolder.INSTANCE;
-    }
-
-    private void setDependencies() {
-        messageService.updateUserService(userService);
-        messageService.updateChannelService(channelService);
     }
 
     @Override

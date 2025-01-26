@@ -18,27 +18,34 @@ public class JCFMessageService implements MessageService {
     private UserService userService;
     private ChannelService channelService;
 
-    private JCFMessageService() {
-        messages = new HashMap<>();
-        validator = new MessageValidator();
+    private JCFMessageService(UserService userService, ChannelService channelService) {
+        this.messages = new HashMap<>();
+        this.validator = new MessageValidator();
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     private static class JCFMessageServiceHolder {
-        private static final MessageService INSTANCE = new JCFMessageService();
+        private static MessageService instance;
+
+        private static void initialize(UserService userService, ChannelService channelService) {
+            instance = new JCFMessageService(userService, channelService);
+        }
+
+        private static MessageService getInstance() {
+            if (instance == null) {
+                throw new IllegalStateException("JCFMessageService is not initialized");
+            }
+            return instance;
+        }
+    }
+
+    public static void initialize(UserService userService, ChannelService channelService) {
+        JCFMessageServiceHolder.initialize(userService, channelService);
     }
 
     public static MessageService getInstance() {
-        return JCFMessageServiceHolder.INSTANCE;
-    }
-
-    @Override
-    public void updateUserService(UserService userService) {
-        this.userService = userService;
-    }
-
-    @Override
-    public void updateChannelService(ChannelService channelService) {
-        this.channelService = channelService;
+        return JCFMessageServiceHolder.getInstance();
     }
 
     @Override

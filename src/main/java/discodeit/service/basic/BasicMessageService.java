@@ -28,16 +28,6 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void updateUserService(UserService userService) {
-
-    }
-
-    @Override
-    public void updateChannelService(ChannelService channelService) {
-
-    }
-
-    @Override
     public Message create(String content, User sender, UUID channelId) {
         userService.find(sender.getId());
         channelService.find(channelId);
