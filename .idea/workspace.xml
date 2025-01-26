@@ -5,42 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0dd1794-1d53-4f90-8a48-de7ed0b464e5" name="변경" comment="">
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gitignore" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/build.gradle" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/gradlew" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/gradlew.bat" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/settings.gradle" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/JavaApplication.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/entity/Message.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/UserService.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFChannelService.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFMessageService.java" afterDir="false" />
-      <change afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFUserService.java" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.github/pull-request-template.md" beforeDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/checksums.lock" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/md5-checksums.bin" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/sha1-checksums.bin" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/executionHistory/executionHistory.lock" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/fileHashes/fileHashes.bin" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/fileHashes/fileHashes.lock" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/8.10/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/file-system.probe" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/compiler.xml" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/gradle.xml" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/misc.xml" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/misc.xml" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/workspace.xml" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/README.md" beforeDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/build/classes/java/main/com/sprint/mission/discodeit/JavaApplication.class" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/build/classes/java/main/com/sprint/mission/discodeit/JavaApplication.class" afterDir="false" />
-      <change beforePath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/build/tmp/compileJava/previous-compilation-data.bin" beforeDir="false" afterPath="C:/github.com/codeit-bootcamp-spring/1-sprint-mission/build/tmp/compileJava/previous-compilation-data.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileChannelService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileMessageService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/JavaApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/JavaApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/ChannelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/MessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFChannelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFMessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/jcf/JCFUserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,12 +56,13 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="C:/github.com/codeit-bootcamp-spring/1-sprint-mission" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -98,9 +80,9 @@
     &quot;Gradle.1-sprint-mission::github.com:codeit-bootcamp-spring:1-sprint-mission [:com.sprint.mission.discodeit.JavaApplication.main()].executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;part1-정연경-sprint1&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/github.com/codeit-bootcamp-spring/1-sprint-mission/out/production/classes&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/github.com/codeit-bootcamp-spring/1-sprint-mission&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -110,7 +92,7 @@
     &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode.Java&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;,
     &quot;애플리케이션.Main.executor&quot;: &quot;Run&quot;
   }
@@ -179,6 +161,15 @@
       <workItem from="1737343956868" duration="1353000" />
       <workItem from="1737345847037" duration="322000" />
       <workItem from="1737346191279" duration="332000" />
+      <workItem from="1737351472141" duration="1534000" />
+      <workItem from="1737380394611" duration="430000" />
+      <workItem from="1737380842322" duration="1831000" />
+      <workItem from="1737387649572" duration="3000" />
+      <workItem from="1737421664392" duration="1061000" />
+      <workItem from="1737423516757" duration="4059000" />
+      <workItem from="1737511164914" duration="594000" />
+      <workItem from="1737875246525" duration="14446000" />
+      <workItem from="1737895344420" duration="3174000" />
     </task>
     <servers />
   </component>
@@ -207,17 +198,6 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://C:/github.com/codeit-bootcamp-spring/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/entity/User.java</url>
-          <line>30</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
