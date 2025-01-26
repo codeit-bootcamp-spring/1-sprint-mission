@@ -19,26 +19,28 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(String name, String introduction, User owner) {
-        return null;
+        Channel channel = new Channel(name, introduction, owner);
+        channels.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        return null;
+        return channels.get(channelId);
     }
 
     @Override
     public List<Channel> findAll() {
-        return List.of();
+        return channels.values().stream().toList();
     }
 
     @Override
     public void update(UUID channelId, String name, String introduction) {
-
+        channels.get(channelId).update(name, introduction);
     }
 
     @Override
     public void delete(UUID channelId) {
-
+        channels.remove(channelId);
     }
 }
