@@ -34,17 +34,17 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID userId, String name, String email, String phoneNumber) {
-        users.get(userId).update(name, email, phoneNumber);
+    public void update(User user, String name, String email, String phoneNumber) {
+        user.update(name, email, phoneNumber);
     }
 
     @Override
-    public void updatePassword(UUID userId, String originalPassword, String newPassword) {
-        users.get(userId).updatePassword(originalPassword, newPassword);
+    public void updatePassword(User user, String originalPassword, String newPassword) {
+        user.updatePassword(originalPassword, newPassword);
     }
 
     @Override
-    public void delete(UUID userId) {
-        users.remove(userId);
+    public void delete(User user) {
+        users.remove(user.getId());
     }
 }
