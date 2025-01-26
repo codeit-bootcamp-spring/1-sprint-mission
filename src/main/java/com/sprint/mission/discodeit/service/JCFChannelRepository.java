@@ -1,25 +1,47 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-public interface JCFChannelRepository {
-    // Repository계층의 주요 역할이 데이터베이스 CRUD 작업처리
-    // 라고하니깐 Repository만 만들도록 하자. Service와 Manager는 만들어도 감당 못하고 뭘 해야할지도 모르겠다.
+public class JCFChannelRepository implements ChannelRepository {
+    private final HashMap<UUID, Channel> data = new HashMap<>();
 
-    // 생성
-    void save(Channel channel);
+    @Override
+    public void save(Channel channel) {
+        data.put(channel.getId(), channel);
+        System.out.println("채널 저장 완료 : " + channel.getId());
+    }
 
-    // 조회
-    void findById(UUID id);
-    void findAll();
+    @Override
+    public void findById(UUID id) {
+        if (data.containsKey(id)) {
+            System.out.println("channel name : " + data.get(id).getChannelName());
+            System.out.println("channel admin : " + data.get(id).getAdminUser().getUserNickName());
+        }
+    }
 
-    // 수정
-    void update(Channel channel);
+    @Override
+    public void findAll() {
+        for (UUID uuid : data.keySet()) {
+            System.out.println("Channel ID : " + uuid);
+            System.out.println("Channel Name : " + data.get(uuid).getChannelName());
+            System.out.println("Channel Admin : " + data.get(uuid).getAdminUser().getUserNickName());
+        }
 
-    // 삭제
-    void delete(UUID id);
+    }
+
+    @Override
+    public void update(Channel channel) {
+        // 이 함수가 호출되면 해당 엔티티의 updateAt값을 변경 시점 시간으로 저장해주어야 한다.
+        data.put(channel.getId(), channel);
+        System.out.println("채널 정보 변경");
+        channel.updateUpdatedAt(System.currentTimeMillis());
+    }
+
+    @Override
+    public void delete(UUID id) {
+        data.remove(id);
+    }
 }

@@ -1,15 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.ChannelService;
-
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.UUID;
 
 public class User {
     private final UUID id; // 유저 식별을 위한 UUID
     private final Long createdAt; // 생성 시점 시간
-    private Long updatedAt; // 정보 변경 시점 시간
+    private static Long updatedAt; // 정보 변경 시점 시간
 
     // 추가적으로 필요한 필드값들은 메소드 만들면서 추가하도록 하자.
     // 지금 넣어봤자 계속 바뀔 것 같다.
@@ -25,7 +21,19 @@ public class User {
         this.password = password;
     }
 
-    public static User createUser(String userEmail, String userNickName, String password) {
+    private User(String userEmail, String userNickName, String password, long updatedTimeStamp) {
+        id = UUID.randomUUID();
+        createdAt = System.currentTimeMillis();
+        this.userNickName = userNickName;
+        this.userEmail = userEmail;
+        this.password = password;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    public static User createUser(String userEmail, String userNickName, String password, boolean isUpdated) {
+        if (isUpdated) {
+            return new User(userEmail, userNickName, password, System.currentTimeMillis());
+        }
         return new User(userEmail, userNickName, password);
     }
 
@@ -65,7 +73,8 @@ public class User {
         userEmail = newemail;
     }
 
-    public void updateUpdatedAt(long newupdatedAt) {
+    public static String updateUpdatedAt(long newupdatedAt) {
         updatedAt = newupdatedAt;
+        return updatedAt.toString();
     }
 }
