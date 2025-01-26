@@ -83,7 +83,19 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public void update(UUID channelId, String name, String introduction) {
+        validator.validate(name, introduction);
+        Channel channel = find(channelId);
+        channel.update(name, introduction);
 
+        Path filePath = directory.resolve(channelId + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

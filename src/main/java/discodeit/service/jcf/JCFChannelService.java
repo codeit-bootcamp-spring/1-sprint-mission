@@ -55,8 +55,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void update(UUID channelId, String name, String introduction) {
         Channel channel = find(channelId);
-        validator.validateName(name);
-        validator.validateIntroduction(introduction);
+        validator.validate(name, introduction);
 
         channel.update(name, introduction);
     }
