@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
@@ -10,47 +9,84 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class JCF_channel implements ChannelService {
-    private final List<Channel> channelSet;
+    private final List<Channel> channelList;
 
     public JCF_channel() {
-        this.channelSet = new ArrayList<>();
+        this.channelList = new ArrayList<>();
     }
-
-    public boolean isDuplication(List<Channel> channelSet, String title) {
-        return channelSet.stream().anyMatch(channel1 -> channel1.getTitle().equals(title));
+    @Override
+    public void creat(String title) {
+        Channel channel = new Channel(title);
+        channelList.add(channel);
+        System.out.println(channelList);
     }
 
     @Override
-    public void creat(Channel channel) {
-        if (isDuplication(channelSet, channel.getTitle())) {
-            System.out.println("Title duplication!");
+    public void addUser(UUID userId, UUID channelId, JCF_user jcfUser) {
+        channelList.stream().filter(channel -> channel.getId().equals(channelId))
+            .forEach(channel -> channel.addUser(userId));
+        jcfUser.addChannel(channelId, userId);
+    }
+
+    @Override
+    public void addMessage(String messageContent, UUID channelId, UUID userId,
+        JCF_message jcfMessage, JCF_user jcfUser) {
+        UUID messageId = jcfMessage.creat(userId, messageContent, channelId);
+        jcfUser.addMessage(messageId, userId);
+        channelList.stream().filter(channel -> channel.getId().equals(channelId))
+            .forEach(channel -> channel.addMessage(messageId));
+    }
+
+    @Override
+    public void delete(UUID channelId, JCF_message jcfMessage) {
+        Optional<Channel> getChannel = channelList.stream().filter(channel -> channel.getId().equals(channelId)).findFirst();
+        if (getChannel.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
         }
         else {
-            channelSet.add(channel);
+            jcfMessage.DeleteMessageList(getChannel.get().getMessageIdList());
+            channelList.remove(getChannel.get());
         }
     }
-
+    //여기아님
     @Override
-    public void delete(UUID channelId) {
-        Optional<Channel> getChannel = channelSet.stream().filter(channel1 -> channel1.getId().equals(channelId)).findFirst();
-        Channel channel = getChannel.get();
-        channelSet.remove(channel);
-
+    public List<UUID> getUserIdList(UUID channelId) {
+        return channelList.stream()
+            .filter(it -> it.getId().equals(channelId))
+            .map(Channel::getUserIdList)
+            .findFirst()
+            .orElse(null);
+    }
+    //여기아님
+    @Override
+    public List<UUID> getMessageIdList(UUID channelId) {
+        return channelList.stream()
+            .filter(it -> it.getId().equals(channelId))
+            .map(Channel::getMessageIdList)
+            .findFirst()
+            .orElse(null);
+    }
+    //여기아님
+    @Override
+    public List<String> getMessageList(UUID channelId, JCF_message jcfMessage, JCF_user jcfUser) {
+        List<UUID> messageIdList = channelList.stream()
+            .filter(it -> it.getId().equals(channelId))
+            .findFirst()
+            .map(Channel::getMessageIdList)
+            .orElse(null);
+        System.out.println(messageIdList);
+        return jcfMessage.getMessageList(messageIdList, jcfUser);
     }
 
     @Override
     public void update(UUID channelId, String title) {
-        channelSet.stream().filter(channel -> channel.getId().equals(channelId))
-            .forEach(channel -> {{channel.updateTitle(title);
-            }
-            });
-
+        channelList.stream().filter(channel -> channel.getId().equals(channelId))
+            .forEach(channel -> channel.updateTitle(title));
     }
-
 
     @Override
     public UUID write(String title) {
-        Optional<Channel> channel = channelSet.stream().filter(channel_id -> channel_id.getTitle().equals(title)).findFirst();
+        Optional<Channel> channel = channelList.stream().filter(channel_id -> channel_id.getTitle().equals(title)).findFirst();
 
         if(channel.isPresent()){
             return channel.get().getId();
@@ -58,12 +94,6 @@ public class JCF_channel implements ChannelService {
         else{
             return null;
         }
-    }
-
-    @Override
-    public List<Channel> allWrite() {
-        return channelSet;
-
     }
 
 }

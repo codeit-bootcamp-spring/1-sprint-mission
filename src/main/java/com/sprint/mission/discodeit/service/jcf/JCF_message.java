@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
@@ -13,54 +11,56 @@ import java.util.stream.Collectors;
 
 public class JCF_message implements MessageService {
 
-    private final List<Message> messageSet;
+    private final List<Message> messageList;
 
     public JCF_message() {
-        messageSet = new ArrayList<>();
+        messageList = new ArrayList<>();
     }
 
     @Override
-    public void creat(Message message) {
-        messageSet.add(message);
-
+    public UUID creat(UUID userId, String content, UUID channelId) {
+        Message message = new Message(userId, content, channelId);
+        messageList.add(message);
+        return message.getId();
     }
 
     @Override
     public void delete(UUID messageId) {
-        Optional<Message> getMessage = messageSet.stream().filter(message1 -> message1.getId().equals(messageId)).findFirst();
-        Message message = getMessage.get();
-        messageSet.remove(message);
+        Optional<Message> getMessage = messageList.stream().filter(message -> message.getId().equals(messageId)).findFirst();
+        if (getMessage.isEmpty()) {
+            throw new IllegalArgumentException("Message not found");
+        }
+        else {
+            messageList.remove(getMessage.get());
+        }
     }
 
     @Override
     public void update(UUID messageId, String updateMessage) {
-        messageSet.stream().filter(message -> message.getId().equals(messageId))
-            .forEach(messageContent -> {{messageContent.updateMessage(updateMessage);
-            }
-        });
+        messageList.stream().filter(message -> message.getId().equals(messageId))
+            .forEach(messageContent -> messageContent.updateMessage(updateMessage)
+            );
     }
 
     @Override
-    public List<Message> write(UUID userId, UUID channelId) {
-        return messageSet.stream().filter(message_id ->
-                        message_id.isUserEqual(userId) && message_id.isChannelEqual(channelId))
+    public void DeleteMessageList(List<UUID> deleteMessageList) {
+        System.out.println(deleteMessageList);
+        messageList.removeIf(message -> deleteMessageList.contains(message.getId()));
+    }
+
+    //여기아님
+    @Override
+    public List<String> getMessageList(List<UUID> messageIdList, JCF_user jcfUser) {
+        if (messageIdList.isEmpty()) {
+            System.out.println("There is no chat in the channel");
+            return null;
+        }
+        else {
+            return messageList.stream()
+                .filter(message -> messageIdList.stream()
+                    .anyMatch(messageId -> message.getId().equals(messageId)))
+                .map(message -> "name" +jcfUser.getName(message.getUserId()) + "  " + message.getContent())
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> getMessage(UUID channelId) {
-        return messageSet.stream().filter(message1 ->
-                        message1.isChannelEqual(channelId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteUserMessage(UUID userId) {
-        messageSet.removeIf(message -> message.isUserEqual(userId));
-    }
-
-    @Override
-    public void deleteChannelMessage(UUID channelId) {
-        messageSet.removeIf(message -> message.isChannelEqual(channelId));
+        }
     }
 }
