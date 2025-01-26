@@ -28,9 +28,9 @@ public class JCFServiceFactory implements ServiceFactory {
     }
 
     private JCFServiceFactory() {
-        this.userService = createUserService();
-        this.channelService = createChannelService();
-        this.messageService = createMessageService();
+        this.userService = new JCFUserService();
+        this.channelService = new JCFChannelService(userService);
+        this.messageService = new JCFMessageService(channelService, userService);
     }
 
     public static JCFServiceFactory getInstance() {
@@ -40,27 +40,4 @@ public class JCFServiceFactory implements ServiceFactory {
         return instance;
     }
 
-    @Override
-    public UserService createUserService() {
-        if (userService == null) {
-            userService = new JCFUserService();
-        }
-        return userService;
-    }
-
-    @Override
-    public ChannelService createChannelService() {
-        if (channelService == null) {
-            channelService = new JCFChannelService(userService);
-        }
-        return channelService;
-    }
-
-    @Override
-    public MessageService createMessageService() {
-        if (messageService == null) {
-            messageService = new JCFMessageService(channelService, userService);
-        }
-        return messageService;
-    }
 }

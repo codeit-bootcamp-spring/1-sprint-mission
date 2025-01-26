@@ -19,9 +19,9 @@ public class BasicServiceFactory implements ServiceFactory {
 
     private BasicServiceFactory(String mode) {
         this.repositoryFactory = BasicRepositoryFactory.getInstance(mode);
-        this.userService = createUserService();
-        this.channelService = createChannelService();
-        this.messageService = createMessageService();
+        this.userService = new BasicUserService(repositoryFactory.getUserRepository());
+        this.channelService = new BasicChannelService(repositoryFactory.getChannelRepository(), userService);
+        this.messageService = new BasicMessageService(repositoryFactory.getMessageRepository(), userService, channelService);
     }
 
     public static BasicServiceFactory getInstance(String mode) {
@@ -29,31 +29,6 @@ public class BasicServiceFactory implements ServiceFactory {
             instance = new BasicServiceFactory(mode);
         }
         return instance;
-    }
-    //레포지토리 어떻게 분리할 수 있을까,,,,
-
-    @Override
-    public UserService createUserService() {
-        if (userService == null) {
-            userService = new BasicUserService(repositoryFactory.getUserRepository());
-        }
-        return userService;
-    }
-
-    @Override
-    public ChannelService createChannelService() {
-        if (channelService == null) {
-            channelService = new BasicChannelService(repositoryFactory.getChannelRepository(), userService);
-        }
-        return channelService;
-    }
-
-    @Override
-    public MessageService createMessageService() {
-        if (messageService == null) {
-            messageService = new BasicMessageService(repositoryFactory.getMessageRepository(), userService, channelService);
-        }
-        return messageService;
     }
 
     @Override

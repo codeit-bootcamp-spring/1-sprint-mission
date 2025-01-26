@@ -11,14 +11,14 @@ public class FileServiceFactory implements ServiceFactory {
 
     private static FileServiceFactory instance;
 
-    private UserService userService;
-    private ChannelService channelService;
-    private MessageService messageService;
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final MessageService messageService;
 
     private FileServiceFactory() {
-        this.userService = createUserService();
-        this.channelService = createChannelService();
-        this.messageService = createMessageService();
+        this.userService = new FileUserService();
+        this.channelService = new FileChannelService(userService);
+        this.messageService = new FileMessageService(userService, channelService);
     }
 
     public static FileServiceFactory getInstance() {
@@ -26,30 +26,6 @@ public class FileServiceFactory implements ServiceFactory {
             instance = new FileServiceFactory();
         }
         return instance;
-    }
-
-    @Override
-    public UserService createUserService() {
-        if (userService == null) {
-            userService = new FileUserService();
-        }
-        return userService;
-    }
-
-    @Override
-    public ChannelService createChannelService() {
-        if (channelService == null) {
-            channelService = new FileChannelService(userService);
-        }
-        return channelService;
-    }
-
-    @Override
-    public MessageService createMessageService() {
-        if (messageService == null) {
-            messageService = new FileMessageService(userService, channelService);
-        }
-        return messageService;
     }
 
     @Override
