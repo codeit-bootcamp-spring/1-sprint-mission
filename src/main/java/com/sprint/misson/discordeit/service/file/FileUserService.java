@@ -84,7 +84,7 @@ public class FileUserService extends FileService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
         User user = getUserByUUID(userId);
 
         if (user == null) {
@@ -119,7 +119,7 @@ public class FileUserService extends FileService implements UserService {
         }
 
         if (isUpdated) {
-            user.setUpdatedAt();
+            user.setUpdatedAt(updatedAt);
             //todo - 고민
             //덮어씌우게 될까?
             Path userPath = userDirectory.resolve(user.getId().concat(".ser"));

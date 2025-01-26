@@ -110,7 +110,7 @@ public class JCFMessageService implements MessageService {
 
     //수정
     @Override
-    public Message updateMessage(String messageId, String newContent) throws CustomException {
+    public Message updateMessage(String messageId, String newContent, long updatedAt) throws CustomException {
 
         Message message = data.get(messageId);
 
@@ -124,7 +124,7 @@ public class JCFMessageService implements MessageService {
         message.setContent(newContent);
 
         if (!message.getContent().equals(newContent)) {
-            message.setUpdatedAt();
+            message.setUpdatedAt(updatedAt);
         }
         return message;
     }

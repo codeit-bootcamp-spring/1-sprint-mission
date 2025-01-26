@@ -55,9 +55,8 @@ public class Message implements Serializable {
         return updatedAt;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-        ;
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현

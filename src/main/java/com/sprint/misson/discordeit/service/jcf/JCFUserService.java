@@ -93,7 +93,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
         User user = data.get(userId);
 
         if (user == null) {
@@ -128,7 +128,7 @@ public class JCFUserService implements UserService {
         }
 
         if (isUpdated) {
-            user.setUpdatedAt();
+            user.setUpdatedAt(updatedAt);
         }
         return user;
     }

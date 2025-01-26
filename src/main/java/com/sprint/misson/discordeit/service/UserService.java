@@ -32,7 +32,7 @@ public interface UserService {
     List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
-    User updateUser(String userId, UserDTO userDTO);
+    User updateUser(String userId, UserDTO userDTO, long updatedAt);
 
     //삭제
     boolean deleteUser(String userId);

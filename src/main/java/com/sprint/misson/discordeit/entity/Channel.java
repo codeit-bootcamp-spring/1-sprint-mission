@@ -65,8 +65,8 @@ public class Channel implements Serializable {
         return updatedAt;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     //채널 생성된 이후, 채널 종류를 변경할 수 없으므로 update 미구현

@@ -74,8 +74,8 @@ public class User implements Serializable {
         return updatedAt;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+    public void setUpdatedAt(long updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public UserStatus getUserStatus() {

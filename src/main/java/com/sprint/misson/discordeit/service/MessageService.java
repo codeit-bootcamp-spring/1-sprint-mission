@@ -31,7 +31,7 @@ public interface MessageService {
     List<Message> getMessagesByChannel(Channel channel);
 
     //수정
-    Message updateMessage(String messageId, String newContent);
+    Message updateMessage(String messageId, String newContent, long updatedAt);
 
     //삭제
     boolean deleteMessage(Message message);

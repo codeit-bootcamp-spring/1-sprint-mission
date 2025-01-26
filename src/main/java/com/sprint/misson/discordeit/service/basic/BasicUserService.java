@@ -68,7 +68,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
         User user = userRepository.findById(userId);
 
         if (user == null) {
@@ -97,7 +97,7 @@ public class BasicUserService implements UserService {
         }
 
         if (isUpdated) {
-            user.setUpdatedAt();
+            user.setUpdatedAt(updatedAt);
         }
 
         return userRepository.save(user);

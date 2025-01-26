@@ -26,7 +26,7 @@ public interface ChannelService {
     List<Channel> getChannelByType(ChannelType channelType);
 
     //수정
-    Channel updateChannel(String channelId, ChannelDTO channelDTO);
+    Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt);
 
     //삭제
     boolean deleteChannel(Channel channel);

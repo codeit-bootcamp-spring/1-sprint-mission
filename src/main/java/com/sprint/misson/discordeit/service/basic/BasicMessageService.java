@@ -85,7 +85,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(String messageId, String newContent) throws CustomException {
+    public Message updateMessage(String messageId, String newContent, long updatedAt) throws CustomException {
         Message message = messageRepository.findById(messageId);
         if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
@@ -95,7 +95,7 @@ public class BasicMessageService implements MessageService {
 
         if (!message.getContent().equals(newContent)) {
             message.setContent(newContent);
-            message.setUpdatedAt();
+            message.setUpdatedAt(updatedAt);
         }
         return messageRepository.save(message);
     }

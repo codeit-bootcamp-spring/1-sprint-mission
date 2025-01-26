@@ -62,7 +62,7 @@ public class FileChannelService extends FileService implements ChannelService {
     // todo
     // 변경사항 체크 로직 따로 뺄 수 있는지 확인
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws CustomException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO,long updatedAt) throws CustomException {
         Channel channel = getChannelByUUID(channelId);
 
         if (channel == null) {
@@ -91,7 +91,7 @@ public class FileChannelService extends FileService implements ChannelService {
 
         // 변경사항이 있는 경우에만 업데이트 시간 설정
         if (isUpdated) {
-            channel.setUpdatedAt();
+            channel.setUpdatedAt(updatedAt);
             Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
             save(channelPath, channel);
         }

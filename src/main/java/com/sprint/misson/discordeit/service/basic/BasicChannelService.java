@@ -52,7 +52,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO) throws CustomException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -79,7 +79,7 @@ public class BasicChannelService implements ChannelService {
 
         // 변경사항이 있는 경우에만 업데이트 시간 설정
         if (isUpdated) {
-            channel.setUpdatedAt();
+            channel.setUpdatedAt(updatedAt);
         }
         return channelRepository.save(channel);
     }

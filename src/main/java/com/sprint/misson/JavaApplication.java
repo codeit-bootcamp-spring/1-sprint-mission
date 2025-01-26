@@ -197,7 +197,7 @@ public class JavaApplication {
         System.out.println("* default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경하여 테스트 하였음");
         UserDTO userDTO = new UserDTO();
         userDTO.setUserStatus(UserStatus.INACTIVE);
-        userService.updateUser(user3.getId(), userDTO);
+        userService.updateUser(user3.getId(), userDTO, System.currentTimeMillis());
 
         System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
         userService.getUserByUserStatus(UserStatus.ACTIVE).forEach(User::displayShortInfo);
@@ -291,7 +291,7 @@ public class JavaApplication {
 
         try {
             System.out.println("\n> 수정 결과: ");
-            userService.updateUser(user1.getId(), userDto).displayFullInfo();
+            userService.updateUser(user1.getId(), userDto, System.currentTimeMillis()).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -306,7 +306,7 @@ public class JavaApplication {
 
 
         System.out.println("\n> 수정 결과:");
-        System.out.println(channelService.updateChannel(channelByUUID.getId(), channelDTO).toFullString());
+        System.out.println(channelService.updateChannel(channelByUUID.getId(), channelDTO, System.currentTimeMillis()).toFullString());
 
         System.out.println("\n\n--- Message 수정 ---");
         System.out.println("\n> msg1 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
@@ -314,7 +314,7 @@ public class JavaApplication {
         messageByUUID.displayFullInfo();
 
         System.out.println("\n> 수정 결과:");
-        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!").displayFullInfo();
+        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!",(System.currentTimeMillis())).displayFullInfo();
 
         // 4. 삭제 테스트
         System.out.println("\n\n=== 4. 삭제 테스트 ===");
