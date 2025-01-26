@@ -13,7 +13,7 @@ public interface UserService {
     void updateMail(User user, String name);
 
     // 모든 유저 조회, 특정 유저 조회
-    List<User> getSearchAllUser();
+    List<User> findAllUserList();
     void searchUser(User user);
 
     // 유저 삭제

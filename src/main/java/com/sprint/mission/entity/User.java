@@ -1,15 +1,16 @@
 package com.sprint.mission.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.UUID;
 import java.time.format.DateTimeFormatter;
 
-public class User {
-
-    private long updateAt;
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L; // 직렬화 버전 관리
+    private Long updateAt;
     private final UUID id;
-    private final long createdAt;
+    private final Long createdAt;
     private String email;
     private String name;
 

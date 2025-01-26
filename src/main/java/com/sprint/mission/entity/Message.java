@@ -1,16 +1,16 @@
 package com.sprint.mission.entity;
 
-
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class Message {
+public class Message implements Serializable {
     private User name;
     private Channel channel;
     private String message;
-    private long createdAt;
-    private long updateAt;
+    private Long createdAt;
+    private Long updateAt;
 
 
     public Message(User name, Channel channel, String message) {

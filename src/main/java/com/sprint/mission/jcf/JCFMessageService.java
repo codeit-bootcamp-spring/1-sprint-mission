@@ -58,7 +58,7 @@ public class JCFMessageService implements MessageService {
 
     // 유저의 모든 메시지 조회
     @Override
-    public List<Message> getAllMessageList() {
+    public List<Message> findAllMessageList() {
         System.out.println("\n***메시지 전체 조회***");
         for (Message message : messageData) {
             System.out.println(message);
