@@ -12,7 +12,7 @@ public class ValidatorTest {
 
         assertThatThrownBy(() -> userValidator.isBlank(""))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("입력이 비어있습니다.");
+                .hasMessage("[ERROR] 입력이 비어있습니다.");
     }
 
     @Test
@@ -21,7 +21,7 @@ public class ValidatorTest {
 
         assertThatThrownBy(() -> userValidator.validateEmail("user.codeit.com"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 이메일 형식입니다.");
+                .hasMessage("[ERROR] 잘못된 이메일 형식입니다.");
     }
 
     @Test
@@ -30,6 +30,6 @@ public class ValidatorTest {
 
         assertThatThrownBy(() -> userValidator.validatePhoneNumber("01012345678"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("잘못된 핸드폰 번호 형식입니다.");
+                .hasMessage("[ERROR] 잘못된 핸드폰 번호 형식입니다.");
     }
 }
