@@ -74,8 +74,8 @@ public class User implements Serializable {
     }
 
     public void updatePassword(String originalPassword, String newPassword) {
-        if (!BCrypt.checkpw(originalPassword, password)) {
-            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+        if (!BCrypt.checkpw(originalPassword, password) || BCrypt.checkpw(newPassword, password)) {
+            throw new IllegalArgumentException("비밀번호 변경에 실패하였습니다.");
         }
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
