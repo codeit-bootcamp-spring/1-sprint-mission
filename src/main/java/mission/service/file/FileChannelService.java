@@ -17,13 +17,18 @@ public class FileChannelService implements ChannelService {
 
 
     private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
-    private final FileUserService fileUserService = FileUserService.getInstance();
+    private FileUserService fileUserService;
 
     private static FileChannelService fileChannelService;
     FileChannelService(){}
     public static FileChannelService getInstance(){
         if (fileChannelService == null) return fileChannelService = new FileChannelService();
         else return fileChannelService;
+    }
+
+    private FileUserService getFileUserService(){
+        if (fileUserService == null) return fileUserService = FileUserService.getInstance();
+        else return fileUserService;
     }
 
     // 생성 수정 오류 메시지 다르게 처리하기위해 오류 던지기

@@ -81,8 +81,8 @@ public class Message implements Serializable, Comparable<Message> {
 
     @Override
     public String toString() {
-        return "[" + firstId + "]" + "Message{" +
-                "message='" + message + "'}";
+        return "[채널: " + writedAt.getName() + "]" + " {작성자: " + writer.getName() +
+                "} => " + message;
     }
 
     @Override

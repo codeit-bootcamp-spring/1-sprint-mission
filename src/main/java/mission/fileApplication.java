@@ -7,6 +7,7 @@ import mission.controller.file.FileChannelController;
 import mission.controller.file.FileMessageController;
 import mission.controller.file.FileUserController;
 import mission.entity.Channel;
+import mission.entity.Message;
 import mission.entity.User;
 
 import java.io.IOException;
@@ -45,17 +46,35 @@ public class fileApplication {
         Channel updatedChannel = updateChannelName(channelList.get(0), "new Name");
 
         // user 등록
-        for (User user : fileUserController.findAll()) {
-            fileChannelController.addUserByChannel(updatedChannel.getId(), user.getId());
-            System.out.println("유저 등록 완료");
-        }
-        System.out.println(updatedChannel);
+        registerUsers(updatedChannel); // 존재하는 유저 전부 등록 (테스트니까)
 
         // 삭제
         deleteChannel(channelList.get(1));
 
-        //
-        
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<Message 테스트>>>>>>>>>>>>>>>>>>>>>>");
+        // 등록
+        Channel writingAt = fileChannelController.findAll().stream().toList().get(0);
+        User writer = fileUserController.findAll().stream().toList().get(0);
+        Message message1 = fileMessageController.create(writingAt.getId(), writer.getId(), "안녕하세요");
+        System.out.println(message1);
+
+        // 수정 및 조회 테스트
+        Message updateMessage = fileMessageController.update(message1.getId(), "안녕히 계세요");
+        System.out.println("수정된 메시지: " + fileMessageController.findById(updateMessage.getId()));
+        System.out.println("전체 메시지: " + fileMessageController.findAll());
+
+        // 삭제
+        fileMessageController.delete(updateMessage.getId());
+        System.out.println(updateMessage.getWritedAt().getName() + "에서 " + updateMessage.getWriter().getName() + "(이)가 작성한 메시지 삭제 완료");
+        System.out.println("전체 메시지: " + fileMessageController.findAll());
+    }
+
+    private static void registerUsers(Channel updatedChannel) throws IOException {
+        for (User user : fileUserController.findAll()) {
+            fileChannelController.addUserByChannel(updatedChannel.getId(), user.getId());
+            System.out.println(user.getName() + " 등록 완료");
+        }
+        System.out.println(fileChannelController.findAll());
     }
 
     private static void deleteChannel(Channel deletingChannel) {

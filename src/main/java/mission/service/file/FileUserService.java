@@ -2,6 +2,7 @@ package mission.service.file;
 
 import mission.entity.Channel;
 import mission.entity.User;
+import mission.repository.file.FileChannelRepository;
 import mission.repository.file.FileUserRepository;
 import mission.service.UserService;
 import mission.service.exception.DuplicateName;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class FileUserService implements UserService {
 
     private static final FileUserRepository fileUserRepository = new FileUserRepository();
-    private final FileChannelService fileChannelService = FileChannelService.getInstance();
+    private FileChannelService fileChannelService;
 
     private static FileUserService fileUserService;
     private FileUserService(){}
@@ -23,6 +24,13 @@ public class FileUserService implements UserService {
         if (fileUserService == null) return fileUserService = new FileUserService();
         else return fileUserService;
     }
+
+    private FileChannelService getFileChannelService(){
+        if (fileChannelService == null) return fileChannelService = FileChannelService.getInstance();
+        else return fileChannelService;
+    }
+
+
 
     @Override
     public User createOrUpdate(User user) throws IOException {
