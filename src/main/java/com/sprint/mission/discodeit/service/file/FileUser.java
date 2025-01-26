@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.MessageService;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -12,45 +12,36 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
-public class FileUser implements UserService {
+public class FileMessage implements MessageService {
   private Path fileDirectory;
-  private FileBasic userFileBasic;
+  private FileBasic messageFileBasic;
 
-  public FileUser(Path directory) {
+  public FileMessage(Path directory) {
     this.fileDirectory = directory;
-    this.userFileBasic = new FileBasic(fileDirectory);
-  }
-
-
-  @Override
-  public void creat(User user) {
-    List<User> userList = userFileBasic.load();
-    Path filePath = fileDirectory.resolve(user.getId().toString().concat(".ser"));
-    boolean duplication = userList.stream().anyMatch(user1 -> user1.getName().equals(user.getName()));
-    if(!duplication) {
-      try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
-          ObjectOutputStream oos = new ObjectOutputStream(fos);
-      ) {
-        oos.writeObject(user);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    else {
-      System.out.println("name duplication!");
-    }
-
+    this.messageFileBasic = new FileBasic(fileDirectory);
   }
 
   @Override
-  public void delete(UUID userId) {
+  public void creat(Message message) {
+    Path filePath = fileDirectory.resolve(message.getId().toString().concat(".ser"));
+
+    try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+    ) {
+      oos.writeObject(message);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void delete(UUID messageId) {
     try {
-      Optional<Path> userDelete = Files.list(fileDirectory)
-          .filter(path -> path.getFileName().toString().equals(userId + ".ser"))
+      Optional<Path> messageDelete = Files.list(fileDirectory)
+          .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
           .findFirst();
-      if(userDelete.isPresent()) {
-        Files.delete(userDelete.get());
+      if(messageDelete.isPresent()) {
+        Files.delete(messageDelete.get());
       }
       else {
         System.out.println("File not found for Id");
@@ -61,15 +52,15 @@ public class FileUser implements UserService {
   }
 
   @Override
-  public void update(UUID userId, String name) {
+  public void update(UUID messageId, String messageContent) {
     try {
-      Optional<Path> updateUser = Files.list(fileDirectory)
-          .filter(path -> path.getFileName().toString().equals(userId + ".ser"))
+      Optional<Path> updateMessage = Files.list(fileDirectory)
+          .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
           .findFirst();
-      if(updateUser.isPresent()) {
-        User user = (User) userFileBasic.deserialization(updateUser.get());
-        user.updateName(name);
-        creat(user);
+      if(updateMessage.isPresent()) {
+        Message message = (Message) messageFileBasic.deserialization(updateMessage.get());
+        message.updateMessage(messageContent);
+        creat(message);
       }
       else {
         System.out.println("File not found for Id");
@@ -80,28 +71,78 @@ public class FileUser implements UserService {
   }
 
   @Override
-  public UUID write(String name) {
-    List<User> userList = userFileBasic.load();
+  public List<Message> write(UUID userId, UUID channelId) {
+    List<Message> messageList = messageFileBasic.load();
     try {
-      return userList.stream()
-          .filter(user -> user.getName().equals(name)).findFirst().get().getId();
+      return messageList.stream()
+          .filter(message -> message.isChannelEqual(channelId) && message.isUserEqual(userId))
+          .map(Message::new)
+          .collect(Collectors.toList());
     }
     catch (Exception e) {
-      System.out.println("There is no user with that name.");
+      System.out.println("There is no Message with that id.");
       return null;
     }
   }
 
   @Override
-  public List<User> allWrite() {
-    List<User> userList = userFileBasic.load();
-    return userList.stream()
-        .map(User::new)
-        .collect(Collectors.toList());
+  public List<Message> getMessage(UUID channelId) {
+    List<Message> messageList = messageFileBasic.load();
+    try {
+      return messageList.stream()
+          .filter(message -> message.isChannelEqual(channelId))
+          .map(Message::new)
+          .collect(Collectors.toList());
+    }
+    catch (Exception e) {
+      System.out.println("There is no Message with that id.");
+      return null;
+    }
   }
 
   @Override
-  public String getName(UUID userId) {
-    return "";
+  public void deleteUserMessage(UUID userID) {
+    try {
+      List<Message> messageList = messageFileBasic.load();
+      Files.list(fileDirectory)
+          .filter(path -> messageList.stream()
+              .anyMatch(message -> message.isUserEqual(userID) &&
+                  path.getFileName().toString().equals(message.getId().toString() + ".ser")))
+          .forEach(path -> {
+            try {
+              Files.delete(path);
+            } catch (IOException e) {
+              System.err.println("Deletion failed.");
+              e.printStackTrace();
+            }
+          });
+    } catch (IOException e) {
+      System.err.println("Error listing files in directory: " + fileDirectory);
+      e.printStackTrace();
+    }
+
+  }
+
+  @Override
+  public void deleteChannelMessage(UUID channelId) {
+    try {
+      List<Message> messageList = messageFileBasic.load();
+      Files.list(fileDirectory)
+          .filter(path -> messageList.stream()
+              .anyMatch(message -> message.isChannelEqual(channelId) &&
+                  path.getFileName().toString().equals(message.getId().toString() + ".ser")))
+          .forEach(path -> {
+            try {
+              Files.delete(path);
+            } catch (IOException e) {
+              System.out.println("Deletion failed.");
+              e.printStackTrace();
+            }
+          });
+    } catch (IOException e) {
+      System.err.println("Error listing files in directory: " + fileDirectory);
+      e.printStackTrace();
+    }
   }
 }
+

@@ -79,47 +79,8 @@ public class Message implements Serializable {
     return false;
   }
 
-<<<<<<< HEAD
   @Override
   public int hashCode() {
     return Objects.hash(id);
   }
-=======
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public boolean isUserEqual(UUID userId) {
-        return userId.equals(getUser);
-    }
-
-    public boolean isChannelEqual(UUID channelId) {
-        return channelId.equals(getChannel);
-    }
-
-
-    public void updateId(UUID id) {
-        this.id = id;
-    }
-    public void updateCreatedAt(Long CreatedAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void updateMessage(String message){
-        this.content = message;
-        this.updatedAt = System.currentTimeMillis();
-    }
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    // 메세지 넣기
-
-    public String toString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return userName + "/ createdAt : " + simpleDateFormat.format(createdAt) + "\n" + "[ " + content
-                +" ]";
-
-    }
->>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
 }

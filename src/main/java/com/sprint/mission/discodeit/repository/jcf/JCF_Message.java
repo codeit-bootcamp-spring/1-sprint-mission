@@ -35,7 +35,7 @@ public class JCF_Message implements MessageRepository {
   @Override
   public void update(UUID messageId, String updateMessage) {
     messageList.stream().filter(message -> message.getId().equals(messageId))
-        .forEach(messageContent -> messageContent.updateMessage(updateMessage)
+        .forEach(message -> message.updateMessage(updateMessage)
         );
   }
 
@@ -60,3 +60,4 @@ public class JCF_Message implements MessageRepository {
         .collect(Collectors.toList());
   }
 }
+

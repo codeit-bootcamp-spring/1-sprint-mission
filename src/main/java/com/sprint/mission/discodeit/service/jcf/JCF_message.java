@@ -1,11 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-<<<<<<< HEAD
 import com.sprint.mission.discodeit.entity.Message;
-=======
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
->>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
