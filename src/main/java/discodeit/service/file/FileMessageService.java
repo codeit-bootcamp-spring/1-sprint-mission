@@ -90,8 +90,9 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public String getInfo(Message message) {
-        return "";
+    public String getInfo(UUID messageId) {
+        Message message = find(messageId);
+        return message.toString();
     }
 
     @Override

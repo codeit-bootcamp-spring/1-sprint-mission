@@ -13,7 +13,7 @@ public interface MessageService {
     Message create(String content, User sender, UUID channelId);
     Message find(UUID messageId);
     List<Message> findAll();
-    String getInfo(Message message);
+    String getInfo(UUID messageId);
     void update(UUID messageId, String content);
     void delete(UUID messageId);
 }

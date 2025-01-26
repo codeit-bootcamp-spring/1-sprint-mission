@@ -61,7 +61,8 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public String getInfo(Message message) {
+    public String getInfo(UUID messageId) {
+        Message message = find(messageId);
         return message.toString();
     }
 
