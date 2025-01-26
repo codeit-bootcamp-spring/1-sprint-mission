@@ -21,6 +21,9 @@ public interface ChannelService {
 
     // 채널 삭제
     boolean deleteChannel(UUID channelId);
+
+    void addUserToChannel(UUID channelId, UUID userId);
+
 }
 
 
