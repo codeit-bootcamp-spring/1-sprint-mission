@@ -94,7 +94,7 @@
          - 해당 키워드가 적용된 필드는 Serialize하는 과정에서 제외됨
          - static이나 final 키워드가 붙은 경우 효과 없음
 
-1. **UserTest 클래스의 userService.updateEmail(id, email) 실행 시 NullPointerException 발생**
+2. **UserTest 클래스의 userService.updateEmail(id, email) 실행 시 NullPointerException 발생**
 
    ![image.png](image/sprint2-troubleshooting2.png)
 
@@ -114,13 +114,13 @@
           ```
 
 
-1. **Category 클래스에서 NotSerializableException으로 인한 RuntimeException 발생**
+3. **Category 클래스에서 NotSerializableException으로 인한 RuntimeException 발생**
 
    ![image.png](image/sprint2-troubleshooting3.png)
 
    - Category 클래스를 Serializable 구현체로 만듦
 
-1. git push가 안되는 문제 발생
+4. git push가 안되는 문제 발생
 
     ```bash
     tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint2)
@@ -139,7 +139,7 @@
    - 로컬 브랜치가 원격 브랜치보다 뒤처져서 발생한 문제
    - `git pull origin [해당 로컬 브랜치]`로 원격 브랜치를 당겨온 뒤, 코드를 고치고 다시 push하여 해결
 
-1. commit 메시지를 잘못 작성하는 문제 발생
+5. commit 메시지를 잘못 작성하는 문제 발생
    - `git commit --amend -m "변경할 커밋 메시지”` 한 뒤 `git push --force origin [커밋할 브랜치]` 로 강제로 push하여 해결
    - 이 방법으로 가장 최근 커밋한 커밋 메시지 변경 가능
    - `push —force`의 경우 강제로 push하는 것이므로 협업 시 동료와의 의논 필수
