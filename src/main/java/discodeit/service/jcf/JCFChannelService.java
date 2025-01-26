@@ -47,7 +47,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public String getInfo(Channel channel) {
+    public String getInfo(UUID channelId) {
+        Channel channel = find(channelId);
         return channel.toString();
     }
 
