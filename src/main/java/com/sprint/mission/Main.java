@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -13,17 +16,24 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Main {
-    static UserService userService = new JCFUserService();
-    static ChannelService channelService = new JCFChannelService();
-    static MessageService messageService = new JCFMessageService(channelService);
+//    static UserService userService = new JCFUserService();
+//    static ChannelService channelService = new JCFChannelService();
+//    static MessageService messageService = new JCFMessageService(channelService);
+
+    private static final String FILE_USER_PATH = "data/users.dat";
+    private static final String FILE_CHANNEL_PATH = "data/channels.dat";
+    private static final String FILE_MESSAGE_PATH = "data/messages.dat";
+    static UserService userService = new FileUserService(FILE_USER_PATH);
+    static ChannelService channelService = new FileChannelService(FILE_CHANNEL_PATH);
+    static MessageService messageService = new FileMessageService(FILE_MESSAGE_PATH, channelService);
 
     public static void main(String[] args) {
-        jcfUserServiceTest();
-        jcfMessageServiceTest();
-        jcfChannelServiceTest();
+        userServiceTest();
+        messageServiceTest();
+        channelServiceTest();
     }
 
-    private static void jcfChannelServiceTest() {
+    private static void channelServiceTest() {
         // 채널 생성
         Channel channel1 = channelService.createChannel("KBS");
         Channel channel2 = channelService.createChannel("EBS");
@@ -53,7 +63,7 @@ public class Main {
                 c -> log("채널 이름", c.getChannelName()));
     }
 
-    private static void jcfMessageServiceTest() {
+    private static void messageServiceTest() {
         // 유저 생성
         User user1 = userService.createUser("1");
         User user2 = userService.createUser("2");
@@ -91,7 +101,7 @@ public class Main {
                 m -> log("메시지 내용", m.getText()));
     }
 
-    private static void jcfUserServiceTest() {
+    private static void userServiceTest() {
         // 유저 생성
         User user1 = userService.createUser("1");
         User user2 = userService.createUser("2");

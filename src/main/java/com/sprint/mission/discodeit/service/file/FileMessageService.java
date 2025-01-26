@@ -17,24 +17,23 @@ import java.util.UUID;
 public class FileMessageService implements MessageService {
     private final String filePath;
     private final Messages messages;
-    private final ChannelService fileChannel;
+    private final ChannelService channelService;
 
     public FileMessageService(String filePath, ChannelService fileChannel) {
         this.filePath = filePath;
-        this.fileChannel = fileChannel;
+        this.channelService = fileChannel;
         this.messages = loadFromFile().orElseGet(Messages::new);
     }
 
     @Override
     public Optional<Message> createMessage(UUID authorID, UUID channelID, String text) {
-        if (fileChannel.getChannel(channelID).isEmpty()) {
-            return Optional.empty();
-        }
-        Message newMessage = new Message(text, authorID, channelID);
-        messages.add(newMessage.getId(), newMessage);
-        fileChannel.addMessageToChannel(channelID, newMessage.getId());
-        saveToFile();
-        return Optional.of(newMessage);
+        return channelService.getChannel(channelID)
+                .map(channel -> {
+                    Message newMessage = new Message(text, authorID, channelID);
+                    messages.add(newMessage.getId(), newMessage);
+                    saveToFile();
+                    return newMessage;
+                });
     }
 
     @Override

@@ -18,16 +18,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Optional<Message> createMessage(UUID authorID, UUID channelID, String text) {
-        // 채널이 있는지 확인
-        if(channelService.getChannel(channelID).isEmpty()) {
-            return Optional.empty();
-        }
-        // 메시지 생성
-        Message newMessage = new Message(text, authorID, channelID);
-        messages.add(newMessage.getId(), newMessage);
-        // 채널에 메시지 등록
-        channelService.addMessageToChannel(channelID, newMessage.getId());
-        return Optional.of(newMessage);
+        return channelService.getChannel(channelID)
+                .map(channel -> {
+                    Message newMessage = new Message(text, authorID, channelID);
+                    messages.add(newMessage.getId(), newMessage);
+                    channelService.addMessageToChannel(channelID, newMessage.getId());
+                    return newMessage;
+                });
     }
 
     @Override
