@@ -56,22 +56,24 @@ public class JCFUserService implements UserService {
     @Override
     public void update(UUID userId, String name, String email, String phoneNumber) {
         User user = find(userId);
-        validator.validateName(name);
-        validator.validateEmail(email);
-        validator.validatePhoneNumber(phoneNumber);
+        validator.validate(name, email, phoneNumber);
 
         user.update(name, email, phoneNumber);
     }
 
     @Override
-    public void updatePassword(User user, String originalPassword, String newPassword) {
+    public void updatePassword(UUID userId, String originalPassword, String newPassword) {
+        User user = find(userId);
         user.updatePassword(originalPassword, newPassword);
         user.updateUpdatedAt();
     }
 
     @Override
-    public void delete(User user) {
-        users.remove(user.getId());
+    public void delete(UUID userId) {
+        if (!users.containsKey(userId)) {
+            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+        }
+        users.remove(userId);
     }
 
     @Override

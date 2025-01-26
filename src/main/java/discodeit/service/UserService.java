@@ -12,8 +12,8 @@ public interface UserService {
     List<User> findAll();
     String getInfo(UUID userId);
     void update(UUID userId, String name, String email, String phoneNumber);
-    void updatePassword(User user, String originalPassword, String newPassword);
-    void delete(User user);
+    void updatePassword(UUID userId, String originalPassword, String newPassword);
+    void delete(UUID userId);
     void isDuplicateEmail(String email);
     void isDuplicatePhoneNumber(String phoneNumber);
 }
