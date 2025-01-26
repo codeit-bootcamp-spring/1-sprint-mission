@@ -88,7 +88,7 @@ public class FileUserService implements UserService {
             System.err.println("===데이터 저장 중 오류 발생: " + e.getMessage() + "===");
         }
     }
-    @SuppressWarnings("unchecked")
+
     private Map<String, User> loadData() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

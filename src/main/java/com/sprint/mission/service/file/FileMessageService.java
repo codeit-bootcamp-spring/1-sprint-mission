@@ -99,7 +99,7 @@ public class FileMessageService implements MessageService {
             System.err.println("===데이터 저장 중 오류 발생: " + e.getMessage() + "===");
         }
     }
-    @SuppressWarnings("unchecked")
+
     private Map<User, Message> loadData() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
