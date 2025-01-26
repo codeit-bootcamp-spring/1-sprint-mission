@@ -30,6 +30,7 @@ public class User extends BaseEntity implements Serializable {
         setUpdatedAt();
     }
 
+
     @Override
     public String toString() {
         return "User{" +
