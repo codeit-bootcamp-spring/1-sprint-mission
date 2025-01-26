@@ -41,70 +41,11 @@ public class BasicUserService implements UserService {
     @Override
     public User readOne(UUID id) {
         return repository.findById(id);
-//        try{
-//            Optional<User> searchUser = Optional.ofNullable(repository.findById(id));
-//
-//            if(searchUser.isPresent()) {
-//                User user = searchUser.get();
-//
-//                System.out.println("userName : " + user.getUsername()
-//                        + " | Email : " + user.getEmail()
-//                        + " | phoneNumber : " + user.getPhoneNumber()
-//                        + " | Address : " + user.getAddr()
-//                        + " | Age : " + user.getAge()
-//                        + " | Hobby : " + user.getHobby()
-//                        + " | Interest : " + user.getInterest()
-//                );
-//                return user;
-//            }else{
-//                throw new DataNotFoundException("사용자가 존재하지 않습니다.");
-//            }
-//        } catch (DataNotFoundException e){
-//            System.out.println("예외 처리 메시지 : " + e.getMessage());
-//            return null;
-//        }
     }
 
     @Override
     public List<User> readAll() {
         return repository.readAll();
-    }
-
-    @Override
-    public List<User> searchByUser(){
-        return repository.readAll();
-//        List<User> list =
-//
-//
-//        list.forEach(data -> {
-//            System.out.println("username : " + data.getUsername()
-//                    + " | Email : " + data.getEmail()
-//                    + " | phoneNumber : " + data.getPhoneNumber()
-//                    + " | Address : " + data.getAddr()
-//                    + " | Age : " + data.getAge()
-//                    + " | Hobby : " + data.getHobby()
-//                    + " | Interest : " + data.getInterest()
-//            );
-//        });
-    }
-
-    @Override
-    public User searchByUserId(UUID id){
-        return repository.findById(id);
-//        try {
-//            User user =
-//
-//            System.out.println("userName : " + user.getUsername()
-//                    + " | Email : " + user.getEmail()
-//                    + " | phoneNumber : " + user.getPhoneNumber()
-//                    + " | Address : " + user.getAddr()
-//                    + " | Age : " + user.getAge()
-//                    + " | Hobby : " + user.getHobby()
-//                    + " | Interest : " + user.getInterest()
-//            );
-//        } catch (NullPointerException e){
-//            System.out.println("유효하지 않은 ID 입니다..\n" + e);
-//        }
     }
 
     @Override

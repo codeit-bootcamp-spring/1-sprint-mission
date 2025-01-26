@@ -106,6 +106,7 @@ public class FileUserRepository implements UserRepository, FileService<User> {
             existingUser.setAge(modifiedUser.getAge());
             existingUser.setHobby(modifiedUser.getHobby());
             existingUser.setInterest(modifiedUser.getInterest());
+            existingUser.update();
             saveToFile(users);
             return modifiedUser;
         } else {
@@ -116,16 +117,13 @@ public class FileUserRepository implements UserRepository, FileService<User> {
 
     @Override
     public boolean deleteById(UUID id){
-
-//        try{
-            List<User> users = new ArrayList<>(loadFromFile().values());
-            boolean removed = users.removeIf(user -> user.getId().equals(id));
-            if(removed) saveToFile((Map<UUID, User>) users);
-            else System.out.println("유효하지 않은 ID 입니다..\n");
-            return removed;
-//        } catch (NullPointerException e){
-//            System.out.println("유효하지 않은 ID 입니다..\n" + e);
-//        }
-//        return false;
+            Map<UUID, User> users = loadFromFile();
+            if(users.remove(id) != null){
+                saveToFile(users);
+                return true;
+            }else{
+                System.out.println("유효하지 않은 ID 입니다..\n");
+                return false; // ID를 찾지 못했을 때 false 반환
+            }
     }
 }
