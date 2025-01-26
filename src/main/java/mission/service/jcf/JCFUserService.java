@@ -1,23 +1,25 @@
 package mission.service.jcf;
 
 
+import mission.controller.jcf.JCFChannelController;
+import mission.entity.Channel;
 import mission.entity.User;
 import mission.repository.jcf.JCFUserRepository;
+import mission.service.ChannelService;
 import mission.service.UserService;
-import mission.service.exception.DuplicateName;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class JCFUserService implements UserService {
 
+    // ChannelRepository 인터페이스로 안 받은 이유 : file클래스들로 인해 생긴 ioe예외 받기 싫어서
     private final JCFUserRepository userRepository = new JCFUserRepository();
 
-    public static JCFUserService jcfUserService;
+    public static JCFUserService userService;
     private JCFUserService() {}
     public static JCFUserService getInstance(){
-        if (jcfUserService == null) return jcfUserService = new JCFUserService();
-        else return jcfUserService;
+        if (userService == null) return userService = new JCFUserService();
+        else return userService;
     }
 
     @Override // 닉네임 중복 허용
@@ -42,6 +44,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public void delete(User user) {
+        user.getChannelsImmutable().stream()
+                        .forEach(channel -> channel.removeUser(user));
         userRepository.delete(user);
     }
 //

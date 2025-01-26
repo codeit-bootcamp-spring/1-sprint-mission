@@ -52,9 +52,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void delete(Channel channel) {
         try {
-            Files.delete(getChannelDirectPath(id));
+            Files.delete(getChannelDirectPath(channel.getId()));
         } catch (IOException e) {
             throw new RuntimeException("삭제 실패 " + e.getMessage());
         }

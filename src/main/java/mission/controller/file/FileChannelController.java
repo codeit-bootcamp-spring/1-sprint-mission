@@ -65,7 +65,7 @@ public class FileChannelController implements ChannelController {
 
     @Override
     public void delete(UUID channelId) {
-        fileChannelService.deleteById(channelId);
+        fileChannelService.delete(fileChannelService.findById(channelId));
     }
 
     @Override

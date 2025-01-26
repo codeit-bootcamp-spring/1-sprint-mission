@@ -69,17 +69,16 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteById(UUID channelId){
-        Channel deletingChannel = findById(channelId);
+    public void delete(Channel deletingChannel){
         for (User user : deletingChannel.getUsersImmutable()) {
-            deletingChannel.removeUser(fileUserService.findById(user.getId()));
+            deletingChannel.removeUser(user);
             try {
                 fileUserService.createOrUpdate(user);  // 유저 파일 업데이트
             } catch (IOException e) {
                 throw new RuntimeException("채널 삭제 도중 소속된 user 삭제 실패");
             }
         }
-        fileChannelRepository.deleteById(channelId);
+        fileChannelRepository.delete(deletingChannel);
     }
 
     /**

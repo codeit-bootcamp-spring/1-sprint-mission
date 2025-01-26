@@ -45,8 +45,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        channelRepository.deleteById(id);
+    public void delete(Channel channel) {
+        channel.getUsersImmutable().stream()
+                        .forEach(user -> user.removeChannel(channel));
+        channelRepository.delete(channel);
     }
 
     /**

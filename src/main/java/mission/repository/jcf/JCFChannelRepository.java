@@ -1,7 +1,6 @@
 package mission.repository.jcf;
 
 import mission.entity.Channel;
-import mission.entity.User;
 import mission.repository.ChannelRepository;
 import mission.service.exception.NotFoundId;
 
@@ -31,8 +30,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        Channel deletingChannel = findById(id);
+    public void delete(Channel deletingChannel) {
         deletingChannel.removeAllUser();
         System.out.printf("채널명 %s는 사라집니다.", deletingChannel.getName());
 

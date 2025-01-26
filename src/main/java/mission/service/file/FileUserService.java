@@ -60,7 +60,7 @@ public class FileUserService implements UserService {
     @Override
     public void delete(User user) {
         for (Channel channel : user.getChannelsImmutable()) {
-            user.removeChannel(fileChannelService.findById(channel.getId()));
+            user.removeChannel(channel);
             try {
                 fileChannelService.createOrUpdate(channel);
             } catch (IOException e) {

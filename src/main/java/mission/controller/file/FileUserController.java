@@ -97,9 +97,8 @@ public class FileUserController implements UserController {
         User user = fileUserService.findById(droppingUser_Id);
 
         for (Channel channel : user.getChannelsImmutable()) {
-            Channel droppingChannel = fileChannelService.findById(channel.getId());
-            user.removeChannel(droppingChannel);
-            fileChannelService.createOrUpdate(droppingChannel);
+            user.removeChannel(channel);
+            fileChannelService.createOrUpdate(channel);
         }
         fileUserService.createOrUpdate(user);
     }

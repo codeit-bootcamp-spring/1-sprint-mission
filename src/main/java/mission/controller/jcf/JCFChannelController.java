@@ -17,7 +17,6 @@ public class JCFChannelController implements ChannelController {
 
     private final JCFUserService userService = JCFUserService.getInstance();
     private final JCFChannelService channelService = JCFChannelService.getInstance();
-    private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     // 채널명은 중복 허용 X
     @Override
@@ -65,7 +64,7 @@ public class JCFChannelController implements ChannelController {
 
     @Override
     public void delete(UUID channelId) {
-        channelService.deleteById(channelId);
+        channelService.delete(channelService.findById(channelId));
     }
 
     /**
