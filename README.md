@@ -81,3 +81,72 @@
 4. **일급 컬렉션 사용**
    - data 패키지 만듦
    - UserData, ChannelData, MessageData 클래스 생성
+
+### 트러블 슈팅
+
+1. **FileUserService 실행 시 RuntimeException 발생**
+
+   ![image.png](image/sprint2-troubleshooting1.png)
+
+   - 현재 validation 패키지에 있는 Email 클래스의 멤버 변수인 UserRepository 인터페이스가 직렬화 불가능이라 생기는 문제로 추정
+      - transient 키워드 사용 → 해결
+      - transient
+         - 해당 키워드가 적용된 필드는 Serialize하는 과정에서 제외됨
+         - static이나 final 키워드가 붙은 경우 효과 없음
+
+1. **UserTest 클래스의 userService.updateEmail(id, email) 실행 시 NullPointerException 발생**
+
+   ![image.png](image/sprint2-troubleshooting2.png)
+
+   - 직렬화할 때 적용한 transient 키워드로 인해 역직렬화 시 userService가 null로 초기화되어 발생한 문제로 추정
+      - readObject 메서드 사용
+         - 역직렬화 시 자동으로 호출됨
+         - 반드시 private으로 선언해야 함
+
+          ```java
+          private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+                  // 역직렬화 실행
+                  ois.defaultReadObject();
+                  
+                  // 역직렬화 실행 후 수행되는 로직
+                  this.userRepository = new FileUserRepository();
+              }
+          ```
+
+
+1. **Category 클래스에서 NotSerializableException으로 인한 RuntimeException 발생**
+
+   ![image.png](image/sprint2-troubleshooting3.png)
+
+   - Category 클래스를 Serializable 구현체로 만듦
+
+1. git push가 안되는 문제 발생
+
+    ```bash
+    tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint2)
+    $ git push origin part1-한성지-sprint2
+    To github.com:hyanyul/1-sprint-mission.git
+     ! [rejected]        part1-한성지-sprint2 -> part1-한성지-sprint2 (fetch first)
+    error: failed to push some refs to 'github.com:hyanyul/1-sprint-mission.git'
+    hint: Updates were rejected because the remote contains work that you do not
+    hint: have locally. This is usually caused by another repository pushing to
+    hint: the same ref. If you want to integrate the remote changes, use
+    hint: 'git pull' before pushing again.
+    hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+    
+    ```
+
+   - 로컬 브랜치가 원격 브랜치보다 뒤처져서 발생한 문제
+   - `git pull origin [해당 로컬 브랜치]`로 원격 브랜치를 당겨온 뒤, 코드를 고치고 다시 push하여 해결
+
+1. commit 메시지를 잘못 작성하는 문제 발생
+   - `git commit --amend -m "변경할 커밋 메시지”` 한 뒤 `git push --force origin [커밋할 브랜치]` 로 강제로 push하여 해결
+   - 이 방법으로 가장 최근 커밋한 커밋 메시지 변경 가능
+   - `push —force`의 경우 강제로 push하는 것이므로 협업 시 동료와의 의논 필수
+
+### 추후 수정할 부분
+
+1. 방어적 복사와 깊은 복사를 통해 불변 객체 만들기
+2. display 관련 메서드 사용 시 너무 많은 매개 변수 필요 → 매개변수 줄이기
+
+   > 참고: [[클린코드] 매개변수 개수](https://lordofkangs.tistory.com/196)
