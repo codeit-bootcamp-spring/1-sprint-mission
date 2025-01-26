@@ -1,5 +1,6 @@
 package mission.service.file;
 
+import mission.entity.Channel;
 import mission.entity.User;
 import mission.repository.file.FileUserRepository;
 import mission.service.UserService;
@@ -13,7 +14,8 @@ import java.util.stream.Collectors;
 
 public class FileUserService implements UserService {
 
-    private final FileUserRepository fileUserRepository = new FileUserRepository();
+    private static final FileUserRepository fileUserRepository = new FileUserRepository();
+    private final FileChannelService fileChannelService = FileChannelService.getInstance();
 
     private static FileUserService fileUserService;
     private FileUserService(){}
@@ -49,6 +51,14 @@ public class FileUserService implements UserService {
 
     @Override
     public void delete(User user) {
+        for (Channel channel : user.getChannelsImmutable()) {
+            user.removeChannel(fileChannelService.findById(channel.getId()));
+            try {
+                fileChannelService.createOrUpdate(channel);
+            } catch (IOException e) {
+                throw new RuntimeException("유저 삭제 도중 소속된 채널 삭제 오류");
+            }
+        }
         fileUserRepository.delete(user);
     }
 

@@ -113,10 +113,8 @@ public class Channel implements Serializable {
 
     @Override
     public String toString() {
-        return "Channel{" +
-                "firstId='" + firstId + '\'' +
-                ", name='" + name + '\'' +
-                ", userCount=" + getUserCount() +
-                '}';
+        return  "`[" + firstId + "]" +
+                " 채널명: " + name +
+                ", 유저 수: " + getUserCount() + '`';
     }
 }

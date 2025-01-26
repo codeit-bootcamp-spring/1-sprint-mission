@@ -2,6 +2,7 @@ package mission.controller;
 
 import mission.entity.Channel;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,8 +15,8 @@ public interface ChannelController {
     Channel findChannelByName(String channelName);
     Set<Channel> findAllChannelByUser(UUID userId);
     void delete(UUID channelId);
-    void addUserByChannel(UUID channelId, UUID userId);
-    void drops(UUID channel_Id, UUID droppingUser_Id);
+    void addUserByChannel(UUID channelId, UUID userId) throws IOException;
+    void drops(UUID channel_Id, UUID droppingUser_Id) throws IOException;
 
     void createChannelDirectory();
 }

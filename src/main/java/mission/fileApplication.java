@@ -6,8 +6,10 @@ import mission.controller.UserController;
 import mission.controller.file.FileChannelController;
 import mission.controller.file.FileMessageController;
 import mission.controller.file.FileUserController;
+import mission.entity.Channel;
 import mission.entity.User;
 
+import java.io.IOException;
 import java.util.*;
 
 public class fileApplication {
@@ -16,7 +18,7 @@ public class fileApplication {
     private static final UserController fileUserController = new FileUserController();
     private static final MessageController fileMessageController = new FileMessageController();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         initDirectory();
 
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<USER 테스트>>>>>>>>>>>>>>>>>>>>>>");
@@ -25,22 +27,67 @@ public class fileApplication {
         List<User> userList = createUser(3);
 
         //이름 비번 수정 테스트
-        User updateUser = updateTest(userList.get(1));
+        User updatedUser = updateTest(userList.get(1));
         System.out.println(fileUserController.findAll());
 
         //삭제 테스트
-        deleteTest(updateUser);
+        deleteTest(updatedUser);
 
         //조회 테스트
         findTest();
 
         System.out.println("<<<<<<<<<<<<<<<<<<<<<<Channel 테스트>>>>>>>>>>>>>>>>>>>>>>");
+        
+        // 생성
+        List<Channel> channelList = createChannel(2);
+        
+        // 수정 
+        Channel updatedChannel = updateChannelName(channelList.get(0), "new Name");
 
+        // user 등록
+        for (User user : fileUserController.findAll()) {
+            fileChannelController.addUserByChannel(updatedChannel.getId(), user.getId());
+            System.out.println("유저 등록 완료");
+        }
+        System.out.println(updatedChannel);
 
+        // 삭제
+        deleteChannel(channelList.get(1));
 
-
-
+        //
+        
     }
+
+    private static void deleteChannel(Channel deletingChannel) {
+        System.out.println("==============삭제 테스트 시작==============");
+        
+        Set<Channel> beforeChannels = fileChannelController.findAll();
+        System.out.println("삭제 전 채널 목록: " + beforeChannels + ", 채널 수: " + beforeChannels.size());
+        fileChannelController.delete(deletingChannel.getId());
+        Set<Channel> afterChannels = fileChannelController.findAll();
+        System.out.println("삭제 후 채널 목록: " + afterChannels + ", 채널 수: " + afterChannels.size());
+    }
+    
+    private static Channel updateChannelName(Channel beforeUpdateChannel, String newName) {
+        Channel afterUpdateChannel = fileChannelController.updateChannelName(beforeUpdateChannel.getId(), newName);
+        System.out.println("업데이트 전 : " + beforeUpdateChannel);
+        System.out.println("업데이트 후 : " + afterUpdateChannel); // 아이디 같음
+        return afterUpdateChannel;
+    }
+
+
+    private static List<Channel> createChannel(int channelCount) {
+        System.out.println("==============생성 테스트 시작==============");
+        System.out.println("==============Channel 생성 수 : " + channelCount + "==============");
+        Random random = new Random();
+        List<Channel> channels = new ArrayList<>();
+        for (int i = 0; i < channelCount; i++){
+            channels.add(fileChannelController.create("channel " + (i+1)));
+        }
+        System.out.println("channel 목록: " + channels + ", 채널 수: " + channels.size());
+        return channels;
+    }
+
 
     private static Boolean findTest() {
         System.out.println("==============조회 테스트 시작==============");

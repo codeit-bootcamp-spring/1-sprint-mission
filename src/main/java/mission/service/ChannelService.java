@@ -14,6 +14,6 @@ public interface ChannelService {
     Set<Channel> findAll();
     Channel findById(UUID id);
     Channel update(Channel channel, String newName);
-    void deleteById(UUID id);
+    void deleteById(UUID id) throws IOException;
     void validateDuplicateName(String name);
 }

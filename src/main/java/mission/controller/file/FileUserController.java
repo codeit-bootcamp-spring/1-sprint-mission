@@ -1,6 +1,7 @@
 package mission.controller.file;
 
 import mission.controller.UserController;
+import mission.entity.Channel;
 import mission.entity.User;
 import mission.service.file.FileChannelService;
 import mission.service.file.FileUserService;
@@ -82,18 +83,35 @@ public class FileUserController implements UserController {
     }
 
     @Override  // 채널 탈퇴
-    public void drops(UUID channel_Id, UUID droppingUser_Id) {
-        fileUserService.findById(droppingUser_Id).removeChannel(fileChannelService.findById(channel_Id));
+    public void drops(UUID channel_Id, UUID droppingUser_Id) throws IOException {
+        Channel channel = fileChannelService.findById(channel_Id);
+        User user = fileUserService.findById(droppingUser_Id);
+
+        user.removeChannel(channel);
+        fileChannelService.createOrUpdate(channel);
+        fileUserService.createOrUpdate(user);
     }
 
     @Override
-    public void dropsAllByUser(UUID droppingUser_Id) {
-        fileUserService.findById(droppingUser_Id).removeAllChannel();
+    public void dropsAllByUser(UUID droppingUser_Id) throws IOException {
+        User user = fileUserService.findById(droppingUser_Id);
+
+        for (Channel channel : user.getChannelsImmutable()) {
+            Channel droppingChannel = fileChannelService.findById(channel.getId());
+            user.removeChannel(droppingChannel);
+            fileChannelService.createOrUpdate(droppingChannel);
+        }
+        fileUserService.createOrUpdate(user);
     }
 
     @Override
-    public void addChannelByUser(UUID channelId, UUID userId) {
-        fileUserService.findById(userId).addChannel(fileChannelService.findById(channelId));
+    public void addChannelByUser(UUID channelId, UUID userId) throws IOException {
+        Channel channel = fileChannelService.findById(channelId);
+        User user = fileUserService.findById(userId);
+
+        user.addChannel(channel);
+        fileUserService.createOrUpdate(user);
+        fileChannelService.createOrUpdate(channel);
     }
 
     /**

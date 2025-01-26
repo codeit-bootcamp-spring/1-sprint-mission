@@ -24,13 +24,11 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createOrUpdate(Channel channel) {
-        validateDuplicateName(channel.getName());
         return channelRepository.create(channel);
     }
 
     @Override
     public Channel update(Channel updatingChannel, String newName) {
-        validateDuplicateName(newName);
         updatingChannel.setName(newName);
         return createOrUpdate(updatingChannel);
         // 클래스 내 메서드 활용(레포지토리 Map 덮어쓰기 가능)

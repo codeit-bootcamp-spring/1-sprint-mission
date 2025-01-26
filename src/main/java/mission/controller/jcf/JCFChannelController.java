@@ -22,11 +22,13 @@ public class JCFChannelController implements ChannelController {
     // 채널명은 중복 허용 X
     @Override
     public Channel create(String name) {
+        channelService.validateDuplicateName(name);
         return channelService.createOrUpdate(new Channel(name));
     }
 
     @Override
     public Channel updateChannelName(UUID channelId, String newName) {
+        channelService.validateDuplicateName(newName);
         return channelService.update(findById(channelId), newName);
     }
 

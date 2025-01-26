@@ -19,9 +19,9 @@ public interface UserController {
     Set<User> findUsersInChannel(UUID channelId);
 
     void deleteUser(UUID id, String nickName, String password);
-    void drops(UUID channel_Id, UUID droppingUser_Id);
-    void dropsAllByUser(UUID droppingUser_Id);
-    void addChannelByUser(UUID channelId, UUID userId);
+    void drops(UUID channel_Id, UUID droppingUser_Id) throws IOException;
+    void dropsAllByUser(UUID droppingUser_Id) throws IOException;
+    void addChannelByUser(UUID channelId, UUID userId) throws IOException;
 
     void createUserDirectory();
 }

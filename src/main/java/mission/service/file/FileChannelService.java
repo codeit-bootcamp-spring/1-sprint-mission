@@ -1,6 +1,7 @@
 package mission.service.file;
 
 import mission.entity.Channel;
+import mission.entity.User;
 import mission.repository.file.FileChannelRepository;
 import mission.service.ChannelService;
 import mission.service.exception.DuplicateName;
@@ -16,9 +17,10 @@ public class FileChannelService implements ChannelService {
 
 
     private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
+    private final FileUserService fileUserService = FileUserService.getInstance();
 
     private static FileChannelService fileChannelService;
-    private FileChannelService(){}
+    FileChannelService(){}
     public static FileChannelService getInstance(){
         if (fileChannelService == null) return fileChannelService = new FileChannelService();
         else return fileChannelService;
@@ -27,7 +29,7 @@ public class FileChannelService implements ChannelService {
     // 생성 수정 오류 메시지 다르게 처리하기위해 오류 던지기
     @Override
     public Channel createOrUpdate(Channel channel) throws IOException {
-        validateDuplicateName(channel.getName());
+        //validateDuplicateName(channel.getName());
         return fileChannelRepository.create(channel);
     }
 
@@ -62,8 +64,17 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteById(UUID id) {
-        fileChannelRepository.deleteById(id);
+    public void deleteById(UUID channelId){
+        Channel deletingChannel = findById(channelId);
+        for (User user : deletingChannel.getUsersImmutable()) {
+            deletingChannel.removeUser(fileUserService.findById(user.getId()));
+            try {
+                fileUserService.createOrUpdate(user);  // 유저 파일 업데이트
+            } catch (IOException e) {
+                throw new RuntimeException("채널 삭제 도중 소속된 user 삭제 실패");
+            }
+        }
+        fileChannelRepository.deleteById(channelId);
     }
 
     /**
@@ -79,7 +90,7 @@ public class FileChannelService implements ChannelService {
         if (!(channelMap.get(validatingName) == null)){
             throw new DuplicateName("채널명 중복");
         }
-        System.out.println("중복되지 않은 채널 이름입니다");
+        //System.out.println("중복되지 않은 채널 이름입니다");
     }
 
     /**

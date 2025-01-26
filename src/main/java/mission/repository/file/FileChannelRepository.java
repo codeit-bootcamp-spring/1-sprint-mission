@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final Path CHANNEL_DIRECT_PATH = Path.of("userDirectory");
+    private static final Path CHANNEL_DIRECT_PATH = Path.of("channelDirectory");
 
     @Override // 생성과 수정 2개 기능을 함
     public Channel create(Channel channel) throws IOException {

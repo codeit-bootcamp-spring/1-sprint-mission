@@ -2,6 +2,7 @@ package mission.controller.file;
 
 import mission.controller.ChannelController;
 import mission.entity.Channel;
+import mission.entity.User;
 import mission.service.file.FileChannelService;
 import mission.service.file.FileMessageService;
 import mission.service.file.FileUserService;
@@ -21,6 +22,7 @@ public class FileChannelController implements ChannelController {
     @Override
     public Channel create(String channelName) {
         try {
+            fileChannelService.validateDuplicateName(channelName);
             return fileChannelService.createOrUpdate(new Channel(channelName));
         } catch (IOException e) {
             throw new RuntimeException("채널 등록 중 오류 발생: " + e.getMessage());
@@ -63,17 +65,27 @@ public class FileChannelController implements ChannelController {
 
     @Override
     public void delete(UUID channelId) {
-        fileMessageService.delete(channelId);
+        fileChannelService.deleteById(channelId);
     }
 
     @Override
-    public void addUserByChannel(UUID channelId, UUID userId) {
-        fileChannelService.findById(channelId).addUser(fileUserService.findById(userId));
+    public void addUserByChannel(UUID channelId, UUID userId) throws IOException {
+        Channel channel = fileChannelService.findById(channelId);
+        User user = fileUserService.findById(userId);
+
+        channel.addUser(user);
+        fileUserService.createOrUpdate(user);
+        fileChannelService.createOrUpdate(channel);
     }
 
-    @Override
-    public void drops(UUID channel_Id, UUID droppingUser_Id) {
-        fileChannelService.findById(channel_Id).removeUser(fileUserService.findById(droppingUser_Id));
+    @Override // 강퇴
+    public void drops(UUID channel_Id, UUID droppingUser_Id) throws IOException {
+        Channel channel = fileChannelService.findById(channel_Id);
+        User user = fileUserService.findById(droppingUser_Id);
+
+        channel.removeUser(user);
+        fileChannelService.createOrUpdate(channel);
+        fileUserService.createOrUpdate(user);
     }
 
     /**
