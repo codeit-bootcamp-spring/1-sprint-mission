@@ -48,7 +48,8 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public String getInfo(User user) {
+    public String getInfo(UUID userId) {
+        User user = find(userId);
         return user.toString();
     }
 

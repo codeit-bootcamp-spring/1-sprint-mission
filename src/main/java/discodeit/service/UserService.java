@@ -10,7 +10,7 @@ public interface UserService {
     User create(String name, String email, String phoneNumber, String password);
     User find(UUID userId);
     List<User> findAll();
-    String getInfo(User user);
+    String getInfo(UUID userId);
     void update(UUID userId, String name, String email, String phoneNumber);
     void updatePassword(User user, String originalPassword, String newPassword);
     void delete(User user);

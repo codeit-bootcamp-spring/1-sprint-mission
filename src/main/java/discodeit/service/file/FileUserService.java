@@ -70,8 +70,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public String getInfo(User user) {
-        return "";
+    public String getInfo(UUID userId) {
+        User user = find(userId);
+        return user.toString();
     }
 
     @Override
