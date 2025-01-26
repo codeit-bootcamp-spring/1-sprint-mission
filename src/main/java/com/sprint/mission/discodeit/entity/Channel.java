@@ -41,7 +41,6 @@ public class Channel implements Serializable {      // 채널 (게시판)
         this.category = new Category(this);  // 카테고리는 기본적으로 null로 설정
     }
 
-
     // Getter 함수
     public UUID getId() {
         return id;
