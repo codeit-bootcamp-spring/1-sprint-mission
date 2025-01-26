@@ -73,10 +73,10 @@ public class FileUserService implements UserRepository {
                 stringBuilder.append(line);
                 stringBuilder.append("\n");
             }
+            System.out.println(stringBuilder);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(stringBuilder.toString());
     }
 
     @Override
