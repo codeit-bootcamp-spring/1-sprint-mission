@@ -20,8 +20,22 @@ public class FileUserService implements UserRepository {
         String userDataCSV = (user.getId() + "," + user.getUserEmail() + "," + user.getUserNickName() +
                 "," + user.getPassword() + "," + user.getCreatedAt() + "," + user.getUpdatedAt() + "\n");
         // append를 true로 하면 계속 저장될텐데, 이거 쌓이면 나중에 불러올때 문제가 생길거같은 느낌이.
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            bw.write(userDataCSV);
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH, true));
+             BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
+            boolean isContain = false;
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] split = line.split(",");
+                if (split[1].equals(user.getUserEmail())) {
+                    System.out.println("해당 E-mail은 이미 저장되어 있습니다.");
+                    isContain = true;
+                    break;
+                }
+            }
+            if (!isContain) {
+                bw.write(userDataCSV);
+                System.out.println("유저 정보 저장 성공");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -92,6 +106,7 @@ public class FileUserService implements UserRepository {
                 String[] data = line.split(",");
                 if (!data[2].equals(id)) {
                     bwForDummy.write(line);
+                    break;
                 }
             }
 
