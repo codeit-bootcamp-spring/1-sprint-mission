@@ -1,28 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {                  // 메시지 (게시물)
+public class Message implements Serializable {                  // 메시지 (게시물)
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     // 공통 필드
     private final UUID id;              // pk
     private final Long createdAt;       // 생성 시간
     private Long updatedAt;             // 수정 시간
 
     private final UUID channelId;       // 메시지가 속해있는 채널
-    private final UUID writer;          // 작성자 id
-    private String message;             // 메시지 내용
+    private final UUID writerId;        // 작성자 id
+    private String context;             // 메시지 내용
 
     // 생성자
-    public Message(UUID channelId, String message, UUID writer){
+    public Message(Channel channel, String context, UUID writerId){
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
 
-        this.channelId = channelId;
-        this.message = message;
-        this.writer = writer;
+        this.channelId = channel.getId();
+        validationAndSetContext(context);
+        this.writerId = writerId;
     }
 
 
@@ -43,22 +46,32 @@ public class Message {                  // 메시지 (게시물)
         return channelId;
     }
 
-    public UUID getWriter() {
-        return writer;
+    public UUID getWriterId() {
+        return writerId;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-
-    // update 함수
-    public void updateMessage(String message) {
-        this.message = message;
-        updateUpdateAt();
+    public String getContext() {
+        return context;
     }
 
     public void updateUpdateAt(){
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    // update 함수
+    public void updateContext(String context) {
+        validationAndSetContext(context);
+        updateUpdateAt();
+    }
+
+    // 메시지 내용 유효성 검사 및 세팅
+    private void validationAndSetContext(String context) {
+        if (context == null || context.isBlank()) {
+            throw new IllegalArgumentException("메시지 내용을 입력해주세요.");
+        }
+
+        context = context.trim();
+
+        this.context = context;
     }
 }
