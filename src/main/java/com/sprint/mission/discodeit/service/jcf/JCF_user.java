@@ -56,6 +56,7 @@ public class JCF_user implements UserService {
 
     @Override
     public void update(UUID userId, String name) {
+<<<<<<< HEAD
         userList.stream().filter(user -> user.getId().equals(userId) && nameSet.add(user.getName()))
             .forEach(user -> {nameSet.remove(user.getName());
                 user.updateName(name);});
@@ -71,6 +72,20 @@ public class JCF_user implements UserService {
     public void addChannel(UUID channelId, UUID userId) {
         userList.stream().filter(user -> user.getId().equals(userId))
             .forEach(user -> user.addChannel(channelId));
+=======
+        boolean duplication = userSet.stream().anyMatch(user1 -> user1.getName().equals(name));
+        if (duplication) {
+            System.out.println("name duplication!");
+            return;
+        }
+        
+        userSet.forEach(users -> {
+            if (users.getId().equals(userId)) {
+                users.updateName(name);
+            }
+        });
+//
+>>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
     }
 
     @Override

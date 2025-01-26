@@ -80,11 +80,19 @@ public class JCF_channel implements ChannelService {
 
     @Override
     public void update(UUID channelId, String title) {
+<<<<<<< HEAD
         channelList.stream().filter(channel -> channel.getId().equals(channelId))
             .forEach(channel -> channel.updateTitle(title));
+=======
+        channelSet.stream()
+                .filter(channel -> channel.getId().equals(channelId))
+                .forEach(channel -> channel.updateTitle(title));
+
+>>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
     }
 
     @Override
+<<<<<<< HEAD
     public UUID write(String title) {
         Optional<Channel> channel = channelList.stream().filter(channel_id -> channel_id.getTitle().equals(title)).findFirst();
 
@@ -94,6 +102,14 @@ public class JCF_channel implements ChannelService {
         else{
             return null;
         }
+=======
+    public UUID get(String title) {
+        return channelSet.stream()
+                .filter(it -> it.getTitle().equals(title))
+                .map(Channel::getId)
+                .findFirst()
+                .orElse(null);
+>>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
     }
 
 }

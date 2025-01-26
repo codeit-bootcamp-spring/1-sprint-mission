@@ -17,6 +17,7 @@ public class User implements Serializable {
   private final List<UUID> userChannelIdList;
   private String name;
 
+<<<<<<< HEAD
   public User(String name) {
     this.id = UUID.randomUUID();
     this.createdAt = System.currentTimeMillis();
@@ -67,6 +68,13 @@ public class User implements Serializable {
     if (obj instanceof User) {
       User user = (User) obj;
       return Objects.equals(this.id, user.id);
+=======
+    public User(String name){
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
+        this.name = name;
+>>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
     }
 
     if (obj instanceof String) {
@@ -87,5 +95,13 @@ public class User implements Serializable {
     return name + "/ createdAt = " + simpleDateFormat.format(createdAt) + "/ updatedAt="
         + updatedAt;
 
+<<<<<<< HEAD
   }
+=======
+    public String toString() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        return name + "/ createdAt = " + simpleDateFormat.format(createdAt) + "/ updatedAt=" + simpleDateFormat.format(updatedAt);
+
+    }
+>>>>>>> 5206eed33a9c5cfc572bc8a1095473360a1463b3
 }
