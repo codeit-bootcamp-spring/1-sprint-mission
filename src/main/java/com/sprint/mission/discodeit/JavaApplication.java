@@ -76,7 +76,8 @@ public class JavaApplication {
         ChannelTest.deleteMember(channel1Id, user2Id, channelService, userService);
 
         // 채널 삭제
-        ChannelTest.deleteChannel(channel2Id, channelService, userService);
+        ChannelTest.deleteChannel(channel2Id.
+                , channelService, userService);
 
 
         /**
