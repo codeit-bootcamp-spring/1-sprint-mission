@@ -6,17 +6,21 @@ import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
+import discodeit.validator.MessageValidator;
+import discodeit.validator.Validator;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
     private final Map<UUID, Message> messages;
+    private final MessageValidator validator;
     private UserService userService;
     private ChannelService channelService;
 
     private JCFMessageService() {
         messages = new HashMap<>();
+        validator = new MessageValidator();
     }
 
     private static class JCFMessageServiceHolder {
@@ -41,6 +45,7 @@ public class JCFMessageService implements MessageService {
     public Message create(String content, User sender, UUID channelId) {
         userService.find(sender.getId());
         channelService.find(channelId);
+        validator.validate(content);
 
         Message message = new Message(content, sender, channelId);
         messages.put(message.getId(), message);

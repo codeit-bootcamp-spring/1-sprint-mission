@@ -6,6 +6,7 @@ import discodeit.repository.MessageRepository;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
+import discodeit.validator.MessageValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,11 +16,13 @@ import java.util.UUID;
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
+    private final MessageValidator validator;
     private final UserService userService;
     private final ChannelService channelService;
 
-    public BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
+    public BasicMessageService(MessageRepository messageRepository, MessageValidator validator, UserService userService, ChannelService channelService) {
         this.messageRepository = messageRepository;
+        this.validator = validator;
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -38,6 +41,7 @@ public class BasicMessageService implements MessageService {
     public Message create(String content, User sender, UUID channelId) {
         userService.find(sender.getId());
         channelService.find(channelId);
+        validator.validate(content);
         return messageRepository.save(content, sender, channelId);
     }
 

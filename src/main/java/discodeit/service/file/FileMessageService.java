@@ -5,6 +5,7 @@ import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
+import discodeit.validator.MessageValidator;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -16,11 +17,13 @@ import java.util.UUID;
 public class FileMessageService implements MessageService {
 
     private final Path directory;
+    private final MessageValidator validator;
     private final UserService userService;
     private final ChannelService channelService;
 
     public FileMessageService(UserService userService, ChannelService channelService) {
         this.directory = Paths.get("src", "main", "resources", "data", "serialized", "messages");
+        this.validator = new MessageValidator();
         this.userService = userService;
         this.channelService = channelService;
     }
@@ -39,6 +42,7 @@ public class FileMessageService implements MessageService {
     public Message create(String content, User sender, UUID channelId) {
         userService.find(sender.getId());
         channelService.find(channelId);
+        validator.validate(content);
 
         Message message = new Message(content, sender, channelId);
         Path filePath = directory.resolve(message.getId() + ".ser");

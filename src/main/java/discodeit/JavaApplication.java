@@ -80,6 +80,8 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
+
+
         UserService userService = new FileUserService();
         ChannelService channelService = new FileChannelService();
         MessageService messageService = new FileMessageService(userService, channelService);
