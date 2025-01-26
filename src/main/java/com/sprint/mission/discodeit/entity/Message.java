@@ -54,15 +54,17 @@ public class Message implements Serializable {                  // 메시지 (�
         return context;
     }
 
-    public void updateUpdateAt(){
-        this.updatedAt = System.currentTimeMillis();
-    }
 
     // update 함수
     public void updateContext(String context) {
         validationAndSetContext(context);
         updateUpdateAt();
     }
+
+    public void updateUpdateAt(){
+        this.updatedAt = System.currentTimeMillis();
+    }
+
 
     // 메시지 내용 유효성 검사 및 세팅
     private void validationAndSetContext(String context) {

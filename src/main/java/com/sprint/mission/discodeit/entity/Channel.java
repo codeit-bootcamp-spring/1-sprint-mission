@@ -41,6 +41,7 @@ public class Channel implements Serializable {      // 채널 (게시판)
         this.category = new Category(this);  // 카테고리는 기본적으로 null로 설정
     }
 
+
     // Getter 함수
     public UUID getId() {
         return id;
@@ -104,6 +105,7 @@ public class Channel implements Serializable {      // 채널 (게시판)
     public void updateUpdateAt() {
         this.updatedAt = System.currentTimeMillis();
     }
+
 
     // 채널 이름 유효성 검사 및 세팅
     private void validationAndSetName(String name) {

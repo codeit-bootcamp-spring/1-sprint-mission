@@ -69,8 +69,9 @@ public class UserTest {
 
             String menu = br.readLine();
 
+            User user = userService.read(id);
+
             try {
-                User user = userService.read(id);
 
                 switch (menu) {
 

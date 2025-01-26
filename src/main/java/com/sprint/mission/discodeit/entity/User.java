@@ -42,6 +42,7 @@ public class User implements Serializable {             // 유저 정보
         this.phoneNumber = new PhoneNumber(phoneNumber);
     }
 
+
     // Getter 함수
     public UUID getId() {
         return id;
@@ -76,6 +77,7 @@ public class User implements Serializable {             // 유저 정보
     }
 
 
+
     // update 함수
     public void updateEmail(String email) {
         this.email.updateEmail(email);
@@ -106,6 +108,7 @@ public class User implements Serializable {             // 유저 정보
         this.updatedAt = System.currentTimeMillis();
     }
 
+
     // 이름 유효성 검사 및 세팅
     private void validationAndSetName(String name) {
 
@@ -129,6 +132,7 @@ public class User implements Serializable {             // 유저 정보
 
         this.nickname = nickname;
     }
+
 
     @Override
     public String toString() {

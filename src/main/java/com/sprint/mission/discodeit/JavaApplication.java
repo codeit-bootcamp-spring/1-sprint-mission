@@ -34,7 +34,8 @@ public class JavaApplication {
          */
 
         // 필요한 인스턴스 생성
-        UserRepository userRepository = new FileUserRepository();
+        UserRepository userRepository = new JCFUserRepository();
+//        UserRepository userRepository = new FileUserRepository();
         UserService userService = new BasicUserService(userRepository);
 
         // 유저 생성
@@ -49,7 +50,7 @@ public class JavaApplication {
         UserTest.updateUser(user1Id, userService);
 
         // 유저 삭제
-        UserTest.deleteUser(user2Id, userService);
+//        UserTest.deleteUser(user2Id, userService);
 
 
         /**
@@ -76,8 +77,7 @@ public class JavaApplication {
         ChannelTest.deleteMember(channel1Id, user2Id, channelService, userService);
 
         // 채널 삭제
-        ChannelTest.deleteChannel(channel2Id.
-                , channelService, userService);
+        ChannelTest.deleteChannel(channel2Id, channelService, userService);
 
 
         /**
