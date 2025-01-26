@@ -15,7 +15,7 @@ public class FileMessageRepository implements MessageRepository {
 
     private final Path directory;
 
-    public FileMessageRepository(Path directory) {
+    public FileMessageRepository() {
         this.directory = Paths.get("src", "main", "resources", "data", "serialized", "messages");
     }
 
