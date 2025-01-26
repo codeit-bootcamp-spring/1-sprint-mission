@@ -3,122 +3,186 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
+
+    // 유틸리티 메서드: 사용자 생성
+    static User setupUser(UserService userService) {
+        User user = userService.create("woody", "woody@codeit.com");
+        System.out.println("사용자 생성: " + user);
+        return user;
+    }
+
+    // 유틸리티 메서드: 채널 생성
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create("공지 채널");
+        System.out.println("채널 생성: " + channel);
+        return channel;
+    }
+
+    // 유틸리티 메서드: 메시지 생성 테스트
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요.", author.getId(), channel.getId());
+        System.out.println("메시지 생성: " + message);
+    }
+
+    // 유틸리티 메서드: 모든 사용자 출력
+    static void printAllUsers(UserService userService) {
+        List<User> users = userService.findAll();
+        System.out.println("=== 모든 사용자 ===");
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    // 유틸리티 메서드: 모든 채널 출력
+    static void printAllChannels(ChannelService channelService) {
+        List<Channel> channels = channelService.findAll();
+        System.out.println("=== 모든 채널 ===");
+        for (Channel channel : channels) {
+            System.out.println(channel);
+        }
+    }
+
+    // 유틸리티 메서드: 모든 메시지 출력
+    static void printAllMessages(MessageService messageService) {
+        List<Message> messages = messageService.findAll();
+        System.out.println("=== 모든 메시지 ===");
+        for (Message message : messages) {
+            System.out.println(message);
+        }
+    }
+
     public static void main(String[] args) {
-        // [A] JCF 기반
-        System.out.println("=== [Basic*Service + JCF] ===");
-        runCrudTest(
-                new BasicUserService(new JCFUserRepository()),
-                new BasicChannelService(new JCFChannelRepository()),
-                new BasicMessageService(new JCFMessageRepository(),
-                        new BasicUserService(new JCFUserRepository()),
-                        new BasicChannelService(new JCFChannelRepository()))
-        );
+        // ============================
+        // [A] Basic Service + JCF Repository
+        // ============================
+        System.out.println("=== [Basic*Service + JCF*Repository] ===");
+        UserRepository jcfUserRepo = new JCFUserRepository();
+        ChannelRepository jcfChannelRepo = new JCFChannelRepository();
+        MessageRepository jcfMessageRepo = new JCFMessageRepository();
 
-        // [B] File 기반
-        System.out.println("\n=== [Basic*Service + File] ===");
-        runCrudTest(
-                new BasicUserService(new FileUserRepository()),
-                new BasicChannelService(new FileChannelRepository()),
-                new BasicMessageService(new FileMessageRepository(),
-                        new BasicUserService(new FileUserRepository()),
-                        new BasicChannelService(new FileChannelRepository()))
-        );
-    }
+        UserService basicJcfUserService = new BasicUserService(jcfUserRepo);
+        ChannelService basicJcfChannelService = new BasicChannelService(jcfChannelRepo);
+        MessageService basicJcfMessageService = new BasicMessageService(jcfMessageRepo, basicJcfUserService, basicJcfChannelService);
 
-    /**
-     * 1~6단계 CRUD 로직을 실행
-     */
-    private static void runCrudTest(UserService userService, ChannelService channelService, MessageService messageService) {
-        // 1) 사용자 등록
-        User user1 = userService.create(new User("이규석", "lks1230@sample.com"));
-        User user2 = userService.create(new User("코드잇", "codeit@sample.com"));
-        사용자목록("등록된 사용자", userService.findAll());
+        // 셋업
+        User jcfUser = setupUser(basicJcfUserService);
+        Channel jcfChannel = setupChannel(basicJcfChannelService);
+        messageCreateTest(basicJcfMessageService, jcfChannel, jcfUser);
 
-        // 2) 채널 등록
-        Channel ch1 = channelService.create(new Channel("일반 채팅"));
-        Channel ch2 = channelService.create(new Channel("기술 토론"));
-        채널목록("등록된 채널", channelService.findAll());
+        // 조회
+        System.out.println("\n--- 조회 ---");
+        User fetchedJcfUser = basicJcfUserService.findById(jcfUser.getId());
+        System.out.println("조회된 사용자: " + fetchedJcfUser);
 
-        // 3) 메시지 생성
-        Message msg1 = messageService.create(new Message("안녕하세요!", user1.getId(), ch1.getId()));
-        Message msg2 = messageService.create(new Message("프로젝트 진행 상황은 어때요?", user2.getId(), ch1.getId()));
-        메시지목록("등록된 메시지", messageService.findAll());
+        Channel fetchedJcfChannel = basicJcfChannelService.findById(jcfChannel.getId());
+        System.out.println("조회된 채널: " + fetchedJcfChannel);
 
-        // 4) 업데이트
-        userService.update(
-                user1.getId().toString(),
-                new User("이규석(수정)", "lks_updated@sample.com")
-        );
-        channelService.update(
-                ch2.getId().toString(),
-                new Channel("기술 토론(수정)")
-        );
-        messageService.update(
-                msg2.getId().toString(),
-                new Message("거의 마무리되었습니다!", user2.getId(), ch1.getId())
-        );
+        // 모든 사용자, 채널, 메시지 출력
+        printAllUsers(basicJcfUserService);
+        printAllChannels(basicJcfChannelService);
+        printAllMessages(basicJcfMessageService);
 
-        사용자목록("수정 후 사용자", userService.findAll());
-        채널목록("수정 후 채널", channelService.findAll());
-        메시지목록("수정 후 메시지", messageService.findAll());
+        // 수정
+        System.out.println("\n--- 수정 ---");
+        basicJcfUserService.update(jcfUser.getId(), "woody_updated", "woody_updated@codeit.com");
+        basicJcfChannelService.update(jcfChannel.getId(), "공지 채널 (수정)");
 
-        // 5) 삭제
-        userService.delete(user2.getId().toString());
-        channelService.delete(ch1.getId().toString());
-        messageService.delete(msg1.getId().toString());
+        // 수정된 데이터 조회
+        User updatedJcfUser = basicJcfUserService.findById(jcfUser.getId());
+        System.out.println("수정된 사용자: " + updatedJcfUser);
 
-        사용자목록("삭제 후 사용자", userService.findAll());
-        채널목록("삭제 후 채널", channelService.findAll());
-        메시지목록("삭제 후 메시지", messageService.findAll());
-    }
+        Channel updatedJcfChannel = basicJcfChannelService.findById(jcfChannel.getId());
+        System.out.println("수정된 채널: " + updatedJcfChannel);
 
-    // ======================
-    // 출력용 메서드들
-    // ======================
-    private static void 사용자목록(String title, List<User> list) {
-        System.out.println("=== " + title + " ===");
-        for (User user : list) {
-            System.out.printf(" - ID: %s, 이름: %s, 이메일: %s%n",
-                    user.getId(), user.getUsername(), user.getEmail()
-            );
-        }
-        System.out.println();
-    }
+        // 삭제
+        System.out.println("\n--- 삭제 ---");
+        basicJcfMessageService.delete(basicJcfMessageService.findAll().get(0).getId());
+        basicJcfUserService.delete(jcfUser.getId());
+        basicJcfChannelService.delete(jcfChannel.getId());
 
-    private static void 채널목록(String title, List<Channel> list) {
-        System.out.println("=== " + title + " ===");
-        for (Channel ch : list) {
-            System.out.printf(" - ID: %s, 채널명: %s%n",
-                    ch.getId(), ch.getName()
-            );
-        }
-        System.out.println();
-    }
+        // 삭제 후 데이터 조회
+        printAllUsers(basicJcfUserService);
+        printAllChannels(basicJcfChannelService);
+        printAllMessages(basicJcfMessageService);
 
-    private static void 메시지목록(String title, List<Message> list) {
-        System.out.println("=== " + title + " ===");
-        for (Message msg : list) {
-            System.out.printf(" - 메시지 ID: %s, 내용: %s, 사용자: %s, 채널: %s%n",
-                    msg.getId(), msg.getContent(), msg.getUserId(), msg.getChannelId()
-            );
-        }
-        System.out.println();
+        // ============================
+        // [B] Basic Service + File Repository
+        // ============================
+        System.out.println("\n=== [Basic*Service + File*Repository] ===");
+        UserRepository fileUserRepo = new FileUserRepository();
+        ChannelRepository fileChannelRepo = new FileChannelRepository();
+        MessageRepository fileMessageRepo = new FileMessageRepository();
+
+        UserService basicFileUserService = new BasicUserService(fileUserRepo);
+        ChannelService basicFileChannelService = new BasicChannelService(fileChannelRepo);
+        MessageService basicFileMessageService = new BasicMessageService(fileMessageRepo, basicFileUserService, basicFileChannelService);
+
+        // 셋업
+        User fileUser = setupUser(basicFileUserService);
+        Channel fileChannel = setupChannel(basicFileChannelService);
+        messageCreateTest(basicFileMessageService, fileChannel, fileUser);
+
+        // 조회
+        System.out.println("\n--- 조회 ---");
+        User fetchedFileUser = basicFileUserService.findById(fileUser.getId());
+        System.out.println("조회된 사용자: " + fetchedFileUser);
+
+        Channel fetchedFileChannel = basicFileChannelService.findById(fileChannel.getId());
+        System.out.println("조회된 채널: " + fetchedFileChannel);
+
+        // 모든 사용자, 채널, 메시지 출력
+        printAllUsers(basicFileUserService);
+        printAllChannels(basicFileChannelService);
+        printAllMessages(basicFileMessageService);
+
+        // 수정
+        System.out.println("\n--- 수정 ---");
+        basicFileUserService.update(fileUser.getId(), "file_woody_updated", "file_woody_updated@codeit.com");
+        basicFileChannelService.update(fileChannel.getId(), "공지 채널 (파일 수정)");
+
+        // 수정된 데이터 조회
+        User updatedFileUser = basicFileUserService.findById(fileUser.getId());
+        System.out.println("수정된 사용자: " + updatedFileUser);
+
+        Channel updatedFileChannel = basicFileChannelService.findById(fileChannel.getId());
+        System.out.println("수정된 채널: " + updatedFileChannel);
+
+        // 삭제
+        System.out.println("\n--- 삭제 ---");
+        basicFileMessageService.delete(basicFileMessageService.findAll().get(0).getId());
+        basicFileUserService.delete(fileUser.getId());
+        basicFileChannelService.delete(fileChannel.getId());
+
+        // 삭제 후 데이터 조회
+        printAllUsers(basicFileUserService);
+        printAllChannels(basicFileChannelService);
+        printAllMessages(basicFileMessageService);
     }
 }
+

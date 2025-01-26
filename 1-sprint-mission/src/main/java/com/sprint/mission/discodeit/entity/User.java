@@ -4,34 +4,57 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class User implements Serializable {
-    private UUID id;
+    private final UUID id;
+    private final long createdAt;
+    private long updatedAt;
+
     private String username;
     private String email;
 
     public User(String username, String email) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.username = username;
         this.email = email;
     }
 
-    // 직렬화용 기본 생성자
-    public User() {}
-
+    // Getter 메서드들
     public UUID getId() {
         return id;
     }
-    public void setId(UUID id) {
-        this.id = id;
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getUsername() {
         return username;
     }
+
     public String getEmail() {
         return email;
     }
 
-    public void update(String username, String email) {
-        this.username = username;
-        this.email = email;
+    // 업데이트 메서드
+    public void update(String newUsername, String newEmail) {
+        this.username = newUsername;
+        this.email = newEmail;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

@@ -16,22 +16,14 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User create(User user) {
-        // ID 설정
-        if (user.getId() == null) {
-            user.setId(UUID.randomUUID());
-        }
+    public User create(String username, String email) {
+        User user = new User(username, email);
         return userRepository.save(user);
     }
 
     @Override
-    public User findById(String id) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            return userRepository.findById(uuid);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
-        }
+    public User findById(UUID id) {
+        return userRepository.findById(id);
     }
 
     @Override
@@ -40,28 +32,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(String id, User updated) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            User existing = userRepository.findById(uuid);
-            if (existing == null) {
-                throw new RuntimeException("User not found for ID: " + id);
-            }
-            existing.update(updated.getUsername(), updated.getEmail());
-            userRepository.save(existing);
-            return existing;
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
+    public User update(UUID id, String newUsername, String newEmail) {
+        User existing = userRepository.findById(id);
+        if (existing != null) {
+            existing.update(newUsername, newEmail);
+            return userRepository.save(existing);
         }
+        return null;
     }
 
     @Override
-    public void delete(String id) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            userRepository.delete(uuid);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
-        }
+    public void delete(UUID id) {
+        userRepository.delete(id);
     }
 }

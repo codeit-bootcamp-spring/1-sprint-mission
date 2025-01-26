@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> storage = new HashMap<>();

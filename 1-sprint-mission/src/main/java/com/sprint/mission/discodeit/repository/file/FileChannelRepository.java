@@ -29,7 +29,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return storage.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(storage.values());
     }
 
     @Override
@@ -38,6 +38,7 @@ public class FileChannelRepository implements ChannelRepository {
         persist();
     }
 
+    // 직렬화하여 파일에 저장
     private void persist() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(storage);
@@ -46,6 +47,7 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
+    // 파일에서 읽어와 역직렬화
     @SuppressWarnings("unchecked")
     private void load() {
         File file = new File(filePath);

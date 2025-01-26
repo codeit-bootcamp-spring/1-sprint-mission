@@ -16,21 +16,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(Channel channel) {
-        if (channel.getId() == null) {
-            channel.setId(UUID.randomUUID());
-        }
+    public Channel create(String name) {
+        Channel channel = new Channel(name);
         return channelRepository.save(channel);
     }
 
     @Override
-    public Channel findById(String id) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            return channelRepository.findById(uuid);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
-        }
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id);
     }
 
     @Override
@@ -39,28 +32,17 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(String id, Channel updated) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            Channel existing = channelRepository.findById(uuid);
-            if (existing == null) {
-                throw new RuntimeException("Channel not found for ID: " + id);
-            }
-            existing.update(updated.getName());
-            channelRepository.save(existing);
-            return existing;
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
+    public Channel update(UUID id, String newName) {
+        Channel existing = channelRepository.findById(id);
+        if (existing != null) {
+            existing.update(newName);
+            return channelRepository.save(existing);
         }
+        return null;
     }
 
     @Override
-    public void delete(String id) {
-        try {
-            UUID uuid = UUID.fromString(id);
-            channelRepository.delete(uuid);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid UUID format: " + id, e);
-        }
+    public void delete(UUID id) {
+        channelRepository.delete(id);
     }
 }

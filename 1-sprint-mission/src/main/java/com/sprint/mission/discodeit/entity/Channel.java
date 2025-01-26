@@ -4,29 +4,49 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public class Channel implements Serializable {
-    private UUID id;
+    private final UUID id;
+    private final long createdAt;
+    private long updatedAt;
+
     private String name;
 
-    // 채널명만 받는 예시
     public Channel(String name) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.name = name;
     }
 
-    // 직렬화용 기본 생성자
-    public Channel() {}
-
+    // Getter 메서드들
     public UUID getId() {
         return id;
     }
-    public void setId(UUID id) {
-        this.id = id;
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getName() {
         return name;
     }
 
-    public void update(String name) {
-        this.name = name;
+    // 업데이트 메서드
+    public void update(String newName) {
+        this.name = newName;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

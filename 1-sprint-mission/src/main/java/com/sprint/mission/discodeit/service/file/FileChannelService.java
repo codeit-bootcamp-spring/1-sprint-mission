@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
+
     private final ChannelRepository channelRepository;
 
     public FileChannelService(ChannelRepository channelRepository) {
@@ -14,14 +16,33 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(com.sprint.mission.discodeit.model.ChannelType type, String name, String description) {
-        String channelId = UUID.randomUUID().toString();
-        Channel channel = new Channel(channelId, type, name, description);
+    public Channel create(String name) {
+        Channel channel = new Channel(name);
         return channelRepository.save(channel);
     }
 
     @Override
-    public Channel findById(String channelId) {
-        return channelRepository.findById(channelId);
+    public Channel findById(UUID id) {
+        return channelRepository.findById(id);
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
+
+    @Override
+    public Channel update(UUID id, String newName) {
+        Channel existing = channelRepository.findById(id);
+        if (existing != null) {
+            existing.update(newName);
+            return channelRepository.save(existing);
+        }
+        return null;
+    }
+
+    @Override
+    public void delete(UUID id) {
+        channelRepository.delete(id);
     }
 }
