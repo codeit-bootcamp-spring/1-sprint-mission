@@ -34,7 +34,7 @@ public class JCFMessageService implements MessageService {
 
         private static MessageService getInstance() {
             if (instance == null) {
-                throw new IllegalStateException("JCFMessageService is not initialized");
+                throw new IllegalStateException("[ERROR] JCFMessageService is not initialized");
             }
             return instance;
         }
@@ -64,7 +64,7 @@ public class JCFMessageService implements MessageService {
         Message foundMessage = messages.get(messageId);
 
         return Optional.ofNullable(foundMessage)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
     }
 
     @Override
@@ -87,7 +87,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         if (!messages.containsKey(messageId)) {
-            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
         }
         messages.remove(messageId);
     }

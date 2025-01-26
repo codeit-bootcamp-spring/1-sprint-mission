@@ -31,7 +31,7 @@ public class BasicUserService implements UserService {
     @Override
     public User find(UUID userId) {
         return Optional.ofNullable(userRepository.find(userId))
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
     }
 
     @Override

@@ -32,7 +32,7 @@ public class FileUserService implements UserService {
         ) {
             oos.writeObject(user);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 유저 생성에 실패하였습니다.");
         }
         return user;
     }
@@ -47,7 +47,7 @@ public class FileUserService implements UserService {
             Object data = ois.readObject();
             return (User) data;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 유저를 찾을 수 없습니다.");
         }
     }
 
@@ -63,13 +63,13 @@ public class FileUserService implements UserService {
                             Object data = ois.readObject();
                             return (User) data;
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("[ERROR] 유저를 찾을 수 없습니다.");
                         }
                     })
                     .toList();
             return users;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 유저를 찾을 수 없습니다.");
         }
     }
 
@@ -92,7 +92,7 @@ public class FileUserService implements UserService {
         ) {
             oos.writeObject(user);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 유저 업데이트에 실패하였습니다.");
         }
     }
 
@@ -108,7 +108,7 @@ public class FileUserService implements UserService {
         ) {
             oos.writeObject(user);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 유저 비밀번호 업데이트에 실패하였습니다.");
         }
     }
 
@@ -119,7 +119,7 @@ public class FileUserService implements UserService {
         try {
             Files.delete(filePath);
         } catch (IOException e) {
-            System.out.println("삭제에 실패하였습니다.");
+            System.out.println("[ERROR] 유저 삭제에 실패하였습니다.");
         }
     }
 

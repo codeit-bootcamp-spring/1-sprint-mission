@@ -39,7 +39,7 @@ public class JCFUserService implements UserService {
         User foundUser = users.get(userId);
 
         return Optional.ofNullable(foundUser)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
     }
 
     @Override
@@ -71,7 +71,7 @@ public class JCFUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         if (!users.containsKey(userId)) {
-            throw new NoSuchElementException("존재하지 않는 유저입니다.");
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
         users.remove(userId);
     }

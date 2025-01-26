@@ -30,7 +30,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel find(UUID channelId) {
         return Optional.ofNullable(channelRepository.find(channelId))
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
     }
 
     @Override

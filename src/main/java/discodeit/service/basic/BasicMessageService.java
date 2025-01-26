@@ -38,7 +38,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message find(UUID messageId) {
         return Optional.ofNullable(messageRepository.find(messageId))
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다."));
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
     }
 
     @Override

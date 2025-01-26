@@ -34,7 +34,7 @@ public class FileChannelService implements ChannelService {
         ) {
             oos.writeObject(channel);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 채널 생성에 실패하였습니다.");
         }
         return channel;
     }
@@ -49,7 +49,7 @@ public class FileChannelService implements ChannelService {
             Object data = ois.readObject();
             return (Channel) data;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 채널을 찾을 수 없습니다.");
         }
     }
 
@@ -65,13 +65,13 @@ public class FileChannelService implements ChannelService {
                             Object data = ois.readObject();
                             return (Channel) data;
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("[ERROR] 채널을 찾을 수 없습니다.");
                         }
                     })
                     .toList();
             return channels;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 채널을 찾을 수 없습니다.");
         }
     }
 
@@ -94,7 +94,7 @@ public class FileChannelService implements ChannelService {
         ) {
             oos.writeObject(channel);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 채널 업데이트에 실패하였습니다.");
         }
     }
 
@@ -105,7 +105,7 @@ public class FileChannelService implements ChannelService {
         try {
             Files.delete(filePath);
         } catch (IOException e) {
-            System.out.println("삭제에 실패하였습니다.");
+            System.out.println("[ERROR] 채널 삭제에 실패하였습니다.");
         }
     }
 }

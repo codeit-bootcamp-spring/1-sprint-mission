@@ -42,7 +42,7 @@ public class FileMessageService implements MessageService {
         ) {
             oos.writeObject(message);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 메시지 생성에 실패하였습니다.");
         }
         return message;
     }
@@ -57,7 +57,7 @@ public class FileMessageService implements MessageService {
             Object data = ois.readObject();
             return (Message) data;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 메시지를 찾을 수 없습니다.");
         }
     }
 
@@ -73,13 +73,13 @@ public class FileMessageService implements MessageService {
                             Object data = ois.readObject();
                             return (Message) data;
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("[ERROR] 메시지를 찾을 수 없습니다.");
                         }
                     })
                     .toList();
             return messages;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 메시지를 찾을 수 없습니다.");
         }
     }
 
@@ -101,7 +101,7 @@ public class FileMessageService implements MessageService {
         ) {
             oos.writeObject(message);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("[ERROR] 메시지 업데이트에 실패하였습니다.");
         }
     }
 
@@ -112,7 +112,7 @@ public class FileMessageService implements MessageService {
         try {
             Files.delete(filePath);
         } catch (IOException e) {
-            System.out.println("삭제에 실패하였습니다.");
+            System.out.println("[ERROR] 메시지 삭제에 실패하였습니다.");
         }
     }
 }

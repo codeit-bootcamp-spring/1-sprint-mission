@@ -75,20 +75,20 @@ public class User implements Serializable {
 
     public void updatePassword(String originalPassword, String newPassword) {
         if (!BCrypt.checkpw(originalPassword, password) || BCrypt.checkpw(newPassword, password)) {
-            throw new IllegalArgumentException("비밀번호 변경에 실패하였습니다.");
+            throw new IllegalArgumentException("[ERROR] 비밀번호 변경에 실패하였습니다.");
         }
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
 
     public void isDuplicateEmail(String email) {
         if (this.email.equals(email)) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
         }
     }
 
     public void isDuplicatePhoneNumber(String phoneNumber) {
         if (this.phoneNumber.equals(phoneNumber)) {
-            throw new IllegalArgumentException("이미 존재하는 번호입니다.");
+            throw new IllegalArgumentException("[ERROR] 이미 존재하는 번호입니다.");
         }
     }
 
