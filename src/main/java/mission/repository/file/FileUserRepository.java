@@ -32,6 +32,7 @@ public class FileUserRepository implements UserRepository {
                 Files.newOutputStream(filePath))) {
             oos.writeObject(user);
         } //oos.close(); << 이거 줄이려고 try   +  나중에 리펙토링 시 예외처리 여기서 할 때 편하려고 try
+        return user;
     }
 
     /**

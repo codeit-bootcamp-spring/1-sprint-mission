@@ -20,14 +20,14 @@ public class JCFMessageController implements MessageController {
     private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     @Override
-    public void create(UUID channelId, UUID userId, String message) {
+    public Message create(UUID channelId, UUID userId, String message) {
         // 채널 찾고, user 찾고 (findById 이 과정에서 검증 다 끝남) => message 생성
-        messageService.createOrUpdate(Message.createMessage(channelService.findById(channelId), userService.findById(userId), message));
+        return messageService.createOrUpdate(Message.createMessage(channelService.findById(channelId), userService.findById(userId), message));
     }
 
     @Override
-    public void update(UUID messageId, String newString) {
-        messageService.update(messageId, newString);
+    public Message update(UUID messageId, String newString) {
+        return messageService.update(messageId, newString);
     }
 
     @Override
