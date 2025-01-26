@@ -10,7 +10,7 @@ public class Message {
     private UUID senderId;
     private UUID channelId;
 
-    public Message(String content, UUID senderId, UUID channelId) {
+    public Message(UUID uuid, String content, UUID senderId, UUID channelId) {
         // 유효성 검사 추가
         if (content == null || content.trim().isEmpty()) {
             throw new IllegalArgumentException("메시지 내용이 비어 있습니다.");
@@ -37,6 +37,10 @@ public class Message {
     public UUID getChannelId() { return channelId; }
     public long getCreatedAt() { return createdAt; }
     public long getUpdatedAt() { return updatedAt; }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public void updateContent(String newContent) {
         // 업데이트 시에도 유효성 검사 추가

@@ -1,37 +1,37 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileChannelService implements ChannelService {
-    private final String filePath = "channels_service.dat";
+public class FileChannelRepository implements ChannelRepository {
+    private final String filePath = "channels.dat";
     private final Map<UUID, Channel> data = new HashMap<>();
 
-    public FileChannelService() {
+    public FileChannelRepository() {
         loadData();
     }
 
     @Override
-    public void createChannel(Channel channel) {
+    public void save(Channel channel) {
         data.put(channel.getId(), channel);
         saveData();
     }
 
     @Override
-    public Channel getChannel(UUID id) {
+    public Channel findById(UUID id) {
         return data.get(id);
     }
 
     @Override
-    public List<Channel> getAllChannels() {
+    public List<Channel> findAll() {
         return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateChannel(UUID id, Channel updatedChannel) {
+    public void update(UUID id, Channel updatedChannel) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("Channel with ID " + id + " does not exist.");
         }
@@ -40,7 +40,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(UUID id) {
+    public void delete(UUID id) {
         if (!data.containsKey(id)) {
             throw new IllegalArgumentException("Channel with ID " + id + " does not exist.");
         }
@@ -52,7 +52,7 @@ public class FileChannelService implements ChannelService {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(data);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save channel data.", e);
+            throw new RuntimeException("Failed to save channels data.", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class FileChannelService implements ChannelService {
                 data.putAll((Map<UUID, Channel>) obj);
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load channel data.", e);
+            throw new RuntimeException("Failed to load channels data.", e);
         }
     }
 }

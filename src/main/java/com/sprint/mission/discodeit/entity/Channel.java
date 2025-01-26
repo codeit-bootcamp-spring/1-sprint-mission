@@ -32,6 +32,10 @@ public class Channel {
     public long getUpdatedAt() { return updatedAt; }
     public UUID getOwnerId() { return ownerId; }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void updateName(String newName) {
         // 업데이트 시에도 유효성 검사 추가
         if (newName == null || newName.trim().isEmpty()) {
