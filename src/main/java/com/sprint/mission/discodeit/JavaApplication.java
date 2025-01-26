@@ -3,108 +3,115 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+
 import java.util.List;
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService();
-        System.out.println("=== [User] ===");
-        System.out.println("Create New User");
-        User user1 = userService.createUser("Alice", "Alice1234@naver.com");
-        User user2 = userService.createUser("Hazel", "Hazel0109@naver.com");
-        System.out.println();
+        JCFUserService userService = new JCFUserService();
+        JCFChannelService channelService = new JCFChannelService();
+        JCFMessageService messageService = new JCFMessageService();
 
-        System.out.println("[All Users]");
-        List<User> getAllUser = userService.getAllUserList();
-        userService.printUserListInfo(getAllUser);
-        System.out.println();
+        User user1 = userService.createUser("Alice", "aliceExample@naver.com");
+        User user2 = userService.createUser("Alex", "alexExample@naver.com");
+        User user3 = userService.createUser("Gray", "GrayExample@naver.com");
+        User user4 = userService.createUser("Hazel", "HazelExample@naver.com");
 
-        System.out.print("Read only one User : ");
-        User searchUser = userService.searchById(user1.getId());
-        userService.printUserInfo(searchUser);
-        System.out.println();
+        Channel channel1 = channelService.createChannel("Codeit", user1);
+        Channel channel2 = channelService.createChannel("Study", user2);
 
-        System.out.print("Updated User Name, "); //유저 이름 변경
-        userService.updateUserName(user2, "Winter");
-        userService.printUserInfo(user2);
+        user1.addChannel(channel1);
+        user4.addChannel(channel1);
 
-        System.out.print("Updated User Email, "); //유저 이메일 변경
-        userService.updateUserEmail(user1, "AliceUpdated@naver.com");
-        userService.printUserInfo(user1);
-        System.out.println();
+        Message message1 = messageService.createMessage(channel1.getId(), user1.getId(), "오늘 수업 9시 시작이에요!");
+        Message message2 = messageService.createMessage(channel1.getId(), user2.getId(), "오늘도 9시간 수업입니다!!");
+        Message message3 = messageService.createMessage(channel2.getId(), user3.getId(), "저랑 같이 스터디 하실분?!");
+        Message message4 = messageService.createMessage(channel2.getId(), user4.getId(), "저도 스터디 하고 싶어요!");
 
-        System.out.print("Deleted User, ");
-        userService.deleteUser(user2);
-        List<User> getAllUser2 = userService.getAllUserList();
-        userService.printUserListInfo(getAllUser2);
-        System.out.println();
+        //READ
+        List<User> userList = userService.getAllUserList();
+        System.out.println(userList);
+        List<Channel>channelList = channelService.getAllChannelList();
+        System.out.println(channelList);
+        List<Message>messageList = messageService.getAllMessageList();
+        System.out.println(messageList);
+        //Update
+        UUID userIdToUpdate = user1.getId();
+        userService.updateUserName(userIdToUpdate, "Winter");
+        userService.updateUserEmail(userIdToUpdate, "winterExample");
+        userService.updateUserEmail(userIdToUpdate, "WinterExample@naver.com");
+        User updateUser = userService.searchById(userIdToUpdate);
+        if(updateUser != null) {
+            System.out.println("수정된 유저 정보 : " + updateUser.toString());
+        }
 
-
-        System.out.println("=== [Channel] ===");
-        System.out.println("Create New Channel");
-        Channel channel1 = channelService.createChannel("Algorithm Study from codeit", user1);
-        Channel channel2 = channelService.createChannel("CodingTest Study from codeit", user1);
-        Channel channel3 = channelService.createChannel("Java Study from codeit", user2);
-        System.out.println();
-
-        System.out.println("[All Channels]");
-        List<Channel> channelList = channelService.getAllChannelList();
-        channelService.printChannelListInfo(channelList);
-        System.out.println();
-
-        System.out.print("Read one Channel : ");
-        Channel searchChannel = channelService.searchById(channel1.getId());
-        channelService.printChannelInfo(searchChannel);
-        System.out.println();
-
-        System.out.print("Updated Channel, ");
-        channelService.updateTitle(channel1, "Running");
-        channelService.printChannelInfo(channel1);
-        System.out.println();
-
-        System.out.print("Deleted Channel, ");
-        channelService.deleteChannel(channel2);
-        List<Channel> channelList2 = channelService.getAllChannelList();
-        channelService.printChannelListInfo(channelList2);
-        System.out.println();
+        UUID channelIdToUpdate = channel1.getId();
+        channelService.updateChannelName(channelIdToUpdate, "Codeit_Sprint");
+        Channel updateChannel = channelService.searchById(channelIdToUpdate);
+        if (updateChannel != null) {
+            System.out.println("수정된 채널 정보 : " + updateChannel.toString());
+        }
 
 
-        System.out.println("=== [Message] ===");
-        System.out.println("Create New Message");
-        Message message = messageService.createMessage(channel1, user1, "First Message for you");
-        Message message2 = messageService.createMessage(channel1, user1, "I think it's too difficult");
-        Message message3 = messageService.createMessage(channel2, user1, "Are you have been to study Java?");
-        System.out.println();
+        UUID messageIdToUpdate = message1.getId();
+        messageService.updateMessage(messageIdToUpdate, "9시에 수업시작하면 QR 체크해주세요!");
+        Message updateMessage = messageService.searchById(messageIdToUpdate);
+        if (updateMessage != null) {
+            System.out.println("수정된 메시지 : " + updateMessage.getContent());
+        }
+        //delete
+        UUID userIdToDelete = user3.getId();
+        userService.deleteUser(userIdToDelete);
+        System.out.println(userService.getAllUserList());
 
-        System.out.println("[All Messages]");
-        List<Message> messageList = messageService.getAllMessageList();
-        messageService.printMessageListInfo(messageList);
-        System.out.println();
+        UUID channelIdToDelte = channel2.getId();
+        channelService.deleteChannel(channelIdToDelte);
+        System.out.println(channelService.getAllChannelList());
 
-        System.out.print("Read one Message : ");
-        Message searchMessage = messageService.searchById(message.getId());
-        messageService.printMessageInfo(searchMessage);
-        System.out.println();
+        UUID messageIdToDelete = message4.getId();
+        messageService.deleteMessage(messageIdToDelete);
+        System.out.println( messageService.getAllMessageList());
 
-        System.out.print("Updated Message, ");
-        messageService.updateMessage(message2, "I want to be Backend developer");
-        messageService.printMessageInfo(message2);
-        System.out.println();
+        System.out.println("======File=====");
+        FileUserRepository userRepository = new FileUserRepository();
+        FileChannelRepository channelRepository = new FileChannelRepository();
+        FileMessageRepository messageRepository = new FileMessageRepository();
 
-        System.out.print("Message Deleted, ");
-        messageService.deleteMessage(message);
-        List<Message> messageList2 = messageService.getAllMessageList();
-        messageService.printMessageListInfo(messageList2);
-        System.out.println();
+        userRepository.createUser("Alice" , "Alice1234@google.com");
+        userRepository.createUser("Hazel" , "Hazel3455@google.com");
+        channelRepository.createChannel("Codeit-Backend", user1);
+        channelRepository.createChannel("SprintBoot", user4);
+        messageRepository.createMessage(channel1.getId(),user1.getId(),"이 채널에서는 뭐하는거에요?");
 
+        List<User> users = userRepository.getAllUserList();
+        users.forEach(System.out::println);
+        List<Channel> channels = channelRepository.getAllChannelList();
+        channels.forEach(System.out::println);
+        List<Message> messages = messageRepository.getAllMessageList();
+
+        UUID userId = users.get(0).getId();
+        userRepository.updateUserName(userId, "Alice Updated");
+        userRepository.updateUserEmail(userId, "AliceUpdated@google.com");
+        users.forEach(System.out::println);
+
+        UUID channelId = channels.get(0).getId();
+        channelRepository.updateChannelName(channelId, "Codeit-Spring");
+        channels.forEach(System.out::println);
+
+        UUID messageId = messages.get(0).getId();
+        messageRepository.updateMessage(messageId,"이것 뭐에요?");
+        messages.forEach(System.out::println);
+
+        userRepository.deleteUser(userId);
+        channelRepository.deleteChannel(channelId);
+        messageRepository.deleteMessage(messageId);
     }
 }

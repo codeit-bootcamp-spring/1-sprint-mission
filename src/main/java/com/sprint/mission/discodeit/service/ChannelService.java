@@ -17,21 +17,11 @@ public interface ChannelService {
     // 채널ID로 채널 하나만 검색
     Channel searchById(UUID channelId);
 
-    // 채널의 전체 정보 출력
-    void printChannelInfo(Channel channel);
-    void printChannelListInfo(List<Channel> channelList);
-
     // 채널 명 수정
-    void updateTitle(Channel channel,String channelName);
+    void updateChannelName(UUID channelId, String channelName);
 
     // 채널 삭제
-    void deleteChannel(Channel channel);
+    void deleteChannel(UUID channelId);
 
-    // 채널의 모든 멤버 조회
-    List<User> getAllMemberList(Channel channel);
-
-    // 채널 멤버 추가 또는 삭제 _> 아직 구현 X
-    void addMember(Channel channel, User user);
-    void deleteMember(Channel channel, User user);
 
 }
