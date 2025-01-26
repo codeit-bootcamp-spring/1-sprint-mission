@@ -3,13 +3,19 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.util.time.SystemTimeProvider;
 import com.sprint.mission.discodeit.util.time.TimeProvider;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public abstract class BaseEntity{
+public abstract class BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
-    private final TimeProvider timeProvider;
+    private transient TimeProvider timeProvider;
 
     public BaseEntity(){
         this(new SystemTimeProvider());
@@ -50,5 +56,11 @@ public abstract class BaseEntity{
     @Override
     public int hashCode(){
         return id.hashCode();
+    }
+
+    @Serial
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.timeProvider = new SystemTimeProvider();
     }
 }

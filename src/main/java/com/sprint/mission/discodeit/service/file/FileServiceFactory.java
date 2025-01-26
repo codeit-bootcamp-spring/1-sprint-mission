@@ -1,14 +1,14 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.UserService;
 
-public class JCFServiceFactory implements ServiceFactory {
-    private static final JCFUserService userService = JCFUserService.getInstance();
-    private static final JCFChannelService channelService = JCFChannelService.getInstance();
-    private static final JCFMessageService messageService = JCFMessageService.getInstance(userService, channelService);
+public class FileServiceFactory implements ServiceFactory {
+    private static final UserService userService = FileUserService.getInstance();
+    private static final ChannelService channelService = FileChannelService.getInstance();
+    private static final MessageService messageService = FileMessageService.getInstance(userService, channelService);
 
     public UserService getUserService() {
         return userService;
