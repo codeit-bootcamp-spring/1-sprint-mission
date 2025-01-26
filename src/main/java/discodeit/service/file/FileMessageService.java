@@ -6,6 +6,9 @@ import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -35,7 +38,20 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message create(String content, User sender, UUID channelId) {
-        return null;
+        userService.find(sender.getId());
+        channelService.find(channelId);
+
+        Message message = new Message(content, sender, channelId);
+        Path filePath = directory.resolve(message.getId() + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return message;
     }
 
     @Override
