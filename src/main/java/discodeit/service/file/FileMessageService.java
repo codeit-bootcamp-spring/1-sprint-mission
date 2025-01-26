@@ -97,7 +97,18 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void update(UUID messageId, String content) {
+        Message message = find(messageId);
+        message.updateContent(content);
 
+        Path filePath = directory.resolve(messageId + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
