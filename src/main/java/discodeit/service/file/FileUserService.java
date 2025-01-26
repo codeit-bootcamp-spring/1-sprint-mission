@@ -27,8 +27,8 @@ public class FileUserService implements UserService {
         User user = new User(name, email, phoneNumber, password);
         Path filePath = directory.resolve(user.getId() + ".ser");
         try (
-            FileOutputStream fos = new FileOutputStream(filePath.toFile());
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(user);
         } catch (IOException e) {
@@ -41,8 +41,8 @@ public class FileUserService implements UserService {
     public User find(UUID userId) {
         Path filePath = directory.resolve(userId + ".ser");
         try (
-            FileInputStream fis = new FileInputStream(filePath.toFile());
-            ObjectInputStream ois = new ObjectInputStream(fis);
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             Object data = ois.readObject();
             return (User) data;
@@ -56,7 +56,7 @@ public class FileUserService implements UserService {
         try {
             List<User> users = Files.list(directory)
                     .map(path -> {
-                        try(
+                        try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis);
                         ) {
@@ -114,7 +114,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        Path filePath = directory.resolve(userId.toString() + ".ser");
+        Path filePath = directory.resolve(userId + ".ser");
 
         try {
             Files.delete(filePath);
