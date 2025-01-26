@@ -8,15 +8,11 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public interface ChannelService {
-    HashMap<UUID, Channel> getChannelsMap();
-
     UUID createChannel(String channelName);
 
-    Channel getChannel(UUID channelId);
+    HashMap<UUID, Channel> getChannelsMap();
 
     boolean deleteChannel(UUID channelId);
-
-    boolean isChannelExist(UUID channelId);
 
     boolean changeChannelName(UUID channelId, String newName);
 

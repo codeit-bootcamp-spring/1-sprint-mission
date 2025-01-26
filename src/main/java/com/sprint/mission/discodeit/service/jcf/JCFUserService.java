@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class JCFUserService implements UserService{
+    private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
+
     //생성자 접근 불가능하도록 함.
     private JCFUserService() {
     }
@@ -13,17 +15,16 @@ public class JCFUserService implements UserService{
     //모든 유저객체가 담기는 해쉬맵 싱글톤 객체 'usersMap' 생성. LazyHolder 방식으로 스레드세이프 보장
     private static class JCFUserServiceHolder {
         private static final JCFUserService INSTANCE = new JCFUserService();
-        private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
     }
 
     public static JCFUserService getInstance() { //외부에서 호출 가능한 싱글톤 인스턴스.
-        return JCFUserService.JCFUserServiceHolder.INSTANCE;
+        return JCFUserServiceHolder.INSTANCE;
     }
 
     //모든 유저 관리 맵 'usersMap' 반환
     @Override
     public HashMap<UUID, User> getUsersMap() {
-        return JCFUserService.JCFUserServiceHolder.usersMap;
+        return usersMap;
     }
 
     //유저 생성. 'usersMap'에 uuid-유저객체 주소 넣어줌. 성공하면 uuid, 실패하면 null 반환

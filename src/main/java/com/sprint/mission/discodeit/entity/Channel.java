@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Channel {
+
+public class Channel implements Serializable, Entity {
+    private static final long serialVersionUID = 1L;
+
     private final long createdAt;
     private long updatedAt;
     private UUID id;

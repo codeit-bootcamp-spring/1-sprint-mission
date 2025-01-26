@@ -1,14 +1,15 @@
 package com.sprint.mission;
-import com.sprint.mission.discodeit.entity.Message;
+
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import java.util.UUID;
 
+import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
         // 싱글톤 객체 생성
+        /*
         JCFUserService userService = JCFUserService.getInstance();
         JCFChannelService channelService = JCFChannelService.getInstance();
         JCFMessageService messageService = JCFMessageService.getInstance();
@@ -39,8 +40,6 @@ public class JavaApplication {
             System.out.println("해당 메세지가 존재하지 않습니다.");
         } else {
             System.out.println(messageService.getMessageContent(message1));
-        }
-
-
+        }*/
     }
 }
