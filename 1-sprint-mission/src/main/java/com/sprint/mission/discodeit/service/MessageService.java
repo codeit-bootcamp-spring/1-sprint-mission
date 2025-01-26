@@ -7,6 +7,6 @@ public interface MessageService {
     Message create(Message message);
     Message findById(String id);
     List<Message> findAll();
-    Message update(String id, Message message);
+    Message update(String id, Message updated);
     void delete(String id);
 }

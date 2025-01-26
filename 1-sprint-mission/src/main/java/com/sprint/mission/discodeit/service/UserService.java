@@ -7,6 +7,6 @@ public interface UserService {
     User create(User user);
     User findById(String id);
     List<User> findAll();
-    User update(String id, User user);
+    User update(String id, User updated);
     void delete(String id);
 }

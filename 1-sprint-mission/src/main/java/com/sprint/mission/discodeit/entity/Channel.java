@@ -1,42 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Channel {
-    private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
-
-    // 채널명이 있을 수 있습니다.
+public class Channel implements Serializable {
+    private UUID id;
     private String name;
 
+    // 채널명만 받는 예시
     public Channel(String name) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-
         this.name = name;
     }
+
+    // 직렬화용 기본 생성자
+    public Channel() {}
 
     public UUID getId() {
         return id;
     }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void updateName(String newName) {
-        this.name = newName;
-        this.updatedAt = System.currentTimeMillis();
+    public void update(String name) {
+        this.name = name;
     }
-
 }
