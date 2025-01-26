@@ -113,6 +113,12 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
+        Path filePath = directory.resolve(messageId + ".ser");
 
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제에 실패하였습니다.");
+        }
     }
 }
