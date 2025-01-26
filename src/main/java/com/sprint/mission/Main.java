@@ -3,26 +3,24 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-import com.sprint.mission.discodeit.service.jcf.JCFMessage;
-import com.sprint.mission.discodeit.service.jcf.JCFUser;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Main {
-    static JCFUser userService = new JCFUser();
-    static JCFChannel channelService = new JCFChannel();
-    static JCFMessage messageService = new JCFMessage(channelService);
+    static JCFUserService userService = new JCFUserService();
+    static JCFChannelService channelService = new JCFChannelService();
+    static JCFMessageService messageService = new JCFMessageService(channelService);
 
     public static void main(String[] args) {
-        userServiceTest();
-
-        messageServiceTest();
-
-        channelServiceTest();
+        jcfUserServiceTest();
+        jcfMessageServiceTest();
+        jcfChannelServiceTest();
     }
 
-    private static void channelServiceTest() {
+    private static void jcfChannelServiceTest() {
         // 채널 생성
         Channel channel1 = channelService.createChannel("KBS");
         Channel channel2 = channelService.createChannel("EBS");
@@ -52,7 +50,7 @@ public class Main {
                 c -> log("채널 이름", c.getChannelName()));
     }
 
-    private static void messageServiceTest() {
+    private static void jcfMessageServiceTest() {
         // 유저 생성
         User user1 = userService.createUser("1");
         User user2 = userService.createUser("2");
@@ -62,13 +60,13 @@ public class Main {
         Channel channel2 = channelService.createChannel("EBS");
 
         // 메시지 생성
-        Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello");
-        Message message2 = messageService.createMessage(user2.getId(), channel2.getId(), "World");
-        log("메시지 등록1", message1.getText());
-        log("메시지 등록2", message2.getText());
+        Optional<Message> message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello");
+        Optional<Message> message2 = messageService.createMessage(user2.getId(), channel2.getId(), "World");
+        log("메시지 등록1", message1.orElseThrow().getText());
+        log("메시지 등록2", message2.orElseThrow().getText());
 
         // 메시지 단건 조회
-        testOptional("메시지 조회 단건", messageService.getMessage(message1.getId()),
+        testOptional("메시지 조회 단건", messageService.getMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 다건 조회
@@ -76,13 +74,13 @@ public class Main {
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 수정
-        messageService.updateMessage(message1.getId(), "Hello Updated");
+        messageService.updateMessage(message1.orElseThrow().getId(), "Hello Updated");
         log("메시지 수정", "완료");
-        testOptional("메시지 수정 성공", messageService.getMessage(message1.getId()),
+        testOptional("메시지 수정 성공", messageService.getMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 삭제
-        testOptional("메시지 삭제 성공", messageService.deleteMessage(message1.getId()),
+        testOptional("메시지 삭제 성공", messageService.deleteMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 삭제 여부 확인
@@ -90,7 +88,7 @@ public class Main {
                 m -> log("메시지 내용", m.getText()));
     }
 
-    private static void userServiceTest() {
+    private static void jcfUserServiceTest() {
         // 유저 생성
         User user1 = userService.createUser("1");
         User user2 = userService.createUser("2");

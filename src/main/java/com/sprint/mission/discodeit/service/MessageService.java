@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(UUID authorID, UUID channelID, String text);
+    Optional<Message> createMessage(UUID authorID, UUID channelID, String text);
 
     Map<UUID, Message> getMessages();
 

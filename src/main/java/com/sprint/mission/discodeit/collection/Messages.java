@@ -1,9 +1,17 @@
 package com.sprint.mission.discodeit.collection;
 
 import com.sprint.mission.discodeit.entity.Message;
-import java.util.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-public class Messages {
+public class Messages implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final Map<UUID, Message> messages = new HashMap<>();
 
     // 메시지 추가

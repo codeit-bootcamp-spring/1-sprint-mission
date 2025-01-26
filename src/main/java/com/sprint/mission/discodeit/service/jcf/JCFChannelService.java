@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFChannel implements ChannelService {
+public class JCFChannelService implements ChannelService {
     private final Channels channels = new Channels();
 
     @Override

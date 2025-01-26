@@ -2,31 +2,32 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.collection.Messages;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFMessage implements MessageService {
+public class JCFMessageService implements MessageService {
     private final Messages messages = new Messages();
-    private final JCFChannel jcfChannel;
+    private final ChannelService channelService;
 
-    public JCFMessage(JCFChannel jcfChannel) {
-        this.jcfChannel = jcfChannel;
+    public JCFMessageService(JCFChannelService jcfChannel) {
+        this.channelService = jcfChannel;
     }
 
     @Override
-    public Message createMessage(UUID authorID, UUID channelID, String text) {
+    public Optional<Message> createMessage(UUID authorID, UUID channelID, String text) {
         // 채널이 있는지 확인
-        if(jcfChannel.getChannel(channelID).isEmpty()) {
-            return null;
+        if(channelService.getChannel(channelID).isEmpty()) {
+            return Optional.empty();
         }
         // 메시지 생성
         Message newMessage = new Message(text, authorID, channelID);
         messages.add(newMessage.getId(), newMessage);
         // 채널에 메시지 등록
-        jcfChannel.addMessageToChannel(channelID, newMessage.getId());
-        return newMessage;
+        channelService.addMessageToChannel(channelID, newMessage.getId());
+        return Optional.of(newMessage);
     }
 
     @Override

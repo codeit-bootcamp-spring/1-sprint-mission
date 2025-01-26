@@ -10,8 +10,14 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // JUnit 5 의존성 추가
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    // Mockito 의존성 추가
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    // Mockito와 JUnit5를 통합하기 위한 '최신버전' 의존성 추가
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
 test {
