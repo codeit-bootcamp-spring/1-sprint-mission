@@ -99,7 +99,13 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(Channel channel) {
+    public void delete(UUID channelId) {
+        Path filePath = directory.resolve(channelId + ".ser");
 
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제에 실패하였습니다.");
+        }
     }
 }
