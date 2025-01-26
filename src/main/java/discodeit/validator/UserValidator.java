@@ -1,4 +1,4 @@
-package discodeit.Validator;
+package discodeit.validator;
 
 import java.util.regex.Pattern;
 

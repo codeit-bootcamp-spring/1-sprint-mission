@@ -1,12 +1,11 @@
 package discodeit.service.file;
 
-import discodeit.Validator.UserValidator;
+import discodeit.validator.UserValidator;
 import discodeit.entity.User;
 import discodeit.service.UserService;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -126,11 +125,13 @@ public class FileUserService implements UserService {
 
     @Override
     public void isDuplicateEmail(String email) {
-
+        List<User> users = findAll();
+        users.forEach(user -> user.isDuplicateEmail(email));
     }
 
     @Override
     public void isDuplicatePhoneNumber(String phoneNumber) {
-
+        List<User> users = findAll();
+        users.forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

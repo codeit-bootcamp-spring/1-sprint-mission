@@ -1,6 +1,6 @@
 package discodeit.service.jcf;
 
-import discodeit.Validator.ChannelValidator;
+import discodeit.validator.ChannelValidator;
 import discodeit.entity.Channel;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;

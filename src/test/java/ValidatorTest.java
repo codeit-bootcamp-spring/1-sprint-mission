@@ -1,4 +1,4 @@
-import discodeit.Validator.UserValidator;
+import discodeit.validator.UserValidator;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;

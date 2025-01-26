@@ -1,4 +1,4 @@
-package discodeit.Validator;
+package discodeit.validator;
 
 public interface Validator {
 

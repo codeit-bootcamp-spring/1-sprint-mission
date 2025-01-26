@@ -1,6 +1,6 @@
 package discodeit.service.jcf;
 
-import discodeit.Validator.UserValidator;
+import discodeit.validator.UserValidator;
 import discodeit.entity.User;
 import discodeit.service.UserService;
 
