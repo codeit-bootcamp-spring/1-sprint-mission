@@ -1,6 +1,6 @@
-package com.sprint.mission.discodit.Service;
+package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodit.Entity.User;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
@@ -10,7 +10,7 @@ public interface UserService {
     public UUID createUser(String userName);
     public User getUser(UUID id);
     public List<User> getUsers();
-    public void setUser(UUID id, String userName);
+    public void updateUser(UUID id, String userName);
     public void deleteUser(UUID id);
 
 }

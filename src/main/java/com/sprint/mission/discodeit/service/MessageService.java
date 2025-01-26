@@ -1,7 +1,6 @@
-package com.sprint.mission.discodit.Service;
+package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodit.Entity.Message;
-import com.sprint.mission.discodit.Entity.User;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,13 +10,12 @@ public interface MessageService {
 
     UUID createMessage(UUID id, String content);
 
-    UUID createMessage(UUID id, UUID sender, String content);
 
     public Message getMessage(UUID id);
 
-    List<Message> getMessageByUserId(UUID userId);
+    List<Message> getMessagesByUserId(UUID userId);
 
     public List<Message> getMessages();
-    public void setMessage(UUID id, String content);
+    public void updateMessage(UUID id, String content);
     public void deleteMessage(UUID id);
 }
