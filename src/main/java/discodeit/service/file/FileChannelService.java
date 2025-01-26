@@ -6,6 +6,9 @@ import discodeit.service.ChannelService;
 import discodeit.validator.ChannelValidator;
 import discodeit.validator.UserValidator;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -23,7 +26,18 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel create(String name, String introduction, User owner) {
-        return null;
+        validator.validate(name, introduction);
+        Channel channel = new Channel(name, introduction, owner);
+        Path filePath = directory.resolve(channel.getId() + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                ) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return channel;
     }
 
     @Override
