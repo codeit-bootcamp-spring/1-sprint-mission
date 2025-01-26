@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public String getInfo(UUID userId) {
-        return userRepository.find(userId).toString();
+        return find(userId).toString();
     }
 
     @Override

@@ -40,7 +40,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public String getInfo(UUID channelId) {
-        return channelRepository.find(channelId).toString();
+        return find(channelId).toString();
     }
 
     @Override
