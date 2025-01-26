@@ -18,17 +18,19 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User save(String name, String email, String phoneNumber, String password) {
-        return null;
+        User user = new User(name, email, phoneNumber, password);
+        users.put(user.getId() ,user);
+        return user;
     }
 
     @Override
     public User find(UUID userId) {
-        return null;
+        return users.get(userId);
     }
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return users.values().stream().toList();
     }
 
     @Override

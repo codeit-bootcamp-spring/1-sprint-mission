@@ -44,7 +44,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return users.values().stream().toList();
     }
 
     @Override
