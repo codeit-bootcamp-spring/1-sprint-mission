@@ -45,7 +45,7 @@ public class Message implements Serializable {                  // 메시지 (�
     public UUID getChannelId() {
         return channelId;
     }
-
+  
     public UUID getWriterId() {
         return writerId;
     }
