@@ -8,62 +8,45 @@ import mission.controller.jcf.JCFMessageController;
 import mission.controller.jcf.JCFUserController;
 import mission.entity.User;
 import java.io.IOException;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class javaApplication {
 
-    private final ChannelController channelController = new JCFChannelController();
-    private final UserController userController = new JCFUserController();
-    private final MessageController messageController = new JCFMessageController();
+    private static final ChannelController channelController = new JCFChannelController();
+    private static final UserController userController = new JCFUserController();
+    private static final MessageController messageController = new JCFMessageController();
 
     public static void main(String[] args) throws IOException {
-//        initDirectory();
-//
-//        // 유저 생성 테스트
-//        User userA = userCreateTest("직원 A", "1234");
-//        User userB = userCreateTest("직원 B", "4321");
-//
-//
-//        // 찾는 유저 테스트
-//        User findUserById = userFindTest(userA.getId());
-//        User findUserByN_PW = fileMainService.findUserByNamePW("직원 A", "1234");
-//        System.out.println("findUserById = " + findUserById);
-//        System.out.println("findUserById = userA : " + userA.equals(findUserById));
-//        System.out.println("findUserByN_PW = userA : " + userA.equals(findUserByN_PW));
-//
-//        // 모두 찾는 테스트
-//        Set<User> users = findUsers();
-//
-//        // 닉네임 패스워드 수정
-//        User updateUserA = fileMainService.updateUserNamePW(userA.getId(), userA.getName(), userA.getPassword(), "유저 F", "9999");
-//        System.out.println("기존 유저 A id = 업테이트 유저 id : " + updateUserA.getId().equals(userA.getId()));
-//        System.out.println("기존 유저 A의 닉네임 = 업데이트 유저 닉네임 : " + updateUserA.getName().equals(userA.getName()));
-//
-//        // 중복검사해야하네
-//
-//        // User B 삭제 테스트 : 필요 정보 ID, NAME, PW
-//        fileMainService.deleteUser(userB.getId(), userB.getName(), userB.getPassword());
-//        System.out.println("전체 유저 목록 = " + findUsers());
-//
-//
-//    }
-//
-//    private static Set<User> findUsers() throws IOException {
-//        Set<User> users = fileMainService.findAllUser();
-//        System.out.println("전체 유저 수 = " + users.size());
-//        return users;
-//    }
-//
-//    private static User userFindTest(UUID findId) throws IOException {
-//        User findUser = fileMainService.findUserById(findId);
-//        return findUser;
-//    }
-//
-//    private static User userCreateTest(String name, String password) throws IOException {
-//        User createUser = fileMainService.createUser(name, password);
-//        System.out.println("createUser = " + createUser);
-//        return createUser;
+
+        // 유저 생성 테스트
+        List<User> userList = userCreateTest(3);
+
+        // 수정
+        User beforeUpdateUser = userList.get(0);
+        System.out.println("BeforeUpdate => 닉네임: " + beforeUpdateUser.getName() + ", 비밀번호: " + beforeUpdateUser.getPassword());
+        User afterUpdateUser = userController.updateUserNamePW(beforeUpdateUser.getId(), beforeUpdateUser.getName() + "-1", String.valueOf(1000 + new Random().nextInt(9000)));
+        System.out.println("afterUpdate => 닉네임: " + afterUpdateUser.getName() + ", 비밀번호: " + afterUpdateUser.getPassword());
+
+        // 나머지 시간 부족
+
+
+
+    }
+
+    private static void findUserTest(){
+        List<User> userList = userController.findAll().stream().toList();
+        System.out.println("전체 유저 목록: " + userList + "유저 수: " + userList.size());
+        User findUser = userController.findById(userList.get(0).getId());
+        System.out.println("findById = " + findUser);
+    }
+
+    private static List<User> userCreateTest(int userCount) {
+        for (int i = 1; i <= userCount; i++) {
+            User creatUser = userController.create("유저" + i, String.valueOf(1000 + new Random().nextInt(9000)));
+            System.out.println(creatUser.getName() + " 생성 완료");
+        }
+        System.out.println("전체 유저: " + userController.findAll());
+        return userController.findAll().stream().toList();
    }
 
 

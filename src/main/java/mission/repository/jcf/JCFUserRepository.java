@@ -13,7 +13,8 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        return data.put(user.getId(), user);
+        data.put(user.getId(), user); // 바로 반환하면 null
+        return data.get(user.getId());
     }
 
 
