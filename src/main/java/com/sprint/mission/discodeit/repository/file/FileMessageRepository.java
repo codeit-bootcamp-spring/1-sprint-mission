@@ -50,18 +50,4 @@ public class FileMessageRepository implements MessageRepository{
         messages.removeIf(m -> m.getId().equals(id));
         fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
     }
-
-    @Override
-    public void deleteByChannel(Channel channel) {
-        List<Message> messages = findAll();
-        messages.removeIf(message -> message.getChannel().equals(channel));
-        fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
-    }
-
-    @Override
-    public void deleteByUser(User user) {
-        List<Message> messages = findAll();
-        messages.removeIf(message -> message.getAuthor().equals(user));
-        fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
-    }
 }

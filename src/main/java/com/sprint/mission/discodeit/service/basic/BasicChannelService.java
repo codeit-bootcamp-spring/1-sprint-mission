@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.service.basic.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
@@ -12,12 +11,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BasicJCFChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private UserService userService;
 
-    public BasicJCFChannelService(ChannelRepository channelRepository) {
+    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
         this.channelRepository = channelRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -34,22 +34,17 @@ public class BasicJCFChannelService implements ChannelService {
 
     @Override
     public void addParticipantToChannel(UUID channelId, UUID userId) {
-        Optional<Channel> existingChannel = channelRepository.findById(channelId);
-        if (existingChannel.isEmpty()) {
-            throw new IllegalArgumentException("Channel does not exists: " + channelId);
-        }
+        Channel existChannel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + channelId));
 
-        Optional<User> existUser = userService.readUser(userId);
-        if (existUser.isEmpty()) {
-            throw new IllegalArgumentException("User does not exists: " + userId);
-        }
+        User existUser = userService.readUser(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist: " + userId));
 
-        Channel foundChannel = existingChannel.get();
-        foundChannel.getParticipants().put(userId,existUser.get());
-        channelRepository.save(foundChannel);
+        existChannel.getParticipants().put(userId,existUser);
+        channelRepository.save(existChannel);
 
-        System.out.println(foundChannel.toString());
-        System.out.println(foundChannel.getName() + " 채널에 " + existUser.get().getUsername() + " 유저 추가 완료\n");
+        System.out.println(existChannel.toString());
+        System.out.println(existChannel.getName() + " 채널에 " + existUser.getUsername() + " 유저 추가 완료\n");
     }
 
     @Override
@@ -68,19 +63,17 @@ public class BasicJCFChannelService implements ChannelService {
 
     @Override
     public Channel updateChannel(UUID existChannelId, Channel updateChannel) {
-        Optional<Channel> existChannel = channelRepository.findById(existChannelId);
-        if (existChannel.isEmpty()) {
-            throw new NoSuchElementException("Channel not found");
-        }
+        Channel existChannel = channelRepository.findById(existChannelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + existChannelId));
 
         System.out.println("업데이트 이전 채널 = " + existChannel.toString());
-        existChannel.get().updateName(updateChannel.getName());
-        existChannel.get().updateDescription(updateChannel.getDescription());
-        existChannel.get().updateParticipants(updateChannel.getParticipants());
-        existChannel.get().updateMessageList(updateChannel.getMessageList());
-        existChannel.get().updateTime();
+        existChannel.updateName(updateChannel.getName());
+        existChannel.updateDescription(updateChannel.getDescription());
+        existChannel.updateParticipants(updateChannel.getParticipants());
+        existChannel.updateMessageList(updateChannel.getMessageList());
+        existChannel.updateTime();
 
-        Channel updatedChannel = channelRepository.save(existChannel.get());
+        Channel updatedChannel = channelRepository.save(existChannel);
         System.out.println("업데이트 이후 채널 = " + updatedChannel.toString());
         return updatedChannel;
     }

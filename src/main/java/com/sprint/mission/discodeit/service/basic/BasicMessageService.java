@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -7,20 +7,21 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BasicJCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private UserService userService;
     private ChannelService channelService;
 
-    public BasicJCFMessageService(MessageRepository messageRepository) {
+    public BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
         this.messageRepository = messageRepository;
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     @Override
@@ -37,7 +38,7 @@ public class BasicJCFMessageService implements MessageService {
         Channel channel = channelService.readChannel(message.getChannel().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId()));
 
-        if (!channel.getParticipants().containsKey(message.getAuthor().getId())) {
+        if (!channel.getParticipants().containsKey(author.getId())) {
             throw new IllegalArgumentException("Author is not a participant of the channel: " + message.getChannel().getId());
         }
 
@@ -61,9 +62,9 @@ public class BasicJCFMessageService implements MessageService {
     @Override
     public Message updateByAuthor(UUID existUserId, Message updateMessage) {
         Message existMessage = messageRepository.findAll().stream()
-                .filter(message -> message.getAuthor().equals(existUserId))
+                .filter(message -> message.getAuthor().getId().equals(existUserId))
                 .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Message not found"));
+                .orElseThrow(() -> new IllegalArgumentException("No message found with id: " + existUserId));
 
         System.out.println("수정 전 메시지 = " + existMessage.getContent());
         existMessage.updateContent(updateMessage.getContent());

@@ -8,9 +8,6 @@ import java.util.*;
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channelData = new HashMap<>();
 
-    public JCFChannelRepository() {
-    }
-
     @Override
     public Channel save(Channel channel) {
         channelData.put(channel.getId(), channel);

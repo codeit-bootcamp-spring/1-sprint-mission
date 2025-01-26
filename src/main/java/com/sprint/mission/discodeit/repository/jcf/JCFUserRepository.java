@@ -8,7 +8,6 @@ import java.util.*;
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userData = new HashMap<>();
 
-
     @Override
     public User save(User user) {
         userData.put(user.getId(), user);
