@@ -1,9 +1,10 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,18 +17,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- * define JCFs as DB + DBMS
+ * defines Basic as cache + DBMS
  * data load + implementation CRUD
  */
-public class JCFUserService implements UserService {
-    private static JCFUserService instance;
-    private final Map<UUID, User> UserList;
-    public JCFUserService() {
+public class BasicUserService implements UserService {
+    private static BasicUserService instance;
+    private Map<UUID, User> UserList;
+    public BasicUserService() {
         this.UserList = new HashMap<>();
     }
-    public static JCFUserService getInstance() {
+    public static BasicUserService getInstance() {
         if (instance == null) {
-            instance = new JCFUserService();
+            instance = new BasicUserService();
         }
         return instance;
     }
@@ -80,7 +81,7 @@ public class JCFUserService implements UserService {
     @Override
     public void deleteUserById(UUID userId) {
         User user = UserList.remove(userId);
-        Map<UUID, Channel> chList = JCFChannelService.getInstance().getChannelList();
+        Map<UUID, Channel> chList = BasicChannelService.getInstance().getChannelList();
 /** refactor: apply Stream API instead of for-each
  for (UUID channelId : user.getAttending()) {
 
@@ -95,7 +96,7 @@ public class JCFUserService implements UserService {
 
 
         user.getAttending().forEach(channelId -> {
-            Channel channel = JCFChannelService.getInstance().readChannelInfo(channelId);
+            Channel channel = BasicChannelService.getInstance().readChannelInfo(channelId);
             if (channel != null) {
                 channel.getChannelMessageList().removeIf(msg -> msg.getWriter().equals(userId));
             }
@@ -104,7 +105,7 @@ public class JCFUserService implements UserService {
 
 
         user.getAttending().forEach(channelId -> {
-            Channel channel = JCFChannelService.getInstance().readChannelInfo(channelId);
+            Channel channel = BasicChannelService.getInstance().readChannelInfo(channelId);
             if (channel != null) {
                 channel.getChannelUserList().removeIf(usr -> usr.getId().equals(userId));
             }
@@ -118,7 +119,7 @@ public class JCFUserService implements UserService {
                         .equals(userId));
         //deletion user's channel.
 
-        List<Message> msgList = JCFMessageService.getInstance().getMesageList();
+        List<Message> msgList = BasicMessageService.getInstance().getMessageList();
         msgList =  msgList.stream()
                 .filter(msg -> !msg
                         .getWriter()
@@ -130,9 +131,13 @@ public class JCFUserService implements UserService {
     }
 
 
-
+    @Override
     public Map<UUID, User> getUserList() {
         return UserList;
+    }
+
+    public void setUserList(Map<UUID, User> userList) {
+        this.UserList = userList;
     }
 
     public void printing() {

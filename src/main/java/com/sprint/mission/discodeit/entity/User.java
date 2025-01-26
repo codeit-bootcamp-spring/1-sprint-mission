@@ -4,8 +4,8 @@ package com.sprint.mission.discodeit.entity;
 
 
 import com.sprint.mission.discodeit.exception.PassWordFormatException;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
@@ -31,7 +32,7 @@ public class User {
         private String passWord;
         private String email;
         private String alias;
-        private List<UUID> attending;
+        private List<UUID> attending; //다대일
 
         public Builder() {
             this.id = UUID.randomUUID();
