@@ -16,16 +16,16 @@ public class ChannelTest {
     // 채널 생성
     public static Channel setUpChannel(User user, ChannelService channelService, UserService userService) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//
+//        System.out.println("채널명 입력 :");
+//        String name = br.readLine();
+//
+//        System.out.println("채널 설명 입력 :");
+//        String explanation = br.readLine();
 
-        System.out.println("채널명 입력 :");
-        String name = br.readLine();
-
-        System.out.println("채널 설명 입력 :");
-        String explanation = br.readLine();
-
-//        String name = "test";
-//        String explanation = "테스트용 채널입니다.";
+        String name = "test";
+        String explanation = "테스트용 채널입니다.";
 
         Channel channel = new Channel(user, name, explanation);
 
@@ -44,7 +44,6 @@ public class ChannelTest {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        Channel channel = channelService.read(id);
 
         loopOut:
         while (true) {
@@ -57,6 +56,8 @@ public class ChannelTest {
             System.out.println("================================================================================");
 
             String menu = br.readLine();
+
+            Channel channel = channelService.read(id);
 
             try {
                 switch (menu) {
@@ -107,6 +108,7 @@ public class ChannelTest {
         DisplayChannel.displayChannel(channel, userService);
 
         channelService.addMember(id, memberId);
+        channel = channelService.read(id);
 
         System.out.println("멤버 추가 후 :");
         DisplayChannel.displayChannel(channel, userService);
@@ -121,6 +123,7 @@ public class ChannelTest {
         DisplayChannel.displayChannel(channel, userService);
 
         channelService.deleteMember(id, memberId);
+        channel = channelService.read(id);
 
         System.out.println("멤버 삭제 후 :");
         DisplayChannel.displayChannel(channel, userService);

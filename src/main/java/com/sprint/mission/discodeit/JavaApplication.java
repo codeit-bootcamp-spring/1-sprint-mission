@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
@@ -31,7 +34,7 @@ public class JavaApplication {
          */
 
         // 필요한 인스턴스 생성
-        UserRepository userRepository = new JCFUserRepository();
+        UserRepository userRepository = new FileUserRepository();
         UserService userService = new BasicUserService(userRepository);
 
         // 유저 생성
@@ -54,7 +57,7 @@ public class JavaApplication {
          */
 
         // 필요한 인스턴스 생성
-        ChannelRepository channelRepository = new JCFChannelRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
         ChannelService channelService = new BasicChannelService(channelRepository);
 
         // 채널 생성
@@ -81,11 +84,11 @@ public class JavaApplication {
          */
 
         // 필요한 인스턴스 생성
-        MessageRepository messageRepository = new JCFMessageRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
         MessageService messageService = new BasicMessageService(messageRepository);
 
         // 메시지 생성
-        Message message1 = MessageTest.setUpMessage(channel1, user2Id, messageService, channelService, userService);
+        Message message1 = MessageTest.setUpMessage(channel1, user1Id, messageService, channelService, userService);
 
         // 테스트용 메시지 UUID
         UUID message1Id = message1.getId();

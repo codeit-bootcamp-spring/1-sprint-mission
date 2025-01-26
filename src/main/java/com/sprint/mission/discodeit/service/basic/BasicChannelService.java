@@ -45,31 +45,41 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void updateCategory(UUID id, String updateCategory) {
 
-        read(id).updateCategory(updateCategory);
+        Channel channel = read(id);
+
+        channel.updateCategory(updateCategory);
+        channelRepository.save(channel);
     }
 
     // 채널 이름 수정
     @Override
     public void updateName(UUID id, String updateName) {
 
-        read(id).updateName(updateName);
+        Channel channel = read(id);
+        channel.updateName(updateName);
+        channelRepository.save(channel);
     }
 
     // 채널 설명 수정
     @Override
     public void updateExplanation(UUID id, String updateExplanation) {
 
-        read(id).updateExplanation(updateExplanation);
+        Channel channel = read(id);
+        channel.updateExplanation(updateExplanation);
+        channelRepository.save(channel);
     }
 
     @Override
     public void addMember(UUID id, UUID memberId) {
+
         Channel channel = read(id);
         channel.addMember(memberId);
+        channelRepository.save(channel);
     }
 
     @Override
     public void deleteMember(UUID id, UUID memberId) {
+
         Channel channel = read(id);
 
         if (channel.getOwnerId() == memberId) {
@@ -77,6 +87,7 @@ public class BasicChannelService implements ChannelService {
         }
 
         channel.deleteMember(memberId);
+        channelRepository.save(channel);
     }
 
     // 채널 삭제

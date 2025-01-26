@@ -2,13 +2,22 @@ package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
-public class Email {
+public class Email implements Serializable {
 
-    private final UserRepository userRepository;
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    // 직렬화 시 NotSerializableException 발생하는 문제 해결하기 위해 transient 키워드 적용
+    private transient UserRepository userRepository;
 
     // 이메일
     private String email;
@@ -80,5 +89,16 @@ public class Email {
     @Override
     public String toString(){
         return email;
+    }
+
+    // transient 키워드 적용으로 역직렬화 시 userRepository가 null로 초기화되는 문제 해결위해 작성
+    // readObject()는 역직렬화 시 자동으로 호출되는 메서드
+    private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+        // 역직렬화 실행
+        ois.defaultReadObject();
+
+        // 역직렬화 실행 후 수행되는 로직
+        // JCFUserRepository를 사용할 때는 쓰이지 않는 메서드이기 때문에 FileUserRepository 대입
+        this.userRepository = new FileUserRepository();
     }
 }

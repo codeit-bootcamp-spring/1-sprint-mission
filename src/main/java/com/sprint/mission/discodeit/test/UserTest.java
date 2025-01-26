@@ -55,8 +55,6 @@ public class UserTest {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        User user = userService.read(id);
-
         loopOut:
         while (true) {
             System.out.println("================================================================================");
@@ -72,7 +70,10 @@ public class UserTest {
             String menu = br.readLine();
 
             try {
+                User user = userService.read(id);
+
                 switch (menu) {
+
                     case "1":
                         System.out.println("================================================================================");
                         System.out.println("현재 정보 : ");

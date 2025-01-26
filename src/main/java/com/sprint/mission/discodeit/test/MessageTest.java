@@ -18,12 +18,12 @@ public class MessageTest {
     // 메시지 생성
     public static Message setUpMessage(Channel channel, UUID writerId, MessageService messageService, ChannelService channelService, UserService userService) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//
+//        System.out.println("메시지 내용 입력 :");
+//        String context = br.readLine();
 
-        System.out.println("메시지 내용 입력 :");
-        String context = br.readLine();
-
-//        String context = "테스트용 메시지입니다.";
+        String context = "테스트용 메시지입니다.";
 
         Message message = new Message(channel, context, writerId);
 
@@ -42,7 +42,6 @@ public class MessageTest {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        Message message = messageService.read(id);
 
         loopOut:
         while (true) {
@@ -53,6 +52,8 @@ public class MessageTest {
             System.out.println("================================================================================");
 
             String menu = br.readLine();
+
+            Message message = messageService.read(id);
 
             try {
                 switch (menu) {

@@ -49,6 +49,7 @@ public class BasicUserService implements UserService {
 
         User updateUser = read(id);
         updateUser.updateEmail(updateEmail);
+        userRepository.save(updateUser);
     }
 
     // 비밀번호 수정
@@ -56,6 +57,7 @@ public class BasicUserService implements UserService {
 
         User updateUser = read(id);
         updateUser.updatePassword(updatePassword);
+        userRepository.save(updateUser);
     }
 
     // 이름 수정
@@ -64,6 +66,7 @@ public class BasicUserService implements UserService {
 
         User updateUser = read(id);
         updateUser.updateName(updateName);
+        userRepository.save(updateUser);
     }
 
     // 닉네임 수정
@@ -72,6 +75,7 @@ public class BasicUserService implements UserService {
 
         User updateUser = read(id);
         updateUser.updateNickname(updateNickname);
+        userRepository.save(updateUser);
     }
 
     // 전화번호 수정
@@ -80,6 +84,7 @@ public class BasicUserService implements UserService {
 
         User updateUser = read(id);
         updateUser.updatePhoneNumber(updatePhoneNumber);
+        userRepository.save(updateUser);
     }
 
 

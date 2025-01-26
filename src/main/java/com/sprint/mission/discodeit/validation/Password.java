@@ -1,6 +1,13 @@
 package com.sprint.mission.discodeit.validation;
 
-public class Password {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Password implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String password;
 
     // 대문자, 소문자, 숫자, 특수문자 각각 하나 이상 포함, 6자리 이상

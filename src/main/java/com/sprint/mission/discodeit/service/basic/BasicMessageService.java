@@ -52,7 +52,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public void updateContext(UUID id, String updateContext) {
 
-        read(id).updateContext(updateContext);
+        Message message = read(id);
+        message.updateContext(updateContext);
+
+        messageRepository.save(message);
     }
 
     @Override
