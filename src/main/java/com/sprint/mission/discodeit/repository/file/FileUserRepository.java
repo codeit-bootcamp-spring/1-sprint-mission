@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-    private final String FILE_NAME = "users.ser";
+    private final String FILE_NAME = "src/main/java/serialized/users.ser";
     private final Map<UUID, User> data;
 
     public FileUserRepository() {

@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class FileMessageService implements MessageService {
     private static volatile FileMessageService instance;
-    private final String FILE_NAME = "messages.ser";
+    private final String FILE_NAME = "src/main/java/serialized/messages.ser";
     private final Map<UUID, Message> data;
     private final UserService userService;
     private final ChannelService channelService;

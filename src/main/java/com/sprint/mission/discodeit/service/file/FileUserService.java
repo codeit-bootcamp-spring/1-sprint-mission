@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class FileUserService implements UserService {
     private static volatile FileUserService instance;
-    private final String FILE_NAME = "users.ser";
+    private final String FILE_NAME = "src/main/java/serialized/users.ser";
     private final Map<UUID, User> data;
 
     private FileUserService() {

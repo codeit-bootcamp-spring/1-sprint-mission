@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private final String FILE_NAME = "messages.ser";
+    private final String FILE_NAME = "src/main/java/serialized/messages.ser";
     private final Map<UUID, Message> data;
 
     public FileMessageRepository() {

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
     private static volatile FileChannelService instance;
-    private final String FILE_NAME = "channels.ser";
+    private final String FILE_NAME = "src/main/java/serialized/channels.ser";
     private final Map<UUID, Channel> data;
 
     private FileChannelService() {
