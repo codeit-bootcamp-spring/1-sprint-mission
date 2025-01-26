@@ -12,7 +12,7 @@ public class JCFMessageService implements MessageService {
     private final Messages messages = new Messages();
     private final ChannelService channelService;
 
-    public JCFMessageService(JCFChannelService jcfChannel) {
+    public JCFMessageService(ChannelService jcfChannel) {
         this.channelService = jcfChannel;
     }
 

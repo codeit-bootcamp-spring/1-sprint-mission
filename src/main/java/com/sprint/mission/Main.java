@@ -3,6 +3,9 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -10,9 +13,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Main {
-    static JCFUserService userService = new JCFUserService();
-    static JCFChannelService channelService = new JCFChannelService();
-    static JCFMessageService messageService = new JCFMessageService(channelService);
+    static UserService userService = new JCFUserService();
+    static ChannelService channelService = new JCFChannelService();
+    static MessageService messageService = new JCFMessageService(channelService);
 
     public static void main(String[] args) {
         jcfUserServiceTest();
