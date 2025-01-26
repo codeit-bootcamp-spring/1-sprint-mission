@@ -6,9 +6,8 @@ import discodeit.service.ChannelService;
 import discodeit.validator.ChannelValidator;
 import discodeit.validator.UserValidator;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -32,7 +31,7 @@ public class FileChannelService implements ChannelService {
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
-                ) {
+        ) {
             oos.writeObject(channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -42,12 +41,38 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel find(UUID channelId) {
-        return null;
+        Path filePath = directory.resolve(channelId + ".ser");
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (Channel) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<Channel> findAll() {
-        return List.of();
+        try {
+            List<Channel> channels = Files.list(directory)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (Channel) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return channels;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
