@@ -12,7 +12,7 @@ public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public void saveUser(User user) {
+    public User save(User user) {
         data.put(user.getId(), user);
     }
 

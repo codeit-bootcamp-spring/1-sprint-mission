@@ -1,20 +1,23 @@
 package mission;
 
+import mission.controller.ChannelController;
+import mission.controller.MessageController;
+import mission.controller.UserController;
+import mission.controller.jcf.JCFChannelController;
+import mission.controller.jcf.JCFMessageController;
+import mission.controller.jcf.JCFUserController;
 import mission.entity.User;
-import mission.controller.FileMainService;
-import mission.controller.ProjectManager;
-
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
 public class javaApplication {
 
-    private static final ProjectManager projectManager = new ProjectManager();
-    private static final FileMainService fileMainService = new FileMainService();
+    private final ChannelController channelController = new JCFChannelController();
+    private final UserController userController = new JCFUserController();
+    private final MessageController messageController = new JCFMessageController();
 
     public static void main(String[] args) throws IOException {
-        // 사전 세팅
         initDirectory();
 
         // 유저 생성 테스트
@@ -64,11 +67,4 @@ public class javaApplication {
     }
 
 
-    private static void initDirectory() throws IOException {
-        fileMainService.createUserDirectory();
-        System.out.println("User 디렉토리 추가 완료");
-        // 이거 말고도 Channel, Message 추가
-
-
-    }
 }

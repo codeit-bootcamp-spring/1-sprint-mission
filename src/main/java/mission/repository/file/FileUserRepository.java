@@ -20,7 +20,7 @@ public class FileUserRepository implements UserRepository {
     private static final Path USER_DIRECT_PATH = Path.of("userDirectory");
 
     @Override
-    public void saveUser(User user) throws IOException {
+    public User save(User user) throws IOException {
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
 
         // 파일 존재하지 않으면(나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할것 같음

@@ -7,6 +7,7 @@ import mission.service.jcf.JCFChannelService;
 import mission.service.jcf.JCFMessageService;
 import mission.service.jcf.JCFUserService;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,16 +16,15 @@ public class JCFUserController implements UserController {
 
     private final JCFUserService userService = JCFUserService.getInstance();
     private final JCFChannelService channelService = JCFChannelService.getInstance();
-    private final JCFMessageService messageService = JCFMessageService.getInstance();
 
     @Override
-    public void create(String name, String password) {
-        userService.createOrUpdate(new User(name, password));
+    public User create(String name, String password) {
+        return userService.createOrUpdate(new User(name, password));
     }
 
     @Override
-    public void updateUserNamePW(UUID id, String newName, String password) {
-        userService.update(userService.findById(id).setNamePassword(newName, password));
+    public User updateUserNamePW(UUID id, String newName, String password) {
+        return userService.update(userService.findById(id).setNamePassword(newName, password));
     }
 
     @Override
@@ -83,6 +83,8 @@ public class JCFUserController implements UserController {
         findById(userId).addChannel(channelService.findById(channelId));
     }
 
+    @Override
+    public void createUserDirectory(){}
     /**
      * 메시지와 연계
      */

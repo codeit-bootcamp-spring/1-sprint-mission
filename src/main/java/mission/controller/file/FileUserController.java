@@ -3,7 +3,6 @@ package mission.controller.file;
 import mission.controller.UserController;
 import mission.entity.User;
 import mission.service.file.FileChannelService;
-import mission.service.file.FileMessageService;
 import mission.service.file.FileUserService;
 
 import java.io.IOException;
@@ -17,9 +16,9 @@ public class FileUserController implements UserController {
     private final FileChannelService fileChannelService = FileChannelService.getInstance();
 
     @Override
-    public void create(String userName, String password){
+    public User create(String userName, String password){
         try {
-            fileUserService.createOrUpdate(new User(userName, password));
+            return fileUserService.createOrUpdate(new User(userName, password));
         } catch (IOException e) {
             throw new RuntimeException("I/O 오류 : 유저 생성 실패");
         }
@@ -29,9 +28,9 @@ public class FileUserController implements UserController {
      * 수정은 이름, 패스워드 무조건 한번에 바꾼다고 가정
      */
     @Override
-    public void updateUserNamePW(UUID id, String newName, String newPassword) {
+    public User updateUserNamePW(UUID id, String newName, String newPassword) {
         // file 검증 끝이라 NULL 검증 필요 X
-        fileUserService.update(fileUserService.findById(id).setNamePassword(newName, newPassword));
+        return fileUserService.update(fileUserService.findById(id).setNamePassword(newName, newPassword));
     }
 
     /**
@@ -100,7 +99,8 @@ public class FileUserController implements UserController {
     /**
      * 디렉토리 생성
      */
-    public void createUserDirectory() throws IOException {
+    @Override
+    public void createUserDirectory(){
         fileUserService.createUserDirectory();
     }
 }

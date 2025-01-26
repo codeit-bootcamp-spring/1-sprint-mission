@@ -63,4 +63,6 @@ public class JCFMessageController implements MessageController {
         messageService.delete(messageId);
     }
 
+    @Override
+    public void createMessageDirectory() {}
 }

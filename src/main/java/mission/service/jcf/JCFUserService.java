@@ -21,13 +21,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override // 닉네임 중복 허용
-    public void createOrUpdate(User user) {
-        userRepository.saveUser(user);
+    public User createOrUpdate(User user) {
+        return userRepository.save(user);
     }
 
     @Override
-    public void update(User user) {
-        createOrUpdate(user);
+    public User update(User user) {
+        return createOrUpdate(user);
     }
 
     @Override

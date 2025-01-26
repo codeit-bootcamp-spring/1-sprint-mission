@@ -20,15 +20,15 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void createOrUpdate(Message message) {
-        messageRepository.createOrUpdateMessage(message);
+    public Message createOrUpdate(Message message) {
+        return messageRepository.createOrUpdateMessage(message);
     }
 
     @Override
-    public void update(UUID messageId, String newMassage){
+    public Message update(UUID messageId, String newMassage){
         Message updatingMessage = findById(messageId);
         updatingMessage.setMessage(newMassage);
-        createOrUpdate(updatingMessage);
+        return createOrUpdate(updatingMessage);
     }
 
     @Override

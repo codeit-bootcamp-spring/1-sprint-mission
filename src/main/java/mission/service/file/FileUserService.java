@@ -23,15 +23,15 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void createOrUpdate(User user) throws IOException {
-        fileUserRepository.saveUser(user);
+    public User createOrUpdate(User user) throws IOException {
+        return fileUserRepository.save(user);
         // 수정-생성 I/O오류 구분하기 위해 여기서 잡지 않고 I/O 예외 던지기
     }
 
     @Override
-    public void update(User updatingUser) {
+    public User update(User updatingUser) {
         try {
-            createOrUpdate(updatingUser);
+            return createOrUpdate(updatingUser);
         } catch (IOException e) {
             throw new RuntimeException("I/O 오류 : 유저 수정 실패");
         }

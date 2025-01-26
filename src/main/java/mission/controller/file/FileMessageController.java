@@ -2,14 +2,11 @@ package mission.controller.file;
 
 import mission.controller.MessageController;
 import mission.entity.Message;
-import mission.entity.User;
 import mission.service.file.FileChannelService;
 import mission.service.file.FileMessageService;
 import mission.service.file.FileUserService;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -22,17 +19,17 @@ public class FileMessageController implements MessageController {
     private final FileMessageService fileMessageService = FileMessageService.getInstance();
 
     @Override
-    public void create(UUID channelId, UUID userId, String message){
+    public Message create(UUID channelId, UUID userId, String message){
         try {
-            fileMessageService.createOrUpdate(Message.createMessage(fileChannelService.findById(channelId), fileUserService.findById(userId), message));
+            return fileMessageService.createOrUpdate(Message.createMessage(fileChannelService.findById(channelId), fileUserService.findById(userId), message));
         } catch (IOException e) {
             throw new RuntimeException("I/O 오류 : 생성 실패");
         }
     }
 
     @Override
-    public void update(UUID messageId, String newMessage){
-        fileMessageService.update(messageId, newMessage);
+    public Message update(UUID messageId, String newMessage){
+        return fileMessageService.update(messageId, newMessage);
     }
 
     @Override
@@ -67,7 +64,8 @@ public class FileMessageController implements MessageController {
         fileMessageService.delete(messageId);
     }
 
-    public void createDirectory(){
+    @Override
+    public void createMessageDirectory(){
         fileMessageService.createDirectory();
     }
 

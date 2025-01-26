@@ -22,17 +22,17 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void createOrUpdate(Message message) throws IOException {
-        fileMessageRepository.createOrUpdateMessage(message);
+    public Message createOrUpdate(Message message) throws IOException {
+        return fileMessageRepository.createOrUpdateMessage(message);
     }
 
     @Override
-    public void update(UUID messageId, String newMassage) {
+    public Message update(UUID messageId, String newMassage) {
         Message updatingMessage = findById(messageId);
         updatingMessage.setMessage(newMassage);
 
         try {
-            fileMessageRepository.createOrUpdateMessage(updatingMessage);
+            return fileMessageRepository.createOrUpdateMessage(updatingMessage);
         } catch (IOException e) {
             throw new RuntimeException("I/O 오류 : 수정 실패");
         }

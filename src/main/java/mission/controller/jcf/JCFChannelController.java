@@ -83,6 +83,9 @@ public class JCFChannelController implements ChannelController {
         findById(channel_Id).removeUser(userService.findById(droppingUser_Id));
     }
 
+    @Override
+    public void createChannelDirectory() {}
+
     /**
      * 메시지와
      */

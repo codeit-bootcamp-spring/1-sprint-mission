@@ -2,8 +2,6 @@ package mission.controller.file;
 
 import mission.controller.ChannelController;
 import mission.entity.Channel;
-import mission.entity.Message;
-import mission.entity.User;
 import mission.service.file.FileChannelService;
 import mission.service.file.FileMessageService;
 import mission.service.file.FileUserService;
@@ -81,6 +79,7 @@ public class FileChannelController implements ChannelController {
     /**
      * 채널 디렉토리 생성
      */
+    @Override
     public void createChannelDirectory() {
         fileChannelService.createChannelDirect();
     }

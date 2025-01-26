@@ -20,7 +20,7 @@ public class FileMessageRepository implements MessageRepository {
     // 수정, 생성이 쓰는 메서드
     // 수정, 생성 오류 메시지 따로 설정하기 위해 throws
     @Override
-    public void createOrUpdateMessage(Message message) throws IOException {
+    public Message createOrUpdateMessage(Message message) throws IOException {
         Path msDirectPath = getMsDirectPath(message.getId());
 
         if (!Files.exists(msDirectPath)) {
@@ -29,6 +29,7 @@ public class FileMessageRepository implements MessageRepository {
 
         ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(msDirectPath));
         oos.writeObject(message);
+        return message;
     }
 
 

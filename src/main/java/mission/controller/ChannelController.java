@@ -16,4 +16,6 @@ public interface ChannelController {
     void delete(UUID channelId);
     void addUserByChannel(UUID channelId, UUID userId);
     void drops(UUID channel_Id, UUID droppingUser_Id);
+
+    void createChannelDirectory();
 }

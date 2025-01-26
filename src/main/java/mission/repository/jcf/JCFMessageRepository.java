@@ -14,7 +14,7 @@ public class JCFMessageRepository implements MessageRepository {
     private final Map<Channel, TreeSet<Message>> data = new HashMap<>();
 
     @Override
-    public void createOrUpdateMessage(Message message){
+    public Message createOrUpdateMessage(Message message){
         Channel writedChannel = message.getWritedAt();
 
         data.putIfAbsent(writedChannel, new TreeSet<>());
@@ -22,6 +22,7 @@ public class JCFMessageRepository implements MessageRepository {
         Set<Message> messageSet = data.get(writedChannel);
         messageSet.remove(findById(message.getId()));
         messageSet.add(message);
+        return message;
     }
 
     @Override
