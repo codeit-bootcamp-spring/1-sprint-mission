@@ -4,11 +4,12 @@ import some_path._1sprintmission.discodeit.entiry.enums.DiscodeStatus;
 import some_path._1sprintmission.discodeit.entiry.enums.UserType;
 import some_path._1sprintmission.discodeit.entiry.validation.Email;
 import some_path._1sprintmission.discodeit.entiry.validation.Phone;
-
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
-public class User extends BaseEntity {
+public class User extends BaseEntity implements Serializable{
 
     private String username; // 닉네임
     private Integer discriminator; //디스코드 전용 코드 이름#+4자리 숫자
@@ -56,8 +57,8 @@ public class User extends BaseEntity {
         this.userType = userType;
     }
 
-    public UserType getIntroduce(){
-        return userType;
+    public String getIntroduce(){
+        return introduce;
     }
 
     public void setIntroduce(String introduce){
@@ -76,9 +77,14 @@ public class User extends BaseEntity {
         return userPhone;
     }
 
-    public void setUserPhone(Phone userPhone) {
-        this.userPhone = userPhone;
-        setUpdatedAt(System.currentTimeMillis() / 1000L);
+    public void setUserPhone(String userPhone) {
+        if (isValidPhoneNumber(userPhone)) {
+            Phone updatephone = new Phone(userPhone);
+            this.userPhone = updatephone;
+            setUpdatedAt(System.currentTimeMillis() / 1000L);
+        } else {
+            throw new IllegalArgumentException("Invalid phone number format: " + userPhone);
+        }
     }
 
     public Integer getDiscriminator() {
@@ -110,6 +116,13 @@ public class User extends BaseEntity {
             channel.removeMember(this);
         }
     }
+
+    private boolean isValidPhoneNumber(String phone) {
+        // Example regex for phone validation (adjust based on your requirements)
+        String phoneRegex = "^010-\\d{4}-\\d{4}$";
+        return Pattern.matches(phoneRegex, phone);
+    }
+
     @Override
     public String toString() {
         return "User{" +

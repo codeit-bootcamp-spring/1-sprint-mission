@@ -29,9 +29,9 @@ public class CreateMessage {
         Message message = new Message(user1, "hi");
         Message message2 = new Message(user2, "Hi, how are you guys?");
         Message message3 = new Message(user3, "good, thank you");
-        messageService.create(message, channel, message.getSender());
-        messageService.create(message2, channel, message2.getSender());
-        messageService.create(message3, channel, message3.getSender());
+        messageService.create(channel, message.getSender(), message);
+        messageService.create(channel, message2.getSender(), message2);
+        messageService.create(channel, message3.getSender(), message3);
 
         System.out.println("=======================================");
         System.out.println("channel Message box");
@@ -39,7 +39,7 @@ public class CreateMessage {
                 .forEach(s -> System.out.println(s.getSender().getUsername() + " : " + s.getContent()));
 
         Message message4 = new Message(user4, "me too"); //not join channel user error
-        messageService.create(message4,channel, message4.getSender());
+        messageService.create(channel, message4.getSender(), message4);
 
 
 
