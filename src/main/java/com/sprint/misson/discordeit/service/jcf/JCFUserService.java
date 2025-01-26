@@ -135,13 +135,6 @@ public class JCFUserService implements UserService {
 
     @Override
     public boolean deleteUser(String userId) throws CustomException {
-
-        User user = data.get(userId);
-
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
-        }
-
-        return data.remove(userId, user);
+        return data.remove(userId) != null;
     }
 }

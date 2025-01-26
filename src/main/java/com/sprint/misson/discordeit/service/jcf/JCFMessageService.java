@@ -131,12 +131,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public boolean deleteMessage(Message message) throws CustomException {
-        Message msg = data.get(message.getId());
-
-        if (msg == null) {
-            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));
-        }
-        //만약 delete 한 후에도 객체가 필요하다면 반환값을 boolean 에서 Message 로 바꾸기
         return data.remove(message.getId()) != null;
     }
 }

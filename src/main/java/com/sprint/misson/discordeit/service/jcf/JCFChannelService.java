@@ -95,11 +95,6 @@ public class JCFChannelService implements ChannelService {
     //삭제
     @Override
     public boolean deleteChannel(Channel channel) throws CustomException {
-        Channel ch = data.get(channel.getId());
-        if (ch == null) {
-            System.out.println("Channel with id " + channel.getId() + " not found");
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
-        }
         return data.remove(channel.getId()) != null;
     }
 
