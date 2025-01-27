@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.file.FileServiceFactory;
-import com.sprint.mission.discodeit.service.jcf.JCFServiceFactory;
+import com.sprint.mission.discodeit.service.basic.BasicServiceFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +20,11 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        ServiceFactory ServiceFactory = new FileServiceFactory();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+
+        ServiceFactory ServiceFactory = new BasicServiceFactory(userRepository, channelRepository, messageRepository);
         UserService userService = ServiceFactory.getUserService();
         ChannelService channelService = ServiceFactory.getChannelService();
         MessageService messageService = ServiceFactory.getMessageService();
