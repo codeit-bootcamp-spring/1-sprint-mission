@@ -1,0 +1,10 @@
+{
+  "e8671ec5-5555-4c80-835c-642788d4be12" : {
+    "id" : "e8671ec5-5555-4c80-835c-642788d4be12",
+    "createdAt" : 1737766782118,
+    "updatedAt" : null,
+    "name" : "코드잇 공지 채널",
+    "description" : "공지 채널입니다",
+    "channelType" : "VOICE"
+  }
+}

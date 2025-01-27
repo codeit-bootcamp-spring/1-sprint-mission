@@ -1,12 +1,17 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.domain;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 
-public class User {
+@Getter
+public class User implements Serializable {
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
@@ -23,30 +28,6 @@ public class User {
         this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
     public void update(String password) {
         this.password = password;
         this.updatedAt = System.currentTimeMillis();
@@ -56,6 +37,23 @@ public class User {
     public static boolean isValidPassword(String password) {
         String passwordRegex = "^(?=.*[A-Z])(?=.*[\\W_])(?=.*[a-zA-Z\\d]).{8,15}$";
         return password.matches(passwordRegex);
+    }
+
+    public static boolean isValidPhone(String phoneNumber) {
+        String phoneRegex = "^010-\\d{4}-\\d{4}$";
+        return phoneNumber.matches(phoneRegex);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return Objects.equals(phone, user.phone);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(phone);
     }
 
     @Override

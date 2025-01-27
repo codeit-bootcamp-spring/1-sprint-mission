@@ -1,0 +1,24 @@
+{
+  "1d6cf41e-e4ed-42fb-84f4-4f80739b6182" : {
+    "id" : "1d6cf41e-e4ed-42fb-84f4-4f80739b6182",
+    "createdAt" : 1737766782119,
+    "updatedAt" : null,
+    "content" : "안녕하세요",
+    "writer" : {
+      "id" : "89f18c5c-e7bf-47b3-8399-bdda8f3ecc8f",
+      "createdAt" : 1737766782116,
+      "updatedAt" : null,
+      "name" : "woody",
+      "phone" : "010-9218-1188",
+      "password" : "Abcdefgh12312!"
+    },
+    "channel" : {
+      "id" : "e8671ec5-5555-4c80-835c-642788d4be12",
+      "createdAt" : 1737766782118,
+      "updatedAt" : null,
+      "name" : "코드잇 공지 채널",
+      "description" : "공지 채널입니다",
+      "channelType" : "VOICE"
+    }
+  }
+}

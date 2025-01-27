@@ -1,42 +1,32 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.factory.Factory;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.domain.User;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.ServiceException;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.ValidPass;
-import com.sprint.mission.discodeit.util.ValidPhone;
 
 import java.util.*;
 
-import static com.sprint.mission.discodeit.error.UserError.*;
-
 public class JCFUserService implements UserService {
     private final Map<UUID, User> userRepository;
-    private final MessageService messageService;
-    private final ChannelService channelService;
 
     public JCFUserService() {
         this.userRepository = new HashMap<>();
-        this.messageService = Factory.getMessageService();
-        this.channelService = Factory.getChannelService();
     }
 
-
     @Override
-    public User createUser(String name, String phone, String password) throws IllegalArgumentException {
-        if (!ValidPass.isValidPassword(password)) {
-            throw new IllegalArgumentException(INVALID_PASSWORD.getMessage());
+    public User create(String name, String phone, String password) {
+        if (!User.isValidPassword(password)) {
+            throw new ServiceException(ErrorCode.INVALID_PASSWORD);
         }
 
-        if (!ValidPhone.isValidPhone(phone)) {
-            throw new IllegalArgumentException(INVALID_PHONE.getMessage());
+        if (!User.isValidPhone(phone)) {
+            throw new ServiceException(ErrorCode.INVALID_WRITER);
         }
 
         if (userRepository.values().stream()
                 .anyMatch(user -> user.getPhone().equals(phone))) {
-            throw new IllegalArgumentException(DUPLICATE_PHONE.getMessage());
+            throw new ServiceException(ErrorCode.CANNOT_FOUND_USER);
         }
         User user = new User(name, phone, password);
         userRepository.put(user.getId(), user);
@@ -58,7 +48,7 @@ public class JCFUserService implements UserService {
     @Override
     public User updateUserPassword(User updateUser, String newPass) {
         if (!userExists(updateUser.getPhone())) {
-            throw new IllegalArgumentException(CANNOT_FOUND_USER.getMessage());
+            throw new ServiceException(ErrorCode.CANNOT_FOUND_USER);
         }
         User findUser = userRepository.get(updateUser.getId());
         findUser.update(newPass);
@@ -66,23 +56,16 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void deleteUser(User removeUser) { // 유저 정보 삭제 시 유저가 속해있던 채널에 해당 유저가 삭제되어야 한다.
+    public void delete(User removeUser) { // 유저 정보 삭제 시 유저가 속해있던 채널에 해당 유저가 삭제되어야 한다.
         if (!userExists(removeUser.getPhone())) {
-            throw new IllegalArgumentException(CANNOT_FOUND_USER.getMessage());
+            throw new ServiceException(ErrorCode.CANNOT_FOUND_USER);
         }
-        channelService.getAllChannel().stream()
-                .forEach(channel -> channel.getMembers()
-                        .removeIf(user -> user.getId().equals(removeUser.getId())));
         userRepository.remove(removeUser.getId());
     }
 
-    @Override
-    public boolean userExists(String phone) {
-        for (User user : userRepository.values()) {
-            if (user.getPhone().equals(phone)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean userExists(String phone) {
+        return userRepository.values()
+                .stream()
+                .anyMatch(user -> user.getPhone().equals(phone));
     }
 }
