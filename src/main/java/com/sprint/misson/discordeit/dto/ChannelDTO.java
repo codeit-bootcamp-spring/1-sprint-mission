@@ -10,6 +10,8 @@ public class ChannelDTO {
 
     private ChannelType channelType;
 
+    private String description;
+
     public String getChannelName() {
         return channelName;
     }
@@ -25,4 +27,13 @@ public class ChannelDTO {
     public void setChannelType(ChannelType channelType) {
         this.channelType = channelType;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }

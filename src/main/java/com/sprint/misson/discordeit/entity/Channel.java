@@ -100,7 +100,7 @@ public class Channel implements Serializable {
     }
 
     public String toFullString() {
-        return toShortString() + " / channelSort: " + channelSort + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
+        return toShortString() + " / channelSort: " + channelSort + " / description: " + description + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
     }
 
     public void displayFullInfo() {
@@ -124,6 +124,12 @@ public class Channel implements Serializable {
         ChannelType newChannelType = channelDTO.getChannelType();
         if (newChannelType != null && channelType != newChannelType) {
             channelType = newChannelType;
+            isUpdated = true;
+        }
+
+        String newDescription = channelDTO.getDescription();
+        if (newDescription != null && !newDescription.isEmpty() && !newDescription.equals(description)) {
+            description = newDescription;
             isUpdated = true;
         }
 
