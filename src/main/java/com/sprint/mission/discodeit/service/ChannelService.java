@@ -12,11 +12,11 @@ public interface ChannelService {
 
     void deleteChannel(Channel channel, User admin);
 
-    void updateChannel(Channel channel, String name, User admin);
+    void updateChannel(Channel channel, String newName, User admin);
 
     List<Map<String, String>> getAllChannel();
 
-    List<String> getAllMember(Channel channel);
+    List<String> getAllMemberNames(Channel channel);
 
     boolean channelExits(Channel channel);
 

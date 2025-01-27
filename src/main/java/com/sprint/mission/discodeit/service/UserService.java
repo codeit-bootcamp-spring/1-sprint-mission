@@ -10,9 +10,10 @@ public interface UserService {
 
     void updateUserEmail(User user, String email);
 
-    void deleteUser(String name, String password);
+    void deleteUser(User user, String password);
 
-    void getUserInfo(String name);
+    void getUserInfo(User user);
 
     void getAllUser();
+
 }
