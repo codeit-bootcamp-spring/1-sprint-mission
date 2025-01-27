@@ -3,273 +3,101 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.test.ChannelTest;
+import com.sprint.mission.discodeit.test.MessageTest;
+import com.sprint.mission.discodeit.test.UserTest;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.UUID;
 
 public class JavaApplication {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
         /**
-         * User 실행
+         * User Test
          */
-        // JCFUserService 인스턴스 생성
-        UserService userService = JCFUserService.getInstance();
 
-        // 유저 등록
-        userService.craete("test1@test.com", "12345678", "name", "nickname", "010-1224-1234");
-        userService.craete("test2@test.com", "12345678", "name", "nickname", "010-1284-1234");
-        userService.craete("test3@test.com", "12345678", "name", "nickname", "010-1284-1234");
+        // 필요한 인스턴스 생성
+        UserRepository userRepository = new JCFUserRepository();
+//        UserRepository userRepository = new FileUserRepository();
+        UserService userService = new BasicUserService(userRepository);
 
-        // 테스트용 uuid
-        UUID UserTestUuid1 = userService.allRead().get(0).getId();
-        UUID UserTestUuid2 = userService.allRead().get(1).getId();
-        UUID UserTestUuid3 = userService.allRead().get(2).getId();
+        // 유저 생성
+        User user1 = UserTest.setUpUser(userService, userRepository);
+        User user2 = UserTest.setUpUser(userService, userRepository);
 
-        // 유저 출력(단건)
-        displayUserInfo(userService.read(UserTestUuid1));
+        // 테스트용 유저 UUID
+        UUID user1Id = user1.getId();
+        UUID user2Id = user2.getId();
 
-        // 전체 유저 출력
-        displayAllUserInfo(userService.allRead());
+        // 유저 정보 변경
+        UserTest.updateUser(user1Id, userService);
 
-
-        // 수정
-        // 이메일 수정
-        userService.updateEmail(UserTestUuid1, "testUpdate@test.com");
-        // 수정된 데이터 조회
-        System.out.println("\n이메일 수정");
-        displayUserInfo(userService.read(UserTestUuid1));
-
-        // 비밀번호 수정
-        userService.updatePassword(UserTestUuid1, "10203040");
-        // 수정된 데이터 조회
-        System.out.println("\n비밀번호 수정");
-        displayUserInfo(userService.read(UserTestUuid1));
-
-        // 이름 수정
-        userService.updateName(UserTestUuid1, "test2");
-        // 수정된 데이터 조회
-        System.out.println("\n이름 수정");
-        displayUserInfo(userService.read(UserTestUuid1));
-
-        // 닉네임 수정
-        userService.updateNickname(UserTestUuid1, "nicknametest");
-        // 수정된 데이터 조회
-        System.out.println("\n닉네임 수정");
-        displayUserInfo(userService.read(UserTestUuid1));
-
-        // 전화번호 수정
-        userService.updatePhoneNumber(UserTestUuid1, "010-1111-1111");
-        // 수정된 데이터 조회
-        System.out.println("\n전화번호 수정");
-        displayUserInfo(userService.read(UserTestUuid1));
-
-
-//        // 유저 삭제
-//        userService.delete(UserTestUuid1);
-//        // 삭제 확인
-//        System.out.println("\n삭제 후 >>> \n");
-//        displayAllUserInfo(userService.allRead());
+        // 유저 삭제
+//        UserTest.deleteUser(user2Id, userService);
 
 
         /**
-         * Channel 실행
+         * Channel Test
          */
-        // JCFChannelService 인스턴스 생성
-        ChannelService channelService = JCFChannelService.getInstance();
+
+        // 필요한 인스턴스 생성
+        ChannelRepository channelRepository = new FileChannelRepository();
+        ChannelService channelService = new BasicChannelService(channelRepository);
 
         // 채널 생성
-        channelService.craete(UserTestUuid1, "testCategory1", "test1", "explain");
-        channelService.craete(UserTestUuid3, "testCategory3", "    test2    ", "설명~");
-        channelService.craete(UserTestUuid1, "testCategory12", "    test2    ", "설명~");
-        channelService.craete(UserTestUuid2, "testCategory2", "    test2    ", "설명~");
+        Channel channel1 = ChannelTest.setUpChannel(user1, channelService, userService);
+        Channel channel2 = ChannelTest.setUpChannel(user1, channelService, userService);
 
-        // 테스트용 uuid
-        UUID channelTestUuid1 = channelService.allRead().get(0).getId();    // 채널 서비스 테스트용 uuid
-        UUID channelTestUuid2 = channelService.allRead().get(1).getId();    // 채널 서비스 테스트용 uuid
-        UUID channelTestUuid3 = channelService.allRead().get(2).getId();    // 채널 서비스 테스트용 uuid
+        // 테스트용 채널 UUID
+        UUID channel1Id = channel1.getId();
+        UUID channel2Id = channel2.getId();
 
-        // 채널 단건 조회
-        System.out.println("\n\n 채널 단건 조회 테스트");
-        displayChannel(channelTestUuid1, channelService.read(channelTestUuid1));
+        // 채널 정보 변경
+        ChannelTest.updateChannel(channel1Id, channelService, userService);
 
-        // 채널 전체 조회
-        System.out.println("\n\n 채널 전체 조회 테스트");
-        displayAllChannel(channelService.allRead());
+        // 채널 멤버 변경
+        ChannelTest.addMember(channel1Id, user2Id, channelService, userService);
+        ChannelTest.deleteMember(channel1Id, user2Id, channelService, userService);
 
-        // 채널 카테고리 수정
-        channelService.updateCategory(channelTestUuid1, "updateCategory");
-        System.out.println("\n\n 채널 카테고리 수정 테스트");
-        displayAllChannel(channelService.allRead());
-
-        // 채널 이름 수정
-        channelService.updateName(channelTestUuid1, "testUpdate");
-        System.out.println("\n\n 채널 이름 수정 테스트");
-        displayAllChannel(channelService.allRead());
-
-        // 채널 설명 수정
-        channelService.updateExplanation(channelTestUuid1, "testUpdate");
-        System.out.println("\n\n 채널 설명 수정 테스트");
-        displayAllChannel(channelService.allRead());
-
-        // 멤버 수정
-        displayChannel(channelTestUuid1, channelService.read(channelTestUuid1));
-        channelService.updateMembers(channelTestUuid1, UserTestUuid2);
-        channelService.updateMembers(channelTestUuid1, UserTestUuid3);
-        System.out.println("\n\n 채널 멤버 수정 테스트");
-        displayChannel(channelTestUuid1, channelService.read(channelTestUuid1));
-
-//        // 채널 삭제
-//        channelService.delete(channelTestUuid1);
-//        System.out.println("\n\n 채널 삭제 테스트");
-//        displayAllChannel(channelService.allRead());
+        // 채널 삭제
+        ChannelTest.deleteChannel(channel2Id, channelService, userService);
 
 
         /**
-         * Message 실행
+         * Message Test
          */
-        // JCFMessageService 인스턴스 생성
-        MessageService messageService = new JCFMessageService();
+
+        // 필요한 인스턴스 생성
+        MessageRepository messageRepository = new FileMessageRepository();
+        MessageService messageService = new BasicMessageService(messageRepository);
 
         // 메시지 생성
-        messageService.craete(channelTestUuid1, "first msg", UserTestUuid1);
-        messageService.craete(channelTestUuid1, "second msg", UserTestUuid1);
-        messageService.craete(channelTestUuid1, "third msg", UserTestUuid1);
-        messageService.craete(channelTestUuid2, "fourth msg", UserTestUuid1);
-        messageService.craete(channelTestUuid2, "fifth msg", UserTestUuid1);
+        Message message1 = MessageTest.setUpMessage(channel1, user1Id, messageService, channelService, userService);
 
-        // 테스트용 uuid
-        UUID messageTestUuid1 = messageService.allRead().get(0).getId();
-        UUID messageTestUuid2 = messageService.allRead().get(1).getId();
-        UUID messageTestUuid3 = messageService.allRead().get(2).getId();
-        UUID messageTestUuid4 = messageService.allRead().get(3).getId();
-        UUID messageTestUuid5 = messageService.allRead().get(4).getId();
-
-        // 메시지 1건 조회
-        System.out.println("\n\n 메시지 1건 조회 테스트");
-        displayMessage(messageService.read(messageTestUuid2));
-
-        // 메시지 특정 채널 전체 조회
-        System.out.println("\n\n 메시지 특정 채널 전체 조회 테스트");
-        displayAllMessage(messageService.allRead(channelTestUuid1));
-
-        // 메시지 전체 조회
-        System.out.println("\n\n 메시지 전체 조회 테스트");
-        displayAllMessage(messageService.allRead());
+        // 테스트용 메시지 UUID
+        UUID message1Id = message1.getId();
 
         // 메시지 수정
-        System.out.println("\n\n 메시지 수정 테스트");
-        messageService.updateMessage(messageTestUuid2, "updateTest");
-        displayAllMessage(messageService.allRead());
+        MessageTest.updateMessage(message1Id, messageService, channelService, userService);
 
         // 메시지 삭제
-        System.out.println("\n\n 메시지 삭제 테스트");
-        messageService.delete(messageTestUuid3);
-        displayAllMessage(messageService.allRead());
-
-    }
-
-
-    // 단일 사용자 정보 출력
-    public static void displayUserInfo(User user) {
-        System.out.println(
-                "이메일: " + user.getEmail()
-                        + ", 이름: " + user.getName()
-                        + ", 닉네임: " + user.getNickname()
-                        + ", 전화번호: " + user.getPhoneNumber() + "\n"
-        );
-    }
-
-    // 모든 사용자 정보 출력
-    public static void displayAllUserInfo(List<User> data) {
-        data.stream()
-                // 정렬 시 @ 앞까지만 잘라서 오름차순
-                .sorted(Comparator.comparing(user -> user.getEmail().split("@")[0]))
-                .forEach(JavaApplication::displayUserInfo);
-    }
-
-    // 채널 1개 출력
-    public static void displayChannel(UUID channelId, Channel channel) {
-        if (channel == null) {
-            System.out.println("채널 없음");
-            return;
-        }
-
-        UserService userService = JCFUserService.getInstance();
-
-        printChannel(userService, channel);
-    }
-
-    // 모든 유저 모든 채널 출력
-    public static void displayAllChannel(List<Channel> channels) {
-
-        UserService userService = JCFUserService.getInstance();
-
-        channels.stream()
-                .sorted(Comparator.comparing((Channel channel) -> userService.read(channel.getOwnerId()).getEmail().split("@")[0])
-                        .thenComparing(Channel::getCategory)
-                        .thenComparing(Channel::getName))
-                .forEach(channel -> {
-                    printChannel(userService, channel);
-                });
-    }
-
-    // 채널 출력 시 공통(출력) 부분
-    public static void printChannel(UserService userService, Channel channel){
-
-        System.out.print(
-                "채널 주인: " + userService.read(channel.getOwnerId()).getEmail()
-                        + ", 카테고리: " + channel.getCategory()
-                        + ", 채널명: " + channel.getName()
-                        + ", 채널 설명: " + channel.getExplanation()
-                        + ", 멤버: "
-        );
-
-        // 멤버 목록 출력
-        // stream 쓰지 않아도 list에 forEach 메서드 내장되어 있음
-        channel.getMembers().forEach(member -> {
-            System.out.print(userService.read(member).getEmail() + " ");
-        });
-
-        System.out.println();
-    }
-
-    // 메시지 1건 조회
-    public static void displayMessage(Message message) {
-
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-
-        System.out.println(
-                "채널: " + channelService.read(message.getChannelId()).getName()
-                        + ", 작성자: " + userService.read(message.getWriter()).getEmail()
-                        + ", 내용: " + message.getMessage()
-        );
-
-    }
-
-    // 메시지 전체 조회
-    public static void displayAllMessage(List<Message> messages) {
-
-        if (messages == null) {
-            System.out.println("메시지 없음");
-            return;
-        }
-
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-
-        messages.forEach(message -> {
-                    System.out.println(
-                            "채널: " + channelService.read(message.getChannelId()).getName()
-                                    + ", 작성자: " + userService.read(message.getWriter()).getEmail()
-                                    + ", 내용: " + message.getMessage()
-                    );
-                });
+        MessageTest.deleteMessage(message1Id, messageService, channelService, userService);
     }
 }
