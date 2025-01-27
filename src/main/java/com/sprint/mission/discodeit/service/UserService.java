@@ -7,10 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    void setDependencies(MessageService messageService, ChannelService channelService);
     User createUser(User user);
-    Optional<User> readUser(User user);
+    Optional<User> readUser(UUID existUserId);
     List<User> readAllUsers();
-    User updateUser(User existUser, User updateUser);
-    boolean deleteUser(User user);
+    User updateUser(UUID existUerId, User updateUser);
+    boolean deleteUser(UUID userId);
 }

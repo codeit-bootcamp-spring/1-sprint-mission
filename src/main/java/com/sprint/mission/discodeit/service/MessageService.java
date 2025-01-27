@@ -9,12 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void setDependencies(UserService userService, ChannelService channelService);
     Message createMessage(Message message);
-    Optional<Message> readMessage(Message message);
-    List<Message> readAll();
-    Message updateByAuthor(User user, Message message);
-    boolean deleteMessage(Message message);
-    void deleteMessageByChannel(Channel channel);
-    void deleteMessageByUser(User user);
+    Optional<Message> readMessage(UUID existMessageId);
+    List<Message> readAllMessages();
+    Message updateByAuthor(UUID existUserId, Message updateMessage);
+    boolean deleteMessage(UUID messageId);
 }
