@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final String FILE_NAME = "/src/main/java/com/sprint/mission/discodeit/serialized/channels.ser";
+    private final String FILE_NAME = "src/main/java/serialized/channels.ser";
     private final Map<UUID, Channel> data;
 
     public FileChannelRepository() {
