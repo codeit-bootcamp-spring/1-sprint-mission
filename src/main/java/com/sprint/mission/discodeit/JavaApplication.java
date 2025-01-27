@@ -164,7 +164,7 @@ public class JavaApplication {
 
         System.out.println("새 메시지 전송(등록)");
         Message message = new Message("Hello, world!", author, channel);
-        Message createdMessage = messageService.sendMessage(message, allUsers);
+        Message createdMessage = messageService.sendMessage(message);
         System.out.println("새 메시지 ID: " + createdMessage.getId());
         System.out.println(message);
 
@@ -206,14 +206,14 @@ public class JavaApplication {
 
 
         System.out.println("유저 A가 유저 B를 멘션하며 메시지 전송");
-        String messageContent = "안녕하세요, @유저B님! 어떻게 지내시나요?";
+        String messageContent = "안녕하세요, @유저B 님! 어떻게 지내시나요?";
         Message messageAtoB = new Message(messageContent, userA, createdChannel);
         System.out.println(messageAtoB);
 
         allUsers = userService.getAllUsers();
 
         // 메시지 전송 및 멘션 알림 처리
-        messageService.sendMessage(messageAtoB, allUsers);
+        messageService.sendMessage(messageAtoB);
         System.out.println("\n=== 심화 요구 사항 테스트 : MessageService에 채널, 유저 검증 로직 추가 ===");
         try {
             User testSender = new User("김진수", "jinsu@gmail.com", UserStatus.ONLINE);
@@ -235,7 +235,7 @@ public class JavaApplication {
             );
 
 
-            messageService.sendMessage(testMessage, List.of(testReceiver));
+            messageService.sendMessage(testMessage);
 
             System.out.println("\n존재하는 채널의 메시지 조회");
             List<Message> messages = messageService.getChannelMessages(testChannel.getId());

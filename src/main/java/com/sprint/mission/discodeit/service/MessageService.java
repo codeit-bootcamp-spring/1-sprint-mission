@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
+    Message sendMessage(Message message);
+
     Message sendMessage(Message message, List<User> allUsers);
 
     List<Message> getChannelMessages(UUID channelId);

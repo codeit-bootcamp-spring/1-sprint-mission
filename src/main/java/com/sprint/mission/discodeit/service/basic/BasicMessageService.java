@@ -7,8 +7,9 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BasicMessageService implements MessageService {
     private static volatile BasicMessageService instance;
@@ -34,14 +35,26 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message sendMessage(Message newMessage, List<User> allUsers) {
+    public Message sendMessage(Message newMessage) {
         validateChannel(newMessage.getChannel().getId());
         validateUser(newMessage.getAuthor().getId());
         messageRepository.save(newMessage);
         // mentions 인식 및 알림
-        List<User> mentionedUsers = parseMentions(newMessage, allUsers);
+        List<User> mentionedUsers = parseMentions(newMessage).stream()
+                .map(userRepository::findByName)
+                .flatMap(Optional::stream)
+                .toList();
+
+        newMessage.getMentions().clear();
+        newMessage.getMentions().addAll(mentionedUsers);
+
         notifyMentions(newMessage.getAuthor(), mentionedUsers);
         return newMessage;
+    }
+
+    @Override
+    public Message sendMessage(Message message, List<User> allUsers) {
+        return sendMessage(message);
     }
 
     @Override
@@ -69,12 +82,16 @@ public class BasicMessageService implements MessageService {
     }
 
     //맨션된 유저들 리스트에 추가
-    private List<User> parseMentions(Message message, List<User> allUsers) {
-        List<User> mentions = allUsers.stream().filter(user -> message.getContent().contains("@" + user.getName())).toList();
+    private Set<String> parseMentions(Message message) {
+        Pattern pattern = Pattern.compile("@(\\w+)"); // 닉네임 후보(@뒤에 연속되는 문자열)
+        Matcher matcher = pattern.matcher(message.getContent());
+        Set<String> mentionedNames = new HashSet<>();
+        while (matcher.find()) {
+            String name = matcher.group(1);
+            mentionedNames.add(name);
+        }
 
-        message.getMentions().clear();
-        message.getMentions().addAll(mentions);
-        return mentions;
+        return mentionedNames;
     }
 
     private void notifyMentions(User sender, List<User> mentions) {

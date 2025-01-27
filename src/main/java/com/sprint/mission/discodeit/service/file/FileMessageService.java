@@ -36,6 +36,11 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
+    public Message sendMessage(Message message) {
+        return sendMessage(message, new ArrayList<>());
+    }
+
+    @Override
     public Message sendMessage(Message newMessage, List<User> allUsers) {
         validateChannel(newMessage.getChannel().getId());
         validateUser(newMessage.getAuthor().getId());
