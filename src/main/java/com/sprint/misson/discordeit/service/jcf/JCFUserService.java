@@ -98,36 +98,8 @@ public class JCFUserService implements UserService {
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
-        } else if (userDTO == null) {
-            throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
         }
-
-        boolean isUpdated = false;
-
-        if (!user.getNickname().equals(userDTO.getNickname())
-                && userDTO.getNickname() != null
-                && !userDTO.getNickname().isEmpty()) {
-            user.setNickname(userDTO.getNickname());
-            isUpdated = true;
-        }
-        if (!user.getEmail().equals(userDTO.getEmail())
-                && userDTO.getEmail() != null
-                && !userDTO.getEmail().isEmpty()) {
-            user.setEmail(userDTO.getEmail());
-            isUpdated = true;
-        }
-        if (!user.getUserStatus().equals(userDTO.getUserStatus())
-                && userDTO.getUserStatus() != null) {
-            user.setUserStatus(userDTO.getUserStatus());
-            isUpdated = true;
-        }
-        if (!user.getAccountStatus().equals(userDTO.getAccountStatus())
-                && userDTO.getAccountStatus() != null) {
-            user.setAccountStatus(userDTO.getAccountStatus());
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
+        if (user.isUpdated(userDTO)) {
             user.setUpdatedAt(updatedAt);
         }
         return user;

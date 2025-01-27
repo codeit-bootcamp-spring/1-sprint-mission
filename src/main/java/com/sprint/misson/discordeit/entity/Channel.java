@@ -1,5 +1,7 @@
 package com.sprint.misson.discordeit.entity;
 
+import com.sprint.misson.discordeit.dto.ChannelDTO;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -36,7 +38,6 @@ public class Channel implements Serializable {
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.channelName = channelName;
-        //추후 수정
         this.channelSort = ChannelSort.TEXT;
         this.channelType = channelType;
         this.description = description;
@@ -108,6 +109,25 @@ public class Channel implements Serializable {
 
     public void displayShortInfo() {
         System.out.println(toShortString());
+    }
+
+    public boolean isUpdated(ChannelDTO channelDTO) {
+        //변경 여부 체크
+        boolean isUpdated = false;
+
+        String newChannelName = channelDTO.getChannelName();
+        if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(channelName)) {
+            channelName = newChannelName;
+            isUpdated = true;
+        }
+
+        ChannelType newChannelType = channelDTO.getChannelType();
+        if (newChannelType != null && channelType != newChannelType) {
+            channelType = newChannelType;
+            isUpdated = true;
+        }
+
+        return isUpdated;
     }
 
 }

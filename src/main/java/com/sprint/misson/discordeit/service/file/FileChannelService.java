@@ -71,26 +71,8 @@ public class FileChannelService extends FileService implements ChannelService {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
-        //변경 여부 체크
-        boolean isUpdated = false;
-
-
-        // 채널 이름 변경 처리
-        String newChannelName = channelDTO.getChannelName();
-        if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(channel.getChannelName())) {
-            channel.setChannelName(newChannelName);
-            isUpdated = true;
-        }
-
-        // 상태 변경 처리
-        ChannelType newChannelType = channelDTO.getChannelType();
-        if (channel.getChannelType() != newChannelType) {
-            channel.setChannelType(newChannelType);
-            isUpdated = true;
-        }
-
         // 변경사항이 있는 경우에만 업데이트 시간 설정
-        if (isUpdated) {
+        if (channel.isUpdated(channelDTO)) {
             channel.setUpdatedAt(updatedAt);
             Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
             save(channelPath, channel);

@@ -1,5 +1,7 @@
 package com.sprint.misson.discordeit.entity;
 
+import com.sprint.misson.discordeit.dto.UserDTO;
+
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -118,5 +120,29 @@ public class User implements Serializable {
         System.out.println(toFullString());
     }
 
+    public boolean isUpdated(UserDTO userDTO) {
+        if (userDTO == null) {
+            return false;
+        }
 
+        boolean isUpdated = false;
+
+        if (!nickname.equals(userDTO.getNickname()) && userDTO.getNickname() != null && !userDTO.getNickname().isEmpty()) {
+            setNickname(userDTO.getNickname());
+            isUpdated = true;
+        }
+        if (!email.equals(userDTO.getEmail()) && userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
+            setEmail(userDTO.getEmail());
+            isUpdated = true;
+        }
+        if (!userStatus.equals(userDTO.getUserStatus()) && userDTO.getUserStatus() != null) {
+            setUserStatus(userDTO.getUserStatus());
+            isUpdated = true;
+        }
+        if (!accountStatus.equals(userDTO.getAccountStatus()) && userDTO.getAccountStatus() != null) {
+            setAccountStatus(userDTO.getAccountStatus());
+            isUpdated = true;
+        }
+        return isUpdated;
+    }
 }

@@ -93,35 +93,8 @@ public class FileUserService extends FileService implements UserService {
             throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
         }
 
-        boolean isUpdated = false;
-
-        if (!user.getNickname().equals(userDTO.getNickname())
-                && userDTO.getNickname() != null
-                && !userDTO.getNickname().isEmpty()) {
-            user.setNickname(userDTO.getNickname());
-            isUpdated = true;
-        }
-        if (!user.getEmail().equals(userDTO.getEmail())
-                && userDTO.getEmail() != null
-                && !userDTO.getEmail().isEmpty()) {
-            user.setEmail(userDTO.getEmail());
-            isUpdated = true;
-        }
-        if (!user.getUserStatus().equals(userDTO.getUserStatus())
-                && userDTO.getUserStatus() != null) {
-            user.setUserStatus(userDTO.getUserStatus());
-            isUpdated = true;
-        }
-        if (!user.getAccountStatus().equals(userDTO.getAccountStatus())
-                && userDTO.getAccountStatus() != null) {
-            user.setAccountStatus(userDTO.getAccountStatus());
-            isUpdated = true;
-        }
-
-        if (isUpdated) {
+        if (user.isUpdated(userDTO)) {
             user.setUpdatedAt(updatedAt);
-            //todo - 고민
-            //덮어씌우게 될까?
             Path userPath = userDirectory.resolve(user.getId().concat(".ser"));
             save(userPath, user);
         }
