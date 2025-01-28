@@ -1,26 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final User owner;
-    private final List<Message> messageList;
-    private final List<User> memberList;
-    private final long createdAt;
+    private long createdAt;
     private long updatedAt;
     private String title;
+    private String description;
+    private ChannelType channelType;
+    private List<Message> messageList;
+    private List<User> memberList;
 
-    public Channel(String title, User owner) {
+    public Channel(ChannelType channelType, String title, String description) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.title = title;
-        this.owner = owner;
+        this.description = description;
+        this.channelType = channelType;
         messageList = new ArrayList<>();
         memberList = new ArrayList<>();
-        memberList.add(owner);
     }
 
     public UUID getId() {
@@ -39,8 +42,8 @@ public class Channel {
         return title;
     }
 
-    public User getOwner() {
-        return owner;
+    public String getDescription() {
+        return description;
     }
 
     public List<Message> getMessageList() {
@@ -57,6 +60,11 @@ public class Channel {
 
     public void updateTitle(String title) {
         this.title = title;
+        updateUpdatedAt();
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
         updateUpdatedAt();
     }
 
@@ -80,7 +88,7 @@ public class Channel {
 
     @Override
     public String toString() {
-        return "Channel{title:" + title + ",owner:" + owner.getName() + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Channel{id:" + id + ",title:" + title +  ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 
 }

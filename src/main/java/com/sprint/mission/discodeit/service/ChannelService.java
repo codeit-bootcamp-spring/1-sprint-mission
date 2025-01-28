@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -8,32 +9,22 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    // 채널 생성
-    Channel createChannel(String title, User owner);
+    Channel createChannel(ChannelType channelType, String title, String description);
 
-    // 모든 채널 조회
     List<Channel> getAllChannelList();
 
-    // 채널ID로 조회
     Channel searchById(UUID channelId);
 
-    // 채널 정보 출력
-    void printChannelInfo(Channel channel);
+    void updateTitle(UUID channelId, String title);
 
-    void printChannelListInfo(List<Channel> channelList);
+    void updateDescription(UUID channelId, String description);
 
-    // 채널명 업데이트
-    void updateTitle(Channel channel, String title);
+    void deleteChannel(UUID channelId);
 
-    // 채널 삭제
-    void deleteChannel(Channel channel);
+    void addMember(UUID channelId, UUID userId);
 
-    // 채널의 모든 멤버 조회
-    List<User> getAllMemberList(Channel channel);
+    void deleteMember(UUID channelId, UUID userId);
 
-    // 채널 멤버
-    void addMember(Channel channel, User user);
-
-    void deleteMember(Channel channel, User user);
+    List<User> getAllMemberList(UUID channelId);
 
 }

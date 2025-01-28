@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Channel channel;
-    private final User writer;
-    private final long createdAt;
+    private long createdAt;
     private long updatedAt;
     private String content;
+    private Channel channel;
+    private User writer;
 
     public Message(Channel channel, User writer, String content) {
         id = UUID.randomUUID();
@@ -54,6 +56,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{channel:" + channel.getTitle() + "writer:" + writer.getName() + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Message{id:" + id + ",channel:" + channel.getTitle() + ",writer:" + writer.getName() + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 }

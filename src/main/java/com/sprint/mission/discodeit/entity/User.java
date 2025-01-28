@@ -1,23 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final long createdAt;
-    private final List<Channel> channelList; // 참가중인 채널
+    private long createdAt;
     private long updatedAt;
     private String name;
     private String email;
+    private transient String password;
+    private List<Channel> channelList;
 
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         channelList = new ArrayList<>();
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {
@@ -58,6 +62,11 @@ public class User {
         updateUpdatedAt();
     }
 
+    public void updatePassword(String password) {
+        this.password = password;
+        updateUpdatedAt();
+    }
+
     public void addChannel(Channel newChannel) {
         channelList.add(newChannel);
     }
@@ -68,6 +77,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
+        return "User{id:" + id + ",name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
     }
 }
