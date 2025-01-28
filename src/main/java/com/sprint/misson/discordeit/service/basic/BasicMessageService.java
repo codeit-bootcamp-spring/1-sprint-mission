@@ -1,33 +1,32 @@
-package com.sprint.misson.discordeit.service.jcf;
+package com.sprint.misson.discordeit.service.basic;
 
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.Message;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.exception.CustomException;
+import com.sprint.misson.discordeit.repository.MessageRepository;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 
-import java.util.HashMap;
 import java.util.List;
 
-public class JCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
 
-    private final HashMap<String, Message> data;
+    private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
 
-    public JCFMessageService(ChannelService channelService, UserService userService) {
-        this.data = new HashMap<>();
+    public BasicMessageService(MessageRepository messageRepository, UserService userService, ChannelService channelService) {
+        this.messageRepository = messageRepository;
         this.userService = userService;
         this.channelService = channelService;
     }
 
-    //생성
+
     @Override
     public Message create(String content, String channelId, String userId) throws CustomException {
-
         if (content == null || content.isEmpty()) {
             System.out.println("Message content is empty for User: " + userId + " Channel: " + channelId);
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
@@ -41,96 +40,72 @@ public class JCFMessageService implements MessageService {
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
             }
             Message message = new Message(userByUUID, content, channelByUUID);
-            data.put(message.getId(), message);
-            return message;
+            return messageRepository.save(message);
         } catch (CustomException e) {
             System.out.println("Failed to create message. User: " + userId + " Channel: " + channelId + " Content: " + content);
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-                throw new CustomException(e.getErrorCode());
+                throw e;
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-                throw new CustomException(e.getErrorCode());
+                throw e;
             }
             throw new CustomException(e.getErrorCode(), "Create message failed");
         }
+
     }
 
-    //모두 읽기
     @Override
     public List<Message> getMessages() {
-        return data.values().stream().toList();
+        return messageRepository.findAll();
     }
 
-    //단일 조회 - uuid
     @Override
-    public Message getMessageByUUID(String messageId) throws CustomException {
-        Message message = data.get(messageId);
-        if (message == null) {
-            System.out.println("Message with id " + messageId + " not found");
-            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
-        }
-        return message;
+    public Message getMessageByUUID(String messageId) {
+        return messageRepository.findById(messageId);
     }
 
-    //다건 조회 - 내용
     @Override
     public List<Message> getMessageByContent(String content) {
-        return data.values().stream().filter(m -> m.getContent().contains(content)).toList();
+        return messageRepository.findAll().stream().filter(m -> m.getContent().contains(content)).toList();
     }
 
-    //다건 조회 - 특정 작성자
     @Override
-    public List<Message> getMessageBySender(User sender) throws CustomException {
-        try {
-            User userByUUID = userService.getUserByUUID(sender.getId());
-            return data.values().stream().filter(m -> m.getSender().equals(userByUUID)).toList();
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+    public List<Message> getMessageBySender(User sender) {
+        //여기 고민해보자
+        return messageRepository.findAll().stream().filter(m -> m.getSenderId().equals(sender.getId())).toList();
     }
 
-    //다건 조회 - 생성 날짜
-    //todo
-    //날짜 포멧 오류 등 예외 처리 필요-검색 시 기준을 날짜로 할지
     @Override
     public List<Message> getMessageByCreatedAt(Long createdAt) {
-        return data.values().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
+        return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().longValue() == createdAt).toList();
     }
 
-    //다건 조회 - 특정 채널
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) throws CustomException {
-        try {
-            Channel channelByUUID = channelService.getChannelByUUID(channel.getId());
-            return data.values().stream().filter(m -> m.getChannelId().equals(channelByUUID.getId())).toList();
-        } catch (Exception e) {
-            System.out.println("Failed to get messages. Channel: " + channel.getId() + " Message: " + e.getMessage());
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
-        }
+    public List<Message> getMessagesByChannel(Channel channel) {
+        return messageRepository.findAll().stream().filter(m -> m.getChannelId().equals(channel.getId())).toList();
     }
 
-    //수정
     @Override
     public Message updateMessage(String messageId, String newContent, long updatedAt) throws CustomException {
-
-        Message message = data.get(messageId);
-
+        Message message = messageRepository.findById(messageId);
         if (message == null) {
-            System.out.println("Failed to update message. Message not found.");
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         } else if (newContent.isEmpty()) {
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
-        message.setContent(newContent);
-
         if (!message.getContent().equals(newContent)) {
+            message.setContent(newContent);
             message.setUpdatedAt(updatedAt);
         }
-        return message;
+        return messageRepository.save(message);
     }
 
     @Override
     public boolean deleteMessage(Message message) throws CustomException {
-        return data.remove(message.getId()) != null;
+        Message messageByUUID = messageRepository.findById(message.getId().toString());
+        if (messageByUUID == null) {
+            throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
+        }
+        return messageRepository.delete(message);
     }
 }

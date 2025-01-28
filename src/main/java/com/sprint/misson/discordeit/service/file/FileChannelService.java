@@ -1,4 +1,4 @@
-package com.sprint.misson.discordeit.service.jcf;
+package com.sprint.misson.discordeit.service.file;
 
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
@@ -9,58 +9,61 @@ import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.UserService;
 
-import java.util.*;
+import java.nio.file.Path;
+import java.util.List;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService extends FileService implements ChannelService {
 
-    private final HashMap<String, Channel> data;
+    private final Path channelDirectory;
     private final UserService userService;
 
-    public JCFChannelService(UserService userService) {
-        this.data = new HashMap<>();
+    public FileChannelService(UserService userService) {
         this.userService = userService;
+        this.channelDirectory = super.getBaseDirectory().resolve("channel");
+        init(channelDirectory);
     }
 
-    //생성
     @Override
     public Channel create(ChannelType type, String name, String description) {
         Channel channel = new Channel(name, type, description);
-        data.put(channel.getId(), channel);
+        String channelId = channel.getId();
+        //저장
+        Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
+        save(channelPath, channel);
+        //예외처리?
         return channel;
     }
 
-    //모두 조회
     @Override
     public List<Channel> getChannels() {
-        return data.values().stream().toList();
+        return load(channelDirectory);
     }
 
-    //단일 조회 - UUID
     @Override
     public Channel getChannelByUUID(String channelId) throws CustomException {
-        Channel channel = data.get(channelId);
-        if (channel == null) {
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
+        Channel ch = getChannels().stream().filter(channel -> channel.getId().equals(channelId)).findFirst().orElse(null);
+
+        if (ch == null) {
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
-        return channel;
+        return ch;
     }
 
-    //다건 조회 - 채널 타입
-    @Override
-    public List<Channel> getChannelByType(ChannelType channelType) {
-        return data.values().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
-    }
-
-    //다건 조회 - 채널명
     @Override
     public List<Channel> getChannelsByName(String channelName) {
-        return data.values().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
+        return getChannels().stream().filter(channel -> channel.getChannelName().contains(channelName)).toList();
     }
 
-    //수정
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt) throws CustomException {
-        Channel channel = data.get(channelId);
+    public List<Channel> getChannelByType(ChannelType channelType) {
+        return getChannels().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
+    }
+
+    // todo
+    // 변경사항 체크 로직 따로 뺄 수 있는지 확인
+    @Override
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO,long updatedAt) throws CustomException {
+        Channel channel = getChannelByUUID(channelId);
 
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
@@ -71,19 +74,26 @@ public class JCFChannelService implements ChannelService {
         // 변경사항이 있는 경우에만 업데이트 시간 설정
         if (channel.isUpdated(channelDTO)) {
             channel.setUpdatedAt(updatedAt);
+            Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
+            save(channelPath, channel);
         }
+
         return channel;
     }
 
-    //삭제
     @Override
-    public boolean deleteChannel(Channel channel) throws CustomException {
-        return data.remove(channel.getId()) != null;
+    public boolean deleteChannel(Channel channel) {
+        Channel ch = getChannelByUUID(channel.getId());
+        if (ch == null) {
+            System.out.println("Channel with id " + channel.getId() + " not found");
+            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+        }
+        return delete(channelDirectory.resolve(ch.getId()));
     }
 
     @Override
-    public List<User> getUsersInChannel(Channel channel) throws CustomException {
-        Channel ch = data.get(channel.getId());
+    public List<User> getUsersInChannel(Channel channel) {
+        Channel ch = getChannelByUUID(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -93,13 +103,15 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean addUserToChannel(String channelId, String userId) throws CustomException {
-        //유저를 채널에 추가
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사
             Channel c = getChannelByUUID(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
             User u = userService.getUserByUUID(userId);
             c.getUserList().put(u.getId(), u);
+
+            Path channelPath = channelDirectory.resolve(c.getId().concat(".ser"));
+            save(channelPath, c);
             return true;
         } catch (CustomException e) {
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
@@ -113,9 +125,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean deleteUserFromChannel(Channel channel, User user) {
-        //유저를 채널에서 삭제
         if (channel.getUserList().containsKey(user.getId())) {
             channel.getUserList().remove(user.getId());
+            Path channelPath = channelDirectory.resolve(channel.getId().concat(".ser"));
+            save(channelPath, channel);
             return true;
         }
         return false;
@@ -123,8 +136,6 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public boolean isUserInChannel(Channel channel, User user) {
-        //유저가 채널에 있는지 검사
-        //있으면 true, 없으면 false 반환
         return channel.getUserList().containsKey(user.getId());
     }
 }

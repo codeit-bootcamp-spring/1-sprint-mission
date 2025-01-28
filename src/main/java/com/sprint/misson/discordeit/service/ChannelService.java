@@ -10,7 +10,7 @@ import java.util.List;
 public interface ChannelService {
 
     //생성
-    Channel createChannel(String name, ChannelType type);
+    Channel create(ChannelType channelType, String name, String description);
 
     //모두 읽기
     List<Channel> getChannels();
@@ -26,14 +26,17 @@ public interface ChannelService {
     List<Channel> getChannelByType(ChannelType channelType);
 
     //수정
-    Channel updateChannel(String channelId, ChannelDTO channelDTO);
+    Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt);
 
     //삭제
     boolean deleteChannel(Channel channel);
 
     List<User> getUsersInChannel(Channel channel);
 
-    boolean addUserToChannel(Channel channel, User user);
+    //고민
+    //근데 String으로 id만 받는게 맞는것 같다.
+    //중간에 객체 자체를 수정해버리는 문제가 생길수도 있을 것 같음?
+    boolean addUserToChannel(String channelId, String userId);
 
     boolean deleteUserFromChannel(Channel channel, User user);
 

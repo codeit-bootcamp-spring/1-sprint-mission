@@ -2,7 +2,7 @@ package com.sprint.misson.discordeit.entity;
 
 import java.io.Serializable;
 
-public enum ChannelType implements Serializable {
-    PRIVATE,
-    PUBLIC
+public enum ChannelSort implements Serializable {
+    TEXT,
+    VOICE
 }

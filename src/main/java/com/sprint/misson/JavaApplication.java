@@ -3,33 +3,60 @@ package com.sprint.misson;
 import com.sprint.misson.discordeit.dto.ChannelDTO;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.*;
-import com.sprint.misson.discordeit.factory.JCFServiceFactory;
-import com.sprint.misson.discordeit.factory.ServiceFactory;
+import com.sprint.misson.discordeit.factory.service.BasicServiceFactory;
+import com.sprint.misson.discordeit.factory.service.ServiceFactory;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
+import com.sprint.misson.discordeit.service.file.FileService;
 
 import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
+    static User setupUser(UserService userService) {
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
+    }
 
     public static void main(String[] args) {
 
-        ServiceFactory serviceFactory = new JCFServiceFactory();
+        FileService.deleteDataDirectory();
+        // ServiceFactory serviceFactory = JCFServiceFactory.getInstance();
+        // ServiceFactory serviceFactory = FileServiceFactory.getInstance();
 
-        UserService userService = serviceFactory.createUserService();
-        ChannelService channelService = serviceFactory.createChannelService();
-        MessageService messageService = serviceFactory.createMessageService();
+        // mode 만 "file"또는 "jcf"로 변경하면 모드에 맞는 repository 로 변경됨
+        ServiceFactory serviceFactory = BasicServiceFactory.getInstance("file");
+
+        UserService userService = serviceFactory.getUserService();
+        ChannelService channelService = serviceFactory.getChannelService();
+        MessageService messageService = serviceFactory.getMessageService();
+
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        channelService.addUserToChannel(channel.getId(), user.getId());
+        // 테스트
+        messageCreateTest(messageService, channel, user);
 
 
         //1. 등록
         System.out.println("\n=== 1. 등록 테스트 ===");
 
         System.out.println("\n--- User 등록---");
-        User user1 = userService.createUser("코드잇", "codeit@codeit.co.kr");
-        User user2 = userService.createUser("박유진", "yudility@gmail.com");
-        User user3 = userService.createUser("홍길동", "gildong@naver.com");
+        User user1 = userService.create("코드잇", "codeit@codeit.co.kr", "codeit123");
+        User user2 = userService.create("박유진", "yudility@gmail.com", "yujinpark123");
+        User user3 = userService.create("홍길동", "gildong@naver.com", "gdhong123123");
 
         System.out.println("> 유저 생성 결과 및 전체 유저 목록: ");
         userService.getUsers().forEach(User::displayFullInfo);
@@ -40,17 +67,17 @@ public class JavaApplication {
         System.out.println("> 실행 결과: ");
 
         try {
-            User user4 = userService.createUser("중복", "codeit@codeit.co.kr");
+            User user4 = userService.create("중복", "codeit@codeit.co.kr", "pwd1341241");
             user4.displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n\n--- Channel 등록---");
-        Channel channel1 = channelService.createChannel("일반1", ChannelType.TEXT);
-        Channel channel2 = channelService.createChannel("일반2", ChannelType.TEXT);
-        Channel channel3 = channelService.createChannel("공지사항", ChannelType.TEXT);
-        Channel channel4 = channelService.createChannel("회의실", ChannelType.VOICE);
+        Channel channel1 = channelService.create(ChannelType.PUBLIC, "일반1", "일반1 채널");
+        Channel channel2 = channelService.create(ChannelType.PUBLIC, "일반2", "일반2 채널");
+        Channel channel3 = channelService.create(ChannelType.PUBLIC, "공지사항", "공지사항 채널");
+        Channel channel4 = channelService.create(ChannelType.PUBLIC, "회의실", "미팅룸");
 
         System.out.println("> 채널 생성 결과 및 전체 채널 목록:");
         channelService.getChannels().forEach(Channel::displayShortInfo);
@@ -58,34 +85,34 @@ public class JavaApplication {
         System.out.println("\n* 채널에 유저 추가 및 삭제: ");
 
         System.out.println();
-        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user1));
-        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user2));
-        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1, user3));
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1.getId(), user1.getId()));
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1.getId(), user2.getId()));
+        System.out.println("- " + channel1.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel1.getId(), user3.getId()));
         channel1.displayShortInfo();
 
         System.out.println();
-        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2, user1));
-        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2, user2));
+        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2.getId(), user1.getId()));
+        System.out.println("- " + channel2.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel2.getId(), user2.getId()));
         channel2.displayShortInfo();
 
         System.out.println();
-        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user1));
-        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user2));
-        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3, user3));
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3.getId(), user1.getId()));
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user2.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3.getId(), user2.getId()));
+        System.out.println("- " + channel3.getChannelName() + " 채널에 " + user3.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel3.getId(), user3.getId()));
         channel3.displayShortInfo();
 
         System.out.println();
-        System.out.println("- " + channel4.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel4, user1));
+        System.out.println("- " + channel4.getChannelName() + " 채널에 " + user1.getNickname() + " 유저 추가 성공 여부 -> " + channelService.addUserToChannel(channel4.getId(), user1.getId()));
         channel4.displayShortInfo();
 
 
         System.out.println("\n\n--- Massage 등록---");
 
-        Message msg1 = messageService.createMessage(user1, "일반1 채널입니다!", channel1);
-        Message msg2 = messageService.createMessage(user3, "반갑습니다!", channel1);
-        Message msg3 = messageService.createMessage(user1, "일반2 채널입니다.", channel2);
-        Message msg4 = messageService.createMessage(user2, "공지사항 채널입니다! 반갑습니다.", channel3);
-        Message msg5 = messageService.createMessage(user1, "회의실 채널입니다.", channel4);
+        Message msg1 = messageService.create("일반1 채널입니다!", channel1.getId(), user1.getId());
+        Message msg2 = messageService.create("반갑습니다!", channel1.getId(), user3.getId());
+        Message msg3 = messageService.create("일반2 채널입니다.", channel2.getId(), user1.getId());
+        Message msg4 = messageService.create("공지사항 채널입니다! 반갑습니다.", channel3.getId(), user2.getId());
+        Message msg5 = messageService.create("회의실 채널입니다.", channel4.getId(), user1.getId());
 
         System.out.println("> 메시지 생성 결과 및 전체 목록:");
         messageService.getMessages().forEach(Message::displayShortInfo);
@@ -93,23 +120,23 @@ public class JavaApplication {
         System.out.println("\n* 심화 - 메세지 예외 처리");
 
         System.out.println("\n1) DB에 존재하지 않는 User로 메세지 생성 ");
-        User notExistUser = new User("없는유저", "noOne@test.com", UserStatus.ACTIVE, "hello", AccountStatus.UNVERIFIED);
+        User notExistUser = new User("없는유저", "noOne@test.com", "hello", UserStatus.ACTIVE, "없는 유저 상태", AccountStatus.UNVERIFIED);
         System.out.println("- 테스트 유저");
         notExistUser.displayShortInfo();
         System.out.println("> 결과: ");
         try {
-            messageService.createMessage(notExistUser, "test message", channel1).displayShortInfo();
+            messageService.create("test message", channel1.getId(), notExistUser.getId()).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n2) DB에 존재하지 않는 Channel로 메세지 생성 ");
-        Channel notExistChannel = new Channel("없는채널", ChannelType.TEXT);
+        Channel notExistChannel = new Channel("없는채널", ChannelType.PUBLIC, "없는 채널의 설명");
         System.out.println("- 테스트 채널");
         notExistChannel.displayShortInfo();
         System.out.println("> 결과: ");
         try {
-            messageService.createMessage(user1, "test message", notExistChannel).displayShortInfo();
+            messageService.create("test message", notExistChannel.getId(), user1.getId()).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -118,7 +145,7 @@ public class JavaApplication {
         System.out.println("- 테스트 채널 및 유저(위 테스트 케이스 사용)");
         System.out.println("> 결과: ");
         try {
-            messageService.createMessage(notExistUser, "test message", notExistChannel).displayShortInfo();
+            messageService.create("test message", notExistChannel.getId(), notExistUser.getId()).displayShortInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -134,7 +161,7 @@ public class JavaApplication {
         tempUsers.forEach(User::displayShortInfo);
 
         System.out.println("\n2) UUID로 조회(단건)");
-        String uuidStringForTest = tempUsers.get(0).getId().toString();
+        String uuidStringForTest = tempUsers.get(0).getId();
 
         System.out.println("- 조회할 UUID를 가진 유저가 있는 경우: ");
         System.out.println("> UUID: " + uuidStringForTest + "로 조회한 결과: ");
@@ -170,7 +197,7 @@ public class JavaApplication {
         System.out.println("* default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경하여 테스트 하였음");
         UserDTO userDTO = new UserDTO();
         userDTO.setUserStatus(UserStatus.INACTIVE);
-        userService.updateUser(user3.getId().toString(), userDTO);
+        userService.updateUser(user3.getId(), userDTO, System.currentTimeMillis());
 
         System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
         userService.getUserByUserStatus(UserStatus.ACTIVE).forEach(User::displayShortInfo);
@@ -181,7 +208,7 @@ public class JavaApplication {
         tempChannels.forEach(Channel::displayShortInfo);
 
         System.out.println("\n2) UUID로 조회(단건)");
-        String uuidStringForChannelTest = tempChannels.get(0).getId().toString();
+        String uuidStringForChannelTest = tempChannels.get(0).getId();
 
         System.out.println("- 조회할 UUID를 가진 채널이 있는 경우: ");
         System.out.println("> 조회할 UUID: " + uuidStringForChannelTest);
@@ -205,8 +232,8 @@ public class JavaApplication {
 
 
         System.out.println("\n4) 채널 type(종류)으로 조회(다건)");
-        System.out.println("> Channal Type이 TEXT인 채널 조회 결과: ");
-        channelService.getChannelByType(ChannelType.TEXT).forEach(Channel::displayShortInfo);
+        System.out.println("> Channel Type 이 PUBLIC 인 채널 조회 결과: ");
+        channelService.getChannelByType(ChannelType.PUBLIC).forEach(Channel::displayShortInfo);
 
         System.out.println("\n5) 채널에 참여중인 유저 목록 조회");
         System.out.println("> channel1에 참여 중인 유저 목록 조회 결과:");
@@ -219,7 +246,7 @@ public class JavaApplication {
 
 
         System.out.println("\n2) UUID로 조회(단건)");
-        String uuidStringForMessageTest = messageList.get(0).getId().toString();
+        String uuidStringForMessageTest = messageList.get(0).getId();
 
         System.out.println("- 조회할 UUID를 가진 메세지가 있는 경우: ");
         System.out.println("> 조회할 UUID: " + uuidStringForMessageTest);
@@ -264,31 +291,30 @@ public class JavaApplication {
 
         try {
             System.out.println("\n> 수정 결과: ");
-            userService.updateUser(user1.getId().toString(), userDto).displayFullInfo();
+            userService.updateUser(user1.getId(), userDto, System.currentTimeMillis()).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         System.out.println("\n\n--- Channel 수정 ---");
         System.out.println("\n> channel1의 이름을 '일반1'에서 '수다방'으로 수정: ");
-        channel1.displayFullInfo();
+        Channel channelByUUID = channelService.getChannelByUUID(channel1.getId());
+        channelByUUID.displayFullInfo();
 
         ChannelDTO channelDTO = new ChannelDTO();
         channelDTO.setChannelName("수다방");
 
-        channelService.updateChannel(channel1.getId().toString(), channelDTO);
 
         System.out.println("\n> 수정 결과:");
-        channel1.displayFullInfo();
+        System.out.println(channelService.updateChannel(channelByUUID.getId(), channelDTO, System.currentTimeMillis()).toFullString());
 
         System.out.println("\n\n--- Message 수정 ---");
         System.out.println("\n> msg1 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
-        msg1.displayFullInfo();
-
-        messageService.updateMessage(msg1.getId().toString(), "수다방 채널입니다!");
+        Message messageByUUID = messageService.getMessageByUUID(msg1.getId());
+        messageByUUID.displayFullInfo();
 
         System.out.println("\n> 수정 결과:");
-        msg1.displayFullInfo();
+        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!",(System.currentTimeMillis())).displayFullInfo();
 
         // 4. 삭제 테스트
         System.out.println("\n\n=== 4. 삭제 테스트 ===");
@@ -328,7 +354,7 @@ public class JavaApplication {
         userService.getUsers().forEach(User::displayShortInfo);
 
         User userFoundByEmail = userService.getUserByEmail("gildong@naver.com");
-        System.out.println("\n-> User 삭제 결과: " + userService.deleteUser(userFoundByEmail.getId().toString()));
+        System.out.println("\n-> User 삭제 결과: " + userService.deleteUser(userFoundByEmail.getId()));
 
         System.out.println("\n> 삭제 후 유저 목록: ");
         userService.getUsers().forEach(User::displayShortInfo);

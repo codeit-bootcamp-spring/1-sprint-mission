@@ -3,6 +3,11 @@ plugins {
     id 'checkstyle'
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 group = 'com.sprint.misson'
 version = '1.0-SNAPSHOT'
 

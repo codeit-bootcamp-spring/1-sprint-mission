@@ -1,6 +1,8 @@
 package com.sprint.misson.discordeit.entity;
 
-public enum AccountStatus {
+import java.io.Serializable;
+
+public enum AccountStatus implements Serializable {
     VERIFIED,
     UNVERIFIED,
     DORMANT,

@@ -1,4 +1,4 @@
-package com.sprint.misson.discordeit.service.jcf;
+package com.sprint.misson.discordeit.service.file;
 
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.UserDTO;
@@ -8,22 +8,24 @@ import com.sprint.misson.discordeit.entity.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
-import java.util.*;
+import java.nio.file.Path;
+import java.util.List;
 
-public class JCFUserService implements UserService {
+public class FileUserService extends FileService implements UserService {
 
-    private final HashMap<String, User> data;
+    private final Path userDirectory;
 
-    public JCFUserService() {
-        this.data = new HashMap<>();
+
+    public FileUserService() {
+        this.userDirectory= super.getBaseDirectory().resolve("user");
+        init(userDirectory);
     }
 
     @Override
-    public User create(String nickname, String email, String password) throws CustomException {
+    public User create(String nickname, String email, String password) {
 
         //스트림으로 HashMap 의 value(User) 들 중 이미 존재하는 email 인지 검사
-        boolean userEmailExists = data.values().stream()
-                .anyMatch(u -> u.getEmail().equals(email));
+        boolean userEmailExists = getUsers().stream().anyMatch(u -> u.getEmail().equals(email));
 
         if (userEmailExists) {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
@@ -31,29 +33,20 @@ public class JCFUserService implements UserService {
 
         User newUser = new User(nickname, email, password, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
 
-        //TODO - 추가 구현할만 한 기능
-        //이메일 인증
-        //1. 이메일 발송
-        //2. 사용자가 이메일에서 인증 버튼 클릭 or 인증 코드 입력
-        //3. 인증 완료 시, user.accountStatus 를 VERIFIED 로 변경
-
-        //* put() - 이미 해당 key 에 key-value 셋이 존재했다면 이전 value 반환(value 가 null 이었으면 null 반환)
-        //          해당하는 key-value 셋이 없었다면 null 반환
-        data.put(newUser.getId(), newUser);
+        Path newUserPath = userDirectory.resolve(newUser.getId().concat(".ser"));
+        save(newUserPath, newUser);
 
         return newUser;
     }
 
     @Override
     public List<User> getUsers() {
-        return new ArrayList<>(data.values());
+        return load(userDirectory);
     }
 
     @Override
     public User getUserByUUID(String userId) throws CustomException {
-
-        User user = data.get(userId);
-
+        User user = getUsers().stream().filter(u -> u.getId().equals(userId)).findFirst().orElse(null);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
@@ -62,9 +55,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User getUserByEmail(String email) throws CustomException {
-
-        User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
-
+        User user = getUsers().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with email %s not found", email));
         }
@@ -73,40 +64,52 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> getUsersByNickname(String nickname) {
-        return data.values().stream()
-                .filter(u -> u.getNickname().contains(nickname))
+        return getUsers().stream()
+                .filter(u -> u.getNickname().equals(nickname))
                 .toList();
     }
 
     @Override
     public List<User> getUsersByAccountStatus(AccountStatus accountStatus) {
-        return data.values().stream()
+        return getUsers().stream()
                 .filter(u -> u.getAccountStatus().equals(accountStatus))
                 .toList();
     }
 
     @Override
     public List<User> getUserByUserStatus(UserStatus userStatus) {
-        return data.values().stream()
+        return getUsers().stream()
                 .filter(u -> u.getUserStatus().equals(userStatus))
                 .toList();
     }
 
     @Override
     public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
-        User user = data.get(userId);
+        User user = getUserByUUID(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
+        } else if (userDTO == null) {
+            throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
         }
+
         if (user.isUpdated(userDTO)) {
             user.setUpdatedAt(updatedAt);
+            Path userPath = userDirectory.resolve(user.getId().concat(".ser"));
+            save(userPath, user);
         }
+
         return user;
     }
 
     @Override
-    public boolean deleteUser(String userId) throws CustomException {
-        return data.remove(userId) != null;
+    public boolean deleteUser(String userId) {
+        User user = getUserByUUID(userId);
+
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
+        }
+
+        return delete(userDirectory.resolve(user.getId()));
     }
 }

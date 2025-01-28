@@ -10,7 +10,7 @@ public interface MessageService {
 
 
     //생성
-    Message createMessage(User user, String content, Channel channel);
+    Message create(String content, String channelId, String userId);
 
     //모두 읽기
     List<Message> getMessages();
@@ -31,7 +31,7 @@ public interface MessageService {
     List<Message> getMessagesByChannel(Channel channel);
 
     //수정
-    Message updateMessage(String messageId, String content);
+    Message updateMessage(String messageId, String newContent, long updatedAt);
 
     //삭제
     boolean deleteMessage(Message message);
