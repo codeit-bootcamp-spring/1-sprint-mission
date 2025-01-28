@@ -20,7 +20,5 @@ public interface UserService {
 
     void addMessage(UUID messageId, UUID userId);
 
-    void addChannel(UUID channelId, UUID userId);
-
-    UUID write(String name);
+    UUID findByName(String name);
 }

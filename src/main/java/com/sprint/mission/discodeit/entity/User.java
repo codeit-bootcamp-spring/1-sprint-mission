@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,9 +15,17 @@ public class User implements Serializable {
   private final UUID id;
   private final Long createdAt;
   private Long updatedAt;
-  private final List<UUID> userMessageIdList;
-  private final List<UUID> userChannelIdList;
+  private List<UUID> userMessageIdList;
   private String name;
+
+  @JsonCreator
+  public User(
+      @JsonProperty("id") UUID id,
+      @JsonProperty("createdAt") Long createdAt
+  ) {
+    this.id = id != null ? id : UUID.randomUUID(); // id가 없으면 새로 생성
+    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis(); // createdAt이 없으면 현재 시간
+  }
 
   public User(String name) {
     this.id = UUID.randomUUID();
@@ -23,7 +33,6 @@ public class User implements Serializable {
     this.name = name;
     this.updatedAt = createdAt;
     this.userMessageIdList = new ArrayList<>();
-    this.userChannelIdList = new ArrayList<>();
   }
 
   public User(User user) {
@@ -32,7 +41,6 @@ public class User implements Serializable {
     this.name = user.name;
     this.updatedAt = user.updatedAt;
     this.userMessageIdList = user.userMessageIdList;
-    this.userChannelIdList = user.userChannelIdList;
   }
 
   public UUID getId() {
@@ -43,22 +51,46 @@ public class User implements Serializable {
     return name;
   }
 
-  public void updateName(String name) {
-    this.name = name;
-    this.updatedAt = System.currentTimeMillis();
+  public List<UUID> getUserMessageIdList() {
+    return userMessageIdList;
+  }
+
+  public Long getCreatedAt() {
+    return createdAt;
+  }
+
+  public Long getUpdatedAt() {
+    return updatedAt;
   }
 
   public void addMessage(UUID messageId) {
     userMessageIdList.add(messageId);
   }
 
-  public void addChannel(UUID channelId) {
-    userChannelIdList.add(channelId);
+
+
+  public void setUpdatedAt (Long updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
-  public List<UUID> getUserMessageIdList() {
-    return userMessageIdList;
+  public void updateName(String name) {
+    this.name = name;
+    this.updatedAt = System.currentTimeMillis();
   }
+
+  public void setMessage(List<UUID> MessageIdList){
+    this.userMessageIdList = MessageIdList;
+  }
+
+//  public void setId(UUID userId) {
+//    this.id = userId;
+//  }
+//
+//  public void setCreatedAt(Long createdAt) {
+//    this.createdAt = createdAt;
+//  }
+
+
 
   @Override
   public boolean equals(Object obj) {

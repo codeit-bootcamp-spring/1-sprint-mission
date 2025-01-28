@@ -68,13 +68,7 @@ public class JCF_user implements UserService {
     }
 
     @Override
-    public void addChannel(UUID channelId, UUID userId) {
-        userList.stream().filter(user -> user.getId().equals(userId))
-            .forEach(user -> user.addChannel(channelId));
-    }
-
-    @Override
-    public UUID write(String name) {
+    public UUID findByName(String name) {
         Optional<User> user = userList.stream().filter(user1 -> user1.getName().equals(name)).findFirst();
         if (user.isPresent()) {
             return user.get().getId();

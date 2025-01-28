@@ -12,15 +12,10 @@ public interface ChannelService {
 
     void creat(String title);
 
-    void addUser(UUID userId, UUID channelId, JCF_user jcfUser);
-
     void addMessage(String messageContent, UUID channelId, UUID userId,
         JCF_message jcfMessage, JCF_user jcfUser);
 
     void delete(UUID channelId, JCF_message jcfMessage);
-
-    //여기아님
-    List<UUID> getUserIdList(UUID channelId);
 
     //여기아님
     List<UUID> getMessageIdList(UUID channelId);
@@ -30,5 +25,5 @@ public interface ChannelService {
 
     void update(UUID channelId, String title);
 
-    UUID write(String title);
+    UUID findByTitle(String title);
 }

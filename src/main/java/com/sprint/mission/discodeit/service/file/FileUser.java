@@ -1,148 +1,122 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.MessageService;
-import java.io.FileOutputStream;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.repository.FileUserRepository;
+import java.io.File;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class FileMessage implements MessageService {
-  private Path fileDirectory;
-  private FileBasic messageFileBasic;
 
-  public FileMessage(Path directory) {
-    this.fileDirectory = directory;
-    this.messageFileBasic = new FileBasic(fileDirectory);
-  }
+public class FileUser implements FileUserRepository {
+  private static final String FILE_PATH = "src/main/java/com/sprint/mission/discodeit/service/file/data/user/user.json";
+  private static final ObjectMapper objectMapper = new ObjectMapper();
 
-  @Override
-  public void creat(Message message) {
-    Path filePath = fileDirectory.resolve(message.getId().toString().concat(".ser"));
+  private Set<String> nameCheck() {
 
-    try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-    ) {
-      oos.writeObject(message);
+    File file = new File("src/main/java/com/sprint/mission/discodeit/service/file/data/user/user.json");
+    if (!file.exists()) return new HashSet<>();
+    try {
+      return objectMapper.readValue(file, new TypeReference<Set<String>>() {});
     } catch (IOException e) {
       e.printStackTrace();
+      return new HashSet<>() {
+      };
+    }
+  }
+
+  private List<User> readAllUsers() {
+    File file = new File(FILE_PATH);
+    if (!file.exists()) return new ArrayList<>();
+    try {
+      return objectMapper.readValue(file, new TypeReference<List<User>>() {});
+    } catch (IOException e) {
+      e.printStackTrace();
+      return new ArrayList<>();
     }
   }
 
   @Override
-  public void delete(UUID messageId) {
+  public void creat(String name){
+    System.out.println(System.getProperty("user.dir"));
+    User user = new User(name);
     try {
-      Optional<Path> messageDelete = Files.list(fileDirectory)
-          .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
-          .findFirst();
-      if(messageDelete.isPresent()) {
-        Files.delete(messageDelete.get());
-      }
-      else {
-        System.out.println("File not found for Id");
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void update(UUID messageId, String messageContent) {
-    try {
-      Optional<Path> updateMessage = Files.list(fileDirectory)
-          .filter(path -> path.getFileName().toString().equals(messageId + ".ser"))
-          .findFirst();
-      if(updateMessage.isPresent()) {
-        Message message = (Message) messageFileBasic.deserialization(updateMessage.get());
-        message.updateMessage(messageContent);
-        creat(message);
-      }
-      else {
-        System.out.println("File not found for Id");
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public List<Message> write(UUID userId, UUID channelId) {
-    List<Message> messageList = messageFileBasic.load();
-    try {
-      return messageList.stream()
-          .filter(message -> message.isChannelEqual(channelId) && message.isUserEqual(userId))
-          .map(Message::new)
-          .collect(Collectors.toList());
+      List<User> users = readAllUsers();
+      users.add(user);
+      saveToFile(users);
     }
     catch (Exception e) {
-      System.out.println("There is no Message with that id.");
-      return null;
+      throw new RuntimeException(e);
     }
+
   }
 
   @Override
-  public List<Message> getMessage(UUID channelId) {
-    List<Message> messageList = messageFileBasic.load();
+  public void delete(UUID userId) {
     try {
-      return messageList.stream()
-          .filter(message -> message.isChannelEqual(channelId))
-          .map(Message::new)
-          .collect(Collectors.toList());
+      List<User> users = readAllUsers();
+      users.removeIf(user -> user.getId().equals(userId));
+      saveToFile(users);
     }
     catch (Exception e) {
-      System.out.println("There is no Message with that id.");
-      return null;
+      throw new RuntimeException(e);
     }
   }
 
   @Override
-  public void deleteUserMessage(UUID userID) {
-    try {
-      List<Message> messageList = messageFileBasic.load();
-      Files.list(fileDirectory)
-          .filter(path -> messageList.stream()
-              .anyMatch(message -> message.isUserEqual(userID) &&
-                  path.getFileName().toString().equals(message.getId().toString() + ".ser")))
-          .forEach(path -> {
-            try {
-              Files.delete(path);
-            } catch (IOException e) {
-              System.err.println("Deletion failed.");
-              e.printStackTrace();
-            }
-          });
-    } catch (IOException e) {
-      System.err.println("Error listing files in directory: " + fileDirectory);
-      e.printStackTrace();
-    }
+  public void update(UUID userId, String name) {
+    List<User> userList = readAllUsers();
 
+    boolean updated = userList.stream()
+        .filter(user -> user.getId().equals(userId))
+        .findFirst()
+        .map(user -> {
+          user.updateName(name);
+          return true;
+        })
+        .orElse(false);
+
+    if (updated) {
+      saveToFile(userList);
+    } else {
+      throw new IllegalArgumentException("User with ID not found.");
+    }
+  }
+
+  private void saveToFile(List<User> users) {
+    try {
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_PATH), users);
+    }
+    catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   @Override
-  public void deleteChannelMessage(UUID channelId) {
-    try {
-      List<Message> messageList = messageFileBasic.load();
-      Files.list(fileDirectory)
-          .filter(path -> messageList.stream()
-              .anyMatch(message -> message.isChannelEqual(channelId) &&
-                  path.getFileName().toString().equals(message.getId().toString() + ".ser")))
-          .forEach(path -> {
-            try {
-              Files.delete(path);
-            } catch (IOException e) {
-              System.out.println("Deletion failed.");
-              e.printStackTrace();
-            }
-          });
-    } catch (IOException e) {
-      System.err.println("Error listing files in directory: " + fileDirectory);
-      e.printStackTrace();
+  public UUID findByName(String name) {
+    List<User> userList = readAllUsers();
+    Optional<User> user = userList.stream().filter(user1 -> user1.getName().equals(name)).findFirst();
+    if(user.isPresent()) {
+      return user.get().getId();
+    }
+   else {
+      throw new IllegalArgumentException("There is no user with that name.");
     }
   }
+
+  @Override
+  public List<User> findByAll() {
+    List<User> userList = readAllUsers();
+    return userList.stream()
+        .map(User::new)
+        .collect(Collectors.toList());
+  }
+
 }
-

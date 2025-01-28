@@ -13,7 +13,6 @@ public class Channel implements Serializable {
   private UUID id;
   private Long createdAt;
   private Long updatedAt;
-  private List<UUID> userIdList;
   private List<UUID> messageIdList;
   private String title;
 
@@ -23,7 +22,6 @@ public class Channel implements Serializable {
     this.createdAt = System.currentTimeMillis();
     this.title = title;
     this.updatedAt = createdAt;
-    this.userIdList = new ArrayList<>();
     this.messageIdList = new ArrayList<>();
   }
 
@@ -33,7 +31,6 @@ public class Channel implements Serializable {
     this.title = channel.title;
     this.updatedAt = channel.updatedAt;
     this.messageIdList = channel.messageIdList;
-    this.userIdList = channel.userIdList;
   }
 
   public UUID getId() {
@@ -51,16 +48,12 @@ public class Channel implements Serializable {
   }
 
   public void addUser(UUID userId) {
-    userIdList.add(userId);
   }
 
   public void addMessage(UUID messageId) {
     messageIdList.add(messageId);
   }
 
-  public List<UUID> getUserIdList() {
-    return userIdList;
-  }
 
   public List<UUID> getMessageIdList() {
     return messageIdList;

@@ -22,13 +22,6 @@ public class JCF_channel implements ChannelService {
     }
 
     @Override
-    public void addUser(UUID userId, UUID channelId, JCF_user jcfUser) {
-        channelList.stream().filter(channel -> channel.getId().equals(channelId))
-            .forEach(channel -> channel.addUser(userId));
-        jcfUser.addChannel(channelId, userId);
-    }
-
-    @Override
     public void addMessage(String messageContent, UUID channelId, UUID userId,
         JCF_message jcfMessage, JCF_user jcfUser) {
         UUID messageId = jcfMessage.creat(userId, messageContent, channelId);
@@ -47,15 +40,6 @@ public class JCF_channel implements ChannelService {
             jcfMessage.DeleteMessageList(getChannel.get().getMessageIdList());
             channelList.remove(getChannel.get());
         }
-    }
-    //여기아님
-    @Override
-    public List<UUID> getUserIdList(UUID channelId) {
-        return channelList.stream()
-            .filter(it -> it.getId().equals(channelId))
-            .map(Channel::getUserIdList)
-            .findFirst()
-            .orElse(null);
     }
     //여기아님
     @Override
@@ -85,7 +69,7 @@ public class JCF_channel implements ChannelService {
     }
 
     @Override
-    public UUID write(String title) {
+    public UUID findByTitle(String title) {
         Optional<Channel> channel = channelList.stream().filter(channel_id -> channel_id.getTitle().equals(title)).findFirst();
 
         if(channel.isPresent()){

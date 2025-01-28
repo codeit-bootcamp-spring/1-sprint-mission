@@ -44,7 +44,6 @@ public class JCF_message implements MessageService {
 
     @Override
     public void DeleteMessageList(List<UUID> deleteMessageList) {
-        System.out.println(deleteMessageList);
         messageList.removeIf(message -> deleteMessageList.contains(message.getId()));
     }
 
