@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
@@ -8,11 +8,11 @@ import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator  channelValidator;
 
-    public JCFChannelService(ChannelRepository channelRepository) {
+    public FileChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
         channelValidator       = ChannelValidator.getInstance();
     }

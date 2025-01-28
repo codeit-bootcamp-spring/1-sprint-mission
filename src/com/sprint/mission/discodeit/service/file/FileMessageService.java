@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
@@ -8,11 +8,11 @@ import com.sprint.mission.discodeit.validation.MessageValidator;
 
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageValidator  messageValidator;
 
-    public JCFMessageService(MessageRepository messageRepository) {
+    public FileMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         messageValidator       = MessageValidator.getInstance();
     }

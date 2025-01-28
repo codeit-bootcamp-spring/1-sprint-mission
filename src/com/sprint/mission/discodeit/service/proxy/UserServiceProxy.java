@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class UserServiceProxy implements UserService {
     private final ServiceLogger logger;
-    private final UserService userService;
+    private final UserService   userService;
 
     public UserServiceProxy(UserService userService) {
         this.userService = userService;
@@ -26,11 +26,7 @@ public class UserServiceProxy implements UserService {
             creation = userService.createUser(userInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, userId);
-        }
-
-        if (creation == User.EMPTY_USER) {
-            logger.warning(logMessage, userId);
-            return creation;
+            System.err.println(logMessage + ", ID: " + userId);
         }
 
         return creation;
@@ -38,13 +34,7 @@ public class UserServiceProxy implements UserService {
 
     @Override
     public User findUserById(UUID key) {
-        User find = userService.findUserById(key);
-        if (find == User.EMPTY_USER) {
-            logger.warning("User find failed", key);
-            return find;
-        }
-
-        return find;
+        return userService.findUserById(key);
     }
 
     @Override
@@ -56,11 +46,7 @@ public class UserServiceProxy implements UserService {
             update = userService.updateUserById(key, userInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
-        }
-
-        if (update == User.EMPTY_USER) {
-            logger.warning(logMessage, key);
-            return update;
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return update;
@@ -68,12 +54,6 @@ public class UserServiceProxy implements UserService {
 
     @Override
     public User deleteUserById(UUID key) {
-        User deletion = userService.deleteUserById(key);
-        if (deletion == User.EMPTY_USER) {
-            logger.warning("User deletion failed", key);
-            return deletion;
-        }
-
-        return deletion;
+        return userService.deleteUserById(key);
     }
 }

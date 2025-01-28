@@ -4,161 +4,123 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.UUID;
 
 public class JavaApplication {
-    private static void testUser() {
+    private static void testBasicUserService(UserService userService) {
         User frog = new User.Builder("frog", "frog@email.com")
                 .build();
         User baek = new User.Builder("baek", "baek@email.com")
                 .phoneNumber("010-1234-5678")
                 .build();
+        User fffrog = new User.Builder("fffrog", "fffrog@email.com")
+                .build();
+        User ppprog = new User.Builder("ppprog", "")
+                .build();
+        UUID randomKey = UUID.randomUUID();
 
-        UserService userService = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService();
-        System.out.println("---------------------------------");
-        System.out.println("userService.createUser()");
-        System.out.println("pass User 'frog'! " + System.lineSeparator() + "User info: " + userService.createUser(frog));
-        System.out.println();
-        System.out.println("pass User 'baek'! " + System.lineSeparator() + "User info: " + userService.createUser(baek));
-        System.out.println();
-        System.out.println("pass User 'frog(already exist)'! " + System.lineSeparator() + "User info: " + userService.createUser(baek));
-        System.out.println();
-        System.out.println();
+        BasicUserService.setupUser(userService, frog);
+        BasicUserService.setupUser(userService, baek);
+        BasicUserService.setupUser(userService, frog);
 
-        System.out.println("---------------------------------");
-        System.out.println("userService.findUserById()");
-        UUID frogKey = frog.getId();
-        UUID baekKey = baek.getId();
-        System.out.println("pass UUID 'frogKey'! " + System.lineSeparator() + "User info: " + userService.findUserById(frogKey));
-        System.out.println();
-        System.out.println("pass UUID 'baekKey'! " + System.lineSeparator() + "User info: " + userService.findUserById(baekKey));
-        System.out.println();
-        System.out.println("pass UUID 'unknownKey'! " + System.lineSeparator() + "User info: " + userService.findUserById(UUID.randomUUID()));
-        System.out.println();
-        System.out.println();
+        BasicUserService.searchUser(userService, frog.getId());
+        BasicUserService.searchUser(userService, baek.getId());
+        BasicUserService.searchUser(userService, randomKey);
 
-        System.out.println("---------------------------------");
-        System.out.println("userService.updateUserById()");
-        System.out.println("pass UUID 'frogKey' and User 'fffrog': " + System.lineSeparator() + "User info: " + userService.updateUserById(
-                frogKey, new User.Builder("fffrog", "fffrog@email.com")
-                        .build()));
-        System.out.println();
-        System.out.println(userService.updateUserById(
-                UUID.randomUUID(), new User.Builder("ppprog", "")
-                        .build())); // validation not passed
-        System.out.println();
-        System.out.println();
+        BasicUserService.updateUser(userService, frog.getId(), fffrog);
+        BasicUserService.updateUser(userService, frog.getId(), ppprog);
 
-        System.out.println("---------------------------------");
-        System.out.println("userService.deleteUserById()");
-        System.out.println("pass UUID 'frogKey'! " + System.lineSeparator() + "User info: " + userService.deleteUserById(frogKey));
-        System.out.println();
-        System.out.println("pass UUID 'frogKey(already deleted)'! " + System.lineSeparator() + "User info: " + userService.deleteUserById(frogKey));
-        System.out.println();
-        System.out.println();
+        BasicUserService.removeUser(userService, frog.getId());
+        BasicUserService.removeUser(userService, frog.getId());
     }
 
-    private static void testMessage() {
-        Message hi = Message.createMessage("hi");
-        Message lo = Message.createMessage("lo");
-
-        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE_FACTORY.createMessageService();
-        System.out.println("---------------------------------");
-        System.out.println("messageService.createMessage()");
-        System.out.println("pass Message 'hi'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(hi));
-        System.out.println();
-        System.out.println("pass Message 'lo'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(lo));
-        System.out.println();
-        System.out.println("pass Message 'lo(already exist)'! " + System.lineSeparator() + "Message info: " + messageService.createMessage(lo));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("---------------------------------");
-        System.out.println("messageService.findMessageById()");
-        UUID hiKey = hi.getId();
-        UUID loKey = lo.getId();
-        System.out.println("pass UUID 'hiKey'! " + System.lineSeparator() + "Message info: " + messageService.findMessageById(hiKey));
-        System.out.println();
-        System.out.println("pass UUID 'loKey'! " + System.lineSeparator() + "Message info: " + messageService.findMessageById(loKey));
-        System.out.println();
-        System.out.println("pass UUID 'unknownKey'! " + System.lineSeparator() + "Message info: " + messageService.findMessageById(UUID.randomUUID()));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("---------------------------------");
-        System.out.println("messageService.updateMessageById()");
-        System.out.println("pass UUID 'hiKey' and Message 'mid': " + System.lineSeparator() + "Message info: " +
-                messageService.updateMessageById(
-                        hiKey, Message.createMessage("mid")));
-        System.out.println();
-        System.out.println(messageService.updateMessageById(
-                UUID.randomUUID(), Message.createMessage("mmmmmmmmmmmmmmmmmmmmm"))); // validation not passed
-        System.out.println();
-        System.out.println();
-
-        System.out.println("---------------------------------");
-        System.out.println("messageService.deleteMessageById()");
-        System.out.println("pass UUID 'hiKey'! " + System.lineSeparator() + "Message info: " + messageService.deleteMessageById(hiKey));
-        System.out.println();
-        System.out.println("pass UUID 'hiKey(already deleted)'! " + System.lineSeparator() + "Message info: " + messageService.deleteMessageById(hiKey));
-        System.out.println();
-        System.out.println();
-    }
-
-    private static void testChannel() {
+    private static void testBasicChannelService(ChannelService channelService) {
         Channel c1 = Channel.createChannel("c1");
         Channel c2 = Channel.createChannel("c2");
+        Channel c3 = Channel.createChannel(c1.getId(), "c3");
+        Channel cc = Channel.createChannel("c12345678910");
+        UUID randomKey = UUID.randomUUID();
 
-        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE_FACTORY.createChannelService();
-        System.out.println("---------------------------------");
-        System.out.println("channelService.createChannel()");
-        System.out.println("pass Channel 'c1'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c1));
-        System.out.println();
-        System.out.println("pass Channel 'c2'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c2));
-        System.out.println();
-        System.out.println("pass Channel 'c2(already exist)'! " + System.lineSeparator() + "Channel info: " + channelService.createChannel(c2));
-        System.out.println();
-        System.out.println();
+        BasicChannelService.setupChannel(channelService, c1);
+        BasicChannelService.setupChannel(channelService, c2);
+        BasicChannelService.setupChannel(channelService, c1);
 
-        System.out.println("---------------------------------");
-        System.out.println("channelService.findChannelById()");
-        UUID c1Key = c1.getId();
-        UUID c2Key = c2.getId();
-        System.out.println("pass UUID 'c1Key'! " + System.lineSeparator() + "Channel info: " + channelService.findChannelById(c1Key));
-        System.out.println();
-        System.out.println("pass UUID 'c2Key'! " + System.lineSeparator() + "Channel info: " + channelService.findChannelById(c2Key));
-        System.out.println();
-        System.out.println("pass UUID 'unknownKey'! " + System.lineSeparator() + "Channel info: " + channelService.findChannelById(UUID.randomUUID()));
-        System.out.println();
-        System.out.println();
+        BasicChannelService.searchChannel(channelService, c1.getId());
+        BasicChannelService.searchChannel(channelService, c2.getId());
+        BasicChannelService.searchChannel(channelService, randomKey);
 
-        System.out.println("---------------------------------");
-        System.out.println("channelService.updateChannelById()");
-        System.out.println("pass UUID 'c1Key' and Channel 'c3': " + System.lineSeparator() + "Channel info: " +
-                channelService.updateChannelById(
-                        c1Key, Channel.createChannel("c3")));
-        System.out.println();
-        System.out.println(channelService.updateChannelById(
-                UUID.randomUUID(), Channel.createChannel("c12345678910"))); // validation not passed
-        System.out.println();
-        System.out.println();
+        BasicChannelService.updateChannel(channelService, c1.getId(), c3);
+        BasicChannelService.updateChannel(channelService, c1.getId(), cc);
 
-        System.out.println("---------------------------------");
-        System.out.println("channelService.deleteChannelById()");
-        System.out.println("pass UUID 'c1Key'! " + System.lineSeparator() + "Channel info: " + channelService.deleteChannelById(c1Key));
-        System.out.println();
-        System.out.println("pass UUID 'c1Key(already deleted)'! " + System.lineSeparator() + "Channel info: " + channelService.deleteChannelById(c1Key));
-        System.out.println();
-        System.out.println();
+        BasicChannelService.removeChannel(channelService, c1.getId());
+        BasicChannelService.removeChannel(channelService, c1.getId());
+    }
+
+    private static void testBasicMessageService(MessageService messageService) {
+        Message hi  = Message.createMessage("hi");
+        Message lo  = Message.createMessage("lo");
+        Message mid = Message.createMessage(hi.getId(), "mid");
+        Message mmm = Message.createMessage("mmmmmmmmmmmmmmmmmmmmm");
+        UUID randomKey = UUID.randomUUID();
+
+        BasicMessageService.setupMessage(messageService, hi);
+        BasicMessageService.setupMessage(messageService, lo);
+        BasicMessageService.setupMessage(messageService, lo);
+
+        BasicMessageService.searchMessage(messageService, hi.getId());
+        BasicMessageService.searchMessage(messageService, lo.getId());
+        BasicMessageService.searchMessage(messageService, randomKey);
+
+        BasicMessageService.updateMessage(messageService, hi.getId(), mid);
+        BasicMessageService.updateMessage(messageService, hi.getId(), mmm);
+
+        BasicMessageService.removeMessage(messageService, hi.getId());
+        BasicMessageService.removeMessage(messageService, hi.getId());
+    }
+
+    private static void testBasicUserService() {
+        UserRepository userRepository = UserRepositoryFactory.JCF_USER_REPOSITORY_FACTORY.createUserRepository();
+        UserService userService = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService(userRepository);
+        //testBasicUserService(userService);
+
+        userRepository = UserRepositoryFactory.FILE_USER_REPOSITORY_FACTORY.createUserRepository();
+        userService = UserServiceFactory.FILE_USER_SERVICE_FACTORY.createUserService(userRepository);
+        testBasicUserService(userService);
+    }
+
+    private static void testBasicChannelService() {
+        ChannelRepository channelRepository = ChannelRepositoryFactory.JCF_CHANNEL_REPOSITORY_FACTORY.createChannelRepository();
+        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE_FACTORY.createChannelService(channelRepository);
+        //testBasicChannelService(channelService);
+
+        channelRepository = ChannelRepositoryFactory.FILE_CHANNEL_REPOSITORY_FACTORY.createChannelRepository();
+        channelService = ChannelServiceFactory.FILE_CHANNEL_SERVICE_FACTORY.createChannelService(channelRepository);
+        testBasicChannelService(channelService);
+    }
+
+    private static void testBasicMessageService() {
+        MessageRepository messageRepository = MessageRepositoryFactory.JCF_MESSAGE_REPOSITORY_FACTORY.createMessageRepository();
+        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE_FACTORY.createMessageService(messageRepository);
+        //testBasicMessageService(messageService);
+
+        messageRepository = MessageRepositoryFactory.FILE_MESSAGE_REPOSITORY_FACTORY.createMessageRepository();
+        messageService = MessageServiceFactory.FILE_MESSAGE_SERVICE_FACTORY.createMessageService(messageRepository);
+        testBasicMessageService(messageService);
     }
 
     public static void main(String[] args) {
-        testUser();
-        testMessage();
-        testChannel();
+        testBasicUserService();
+        testBasicMessageService();
+        testBasicChannelService();
     }
 }

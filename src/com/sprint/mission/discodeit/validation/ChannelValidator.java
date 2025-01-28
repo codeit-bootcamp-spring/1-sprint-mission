@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.validation;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.validation.format.CreateAtValidator;
-import com.sprint.mission.discodeit.validation.format.NameValidator;
 import com.sprint.mission.discodeit.validation.format.IdValidator;
+import com.sprint.mission.discodeit.validation.format.NameValidator;
 import com.sprint.mission.discodeit.validation.format.UpdateAtValidator;
 
 

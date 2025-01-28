@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import java.util.UUID;
 
 public class MessageServiceProxy implements MessageService {
-    private final ServiceLogger logger;
+    private final ServiceLogger  logger;
     private final MessageService messageService;
 
     public MessageServiceProxy(MessageService messageService) {
@@ -26,11 +26,7 @@ public class MessageServiceProxy implements MessageService {
             creation = messageService.createMessage(messageInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, messageId);
-        }
-
-        if (creation == Message.EMPTY_MESSAGE) {
-            logger.warning(logMessage, messageId);
-            return creation;
+            System.err.println(logMessage + ", ID: " + messageId);
         }
 
         return creation;
@@ -38,13 +34,7 @@ public class MessageServiceProxy implements MessageService {
 
     @Override
     public Message findMessageById(UUID key) {
-        Message find = messageService.findMessageById(key);
-        if (find == Message.EMPTY_MESSAGE) {
-            logger.warning("Message find failed", key);
-            return find;
-        }
-
-        return find;
+        return messageService.findMessageById(key);
     }
 
     @Override
@@ -56,23 +46,14 @@ public class MessageServiceProxy implements MessageService {
             updated = messageService.updateMessageById(key, messageInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
+            System.err.println(logMessage + ", ID: " + key);
         }
 
-        if (updated == Message.EMPTY_MESSAGE) {
-            logger.warning(logMessage, key);
-            return updated;
-        }
         return updated;
     }
 
     @Override
     public Message deleteMessageById(UUID key) {
-        Message deletion = messageService.deleteMessageById(key);
-        if (deletion == Message.EMPTY_MESSAGE) {
-            logger.warning("Message deletion failed", key);
-            return deletion;
-        }
-
-        return deletion;
+        return messageService.deleteMessageById(key);
     }
 }

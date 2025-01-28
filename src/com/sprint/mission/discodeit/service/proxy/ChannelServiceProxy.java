@@ -5,11 +5,10 @@ import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.log.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.io.IOException;
 import java.util.UUID;
 
 public class ChannelServiceProxy implements ChannelService {
-    private final ServiceLogger logger;
+    private final ServiceLogger  logger;
     private final ChannelService channelService;
 
     public ChannelServiceProxy(ChannelService channelService) {
@@ -27,11 +26,7 @@ public class ChannelServiceProxy implements ChannelService {
             creation = channelService.createChannel(channelInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, channelId);
-        }
-
-        if (creation == Channel.EMPTY_CHANNEL) {
-            logger.warning(logMessage, channelId);
-            return creation;
+            System.err.println(logMessage + ", ID: " + channelId);
         }
 
         return creation;
@@ -39,13 +34,7 @@ public class ChannelServiceProxy implements ChannelService {
 
     @Override
     public Channel findChannelById(UUID key) {
-        Channel find = channelService.findChannelById(key);
-        if (find == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel find failed", key);
-            return find;
-        }
-
-        return find;
+        return channelService.findChannelById(key);
     }
 
     @Override
@@ -57,11 +46,7 @@ public class ChannelServiceProxy implements ChannelService {
             updated = channelService.updateChannelById(key, channelInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
-        }
-
-        if (updated == Channel.EMPTY_CHANNEL) {
-            logger.warning(logMessage, key);
-            return updated;
+            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
@@ -69,12 +54,6 @@ public class ChannelServiceProxy implements ChannelService {
 
     @Override
     public Channel deleteChannelById(UUID key) {
-        Channel deletion = channelService.deleteChannelById(key);
-        if (deletion == Channel.EMPTY_CHANNEL) {
-            logger.warning("Channel deletion failed", key);
-            return deletion;
-        }
-
-        return deletion;
+        return channelService.deleteChannelById(key);
     }
 }

@@ -1,22 +1,25 @@
 package com.sprint.mission.discodeit.factory;
 
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.proxy.MessageServiceProxy;
 
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 public enum MessageServiceFactory {
-    JCF_MESSAGE_SERVICE_FACTORY(() -> new MessageServiceProxy(new JCFMessageService())),
+    JCF_MESSAGE_SERVICE_FACTORY((messageRepository) -> new MessageServiceProxy(new JCFMessageService(messageRepository))),
+    FILE_MESSAGE_SERVICE_FACTORY((messageRepository) -> new MessageServiceProxy(new FileMessageService(messageRepository)))
     ;
 
-    private final Supplier<MessageService> supplier;
+    private final Function<MessageRepository, MessageService> function;
 
-    MessageServiceFactory(Supplier<MessageService> supplier) {
-        this.supplier = supplier;
+    MessageServiceFactory(Function<MessageRepository, MessageService> function) {
+        this.function = function;
     }
 
-    public MessageService createMessageService() {
-        return supplier.get();
+    public MessageService createMessageService(MessageRepository messageRepository) {
+        return function.apply(messageRepository);
     }
 }
