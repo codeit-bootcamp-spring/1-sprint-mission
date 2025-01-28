@@ -1,22 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
 
-public class User extends BaseEntity {
-    private String nickname;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
+
     private String username;
     private String email;
     private String phoneNumber;
+    private String password;
 
-    public User(String username, String email, String phoneNumber) {
-        super();
-        this.nickname = username;
+    public User() {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+    }
+
+    public User(String username, String email, String phoneNumber, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.password = password;
     }
 
-    public String getNickname() {
-        return nickname;
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
     public String getUsername() {
@@ -31,11 +56,15 @@ public class User extends BaseEntity {
         return phoneNumber;
     }
 
-    public void update(String nickname, String username, String email, String phoneNumber) {
-        this.nickname = nickname;
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String username, String email, String phoneNumber, String password) {
         this.username = username;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        update();
+        this.password = password;
+        updatedAt = Instant.now().getEpochSecond();
     }
 }
