@@ -1,19 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private UUID id;
-  private Long createdAt;
+  private final UUID id;
+  private final Long createdAt;
   private Long updatedAt;
   private UUID userId;
   private UUID channelId;
   private String content;
+
+  @JsonCreator
+  public Message(
+      @JsonProperty("id") UUID id,
+      @JsonProperty("createdAt") Long createdAt
+  ) {
+    this.id = id != null ? id : UUID.randomUUID(); // id가 없으면 새로 생성
+    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis(); // createdAt이 없으면 현재 시간
+  }
 
   public Message(UUID userId, String content, UUID channelId) {
     this.id = UUID.randomUUID();
@@ -37,22 +50,16 @@ public class Message implements Serializable {
     return id;
   }
 
+  public Long getCreatedAt() {
+    return createdAt;
+  }
+
+  public Long getUpdatedAt() {
+    return updatedAt;
+  }
+
   public UUID getUserId() {
     return userId;
-  }
-
-  public boolean isUserEqual(UUID getUser) {
-    return userId.equals(getUser);
-  }
-
-  public boolean isChannelEqual(UUID getChannel) {
-    return channelId.equals(getChannel);
-  }
-
-
-  public void updateMessage(String message) {
-    this.content = message;
-    this.updatedAt = System.currentTimeMillis();
   }
 
   public UUID getChannelId() {
@@ -62,6 +69,30 @@ public class Message implements Serializable {
   public String getContent() {
     return content;
   }
+
+
+
+  public void updateMessage(String message) {
+    this.content = message;
+    this.updatedAt = System.currentTimeMillis();
+  }
+
+  public void setUpdatedAt(Long updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  public void setUserId(UUID userId) {
+    this.userId = userId;
+  }
+
+  public void setChannelId(UUID channelId) {
+    this.channelId = channelId;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
 
   @Override
   public boolean equals(Object obj) {

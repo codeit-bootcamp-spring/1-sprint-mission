@@ -1,98 +1,121 @@
-//package com.sprint.mission.discodeit.service.file;
-//
-//import com.sprint.mission.discodeit.entity.Channel;
-//import com.sprint.mission.discodeit.entity.User;
-//import com.sprint.mission.discodeit.service.ChannelService;
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.io.ObjectOutputStream;
-//import java.nio.file.Files;
-//import java.nio.file.Path;
-//import java.util.List;
-//import java.util.Optional;
-//import java.util.UUID;
-//import java.util.stream.Collectors;
-//
-//public class FileChannel implements ChannelService {
-//  private Path fileDirectory;
-//  private FileBasic chnnelFileBasic;
-//
-//  public FileChannel(Path directory) {
-//    this.fileDirectory = directory;
-//    this.chnnelFileBasic = new FileBasic(fileDirectory);
-//  }
-//
-//  @Override
-//  public void creat(Channel channel) {
-//    Path filePath = fileDirectory.resolve(channel.getId().toString().concat(".ser"));
-//    try (FileOutputStream fos = new FileOutputStream(filePath.toFile());
-//        ObjectOutputStream oos = new ObjectOutputStream(fos);
-//    ) {
-//      oos.writeObject(channel);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//  }
-//
-//
-//  @Override
-//  public void delete(UUID channelId) {
-//    try {
-//      Optional<Path> channelDelete = Files.list(fileDirectory)
-//          .filter(path -> path.getFileName().toString().equals(channelId + ".ser"))
-//          .findFirst();
-//      if(channelDelete.isPresent()) {
-//        Files.delete(channelDelete.get());
-//      }
-//      else {
-//        System.out.println("File not found for Id");
-//      }
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//
-//  }
-//
-//  @Override
-//  public void update(UUID channelId, String title) {
-//    try {
-//      Optional<Path> updateChannel = Files.list(fileDirectory)
-//          .filter(path -> path.getFileName().toString().equals(channelId + ".ser"))
-//          .findFirst();
-//      if(updateChannel.isPresent()) {
-//        Channel channel = (Channel) chnnelFileBasic.deserialization(updateChannel.get());
-//        channel.updateTitle(title);
-//        creat(channel);
-//      }
-//      else {
-//        System.out.println("File not found for Id");
-//      }
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//  }
-//
-//  @Override
-//  public UUID write(String title) {
-//    List<Channel> channelList = chnnelFileBasic.load();
-//    for(Channel item : channelList) {
-//      System.out.println(item);
-//    }
-//    try {
-//      return channelList.stream()
-//          .filter(channel -> channel.getTitle().equals(title)).findFirst().get().getId();
-//    }
-//    catch (Exception e) {
-//      System.out.println("There is no user with that name.");
-//      return null;
-//    }
-//  }
-//
-//  @Override
-//  public List<Channel> allWrite() {
-//    List<Channel> channelList = chnnelFileBasic.load();
-//    return channelList.stream()
-//        .map(Channel::new)
-//        .collect(Collectors.toList());
-//  }
-//}
+package com.sprint.mission.discodeit.service.file;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.service.file.repository.FileChannelRepository;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+public class FileChannel implements FileChannelRepository {
+  private static final String FILE_PATH = "src/main/java/com/sprint/mission/discodeit/service/file/data/channel/channel.json";
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+
+  private List<Channel> readAllChannels() {
+    File file = new File(FILE_PATH);
+    if (!file.exists() || file.length() == 0)
+      return new ArrayList<>();
+    try {
+      return objectMapper.readValue(file, new TypeReference<List<Channel>>() {
+      });
+    } catch (IOException e) {
+      e.printStackTrace();
+      return new ArrayList<>();
+    }
+  }
+
+  @Override
+  public void creat(String name) {
+    Channel channel = new Channel(name);
+    try {
+      List<Channel> channelList = readAllChannels();
+      channelList.add(channel);
+      saveToFile(channelList);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  @Override
+  public void delete(UUID channelId) {
+    try {
+      List<Channel> channels = readAllChannels();
+      channels.removeIf(channel -> channel.getId().equals(channelId));
+      saveToFile(channels);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void update(UUID channelId, String title) {
+    List<Channel> channelList = readAllChannels();
+
+    boolean updated = channelList.stream()
+        .filter(channel -> channel.getId().equals(channelId))
+        .findFirst()
+        .map(channel -> {
+          channel.updateTitle(title);
+          return true;
+        })
+        .orElse(false);
+
+    if (updated) {
+      saveToFile(channelList);
+    } else {
+      throw new IllegalArgumentException("Channel with ID not found.");
+    }
+  }
+
+  private void saveToFile(List<Channel> channels) {
+    try {
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_PATH), channels);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+
+  @Override
+  public UUID findByTitle(String title) {
+    List<Channel> channelList = readAllChannels();
+    Optional<Channel> channel = channelList.stream().filter(channel1 -> channel1.getTitle().equals(title))
+        .findFirst();
+    if (channel.isPresent()) {
+      return channel.get().getId();
+    } else {
+      throw new IllegalArgumentException("There is no channel with that name.");
+    }
+  }
+
+  @Override
+  public List<Channel> findByAll() {
+    List<Channel> channelList = readAllChannels();
+    return channelList.stream()
+        .map(Channel::new)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public void addMessage(UUID messageId, UUID channelId) {
+    List<Channel> channelList = readAllChannels();
+    boolean updated = channelList.stream()
+        .filter(channel -> channel.getId().equals(channelId))
+        .findFirst()
+        .map(channel -> {
+          channel.addMessage(messageId);
+          return true;
+        })
+        .orElse(false);
+
+    if (updated) {
+      saveToFile(channelList);
+    }
+
+  }
+}

@@ -16,4 +16,8 @@ public interface FileUserRepository {
   UUID findByName(String name);
 
   List<User> findByAll() throws IOException;
+
+  void addMessage(UUID messageId, UUID userId);
+
+  String getName(UUID userId);
 }
