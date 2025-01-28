@@ -5,24 +5,42 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.HashMap;
 import java.util.UUID;
 
-public interface JCFUserRepository {
-    // Repository계층의 주요 역할이 데이터베이스 CRUD 작업처리
-    // 라고하니깐 Repository만 만들도록 하자. Service와 Manager는 만들어도 감당 못하고 뭘 해야할지도 모르겠다.
+public class JCFUserRepository implements UserRepository {
+    private final HashMap<UUID, User> data = new HashMap<>();
 
-    // 생성
-    // 유저를 데이터 베이스에 저장.
-    // 유저가 회원가입을 해서 정보를 서버를 넘기면 그 정보를 그대로 데이터베이스에 저장한다고 이해하자.
-    void save(User user);
+    @Override
+    public void save(User user) {
+        data.put(user.getId(), user);
+        System.out.println("유저 저장 완료 : " + user.getId());
+    }
 
-    // 조회
-    // 관리자가 특정 유저를 찾는 기능이라고 생각하자.
-    void findById(UUID id);
-    void findAll();
+    @Override
+    public String findById(String id) {
+        if(data.containsKey(id)) {
+            System.out.println("userEmail = " + data.get(id).getUserEmail());
+            System.out.println("userNickName = " + data.get(id).getUserNickName());
+            System.out.println("password = " + data.get(id).getPassword());
+        }
+        return id;
+    }
 
-    // 수정
-    void update(User user);
+    @Override
+    public void findAll() {
+        for (UUID uuid : data.keySet()) {
+            System.out.println("userID = " + uuid);
+            System.out.println("userEmail = " + data.get(uuid).getUserEmail());
+            System.out.println("userNickName = " + data.get(uuid).getUserNickName());
+            System.out.println("password = " + data.get(uuid).getPassword());
+        }
+    }
 
-    // 삭제
-    void delete(UUID id);
+    @Override
+    public void update(String user) {
 
+    }
+
+    @Override
+    public void delete(String id) {
+
+    }
 }

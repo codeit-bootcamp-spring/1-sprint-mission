@@ -1,26 +1,43 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-public interface JCFMessageRepository {
-    // Repository계층의 주요 역할이 데이터베이스 CRUD 작업처리
-    // 라고하니깐 Repository만 만들도록 하자. Service와 Manager는 만들어도 감당 못하고 뭘 해야할지도 모르겠다.
+public class JCFMessageRepository implements MessageRepository {
+    private final HashMap<UUID, Message> data = new HashMap<>();
 
-    // 생성
-    void save(Message message);
+    @Override
+    public void save(Message message) {
+        data.put(message.getId(), message);
+        System.out.println("메세지 저장 완료 : " + message.getId());
+    }
 
-    // 조회
-    void findById(UUID id);
-    void findAll();
+    @Override
+    public void findById(UUID id) {
+        if (data.containsKey(id)) {
+            System.out.println("message Id : " + data.get(id).getId());
+            System.out.println("message content : " + data.get(id).getMessageContent());
+        }
+    }
 
-    // 수정
-    void update(Message message);
+    @Override
+    public void findAll() {
+        for (UUID uuid : data.keySet()) {
+            System.out.println("message Id : " + data.get(uuid).getId());
+            System.out.println("message content : " + data.get(uuid).getMessageContent());
+        }
+    }
 
-    // 삭제
-    void delete(UUID id);
+    @Override
+    public void update(Message message) {
+        data.put(message.getId(), message);
+        message.updateUpdatedAt(System.currentTimeMillis());
+    }
 
+    @Override
+    public void delete(UUID id) {
+        data.remove(id);
+    }
 }
