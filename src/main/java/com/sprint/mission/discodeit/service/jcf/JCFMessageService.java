@@ -14,7 +14,7 @@ public class JCFMessageService implements MessageService {
     private final UserService userService; // 사용자 서비스
     private final ChannelService channelService; // 채널 서비스
 
-    // private 생성자: 싱글톤 패턴
+    // private 생성자: 외부에서 객체 생성을 방지
     private JCFMessageService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
@@ -68,7 +68,6 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
-        // 메시지를 삭제
-        data.remove(id);
+        data.remove(id); // 메시지를 삭제
     }
 }
