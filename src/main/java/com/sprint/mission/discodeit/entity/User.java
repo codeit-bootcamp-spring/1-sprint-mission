@@ -1,8 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User {
+// //JCF 테스트 시
+//public class User  {
+
+// //File 테스트시
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private String username;
     private String password;

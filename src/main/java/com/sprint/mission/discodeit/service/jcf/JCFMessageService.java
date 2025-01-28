@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,25 +15,42 @@ public class JCFMessageService implements MessageService {
 
     private final List<Message> messages = new ArrayList<>();
     private final ChannelService channelService;
+    private final UserService userService;
 
-    public JCFMessageService(ChannelService channelService) {
+    public JCFMessageService(ChannelService channelService, UserService userService) {
         this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
     public Message createMessage(String username, UUID channelId, String content) {
+        Channel channel = channelService.getChannelById(channelId);
+
+        //채널 확인
+        if (channel == null) {
+            System.out.println("Channel을 찾을 수 없습니다!");
+            return null;
+        }
+
+        User user = findUserByUsername(username);
+        if (user == null) {
+            System.out.println("유저를 찾을 수 없습니다");
+            return null;
+        }
+
+        if (!channel.isUserInChannel(user.getId())) {
+            System.out.println("해당 유저는 채널에 존재하지 않습니다!");
+            return null;
+        }
         // 메시지 생성
-        Message message = new Message(username, channelId, content);
+        //+
+        Message message = new Message(user.getUsername(), channelId, content);
 
         // 메시지 저장
         messages.add(message);
+        channel.addMessage(message);
 
-        // 채널에 메시지 추가
-        Channel channel = channelService.getChannelById(channelId);
-        if (channel != null) {
-            channel.addMessage(message);
-        }
-
+        System.out.println("메시지 생성 성공!");
         return message;
     }
 
@@ -61,6 +79,15 @@ public class JCFMessageService implements MessageService {
         return messages;
     }
 
+    private User findUserByUsername(String username) {
+        List<User> users = userService.getAllUsers();
+        for (User user : users) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
     // ======================================================================================================
     public void printSingleMessage(UUID messageId) {
         Message message = getMessageById(messageId); // 단일 메시지 조회
@@ -117,5 +144,7 @@ public class JCFMessageService implements MessageService {
         }
         return false;
     }
+
+
 
 }

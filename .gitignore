@@ -16,6 +16,7 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+/Users/parkjihyun/Desktop/CodeitProjects/Codeit/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/mentoring
 /src/main/java/com/sprint/mission/discodeit/mentoring
 ### Eclipse ###
 .apt_generated

@@ -32,6 +32,16 @@ public class JCFChannelService implements ChannelService {
     public List<Channel> getAllChannels() {
         return channels;
     }
+    public void addUserToChannel (UUID channelId, UUID userId) {
+        Channel channel = getChannelById(channelId);
+        if (channel != null) {
+            channel.addUser(userId);
+            //+
+            System.out.println("user is successfully added to channel. channelId: " + channel.getChannelName() + ", userId: " + userId);
+        } else {
+            System.out.println("Channel not found");
+        }
+    }
     // ======================================================================================================
     //단건 출력 메서드
     public void printSingleChannel(UUID channelId) {
