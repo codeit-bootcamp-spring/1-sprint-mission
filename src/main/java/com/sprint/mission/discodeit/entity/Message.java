@@ -24,8 +24,8 @@ public class Message implements Serializable {
       @JsonProperty("id") UUID id,
       @JsonProperty("createdAt") Long createdAt
   ) {
-    this.id = id != null ? id : UUID.randomUUID(); // id가 없으면 새로 생성
-    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis(); // createdAt이 없으면 현재 시간
+    this.id = id != null ? id : UUID.randomUUID();
+    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis();
   }
 
   public Message(UUID userId, String content, UUID channelId) {

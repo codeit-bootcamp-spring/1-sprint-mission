@@ -11,6 +11,10 @@ import com.sprint.mission.discodeit.service.file.FileUser;
 import java.util.List;
 import java.util.UUID;
 
+// 해야할 일
+// User와 Channel의 연결하는 중간 모델 적용
+// 모델 일대다 HashMap으로 교체
+// 싱글톤 구현
 
 public class JavaApplication {
 

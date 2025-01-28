@@ -27,8 +27,8 @@ public class User implements Serializable {
       @JsonProperty("id") UUID id,
       @JsonProperty("createdAt") Long createdAt
   ) {
-    this.id = id != null ? id : UUID.randomUUID(); // id가 없으면 새로 생성
-    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis(); // createdAt이 없으면 현재 시간
+    this.id = id != null ? id : UUID.randomUUID();
+    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis();
   }
 //userMessageIdList map<id, userMessageIdList>
   public User(String name) {
