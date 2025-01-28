@@ -4,62 +4,58 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
 
-    final List<User> userData;
+    private final Map<UUID, User> userList;
 
     public JCFUserService() {
-        this.userData = new ArrayList<>();
+        this.userList = new HashMap<>();
     }
 
     @Override
-    public User createUser(String userName) { //유저 추가
+    public User createUser(String userName) { // 유저 추가
+        if (userName == null || userName.trim().isEmpty()) {
+            throw new IllegalArgumentException("유저 이름은 null 또는 빈 문자열일 수 없습니다.");
+        }
         User user = new User(userName);
-        this.userData.add(user);
+        userList.put(user.getUserId(), user);
         System.out.println(Utils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
         return user;
     }
 
     @Override
-    public User readUser(UUID id) {
-        return
-                this.userData.stream()
-                        .filter(user -> user.getUserId().equals(id))
-                        .findFirst()
-                        .orElse(null);
+    public User readUser(UUID id) { // 유저 읽기
+        return Optional.ofNullable(userList.get(id))
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다. ID: " + id));
     }
 
     @Override
-    public List<User> readAllUser() {
-        return this.userData;
+    public List<User> readAllUser() { // 모든 유저 읽기
+        return new ArrayList<>(userList.values());
     }
 
     @Override
-    public User modifyUser(UUID userID, String newName) {
-        User user= readUser(userID);
-        String oriName=user.getUserName();
+    public User modifyUser(UUID userID, String newName) { // 유저 수정
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("유저 이름은 null 또는 빈 문자열일 수 없습니다.");
+        }
+        User user = readUser(userID);
+        String oriName = user.getUserName();
         user.updateUsername(newName);
         user.updateUpdatedAt();
-        System.out.println("유저이름 변경: " + oriName+ " -> " + newName );
+        System.out.println("유저 이름 변경: \"" + oriName + "\" -> \"" + newName + "\"");
         return user;
-
     }
 
     @Override
-    public void deleteUser(UUID id) {
-
-        String name= readUser(id).getUserName();
-        boolean isDeleted = this.userData.removeIf(user -> user.getUserId().equals(id));
-
-        if(isDeleted) {
-            System.out.println(name + " 유저가 삭제되었습니다.");
-        }else{
-            System.out.println(name + " 유저 삭제 실패하였습니다.");
+    public void deleteUser(UUID id) { // 유저 삭제
+        User user = readUser(id);
+        if (userList.remove(id) != null) {
+            System.out.println(user.getUserName() + " 유저가 삭제되었습니다.");
+        } else {
+            System.out.println(user.getUserName() + " 유저 삭제 실패하였습니다.");
         }
     }
-
 }

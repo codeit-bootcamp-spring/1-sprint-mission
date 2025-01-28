@@ -3,83 +3,107 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileChannelService implements ChannelService {
 
 
-    private String fileName = "channel.ser";
-    private static Path filePath;
+    private final String fileName = "savedata/channel.ser";
+    private final Map<UUID, Channel> channelList;
 
-    public static void init(Path directory) {
-        //파일 디렉토리 설정 -> service를 묶고, 그 클래스에 옮겨도 될 듯
-        if (!Files.exists(directory)) {
-            try {
-                Files.createDirectories(directory);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        filePath = directory;
+    public FileChannelService() {
+        this.channelList = loadFile();
     }
+
 
     public Channel createChannel(String name) {
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("채널 이름이 잘못되었습니다");
+            throw new IllegalArgumentException("채널명을 null 또는 빈 문자열로 생성할 수 없습니다.");
         }
 
         Channel channel = new Channel(name);
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.resolve(fileName).toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(channel);
+        channelList.put(channel.getChannelId(), channel);
+        System.out.println("채널명: " + channel.getChannelName() + " 채널이 추가되었습니다.");
+        saveFile();
+        return channel;
+    }
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+
+    @Override
+    public Channel readChannel(UUID id) {
+        Channel channel = channelList.get(id);
+        //null 방어
+        if (channel == null) {
+            throw new IllegalArgumentException("채널을 찾을 수 없습니다. ID: " + id);
         }
-
         return channel;
     }
 
     @Override
-    public Channel readChannel(UUID id) {
-        if (id == null) {
-            throw new IllegalArgumentException("id가 null입니다");
-        }
-
-        Channel channel;
-        try{
-
-            Map<UUID, Channel>  map = Files.list(filePath)
-                    .map()
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return null;
-    }
-
-    @Override
     public List<Channel> readAllChannel() {
-        return List.of();
+        return new ArrayList<>(channelList.values());
     }
 
     @Override
     public Channel modifyChannel(UUID id, String name) {
-        return null;
+        Channel target = readChannel(id);
+        if (target == null) {
+            throw new IllegalArgumentException("수정할 채널을 찾을 수 없습니다. ID: " + id);
+        }
+        String oriName = target.getChannelName();
+        target.updateName(name);
+        System.out.println("채널 이름 변경: \"" + oriName + "\" -> \"" + name + "\"");
+        saveFile();
+
+        return target;
     }
 
     @Override
     public void deleteChannel(UUID id) {
+        Channel target = readChannel(id);
+        if (target == null) {
+            throw new IllegalArgumentException("삭제할 채널을 찾을 수 없습니다. ID: " + id);
+        }
+        channelList.remove(id);
+        saveFile();
+
+        System.out.println("채널 \"" + target.getChannelName() + "\"이 삭제되었습니다.");
+    }
+
+
+    public void saveFile(){
+        File file = new File(fileName);
+        try (ObjectOutputStream oos = new ObjectOutputStream
+                (new FileOutputStream(fileName))) {
+            oos.writeObject(channelList);
+
+        } catch (IOException e) {
+            throw new RuntimeException("파일 저장 실패 : " + e.getMessage(), e);
+        }
 
     }
+
+    public Map<UUID, Channel> loadFile(){
+
+        File file = new File(fileName);
+
+        if (!file.exists()) {
+            return new HashMap<>();
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream
+                (new FileInputStream(file)))
+        {
+            return (Map<UUID, Channel>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("파일 로드 실패 : " + e.getMessage(), e);
+        }
+    }
+
+
 }

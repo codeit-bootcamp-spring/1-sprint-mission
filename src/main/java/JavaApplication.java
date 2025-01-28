@@ -3,6 +3,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -14,23 +16,31 @@ import java.util.Comparator;
 import java.util.List;
 
 public class JavaApplication {
-    public static JCFChannelService jcfChannelService = new JCFChannelService();
-    public static JCFUserService jcfUserService = new JCFUserService();
-    public static JCFMessageService jcfMessageService = new JCFMessageService();
 
-    public static FileChannelService fileChannelService = new FileChannelService();
-
-
-    //saveDirectory
-    public static Path directory = Paths.get(
-            System.getProperty("save.dir", "save"), "data");
 
     public static void main(String[] args) {
 
-        fileChannelService.init(directory);
-        Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
-        System.out.println(channel1.getChannelName());
+        JCFChannelService jcfChannelService = new JCFChannelService();
+        JCFUserService jcfUserService = new JCFUserService();
+        JCFMessageService jcfMessageService = new JCFMessageService();
 
+        FileChannelService fileChannelService = new FileChannelService();
+        FileUserService fileUserService= new FileUserService();
+        FileMessageService fileMessageService = new FileMessageService();
+
+
+        Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
+        Channel channel3 = fileChannelService.createChannel("ch_fileIO_3");
+        Channel channel2=  fileChannelService.readChannel(channel1.getChannelId());
+
+        User user1 = fileUserService.createUser("user1");
+
+        Message message1 = fileMessageService.createMessage(user1.getUserId(), channel1.getChannelId(),"message1");
+
+        System.out.println(channel1.getChannelId());
+        System.out.println(channel2.getChannelId());
+
+        System.out.println(channel2.getChannelName());
 
 
 
@@ -39,10 +49,19 @@ public class JavaApplication {
 //
 //        //채널 생성
 //        Channel channel1 = jcfChannelService.createChannel("ch1");
-//        Channel channel2 = jcfChannelService.createChannel("ch2");
+//        //Channel channel2 = jcfChannelService.createChannel("");
 //
+//        //null/공백 방어 테스트
+//        try {
+//            // 예시로 잘못된 채널명으로 생성
+//            Channel channel = jcfChannelService.createChannel("");  // 빈 문자열을 넣어 예외 발생
+//        } catch (IllegalArgumentException e) {
+//            System.out.println("채널 생성 실패: " + e.getMessage());
+//        } catch (RuntimeException e) {
+//            System.out.println("오류 발생: " + e.getMessage());
+//        }
 //        //채널 명 변경
-//        jcfChannelService.modifyChannel(channel1.getChId(), "ch12");
+//        jcfChannelService.modifyChannel(channel1.getChannelId(), "ch12");
 //
 //        //모두 읽기
 //        List<Channel> channelList = jcfChannelService.readAllChannel();
@@ -50,9 +69,9 @@ public class JavaApplication {
 //        for (Channel ch : channelList) {
 //            System.out.println(" " + ch.getChannelName());
 //        }
-//
-//        //채널 삭제
-//        jcfChannelService.deleteChannel(channel2.getChId());
+////
+////        //채널 삭제
+////        jcfChannelService.deleteChannel(channel2.getChannelId());
 //        //모두 읽기
 //        System.out.println("모든 채널을 출력합니다.");
 //        for (Channel ch : channelList) {
@@ -95,12 +114,10 @@ public class JavaApplication {
 //        /////////메시지 테스트
 //
 //        System.out.println("\n------------\n*메시지 도메인 test");
-//        Message message1 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChId(),  "안녕하세요");
-//        Message message2 = jcfMessageService.createMessage(user2.getUserId(), channel1.getChId(), "야옹야옹");
-//        Message message3 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChId(), "반가워요~");
-//        Message message4 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChId(), "잘지내요~");
-//
-//
+//        Message message1 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "안녕하세요");
+//        Message message2 = jcfMessageService.createMessage(user2.getUserId(), channel1.getChannelId(), "야옹야옹");
+//        Message message3 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "반가워요~");
+//        Message message4 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "잘지내요~");
 //
 //
 //        //메시지 조회
@@ -122,28 +139,9 @@ public class JavaApplication {
 //        for (Message msg : jcfMessageService.readAllMessage()) {
 //            System.out.println(" " + msg.getUserID() + ": " + msg.getContent());
 //        }
-//
-//
-//        ////////////////////////////서비스 간 상호작용
-//
-//
-//
-//        System.out.println("\n\n");
-//        //심화?
-//        //채널의 유저들의 메시지를 시간순으로 출력하기.
-//        for (Channel ch : jcfChannelService.readAllChannel()) {
-//            System.out.println("++채널: " + ch.getChannelName() + "의 모든 채팅 출력 ");
-//
-//            // 해당 채널에 속한 유저들 가져오기
-//            List<User> channelUsers = jcfUserService.readAllUser(); // 채널에 속한 유저 목록을 가져온다고 가정
-//
-//            for (User user : channelUsers) {
-//                System.out.print(user.getUserName() + ", ");
-//            }
-//            System.out.println("님이 접속중입니다.");
-//
-//        }
+
 
 
     }
+        
 }
