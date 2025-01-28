@@ -52,7 +52,7 @@ public abstract class AbstractUUIDEntity implements Serializable {
         this.updateAt = createUnixTimestamp();
     }
 
-    public void updateStatusAndUpdateAt() {
+    public void updateModified() {
         updateStatus(MODIFIED);
     }
 
@@ -60,7 +60,7 @@ public abstract class AbstractUUIDEntity implements Serializable {
         updateStatus(UNREGISTERED);
     }
 
-    public boolean isNotUnregistered() {
+    public boolean isRegistered() {
         return status != UNREGISTERED;
     }
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.ErrorCode;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.message.DirectMessage;
 import com.sprint.mission.discodeit.entity.message.dto.DirectMessageInfoResponse;
@@ -57,9 +57,9 @@ public class BasicDirectMessageService implements DirectMessageService {
 
     private User findUserByIdOrThrow(UUID userId) {
         var foundUser = userRepository.findById(userId)
-                .filter(User::isNotUnregistered)
-                .orElseThrow(() -> UserException.ofErrorMessageAndId(
-                        ErrorMessage.USER_NOT_FOUND, userId.toString()
+                .filter(User::isRegistered)
+                .orElseThrow(() -> UserException.ofNotJoinChannel(
+                        ErrorCode.USER_NOT_FOUND, userId.toString()
                 ));
 
         return foundUser;

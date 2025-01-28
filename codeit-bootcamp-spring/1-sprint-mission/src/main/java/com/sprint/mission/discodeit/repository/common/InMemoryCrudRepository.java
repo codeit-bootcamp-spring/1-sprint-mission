@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.common;
 
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -32,12 +33,8 @@ public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID ex
         if (store.isEmpty()) {
             return Collections.emptyList();
         }
-        
-        var existEntities = store.values()
-                .stream()
-                .toList();
 
-        return Collections.unmodifiableList(existEntities);
+        return List.copyOf(store.values());
     }
 
     @Override

@@ -1,10 +1,13 @@
-package com.sprint.mission.discodeit.common.valid;
+package com.sprint.mission.discodeit.common.validation;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
+import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class ValidationUtils {
     
@@ -14,12 +17,9 @@ public class ValidationUtils {
 
     public static <T> void validate(T object) {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
-        if (!violations.isEmpty()) {
-            StringBuilder errorMessage = new StringBuilder();
-            for (ConstraintViolation<T> violation : violations) {
-                errorMessage.append(violation.getMessage()).append("\n");
-            }
-            throw new IllegalArgumentException(errorMessage.toString());
-        }
+        String errorMessage = violations.stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining("\n"));
+        throw new ValidationException(String.valueOf(errorMessage));
     }
 }

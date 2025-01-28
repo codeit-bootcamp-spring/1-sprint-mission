@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
-import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
+import static com.sprint.mission.discodeit.common.error.ErrorCode.USER_NOT_PARTICIPATED_CHANNEL;
 import static com.sprint.mission.discodeit.entity.common.Status.MODIFIED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
@@ -69,7 +69,7 @@ class ParticipatedChannelTest {
             var channelId = createdChannel1.getId();
 
             // when
-            var findByIdParticipatedChannel = channels.findByChannelIdNotUnregisteredOrThrow(channelId);
+            var findByIdParticipatedChannel = channels.getUnregisteredChannelById(channelId);
 
             // then
             assertAll(
@@ -114,12 +114,12 @@ class ParticipatedChannelTest {
 
             // when
             var throwable = catchThrowable(() ->
-                    channels.findByChannelIdNotUnregisteredOrThrow(notExistedChannelId)
+                    channels.getUnregisteredChannelById(notExistedChannelId)
             );
 
             // then
             assertThat(throwable).isInstanceOf(ChannelException.class)
-                    .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getMessage());
+                    .hasMessageContaining(USER_NOT_PARTICIPATED_CHANNEL.getErrorMessage());
         }
 
         @Test

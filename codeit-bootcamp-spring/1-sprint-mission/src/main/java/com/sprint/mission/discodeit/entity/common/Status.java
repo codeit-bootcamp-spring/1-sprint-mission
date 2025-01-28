@@ -7,13 +7,13 @@ public enum Status {
     UNREGISTERED("해지")
     ;
 
-    private final String status;
+    private final String description;
 
     Status(String status) {
-        this.status = status;
+        this.description = status;
     }
 
-    public String getStatus() {
-        return status;
+    public String getDescription() {
+        return description;
     }
 }

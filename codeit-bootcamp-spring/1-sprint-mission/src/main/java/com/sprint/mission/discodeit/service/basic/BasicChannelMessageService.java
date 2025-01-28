@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.ErrorCode;
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
@@ -73,9 +73,9 @@ public class BasicChannelMessageService implements ChannelMessageService {
      */
     private User findUserByIdOrThrow(UUID userId) {
         var foundUser = userRepository.findById(userId)
-                .filter(User::isNotUnregistered)
-                .orElseThrow(() -> UserException.ofErrorMessageAndId(
-                        ErrorMessage.USER_NOT_FOUND, userId.toString()
+                .filter(User::isRegistered)
+                .orElseThrow(() -> UserException.ofNotJoinChannel(
+                        ErrorCode.USER_NOT_FOUND, userId.toString()
                 ));
 
         return foundUser;
@@ -84,8 +84,8 @@ public class BasicChannelMessageService implements ChannelMessageService {
 
     private Channel findChannelByIdOrThrow(UUID channelId) {
         var foundChannel = channelRepository.findById(channelId)
-                .orElseThrow(() -> ChannelException.ofErrorMessageAndNotExistChannelId(
-                        ErrorMessage.CHANNEL_NOT_FOUND,
+                .orElseThrow(() -> ChannelException.ofNotFound(
+                        ErrorCode.CHANNEL_NOT_FOUND,
                         channelId
                 ));
         return foundChannel;

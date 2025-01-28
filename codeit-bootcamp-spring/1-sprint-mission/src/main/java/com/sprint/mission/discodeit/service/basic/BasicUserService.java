@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.common.error.ErrorCode.USER_NOT_FOUND;
 
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.user.dto.ExitChannelRequest;
@@ -39,7 +39,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserInfoResponse findUserByUsernameOrThrow(FindUserRequest findUserRequest) {
         var foundUser = userRepository.findByUsername(findUserRequest.username())
-                .filter(User::isNotUnregistered)
+                .filter(User::isRegistered)
                 .map(converter::toDto)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
 
@@ -75,7 +75,7 @@ public class BasicUserService implements UserService {
 
     private User findByUserIdOrThrow(UUID id) {
         var entity = userRepository.findById(id)
-                .filter(User::isNotUnregistered)
+                .filter(User::isRegistered)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
         return entity;
     }

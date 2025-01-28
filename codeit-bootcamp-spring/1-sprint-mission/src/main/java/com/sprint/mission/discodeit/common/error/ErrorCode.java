@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.common.error;
 
-public enum ErrorMessage {
+public enum ErrorCode {
 
     /**
      * 1000 ~ 1999 User 관련 에러
@@ -9,7 +9,7 @@ public enum ErrorMessage {
 
     USER_NAME_NULL(1_001, "유저의 이름은 반드시 존재해야합니다."),
 
-    NAME_LENGTH_ERROR_MESSAGE(1_002, "유저 이름의 길이 제한을 확인해주세요."),
+    USER_NAME_LENGTH_OUT_OF_RANGE(1_002, "유저 이름의 길이 제한을 확인해주세요."),
 
     USER_NOT_PARTICIPATED_CHANNEL(1_003, "유저가 참여하지 않은 방입니다."),
 
@@ -21,16 +21,20 @@ public enum ErrorMessage {
     ;
 
     private final int errorCode;
-    private final String message;
+    private final String errorMessage;
 
 
-    ErrorMessage(int errorCode, String message) {
+    ErrorCode(int errorCode, String message) {
         this.errorCode = errorCode;
-        this.message = message;
+        this.errorMessage = message;
     }
 
-    public String getMessage() {
-        return message;
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.common.error.user;
 
-import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.ErrorCode;
 
 public class UserException extends RuntimeException {
 
@@ -12,8 +12,8 @@ public class UserException extends RuntimeException {
         super(message, cause);
     }
 
-    public static UserException of(ErrorMessage message) {
-        return new UserException(message.getMessage());
+    public static UserException of(ErrorCode message) {
+        return new UserException(message.getErrorMessage());
     }
 
     public static UserException of(String message, Throwable cause) {
@@ -21,24 +21,12 @@ public class UserException extends RuntimeException {
     }
 
 
-    public static UserException ofErrorMessageAndId(
-            ErrorMessage message, String id
+    public static UserException ofNotJoinChannel(
+            ErrorCode message, String id
     ) {
         var format = String.format(
                 "%s : not participated channel id %s",
-                message.getMessage(), id
-        );
-
-        return new UserException(format);
-    }
-
-
-    public static UserException ofErrorMessageAndChannelName(
-            ErrorMessage message, String channelName
-    ) {
-        var format = String.format(
-                "%s : not participated channel name %s",
-                message.getMessage(), channelName
+                message.getErrorMessage(), id
         );
 
         return new UserException(format);

@@ -66,7 +66,7 @@ class ChannelTest {
             // given
 
             // when
-            var validResult = channel.isStatusNotUnregisteredAndEqualsTo(CHANNEL_NAME);
+            var validResult = channel.isRegisteredAndNameEqual(CHANNEL_NAME);
             // then
             assertThat(validResult).isTrue();
         }
@@ -77,7 +77,7 @@ class ChannelTest {
             // given
             var differentChannelName = "스프린트_백엔드_100기";
             // when
-            var validResult = channel.isStatusNotUnregisteredAndEqualsTo(differentChannelName);
+            var validResult = channel.isRegisteredAndNameEqual(differentChannelName);
             // then
             assertThat(validResult).isFalse();
         }
@@ -88,7 +88,7 @@ class ChannelTest {
             // given
             var findChannelNameRequest = CHANNEL_NAME;
             // when
-            var isEquals = channel.isStatusNotUnregisteredAndEqualsTo(findChannelNameRequest);
+            var isEquals = channel.isRegisteredAndNameEqual(findChannelNameRequest);
             // then
             assertThat(isEquals).isTrue();
         }
@@ -100,7 +100,7 @@ class ChannelTest {
             var findChannelNameRequest = CHANNEL_NAME;
             channel.updateUnregistered();
             // when
-            var isEquals = channel.isStatusNotUnregisteredAndEqualsTo(findChannelNameRequest);
+            var isEquals = channel.isRegisteredAndNameEqual(findChannelNameRequest);
             // then
             assertThat(isEquals).isFalse();
         }

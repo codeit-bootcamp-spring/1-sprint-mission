@@ -29,7 +29,7 @@ public class User extends AbstractUUIDEntity {
         Preconditions.checkNotNull(newName);
         var changedName = this.name.changeName(newName);
         this.name = changedName;
-        updateStatusAndUpdateAt();
+        updateModified();
     }
 
     /**

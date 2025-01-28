@@ -10,8 +10,8 @@ public class ChannelConverter {
         var channelResponse = new Builder()
                 .channelId(channel.getId())
                 .channelName(channel.getChannelName())
-                .creator(channel.getCreator())
-                .status(channel.getStatus().getStatus())
+                .creator(channel.getCreatorName())
+                .status(channel.getStatus().getDescription())
                 .build();
 
         return channelResponse;
