@@ -9,7 +9,7 @@ import java.util.UUID;
 public class JCFMessageService implements MessageService {
     JCFUserService userService = JCFUserService.getInstance();
     JCFChannelRepository JCFChannelRepositoryInstance = JCFChannelRepository.getInstance();
-
+    JCFChannelRepository JCFUserRepositoryInstance = JCFChannelRepository.getInstance();
     private static final HashMap<UUID, Message> MessageMap = new HashMap<UUID, Message>();
 
     //모든 메세지 객체를 담은 해쉬맵 싱글톤 객체 'MessageListsByChannel' 생성. LazyHolder 방식으로 스레드세이프 보장
@@ -31,7 +31,10 @@ public class JCFMessageService implements MessageService {
     //보내는 유저와 보내질 채널명, 보낼 내용 존재여부 검증 후 메세지 객체 생성. 성공하면 uuid, 실패하면 null 반환.
     @Override
     public UUID sendMessage(UUID fromUserId, UUID channelId, String content) {
-        Message newMessage = new Message(userService.getUser(fromUserId), JCFChannelRepositoryInstance.getChannel(channelId), content);
+        if(JCFUserRepositoryInstance.isExistUser(fromUserId) == false || channelId == null || JCFChannelRepositoryInstance.isChannelExist(channelId) == false || content == null){
+            return null;
+        }
+        Message newMessage = new Message(JCFUserRepositoryInstance.getUser(fromUserId), JCFChannelRepositoryInstance.getChannel(channelId), content);
         MessageMap.put(newMessage.getId(), newMessage);
         return newMessage.getId();
     }

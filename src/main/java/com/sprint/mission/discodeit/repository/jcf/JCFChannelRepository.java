@@ -21,7 +21,7 @@ public class JCFChannelRepository implements ChannelRepository {
 
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static JCFChannelRepository getInstance() {
-        return JCFChannelRepository.JCFChannelRepositoryHolder.INSTANCE;
+        return JCFChannelRepositoryHolder.INSTANCE;
     }
 
     // I/O로 생성된 모든 채널 객체가 담기는 해쉬맵 반환
@@ -59,6 +59,14 @@ public class JCFChannelRepository implements ChannelRepository {
         return true;
     }
 
+    // 채널 존재여부 반환
+    @Override
+    public boolean isChannelExist(UUID channelId) {
+        if (channelId == null || channelsMap.containsKey(channelId) == false) {
+            return false;
+        }
+        return true;
+    }
 
 
 

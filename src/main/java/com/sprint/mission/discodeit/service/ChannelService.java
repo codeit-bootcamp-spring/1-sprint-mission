@@ -20,6 +20,8 @@ public interface ChannelService {
 
     boolean addChannelMember(UUID channelID, UUID memberID);
 
+    boolean isChannelExist(UUID channelId);
+
     //채널에 속한 멤버 관리하는 메서드 추가
 }
 

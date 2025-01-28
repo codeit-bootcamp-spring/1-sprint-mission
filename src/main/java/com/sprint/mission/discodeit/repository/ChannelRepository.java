@@ -9,5 +9,6 @@ public interface ChannelRepository {
     public HashMap<UUID, Channel> getChannelsMap();
     public boolean deleteChannel(UUID channelId);
     public boolean addChannel(Channel channel);
+    public boolean isChannelExist(UUID channelId);
     //업데이트 메소드의 필요성을 느끼지 못하여 우선은 C, R, D만 구현
 }

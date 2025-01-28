@@ -33,7 +33,7 @@ public class FileChannelRepository implements ChannelRepository {
     // 특정 채널객체 여부에 따라 객체 혹은 null 반환.
     @Override
     public Channel getChannel(UUID channelId) {
-        if (channelsMap.containsKey(channelId)==false) {
+        if (channelId==null || channelsMap.containsKey(channelId)==false) {
             return null;
         }
         return channelsMap.get(channelId);
@@ -41,11 +41,11 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 특정 채널객체 여부 확인 후 삭제. 불값 반환
     @Override
-    public boolean deleteChannel(UUID Id) {
-        if (channelsMap.containsKey(Id) == false) {
+    public boolean deleteChannel(UUID channelId) {
+        if (channelId==null || channelsMap.containsKey(channelId) == false) {
             return false;
         }
-        channelsMap.remove(Id);
+        channelsMap.remove(channelId);
         return true;
     }
 
@@ -56,6 +56,15 @@ public class FileChannelRepository implements ChannelRepository {
             return false;
         }
         channelsMap.put(channel.getId(), channel);
+        return true;
+    }
+
+    //채널 존재여부 반환
+    @Override
+    public boolean isChannelExist(UUID channelId) {
+        if (channelId==null || channelsMap.containsKey(channelId) == false) {
+            return false;
+        }
         return true;
     }
 

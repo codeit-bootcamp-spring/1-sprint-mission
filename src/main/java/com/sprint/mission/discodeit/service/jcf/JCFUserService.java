@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 public class JCFUserService implements UserService{
+    JCFUserRepository JCFUserRepositoryInstance = JCFUserRepository.getInstance();
+
     private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
 
     //생성자 접근 불가능하도록 함.
@@ -38,20 +41,15 @@ public class JCFUserService implements UserService{
         return newUser.getId();
     }
 
-    //usersMap에 해당 id 존재여부 리턴
+    //유저 존재여부 확인
     @Override
     public boolean isUserExist(UUID userId) {
-        return getUsersMap().containsKey(userId);
+        if (userId == null){
+            return false;
+        }
+        return JCFUserRepositoryInstance.isUserExist(userId);
     }
 
-    //UUID를 통해 유저 객체를 찾아 유저주소 리턴. 없으면 null 리턴.
-    @Override
-    public User getUser(UUID userId) {
-        if (userId == null){
-            return null;
-        }
-        return getUsersMap().get(userId);
-    }
 
     //UUID를 통해 유저 객체를 찾아 삭제. 성공여부 리턴
     @Override
@@ -59,7 +57,7 @@ public class JCFUserService implements UserService{
         if (userId == null){
             return false;
         }
-        getUsersMap().remove(userId);
+        JCFUserRepositoryInstance.deleteUser(userId);
         return true;
     }
 
@@ -69,7 +67,7 @@ public class JCFUserService implements UserService{
         if (userId == null||newName == null){
             return false;
         }
-        getUser(userId).setUserName(newName);
+        JCFUserRepositoryInstance.getUser(userId).setUserName(newName);
         return true;
 
     }
