@@ -14,16 +14,17 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 
 import java.time.Instant;
-import java.util.Optional;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        // JCF 기반 테스트
         System.out.println("== JCF 기반 테스트 ==");
         long startTime = System.nanoTime();
         testService(new JCFUserRepository(), new JCFChannelRepository(), new JCFMessageRepository());
         long endTime = System.nanoTime();
         System.out.printf("JCF 실행 시간: %.3f ms%n", (endTime - startTime) / 1_000_000.0);
 
+        // File IO 기반 테스트
         System.out.println("\n== File IO 기반 테스트 ==");
         startTime = System.nanoTime();
         testService(new FileUserRepository(), new FileChannelRepository(), new FileMessageRepository());
@@ -35,7 +36,6 @@ public class JavaApplication {
             UserRepository userRepository,
             ChannelRepository channelRepository,
             MessageRepository messageRepository) {
-
         System.out.println("\n[사용자 등록]");
         User user1 = new User("Amy", "amy@example.com");
         User user2 = new User("Chris", "chris@example.com");
@@ -65,40 +65,14 @@ public class JavaApplication {
         channelRepository.save(channel1);
         System.out.printf("채널 등록 완료: %s (설명: %s)%n", channel1.getName(), channel1.getDescription());
 
-        System.out.println("\n[채널 수정]");
-        channel1.updateDescription("업데이트된 Second 채널 설명");
-        channelRepository.update(channel1.getId(), channel1);
-        System.out.printf("수정된 채널: %s (설명: %s)%n", channel1.getName(), channel1.getDescription());
-
-        System.out.println("\n[채널 삭제]");
-        channelRepository.delete(channel1.getId());
-        System.out.println(channelRepository.findById(channel1.getId()).isPresent() ?
-                "채널 삭제 실패!" : "채널 삭제 성공!");
-
         System.out.println("\n[메시지 등록]");
         Message message1 = new Message("안녕하세요!", user2.getId(), channel1.getId());
         messageRepository.save(message1);
-        System.out.printf("메시지 등록 완료: %s (보낸이: %s)%n",
-                message1.getContent(), user2.getUsername());
-
-        System.out.println("\n[메시지 수정]");
-        message1.updateContent("안녕하세요! (수정됨)");
-        messageRepository.update(message1.getId(), message1);
-        System.out.printf("수정된 메시지: %s%n", messageRepository.findById(message1.getId()).get().getContent());
+        System.out.printf("메시지 등록 완료: %s (보낸이: %s)%n", message1.getContent(), user2.getUsername());
 
         System.out.println("\n[메시지 삭제]");
         messageRepository.delete(message1.getId());
         System.out.println(messageRepository.findById(message1.getId()).isPresent() ?
                 "메시지 삭제 실패!" : "메시지 삭제 성공!");
-
-        System.out.println("\n[데이터 전체 조회]");
-        System.out.println("사용자 목록:");
-        userRepository.findAll().forEach(System.out::println);
-
-        System.out.println("채널 목록:");
-        channelRepository.findAll().forEach(System.out::println);
-
-        System.out.println("메시지 목록:");
-        messageRepository.findAll().forEach(System.out::println);
     }
 }
