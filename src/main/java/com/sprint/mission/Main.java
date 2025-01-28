@@ -3,22 +3,33 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCFChannel;
-import com.sprint.mission.discodeit.service.jcf.JCFMessage;
-import com.sprint.mission.discodeit.service.jcf.JCFUser;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public class Main {
-    static JCFUser userService = new JCFUser();
-    static JCFChannel channelService = new JCFChannel();
-    static JCFMessage messageService = new JCFMessage(channelService);
+//    static UserService userService = new JCFUserService();
+//    static ChannelService channelService = new JCFChannelService();
+//    static MessageService messageService = new JCFMessageService(channelService);
+
+    private static final String FILE_USER_PATH = "data/users.dat";
+    private static final String FILE_CHANNEL_PATH = "data/channels.dat";
+    private static final String FILE_MESSAGE_PATH = "data/messages.dat";
+    static UserService userService = new FileUserService(FILE_USER_PATH);
+    static ChannelService channelService = new FileChannelService(FILE_CHANNEL_PATH);
+    static MessageService messageService = new FileMessageService(FILE_MESSAGE_PATH, channelService);
 
     public static void main(String[] args) {
         userServiceTest();
-
         messageServiceTest();
-
         channelServiceTest();
     }
 
@@ -62,13 +73,13 @@ public class Main {
         Channel channel2 = channelService.createChannel("EBS");
 
         // 메시지 생성
-        Message message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello");
-        Message message2 = messageService.createMessage(user2.getId(), channel2.getId(), "World");
-        log("메시지 등록1", message1.getText());
-        log("메시지 등록2", message2.getText());
+        Optional<Message> message1 = messageService.createMessage(user1.getId(), channel1.getId(), "Hello");
+        Optional<Message> message2 = messageService.createMessage(user2.getId(), channel2.getId(), "World");
+        log("메시지 등록1", message1.orElseThrow().getText());
+        log("메시지 등록2", message2.orElseThrow().getText());
 
         // 메시지 단건 조회
-        testOptional("메시지 조회 단건", messageService.getMessage(message1.getId()),
+        testOptional("메시지 조회 단건", messageService.getMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 다건 조회
@@ -76,13 +87,13 @@ public class Main {
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 수정
-        messageService.updateMessage(message1.getId(), "Hello Updated");
+        messageService.updateMessage(message1.orElseThrow().getId(), "Hello Updated");
         log("메시지 수정", "완료");
-        testOptional("메시지 수정 성공", messageService.getMessage(message1.getId()),
+        testOptional("메시지 수정 성공", messageService.getMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 메시지 삭제
-        testOptional("메시지 삭제 성공", messageService.deleteMessage(message1.getId()),
+        testOptional("메시지 삭제 성공", messageService.deleteMessage(message1.orElseThrow().getId()),
                 m -> log("메시지 내용", m.getText()));
 
         // 삭제 여부 확인

@@ -1,9 +1,17 @@
 package com.sprint.mission.discodeit.collection;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import java.util.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-public class Channels {
+public class Channels implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final Map<UUID, Channel> channels = new HashMap<>();
 
     // 채널 추가

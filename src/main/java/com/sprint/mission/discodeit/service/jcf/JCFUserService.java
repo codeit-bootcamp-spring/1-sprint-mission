@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class JCFUser implements UserService {
+public class JCFUserService implements UserService {
     private final Users users = new Users();
 
     @Override

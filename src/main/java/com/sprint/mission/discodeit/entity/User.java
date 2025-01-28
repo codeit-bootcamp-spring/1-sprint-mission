@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
-
     private String username;
 
     public User(String username) {
@@ -16,6 +19,11 @@ public class User {
         this.username = username;
         this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         this.updatedAt = createdAt;
+    }
+
+    public void updateUsername(String username) {
+        this.username = username;
+        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
     }
 
     public UUID getId() {
@@ -32,11 +40,5 @@ public class User {
 
     public String getUsername() {
         return username;
-    }
-
-
-    public void updateUsername(String username) {
-        this.username = username;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
     }
 }
