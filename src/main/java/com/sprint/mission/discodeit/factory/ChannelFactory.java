@@ -8,15 +8,6 @@ import com.sprint.mission.discodeit.service.UserService;
 
 public class ChannelFactory {
 
-//    private final UserService userService;
-//    private final MessageServiceV2 messageServiceV2;
-//
-//    public ChannelFactory(UserService userService, MessageServiceV2 messageServiceV2) {
-//        this.userService = userService;
-//        this.messageServiceV2 = messageServiceV2;
-//    }
-
-
   public ChatChannel createChatChannel(
       String serverUUID,
       String categoryUUID,
@@ -24,10 +15,9 @@ public class ChannelFactory {
       int maxNumberOfPeople
   ) throws ChannelValidationException {
 
-    return new ChatChannel.ChatChannelBuilder()
+    return new ChatChannel.ChatChannelBuilder(channelName)
         .serverUUID(serverUUID)
         .categoryUUID(categoryUUID)
-        .channelName(channelName)
         .maxNumberOfPeople(maxNumberOfPeople)
         .isPrivate(true).build();
 
@@ -38,10 +28,9 @@ public class ChannelFactory {
       String categoryUUID,
       String channelName,
       boolean isPrivate) throws ChannelValidationException {
-    return new VoiceChannel.VoiceChannelBuilder()
+    return new VoiceChannel.VoiceChannelBuilder(channelName)
         .serverUUID(serverUUID)
         .categoryUUID(categoryUUID)
-        .channelName(channelName)
         .isPrivate(isPrivate)
         .build();
   }

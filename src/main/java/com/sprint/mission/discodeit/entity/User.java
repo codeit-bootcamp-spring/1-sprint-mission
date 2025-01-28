@@ -6,9 +6,14 @@ import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private String UUID;
   private String username;
   private String password;
@@ -45,18 +50,10 @@ public class User {
     public UserBuilder(String username, String password, String email) throws UserValidationException {
       this.username = username;
       this.password = password;
-      if (!email.matches(UserConstant.EMAIL_REGEX)) {
-        throw new UserValidationException(UserConstant.ERROR_INVALID_EMAIL);
-      }
       this.email = email;
     }
 
     public UserBuilder nickname(String nickname) throws UserValidationException {
-
-      if (nickname.length() <= UserConstant.USERNAME_MIN_LENGTH
-          || nickname.length() > UserConstant.USERNAME_MAX_LENGTH) {
-        throw new UserValidationException(UserConstant.ERROR_USERNAME_LENGTH);
-      }
 
       this.nickname = nickname;
       return this;
@@ -85,17 +82,24 @@ public class User {
 
   @Override
   public String toString() {
-    return "User{" +
-        "UUID='" + UUID + '\'' +
+    return
         ", username='" + username + '\'' +
-        ", password='" + password + '\'' +
         ", email='" + email + '\'' +
         ", nickname='" + nickname + '\'' +
         ", phoneNumber='" + phoneNumber + '\'' +
-        ", profilePictureURL='" + profilePictureURL + '\'' +
-        ", description='" + description + '\'' +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    User user = (User) o;
+    return Objects.equals(UUID, user.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

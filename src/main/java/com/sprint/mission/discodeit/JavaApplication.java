@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.config.ApplicationConfig;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.UserUpdateDto;
@@ -8,25 +9,66 @@ import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.factory.ChannelFactory;
+import com.sprint.mission.discodeit.factory.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageServiceV2;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.util.ServiceType;
+import com.sprint.mission.discodeit.util.StorageType;
+import lombok.extern.slf4j.Slf4j;
 
+
+import java.io.File;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static com.sprint.mission.discodeit.constant.FileConstant.*;
+
+@Slf4j
 public class JavaApplication {
-  static ChannelService channelService = JCFChannelService.getInstance();
-  static UserService userService = JCFUserService.getInstance();
-  static MessageServiceV2 messageServiceV2 = JCFMessageServiceV2.getInstance(userService);
+
+  static ChannelService channelService;
+  static UserService userService;
+  static MessageServiceV2<ChatChannel> messageServiceV2;
   static ChannelFactory channelFactory;
 
+
+  private static void setup() {
+    File file = new File(MESSAGE_FILE);
+    File file2 = new File(USER_FILE);
+    File file3 = new File(CHANNEL_FILE);
+
+    if (file.exists()) {
+      file.delete();
+    }
+    if (file2.exists()) {
+      file2.delete();
+    }
+    if (file3.exists()) {
+      file3.delete();
+    }
+  }
+
   public static void main(String[] args) {
+
+    ApplicationConfig ac = new ApplicationConfig.ApplicationConfigBuilder()
+        .channelServiceType(ServiceType.BASIC)
+        .channelStorageType(StorageType.JCF)
+        .userServiceType(ServiceType.BASIC)
+        .userStorageType(StorageType.JCF)
+        .messageServiceType(ServiceType.BASIC)
+        .messageStorageType(StorageType.JCF)
+        .build();
+
+    channelService = ServiceFactory.createChannelService(ac);
+    userService = ServiceFactory.createUserService(ac);
+    messageServiceV2 = ServiceFactory.createMessageService(ac, userService, channelService);
+
     channelFactory = new ChannelFactory();
+
+    setup();
+
     userSimulation();
     channelSimulation2();
     messageSimulation2();
@@ -39,7 +81,7 @@ public class JavaApplication {
 
     System.out.println("=== 유저 생성 및 조회 ===");
     try {
-      user = new User.UserBuilder("exampleUserName", "examplePwd", "example@gmail.com")
+      user = new User.UserBuilder("user1", "examplePwd", "example@gmail.com")
           .nickname("exampleNickname")
           .phoneNumber("01012345678")
           .profilePictureURL("https://example-url.com")
@@ -50,7 +92,7 @@ public class JavaApplication {
     }
 
     try {
-      user2 = new User.UserBuilder("exampleU2", "examplePwd2", "example2@gmail.com")
+      user2 = new User.UserBuilder("user2", "examplePwd2", "example2@gmail.com")
           .nickname("exampleNick2")
           .phoneNumber("01013345678")
           .description("this is example description2")
@@ -58,6 +100,7 @@ public class JavaApplication {
     } catch (UserValidationException e) {
       System.out.println(e.getMessage());
     }
+
     userService.createUser(user);
     userService.createUser(user2);
 
@@ -71,6 +114,7 @@ public class JavaApplication {
     List<User> users = userService.readAllUsers();
 
     System.out.println("\n=== 여러 유저 조회 ===");
+
     for (User u : users) {
       System.out.println(u);
     }
@@ -89,9 +133,13 @@ public class JavaApplication {
 
     userService.updateUser(userId, updateDto, "examplePwd");
 
-    // 업데이트 유저 출력, 동등성
+    // 업데이트 유저 출력
+
     User updatedUser = userService.readUserById(userId).get();
+
+    System.out.println("USERs : " + userService.readAllUsers().size());
     System.out.println(fetchedUser);
+
     System.out.println(fetchedUser == updatedUser);
 
     System.out.println("\n=== 유저 데이터 조작 비밀번호 오류 ===");
@@ -116,7 +164,7 @@ public class JavaApplication {
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
-
+    System.out.println("USERs : " + userService.readAllUsers().size());
     System.out.println(userService.readUserById(userId).isEmpty());
   }
 
@@ -269,7 +317,7 @@ public class JavaApplication {
     try {
       messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
           user.getUUID(),
-          chatChannel.getUUID(),
+          chatChannel2.getUUID(),
           "this is second channel first Chat"
       ).build(), chatChannel2);
     } catch (MessageValidationException e) {
@@ -305,7 +353,7 @@ public class JavaApplication {
           "false"
       ).build();
       messageServiceV2.createMessage(falseUserUUID, falseUserMessage, chatChannel);
-    } catch (IllegalArgumentException | MessageValidationException e) {
+    } catch (MessageValidationException e) {
       System.out.println(e.getMessage());
     }
   }

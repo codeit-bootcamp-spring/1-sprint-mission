@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
-public abstract class BaseChannel {
+public abstract class BaseChannel implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private final String UUID;
   private final String ServerUUID;
   private final String CategoryUUID;
@@ -19,9 +24,6 @@ public abstract class BaseChannel {
   private Boolean isPrivate;
 
   BaseChannel(BaseChannelBuilder<?> builder) {
-    if (builder.serverUUID == null || builder.categoryUUID == null || builder.channelName == null) {
-      throw new IllegalArgumentException("Required fields cannot be null");
-    }
     this.UUID = java.util.UUID.randomUUID().toString();
     this.ServerUUID = builder.serverUUID;
     this.CategoryUUID = builder.categoryUUID;
@@ -41,6 +43,13 @@ public abstract class BaseChannel {
     private String tag = "default";
     private Boolean isPrivate = false;
 
+    public BaseChannelBuilder(String channelName) {
+      if (channelName == null || channelName.isEmpty()) {
+        throw new ChannelValidationException();
+      }
+      this.channelName = channelName;
+    }
+
     public T serverUUID(String serverUUID) {
       this.serverUUID = serverUUID;
       return self();
@@ -48,11 +57,6 @@ public abstract class BaseChannel {
 
     public T categoryUUID(String categoryUUID) {
       this.categoryUUID = categoryUUID;
-      return self();
-    }
-
-    public T channelName(String channelName) {
-      this.channelName = channelName;
       return self();
     }
 
@@ -96,5 +100,18 @@ public abstract class BaseChannel {
         ", updatedAt=" + updatedAt +
         ", isPrivate=" + isPrivate +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BaseChannel that = (BaseChannel) o;
+    return Objects.equals(UUID, that.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

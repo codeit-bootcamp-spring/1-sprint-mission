@@ -5,11 +5,28 @@ import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
-public class Message {
+public class Message implements Serializable {
+  private static final long serialVersionUID = 1L;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Message message = (Message) o;
+    return Objects.equals(UUID, message.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
+  }
+
   private String UUID;
   private String userUUID;
   private String channelUUID;
