@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter @Setter
-public class Message extends BaseEntity{
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String content;
     private User sender;
     private User recipient;

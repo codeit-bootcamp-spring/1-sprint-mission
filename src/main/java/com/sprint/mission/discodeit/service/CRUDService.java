@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface CRUDService<T> {
     T create(T entity);
-    T read(UUID id);
+    T readOne(UUID id);
     List<T> readAll();
     T update(UUID id, T entity);
     boolean delete(UUID id);
