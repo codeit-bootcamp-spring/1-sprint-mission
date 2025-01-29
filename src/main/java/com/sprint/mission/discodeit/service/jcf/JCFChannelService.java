@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
@@ -11,6 +12,12 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void createChannel(Channel channel) {
         data.put(channel.getId(), channel);
+    }
+
+    @Override
+    public Channel createChannel(ChannelType type, String channelName, String description) {
+        Channel channel = new Channel(UUID.randomUUID(), System.currentTimeMillis(), System.currentTimeMillis(), channelName, description);// Repository에 저장
+        return channel;
     }
 
     @Override

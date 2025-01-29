@@ -7,12 +7,14 @@ public class Channel{
     private final Long createdAt;
     private Long updatedAt;
     private String channelName;
+    private String description;
 
-    public Channel(UUID id, Long createdAt, Long updatedAt, String channelName) {
+    public Channel(UUID id, Long createdAt, Long updatedAt, String channelName, String description) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.channelName = channelName;
+        this.description = description;
     }
 
     public UUID getId() {

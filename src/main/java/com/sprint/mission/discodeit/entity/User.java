@@ -7,12 +7,16 @@ public class User {
     private final Long createdAt;
     private Long updatedAt;
     private String userName;
+    private String email;
+    private String password;
 
-    public User(UUID id, Long createdAt, Long updatedAt, String userName) {
+    public User(UUID id, Long createdAt, Long updatedAt, String userName, String email, String password) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.userName = userName;
+        this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {

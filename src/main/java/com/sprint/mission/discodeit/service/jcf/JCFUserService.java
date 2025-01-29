@@ -14,6 +14,15 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public User createUser(String userName, String email, String password) {
+        UUID userId = UUID.randomUUID();
+        long currentTime = System.currentTimeMillis();
+        User user = new User(userId, System.currentTimeMillis(), System.currentTimeMillis(), userName, email, password); // User 객체 생성
+        data.put(userId, user);
+        return user;
+    }
+
+    @Override
     public User getUser(UUID id) {
         return data.get(id);
     }
