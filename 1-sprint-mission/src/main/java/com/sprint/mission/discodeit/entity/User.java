@@ -1,24 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class User {
-    // 공통 필드
+public class User implements Serializable {
     private final UUID id;
     private final long createdAt;
     private long updatedAt;
 
-    // User 전용 필드
     private String username;
     private String email;
 
-    // 생성자
     public User(String username, String email) {
-        this.id = UUID.randomUUID();         // UUID 자동 생성
-        this.createdAt = System.currentTimeMillis(); // 현재 시간 (밀리초)
-        this.updatedAt = this.createdAt;     // 최초 생성 시점으로 초기값 설정
-
-        // 나머지는 파라미터로 초기화
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = this.createdAt;
         this.username = username;
         this.email = email;
     }
@@ -44,14 +40,21 @@ public class User {
         return email;
     }
 
-    // Update 메서드 예시
-    public void updateUsername(String newUsername) {
+    // 업데이트 메서드
+    public void update(String newUsername, String newEmail) {
         this.username = newUsername;
-        this.updatedAt = System.currentTimeMillis(); // 업데이트 시간 갱신
-    }
-
-    public void updateEmail(String newEmail) {
         this.email = newEmail;
         this.updatedAt = System.currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }
