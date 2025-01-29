@@ -15,7 +15,7 @@ public class JCFChannelService implements ChannelService {
         this.data = new ConcurrentHashMap<>(); // data 동시성 관리
     }
 
-    public static JCFChannelService getInstance() {
+    protected static JCFChannelService getInstance() {
         if (instance == null) {
             synchronized (JCFChannelService.class) {
                 if (instance == null) {

@@ -43,3 +43,6 @@ bin/
 
 ### .idea 디렉토리 형상관리 제외 ###
 .idea/
+
+### Serialized 파일 제외 ###
+src/main/java/serialized/

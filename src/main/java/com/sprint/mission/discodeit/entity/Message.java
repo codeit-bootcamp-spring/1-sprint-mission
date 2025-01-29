@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Message extends BaseEntity {
+    @Serial
+    private static final long serialVersionUID = 4L;
     private String content; //메시지 내용
     private final User author; //작성자
     private List<User> mentions; //멘션된 사용자 리스트

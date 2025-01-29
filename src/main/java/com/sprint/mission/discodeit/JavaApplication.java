@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ServiceFactory;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicServiceFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,9 +20,14 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = JCFUserService.getInstance();
-        ChannelService channelService = JCFChannelService.getInstance();
-        MessageService messageService = JCFMessageService.getInstance(userService, channelService);
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+
+        ServiceFactory ServiceFactory = new BasicServiceFactory(userRepository, channelRepository, messageRepository);
+        UserService userService = ServiceFactory.getUserService();
+        ChannelService channelService = ServiceFactory.getChannelService();
+        MessageService messageService = ServiceFactory.getMessageService();
 
         System.out.println("============================================================== 사용자 서비스 테스트 ==============================================================");
         testUserService(userService);
@@ -154,7 +164,7 @@ public class JavaApplication {
 
         System.out.println("새 메시지 전송(등록)");
         Message message = new Message("Hello, world!", author, channel);
-        Message createdMessage = messageService.sendMessage(message, allUsers);
+        Message createdMessage = messageService.sendMessage(message);
         System.out.println("새 메시지 ID: " + createdMessage.getId());
         System.out.println(message);
 
@@ -163,7 +173,7 @@ public class JavaApplication {
         System.out.println("채널에 등록된 메시지 수: " + channelMessages.size());
 
         System.out.println("\n작성자 메시지 조회");
-        List<Message> userMessages = messageService.getUserMessage(author);
+        List<Message> userMessages = messageService.getUserMessages(author);
         System.out.println(author.getName() + "님이 작성한 메시지 수 : " + userMessages.size());
 
         System.out.println("\n메시지 수정");
@@ -196,15 +206,15 @@ public class JavaApplication {
 
 
         System.out.println("유저 A가 유저 B를 멘션하며 메시지 전송");
-        String messageContent = "안녕하세요, @유저B님! 어떻게 지내시나요?";
+        String messageContent = "안녕하세요, @유저B 님! 어떻게 지내시나요?";
         Message messageAtoB = new Message(messageContent, userA, createdChannel);
         System.out.println(messageAtoB);
 
         allUsers = userService.getAllUsers();
 
         // 메시지 전송 및 멘션 알림 처리
-        messageService.sendMessage(messageAtoB, allUsers);
-        System.out.println("\n=== 심화 요구 사항 테스트 : JCFMessageService에 채널, 유저 검증 로직 추가 ===");
+        messageService.sendMessage(messageAtoB);
+        System.out.println("\n=== 심화 요구 사항 테스트 : MessageService에 채널, 유저 검증 로직 추가 ===");
         try {
             User testSender = new User("김진수", "jinsu@gmail.com", UserStatus.ONLINE);
             User testReceiver = new User("강동원", "dongwon@hanmail.net", UserStatus.IDLE);
@@ -225,7 +235,7 @@ public class JavaApplication {
             );
 
 
-            messageService.sendMessage(testMessage, List.of(testReceiver));
+            messageService.sendMessage(testMessage);
 
             System.out.println("\n존재하는 채널의 메시지 조회");
             List<Message> messages = messageService.getChannelMessages(testChannel.getId());

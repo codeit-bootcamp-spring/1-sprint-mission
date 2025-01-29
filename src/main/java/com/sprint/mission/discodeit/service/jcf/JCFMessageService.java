@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private static volatile JCFMessageService instance;
@@ -22,7 +21,7 @@ public class JCFMessageService implements MessageService {
         this.channelService = channelService;
     }
 
-    public static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
+    protected static JCFMessageService getInstance(UserService userService, ChannelService channelService) {
         if (instance == null) {
             synchronized (JCFMessageService.class) {
                 if (instance == null) {
@@ -31,6 +30,11 @@ public class JCFMessageService implements MessageService {
             }
         }
         return instance;
+    }
+
+    @Override
+    public Message sendMessage(Message message) {
+        return sendMessage(message, new ArrayList<>());
     }
 
     @Override
@@ -56,7 +60,7 @@ public class JCFMessageService implements MessageService {
 
 
     @Override
-    public List<Message> getUserMessage(User author) {
+    public List<Message> getUserMessages(User author) {
         validateUser(author.getId());
         return data.values().stream()
                 .filter(message -> message.getAuthor().equals(author))
@@ -101,6 +105,6 @@ public class JCFMessageService implements MessageService {
 
     private void validateUser(UUID userId) {
         userService.getUserDetails(userId)
-                .orElseThrow(() ->  new IllegalArgumentException("채널 id : " + userId + " **존재하지 않는 채널입니다!**"));
+                .orElseThrow(() -> new IllegalArgumentException("채널 id : " + userId + " **존재하지 않는 채널입니다!**"));
     }
 }
