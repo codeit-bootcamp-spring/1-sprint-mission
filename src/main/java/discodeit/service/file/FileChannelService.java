@@ -1,33 +1,31 @@
-package discodeit.service.jcf;
+package discodeit.service.file;
 
 import discodeit.dto.ChannelInfoDto;
 import discodeit.enity.Channel;
 import discodeit.enity.ChannelType;
 import discodeit.enity.User;
-import discodeit.repository.jcf.JCFChannelRepository;
+import discodeit.repository.file.FileChannelRepository;
 import discodeit.service.ChannelService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
+    //싱글톤
+    private static volatile FileChannelService instance;
+    private final FileChannelRepository fileChannelRepository;
+    private FileUserService fileUserService;
+    private FileMessageService fileMessageService;
 
-    private static volatile JCFChannelService instance;
-    private final JCFChannelRepository jcfChannelRepository;
-
-    private JCFUserService jcfUserService;
-    private JCFMessageService jcfMessageService;
-
-    private JCFChannelService() {
-        this.jcfChannelRepository = new JCFChannelRepository();
-
+    public FileChannelService() {
+        this.fileChannelRepository = new FileChannelRepository();
     }
 
-    public static JCFChannelService getInstance() {
+    public static FileChannelService getInstance() {
         if (instance == null) {
-            synchronized (JCFUserService.class) {
+            synchronized (FileChannelService.class) {
                 if (instance == null) {
-                    instance = new JCFChannelService();
+                    instance = new FileChannelService();
                 }
             }
         }
@@ -35,15 +33,14 @@ public class JCFChannelService implements ChannelService {
     }
 
     protected void setService() {
-        this.jcfUserService = jcfUserService.getInstance();
-        this.jcfMessageService = jcfMessageService.getInstance();
+        this.fileUserService = fileUserService.getInstance();
+        this.fileMessageService = fileMessageService.getInstance();
     }
-
 
     @Override
     public UUID createChannel(String name, String description, ChannelType type) {
         Channel channel = new Channel(name, description, type);
-        jcfChannelRepository.save(channel);
+        fileChannelRepository.save(channel);
         System.out.println("채널: " + name + "(" + type + ")" + ", 생성 시간: " + channel.getCreatedAt());
         return channel.getId();
     }
@@ -56,10 +53,10 @@ public class JCFChannelService implements ChannelService {
             // 채널에 참여한 사용자 이름
             List<String> userNames = new ArrayList<>();
             for (UUID userId : channel.getUsers()) {
-                userNames.add((jcfUserService.findById(userId).getName()));
+                userNames.add((fileUserService.findById(userId).getName()));
             }
             // 채널 내 메세지
-            List<String> formattedMessages = jcfMessageService.getMessagesByChannelId(channelId);
+            List<String> formattedMessages = fileMessageService.getMessagesByChannelId(channelId);
 
             return new ChannelInfoDto(channel.getName(), channel.getDescription(),
                     userNames, formattedMessages);
@@ -72,8 +69,8 @@ public class JCFChannelService implements ChannelService {
     // 채널별 이름, 설명, 채널 내 사용자 조회
     @Override
     public List<ChannelInfoDto> getAllChannelsInfo() {
-        Map<UUID, Channel> data = jcfChannelRepository.findAll();
-        if (data.isEmpty()) {
+        Map<UUID, Channel> data = fileChannelRepository.findAll();
+        if (data == null || data.isEmpty()) {
             System.out.println("채널이 없습니다.");
             return null;
         }
@@ -81,10 +78,9 @@ public class JCFChannelService implements ChannelService {
         data.values().stream()
                 .sorted(Comparator.comparing(channel -> channel.getCreatedAt()))
                 .forEach(channel -> {
-                    // 채널에 참여한 사용자 이름
                     List<String> userNames = new ArrayList<>();
                     for (UUID userId : channel.getUsers()) {
-                        userNames.add((jcfUserService.findById(userId).getName()));
+                        userNames.add((fileUserService.findById(userId).getName()));
                     }
                     list.add(new ChannelInfoDto(channel.getName(), channel.getDescription(),
                             userNames, null));  // 메세지는 출력 x
@@ -99,6 +95,8 @@ public class JCFChannelService implements ChannelService {
             Channel channel = findById(channelId);
             String prevName = channel.getName();
             channel.updateName(name);
+            // 수정 후 ser 파일에 저장
+            fileChannelRepository.save(channel);
             System.out.println("채널 '" + prevName + "'이 '" + name + "'으로 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
@@ -110,6 +108,8 @@ public class JCFChannelService implements ChannelService {
         try {
             Channel channel = findById(channelId);
             channel.updateDescription(description);
+            // 수정 후 ser 파일에 저장
+            fileChannelRepository.save(channel);
             System.out.println("채널 설명이 변경되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
@@ -120,8 +120,8 @@ public class JCFChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         try {
             // 채널에 속해있던 메세지도 삭제
-            jcfMessageService.deleteMessagesInChannel(channelId);
-            jcfChannelRepository.delete(channelId);
+            fileMessageService.deleteMessagesInChannel(channelId);
+            fileChannelRepository.delete(channelId);
             System.out.println("채널이 삭제되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 채널입니다. " + e.getMessage());
@@ -132,12 +132,14 @@ public class JCFChannelService implements ChannelService {
     public void addUserIntoChannel(UUID channelId, UUID userId) {
         try {
             Channel channel = findById(channelId);
-            User user = jcfUserService.findById(userId);
+            User user = fileUserService.findById(userId);
 
             if (checkUserInChannel(userId, channelId)) {
                 System.out.println(channel.getName() + "은 채널에 이미 입장한 사용자입니다.");
             } else {
                 channel.getUsers().add(userId);
+                // 채널 객체 수정 후 ser 파일에 반영
+                fileChannelRepository.save(channel);
                 System.out.println(user.getName() + "님이 채널 '"
                         + channel.getName() + "'에 입장합니다.");
             }
@@ -150,12 +152,14 @@ public class JCFChannelService implements ChannelService {
     public void deleteUserInChannel(UUID channelId, UUID userId) {
         try {
             Channel channel = findById(channelId);
-            User user = jcfUserService.findById(userId);
+            User user = fileUserService.findById(userId);
 
             if (!checkUserInChannel(userId, channelId)) {
                 System.out.println(user.getName() + "은 채널에 없는 사용자입니다.");
             } else {
                 channel.getUsers().remove(userId);
+                // 채널 객체 수정 후 ser 파일에 반영
+                fileChannelRepository.save(channel);
                 System.out.println(user.getName() + "님이 채널 '"
                         + channel.getName() + "'에서 퇴장합니다.");
             }
@@ -166,22 +170,25 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteUserInAllChannels(UUID userId) {
-        Map<UUID, Channel> data = jcfChannelRepository.findAll();
+        Map<UUID, Channel> data = fileChannelRepository.findAll();
+        if (data == null || data.size() == 0) return;
         data.values().stream()
                 .forEach(channel -> {
                     channel.getUsers().remove(userId);
+                    // 채널 객체 수정 후 ser 파일에 반영
+                    fileChannelRepository.save(channel);
                 });
     }
 
     @Override
     public Channel findById(UUID channelId) {
-        return jcfChannelRepository.findById(channelId);
+        return fileChannelRepository.findById(channelId);
     }
 
-    // 현재 userId가 소속된 채널 목록을 조회
     @Override
     public List<Channel> getChannelsByUserId(UUID userId) {
-        Map<UUID, Channel> data = jcfChannelRepository.findAll();
+        Map<UUID, Channel> data = fileChannelRepository.findAll();
+        if (data == null || data.size() == 0) return null;
         List<Channel> channels = data.values().stream()
                 .filter(channel -> channel.getUsers().contains(userId))
                 .collect(Collectors.toList());
@@ -198,6 +205,4 @@ public class JCFChannelService implements ChannelService {
             throw e;
         }
     }
-
-
 }

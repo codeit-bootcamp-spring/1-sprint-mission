@@ -1,47 +1,35 @@
-package discodeit.service.jcf;
+package discodeit.service.basic;
 
 import discodeit.enity.Channel;
 import discodeit.enity.Message;
 import discodeit.enity.User;
-import discodeit.repository.jcf.JCFMessageRepository;
+import discodeit.repository.MessageRepository;
+import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
+import discodeit.service.UserService;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
+    private MessageRepository messageRepository;
+    private UserService userService;
+    private ChannelService channelService;
 
-    private static volatile JCFMessageService instance;
-    private final JCFMessageRepository jcfMessageRepository;
-
-    private JCFUserService jcfUserService;
-    private JCFChannelService jcfChannelService;
-
-    private JCFMessageService() {
-        this.jcfMessageRepository = new JCFMessageRepository();
+    public BasicMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
-    public static JCFMessageService getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserService.class) {
-                if (instance == null) {
-                    instance = new JCFMessageService();
-                }
-            }
-        }
-        return instance;
-    }
-
-    protected void setService() {
-        this.jcfUserService = jcfUserService.getInstance();
-        this.jcfChannelService = jcfChannelService.getInstance();
+    public void setService(UserService userService, ChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     @Override
     public UUID createMessage(UUID userId, UUID channelId, String content) {
         try {
-            Channel channel = jcfChannelService.findById(channelId);
-            User user = jcfUserService.findById(userId);
+            Channel channel = channelService.findById(channelId);
+            User user = userService.findById(userId);
 
             if (!channel.getUsers().contains(userId)) {
                 System.out.println("메세지를 보낼 수 없습니다: " +
@@ -50,7 +38,7 @@ public class JCFMessageService implements MessageService {
             }
 
             Message message = new Message(userId, channelId, content);
-            jcfMessageRepository.save(message);
+            messageRepository.save(message);
             System.out.println("메세지 전송 완료: " + message.getContent());
             return message.getId();
         } catch (NoSuchElementException e) {
@@ -59,16 +47,15 @@ public class JCFMessageService implements MessageService {
         }
     }
 
-    // 형식) {채널 이름} > {작성자 이름} : {메세지 내용} {시간,수정 여부}
     @Override
     public String getMessageById(UUID messageId) {
         try {
             Message message = findById(messageId);
-            Channel channel = jcfChannelService.findById(message.getChannelId());
+            Channel channel = channelService.findById(message.getChannelId());
             String formattedMessage = channel.getName() + " > ";
             try {
-                User user = jcfUserService.findById(message.getSenderId());
-                if (jcfChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                User user = userService.findById(message.getSenderId());
+                if (channelService.checkUserInChannel(user.getId(), channel.getId())) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -86,12 +73,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<String> getAllMessages() {
-        Map<UUID, Message> data = jcfMessageRepository.findAll();
+        Map<UUID, Message> data = messageRepository.findAll();
+        if (data == null || data.size() == 0) return null;
         List<String> formattedMessages = new ArrayList<>();
         data.values().stream()
                 .sorted(Comparator.comparing(message -> message.getUpdatedAt()))
                 .forEach(message -> {
-                    Channel channel = jcfChannelService.findById(message.getChannelId());
+                    Channel channel = channelService.findById(message.getChannelId());
                     String formattedMessage = channel.getName() + " > ";
                     // 유저가 채널을 나간 경우 '퇴장한 사용자' 표시, 유저가 삭제된 경우 '알 수 없는 사용자' 표시
                     /*
@@ -101,8 +89,8 @@ public class JCFMessageService implements MessageService {
                         이 경우를 처리하기 위해 catch문에서 "알 수 없는 사용자"로 표시함.
                     */
                     try {
-                        User user = jcfUserService.findById(message.getSenderId());
-                        if (jcfChannelService.checkUserInChannel(user.getId(), channel.getId())) {
+                        User user = userService.findById(message.getSenderId());
+                        if (channelService.checkUserInChannel(user.getId(), channel.getId())) {
                             formattedMessage += user.getName() + ": ";
                         } else {
                             formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -116,6 +104,7 @@ public class JCFMessageService implements MessageService {
         return formattedMessages;
     }
 
+
     @Override
     public void updateMessage(UUID userId, UUID messageId, String newContent) {
         try {
@@ -127,6 +116,7 @@ public class JCFMessageService implements MessageService {
                 return;
             }
             message.updateContent(newContent);
+            messageRepository.save(message);
             System.out.println("메세지가 수정되었습니다.: " + newContent);
         } catch (NoSuchElementException e) {
             System.out.println("메세지 또는 사용자 데이터가 올바르지 않습니다. " + e.getMessage());
@@ -136,7 +126,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID messageId) {
         try {
-            jcfMessageRepository.delete(messageId);
+            messageRepository.delete(messageId);
             System.out.println("메세지가 삭제되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println("존재하지 않는 메세지입니다. " + e.getMessage());
@@ -145,12 +135,13 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message findById(UUID messageId) {
-        return jcfMessageRepository.findById(messageId);
+        return messageRepository.findById(messageId);
     }
 
     @Override
     public List<String> getMessagesByChannelId(UUID channelId) {
-        Map<UUID, Message> data = jcfMessageRepository.findAll();
+        Map<UUID, Message> data = messageRepository.findAll();
+        if (data == null || data.size() == 0) return null;
         // 특정 채널에 속하는 메세지 찾기
         List<Message> messagesInChannel = data.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))    // 각 메세지가 가진 채널 ID로 판별
@@ -161,8 +152,8 @@ public class JCFMessageService implements MessageService {
         for (Message message : messagesInChannel) {
             String formattedMessage = "";
             try {
-                User user = jcfUserService.findById(message.getSenderId());
-                if (jcfChannelService.checkUserInChannel(user.getId(), channelId)) {
+                User user = userService.findById(message.getSenderId());
+                if (channelService.checkUserInChannel(user.getId(), channelId)) {
                     formattedMessage += user.getName() + ": ";
                 } else {
                     formattedMessage += user.getName() + "(퇴장한 사용자): ";
@@ -178,13 +169,14 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void deleteMessagesInChannel(UUID channelId) {
-        Map<UUID, Message> data = jcfMessageRepository.findAll();
+        Map<UUID, Message> data = messageRepository.findAll();
+        if (data == null) return;
         data.values().stream()
                 .forEach(message -> {
                     // 해당 채널에 쓰여진 메세지 객체를 찾고
                     if (message.getChannelId().equals(channelId)) {
                         // 그 객체를 레포지토리에서 삭제
-                        jcfMessageRepository.delete(message.getId());
+                        messageRepository.delete(message.getId());
                     }
                 });
     }

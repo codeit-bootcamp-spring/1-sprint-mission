@@ -6,6 +6,13 @@ plugins {
 group = 'com.sprint.mission'
 version = '1.0-SNAPSHOT'
 
+// java version 명시
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 repositories {
     mavenCentral()
 }
