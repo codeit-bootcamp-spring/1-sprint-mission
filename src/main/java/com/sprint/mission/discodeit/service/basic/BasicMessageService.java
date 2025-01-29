@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
@@ -11,19 +11,20 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class JCFMessageService implements MessageService {
-
+public class BasicMessageService implements MessageService {
     private final Validator validator = new ValidatorImpl();
     private MessageRepository messageRepository;
 
-    public JCFMessageService() {
-        this.messageRepository = new JCFMessageRepository();
+    public BasicMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
     }
 
     @Override
@@ -49,13 +50,15 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public MessageResDTO getMessage(Long id) {
-        Message msg = Objects.requireNonNull(findMessageById(id), "해당 ID의 메시지가 존재하지 않습니다.");
+        Message msg = findMessageById(id);
+        if (msg == null) throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         return new MessageResDTO(id, msg);
     }
 
     @Override
     public MessageResDTO getMessage(String uuid) {
-        Optional<Map.Entry<Long, Message>> msg = Objects.requireNonNull(findMessageByUUID(uuid), "해당 ID의 메시지가 존재하지 않습니다.");
+        Optional<Map.Entry<Long, Message>> msg = findMessageByUUID(uuid);
+        if (msg == null) throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         return new MessageResDTO(msg.get().getKey(), msg.get().getValue());
     }
 
@@ -117,4 +120,5 @@ public class JCFMessageService implements MessageService {
         messageRepository.deleteMessage(deleteMessage.getId());
         return deleteMessage;
     }
+
 }

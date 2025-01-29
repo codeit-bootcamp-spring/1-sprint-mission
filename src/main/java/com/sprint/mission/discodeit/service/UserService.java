@@ -20,8 +20,6 @@ public interface UserService {
 
     public UserResDTO getUser(String userName);
 
-    public User getUserToUserObj(Long id);
-
     public List<UserResDTO> getAllUser();   // TODO: Paging 넣어 말아? <- 시간 상 가능하다면!
 
     public User findUserById(Long id);

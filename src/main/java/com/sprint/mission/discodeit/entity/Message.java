@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.dto.MessageReqDTO;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -13,7 +14,7 @@ import java.util.UUID;
  */
 
 @Getter
-public class Message {
+public class Message implements Serializable {
     private UUID id;
     private User author;    // 작성자
     private String content; // 메시지 내용

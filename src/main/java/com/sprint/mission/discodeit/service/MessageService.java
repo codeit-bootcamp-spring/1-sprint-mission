@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public interface MessageService {
 
@@ -21,12 +23,14 @@ public interface MessageService {
 
     public MessageResDTO getMessage(String uuid);
 
-    public Message getMessageToMsgObj(Long id);
+    public Message findMessageById(Long id);
 
     // 전체 조회
     public List<MessageResDTO> getAllMessage(); // 그냥 모든 메시지
 
     public List<MessageResDTO> getChannelMessage(String channelName);   // 채널의 모든 메시지
+
+    Optional<Map.Entry<Long, Message>> findMessageByUUID(String uuid);
 
     // 메시지 수정
     public boolean updateMessage(Long id, MessageUpdateDTO updateInfo);

@@ -4,12 +4,13 @@ import com.sprint.mission.discodeit.common.Name;
 import com.sprint.mission.discodeit.dto.ChannelReqDTO;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Channel {
+public class Channel implements Serializable {
     /**
      * TODO: 서버별 프로필이 존재하는데 User 객체를 넣어도 될까? UUID를 넣는게 나을까?
      * members, bannedUser도 같음.

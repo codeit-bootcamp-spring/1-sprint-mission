@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
@@ -11,19 +11,20 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JCFMessageService implements MessageService {
+public class FileMessageService implements MessageService {
 
     private final Validator validator = new ValidatorImpl();
     private MessageRepository messageRepository;
 
-    public JCFMessageService() {
-        this.messageRepository = new JCFMessageRepository();
+    public FileMessageService(Path directory) {
+        this.messageRepository = new FileMessageRepository(directory);
     }
 
     @Override
@@ -49,14 +50,18 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public MessageResDTO getMessage(Long id) {
-        Message msg = Objects.requireNonNull(findMessageById(id), "해당 ID의 메시지가 존재하지 않습니다.");
+        Message msg = Objects.requireNonNull(messageRepository.loadMessage(id), "해당 ID의 메시지가 존재하지 않습니다.");
         return new MessageResDTO(id, msg);
     }
 
     @Override
     public MessageResDTO getMessage(String uuid) {
-        Optional<Map.Entry<Long, Message>> msg = Objects.requireNonNull(findMessageByUUID(uuid), "해당 ID의 메시지가 존재하지 않습니다.");
-        return new MessageResDTO(msg.get().getKey(), msg.get().getValue());
+        Map<Long, Message> allMessages = messageRepository.loadAllMessages();
+        return allMessages.entrySet().stream()
+                .filter(entry -> entry.getValue().getId().toString().equals(uuid))
+                .findFirst()
+                .map(entry -> new MessageResDTO(entry.getKey(), entry.getValue()))
+                .orElseThrow(() -> new RuntimeException("해당 ID의 메시지가 존재하지 않습니다."));
     }
 
     @Override
@@ -78,7 +83,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message findMessageById(Long id) {
-        return messageRepository.loadMessage(id);
+        return messageRepository.loadAllMessages().get(id);
     }
 
     @Override

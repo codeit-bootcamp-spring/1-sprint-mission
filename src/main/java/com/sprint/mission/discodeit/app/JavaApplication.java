@@ -3,277 +3,220 @@ package com.sprint.mission.discodeit.app;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 public class JavaApplication {
+
     public static void main(String[] args) {
         // User
-        UserService userService = new JCFUserService();
-        // 1. 등록
-        Long user1 = userService.createUserData(
-                "username1",
-                "nickname1",
-                "email@mail.com",
-                "password!1234",
-                "KR",
-                "010-1111-2222",
-                null
-        );
-        Long user2 = userService.createUserData("username2", "nickname2", "email2@mail.com", "password!5678", "KR", "010-2222-2222", null);
-        Long user3 = userService.createUserData("username3", "nickname3", "email3@mail.com", "password!2345", "KR", "010-3333-2222", "test.png");
-        Long user4 = userService.createUserData("username4", "nickname4", "email4@mail.com", "password!3456", "KR", "010-4444-2222", "GOOd.png");
-        Long user5 = userService.createUserData("username5", "nickname5", "email5@mail.com", "password!0987", "KR", "010-5555-2222", "HAPPY.png");
+        Path userDirectory = Paths.get(System.getProperty("user.dir"), "temp/user");
 
-        System.out.println("------------------------------");
+//        UserService userService = new FileUserService(userDirectory);
+//        UserService userService = new JCFUserService();
+        UserRepository userRepository = new FileUserRepository(userDirectory);
+        UserRepository jcfUserRepository = new JCFUserRepository();
+        UserService userService = new BasicUserService(userRepository);
 
-        // 2.1 조회(단건)
-        UserResDTO findUser = userService.getUser(user1);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                findUser.getId(), findUser.getUuid(), findUser.getUserName(), findUser.getNickname(), findUser.getEmail()));
+        // 사용자 생성
+        Long userId = userService.createUserData("username1", "nickname1", "email@mail.com", "password!1234", "KR", "010-1111-2222", null);
+        System.out.println("User created with ID: " + userId);
+        userId = userService.createUserData("username2", "nickname2", "email2@mail.com", "password!5678", "KR", "010-2222-2222", null);
+        System.out.println("User created with ID: " + userId);
+        userId = userService.createUserData("username3", "nickname3", "email3@mail.com", "password!1234", "KR", "010-2222-3333", "TEST.png");
+        System.out.println("User created with ID: " + userId);
+        userId = userService.createUserData("username4", "nickname4", "email4@mail.com", "password!3456", "KR", "010-4444-2222", "GOOd.png");
+        System.out.println("User created with ID: " + userId);
+        userId = userService.createUserData("username5", "nickname5", "email5@mail.com", "password!0987", "KR", "010-5555-2222", "HAPPY.png");
+        System.out.println("User created with ID: " + userId);
 
-        findUser = userService.getUser("username4");
-        System.out.println(String.format("ID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                findUser.getId(), findUser.getUuid(), findUser.getUserName(), findUser.getNickname(), findUser.getEmail()));
+        // 사용자 조회 (id)
+        UserResDTO user = userService.getUser(userId);
+        System.out.println(user);
 
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
-        // 2.2 조회(다건)
-        List<UserResDTO> userList = userService.getAllUser();
-        // TODO: 이건 이해해보고 넘어갑쉬당
-        IntStream.range(0, userList.size()).forEach(i -> {
-            UserResDTO user = userList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                    i, user.getUuid(), user.getUserName(), user.getNickname(), user.getEmail()));
-        });
+        // 사용자 조회 (닉네임)
+        user = userService.getUser("username2");
+        System.out.println(user);
 
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
-        // 3.1 수정
-        long idx = 2;
-        boolean updateFlag = userService.updateUser(idx,
+
+        // 사용자 정보 갱신
+        boolean updateFlag = userService.updateUser(userId,
                 new UserUpdateDTO(null, "changeNickname", null, null,
                         null, null, "TTT.jpeg", null));
         if (updateFlag) {
             // update가 되었다면
-            UserResDTO user = userList.get((int) idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                    idx, user.getUuid(), user.getUserName(), user.getNickname(), user.getEmail()));
+            user = userService.getUser(userId);
+            System.out.println("[UPDATE]\n" + user);
         } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
+            System.out.println("[UPDATE]\n수정된 내용이 존재하지 않습니다.");
         }
 
-        idx = 3;
-        updateFlag = userService.updateUser(idx,
-                new UserUpdateDTO(null, null, "email3@mail.com", null,
-                        null, null, null, null));
-        if (updateFlag) {
-            // update가 되었다면
-            UserResDTO user = userList.get((int) idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                    idx, user.getUuid(), user.getUserName(), user.getNickname(), user.getEmail()));
-        } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
-        }
+        System.out.println("===========================================");
 
-        System.out.println("------------------------------");
+        // 모든 사용자 조회
+        System.out.println("전체 조회");
+        userService.getAllUser().forEach(System.out::println);
 
-        // 4.1 삭제
-        idx = 4;
-        UserResDTO deletedUser = userService.deleteUser(idx);
-        System.out.println(String.format("[DELETE LOG]\nID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                idx, deletedUser.getUuid(), deletedUser.getUserName(), deletedUser.getNickname(), deletedUser.getEmail()));
+        System.out.println("===========================================");
 
-        System.out.println("-----------[AFTER DELETE]----------");
+        // 사용자 삭제
+        UserResDTO deletedUser = userService.deleteUser(userId);
+        System.out.println("[DELETED]\n" + deletedUser);
 
-        // 4.2 조회를 통해 삭제되었는지 확인
-        List<UserResDTO> deleteUserList = userService.getAllUser();
-        // TODO: 이건 이해해보고 넘어갑쉬당
-        IntStream.range(0, deleteUserList.size()).forEach(i -> {
-            UserResDTO user = deleteUserList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, UserName: %s, Nickname: %s, Email: %s",
-                    i, user.getUuid(), user.getUserName(), user.getNickname(), user.getEmail()));
-        });
+        // 삭제 후 모든 사용자 조회
+        System.out.println("[AFTER DELETED]");
+        userService.getAllUser().forEach(System.out::println);
 
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
         // Channel
-        ChannelService channelService = new JCFChannelService();
+        Path channelDirectory = Paths.get(System.getProperty("user.dir"), "temp/channel");
+//        ChannelService channelService = new FileChannelService(channelDirectory);
+//        ChannelService channelService = new JCFChannelService();
+        ChannelRepository channelRepository = new FileChannelRepository(channelDirectory);
+        ChannelRepository jcfChannelRepository = new JCFChannelRepository();
+        ChannelService channelService = new BasicChannelService(channelRepository);
 
-        // 1. 등록
         Optional<Map.Entry<Long, User>> owner = userService.findUserByUserName("username1");
         Optional<Map.Entry<Long, User>> owner2 = userService.findUserByUserName("username3");
 
-        Long ch1 = channelService.createChannel(owner.get().getValue(), "server1", null, null);
-        Long ch2 = channelService.createChannel(owner.get().getValue(), "server2", null, "ICON.jpg");
-        Long ch3 = channelService.createChannel(owner2.get().getValue(), "server3", "TEST", null);
-        Long ch4 = channelService.createChannel(owner2.get().getValue(), "server9", "TTT", "ICONID.png");
-        Long ch5 = channelService.createChannel(owner2.get().getValue(), "나는 서버다", "나는 서버다앙", "server.jpeg");
+        Long channelId = channelService.createChannel(owner.get().getValue(), "server1", null, null);
+        System.out.println("Channel created with ID: " + channelId);
+
+        channelId = channelService.createChannel(owner.get().getValue(), "server2", null, "ICON.jpg");
+        System.out.println("Channel created with ID: " + channelId);
+
+        channelId = channelService.createChannel(owner2.get().getValue(), "server3", "TEST", null);
+        System.out.println("Channel created with ID: " + channelId);
+
+        channelId = channelService.createChannel(owner2.get().getValue(), "server9", "TTT", "ICONID.png");
+        System.out.println("Channel created with ID: " + channelId);
+
+        channelId = channelService.createChannel(owner2.get().getValue(), "나는 서버다", "나는 서버다앙", "server.jpeg");
+        System.out.println("Channel created with ID: " + channelId);
 
         System.out.println("채널 생성 완료!");
 
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
-        // 2.1 조회(단건)
-        ChannelResDTO findChannel = channelService.getChannel(ch1);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                findChannel.getId(), findChannel.getUuid(), findChannel.getServerName(), findChannel.getOwnerName(), findChannel.getDescription(), findChannel.getIconImgPath()));
+        ChannelResDTO channel = channelService.getChannel(channelId);
+        System.out.println(channel);
 
-        findChannel = channelService.getChannel(ch5);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                findChannel.getId(), findChannel.getUuid(), findChannel.getServerName(), findChannel.getOwnerName(), findChannel.getDescription(), findChannel.getIconImgPath()));
+        System.out.println("===========================================");
 
-        System.out.println("------------------------------");
+        System.out.println("전체 조회");
+        channelService.getAllChannel().forEach(System.out::println);
 
-        // 2.2 조회(다건)
-        List<ChannelResDTO> channelList = channelService.getAllChannel();
-        IntStream.range(0, channelList.size()).forEach(i -> {
-            ChannelResDTO channel = channelList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                    channel.getId(), channel.getUuid(), channel.getServerName(), channel.getOwnerName(), channel.getDescription(), channel.getIconImgPath()));
-        });
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
-        // 3.1 수정
-        idx = 2;
-        updateFlag = channelService.updateChannelInfo(idx,
+        // 정보 갱신
+        updateFlag = channelService.updateChannelInfo(channelId,
                 new ChannelUpdateDTO(null, "sssssssss서버", "HAPPY", null));
         if (updateFlag) {
             // update가 되었다면
-            ChannelResDTO channel = channelService.getChannel(idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                    channel.getId(), channel.getUuid(), channel.getServerName(), channel.getOwnerName(), channel.getDescription(), channel.getIconImgPath()));
+            channel = channelService.getChannel(channelId);
+            System.out.println("[UPDATE]\n" + channel);
         } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
+            System.out.println("[UPDATE]\n수정된 내용이 존재하지 않습니다.");
         }
+        System.out.println("[AFTER UPDATE]");
+        channelService.getAllChannel().forEach(System.out::println);
 
-        idx = 1;
-        User changeOwner = userService.getUserToUserObj(2L);
-        updateFlag = channelService.updateChannelInfo(idx,
-                new ChannelUpdateDTO(changeOwner, null, "주인을 바꿨답니다~", null));
-        if (updateFlag) {
-            // update가 되었다면
-            ChannelResDTO channel = channelService.getChannel(idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                    channel.getId(), channel.getUuid(), channel.getServerName(), channel.getOwnerName(), channel.getDescription(), channel.getIconImgPath()));
-        } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
-        }
+        System.out.println("===========================================");
 
-        updateFlag = channelService.updateChannelInfo(4L,
-                new ChannelUpdateDTO(null, null, null, null));
-        if (updateFlag) {
-            // update가 되었다면
-            ChannelResDTO channel = channelService.getChannel(idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                    channel.getId(), channel.getUuid(), channel.getServerName(), channel.getOwnerName(), channel.getDescription(), channel.getIconImgPath()));
-        } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
-        }
-        System.out.println("------------------------------");
+        // 삭제
+        ChannelResDTO deletedChannel = channelService.deleteChannel(channelId);
+        System.out.println("[DELETED]\n" + deletedChannel);
 
-        // 4.1 삭제
-        idx = 4;
-        ChannelResDTO channel = channelService.deleteChannel(idx);
-        System.out.println(String.format("[DELETE LOG]\nID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                channel.getId(), channel.getUuid(), channel.getServerName(), channel.getOwnerName(), channel.getDescription(), channel.getIconImgPath()));
+        // 삭제 후 전체 조회
+        System.out.println("[AFTER DELETED]");
+        channelService.getAllChannel().forEach(System.out::println);
 
-        System.out.println("-----------[AFTER DELETE]----------");
+        System.out.println("===========================================");
 
-        // 4.2 조회를 통해 삭제되었는지 확인
-        List<ChannelResDTO> deleteChannelList = channelService.getAllChannel();
-        IntStream.range(0, deleteChannelList.size()).forEach(i -> {
-            ChannelResDTO afterChannel = deleteChannelList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelName: %s, OwnerName: %s, Description: %s, IconImgPath: %s",
-                    afterChannel.getId(), afterChannel.getUuid(), afterChannel.getServerName(), afterChannel.getOwnerName(), afterChannel.getDescription(), afterChannel.getIconImgPath()));
-        });
-
-        System.out.println("------------------------------");
         // Message
-        MessageService messageService = new JCFMessageService();
-        // 1. 등록
-        // Channel에 사용자가 member로서 존재하는지 로직 확인 (현재는 true인 것으로 가정)
+        Path messageDirectory = Paths.get(System.getProperty("user.dir"), "temp/message");
+//        MessageService messageService = new FileMessageService(messageDirectory);
+//        MessageService messageService = new JCFMessageService();
+        MessageRepository messageRepository = new FileMessageRepository(messageDirectory);
+        MessageRepository jcfMessageRepository = new JCFMessageRepository();
+        MessageService messageService = new BasicMessageService(messageRepository);
 
-        User author1 = userService.getUserToUserObj(1L);
-        Channel channel1 = channelService.getChannelToChannelObj(1L);
+        User author1 = userService.findUserById(1L);
+        Channel channel1 = channelService.findChannelById(1L);
 
-        Long msg1 = messageService.createMessage(author1, channel1, "메시지1");
-        Long msg2 = messageService.createMessage(author1, channel1, "메시지2");
-        Long msg3 = messageService.createMessage(author1, channel1, "메시지3");
-        Long msg4 = messageService.createMessage(author1, channel1, "메시지4");
-        Long msg5 = messageService.createMessage(author1, channel1, "메시지5");
-        System.out.println("메시지 생성 완료!");
+        Long msgId = messageService.createMessage(author1, channel1, "메시지1");
+        System.out.println("Message created with ID: " + msgId);
 
-        System.out.println("------------------------------");
+        msgId = messageService.createMessage(author1, channel1, "메시지2");
+        System.out.println("Message created with ID: " + msgId);
 
-        // 2.1 조회(단건)
-        idx = 1L;
-        MessageResDTO findMsg = messageService.getMessage(idx);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                findMsg.getId(), findMsg.getUuid(), findMsg.getChannelUuid(), findMsg.getAuthorName(), findMsg.getContent()));
+        msgId = messageService.createMessage(author1, channel1, "메시지3");
+        System.out.println("Message created with ID: " + msgId);
 
-        idx = 3L;
-        findMsg = messageService.getMessage(idx);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                findMsg.getId(), findMsg.getUuid(), findMsg.getChannelUuid(), findMsg.getAuthorName(), findMsg.getContent()));
+        msgId = messageService.createMessage(author1, channel1, "메시지4");
+        System.out.println("Message created with ID: " + msgId);
 
-        System.out.println("------------------------------");
+        msgId = messageService.createMessage(author1, channel1, "메시지5");
+        System.out.println("Message created with ID: " + msgId);
 
-        // 2.2 조회(다건)
-        List<MessageResDTO> msgList = messageService.getAllMessage();
-        IntStream.range(0, msgList.size()).forEach(i -> {
-            MessageResDTO msg = msgList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                    msg.getId(), msg.getUuid(), msg.getChannelUuid(), msg.getAuthorName(), msg.getContent()));
-        });
-        System.out.println("------------------------------");
+        System.out.println("메시지 작성 완료!");
 
-        // 3.1 수정
-        idx = 2;
-        updateFlag = messageService.updateMessage(idx, new MessageUpdateDTO("HAPPy~"));
+        System.out.println("===========================================");
+
+        MessageResDTO msg = messageService.getMessage(msgId);
+        System.out.println(msg);
+
+        System.out.println("===========================================");
+
+        System.out.println("전체 조회");
+        messageService.getAllMessage().forEach(System.out::println);
+
+        // 정보 갱신
+        updateFlag = messageService.updateMessage(msgId, new MessageUpdateDTO("HAPPy~"));
         if (updateFlag) {
             // update가 되었다면
-            MessageResDTO msg = messageService.getMessage(idx);
-            System.out.println(String.format("[UPDATE LOG]\nID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                    msg.getId(), msg.getUuid(), msg.getChannelUuid(), msg.getAuthorName(), msg.getContent()));
+            msg = messageService.getMessage(msgId);
+            System.out.println("[UPDATE]\n" + msg);
         } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
+            System.out.println("[UPDATE]\n수정된 내용이 존재하지 않습니다.");
         }
+        System.out.println("[AFTER UPDATE]");
+        channelService.getAllChannel().forEach(System.out::println);
 
-        idx = 3;
-        updateFlag = messageService.updateMessage(idx, new MessageUpdateDTO(null));
-        if (updateFlag) {
-            // update가 되었다면
-            MessageResDTO msg = messageService.getMessage(idx);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                    msg.getId(), msg.getUuid(), msg.getChannelUuid(), msg.getAuthorName(), msg.getContent()));
-        } else {
-            System.out.println("[UPDATE LOG]\n수정된 내용이 존재하지 않습니다.");
-        }
-        System.out.println("------------------------------");
+        System.out.println("===========================================");
 
-        // 4.1 삭제
-        idx = 2;
-        MessageResDTO msg = messageService.deleteMessage(idx);
-        System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                msg.getId(), msg.getUuid(), msg.getChannelUuid(), msg.getAuthorName(), msg.getContent()));
-        System.out.println("-----------[AFTER DELETE]----------");
+        // 삭제
+        MessageResDTO deletedMessage = messageService.deleteMessage(msgId);
+        System.out.println("[DELETED]\n" + deletedMessage);
 
-        // 4.2 조회를 통해 삭제되었는지 확인
-        List<MessageResDTO> deleteList = messageService.getAllMessage();
-        IntStream.range(0, deleteList.size()).forEach(i -> {
-            MessageResDTO afterMsg = deleteList.get(i);
-            System.out.println(String.format("ID(Index): %d, UUID: %s, ChannelUUID: %s, AuthorName: %s, Content: %s",
-                    afterMsg.getId(), afterMsg.getUuid(), afterMsg.getChannelUuid(), afterMsg.getAuthorName(), afterMsg.getContent()));
-        });
+        // 삭제 후 전체 조회
+        System.out.println("[AFTER DELETED]");
+        messageService.getAllMessage().forEach(System.out::println);
+
+        System.out.println("===========================================");
+
     }
 }

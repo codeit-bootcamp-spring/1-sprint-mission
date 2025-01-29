@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.enums.RegionCode;
 import com.sprint.mission.discodeit.enums.UserType;
 import lombok.Getter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
 /* # User
@@ -17,12 +19,14 @@ import java.util.UUID;
  */
 
 @Getter
-public class User {
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private UUID id;    // 고유 번호
     private Name userName;  // ID와 같은 역할
     private Name nickname;  // 별명 (사용자)
     private Email email;    // 이메일
-    private Password password;    // 비밀번호 -> 추후에는 암호화 되어 저장된다고 생각하기
+    private transient Password password;    // 비밀번호 -> 추후에는 암호화 되어 저장된다고 생각하기
     private Phone phone;    // 전화 번호
     private UserType userType;  // 기본은 Common
     private boolean status; // 활성화(1)/비활성화(0) 상태 -> 생성 시 default로 1
@@ -90,5 +94,10 @@ public class User {
     public void updateIntroduce(String introduce) {
         this.introduce = introduce;
         updatedAt = System.currentTimeMillis();
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + this.getId().toString() + "\n Username: " + this.getUserName().getName();
     }
 }

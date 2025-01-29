@@ -21,4 +21,16 @@ public class ChannelResDTO implements ChannelDTO {
         this.description = channel.getDescription();
         this.iconImgPath = channel.getIconImgPath();
     }
+
+    @Override
+    public String toString() {
+        return "ChannelResDTO{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", ownerName='" + ownerName + '\'' +
+                ", serverName='" + serverName + '\'' +
+                ", description='" + description + '\'' +
+                ", iconImgPath='" + iconImgPath + '\'' +
+                '}';
+    }
 }

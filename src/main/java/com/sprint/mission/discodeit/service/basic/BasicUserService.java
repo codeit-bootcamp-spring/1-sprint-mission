@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
@@ -11,23 +11,20 @@ import com.sprint.mission.discodeit.enums.UserType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class JCFUserService implements UserService {
-    // DB 대체로 생각함
+public class BasicUserService implements UserService {
     private final Validator validator = new ValidatorImpl();
     private UserRepository userRepository;
 
-    public JCFUserService() {
-        this.userRepository = new JCFUserRepository();   // 데이터 저장소
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;   // 데이터 저장소
     }
 
     @Override
@@ -68,16 +65,17 @@ public class JCFUserService implements UserService {
         }
     }
 
-    // TODO: Custom Exception으로 바꾸기~
     @Override
     public UserResDTO getUser(Long id) {
-        User user = Objects.requireNonNull(findUserById(id), "해당 ID의 사용자가 존재하지 않습니다.");
+        User user = findUserById(id);
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
         return new UserResDTO(id, user);
     }
 
     @Override
     public UserResDTO getUser(String userName) {
-        Optional<Map.Entry<Long, User>> user = Objects.requireNonNull(findUserByUserName(userName), "해당 이름의 사용자가 존재하지 않습니다.");
+        Optional<Map.Entry<Long, User>> user = findUserByUserName(userName);
+        if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
         return new UserResDTO(user.get().getKey(), user.get().getValue());
     }
 
@@ -163,4 +161,5 @@ public class JCFUserService implements UserService {
         userRepository.deleteUser(deleteUser.getId());
         return deleteUser;
     }
+
 }

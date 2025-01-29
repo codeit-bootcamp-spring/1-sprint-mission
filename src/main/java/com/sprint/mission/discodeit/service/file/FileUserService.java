@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
@@ -11,24 +11,26 @@ import com.sprint.mission.discodeit.enums.UserType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class JCFUserService implements UserService {
+public class FileUserService implements UserService {
     // DB 대체로 생각함
     private final Validator validator = new ValidatorImpl();
     private UserRepository userRepository;
 
-    public JCFUserService() {
-        this.userRepository = new JCFUserRepository();   // 데이터 저장소
+    public FileUserService(Path directory) {
+        this.userRepository = new FileUserRepository(directory);
     }
+
 
     @Override
     public Long createUserData(String username, String nickname, String email, String password, String regionCode, String phone, String imgPath) {
@@ -71,21 +73,23 @@ public class JCFUserService implements UserService {
     // TODO: Custom Exception으로 바꾸기~
     @Override
     public UserResDTO getUser(Long id) {
-        User user = Objects.requireNonNull(findUserById(id), "해당 ID의 사용자가 존재하지 않습니다.");
+        User user = Objects.requireNonNull(userRepository.loadUser(id), "해당 ID의 사용자가 존재하지 않습니다.");
         return new UserResDTO(id, user);
     }
 
     @Override
     public UserResDTO getUser(String userName) {
-        Optional<Map.Entry<Long, User>> user = Objects.requireNonNull(findUserByUserName(userName), "해당 이름의 사용자가 존재하지 않습니다.");
-        return new UserResDTO(user.get().getKey(), user.get().getValue());
+        return userRepository.loadAllUsers().entrySet().stream()
+                .filter(entry -> entry.getValue().getUserName().getName().equals(userName))
+                .findFirst()
+                .map(entry -> new UserResDTO(entry.getKey(), entry.getValue()))
+                .orElseThrow(() -> new RuntimeException("해당 이름의 사용자가 존재하지 않습니다."));
     }
 
     @Override
     public List<UserResDTO> getAllUser() {
         return userRepository.loadAllUsers().entrySet().stream()
-                .map(entry ->
-                        new UserResDTO(entry.getKey(), entry.getValue()))
+                .map(entry -> new UserResDTO(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
 

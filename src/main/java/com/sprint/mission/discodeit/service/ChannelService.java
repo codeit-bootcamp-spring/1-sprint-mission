@@ -26,8 +26,6 @@ public interface ChannelService {
     // 모든 채널
     public List<ChannelResDTO> getAllChannel();
 
-    public Channel getChannelToChannelObj(Long id);
-
     public Channel findChannelById(Long id);
 
     public Optional<Map.Entry<Long, Channel>> findChannelByUUID(UUID uuid);

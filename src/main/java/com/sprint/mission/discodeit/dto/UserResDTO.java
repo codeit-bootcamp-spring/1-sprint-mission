@@ -24,4 +24,15 @@ public class UserResDTO implements UserDTO {
         this.nickname = user.getNickname().getName();
         this.email = user.getEmail().getEmail();
     }
+
+    @Override
+    public String toString() {
+        return "UserResDTO{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", userName='" + userName + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

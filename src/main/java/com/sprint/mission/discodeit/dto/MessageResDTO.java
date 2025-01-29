@@ -24,4 +24,14 @@ public class MessageResDTO implements MessageDTO {
         return channelUuid;
     }
 
+    @Override
+    public String toString() {
+        return "MessageResDTO{" +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", authorName='" + authorName + '\'' +
+                ", channelUuid='" + channelUuid + '\'' +
+                ", content='" + content + '\'' +
+                '}';
+    }
 }

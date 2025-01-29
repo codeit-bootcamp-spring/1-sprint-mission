@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
@@ -10,20 +10,21 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class JCFChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
 
     private final Validator validator = new ValidatorImpl();
     private ChannelRepository channelRepository;
 
-    public JCFChannelService() {
-        this.channelRepository = new JCFChannelRepository();
+    public FileChannelService(Path directory) {
+        this.channelRepository = new FileChannelRepository(directory);
     }
 
     @Override
@@ -54,16 +55,21 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public ChannelResDTO getChannel(Long id) {
-        Channel channel = Objects.requireNonNull(findChannelById(id), "해당 ID의 채널이 존재하지 않습니다.");
+        Channel channel = Objects.requireNonNull(channelRepository.loadChannel(id), "해당 ID의 채널이 존재하지 않습니다.");
         return new ChannelResDTO(id, channel, channel.getOwner());
     }
 
     // TODO: 'Optional. get()' without 'isPresent()' check <- 확인
     @Override
     public ChannelResDTO getChannel(String uuid) {
-        Optional<Map.Entry<Long, Channel>> channel = Objects.requireNonNull(findChannelByUUID(UUID.fromString(uuid)), "해당 ID의 채널이 존재하지 않습니다.");
-        return new ChannelResDTO(channel.get().getKey(), channel.get().getValue(), channel.get().getValue().getOwner());
+        Map<Long, Channel> allChannels = channelRepository.loadAllChannels();
+        return allChannels.entrySet().stream()
+                .filter(entry -> entry.getValue().getId().toString().equals(uuid))
+                .findFirst()
+                .map(entry -> new ChannelResDTO(entry.getKey(), entry.getValue(), entry.getValue().getOwner()))
+                .orElseThrow(() -> new RuntimeException("해당 ID의 채널이 존재하지 않습니다."));
     }
+
 
     @Override
     public List<ChannelResDTO> getAllChannel() {
@@ -80,7 +86,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Optional<Map.Entry<Long, Channel>> findChannelByUUID(UUID uuid) {
-        return channelRepository.loadAllChannels().entrySet().stream()
+        Map<Long, Channel> allChannels = channelRepository.loadAllChannels();
+        return allChannels.entrySet().stream()
                 .filter(entry -> entry.getValue().getId().equals(uuid))
                 .findFirst();
     }
