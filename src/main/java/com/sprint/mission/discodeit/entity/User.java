@@ -1,64 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
+import java.io.Serializable;
 
-public class User {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-    private String name;
-    private int age;
-    private char gender;
+public class User implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-    public User(String name, int age, char gender) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-    }
+  private UUID id;
+  private Long createdAt;
+  private Long updatedAt;
+  private String name;
+  private int age;
+  private char gender;
 
-    public UUID getId() {
-        return id;
-    }
+  public User(String name, int age, char gender) {
+    this.id = UUID.randomUUID();
+    this.createdAt = System.currentTimeMillis();
+    this.updatedAt = this.createdAt;
+    this.name = name;
+    this.age = age;
+    this.gender = gender;
+  }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
+  public Long getCreatedAt() {
+    return createdAt;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public Long getUpdatedAt() {
+    return updatedAt;
+  }
 
-    public int getAge() {
-        return age;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public char getGender() {
-        return gender;
-    }
+  public int getAge() {
+    return age;
+  }
 
-    public void update(String name, int age, char gender) {
-        this.name = name;
-        this.age = age;
-        this.gender = gender;
-        this.updatedAt = System.currentTimeMillis();
-    }
+  public char getGender() {
+    return gender;
+  }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", age=" + age +
-                ", gender=" + gender +
-                '}';
-    }
+  public void update(String name, int age, char gender) {
+    this.name = name;
+    this.age = age;
+    this.gender = gender;
+    this.updatedAt = System.currentTimeMillis();
+  }
+
+  @Override
+  public String toString() {
+    return "User{" +
+      "id=" + id +
+      ", name='" + name + '\'' +
+      ", age=" + age +
+      ", gender=" + gender +
+      "}";
+  }
 }
 
 
