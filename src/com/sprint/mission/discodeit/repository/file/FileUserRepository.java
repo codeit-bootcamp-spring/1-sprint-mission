@@ -52,7 +52,6 @@ public class FileUserRepository implements UserRepository {
             return userToCreate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -72,7 +71,6 @@ public class FileUserRepository implements UserRepository {
             return (User) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -104,7 +102,6 @@ public class FileUserRepository implements UserRepository {
             return userToUpdate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();
@@ -123,7 +120,6 @@ public class FileUserRepository implements UserRepository {
             return exsitingUser;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
         }
 
         return User.createEmptyUser();

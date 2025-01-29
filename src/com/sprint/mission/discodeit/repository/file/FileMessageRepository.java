@@ -51,7 +51,7 @@ public class FileMessageRepository implements MessageRepository {
             return messageToCreate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Message.createEmptyMessage();
@@ -71,7 +71,7 @@ public class FileMessageRepository implements MessageRepository {
             return (Message) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Message.createEmptyMessage();
@@ -102,7 +102,7 @@ public class FileMessageRepository implements MessageRepository {
             return messageToUpdate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Message.createEmptyMessage();
@@ -121,7 +121,7 @@ public class FileMessageRepository implements MessageRepository {
             return exsitingMessage;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Message.createEmptyMessage();

@@ -26,7 +26,6 @@ public class MessageServiceProxy implements MessageService {
             creation = messageService.createMessage(messageInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, messageId);
-            System.err.println(logMessage + ", ID: " + messageId);
         }
 
         return creation;
@@ -46,7 +45,6 @@ public class MessageServiceProxy implements MessageService {
             updated = messageService.updateMessageById(key, messageInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;

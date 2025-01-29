@@ -4,6 +4,12 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.*;
+import com.sprint.mission.discodeit.factory.type.repository.ChannelRepositoryType;
+import com.sprint.mission.discodeit.factory.type.repository.MessageRepositoryType;
+import com.sprint.mission.discodeit.factory.type.repository.UserRepositoryType;
+import com.sprint.mission.discodeit.factory.type.service.ChannelServiceType;
+import com.sprint.mission.discodeit.factory.type.service.MessageServiceType;
+import com.sprint.mission.discodeit.factory.type.service.UserServiceType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -89,32 +95,26 @@ public class JavaApplication {
     }
 
     private static void testBasicUserService() {
-        UserRepository userRepository = UserRepositoryFactory.JCF_USER_REPOSITORY_FACTORY.createUserRepository();
-        UserService userService = UserServiceFactory.JCF_USER_SERVICE_FACTORY.createUserService(userRepository);
+        UserService userService = UserServiceFactory.createService(UserServiceType.JCF, UserRepositoryType.JCF);
         //testBasicUserService(userService);
 
-        userRepository = UserRepositoryFactory.FILE_USER_REPOSITORY_FACTORY.createUserRepository();
-        userService = UserServiceFactory.FILE_USER_SERVICE_FACTORY.createUserService(userRepository);
+        userService = UserServiceFactory.createService(UserServiceType.FILE, UserRepositoryType.FILE);
         testBasicUserService(userService);
     }
 
     private static void testBasicChannelService() {
-        ChannelRepository channelRepository = ChannelRepositoryFactory.JCF_CHANNEL_REPOSITORY_FACTORY.createChannelRepository();
-        ChannelService channelService = ChannelServiceFactory.JCF_CHANNEL_SERVICE_FACTORY.createChannelService(channelRepository);
+        ChannelService channelService = ChannelServiceFactory.createService(ChannelServiceType.JCF, ChannelRepositoryType.JCF);
         //testBasicChannelService(channelService);
 
-        channelRepository = ChannelRepositoryFactory.FILE_CHANNEL_REPOSITORY_FACTORY.createChannelRepository();
-        channelService = ChannelServiceFactory.FILE_CHANNEL_SERVICE_FACTORY.createChannelService(channelRepository);
+        channelService = ChannelServiceFactory.createService(ChannelServiceType.FILE, ChannelRepositoryType.FILE);
         testBasicChannelService(channelService);
     }
 
     private static void testBasicMessageService() {
-        MessageRepository messageRepository = MessageRepositoryFactory.JCF_MESSAGE_REPOSITORY_FACTORY.createMessageRepository();
-        MessageService messageService = MessageServiceFactory.JCF_MESSAGE_SERVICE_FACTORY.createMessageService(messageRepository);
+        MessageService messageService = MessageServiceFactory.createService(MessageServiceType.JCF, MessageRepositoryType.JCF);
         //testBasicMessageService(messageService);
 
-        messageRepository = MessageRepositoryFactory.FILE_MESSAGE_REPOSITORY_FACTORY.createMessageRepository();
-        messageService = MessageServiceFactory.FILE_MESSAGE_SERVICE_FACTORY.createMessageService(messageRepository);
+        messageService = MessageServiceFactory.createService(MessageServiceType.FILE, MessageRepositoryType.FILE);
         testBasicMessageService(messageService);
     }
 

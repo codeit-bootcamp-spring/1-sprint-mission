@@ -23,7 +23,6 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (creation == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, messageId);
-            System.err.println(logMessage + ", ID: " + messageId);
         }
 
         return creation;
@@ -36,7 +35,6 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (find == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -49,7 +47,6 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (updated == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
@@ -62,7 +59,6 @@ public class MessageRepositoryProxy implements MessageRepository {
 
         if (deletion == Message.EMPTY_MESSAGE) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

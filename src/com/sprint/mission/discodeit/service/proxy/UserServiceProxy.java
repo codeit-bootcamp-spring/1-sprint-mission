@@ -26,7 +26,6 @@ public class UserServiceProxy implements UserService {
             creation = userService.createUser(userInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, userId);
-            System.err.println(logMessage + ", ID: " + userId);
         }
 
         return creation;
@@ -46,7 +45,6 @@ public class UserServiceProxy implements UserService {
             update = userService.updateUserById(key, userInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return update;

@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.UUID;
 
 public class BasicMessageService {
+
+    private static final ServiceLogger logger = ServiceLogger.getInstance();
+
     public static Message setupMessage(MessageService messageService, Message messageInfoToCreate) {
         printStartInfo("setupMessage(MessageService, Message)");
 
@@ -47,16 +51,15 @@ public class BasicMessageService {
     }
 
     private static void printStartInfo(String startInfo) {
-        System.out.println("---------------------------------");
-        System.out.println(startInfo);
+        logger.info("---------------------------------");
+        logger.info(startInfo);
     }
 
     private static void printArgsAndMessageInfo(UUID key, Message message, String messageWhenEmpty) {
-        System.out.println("pass UUID '" + key + "'! ");
+        logger.info("pass UUID '" + key + "'! ");
         if (message == Message.EMPTY_MESSAGE) {
-            System.out.println(messageWhenEmpty);
+            logger.info(messageWhenEmpty);
         }
-        System.out.println("Message info: " + message);
-        System.out.println();
+        logger.info("Message info: " + message);
     }
 }

@@ -1,25 +1,14 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.factory.type.repository.MessageRepositoryType;
+import com.sprint.mission.discodeit.factory.type.repository.UserRepositoryType;
+import com.sprint.mission.discodeit.factory.type.service.MessageServiceType;
+import com.sprint.mission.discodeit.factory.type.service.UserServiceType;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.proxy.MessageServiceProxy;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.function.Function;
-
-public enum MessageServiceFactory {
-    JCF_MESSAGE_SERVICE_FACTORY((messageRepository) -> new MessageServiceProxy(new JCFMessageService(messageRepository))),
-    FILE_MESSAGE_SERVICE_FACTORY((messageRepository) -> new MessageServiceProxy(new FileMessageService(messageRepository)))
-    ;
-
-    private final Function<MessageRepository, MessageService> function;
-
-    MessageServiceFactory(Function<MessageRepository, MessageService> function) {
-        this.function = function;
-    }
-
-    public MessageService createMessageService(MessageRepository messageRepository) {
-        return function.apply(messageRepository);
+public class MessageServiceFactory {
+    public static MessageService createService(MessageServiceType serviceType, MessageRepositoryType repositoryType) {
+        return serviceType.create(repositoryType.create());
     }
 }

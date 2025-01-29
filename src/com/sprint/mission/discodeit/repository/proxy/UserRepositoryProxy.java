@@ -23,7 +23,6 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (creation == User.EMPTY_USER) {
             logger.warning(logMessage, userId);
-            System.err.println(logMessage + ", ID: " + userId);
         }
 
         return creation;
@@ -36,7 +35,6 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (find == User.EMPTY_USER) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -49,7 +47,6 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (update == User.EMPTY_USER) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return update;
@@ -62,7 +59,6 @@ public class UserRepositoryProxy implements UserRepository {
 
         if (deletion == User.EMPTY_USER) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

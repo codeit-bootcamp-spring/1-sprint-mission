@@ -51,7 +51,7 @@ public class FileChannelRepository implements ChannelRepository {
             return channelToCreate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Channel.createEmptyChannel();
@@ -71,7 +71,7 @@ public class FileChannelRepository implements ChannelRepository {
             return (Channel) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Channel.createEmptyChannel();
@@ -102,7 +102,7 @@ public class FileChannelRepository implements ChannelRepository {
             return channelToUpdate;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Channel.createEmptyChannel();
@@ -121,7 +121,7 @@ public class FileChannelRepository implements ChannelRepository {
             return exsitingChannel;
         } catch (IOException e) {
             logger.severe(e);
-            System.out.println(e.getMessage());
+            
         }
 
         return Channel.createEmptyChannel();

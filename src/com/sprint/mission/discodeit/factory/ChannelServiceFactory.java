@@ -1,25 +1,14 @@
 package com.sprint.mission.discodeit.factory;
 
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.factory.type.repository.ChannelRepositoryType;
+import com.sprint.mission.discodeit.factory.type.repository.UserRepositoryType;
+import com.sprint.mission.discodeit.factory.type.service.ChannelServiceType;
+import com.sprint.mission.discodeit.factory.type.service.UserServiceType;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.proxy.ChannelServiceProxy;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.function.Function;
-
-public enum ChannelServiceFactory {
-    JCF_CHANNEL_SERVICE_FACTORY((channelRepository) -> new ChannelServiceProxy(new JCFChannelService(channelRepository))),
-    FILE_CHANNEL_SERVICE_FACTORY((channelRepository) -> new ChannelServiceProxy(new FileChannelService(channelRepository)))
-    ;
-
-    private final Function<ChannelRepository, ChannelService> function;
-
-    ChannelServiceFactory(Function<ChannelRepository, ChannelService> function) {
-        this.function = function;
-    }
-
-    public ChannelService createChannelService(ChannelRepository channelRepository) {
-        return function.apply(channelRepository);
+public class ChannelServiceFactory {
+    public static ChannelService createService(ChannelServiceType serviceType, ChannelRepositoryType repositoryType) {
+        return serviceType.create(repositoryType.create());
     }
 }

@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.UUID;
 
 public class BasicChannelService {
+
+    private static final ServiceLogger logger = ServiceLogger.getInstance();
+
+
     public static Channel setupChannel(ChannelService channelService, Channel channelInfoToCreate) {
         printStartInfo("setupChannel(ChannelService, Channel)");
 
@@ -47,16 +52,15 @@ public class BasicChannelService {
     }
 
     private static void printStartInfo(String startInfo) {
-        System.out.println("---------------------------------");
-        System.out.println(startInfo);
+        logger.info("---------------------------------");
+        logger.info(startInfo);
     }
 
     private static void printArgsAndUserInfo(UUID key, Channel channel, String messageWhenEmpty) {
-        System.out.println("pass UUID '" + key + "'! ");
+        logger.info("pass UUID '" + key + "'! ");
         if (channel == Channel.EMPTY_CHANNEL) {
-            System.out.println(messageWhenEmpty);
+            logger.info(messageWhenEmpty);
         }
-        System.out.println("Channel info: " + channel);
-        System.out.println();
+        logger.info("Channel info: " + channel);
     }
 }

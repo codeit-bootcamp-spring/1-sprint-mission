@@ -26,7 +26,6 @@ public class ChannelServiceProxy implements ChannelService {
             creation = channelService.createChannel(channelInfoToCreate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, channelId);
-            System.err.println(logMessage + ", ID: " + channelId);
         }
 
         return creation;
@@ -46,7 +45,6 @@ public class ChannelServiceProxy implements ChannelService {
             updated = channelService.updateChannelById(key, channelInfoToUpdate);
         } catch (InvalidFormatException e) {
             logger.warning(e.getErrorCode(), logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;

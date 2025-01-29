@@ -23,7 +23,6 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (creation == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, channelId);
-            System.err.println(logMessage + ", ID: " + channelId);
         }
 
         return creation;
@@ -36,7 +35,6 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (find == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return find;
@@ -49,7 +47,6 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (updated == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return updated;
@@ -62,7 +59,6 @@ public class ChannelRepositoryProxy implements ChannelRepository {
 
         if (deletion == Channel.EMPTY_CHANNEL) {
             logger.warning(logMessage, key);
-            System.err.println(logMessage + ", ID: " + key);
         }
 
         return deletion;

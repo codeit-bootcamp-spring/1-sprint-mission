@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.UUID;
 
 public class BasicUserService {
+
+    private static final ServiceLogger logger = ServiceLogger.getInstance();
 
     public static User setupUser(UserService userService, User userInfoToCreate) {
         printStartInfo("setupUser(UserService, User)");
@@ -48,16 +51,15 @@ public class BasicUserService {
     }
 
     private static void printStartInfo(String startInfo) {
-        System.out.println("---------------------------------");
-        System.out.println(startInfo);
+        logger.info("---------------------------------");
+        logger.info(startInfo);
     }
 
     private static void printArgsAndUserInfo(UUID key, User user, String messageWhenEmpty) {
-        System.out.println("pass UUID '" + key + "'! ");
+        logger.info("pass UUID '" + key + "'! ");
         if (user == User.EMPTY_USER) {
-            System.out.println(messageWhenEmpty);
+            logger.info(messageWhenEmpty);
         }
-        System.out.println("User info: " + user);
-        System.out.println();
+        logger.info("User info: " + user);
     }
 }
