@@ -15,7 +15,7 @@ public class FileUserRepository implements UserRepository {
         if(userMap == null) {
             userMap = new HashMap<>();
         }
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
+        try (FileOutputStream fos = new FileOutputStream("tmp/user.ser");
              ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             userMap.put(user.getId(), user);
             oos.writeObject(userMap);
@@ -30,7 +30,7 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> userMap = this.findAll();
         Optional<User> findUser = userMap.values().stream().filter(user -> user.getId().equals(userId))
                 .findAny();
-        return findUser.orElseThrow(() -> new NoSuchElementException("userId :" + userId + "를 찾을 수 없습니다."))
+        return findUser.orElseThrow(() -> new NoSuchElementException("userId :" + userId + "를 찾을 수 없습니다."));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class FileUserRepository implements UserRepository {
             throw new NoSuchElementException("UserId :" + userId + "를 찾을 수 없습니다.");
         }
         userMap.remove(userId);
-        try (FileOutputStream fos = new FileOutputStream("user.ser");
+        try (FileOutputStream fos = new FileOutputStream("tmp/user.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             oos.writeObject(userMap);
         } catch (IOException e) {
@@ -54,7 +54,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public Map<UUID, User> findAll() {
         Map<UUID, User> userMap = new HashMap<>();
-        try (FileInputStream fis = new FileInputStream("user.ser");
+        try (FileInputStream fis = new FileInputStream("tmp/user.ser");
              ObjectInputStream ois = new ObjectInputStream(fis);) {
             userMap = (Map<UUID, User>) ois.readObject();
         } catch (EOFException e) {

@@ -15,7 +15,7 @@ public class FileChannelRepository implements ChannelRepository {
         if(channelMap == null) {
             channelMap = new HashMap<>();
         }
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        try (FileOutputStream fos = new FileOutputStream("tmp/channel.ser");
         ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             channelMap.put(channel.getId(), channel);
             oos.writeObject(channelMap);
@@ -40,7 +40,7 @@ public class FileChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("ChannelId: " + channelId + "를 찾을 수 없습니다.");
         }
         channelMap.remove(channelId);
-        try (FileOutputStream fos = new FileOutputStream("channel.set");
+        try (FileOutputStream fos = new FileOutputStream("tmp/channel.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
             oos.writeObject(channelMap);
         } catch (IOException e) {
@@ -54,7 +54,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Map<UUID, Channel> findAll() {
         Map<UUID,Channel> channelMap = new HashMap<>();
-        try (FileInputStream fis = new FileInputStream("channel.ser");
+        try (FileInputStream fis = new FileInputStream("tmp/channel.ser");
             ObjectInputStream ois = new ObjectInputStream(fis)) {
             channelMap = (Map<UUID, Channel>) ois.readObject();
         } catch ( EOFException e) {

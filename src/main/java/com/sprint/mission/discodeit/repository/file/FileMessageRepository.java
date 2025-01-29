@@ -13,7 +13,7 @@ public class FileMessageRepository implements MessageRepository {
         Map<UUID, Message> messageMap = this.findAll();
         if(messageMap == null) {
             messageMap = new HashMap<>();
-        } try (FileOutputStream fos = new FileOutputStream("message.ser");
+        } try (FileOutputStream fos = new FileOutputStream("tmp/message.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);){
             messageMap.put(message.getId(), message);
             oos.writeObject(messageMap);
@@ -38,7 +38,7 @@ public class FileMessageRepository implements MessageRepository {
             throw new NoSuchElementException("MessageId :" + messageId + "를 찾을 수 없습니다.");
         }
         messageMap.remove(messageId);
-        try (FileOutputStream fos = new FileOutputStream("message.set");
+        try (FileOutputStream fos = new FileOutputStream("tmp/message.ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);){
             oos.writeObject(messageMap);
         } catch (IOException e) {
@@ -52,7 +52,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public Map<UUID, Message> findAll() {
         Map<UUID, Message> messageMap = new HashMap<>();
-        try(FileInputStream fis = new FileInputStream("message.ser");
+        try(FileInputStream fis = new FileInputStream("tmp/message.ser");
         ObjectInputStream ois = new ObjectInputStream(fis)) {
             messageMap = (Map<UUID, Message>) ois.readObject();
         } catch (EOFException e) {

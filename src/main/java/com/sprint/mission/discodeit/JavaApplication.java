@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
