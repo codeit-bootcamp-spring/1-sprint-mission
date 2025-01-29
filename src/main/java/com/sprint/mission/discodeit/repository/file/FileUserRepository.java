@@ -37,7 +37,7 @@ public class FileUserRepository implements UserRepository {
     public void delete(UUID userId) {
         Map<UUID, User> userMap = this.findAll();
         if(userMap == null || !userMap.containsKey(userId)) {
-            throw new NoSuchElementException("UserId :" + userId + "를 찾을 수 없습니다.")
+            throw new NoSuchElementException("UserId :" + userId + "를 찾을 수 없습니다.");
         }
         userMap.remove(userId);
         try (FileOutputStream fos = new FileOutputStream("user.ser");

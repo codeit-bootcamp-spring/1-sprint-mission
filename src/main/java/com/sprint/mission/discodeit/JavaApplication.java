@@ -12,11 +12,107 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        JCFUserService userService = new JCFUserService();
+        FileUserRepository fileUserRepository = new FileUserRepository();
+        FileChannelRepository fileChannelRepository = new FileChannelRepository();
+        FileMessageRepository fileMessageRepository = new FileMessageRepository();
+
+        User user1 = new User("Alice", "Alice1234@example.com");
+        User user2 = new User("Hazel", "Hazel1234@example.com");
+        Channel channel1 = new Channel("General", user1);
+        Channel channel2 = new Channel("Premium", user2);
+        Message message1 = new Message("Hello, everyone!", channel1.getId(), user1.getId());
+        Message message2 = new Message("Today's Class news~", channel2.getId(), user1.getId());
+
+        fileUserRepository.save(user1);
+        fileUserRepository.save(user2);
+        fileChannelRepository.save(channel1);
+        fileChannelRepository.save(channel2);
+        fileMessageRepository.save(message1);
+        fileMessageRepository.save(message2);
+
+        //사용자 조회
+        try {
+            User retrievedUser = fileUserRepository.findById(user1.getId());
+            System.out.println("User found: " + retrievedUser.getUserName() + " - " + retrievedUser.getUserEmail());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+        //채널 조회 (channelId로 찾기)
+        try {
+            Channel retrievedChannel = fileChannelRepository.findById(channel1.getId());
+            System.out.println("Channel found: " + retrievedChannel.getChannelName());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // 메시지 조회 (message1의 ID로 찾기)
+        try {
+            Message retrievedMessage = fileMessageRepository.findById(message1.getId());
+            System.out.println("Message found: " + retrievedMessage.getContent());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // 모든 사용자 조회
+        fileUserRepository.findAll().forEach((uuid, user) -> {
+            System.out.println("User: " + user.getUserName() + " - " + user.getUserEmail());
+        });
+
+        // 모든 채널 조회
+        System.out.println("\nAll Channels:");
+        fileChannelRepository.findAll().forEach((uuid, channel) -> {
+            System.out.println("Channel: " + channel.getChannelName());
+        });
+
+        // 모든 메시지 조회
+        System.out.println("\nAll Messages:");
+        fileMessageRepository.findAll().forEach((uuid, message) -> {
+            System.out.println("Message: " + message.getContent());
+        });
+
+
+        // 사용자 삭제 (user1의 ID로 삭제)
+        fileUserRepository.delete(user1.getId());
+        System.out.println("User1 deleted.");
+
+        // 채널 삭제 (channel1의 ID로 삭제)
+        fileChannelRepository.delete(channel1.getId());
+        System.out.println("\nChannel1 deleted.");
+
+        // 메시지 삭제 (message1의 ID로 삭제)
+        fileMessageRepository.delete(message1.getId());
+        System.out.println("Message1 deleted.");
+
+        // 삭제 후 사용자 조회
+        try {
+            User retrievedUser = fileUserRepository.findById(user1.getId());
+            System.out.println("User found: " + retrievedUser.getUserName() + " - " + retrievedUser.getUserEmail());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // 삭제 후 채널 조회 (channel1을 다시 찾으려고 시도)
+        try {
+            Channel retrievedChannel = fileChannelRepository.findById(channel1.getId());
+            System.out.println("Channel found: " + retrievedChannel.getChannelName());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+
+        // 삭제 후 메시지 조회 (message1을 다시 찾으려고 시도)
+        try {
+            Message retrievedMessage = fileMessageRepository.findById(message1.getId());
+            System.out.println("Message found: " + retrievedMessage.getContent());
+        } catch (NoSuchElementException e) {
+            System.out.println(e.getMessage());
+        }
+
+        /*JCFUserService userService = new JCFUserService();
         JCFChannelService channelService = new JCFChannelService();
         JCFMessageService messageService = new JCFMessageService();
 
@@ -91,7 +187,7 @@ public class JavaApplication {
         channelRepository.createChannel("SprintBoot", user4);
         messageRepository.createMessage(channel1.getId(),user1.getId(),"이 채널에서는 뭐하는거에요?");
 
-        List<User> users = userRepository.getAllUserList();
+        List<User> users = userRepository.();
         users.forEach(System.out::println);
         List<Channel> channels = channelRepository.getAllChannelList();
         channels.forEach(System.out::println);
@@ -113,5 +209,6 @@ public class JavaApplication {
         userRepository.deleteUser(userId);
         channelRepository.deleteChannel(channelId);
         messageRepository.deleteMessage(messageId);
+         */
     }
 }
