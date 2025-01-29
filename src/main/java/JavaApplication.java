@@ -2,6 +2,7 @@
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -24,23 +25,27 @@ public class JavaApplication {
         JCFUserService jcfUserService = new JCFUserService();
         JCFMessageService jcfMessageService = new JCFMessageService();
 
+
+
+        //file* Service 테스트
+
         FileChannelService fileChannelService = new FileChannelService();
         FileUserService fileUserService= new FileUserService();
         FileMessageService fileMessageService = new FileMessageService();
-
 
         Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
         Channel channel3 = fileChannelService.createChannel("ch_fileIO_3");
         Channel channel2=  fileChannelService.readChannel(channel1.getChannelId());
 
-        User user1 = fileUserService.createUser("user1");
-
-        Message message1 = fileMessageService.createMessage(user1.getUserId(), channel1.getChannelId(),"message1");
 
         System.out.println(channel1.getChannelId());
         System.out.println(channel2.getChannelId());
 
         System.out.println(channel2.getChannelName());
+
+        User user1 = fileUserService.createUser("user1");
+
+        Message message1 = fileMessageService.createMessage(user1.getUserId(), channel1.getChannelId(),"message1");
 
 
 

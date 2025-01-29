@@ -15,7 +15,6 @@ public class FileUserService implements UserService {
     private final Map<UUID, User> userList;
 
     public FileUserService() {
-        //this.userList = new HashMap<>();
         this.userList = loadFile();
     }
 

@@ -4,12 +4,25 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FileChannelService implements ChannelService {
+
+
+    /*
+    비즈니스 로직: 동일
+    저장 로직:
+    File*Service는 직렬화/역직렬화를 통해 파일을 관리한다.
+    - saveFile()
+        현재 데이터를 직렬화하여 .ser 확장자로 로컬에 저장한다.
+        또한, 데이터 입력, 변경, 삭제 시 saveFile()을 통해 업데이트한다.
+    - loadFile()
+        로컬 경로의 파일을 읽어 역직렬화하여 Map<UUID, [class] > 형태로 리턴한다.
+        이를 통해 데이터를 프로그램 종료 시에도 저장하고, 재시작시 읽어 사용할 수 있다.
+
+    File*Service 역시 동일하게 메모리에 데이터를 올려 사용하나, 프로그램 종료시 삭제된다.
+
+     */
 
 
     private final String fileName = "savedata/channel.ser";
