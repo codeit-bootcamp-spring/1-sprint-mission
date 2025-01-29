@@ -1,66 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel extends Common{
+public class Channel extends Common implements Serializable {
+    private static final long serialVersionUID = 1L; //직렬화 버전
     //필드
+    public enum ChannelType {
+        PUBLIC,PRIVATE
+    } //채널 타입
+    private ChannelType channelType;
     private String channelName; // 채널 이름
-    private String notificationTitle; // 공지 제목
-    private String notificationContent; // 공지 내용
-    private String author; // 작성자
+    private String description; // 채널 설명
 
-    public Channel(String channelName, String notificationTitle, String notificationContent, String author) {
+    public Channel(ChannelType channelType,String channelName, String description) {
         super();
+        this.channelType = channelType;
         this.channelName = channelName;
-        this.notificationTitle = notificationTitle;
-        this.notificationContent = notificationContent;
-        this.author = author;
+        this.description = description;
     }
-    //Getter
+
     public String getChannelName() {
         return channelName;
     }
-    public String getNotificationTitle() {
-        return notificationTitle;
-    }
-    public String getNotificationContent() {
-        return notificationContent;
-    }
-    public String getAuthor() {
-        return author;
+
+    public String getDescription() {
+        return description;
     }
 
     @Override
     public String toString() {
-        return "채널명='" + channelName + '\'' +
-                ", 공지 제목='" + notificationTitle + '\'' +
-                ", 공지 내용='" + notificationContent + '\'' +
-                ", 작성자='" + author + '\'' +
-                ", 생성='"+ getFormattedCreatedAt();
-    }
-    public String toStringUpdate() {
-        return "채널명='" + channelName + '\'' +
-                ", 공지 제목='" + notificationTitle + '\'' +
-                ", 공지 내용='" + notificationContent + '\'' +
-                ", 작성자='" + author + '\'' +
-                ", 수정='"+ getFormattedUpdatedAt();
+        return "Channel{" +
+                "channelType=" + channelType +
+                ", channelName='" + channelName + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 
     // update 메소드
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-        setUpdatedAt(System.currentTimeMillis());
+    public void updateDescription(String description) {
+        this.description = description;
+        setUpdatedAt(Instant.now().getEpochSecond());
     }
-    public void updateNotificationTitle(String notificationTitle) {
-        this.notificationTitle = notificationTitle;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-    public void updateNotificationContent(String notificationContent) {
-        this.notificationContent = notificationContent;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-    public void updateAuthor(String author) {
-        this.author = author;
-        setUpdatedAt(System.currentTimeMillis());
-    }
+
 }

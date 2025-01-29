@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-public class User extends Common{
+public class User extends Common implements Serializable {
+    private static final long serialVersionUID = 1L; //직렬화 버전
     //필드
     private String username; //유저이름
     private String email; //이메일(아이디)
-    private String password;//비밀번호
+    private transient String password;//비밀번호
     private String phoneNumber;//전화번호
     private String address; //주소
 
@@ -45,7 +49,7 @@ public class User extends Common{
                 ", 비밀번호='" + password + '\'' +
                 ", 전화번호='" + phoneNumber + '\'' +
                 ", 주소='" + address + '\'' +
-                ", 생성='"+ getFormattedCreatedAt();
+                ", 생성='"+ getCreatedAt();
     }
 
     public String toStringUpdate() {
@@ -54,28 +58,17 @@ public class User extends Common{
                 ", 비밀번호='" + password + '\'' +
                 ", 전화번호='" + phoneNumber + '\'' +
                 ", 주소='" + address + '\'' +
-                ", 수정='"+ getFormattedUpdatedAt();
+                ", 수정='"+ getUpdatedAt();
     }
 
     // update 메소드
-    public void updateUserName(String username){
-        this.username=username;
-        setUpdatedAt(System.currentTimeMillis());
+    public void update(String username, String email, String password, String phoneNumber, String address) {
+        if (username != null) this.username = username;
+        if (email != null) this.email = email;
+        if (password != null) this.password = password;
+        if (phoneNumber != null) this.phoneNumber = phoneNumber;
+        if (address != null) this.address = address;
+        setUpdatedAt(Instant.now().getEpochSecond());
     }
-    public void updateEmail(String email){
-        this.email=email;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-    public void updatePassword(String password){
-        this.password=password;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-    public void updatePhoneNumber(String phoneNumber){
-        this.phoneNumber=phoneNumber;
-        setUpdatedAt(System.currentTimeMillis());
-    }
-    public void updateAddress(String address){
-        this.address=address;
-        setUpdatedAt(System.currentTimeMillis());
-    }
+
 }
