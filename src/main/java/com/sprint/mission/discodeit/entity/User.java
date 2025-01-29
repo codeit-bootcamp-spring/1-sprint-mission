@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -55,17 +56,5 @@ public class User implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
-    }
-
-    public void setUsername(String username) {  // ✅ 직접 추가
-        this.username = username;
-    }
-
-    public void setEmail(String email) {  // ✅ 직접 추가
-        this.email = email;
-    }
-
-    public void setPassword(String password) {  // ✅ 직접 추가
-        this.password = password;
     }
 }
