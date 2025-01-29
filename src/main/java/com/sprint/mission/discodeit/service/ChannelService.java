@@ -1,7 +1,6 @@
-package com.sprint.mission.discodit.Service;
+package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodit.Entity.Channel;
-import com.sprint.mission.discodit.Entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +10,6 @@ public interface ChannelService {
     public UUID createChannel(String userName);
     public Channel getChannel(UUID id);
     public List<Channel> getChannels();
-    public void setChannel(UUID id, String name);
+    public void updateChannel(UUID id, String name);
     public void deleteChannel(UUID id);
 }
