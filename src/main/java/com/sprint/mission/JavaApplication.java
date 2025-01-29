@@ -1,33 +1,42 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
 
-    private static UserService userService = JCFUserService.getInstance();
-    private static ChannelService channelService = JCFChannelService.getInstance();
-    private static MessageService messageService = JCFMessageService.getInstance();
+    private static final UserService userService = BasicUserService.getInstance();
+    private static final ChannelService channelService = BasicChannelService.getInstance();
+    private static final MessageService messageService = BasicMessageService.getInstance();
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
+
         System.out.println("===== userServiceTest ====");
         System.out.println();
 
         System.out.println("===== user 생성 =====");
-        User user1 = userService.createUser(new UserDto("test1", "test1", "허원재"));
-        User user2 = userService.createUser(new UserDto("test2", "test2", "이규석"));
-        User user3 = userService.createUser(new UserDto("test3", "test3", "임수빈"));
+        User user1 = userService.createUser(UserDto.of("test1", "test1", "허원재"));
+        User user2 = userService.createUser(UserDto.of("test2", "test2", "이규석"));
+        User user3 = userService.createUser(UserDto.of("test3", "test3", "임수빈"));
 
-        System.out.println("===== 생성된 user =====");
+        System.out.println("===== 등록된 user =====");
         userService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
@@ -36,7 +45,7 @@ public class JavaApplication {
         System.out.println();
 
         System.out.println("===== user1의 loginId와 password를 변경 =====");
-        userService.updateUser(user1.getId(), new UserDto("asdf", "qwer", "허원재"));
+        userService.updateUser(user1.getId(), UserDto.of("asdf", "qwer", "허원재"));
         user1 = userService.readUser(user1.getId());
         System.out.println(user1);
         System.out.println();
@@ -53,15 +62,15 @@ public class JavaApplication {
         System.out.println("===== channelServiceTest =====\n");
 
         System.out.println("===== channel 생성 =====");
-        Channel codeit = channelService.createChannel("codeit");
-        Channel spring = channelService.createChannel("spring");
+        Channel codeit = channelService.createChannel(ChannelDto.of("codeit", "codeit channel"));
+        Channel spring = channelService.createChannel(ChannelDto.of("spring", "spring channel"));
 
-        System.out.println("===== 생성된 channel =====");
+        System.out.println("===== 등록된 channel =====");
         channelService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
         System.out.println("===== codeit channel 이름 변경 =====");
-        channelService.updateName(codeit.getId(), "newCodeit");
+        channelService.updateChannel(codeit.getId(), ChannelDto.of("newCodeit", "codeit channel"));
         System.out.println(channelService.readChannel(codeit.getId()));
         System.out.println();
 
@@ -87,8 +96,8 @@ public class JavaApplication {
         System.out.println("===== messageServiceTest =====\n");
 
         System.out.println("===== message 생성 =====");
-        Message message1 = messageService.createMessage(new MessageDto(user1, "hi", spring));
-        Message message2 = messageService.createMessage(new MessageDto(user1, "world", spring));
+        Message message1 = messageService.createMessage(MessageDto.of(user1, "hi", spring));
+        Message message2 = messageService.createMessage(MessageDto.of(user1, "world", spring));
         System.out.println("===== 등록된 message =====");
         messageService.readAll().stream().forEach(System.out::println);
         System.out.println();
@@ -96,8 +105,8 @@ public class JavaApplication {
         System.out.println("===== 등록되지 않은 user거나 보내는 channel에 등록되지 않은 유저면 exception 발생 =====");
         System.out.println("===== createMessage(new MessageDto(user2, \"hello\", spring)) =====");
         try {
-            Message message3 = messageService.createMessage(new MessageDto(user2, "hello", spring));
-        } catch (RuntimeException e) {
+            Message message3 = messageService.createMessage(MessageDto.of(user2, "hello", spring));
+        } catch (NotFoundException e) {
             System.out.println(e);
         }
         System.out.println();
@@ -109,7 +118,7 @@ public class JavaApplication {
 
         System.out.println("===== 메세지 삭제 =====");
         messageService.deleteMessage(message1.getId());
-        System.out.println("===== 현재 등록된 message =====");
+        System.out.println("===== 등록된 message =====");
         messageService.readAll().stream().forEach(System.out::println);
         System.out.println();
     }

@@ -1,25 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.NotFoundException;
+import lombok.Getter;
+import lombok.ToString;
+
+import java.io.Serializable;
 import java.util.*;
 
-public class Channel {
+
+@Getter
+@ToString
+public class Channel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private UUID id;
     private Long createdAt;
     private Long updatedAt;
 
     private String name;
+    private String description;
     private Map<UUID, User> users;
 
-    public Channel(String name) {
+    private Channel(String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
         this.name = name;
-        users = new HashMap<>();
+        this.description = description;
+        users = new HashMap<>(100);
+    }
+
+    public static Channel of(String name, String description) {
+        return new Channel(name, description);
     }
 
     public void updateName(String name) {
         this.name = name;
+        updatedAt = System.currentTimeMillis();
+    }
+
+    public void updateDescription(String description) {
+        this.description = description;
         updatedAt = System.currentTimeMillis();
     }
 
@@ -33,42 +55,8 @@ public class Channel {
         updatedAt = System.currentTimeMillis();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public User getUser(UUID userId) {
-        User user = users.get(userId);
-        if (user == null) {
-            throw new RuntimeException("현재 channel에 등록되지 않은 user입니다.");
-        }
-        return user;
-    }
-
-    public Map<UUID, User> getUsers() {
-        return users;
-    }
-
-    @Override
-    public String toString() {
-        return "Channel{" +
-                "id=" + id.toString().substring(0, 8) +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", name='" + name + '\'' +
-                ",\n                users=" + users +
-                '}';
+        return Optional.ofNullable(users.get(userId))
+                .orElseThrow(() -> new NotFoundException("현재 channel에 등록되지 않은 user입니다."));
     }
 }

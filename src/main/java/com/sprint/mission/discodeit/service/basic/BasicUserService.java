@@ -1,59 +1,59 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
 
-    private static final JCFUserService jcfUserService = new JCFUserService();
-    private final Map<UUID, User> data;
+    private static final BasicUserService basicUserService = new BasicUserService();
 
-    private JCFUserService() {
-        this.data = new HashMap<>(1000);
+    private final UserRepository userRepository;
+
+    private BasicUserService() {
+        this.userRepository = FileUserRepository.getInstance();
     }
 
-    public static JCFUserService getInstance() {
-        return jcfUserService;
+    public static BasicUserService getInstance() {
+        return basicUserService;
     }
 
     @Override
     public User createUser(UserDto userDto) {
-        String hashedPassword = generatePassword(userDto.getPassword());
-
-        User user = User.of(userDto.getName(), userDto.getLoginId(), hashedPassword);
-        data.put(user.getId(), user);
-        return user;
+        String password = generatePassword(userDto.getPassword());
+        User user = User.of(userDto.getName(), userDto.getLoginId(), password);
+        return userRepository.save(user);
     }
 
     @Override
     public User readUser(UUID userId) {
-        return Optional.ofNullable(data.get(userId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
+        return userRepository.findUser(userId);
     }
 
     @Override
     public List<User> readAll() {
-        return new ArrayList<>(data.values());
+        return userRepository.findAll();
     }
 
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
-        User user = readUser(userId);
-
+        User user = userRepository.findUser(userId);
+        user.updateName(userDto.getName());
         user.updateLoginId(userDto.getLoginId());
         user.updatePassword(generatePassword(userDto.getPassword()));
-        user.updateName(userDto.getName());
+        userRepository.updateUser(user);
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        data.remove(userId);
+        userRepository.deleteUser(userId);
     }
 
     private String generatePassword(String password) {
