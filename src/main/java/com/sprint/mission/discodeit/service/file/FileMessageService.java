@@ -66,6 +66,8 @@ public class FileMessageService implements MessageService {
         }
     }
 
+
+    //저장로직
     public void saveFile(){
         File file = new File(fileName);
         try (ObjectOutputStream oos = new ObjectOutputStream
@@ -77,6 +79,7 @@ public class FileMessageService implements MessageService {
         }
 
     }
+
 
     public Map<UUID, Message> loadFile(){
 

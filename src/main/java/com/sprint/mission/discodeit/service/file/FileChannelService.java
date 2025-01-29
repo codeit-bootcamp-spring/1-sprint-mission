@@ -76,6 +76,9 @@ public class FileChannelService implements ChannelService {
     }
 
 
+
+    //저장로직
+
     public void saveFile(){
         File file = new File(fileName);
         try (ObjectOutputStream oos = new ObjectOutputStream
