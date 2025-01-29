@@ -1,18 +1,22 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.*;
 
-public class User {
+public class User extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final UUID userUuid;
-    private final long createdAt;
-    private long updatedAt;
+    private final Long createdAt;
+    private Long updatedAt;
     private String userName;
     private String userId;
-    private final List<User>userData;
+
 
     public User(String userName, String userId){
-        userData = new ArrayList<>();
+
         userUuid = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
         this.userName = userName;
@@ -20,12 +24,10 @@ public class User {
     }
 
     //Getter
-    public List<User> getUserData() {
-        return userData;
-    }
 
-    public UUID getUserUuid() {
-        return userUuid;
+
+    public String getUserUuid() {
+        return userUuid.toString();
     }
 
     public String getUserId() {
@@ -36,25 +38,16 @@ public class User {
         return userName;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
 
     //Updated 메소드
-    public void updateUserId(String userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public void updateUserName(String userName) {
+    public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-    }
+
 }

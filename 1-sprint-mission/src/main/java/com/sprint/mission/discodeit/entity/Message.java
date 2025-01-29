@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private final UUID messageUuid;
-    private final long createdAt;
-    private long updatedAt;
-    private String userId;
+    private final Long createdAt;
+    private Long updatedAt;
+    private final String userId;
     private String messageText;
+
 
     public Message(String userId, String messageText) {
         this.messageUuid = UUID.randomUUID();
@@ -19,17 +24,11 @@ public class Message {
     }
 
     // Getters
-    public UUID getMessageUuid() {
-        return messageUuid;
+    public String getMessageUuid() {
+        return messageUuid.toString();
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
     public String getUserId() {
         return userId;
@@ -40,18 +39,14 @@ public class Message {
     }
 
     // Setters
-    public void setUserId(String userId) {
-        this.userId = userId;
-        updateUpdatedAt();
-    }
+
 
     public void setMessageText(String messageText) {
+        if(messageText == null || messageText.isEmpty()){
+            throw new IllegalArgumentException("messageText cannot be null or empty");
+        }
         this.messageText = messageText;
         updateUpdatedAt();
     }
 
-    // Private Methods
-    private void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-    }
 }
