@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JcfMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
@@ -8,54 +10,43 @@ import java.util.*;
 import static com.sprint.mission.discodeit.util.MyLogger.log;
 
 public class JcfMessageService implements MessageService {
-    private final Map<UUID, Message> data=new HashMap<>();
-//    private final List<Message> data=new ArrayList<>();
 
+    private final MessageRepository messageRepository=new JcfMessageRepository();
     @Override
     public void messageSave(Message message) {
         if (message.getContent().trim().isEmpty()) {
             log("메세지 내용을 입력해주세요.");
             return;
         }
-        data.put(message.getId(),message);
+        messageRepository.createMessage(message.getId(), message);
     }
 
     @Override
     public Optional<Message> findMessage(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return messageRepository.findById(id);
     }
 
     @Override
     public List<Message> findAllMessages() {
-        Message copyMessage=null;
-        List<Message> newMessageList=new ArrayList<>();
-       //깊은복사
-        for (UUID uuid : data.keySet()) {
-            copyMessage=data.get(uuid);
-            newMessageList.add(copyMessage);
-        }
-        return newMessageList;
+        return messageRepository.findAll();
     }
 
     @Override
     public void updateMessage(UUID id,String updateMessage) {
-        if(data.containsKey(id)) {
-            data.get(id).updateMessage(updateMessage);
-            log("메세지 업데이트 완료");
+        if(messageRepository.findById(id).isPresent()) {
+            messageRepository.updateMessage(id, updateMessage);
         }else {
-            log("메세지 ID가 유효하지 않습니다");
+            throw new IllegalArgumentException("해당 아이디를 찾을 수 없습니다");
         }
     }
 
 
     @Override
     public void deleteMessage(UUID id) {
-        if(data.containsKey(id)) {
-            data.remove(id);
+        if(messageRepository.findById(id).isPresent()) {
+            messageRepository.deleteMessage(id);
+        }else {
+            throw new IllegalArgumentException("해당 아이디를 찾을 수 없습니다");
         }
-    }
-    private static Message copyMessage(Message message) {
-        Message copyMessage = new Message(message);
-        return copyMessage;
     }
 }
