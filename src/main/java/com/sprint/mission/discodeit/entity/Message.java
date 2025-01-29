@@ -1,73 +1,117 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.service.jcf.JCF_user;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
-public class Message {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-    private JCF_user jcfUser = new JCF_user();
-    private String userName;
-    private UUID userId;
+public class Message implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-    private UUID channelId;
+  private final UUID id;
+  private final Long createdAt;
+  private Long updatedAt;
+  private UUID userId;
+  private UUID channelId;
+  private String content;
 
-    private String content;
+  @JsonCreator
+  public Message(
+      @JsonProperty("id") UUID id,
+      @JsonProperty("createdAt") Long createdAt
+  ) {
+    this.id = id != null ? id : UUID.randomUUID();
+    this.createdAt = createdAt != null ? createdAt : System.currentTimeMillis();
+  }
 
-    public Message(UUID userId, String content, UUID channelId, String userName){
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.userId = userId;
-        this.content = content;
-        this.channelId = channelId;
-        this.userName = userName;
+  public Message(UUID userId, String content, UUID channelId) {
+    this.id = UUID.randomUUID();
+    this.createdAt = System.currentTimeMillis();
+    this.userId = userId;
+    this.content = content;
+    this.channelId = channelId;
+    this.updatedAt = createdAt;
+  }
+
+  public Message(Message message) {
+    this.id = message.id;
+    this.createdAt = message.createdAt;
+    this.userId = message.userId;
+    this.content = message.content;
+    this.channelId = message.channelId;
+    this.updatedAt = message.updatedAt;
+  }
+
+  public UUID getId() {
+    return id;
+  }
+
+  public Long getCreatedAt() {
+    return createdAt;
+  }
+
+  public Long getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public UUID getUserId() {
+    return userId;
+  }
+
+  public UUID getChannelId() {
+    return channelId;
+  }
+
+  public String getContent() {
+    return content;
+  }
+
+
+
+  public void updateMessage(String message) {
+    this.content = message;
+    this.updatedAt = System.currentTimeMillis();
+  }
+
+  public void setUpdatedAt(Long updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  public void setUserId(UUID userId) {
+    this.userId = userId;
+  }
+
+  public void setChannelId(UUID channelId) {
+    this.channelId = channelId;
+  }
+
+  public void setContent(String content) {
+    this.content = content;
+  }
+
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (obj instanceof Message) {
+      Message message = (Message) obj;
+      return Objects.equals(this.id, message.id);
     }
 
-    public UUID getId() {
-        return id;
+    if (obj instanceof String) {
+      return Objects.equals(this.id.toString(), obj);
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
+    return false;
+  }
 
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public boolean isUserEqual(UUID userId) {
-        return userId.equals(getUser);
-    }
-
-    public boolean isChannelEqual(UUID channelId) {
-        return channelId.equals(getChannel);
-    }
-
-
-    public void updateId(UUID id) {
-        this.id = id;
-    }
-    public void updateCreatedAt(Long CreatedAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void updateMessage(String message){
-        this.content = message;
-        this.updatedAt = System.currentTimeMillis();
-    }
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    // 메세지 넣기
-
-    public String toString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        return userName + "/ createdAt : " + simpleDateFormat.format(createdAt) + "\n" + "[ " + content
-                +" ]";
-
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
 }

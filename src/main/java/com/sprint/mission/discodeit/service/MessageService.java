@@ -5,21 +5,21 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
+import com.sprint.mission.discodeit.service.jcf.JCF_user;
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    public void creat(String content, UUID userId, UUID channelId);
 
-    public void delete(UUID messageId);
+    UUID creat(UUID userId, String content, UUID channelId);
 
-    public void update(UUID messageId, String updateMessage);
+    void delete(UUID messageId);
 
-    List<Message> write(UUID userId, UUID channelId);
+    void update(UUID messageId, String updateMessage);
 
-    public List<Message> getMessage(UUID channelId);
+    void DeleteMessageList(List<UUID> deleteMessageList);
 
-    public void deleteUserMessage(UUID userID);
+    //여기아님
+    List<String> getMessageList(List<UUID> messageIdList, JCF_user jcfUser);
 
-    public void deleteChannelMessage(UUID channelId);
 }
