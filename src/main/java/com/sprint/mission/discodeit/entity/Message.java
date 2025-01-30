@@ -1,51 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import java.io.Serial;
+import java.io.Serializable;
+import lombok.*;
 
-public class Message {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String content;
+@Getter
+@Setter
+public class Message extends BaseEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private final User writer;
     private final Channel channel;
+    private String content;
 
-    public Message(Channel channel, User writer, String content){
-        id = UUID.randomUUID();
-        createdAt=System.currentTimeMillis();
-        updatedAt=null;
+    public Message(Channel channel, User writer, String content) {
+        super();
         this.channel = channel;
         this.writer = writer;
         this.content = content;
     }
 
-    public Long getCreatedAt(){
-        return createdAt;
-    }
-
-    public Long getUpdatedAt(){
-        return updatedAt;
-    }
-
-    public UUID getId(){
-        return id;
-    }
-
-    public String getContent(){
-        return content;
-    }
-
-    public User getWriter(){
-        return writer;
-    }
-
-    public Channel getChannel(){
-        return channel;
-    }
-
-    public void setContent(String content){
+    public void setContent(String content) {
         this.content = content;
-        updatedAt = System.currentTimeMillis();
+        update();
     }
+
 
 }
