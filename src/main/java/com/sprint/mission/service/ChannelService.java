@@ -14,7 +14,7 @@ public interface ChannelService {
     void updateChannel(User user, String channel, String afterChannelName);
 
     // 채널 조회
-    List<Channel> getAllChannelList();
+    List<Channel> findAllChannelList();
 
     // 채널 정보 출력
     void channelInfo(User user);

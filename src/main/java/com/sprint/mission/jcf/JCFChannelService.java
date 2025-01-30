@@ -51,7 +51,7 @@ public class JCFChannelService implements ChannelService {
 
     // 전체 채널 조회
     @Override
-    public List<Channel> getAllChannelList() {
+    public List<Channel> findAllChannelList() {
         System.out.println("\n***채널 전체 조회***");
         for (Channel channel : channelData) {
             System.out.println(channel);

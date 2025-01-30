@@ -52,7 +52,7 @@ public class JCFUserService implements UserService {
 
     // 모든 유저 조회
     @Override
-    public List<User> getSearchAllUser() {
+    public List<User> findAllUserList() {
         System.out.println("\n***사용자 정보 전부 조회***");
         for (User user : userData) {
             System.out.println(user);

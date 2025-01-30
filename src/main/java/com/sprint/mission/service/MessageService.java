@@ -15,7 +15,7 @@ public interface MessageService {
     void updateMessage(User user, Channel channel, String Message, String afterMessage);
 
     // 메시지 정보 조회
-    List<Message> getAllMessageList();
+    List<Message> findAllMessageList();
 
     // 메시지 출력
     void printChannelMessage(User user);

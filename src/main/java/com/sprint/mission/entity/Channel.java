@@ -1,15 +1,16 @@
 package com.sprint.mission.entity;
 
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-public class Channel {
+public class Channel implements Serializable {
     private String channelName;
-    private long createdAt;
+    private Long createdAt;
     private User user;
-    private long updateAt;
+    private Long updateAt;
 
     public Channel(User user, String channelName) {
         this.user = user;

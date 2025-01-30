@@ -21,54 +21,55 @@ public class JavaApplication {
         User Bob = userService.createUser("yeoksam2@codeit.com", "Bob");
 
         // 전체 유저 조회
-        userService.getSearchAllUser();
+        userService.findAllUserList();
 
         // Jack, Bob 이메일 변경
         userService.updateMail(Jack, "sprint@codeit.com");
         userService.updateMail(Bob, "yeoksamWework2@codeit.com");
-        userService.getSearchAllUser();
+        userService.findAllUserList();
 
         // Jack 계정 삭제
         userService.deleteUser(Jack);
-        userService.getSearchAllUser();
+        userService.findAllUserList();
 
         // 채널 CRUD 구현
-        ChannelService channelService = JCFChannelService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
 
         // Jack, Bob의 채널 생성 -> 각 유저마다 채널 객체 생성
         channelService.createChannel(Jack, "codeit");
         channelService.createChannel(Bob, "codeit2");
         channelService.createChannel(Jack, "codeit3");
-        
+
 
         // 전체 채널 조회
-        channelService.getAllChannelList();
+        channelService.findAllChannelList();
 
         // 채널명 변경
         channelService.updateChannel(Jack,"codeit3", "sprint");
-        channelService.getAllChannelList();
+        channelService.findAllChannelList();
 
          // 채널 삭제
         channelService.deleteChannel("sprint");
-        channelService.getAllChannelList();
+        channelService.findAllChannelList();
 
         // 메시지 CRUD 구현
         JCFMessageService messageService = JCFMessageService.getInstance();
 
         // 메시지 생성 -> 채널에 메시지 객체 생성
-        Channel channel = channelService.createChannel(Bob, "codeit2");
-        messageService.createMessage(Bob, channel, "수정 전 메시지 생성1");
-        messageService.createMessage(Bob, channel, "수정 전 메시지 생성2");
+        Channel jackChannel = channelService.createChannel(Jack, "codeit");
+        Channel bobChannel = channelService.createChannel(Bob, "codeit2");
+        messageService.createMessage(Jack, jackChannel, "수정 전 메시지 생성1");
+        messageService.createMessage(Bob, bobChannel, "수정 전 메시지 생성2");
 
         // 특정 유저 메시지 조회
         messageService.printChannelMessage(Bob);
 
         //메시지 변경
-        messageService.updateMessage(Bob, channel, "수정 전 메시지 생성1", "Bob입니다.");
-        messageService.getAllMessageList();
+        messageService.updateMessage(Bob, bobChannel, "수정 전 메시지 생성1", "Bob입니다.");
+        messageService.findAllMessageList();
 
         // 메시지 삭제
         messageService.deleteMessage("수정 전 메시지 생성2");
-        messageService.getAllMessageList();
+        messageService.findAllMessageList();
     }
 }
