@@ -26,14 +26,16 @@ public class FileIOHandler {
     }
 
     //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
-    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> hashMap, String fileName) {
-        if (hashMap == null || hashMap.isEmpty() || fileName == null) {
+    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName) {
+        if (entityMap == null || entityMap.isEmpty() == true || fileName == null) {
             return false;
         }
-        try (FileOutputStream fos = new FileOutputStream(fileName+".ser");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);)
+        String filePath = System.getProperty("user.dir") + "\\" + fileName + ".ser";
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+            ObjectOutputStream oos = new ObjectOutputStream(fos))
         {
-            oos.writeObject(hashMap);
+            oos.writeObject(entityMap);
+            System.out.println("Serialization successful: File saved at " + fileName+".ser");
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,15 +43,15 @@ public class FileIOHandler {
         }
     }
 
-    //
+    //역직렬화 성공여부에 따라 해쉬맵 or null 반환
     public HashMap<UUID, ? extends Entity> deserializeHashMap(String fileName) {
         if (fileName == null) {
             return null;
         }
-        try (FileInputStream fis = new FileInputStream(fileName+".ser");
+        String filePath = System.getProperty("user.dir") + "\\" + fileName + ".ser";
+        try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
-            HashMap<UUID, ? extends Entity> deserializedHashMap = (HashMap<UUID, ? extends Entity>) ois.readObject();
-            return deserializedHashMap;
+            return (HashMap<UUID, ? extends Entity>) ois.readObject();
         } catch (Exception e){
             e.printStackTrace();
             return null;

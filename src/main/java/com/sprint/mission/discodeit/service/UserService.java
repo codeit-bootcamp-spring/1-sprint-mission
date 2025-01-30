@@ -12,6 +12,10 @@ public interface UserService {
 
     HashMap<UUID, User> getUsersMap();
 
+    User getUserById(UUID id);
+
+    String getUserNameById(UUID id);
+
     boolean deleteUser(UUID userId);
 
     boolean changeUserName(UUID userId, String newName);

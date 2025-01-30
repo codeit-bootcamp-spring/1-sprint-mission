@@ -7,20 +7,22 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-    private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
 
+    // 유저 객체가 담기는 해쉬맵
+    private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
     // 외부에서 생성자 접근 불가
     private FileUserRepository() {}
-
     // 레포지토리 객체 LazyHolder 싱글톤 구현.
     private static class FileUserRepositoryHolder {
         private static final FileUserRepository INSTANCE = new FileUserRepository();
     }
-
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static FileUserRepository getInstance() {
         return FileUserRepository.FileUserRepositoryHolder.INSTANCE;
     }
+
+
+
 
     // I/O로 생성된 모든 유저 객체가 담기는 해쉬맵 반환
     @Override
@@ -37,13 +39,13 @@ public class FileUserRepository implements UserRepository {
         return usersMap.get(userId);
     }
 
-    // 특정 유저객체 여부 확인 후 삭제. 불값 반환
+    // 특정 유저객체 존재여부 확인 후 삭제
     @Override
-    public boolean deleteUser(UUID Id) {
-        if (usersMap.containsKey(Id) == false) {
+    public boolean deleteUser(UUID userId) {
+        if (usersMap.containsKey(userId) == false) {
             return false;
         }
-        usersMap.remove(Id);
+        usersMap.remove(userId);
         return true;
     }
 

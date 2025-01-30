@@ -33,16 +33,16 @@ public class FileChannelRepository implements ChannelRepository {
     // 특정 채널객체 여부에 따라 객체 혹은 null 반환.
     @Override
     public Channel getChannel(UUID channelId) {
-        if (channelId==null || channelsMap.containsKey(channelId)==false) {
+        if (channelId==null) {
             return null;
         }
         return channelsMap.get(channelId);
     }
 
-    // 특정 채널객체 여부 확인 후 삭제. 불값 반환
+    // 특정 채널객체 여부 확인 후 삭제
     @Override
     public boolean deleteChannel(UUID channelId) {
-        if (channelId==null || channelsMap.containsKey(channelId) == false) {
+        if (channelId==null) {
             return false;
         }
         channelsMap.remove(channelId);

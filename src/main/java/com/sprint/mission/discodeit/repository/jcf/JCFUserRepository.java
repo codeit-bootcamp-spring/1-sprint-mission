@@ -7,21 +7,22 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
+
     // 유저 객체가 담기는 해쉬맵
     private static final HashMap<UUID, User> usersMap = new HashMap<UUID, User>();
-
     // 외부에서 생성자 접근 불가
     private JCFUserRepository() {}
-
     // 레포지토리 객체 LazyHolder 싱글톤 구현.
     private static class JCFUserRepositoryHolder {
         private static final JCFUserRepository INSTANCE = new JCFUserRepository();
     }
-
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static JCFUserRepository getInstance() {
         return JCFUserRepositoryHolder.INSTANCE;
     }
+
+
+
 
     // 유저 객체가 담기는 해쉬맵 반환
     @Override
@@ -38,7 +39,7 @@ public class JCFUserRepository implements UserRepository {
         return usersMap.get(userId);
     }
 
-    // 특정 유저객체 여부 확인 후 삭제. 불값 반환
+    // 특정 유저객체 존재여부 확인 후 삭제
     @Override
     public boolean deleteUser(UUID id) {
         if (usersMap.containsKey(id) == false) {

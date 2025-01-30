@@ -39,7 +39,7 @@ public class JCFChannelRepository implements ChannelRepository {
         return channelsMap.get(channelId);
     }
 
-    // 특정 채널객체 여부 확인 후 삭제. 불값 반환
+    // 특정 채널객체 여부 확인 후 삭제
     @Override
     public boolean deleteChannel(UUID channelId) {
         if (channelsMap.containsKey(channelId) == false || channelId == null) {

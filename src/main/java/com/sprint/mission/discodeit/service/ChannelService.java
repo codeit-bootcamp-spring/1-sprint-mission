@@ -12,6 +12,8 @@ public interface ChannelService {
 
     HashMap<UUID, Channel> getChannelsMap();
 
+    Channel getChannelById(UUID channelId);
+
     boolean deleteChannel(UUID channelId);
 
     boolean changeChannelName(UUID channelId, String newName);
@@ -22,6 +24,12 @@ public interface ChannelService {
 
     boolean isChannelExist(UUID channelId);
 
-    //채널에 속한 멤버 관리하는 메서드 추가
+    ArrayList<User> getAllMembers(UUID channelId);
+
+    String getChannelNameById(UUID userId);
+
+    boolean printAllMemberNames(UUID channelId);
+
+
 }
 

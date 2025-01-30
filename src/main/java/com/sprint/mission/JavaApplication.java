@@ -1,45 +1,73 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // 싱글톤 객체 생성
-        /*
-        JCFUserService userService = JCFUserService.getInstance();
-        JCFChannelService channelService = JCFChannelService.getInstance();
-        JCFMessageService messageService = JCFMessageService.getInstance();
 
-        //유저 생성
-        UUID user1 = userService.createUser("Kaya");
-        UUID user2 = userService.createUser("Ayden");
-        UUID user3 = userService.createUser("Sia");
+        JCFUserService JCFUserServiceInstance = JCFUserService.getInstance();
+        JCFChannelService JCFChannelServiceInstance = JCFChannelService.getInstance();
+        FileUserService FileUserServiceInstance = FileUserService.getInstance();
+        FileChannelService FileChannelServiceInstance = FileChannelService.getInstance();
+        FileMessageService FileMessageServiceInstance = FileMessageService.getInstance();
+        JCFMessageService JCFMessageServiceInstance = JCFMessageService.getInstance();
 
-        //채널 생성
-        UUID channel1 = channelService.createChannel("Kaya's Channel");
-        //채널1에 모든 유저 추가
-        userService.getUsersMap().keySet().forEach(user -> channelService.addChannelMember(channel1, user));
-        //채널1에 속한 유저 이름 출력
-        channelService.getChannel(channel1).getMembers().forEach(
-                member -> System.out.println(channelService.getChannel(channel1).getChannelName()+" 채널의 멤버 "+ member.getUserName())
-        );
+        //JCF 유저 생성
+        UUID JCFuser1 = JCFUserServiceInstance.createUser("Kaya");
+        UUID JCFuser2 = JCFUserServiceInstance.createUser("Ayden");
+        UUID JCFuser3 = JCFUserServiceInstance.createUser("Sia");
+
+        //JCF채널 생성
+        UUID JCFchannel1 = JCFChannelServiceInstance.createChannel("Kaya's Channel");
+
+        //JCF채널1에 생성한 모든 유저 추가
+        JCFUserServiceInstance.getUsersMap().keySet().stream().forEach(userId -> {JCFChannelServiceInstance.addChannelMember(JCFchannel1, userId);});
+
+        //JCF채널1에 속한 유저 이름 출력
+        JCFChannelServiceInstance.printAllMemberNames(JCFchannel1);
+
+        //직접 생성한 JCF 유저들을 모두 직렬화
+        JCFUserServiceInstance.exportUsersMap("JCFUsersMap");
+
+        //직렬화했던 JCF 유저들을 File 클래스를 이용해 관리할 수 있도록 역직렬화
+        FileUserServiceInstance.importUserMap("JCFUsersMap");
+
+        //FileUserService를 이용해서 불러온 유저들 출력
+        System.out.println("역직렬화로 불러온 파일클래스 유저들 : " + FileUserServiceInstance.getUsersMap().keySet().stream().map((userId) -> FileUserServiceInstance.getUserNameById(userId)).collect(Collectors.joining(", ")));
+
         //메세지 생성
-        UUID message1 = messageService.sendMessage(user1, channel1, "Hello World");
-        //메세지 수정
-        messageService.reviseMessage(message1, "Bye World");
-        //메세지 내용 출력
-        System.out.println("메세지 내용:" + messageService.getMessageContent(message1));
-        //메세지 삭제
-        messageService.deleteMessage(message1);
-        //메세지 존재 시 내용 출력. 존재하지 않을 시 메세지 출력.
-        if (messageService.isMessageExist(message1) == false) {
-            System.out.println("해당 메세지가 존재하지 않습니다.");
-        } else {
-            System.out.println(messageService.getMessageContent(message1));
-        }*/
+        UUID JCFmessage1 = JCFMessageServiceInstance.createMessage(JCFuser2, JCFchannel1, "Hello World");
+        UUID JCFmessage2 = JCFMessageServiceInstance.createMessage(JCFuser1, JCFchannel1, "It's hard to debug... Hey java.. just work al jal ddak ggal sen please.. ");
+
+        //메세지 내용 및 상세정보 출력
+        JCFMessageServiceInstance.printMessageDetails(JCFmessage1);
+
+        //생성한 채널 직렬화
+        JCFChannelServiceInstance.exportChannelMap("JCFChannelMap");
+        //생성한 메세지들 직렬화
+        JCFMessageServiceInstance.exportMessagesMap("JCFMessagesMap");
+        //생성한 채널 역직렬화
+        FileChannelServiceInstance.importChannelMap("JCFChannelMap");
+        //생성한 메세지들 역직렬화
+        FileMessageServiceInstance.importMessageMap("JCFMessagesMap");
+
+        //JCF로 생성하고 직렬화했던 메세지들 역직렬화하여 상세정보 출력
+        UUID FileMessage1 = JCFmessage1;
+        UUID FileMessage2 = JCFmessage2;
+
+        FileMessageServiceInstance.reviseMessageContent(JCFmessage2, "Bye World");
+        FileMessageServiceInstance.printMessageDetails(JCFmessage2);
+
+
     }
 }
