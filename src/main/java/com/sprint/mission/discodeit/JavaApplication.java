@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public class JavaApplication {
     public static void main(String[] args) {
@@ -66,13 +67,23 @@ public class JavaApplication {
         System.out.printf("채널 등록 완료: %s (설명: %s)%n", channel1.getName(), channel1.getDescription());
 
         System.out.println("\n[메시지 등록]");
-        Message message1 = new Message("안녕하세요!", user2.getId(), channel1.getId());
-        messageRepository.save(message1);
-        System.out.printf("메시지 등록 완료: %s (보낸이: %s)%n", message1.getContent(), user2.getUsername());
+
+        // 사용자 및 채널이 유효한지 검증 후 메시지 생성
+        Optional<User> sender = userRepository.findById(user2.getId());
+        Optional<Channel> channel = channelRepository.findById(channel1.getId());
+
+        if (sender.isPresent() && channel.isPresent()) {
+            Message message1 = new Message("안녕하세요!", sender.get().getId(), channel.get().getId());
+            messageRepository.save(message1);
+            System.out.printf("메시지 등록 완료: %s (보낸이: %s, 채널: %s)%n",
+                    message1.getContent(), sender.get().getUsername(), channel.get().getName());
+        } else {
+            System.out.println("메시지 등록 실패: 유효하지 않은 사용자 또는 채널입니다.");
+        }
 
         System.out.println("\n[메시지 삭제]");
-        messageRepository.delete(message1.getId());
-        System.out.println(messageRepository.findById(message1.getId()).isPresent() ?
+        messageRepository.delete(channel1.getId());
+        System.out.println(messageRepository.findById(channel1.getId()).isPresent() ?
                 "메시지 삭제 실패!" : "메시지 삭제 성공!");
     }
 }
