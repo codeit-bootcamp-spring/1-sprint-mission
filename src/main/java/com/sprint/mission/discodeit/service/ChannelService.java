@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
+
+    static final String test = "TEST";
+
     Channel createChannel(String channelName);
 
     Map<UUID, Channel> getChannels();
