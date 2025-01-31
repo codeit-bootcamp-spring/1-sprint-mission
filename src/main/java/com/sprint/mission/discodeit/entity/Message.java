@@ -4,36 +4,50 @@ import java.util.UUID;
 
 public class Message {
     private final UUID id;
-    private final String content;
-    private final UUID userId;
-    private final UUID channelId;
+    private final long createdAt;
+    private long updatedAt;
+    private String content;
+    private UUID senderId;
+    private UUID channelId;
 
-    public Message(String content, UUID userId, UUID channelId) {
+    public Message(UUID uuid, String content, UUID senderId, UUID channelId) {
+        // 유효성 검사 추가
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("메시지 내용이 비어 있습니다.");
+        }
+        if (senderId == null) {
+            throw new IllegalArgumentException("발신자 ID가 비어 있습니다.");
+        }
+        if (channelId == null) {
+            throw new IllegalArgumentException("채널 ID가 비어 있습니다.");
+        }
+
         this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
+        this.updatedAt = createdAt;
         this.content = content;
-        this.userId = userId;
+        this.senderId = senderId;
         this.channelId = channelId;
     }
 
-    // Getter 메서드 추가
-    public UUID getId() {
-        return id;
-    }
+    // 각 필드의 Getter 함수 정의
+    public UUID getId() { return id; }
+    public String getContent() { return content; }
+    public UUID getSenderId() { return senderId; }
+    public UUID getChannelId() { return channelId; }
+    public long getCreatedAt() { return createdAt; }
+    public long getUpdatedAt() { return updatedAt; }
 
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getUserId() { // getUserId 메서드 추가
-        return userId;
-    }
-
-    public UUID getChannelId() { // getChannelId 메서드 추가
-        return channelId;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public void updateContent(String newContent) {
-        // content 필드가 final인 경우 이를 변경하려면 새로운 객체를 생성해야 합니다.
-        // 또는 content 필드를 final에서 제거하고 setter 메서드를 추가해야 합니다.
+        // 업데이트 시에도 유효성 검사 추가
+        if (newContent == null || newContent.trim().isEmpty()) {
+            throw new IllegalArgumentException("새 메시지 내용이 비어있습니다.");
+        }
+        this.content = newContent;
+        this.updatedAt = System.currentTimeMillis();
     }
 }

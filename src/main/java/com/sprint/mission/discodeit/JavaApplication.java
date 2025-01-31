@@ -1,86 +1,48 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+
+import java.util.UUID;
 
 public class JavaApplication {
 
-    public static void main(String[] args) {
-        // 의존성 주입 (Dependency Injection)
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(userService, channelService);
-
-        // 사용자 등록
-        User user1 = new User("Kimdoil", "pw12345678!");
-        User user2 = new User("testName", "test12345678!");
-
+    static void userCRUDTest(UserService userService) {
+        System.out.println("=== 사용자 추가 테스트 ===");
+        User user1 = new User(UUID.randomUUID(), "JohnDoe", "password123");
+        User user2 = new User(UUID.randomUUID(), "JaneDoe", "password456");
         userService.addUser(user1);
         userService.addUser(user2);
 
-        // 채널 등록
-        Channel channel1 = new Channel("8팀", user1.getId());
-        Channel channel2 = new Channel("General", user2.getId());
+        System.out.println("Added Users:");
+        userService.getAllUsers().forEach(System.out::println);
 
-        channelService.addChannel(channel1);
-        channelService.addChannel(channel2);
+        System.out.println("\n=== 모든 사용자 조회 ===");
+        userService.getAllUsers().forEach(System.out::println);
 
-        // 메시지 등록
-        Message message1 = new Message("8팀 김도일입니다.", user1.getId(), channel1.getId());
-        Message message2 = new Message("테스트 계정입니다. 반갑습니다!", user2.getId(), channel2.getId());
+        System.out.println("\n=== 사용자 업데이트 테스트 ===");
+        userService.updateUser(user1.getId(), "JohnDoeUpdated", "newpassword123");
+        System.out.println("Updated User: " + userService.getUser(user1.getId()));
 
-        messageService.addMessage(message1);
-        messageService.addMessage(message2);
-
-        // 조회 (단건)
-        System.out.println("조회 - 단건:");
-        System.out.println("User1: " + userService.getUser(user1.getId()).getUsername());
-        System.out.println("Channel1: " + channelService.getChannel(channel1.getId()).getName());
-        System.out.println("Message1: " + messageService.getMessage(message1.getId()).getContent());
-
-        // 조회 (다건)
-        System.out.println("\n조회 - 다건:");
-        System.out.println("All Users:");
-        userService.getAllUsers().forEach(user -> System.out.println(user.getUsername()));
-
-        System.out.println("\nAll Channels:");
-        channelService.getAllChannels().forEach(channel -> System.out.println(channel.getName()));
-
-        System.out.println("\nAll Messages:");
-        messageService.getAllMessages().forEach(msg -> System.out.println(msg.getContent()));
-
-        // 수정
-        userService.updateUser(user1.getId(), "KimdoilUpdated", "newpw12345678!");
-        channelService.updateChannel(channel1.getId(), "GeneralUpdated");
-        messageService.updateMessage(message1.getId(), "Updated Message!");
-
-        // 수정된 데이터 조회
-        System.out.println("\n수정된 데이터 조회:");
-        System.out.println("Updated User1: " + userService.getUser(user1.getId()).getUsername());
-        System.out.println("Updated Channel1: " + channelService.getChannel(channel1.getId()).getName());
-        System.out.println("Updated Message1: " + messageService.getMessage(message1.getId()).getContent());
-
-        // 삭제
+        System.out.println("\n=== 사용자 삭제 테스트 ===");
         userService.deleteUser(user2.getId());
-        channelService.deleteChannel(channel2.getId());
-        messageService.deleteMessage(message2.getId());
+        System.out.println("Deleted User with ID: " + user2.getId());
 
-        // 삭제 후 조회
-        System.out.println("\n삭제 후 조회:");
-        System.out.println("All Users:");
-        userService.getAllUsers().forEach(user -> System.out.println(user.getUsername()));
+        System.out.println("\n=== 삭제 후 모든 사용자 조회 ===");
+        userService.getAllUsers().forEach(System.out::println);
+    }
 
-        System.out.println("\nAll Channels:");
-        channelService.getAllChannels().forEach(channel -> System.out.println(channel.getName()));
+    public static void main(String[] args) {
+        // JCF 기반 저장소 테스트
+        System.out.println("=== JCF 기반 테스트 ===");
+        UserService jcfUserService = new BasicUserService(new JCFUserRepository());
+        userCRUDTest(jcfUserService);
 
-        System.out.println("\nAll Messages:");
-        messageService.getAllMessages().forEach(msg -> System.out.println(msg.getContent()));
+        // File 기반 저장소 테스트
+        System.out.println("\n=== File 기반 테스트 ===");
+        UserService fileUserService = new BasicUserService(new FileUserRepository());
+        userCRUDTest(fileUserService);
     }
 }
