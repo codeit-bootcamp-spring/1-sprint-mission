@@ -7,8 +7,12 @@ import java.util.UUID;
 
 public interface UserService {
     void addUser(User user);
+
     User getUser(UUID id);
+
     List<User> getAllUsers();
+
     void updateUser(UUID id, String newUsername, String newPassword);
+
     void deleteUser(UUID id);
 }
