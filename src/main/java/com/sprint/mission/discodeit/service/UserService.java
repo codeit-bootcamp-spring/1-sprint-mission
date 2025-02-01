@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import java.util.List;
 import com.sprint.mission.discodeit.entity.User;
 
 public interface UserService {
@@ -14,12 +13,12 @@ public interface UserService {
     User updateEmail(User user, String email);
 
     // 조회
-    User findUserById(UUID id);
-    ArrayList<User> findAllUsers();
+    User findUserById(User u);
+    List<User> findAllUsers();
 
     // 유저 프린트
     void printUser(User user);
-    void printListUsers(ArrayList<User> users);
+    void printListUsers(List<User> users);
 
     // 삭제
     void deleteUserById(User user);

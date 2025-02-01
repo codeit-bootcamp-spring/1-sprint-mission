@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 
+import java.util.List;
 import java.util.ArrayList;
-import java.util.UUID;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -16,9 +16,7 @@ public class JCFChannelService implements ChannelService {
 
     // 채널 생성
     public Channel createChannel(String channelName, String description) {
-        UUID uuid = UUID.randomUUID();
-        long timestamp = System.currentTimeMillis();
-        Channel channel = new Channel(uuid, channelName, description, timestamp);
+        Channel channel = new Channel(channelName, description);
         data.add(channel);
         System.out.println(channel.getChannelName() + " channel created");
         return channel;
@@ -37,17 +35,17 @@ public class JCFChannelService implements ChannelService {
     }
 
     // 채널 조회
-    public Channel findChannel(UUID id) {
-        for (Channel channel : data) {
-            if (channel.getId().equals(id)) {
+    public Channel findChannel(Channel channel) {
+        for (Channel c : data) {
+            if (c.getId().equals(channel.getId())) {
                 System.out.println("channel found");
-                return channel;
+                return c;
             }
         }
         System.out.println("channel not found");
         return null;
     }
-    public ArrayList<Channel> findAllChannels() {
+    public List<Channel> findAllChannels() {
         return data;
     }
 
@@ -55,7 +53,7 @@ public class JCFChannelService implements ChannelService {
     public void printChannel(Channel channel) {
         System.out.println(channel);
     }
-    public void printAllChannels(ArrayList<Channel> channels) {
+    public void printAllChannels(List<Channel> channels) {
         for (Channel channel : channels) {
             System.out.println(channel);
         }

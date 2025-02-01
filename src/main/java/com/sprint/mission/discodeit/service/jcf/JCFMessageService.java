@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-
+import java.util.List;
 import java.util.ArrayList;
-import java.util.UUID;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,7 +9,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 
 
 public class JCFMessageService implements MessageService {
-    private final ArrayList<Message> data;
+    private final List<Message> data;
 
     public JCFMessageService() {
         data = new ArrayList<>();
@@ -18,13 +17,12 @@ public class JCFMessageService implements MessageService {
 
     // 생성
     public Message createMessage(String content, Channel channel, User sender) {
-        UUID uuid = UUID.randomUUID();
-        long timestamp = System.currentTimeMillis();
-        Message message = new Message(uuid, content, channel, sender, timestamp);
+        Message message = new Message(content, channel, sender);
         data.add(message);
         System.out.println(channel.getChannelName() + " channel " + sender.getUsername() + " : " + content);
         return message;
     }
+
     // 메세지 수정
     public Message updateContent(Message message, String content) {
         message.updateContent(content);
@@ -33,9 +31,9 @@ public class JCFMessageService implements MessageService {
     }
 
     // 조회
-    public Message findMessageById(UUID id) {
+    public Message findMessageById(Message m) {
         for (Message message : data) {
-            if (message.getId().equals(id)) {
+            if (message.getId().equals(m.getId())) {
                 System.out.println("message found");
                 return message;
             }
@@ -43,7 +41,16 @@ public class JCFMessageService implements MessageService {
         System.out.println("message not found");
         return null;
     }
-    public ArrayList<Message> findAllMessage() {
+    public List<Message> findMessageByChannel(Message message) {
+        List<Message> messageByChannel = new ArrayList<>();
+        for (Message m : data) {
+            if (m.getChannel().equals(message.getChannel())) {
+                messageByChannel.add(m);
+            }
+        }
+        return messageByChannel;
+    }
+    public List<Message> findAllMessage() {
         return data;
     }
 
@@ -51,14 +58,7 @@ public class JCFMessageService implements MessageService {
     public void printMessage(Message message) {
         System.out.println(message);
     }
-    public void printChannelMessage(Message message, ArrayList<Message> messagesList) {
-        for (Message messages : messagesList) {
-            if (messages.getChannel().equals(message.getChannel())) {
-                System.out.println(messages);
-            }
-        }
-    }
-    public void printAllMessages(ArrayList<Message> messages) {
+    public void printMessagesList(List<Message> messages) {
         for (Message message : messages) {
             System.out.println(message);
         }

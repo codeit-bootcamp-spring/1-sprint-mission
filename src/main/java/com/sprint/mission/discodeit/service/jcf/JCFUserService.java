@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 
+import java.util.List;
 import java.util.ArrayList;
-import java.util.UUID;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 
 public class JCFUserService implements UserService {
-    private final ArrayList<User> data;
+    private final List<User> data;
 
     public JCFUserService() {
         data = new ArrayList<>();
@@ -16,9 +16,7 @@ public class JCFUserService implements UserService {
 
     // 유저 생성
     public User createUser(String username, String password, String email) {
-        UUID uuid = UUID.randomUUID();
-        long timestamp = System.currentTimeMillis();
-        User user = new User(uuid, username, password, email, timestamp);
+        User user = new User(username, password, email);
         data.add(user);
         System.out.println("Created user " + username);
         return user;
@@ -42,9 +40,9 @@ public class JCFUserService implements UserService {
     }
 
     // 유저 조회
-    public User findUserById(UUID id) {
+    public User findUserById(User u) {
         for (User user : data) {
-            if (user.getId().equals(id)) {
+            if (user.getId().equals(u.getId())) {
                 System.out.println("User found");
                 return user;
             }
@@ -52,7 +50,7 @@ public class JCFUserService implements UserService {
         System.out.println("User not found");
         return null;
     }
-    public ArrayList<User> findAllUsers() {
+    public List<User> findAllUsers() {
         return data;
     }
 
@@ -60,7 +58,7 @@ public class JCFUserService implements UserService {
     public void printUser(User user) {
         System.out.println(user);
     }
-    public void printListUsers(ArrayList<User> users) {
+    public void printListUsers(List<User> users) {
         for (User user : users) {
             System.out.println(user);
         }
