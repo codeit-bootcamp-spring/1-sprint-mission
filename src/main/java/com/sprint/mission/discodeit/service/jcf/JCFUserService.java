@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+
 import java.util.*;
 
 public class JCFUserService implements UserService {
@@ -26,6 +27,9 @@ public class JCFUserService implements UserService {
 
     @Override
     public void create(User user) {
+        if (data.containsKey(user.getId())) {
+            throw new IllegalArgumentException("이미 존재하는 사용자입니다: " + user.getUsername());
+        }
         data.put(user.getId(), user); // 사용자 데이터를 저장
     }
 
@@ -41,16 +45,17 @@ public class JCFUserService implements UserService {
 
     @Override
     public void update(UUID id, User user) {
-        // ID가 존재하는 경우 사용자 정보 업데이트
-        if (data.containsKey(id)) {
-            data.put(id, user);
-        } else {
-            throw new IllegalArgumentException("User not found: " + id); // ID가 없으면 예외 발생
+        if (!data.containsKey(id)) {
+            throw new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다: " + id);
         }
+        data.put(id, user); // 사용자 정보 업데이트
     }
 
     @Override
     public void delete(UUID id) {
+        if (!data.containsKey(id)) {
+            throw new IllegalArgumentException("삭제할 사용자가 존재하지 않습니다: " + id);
+        }
         data.remove(id); // 사용자 데이터 삭제
     }
 }

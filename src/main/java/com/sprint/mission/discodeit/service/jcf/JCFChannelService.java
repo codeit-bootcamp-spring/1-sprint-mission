@@ -25,6 +25,9 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void create(Channel channel) {
+        if (data.containsKey(channel.getId())) {
+            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channel.getName());
+        }
         data.put(channel.getId(), channel);
     }
 
@@ -40,15 +43,17 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(UUID id, Channel channel) {
-        if (data.containsKey(id)) {
-            data.put(id, channel);
-        } else {
-            throw new IllegalArgumentException("Channel not found for ID: " + id);
+        if (!data.containsKey(id)) {
+            throw new IllegalArgumentException("해당 ID의 채널을 찾을 수 없습니다: " + id);
         }
+        data.put(id, channel);
     }
 
     @Override
     public void delete(UUID id) {
+        if (!data.containsKey(id)) {
+            throw new IllegalArgumentException("삭제할 채널이 존재하지 않습니다: " + id);
+        }
         data.remove(id);
     }
 }
