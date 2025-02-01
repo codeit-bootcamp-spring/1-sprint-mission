@@ -29,6 +29,7 @@ public class JCFMessageService implements MessageService {
         System.out.println("content updated");
         return message;
     }
+
     // 조회
     public Message findMessageById(Message m) {
         for (Message message : data) {
