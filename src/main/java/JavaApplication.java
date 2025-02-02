@@ -2,7 +2,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.PassWordFormatException;
-
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -15,7 +14,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,9 +59,6 @@ public class JavaApplication {
         ((BasicUserService) userDB).printing();
         ((BasicChannelService) channelDB).printing();
         ((BasicMessageService) messageDB).printing();
-
-
-
 
         //userDB.createUser(new User.Builder().buildEmail("a@b"). ... .build()); -> 하고싶었는데, user A, B, C alias가 필요.
         //없으면 -> sout(userDB.getUserList().~~find userA -> by traversing userList using PKable props(ex email)
@@ -141,6 +136,7 @@ public class JavaApplication {
 
         System.out.println("==========Update Channel Information==========");
         channelDB.updateChannelField(((BasicChannelService) channelDB).getChannelList().get(c1.getId()).getId(), "channelName", "channel_1_mod");
+
         channelDB.updateChannelField(c2.getId(), "owner", F);
 
         System.out.println("==========Modified Channel Information==========");
@@ -187,6 +183,7 @@ public class JavaApplication {
 
         System.out.println("2. Delete c2, message of channel 2 will flush, user channel attending list related to c2 will update automatically");
         channelDB.deleteChannel(c2.getId());
+
         System.out.println(userDB.getUserList().get(D.getId()).toString());
         System.out.println(userDB.getUserList().get(E.getId()).toString());
         System.out.println(userDB.getUserList().get(F.getId()).toString());
@@ -203,6 +200,7 @@ public class JavaApplication {
         ((BasicUserService) userDB).printing();
         ((BasicChannelService) channelDB).printing();
         ((BasicMessageService) messageDB).printing();
+
         System.out.println("==========Independent Field==========");
         System.out.println(c3.getChannelMessageList());
         System.out.println(c3.getChannelUserList());
@@ -211,6 +209,7 @@ public class JavaApplication {
         userFile.save(userDB.getUserList());
         channelFile.save(channelDB.getChannelList());
         messageFile.save(messageDB.getMessageList());
+
 
 
 

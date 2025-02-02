@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Long createdAt;
     private Long updatedAt;
@@ -20,6 +22,7 @@ public class Channel implements Serializable {
     private List<User> channelUserList;
     private List<Message> channelMessageList;
     //일단, 돌아가는 코드를 위해 살려두겠습니다. 리팩토링 하며 삭제예정
+
 
 
     public static class Builder {
