@@ -26,13 +26,13 @@ public class JCFChannelRepository implements ChannelRepository {
         return new ArrayList<>(data.values());
     }
 
-    @Override
-    public boolean update(UUID id, String name, String topic, ChannelType type) {
-        return data.computeIfPresent(id, (key, c) -> {
-            c.update(name, topic, type);
-            return c;
-        }) != null;
-    }
+//    @Override
+//    public boolean update(UUID id, String name, String topic, ChannelType type) {
+//        return data.computeIfPresent(id, (key, c) -> {
+//            c.update(name, topic, type);
+//            return c;
+//        }) != null;
+//    }
 
     @Override
     public boolean delete(UUID id) {

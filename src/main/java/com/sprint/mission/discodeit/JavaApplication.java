@@ -20,9 +20,9 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        UserRepository userRepository = new FileUserRepository("src/main/java/serialized/users.ser");
+        ChannelRepository channelRepository = new FileChannelRepository("src/main/java/serialized/channels.ser");
+        MessageRepository messageRepository = new FileMessageRepository("src/main/java/serialized/messages.ser");
 
         ServiceFactory ServiceFactory = new BasicServiceFactory(userRepository, channelRepository, messageRepository);
         UserService userService = ServiceFactory.getUserService();

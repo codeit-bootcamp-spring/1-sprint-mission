@@ -51,8 +51,11 @@ public class BasicMessageService implements MessageService {
         notifyMentions(newMessage.getAuthor(), mentionedUsers);
         return newMessage;
     }
-
-    @Override
+    /**
+     * @deprecated 새로운 sendMessage(Message newMessage) 사용을 권장합니다.
+     * 메시지 전송 시, List<User> allUsers를 매번 파라미터로 넘겨주는 불필요함 개선
+     */
+    @Deprecated
     public Message sendMessage(Message message, List<User> allUsers) {
         return sendMessage(message);
     }
@@ -73,7 +76,14 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public boolean editMessage(UUID id, String updatedContent) {
-        return messageRepository.update(id, updatedContent);
+        Optional<Message> byId = messageRepository.findById(id);
+        if(byId.isPresent()){
+            Message message = byId.get();
+            message.update(updatedContent);
+            messageRepository.save(message);
+            return true;
+        }
+        return false;
     }
 
     @Override
