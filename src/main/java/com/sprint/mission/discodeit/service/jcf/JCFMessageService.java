@@ -17,11 +17,10 @@ public class JCFMessageService implements MessageService {
 
     // Create Message
     @Override
-    public Message createMessage(Channel channel, User writer, String content) {
-        if (isContent(content)) {
-            Message newMessage = new Message(channel, writer, content);
-            data.put(newMessage.getId(),newMessage);
-            System.out.println(channel.getTitle() + " channel: " + writer.getName() + " 님께서 새로운 메시지를 보내셨습니다.");
+    public Message createMessage(UUID channelId, UUID authorId, String content) {
+        if(isContent(content)){
+            Message newMessage = new Message(content,channelId,authorId);
+            data.put(newMessage.getId(), newMessage);
             return newMessage;
         }
         return null;
@@ -30,7 +29,7 @@ public class JCFMessageService implements MessageService {
     // Read all message
     @Override
     public List<Message> getAllMessageList() {
-        return data.values().stream().collect(Collectors.toList());
+        return new ArrayList<>(data.values());
     }
 
     // id 받아서 -> Read that message
@@ -43,35 +42,30 @@ public class JCFMessageService implements MessageService {
         return message;
     }
 
-    //message 정보 출력하기
     @Override
-    public void printMessageInfo(Message message) {
-        System.out.println(message);
-    }
-
-    //message 정보 리스트로 출력하기
-    @Override
-    public void printMessageListInfo(List<Message> messageList) {
-        for (Message message : messageList) {
-            printMessageInfo(message);
+    public void deleteMessage(UUID messageId) {
+        Message message = data.remove(messageId);
+        if(message == null) {
+            System.out.println("삭제할 메시지가 존재하지 않습니다.");
+        } else {
+            System.out.println("메시지가 성공적으로 삭제되었습니다 : " + message.getContent());
         }
     }
 
-    // update Message Content
     @Override
-    public void updateMessage(Message message, String content) {
-        if (isContent(content)) {
-            message.updateContent(content);
-            System.out.println("수정되었습니다");
+    public void updateMessage(UUID messageId, String content) {
+        Message message = data.get(messageId);
+        if(message == null) {
+            System.out.println("수정할 메시지가 존재하지 않습니다.");
+            return;
         }
+        if(isContent(content)) {
+            message.setContent(content);
+            System.out.println("메시지가 성공적으로 수정되었습니다. : " + content);
+        }
+
     }
 
-    // Delete Message
-    @Override
-    public void deleteMessage(Message message) {
-        data.remove(message);
-        System.out.println("삭제된 메세지입니다.");
-    }
 
     // 유효성 검사 -> message에 내용이 들어가있는지?
     private boolean isContent(String content) {

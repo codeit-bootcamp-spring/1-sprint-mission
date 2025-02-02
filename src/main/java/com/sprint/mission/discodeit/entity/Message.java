@@ -2,58 +2,51 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
 
-public class Message extends Entity{
-    //private final UUID id;
-    private final Channel channel;
-    private final User user;
-    private final long createdAt;
-    private long updatedAt;
+public class Message extends BaseEntity {
     private String content;
+    private UUID channelId; //메세지가 작성된 채널의 ID
+    private UUID authorId; //메시지를 작성한 사용자의 ID
 
-    public Message(Channel channel, User user, String content) {
+    public Message(String content, UUID channelId, UUID authorId) {
         super();
-        //id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.channel = channel;
-        this.user = user;
         this.content = content;
-    }
-   /* public UUID getId() {
-        return id;
-    }*/
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public User getWriter() {
-        return user;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
     public String getContent() {
         return content;
     }
 
-    // update
-    public void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public void updateContent(String updateContent){
-        this.content = updateContent;
-        updateUpdatedAt();
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(UUID channelId) {
+        this.channelId = channelId;
+    }
+
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(UUID authorId) {
+        this.authorId = authorId;
     }
 
     @Override
     public String toString() {
-        return "Message{channel:" + channel.getTitle() + "user:" + user.getName() + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Message{" +
+                "messageId=" + getId() +
+                ", content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                ", createdAt=" + getCreatedAt() +
+                ", updatedAt=" + getUpdatedAt() +
+                '}';
     }
 }

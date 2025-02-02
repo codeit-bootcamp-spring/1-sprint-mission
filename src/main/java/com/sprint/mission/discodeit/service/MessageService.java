@@ -10,7 +10,8 @@ import java.util.UUID;
 public interface MessageService {
 
     //새로운 메시지 생성
-    Message createMessage(Channel channel, User writer, String content);
+
+    Message createMessage(UUID channelId, UUID authorId, String content);
 
     // 메세지 모두 조회
     List<Message> getAllMessageList();
@@ -18,13 +19,9 @@ public interface MessageService {
     // message 고유 ID로 메세지 조회
     Message searchById(UUID messageId);
 
-    // 메세지 정보 리스트로 전체 출력
-    void printMessageInfo(Message message);
-    void printMessageListInfo(List<Message> messageList);
-
     // 메세지 삭제
-    void deleteMessage(Message message);
+    void deleteMessage(UUID messageId);
 
     // 메세지 수정
-    void updateMessage(Message message, String content);
+    void updateMessage(UUID messageId, String content);
 }

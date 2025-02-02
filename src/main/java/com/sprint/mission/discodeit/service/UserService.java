@@ -10,18 +10,15 @@ public interface UserService {
     User createUser(String name, String email);
 
     // 유저 정보 수정 - name 과 email 만 수정 가능
-    void updateUserName(User user, String name);
-    void updateUserEmail(User user, String email);
+    void updateUserName(UUID userId, String name);
+    void updateUserEmail(UUID userId, String email);
 
     // 모든 유저 조회
     List<User> getAllUserList();
     User searchById(UUID userId);
 
-    // 유저 정보 전체 리스트로 출력
-    void printUserInfo(User user);
-    void printUserListInfo(List<User> userList);
 
     // 유저 삭제
-    void deleteUser(User user);
+    void deleteUser(UUID userId);
 
 }

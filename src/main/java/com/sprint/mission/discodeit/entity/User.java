@@ -2,79 +2,59 @@ package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-public class User extends Entity{
-    //private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
-    private final List<Channel> channelList;
+
+public class User extends BaseEntity {
     private String userName;
     private String userEmail;
+    private List<Channel> channelList; //유저가 가지고 있는 채널 리스트
 
     //생성자
     public User(String userName, String userEmail) {
-        //id = UUID.randomUUID();
         super();
-        createdAt = System.currentTimeMillis();
-        channelList = new ArrayList<>();
         this.userName = userName;
         this.userEmail = userEmail;
+        this.channelList = new ArrayList<>();
     }
 
-   /* public UUID getId() {
-        return id;
-    }*/
-
-    public String getName() {
+    public String getUserName() {
         return userName;
     }
 
-    public String getEmail() {
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserEmail() {
         return userEmail;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     public List<Channel> getChannelList() {
         return channelList;
     }
 
-    private void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
+    public void setChannelList(List<Channel> channelList) {
+        this.channelList = channelList;
     }
 
-    //유저 이름 수정
-    public void updateName(String userName) {
-        this.userName = userName;
-        updateUpdatedAt();
+    public void addChannel(Channel channel) {
+        this.channelList.add(channel);
     }
-
-    //유저 이메일 수정
-    public void updateEmail(String email) {
-        this.userEmail = email;
-        updateUpdatedAt();
-    }
-
-    //유저에 Channel 추가하기
-    public void addChannel(Channel newChannel) {
-        channelList.add(newChannel);
-    }
-
-    public void removeChannel(Channel removeChannel) {
-        channelList.remove(removeChannel);
+    public void removeChannel(Channel channel){
+        this.channelList.remove(channel);
     }
 
     @Override
-    public String toString(){
-        return "User{name:" + userName + ",email:" + userEmail
-                + ",channelList:" + channelList + ",createdAt:" + createdAt
-                + ",updateAt:" + updatedAt + "}";
+    public String toString() {
+        return "User{" +
+                "userId=" + getId() +
+                ", userName='" + userName + '\'' +
+                ", userEmail='" + userEmail + '\'' +
+                ", channelList=" + channelList +
+                '}';
     }
 }
