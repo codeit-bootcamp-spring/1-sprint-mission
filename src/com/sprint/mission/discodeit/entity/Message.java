@@ -1,30 +1,22 @@
 package com.sprint.mission.discodeit.entity;
-
-import java.io.Serializable;
 import java.util.UUID;
 
-public class Message implements Serializable {
-
-
-    private static final Long serialVersionUID = 1L;
-    private UUID id ;
+public class Message {
+    private User user; //유저
+    private String id ;
     private String content;
-    private final Long createdAt;
-    private Long updatedAt;
+    private long createdAt;
+    private long updatedAt;
 
-    private UUID senderId;
-    private UUID channelId;
-
-    public Message(UUID userId, UUID channelId, String content){
-        this.id = UUID.randomUUID();
+    public Message(User user, String content){
+        this.id = UUID.randomUUID().toString();
         this.content = content;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
-        this.senderId = userId;
-        this.channelId=channelId;
+        this.user = user;
     }
 
     //get
-    public UUID getMsgId(){
+    public String getMsgId(){
         return this.id;
     }
     public String getContent(){
@@ -36,8 +28,8 @@ public class Message implements Serializable {
     public long getUpdatedAt(){
         return this.updatedAt;
     }
-    public UUID getUserID(){
-        return this.senderId;
+    public User getUser(){
+        return this.user;
     }
 
     //update

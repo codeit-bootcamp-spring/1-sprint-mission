@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.util.UUID;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Channel implements Serializable  {
 
@@ -20,8 +21,8 @@ public class Channel implements Serializable  {
 
     //get
     public UUID getChannelId(){
-        return this.id;
-    }
+            return this.id;
+        }
     public String getChannelName(){
         return this.channelName;
     }
@@ -29,7 +30,7 @@ public class Channel implements Serializable  {
         return this.createdAt;
     }
     public Long getUpdatedAt(){
-        return this.updatedAt;
+            return this.updatedAt;
     }
 
     //update
