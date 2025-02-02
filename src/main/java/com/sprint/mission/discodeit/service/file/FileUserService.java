@@ -107,7 +107,7 @@ public class FileUserService implements UserService {
             System.out.println("유저 직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        fileIOHandlerInstance.serializeHashMap(FileUserRepositoryInstance.getUsersMap(), fileName);
+        fileIOHandlerInstance.serializeHashMap(FileUserRepositoryInstance.getUsersMap(), "User\\"+fileName);
         System.out.println("유저 직렬화 성공!");
         return true;
     }
@@ -119,7 +119,7 @@ public class FileUserService implements UserService {
             System.out.println("유저 불러오기 실패. 입력값을 확인해주세요.");
             return false;
         }
-        HashMap<UUID, User> importedUserMap = (HashMap<UUID, User>) fileIOHandlerInstance.deserializeHashMap(fileName);
+        HashMap<UUID, User> importedUserMap = (HashMap<UUID, User>) fileIOHandlerInstance.deserializeHashMap("User\\"+fileName);
         if (importedUserMap==null || importedUserMap.isEmpty()){
             System.out.println("유저 불러오기 실패. 추가할 유저가 존재하지 않습니다.");
             return false;

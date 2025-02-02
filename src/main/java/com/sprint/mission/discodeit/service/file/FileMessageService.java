@@ -147,7 +147,7 @@ public class FileMessageService implements MessageService {
             System.out.println("메세지 역직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        fileIOHandlerInstance.serializeHashMap(FileMessageRepositoryInstance.getMessagesMap(), fileName);
+        fileIOHandlerInstance.serializeHashMap(FileMessageRepositoryInstance.getMessagesMap(), "Message\\"+fileName);
         System.out.println("메세지 직렬화 성공!");
         return true;
     }
@@ -159,7 +159,7 @@ public class FileMessageService implements MessageService {
             System.out.println("채널 불러오기 실패. 입력값을 확인해주세요.");
             return false;
         }
-        HashMap<UUID, Message> importedMessageMap = (HashMap<UUID, Message>) fileIOHandlerInstance.deserializeHashMap(fileName);
+        HashMap<UUID, Message> importedMessageMap = (HashMap<UUID, Message>) fileIOHandlerInstance.deserializeHashMap("Message\\"+fileName);
         if (importedMessageMap == null || importedMessageMap.isEmpty()) {
             System.out.println("메세지 불러오기 실패. 추가할 메세지가 존재하지 않습니다.");
             return false;

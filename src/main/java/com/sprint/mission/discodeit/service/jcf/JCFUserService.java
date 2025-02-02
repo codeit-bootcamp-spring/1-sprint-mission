@@ -104,7 +104,7 @@ public class JCFUserService implements UserService{
             System.out.println("유저 직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        IOHandlerInstance.serializeHashMap(JCFUserRepositoryInstance.getUsersMap(), fileName);
+        IOHandlerInstance.serializeHashMap(JCFUserRepositoryInstance.getUsersMap(), "User\\"+fileName);
         System.out.println("유저 직렬화 성공!");
         return true;
     }

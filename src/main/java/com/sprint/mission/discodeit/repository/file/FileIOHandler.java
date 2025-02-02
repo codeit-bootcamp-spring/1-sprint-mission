@@ -30,7 +30,7 @@ public class FileIOHandler {
         if (entityMap == null || entityMap.isEmpty() == true || fileName == null) {
             return false;
         }
-        String filePath = System.getProperty("user.dir") + "\\" + fileName + ".ser";
+        String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileOutputStream fos = new FileOutputStream(filePath);
             ObjectOutputStream oos = new ObjectOutputStream(fos))
         {
@@ -48,7 +48,7 @@ public class FileIOHandler {
         if (fileName == null) {
             return null;
         }
-        String filePath = System.getProperty("user.dir") + "\\" + fileName + ".ser";
+        String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (HashMap<UUID, ? extends Entity>) ois.readObject();

@@ -157,7 +157,7 @@ public class FileChannelService implements ChannelService {
             System.out.println("채널 직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        fileIOHandlerInstance.serializeHashMap(FileChannelRepositoryInstance.getChannelsMap(), fileName);
+        fileIOHandlerInstance.serializeHashMap(FileChannelRepositoryInstance.getChannelsMap(), "Channel\\"+fileName);
         System.out.println("채널 직렬화 성공!");
         return true;
     }
@@ -170,7 +170,7 @@ public class FileChannelService implements ChannelService {
             System.out.println("채널 불러오기 실패. 입력값을 확인해주세요.");
             return false;
         }
-        HashMap<UUID, Channel> importedChannelMap = (HashMap<UUID, Channel>) fileIOHandlerInstance.deserializeHashMap(fileName);
+        HashMap<UUID, Channel> importedChannelMap = (HashMap<UUID, Channel>) fileIOHandlerInstance.deserializeHashMap("Channel\\"+fileName);
         if (importedChannelMap==null || importedChannelMap.isEmpty()){
             System.out.println("채널 불러오기 실패. 추가할 채널이 존재하지 않습니다.");
             return false;

@@ -147,7 +147,7 @@ public class JCFMessageService implements MessageService {
             System.out.println("메세지 직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        IOHandlerInstance.serializeHashMap(JCFMessageRepositoryInstance.getMessagesMap(), fileName);
+        IOHandlerInstance.serializeHashMap(JCFMessageRepositoryInstance.getMessagesMap(), "Message\\"+fileName);
         System.out.println("메세지 직렬화 성공!");
         return true;
     }

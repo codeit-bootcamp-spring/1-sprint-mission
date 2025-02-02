@@ -157,7 +157,7 @@ public class JCFChannelService implements ChannelService {
             System.out.println("채널 직렬화 실패. 입력값을 확인해주세요.");
             return false;
         }
-        fileIOHandlerInstance.serializeHashMap(JCFChannelRepositoryInstance.getChannelsMap(), fileName);
+        fileIOHandlerInstance.serializeHashMap(JCFChannelRepositoryInstance.getChannelsMap(), "Channel\\"+fileName);
         System.out.println("채널 직렬화 성공!");
         return true;
     }
