@@ -76,7 +76,14 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public boolean editMessage(UUID id, String updatedContent) {
-        return messageRepository.update(id, updatedContent);
+        Optional<Message> byId = messageRepository.findById(id);
+        if(byId.isPresent()){
+            Message message = byId.get();
+            message.update(updatedContent);
+            messageRepository.save(message);
+            return true;
+        }
+        return false;
     }
 
     @Override

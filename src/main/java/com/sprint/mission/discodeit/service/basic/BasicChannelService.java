@@ -48,13 +48,12 @@ public class BasicChannelService implements ChannelService {
         Optional<Channel> byId = channelRepository.findById(id);
         if (byId.isPresent()) {
             Channel channel = byId.get();
-            channel.setChannelInfo(name, topic, type);
+            channel.update(name, topic, type);
             channelRepository.save(channel);
             return true;
         }
         return false;
     }
-
 
 
     @Override

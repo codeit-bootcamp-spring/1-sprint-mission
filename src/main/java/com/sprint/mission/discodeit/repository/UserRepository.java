@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +14,6 @@ public interface UserRepository {
     Optional<User> findByName(String name);
 
     List<User> findAll();
-
-    boolean update(UUID id, String name, String email, UserStatus status);
 
     boolean delete(UUID id);
 }
