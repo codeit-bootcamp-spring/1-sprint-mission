@@ -26,14 +26,6 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean update(UUID id, String updatedContent) {
-        return data.computeIfPresent(id, (key, m) -> {
-            m.update(updatedContent);
-            return m;
-        }) != null;
-    }
-
-    @Override
     public boolean delete(UUID id) {
         return data.remove(id) != null;
     }

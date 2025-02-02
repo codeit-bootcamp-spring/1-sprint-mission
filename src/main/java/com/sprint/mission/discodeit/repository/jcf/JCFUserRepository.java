@@ -34,14 +34,6 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean update(UUID id, String name, String email, UserStatus status) {
-        return data.computeIfPresent(id, (key, u) -> {
-            u.update(name, email, status);
-            return u;
-        }) != null;
-    }
-
-    @Override
     public boolean delete(UUID id) {
         return data.remove(id) != null;
     }

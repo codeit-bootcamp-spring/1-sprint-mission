@@ -46,7 +46,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean updateUserProfile(UUID id, String name, String email, UserStatus status) {
-        return userRepository.update(id, name, email, status);
+        Optional<User> byId = userRepository.findById(id);
+        if(byId.isPresent()){
+            User user = byId.get();
+            user.update(name, email, status);
+            userRepository.save(user);
+            return true;
+        }
+        return false;
     }
 
     @Override
