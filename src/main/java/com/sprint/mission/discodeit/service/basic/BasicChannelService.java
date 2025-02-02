@@ -45,8 +45,17 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public boolean editChannel(UUID id, String name, String topic, ChannelType type) {
-        return channelRepository.update(id, name, topic, type);
+        Optional<Channel> byId = channelRepository.findById(id);
+        if (byId.isPresent()) {
+            Channel channel = byId.get();
+            channel.setChannelInfo(name, topic, type);
+            channelRepository.save(channel);
+            return true;
+        }
+        return false;
     }
+
+
 
     @Override
     public boolean deleteChannel(UUID id) {

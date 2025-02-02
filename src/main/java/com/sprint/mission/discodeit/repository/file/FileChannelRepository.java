@@ -11,17 +11,4 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
     public FileChannelRepository(String FILE_PATH) {
         super(FILE_PATH);
     }
-
-
-    @Override
-    public boolean update(UUID id, String name, String topic, ChannelType type) {
-        boolean updated = data.computeIfPresent(id, (key, c) -> {
-            c.update(name, topic, type);
-            return c;
-        }) != null;
-        if (updated) {
-            saveData();
-        }
-        return updated;
-    }
 }

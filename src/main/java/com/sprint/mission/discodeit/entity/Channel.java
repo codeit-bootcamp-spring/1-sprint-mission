@@ -16,6 +16,12 @@ public class Channel extends BaseEntity {
         this.type = type;
     }
 
+    public void setChannelInfo(String name, String topic, ChannelType type){
+        this.name = name;
+        this.topic = topic;
+        this.type = type;
+    }
+
     public String getName() {
         return name;
     }
