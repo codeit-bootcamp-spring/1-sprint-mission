@@ -1,50 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
-    private String content;
-    private String author;
-    public String channel;
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public Message(String content, String author, String channel) {
-        super();
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.content = content;
-        this.author = author;
-        this.channel = channel;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
-    // getter
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
     public String getContent() {
         return content;
     }
-    public String getAuthor() {
-        return author;
-    }
-    public String getChannel() {
-        return channel;
+
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    // update
-    public void updateContent(String content) {
-        this.content = content;
-        update();
+    public UUID getAuthorId() {
+        return authorId;
     }
-    public void updateAuthor(String author) {
-        this.author = author;
-        update();
-    }
-    public void updateChannel(String channel) {
-        this.channel = channel;
-        update();
-    }
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", author='" + author + '\'' +
-                ", channel='" + channel + '\'' +
 
-                '}';
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

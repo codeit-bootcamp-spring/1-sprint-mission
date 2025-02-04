@@ -6,21 +6,35 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final Map<String, User> data = new HashMap<>();
+    private final Map<UUID, User> data;
 
-    @Override
-    public void saveAll(List<User> users) {
-        users.forEach(user -> data.put(user.getId().toString(), user));
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public List<User> loadAll() {
-        return new ArrayList<>(data.values());
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public void reset() {
-        data.clear(); // 메모리 데이터를 초기화
-        System.out.println("메모리 데이터가 초기화되었습니다.");
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
