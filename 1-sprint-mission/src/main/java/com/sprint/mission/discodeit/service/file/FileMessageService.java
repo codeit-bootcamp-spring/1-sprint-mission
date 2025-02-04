@@ -1,90 +1,106 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileMessageService implements MessageService {
     private static FileMessageService instance;
     private final MessageRepository messageRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
-    public FileMessageService(MessageRepository messageRepository, UserService userService) {
+    public FileMessageService(MessageRepository messageRepository, UserRepository userRepository, ChannelRepository channelRepository) {
         this.messageRepository = messageRepository;
-        this.userService = userService;
+        this.userRepository = userRepository;
+        this.channelRepository = channelRepository;
     }
 
-    public static synchronized FileMessageService getInstance(MessageRepository messageRepository, UserService userService){
+    public static synchronized FileMessageService getInstance(MessageRepository messageRepository, UserRepository userRepository, ChannelRepository channelRepository){
         if(instance ==null){
-            instance = new FileMessageService(messageRepository ,userService);
+            instance = new FileMessageService(messageRepository ,userRepository, channelRepository);
         }
         return instance;
     }
 
     @Override
-    public void createMessage(Message message) {
-        if (userService.readUser(message.getUserId()).isEmpty()) {
-            System.out.println("Cannot create message. User with ID " + message.getUserId() + " does not exist.");
-            return;
-        }
-        if (userService.readUser(message.getUserId()).isEmpty()) {
-            System.out.println("Cannot create message. User with ID " + message.getUserId() + " does not exist.");
-            return;
-        }
+    public Message create(String content, UUID channelId, UUID authorId) {
         try {
-            messageRepository.save(message);
-            System.out.println("Channel created >>>> " + message.getUserId() + " : " + message.getMessageText());
+            Message newMessage = new Message(content, channelId,authorId);
+            if(!channelRepository.existsById(channelId)) {
+                throw new IllegalArgumentException("Channel not found");
+            } else if (!userRepository.existsById(authorId)) {
+                throw new IllegalArgumentException("User not found");
+            }
+            messageRepository.save(newMessage);
+            System.out.println("Message created: " + content);
+            return newMessage;
         }catch (IllegalArgumentException e){
-            System.out.println("Failed to Create User >>>> " + e.getMessage());
-        }
-    }
-
-    @Override
-    public Optional<Message> readMessage(String messageUuid) {
-        try {
-            return messageRepository.findByUuid(messageUuid);
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to Search User >>>> " + e.getMessage());
+            System.out.println(e.getMessage());
             return null;
         }
     }
 
     @Override
-    public List<Message> readAllMessages() {
-        List<Message>messages =  messageRepository.findAll();
-        if(messages.isEmpty()){
-            System.out.println("   No message found ");
-        }
-        return messages;
-    }
-
-    @Override
-    public void updateMessage(String messageUuid, String newMessageText) {
+    public Message find(UUID messageId) {
         try {
-            Optional<Message> message = messageRepository.findByUuid(messageUuid);
-            message.get().setMessageText(newMessageText);
-            messageRepository.delete(messageUuid);
-            messageRepository.save(message.orElse(null));
-            System.out.println("Message updated: " + message.get().getMessageText() + " (User ID: " + message.get().getUserId() + ")");
+            return messageRepository.findById(messageId)
+                    .orElseThrow(() -> new IllegalArgumentException("Message not found"));
         }catch (IllegalArgumentException e){
-            System.out.println("Failed to Update Message >>>> " + e.getMessage());
+            System.out.println("Failed to read message: " + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public void deleteMessage(String messageUuid) {
+    public List<Message> findAll() {
         try {
-            messageRepository.delete(messageUuid);
-            System.out.println("Message with UUID " + messageUuid + " deleted.");
-
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to Delete Message >>>> " + e.getMessage());
+            List<Message> messages = messageRepository.findAll();
+            if (messages.isEmpty()) {
+                throw new IllegalStateException("No messages found in the system.");
+            }
+            return messages;
+        }catch (IllegalStateException e){
+            System.out.println("Failed to read all messages: " + e.getMessage());
+            return List.of();
         }
     }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        try {
+            Message message= find(messageId);
+            message.update(newContent);
+            System.out.println("Message updated: " + newContent);
+            messageRepository.save(message);
+            return message;
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to update message: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        try {
+            messageRepository.deleteById(messageId);
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to delete message: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+
 
 
 

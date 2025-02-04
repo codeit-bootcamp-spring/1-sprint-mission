@@ -22,7 +22,7 @@ public class JCFChannelService implements ChannelService {
 
     }
 
-    public static synchronized JCFChannelService getInstance(ChannelRepository channelRepository, UserService userService) {
+    public static synchronized JCFChannelService getInstance(ChannelRepository channelRepository) {
         if (instance == null) {
             instance = new JCFChannelService(channelRepository);
         }

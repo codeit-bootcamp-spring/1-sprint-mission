@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserService implements UserService {
     private static FileUserService instance;
@@ -25,62 +26,67 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(String username, String email, String password) {
+        User newUser = new User(username, email, password);
         try {
-            userRepository.save(user);
-            System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
-            return user;
+            userRepository.save(newUser);
+            System.out.println("User created: " + username + " (email: " + email + ")");
         } catch (IllegalArgumentException e) {
-            System.out.println("Failed to create user >>>> " + e.getMessage());
+            System.out.println("Failed to create user: " + e.getMessage());
+        }
+        return newUser;
+    }
+
+    @Override
+    public User find(UUID userId) {
+        try {
+            return userRepository.findById(userId)
+                    .orElseThrow(()-> new IllegalArgumentException("User not found"));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to Read user: " + e.getMessage());
             return null;
         }
     }
 
     @Override
-    public Optional<User> readUser(String userId) {
+    public List<User> findAll() {
         try {
-            return userRepository.findById(userId);
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to Search user >>>> " + e.getMessage());
-            throw e;
-        }
-
-    }
-
-    @Override
-    public List<User> readAllUsers() {
-        List<User>users = userRepository.findAll();
-        if(users.isEmpty()){
-            System.out.println("   No users found. ");
-        }
-        return users;
-    }
-
-    @Override
-    public void updateUser(String userId, String newUserName) {
-        try {
-            Optional<User> user = userRepository.findById(userId);
-            user.get().setUserName(newUserName);
-            userRepository.delete(userId);
-            userRepository.save(user.orElse(null));
-            System.out.println("User updated: " + user.get().getUserName() + " (ID: " + user.get().getUserId() + ")");
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to Update user >>>> " + e.getMessage());
+            List<User> users = userRepository.findAll();
+            if (users.isEmpty()) {
+                throw new IllegalStateException("No users found in the system.");
+            }
+            return users;
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to read all users: " + e.getMessage());
+            return List.of();
         }
     }
 
     @Override
-    public void deleteUser(String userId) {
-        Optional<User> user = userRepository.findById(userId);
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         try {
-            userRepository.delete(userId);
-            System.out.println("User with ID " + userId + " deleted.");
-
-        }catch (IllegalArgumentException e){
-            System.out.println("User with ID " + userId + " not found.");
+            User user = find(userId);
+            user.update(newUsername, newEmail, newPassword);
+            System.out.println("User updated: " + newUsername + " (Email: " + newEmail + ")");
+            userRepository.save(user);
+            return user;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to update user: " + e.getMessage());
+            return null;
         }
-
     }
+
+    @Override
+    public void delete(UUID userId) {
+        try {
+            System.out.println("User deleted: " + find(userId).getEmail());
+            userRepository.deleteById(userId);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to delete user: " + e.getMessage());
+        }
+    }
+
+
 }
 
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -12,82 +13,81 @@ import java.util.UUID;
 public class FileChannelService implements ChannelService {
 
     private static FileChannelService instance;
-    private final UserService userService;
     private final ChannelRepository channelRepository;
 
 
-    public FileChannelService(ChannelRepository channelRepository, UserService userService) {
-        this.userService = userService;
+    public FileChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
 
-    public static synchronized FileChannelService getInstance(ChannelRepository channelRepository, UserService userService){
+    public static synchronized FileChannelService getInstance(ChannelRepository channelRepository){
         if(instance == null){
-            instance = new FileChannelService(channelRepository,userService);
+            instance = new FileChannelService(channelRepository);
         }
         return instance;
     }
 
 
     @Override
-    public void createChannel(Channel channel) {
-        if (userService.readUser(channel.getUserId()) == null) {
-            return;
-        }
+    public Channel create(ChannelType type, String name, String description) {
         try {
+            Channel channel = new Channel(type, name, description);
             channelRepository.save(channel);
-            System.out.println("Channel created: " + channel.getChannelTitle() + " (User ID: " + channel.getUserId() + ")");
+            System.out.println("Channel created: " + name + " (설명: " + description + ")");
+            return channel;
         }catch (IllegalArgumentException e){
-            System.out.println("Failed to Create Channel >>>> " + e.getMessage());
-        }
-    }
-
-    @Override
-    public Channel readChannel(String channelUuid) {
-        try {
-            return channelRepository.findByUuid(channelUuid);
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to Search Channel >>>> " + e.getMessage());
+            System.out.println(e.getMessage());
             return null;
         }
-
     }
 
     @Override
-    public List<Channel> readAllChannels() {
-        List<Channel> channels = channelRepository.findAll();
-        if(channels.isEmpty()){
-            System.out.println("   No Channel Found ");
-        }
-        return channels;
-    }
-
-    @Override
-    public void updateChannel(String channelUuid, String newChannelTitle) {
+    public Channel find(UUID channelId) {
         try {
-            Channel channel = channelRepository.findByUuid(channelUuid);
-            channel.setChannelTitle(newChannelTitle);
-            channelRepository.delete(channelUuid);
+            return channelRepository.findById(channelId)
+                    .orElseThrow(()-> new IllegalArgumentException("Channel not found"));
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to Read Channel >>>> " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        try {
+            List<Channel> channels = channelRepository.findAll();
+            if (channels.isEmpty()) {
+                throw new IllegalStateException("No channels found in the system.");
+            }
+            return channels;
+        }catch (IllegalStateException e){
+            System.out.println("Failed to read all channels: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    @Override
+    public Channel update(UUID channelId, String newName, String newDescription) {
+        try {
+            Channel channel = find(channelId);
+            channel.update(newName, newDescription);
             channelRepository.save(channel);
-            System.out.println("Channel updated: " + channel.getChannelTitle() + " (User ID: " + channel.getUserId() + ")");
+            System.out.println("Channel updated: " + newName + " (Description: " + newDescription + ")");
+            return channel;
         }catch (IllegalArgumentException e){
             System.out.println("Failed to Update Channel >>>> " + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public void deleteChannel(String channelUuid) {
-       try {
-           Channel channel = channelRepository.findByUuid(channelUuid);
-           if (channel == null) {
-               throw new IllegalArgumentException("Channel with UUID " + channelUuid + " not found.");
-           }
-           System.out.println("Channel : " + channelRepository.findByUuid(channelUuid).getChannelTitle() + " deleted.");
-           channelRepository.delete(channelUuid);
-       }catch (IllegalArgumentException e){
-           System.out.println("Failed to Delete Channel >>>> " + e.getMessage());
-       }
-
+    public void delete(UUID channelId) {
+        try {
+            System.out.println("Channel deleted:  " + find(channelId).getName());
+            channelRepository.deleteById(channelId);
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to Delete Channel >>>> " + e.getMessage());
+        }
     }
 
 }
