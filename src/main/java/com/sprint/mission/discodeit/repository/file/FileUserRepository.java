@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.Optional;
 
+@Repository
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
 
     public FileUserRepository(String FILE_PATH) {
