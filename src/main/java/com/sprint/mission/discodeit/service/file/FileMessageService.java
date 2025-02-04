@@ -11,14 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileMessageService implements MessageService {
+    private static final String FILE_EXTENSION = ".ser";
+
     public Path directory = Paths.get(System.getProperty("user.dir"), "data/messages");
-    FileManager fileManager = new FileManager();
+    public final FileManager fileManager;
+
+    public FileMessageService(FileManager fileManager) {
+        this.fileManager = fileManager;
+    }
 
     // 생성
     public Message createMessage(String content, Channel channel, User sender) {
         fileManager.init(directory);
         Message message = new Message(content, channel, sender);
-        Path filePath = directory.resolve(message.getId().toString().concat(".ser"));
+        Path filePath = directory.resolve(message.getId().toString().concat(FILE_EXTENSION));
         fileManager.save(filePath, message);
         System.out.println(channel.getChannelName() + " channel " + sender.getUsername() + " : " + content);
         return message;
@@ -31,7 +37,7 @@ public class FileMessageService implements MessageService {
         for (Message targetMessage : messageList) {
             if (targetMessage.getId().equals(message.getId())) {
                 targetMessage.updateContent(content);
-                fileManager.save(directory.resolve(targetMessage.getId().toString().concat(".ser")), targetMessage);
+                fileManager.save(directory.resolve(targetMessage.getId().toString().concat(FILE_EXTENSION)), targetMessage);
                 System.out.println("content updated");
                 return targetMessage;
             }
@@ -41,7 +47,7 @@ public class FileMessageService implements MessageService {
 
     // 조회
     public Message findMessageById(Message message) {
-        return fileManager.load(directory.resolve(message.getId().toString().concat(".ser")), Message.class);
+        return fileManager.load(directory.resolve(message.getId().toString().concat(FILE_EXTENSION)), Message.class);
     }
     public List<Message> findMessageByChannel(Message message) {
         List<Message> messageList = fileManager.allLoad(directory);
@@ -77,7 +83,7 @@ public class FileMessageService implements MessageService {
         for (Message targetMessage : messageList) {
             if (targetMessage.getId().equals(message.getId())) {
                 System.out.println(message.getContent() + " content message deleted");
-                fileManager.delete(directory.resolve(targetMessage.getId().toString().concat(".ser")));
+                fileManager.delete(directory.resolve(targetMessage.getId().toString().concat(FILE_EXTENSION)));
             }
         }
     }

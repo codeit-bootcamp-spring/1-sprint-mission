@@ -9,14 +9,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileChannelService implements ChannelService {
+    private static final String FILE_EXTENSION = ".ser";
+
     public Path directory = Paths.get(System.getProperty("user.dir"), "data/channel");
-    FileManager fileManager = new FileManager();
+    public final FileManager fileManager;
+
+    public FileChannelService(FileManager fileManager) {
+        this.fileManager = fileManager;
+    }
 
     //생성
     public Channel createChannel(String channelName, String description) {
         fileManager.init(directory);
         Channel channel = new Channel(channelName, description);
-        Path filePath = directory.resolve(channel.getId().toString().concat(".ser"));
+        Path filePath = directory.resolve(channel.getId().toString().concat(FILE_EXTENSION));
         fileManager.save(filePath, channel);
         System.out.println(channel.getChannelName() + " channel created");
         return channel;
@@ -29,7 +35,7 @@ public class FileChannelService implements ChannelService {
         for (Channel targetChannel : channelList) {
             if (targetChannel.getId().equals(channel.getId())) {
                 targetChannel.updateChannelName(name);
-                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(".ser")), targetChannel);
+                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(FILE_EXTENSION)), targetChannel);
                 System.out.println("channel name updated");
                 return targetChannel;
             }
@@ -43,7 +49,7 @@ public class FileChannelService implements ChannelService {
         for (Channel targetChannel : channelList) {
             if (targetChannel.getId().equals(channel.getId())) {
                 targetChannel.updateDescription(description);
-                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(".ser")), targetChannel);
+                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(FILE_EXTENSION)), targetChannel);
                 System.out.println("channel description updated");
                 return targetChannel;
             }
@@ -53,7 +59,7 @@ public class FileChannelService implements ChannelService {
 
     // 조회
     public Channel findChannel(Channel channel) {
-        return fileManager.load(directory.resolve(channel.getId().toString().concat(".ser")), Channel.class);
+        return fileManager.load(directory.resolve(channel.getId().toString().concat(FILE_EXTENSION)), Channel.class);
     }
 
     public List<Channel> findAllChannels() {
@@ -79,7 +85,7 @@ public class FileChannelService implements ChannelService {
         for (Channel targetChannel : channelList) {
             if (targetChannel.getId().equals(channel.getId())) {
                 System.out.println(targetChannel.getChannelName() + " channel deleted");
-                fileManager.delete(directory.resolve(targetChannel.getId().toString().concat(".ser")));
+                fileManager.delete(directory.resolve(targetChannel.getId().toString().concat(FILE_EXTENSION)));
             }
         }
     }

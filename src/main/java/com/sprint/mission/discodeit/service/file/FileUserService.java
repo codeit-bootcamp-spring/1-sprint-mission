@@ -10,14 +10,20 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
+    private static final String FILE_EXTENSION = ".ser";
+
     public Path directory = Paths.get(System.getProperty("user.dir"), "data/user");
-    FileManager fileManager = new FileManager();
+    private final FileManager fileManager;
+
+    public FileUserService(FileManager fileManager) {
+        this.fileManager = fileManager;
+    }
 
     // 생성
     public User createUser(String username, String password, String email) {
         fileManager.init(directory);
         User user = new User(username, password, email);
-        Path filePath = directory.resolve(user.getId().toString().concat(".ser"));
+        Path filePath = directory.resolve(user.getId().toString().concat(FILE_EXTENSION));
         fileManager.save(filePath, user);
         System.out.println("Created user " + username);
         return user;
@@ -30,7 +36,7 @@ public class FileUserService implements UserService {
         for (User targetUser : userList) {
             if (targetUser.getId().equals(user.getId())) {
                 targetUser.updateName(username);
-                fileManager.save(directory.resolve(targetUser.getId().toString().concat(".ser")), targetUser);
+                fileManager.save(directory.resolve(targetUser.getId().toString().concat(FILE_EXTENSION)), targetUser);
                 System.out.println("User name updated");
                 return targetUser;
             }
@@ -50,7 +56,7 @@ public class FileUserService implements UserService {
         for (User targetUser : userList) {
             if (targetUser.getId().equals(user.getId())) {
                 targetUser.updateEmail(email);
-                fileManager.save(directory.resolve(targetUser.getId().toString().concat(".ser")), targetUser);
+                fileManager.save(directory.resolve(targetUser.getId().toString().concat(FILE_EXTENSION)), targetUser);
                 System.out.println("User email updated");
                 return targetUser;
             }
@@ -60,7 +66,7 @@ public class FileUserService implements UserService {
 
     // 조회
     public User findUserById(User u) {
-        return fileManager.load(directory.resolve(u.getId().toString().concat(".ser")), User.class);
+        return fileManager.load(directory.resolve(u.getId().toString().concat(FILE_EXTENSION)), User.class);
     }
 
     public List<User> findAllUsers() {
@@ -86,7 +92,7 @@ public class FileUserService implements UserService {
         for (User targetUser : userList) {
             if (targetUser.getId().equals(user.getId())) {
                 System.out.println(targetUser.getUsername() + " User deleted");
-                fileManager.delete(directory.resolve(targetUser.getId().toString().concat(".ser")));
+                fileManager.delete(directory.resolve(targetUser.getId().toString().concat(FILE_EXTENSION)));
             }
         }
     }
