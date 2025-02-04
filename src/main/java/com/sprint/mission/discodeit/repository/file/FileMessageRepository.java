@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
     //< 채널 UUID < 메시지 UUID, 매시지 객체 >>
     private final Map<UUID, Map<UUID, Message>> data = new HashMap<>();
