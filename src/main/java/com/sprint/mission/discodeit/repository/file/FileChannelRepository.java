@@ -88,7 +88,7 @@ public class FileChannelRepository implements ChannelRepository {
             return;
         }*/
         List<Channel> channels = findAll();
-        if(channels.contains(id)){
+        if(channels.contains(findById(id))){
             System.out.println("이미 존재하는 채널입니다.");
             return;
         }

@@ -131,7 +131,7 @@ public class FileChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         //Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
         List<Channel> channels = fileChannelRepository.findAll();
-        if(channels.contains(channelId)){
+        if(channels.contains(fileChannelRepository.findById(channelId))) {
             List<Message> collect = messages.get(channelId).stream().map(s -> fileMessageService.getMessage(s)).collect(Collectors.toList());
             for (Message message : collect) {
                 try {

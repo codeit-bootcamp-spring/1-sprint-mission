@@ -80,8 +80,9 @@ public class JCFMessageRepository implements MessageRepository  {
     @Override
     public boolean delete(UUID messageId) {
         if(messageMap.containsKey(messageId)){
-            Message message = messageMap.get(messageId);
-            initializeMessage(message);
+            //Message message = messageMap.get(messageId);
+            //initializeMessage(message);
+            messageMap.replace(messageId, new Message());
             messageMap.remove(messageId);
             return true;
         }else {

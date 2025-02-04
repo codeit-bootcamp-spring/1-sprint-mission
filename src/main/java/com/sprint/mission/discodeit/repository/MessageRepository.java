@@ -24,6 +24,6 @@ public interface MessageRepository {
     List<Message> findAll();
     boolean delete(UUID messageId);
     void update(UUID id, String content);
-    public void initializeMessage(Message message);
+    void initializeMessage(Message message);
 }
 
