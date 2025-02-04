@@ -8,16 +8,15 @@ import com.sprint.misson.discordeit.entity.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.repository.UserRepository;
 import com.sprint.misson.discordeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public User create(String nickname, String email, String password) {

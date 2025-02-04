@@ -9,18 +9,15 @@ import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.repository.ChannelRepository;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.UserService;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserService userService;
-
-    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
-        this.channelRepository = channelRepository;
-        this.userService = userService;
-    }
 
     @Override
     public Channel create(ChannelType channelType, String name, String description) {
