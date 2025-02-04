@@ -6,8 +6,7 @@ import java.util.UUID;
 public class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    // 공통 필드 작성
+    // 공통 필드
     private transient UUID id;
     private String idString;
     private final Long createdAt;
@@ -26,9 +25,11 @@ public class BaseEntity implements Serializable {
             id = UUID.fromString(idString);
         }
         return id;}
+    
     public Long getCreatedAt(){
         return createdAt;
     }
+    
     public Long getUpdatedAt(){
         return updatedAt;
     }

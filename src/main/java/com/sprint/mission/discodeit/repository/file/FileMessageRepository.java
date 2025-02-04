@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
@@ -18,7 +19,7 @@ public class FileMessageRepository implements MessageRepository {
     // FileUserRepository 는 FileIO save/load 분리를 안했는데, 여기서는 하겠습니다!!
 
     // 폴더 주소
-    private final String MESSAGES_PATH = "messages/";
+    private final String MESSAGES_PATH = Paths.get("messages").toString();
 
     public FileMessageRepository(){
         // 초기화 시 폴더의 존재 유무 확인
