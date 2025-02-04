@@ -10,11 +10,13 @@ import java.util.UUID;
 
 public interface MessageService {
 
+/*
     //DB로직
     UUID save(Message message);
     Message findOne(UUID id);
     List<Message> findAll();
     UUID delete (UUID id);
+*/
 
     //서비스 로직
     UUID create(String content, User user, Channel channel);

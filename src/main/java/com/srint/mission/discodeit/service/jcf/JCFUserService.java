@@ -16,13 +16,13 @@ public class JCFUserService implements UserService {
 
 
     //DB 로직
-    @Override
     public UUID save(User user) {
-        data.put(user.getId(), user);
+        if(!data.containsKey(user.getId())){
+            data.put(user.getId(), user);
+        }
         return user.getId();
     }
 
-    @Override
     public User findOne(UUID id) {
         if(!data.containsKey(id)){
             throw new IllegalArgumentException("조회할 User을 찾지 못했습니다.");
@@ -30,15 +30,13 @@ public class JCFUserService implements UserService {
         return data.get(id);
     }
 
-    @Override
     public List<User> findAll() {
         if(data.isEmpty()){
-            throw new IllegalArgumentException("User가 없습니다.");
+            return Collections.emptyList(); // 빈 리스트 반환
         }
         return data.values().stream().toList();
     }
 
-    @Override
     public UUID delete(UUID id) {
         if(!data.containsKey(id)){
             throw new IllegalArgumentException("삭제할 User를 찾지 못했습니다.");
@@ -70,6 +68,7 @@ public class JCFUserService implements UserService {
     public User updateUserName(UUID id, String name) {
         User findUser = findOne(id);
         findUser.setUsername(name);
+        save(findUser);
         return findUser;
     }
 
@@ -77,6 +76,7 @@ public class JCFUserService implements UserService {
     public User updateEmail(UUID id, String email) {
         User findUser = findOne(id);
         findUser.setEmail(email);
+        save(findUser);
         return findUser;
     }
 
@@ -84,6 +84,7 @@ public class JCFUserService implements UserService {
     public User updatePassword(UUID id, String password) {
         User findUser = findOne(id);
         findUser.setPassword(password);
+        save(findUser);
         return findUser;
     }
 
