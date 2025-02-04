@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FileChannelRepository implements ChannelRepository {
@@ -19,9 +20,9 @@ public class FileChannelRepository implements ChannelRepository {
     // FileUserRepository 는 FileIO save/load 분리를 안했는데, 여기서는 하겠습니다!!
 
     // 폴더 주소
-    private final String CHANNELS_PATH = "channels/";
+    private final String CHANNELS_PATH = Paths.get("channels").toString();
 
-    public void FileUserService(){
+    public FileChannelRepository(){
         // 초기화 시 폴더의 존재 유무 확인
         File dir = new File(CHANNELS_PATH);
         if (!dir.exists()) {

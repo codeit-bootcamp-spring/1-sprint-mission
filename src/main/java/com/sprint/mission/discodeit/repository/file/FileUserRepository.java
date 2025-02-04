@@ -16,9 +16,9 @@ public class FileUserRepository implements UserRepository {
     **/
     
     // 폴더 주소
-    private final String USERS_PATH = "users/";
+    private final String USERS_PATH = Paths.get("users").toString();
 
-    public void FileUserService(){
+    public FileUserRepository(){
         // 초기화 시 파일의 존재 유무 확인
         File dir = new File(USERS_PATH);
         if (!dir.exists()) {

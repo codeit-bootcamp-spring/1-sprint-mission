@@ -11,23 +11,18 @@ import com.sprint.mission.discodeit.io.InputHandler;
 
 
 public class JCFUserService implements UserService {
-    // Scanner sc = new Scanner(System.in);
-    // private final HashMap<String, User> Users;
-
     private final UserRepository userRepository;
 
     // mocking 이용으로 추가
     private InputHandler inputHandler;
+    public void setInputHandler(InputHandler inputHandler) {
+        this.inputHandler = inputHandler;
+    }
 
     public JCFUserService(UserRepository userRepository, InputHandler inputHandler){
         // 생성자에서 users 데이터 초기화
         this.userRepository = userRepository;
         // mocking 이용으로 추가
-        this.inputHandler = inputHandler;
-    }
-
-    // mocking 이용으로 추가
-    public void setInputHandler(InputHandler inputHandler) {
         this.inputHandler = inputHandler;
     }
 

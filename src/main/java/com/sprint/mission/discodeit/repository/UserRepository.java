@@ -10,6 +10,7 @@ public interface UserRepository {
     // 저장
     void saveUser(User user);
     // 읽기 = 찾기
+    // 레포지토리 관점에서 네이밍 더 간단하게 만들기
     Optional<User> findUserById(UUID id);
     Collection<User> getAllUsers();
     // 삭제
