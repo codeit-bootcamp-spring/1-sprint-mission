@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -12,15 +13,15 @@ public class Channel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final UUID channeluuId;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String channelName;
 
 
 
     public Channel(String channelName) {
         this.channeluuId = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.channelName = channelName;
     }
@@ -29,7 +30,7 @@ public class Channel implements Serializable {
 
     public void update(String channelName) {
         this.channelName = channelName;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
+        this.updatedAt = Instant.now();// 수정 시간을 갱신
     }
 
     @Override
@@ -38,8 +39,8 @@ public class Channel implements Serializable {
         return "Channel{\n" +
                 "UUId : " + channeluuId +
                 ", \nchannelName : " + channelName +
-                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) + "\n}";
+                ", \ncreatedAt : " + createdAt +
+                ", \nupdatedAt : " + updatedAt + "\n}";
     }
 
 }

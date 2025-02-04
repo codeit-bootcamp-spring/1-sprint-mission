@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,8 +15,8 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final UUID uuID;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private final String name;
     private String email;
     private String password;
@@ -24,7 +25,7 @@ public class User implements Serializable {
 
     public User(String name, String email,String iD ,String password){
         this.uuID = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.name = name;
         this.email = email;
@@ -37,7 +38,7 @@ public class User implements Serializable {
         this.email = email;
         this.iD = iD;
         this.password = password;
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     @Override
@@ -45,8 +46,8 @@ public class User implements Serializable {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "User{\n" +
                 "UUID : " + uuID +
-                ", \ncreatedAt : " + sdf.format(new Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new Date(updatedAt)) +
+                ", \ncreatedAt : " + createdAt +
+                ", \nupdatedAt : " + updatedAt +
                 ", \nname : " + name +
                 ", \nemail : " + email +
                 ", \nid : " + iD + "\n}";
