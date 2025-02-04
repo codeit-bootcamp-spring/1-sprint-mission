@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 
+
+@Getter
 public class Channel extends BaseEntity {
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 12L;
     private String name; //채널명
     private String topic; //채널의 목적 규칙에 대한 설명
     private ChannelType type; //채널 타입
@@ -14,18 +18,6 @@ public class Channel extends BaseEntity {
         this.name = name;
         this.topic = topic;
         this.type = type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public ChannelType getType() {
-        return type;
     }
 
     public void update(String name, String topic, ChannelType type) {

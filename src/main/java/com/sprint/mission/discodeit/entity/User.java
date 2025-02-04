@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 
+@Getter
 public class User extends BaseEntity {
     @Serial
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 13L;
     private String name;
     private String email;
     private String password;
