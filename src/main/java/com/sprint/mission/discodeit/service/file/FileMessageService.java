@@ -32,17 +32,10 @@ public class FileMessageService implements MessageService {
 
     // 내용 수정
     public Message updateContent(Message message, String content) {
-        List<Message> messageList = fileManager.allLoad(directory);
-
-        for (Message targetMessage : messageList) {
-            if (targetMessage.getId().equals(message.getId())) {
-                targetMessage.updateContent(content);
-                fileManager.save(directory.resolve(targetMessage.getId().toString().concat(FILE_EXTENSION)), targetMessage);
-                System.out.println("content updated");
-                return targetMessage;
-            }
-        }
-        return null;
+        message.updateContent(content);
+        fileManager.save(directory.resolve(message.getId().toString().concat(FILE_EXTENSION)), message);
+        System.out.println(message.getChannel().getChannelName() + " channel " + message.getSender().getUsername() + " : " + content);
+        return message;
     }
 
     // 조회
@@ -71,9 +64,7 @@ public class FileMessageService implements MessageService {
         System.out.println(message);
     }
     public void printMessagesList(List<Message> messages) {
-        for (Message message : messages) {
-            System.out.println(message);
-        }
+        messages.forEach(System.out::println);
     }
 
     // 삭제

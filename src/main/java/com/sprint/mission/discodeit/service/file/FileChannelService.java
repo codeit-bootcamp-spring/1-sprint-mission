@@ -30,31 +30,17 @@ public class FileChannelService implements ChannelService {
 
     // 수정
     public Channel updateName(Channel channel, String name) {
-        List<Channel> channelList = fileManager.allLoad(directory);
-
-        for (Channel targetChannel : channelList) {
-            if (targetChannel.getId().equals(channel.getId())) {
-                targetChannel.updateChannelName(name);
-                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(FILE_EXTENSION)), targetChannel);
-                System.out.println("channel name updated");
-                return targetChannel;
-            }
-        }
-        return null;
+        channel.updateChannelName(name);
+        fileManager.save(directory.resolve(channel.getId().toString().concat(FILE_EXTENSION)), channel);
+        System.out.println(channel.getChannelName() + " channel name updated");
+        return channel;
     }
 
     public Channel updateDescription(Channel channel, String description) {
-        List<Channel> channelList = fileManager.allLoad(directory);
-
-        for (Channel targetChannel : channelList) {
-            if (targetChannel.getId().equals(channel.getId())) {
-                targetChannel.updateDescription(description);
-                fileManager.save(directory.resolve(targetChannel.getId().toString().concat(FILE_EXTENSION)), targetChannel);
-                System.out.println("channel description updated");
-                return targetChannel;
-            }
-        }
-        return null;
+        channel.updateDescription(description);
+        fileManager.save(directory.resolve(channel.getId().toString().concat(FILE_EXTENSION)), channel);
+        System.out.println(channel.getChannelName() + " channel description updated : " + description);
+        return channel;
     }
 
     // 조회
@@ -73,9 +59,7 @@ public class FileChannelService implements ChannelService {
     }
 
     public void printAllChannels(List<Channel> channels) {
-        for (Channel channel : channels) {
-            System.out.println(channel);
-        }
+        channels.forEach(System.out::println);
     }
 
     // 삭제

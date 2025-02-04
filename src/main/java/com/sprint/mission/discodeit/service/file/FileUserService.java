@@ -31,37 +31,24 @@ public class FileUserService implements UserService {
 
     // 정보 수정
     public User updateUserName(User user, String username) {
-        List<User> userList = fileManager.allLoad(directory);
-
-        for (User targetUser : userList) {
-            if (targetUser.getId().equals(user.getId())) {
-                targetUser.updateName(username);
-                fileManager.save(directory.resolve(targetUser.getId().toString().concat(FILE_EXTENSION)), targetUser);
-                System.out.println("User name updated");
-                return targetUser;
-            }
-        }
-        return null;
+        user.updateName(username);
+        fileManager.save(directory.resolve(user.getId().toString().concat(FILE_EXTENSION)), user);
+        System.out.println("User name updated");
+        return user;
     }
 
     public User updatePassword(User user, String password) {
         user.updatePassword(password);
+        fileManager.save(directory.resolve(user.getId().toString().concat(FILE_EXTENSION)), user);
         System.out.println("User password updated");
         return user;
     }
 
     public User updateEmail(User user, String email) {
-        List<User> userList = fileManager.allLoad(directory);
-
-        for (User targetUser : userList) {
-            if (targetUser.getId().equals(user.getId())) {
-                targetUser.updateEmail(email);
-                fileManager.save(directory.resolve(targetUser.getId().toString().concat(FILE_EXTENSION)), targetUser);
-                System.out.println("User email updated");
-                return targetUser;
-            }
-        }
-        return null;
+        user.updateEmail(email);
+        fileManager.save(directory.resolve(user.getId().toString().concat(FILE_EXTENSION)), user);
+        System.out.println("User email updated");
+        return user;
     }
 
     // 조회
@@ -80,9 +67,7 @@ public class FileUserService implements UserService {
     }
 
     public void printListUsers(List<User> users) {
-        for (User user : users) {
-            System.out.println(user);
-        }
+        users.forEach(System.out::println);
     }
 
     // 삭제
