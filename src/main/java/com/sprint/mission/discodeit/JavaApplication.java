@@ -91,7 +91,7 @@ public class JavaApplication {
 
         // 4. 유저 정보 수정
         System.out.println("\n유저 정보 수정 ");
-        boolean updateSuccess = userService.updateUserProfile(gildongUser.getId(), "홍길동", "gildong@naver.com", UserStatus.IDLE);
+        boolean updateSuccess = userService.updateUserProfile(gildongUser.getId(), "홍길동", "gildong@naver.com", "1234",UserStatus.IDLE);
         System.out.println("수정 결과 : " + (updateSuccess ? "성공" : "실패"));
 
         // 5. 수정된 유저 데이터 조회

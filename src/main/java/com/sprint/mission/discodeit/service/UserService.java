@@ -14,7 +14,7 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    boolean updateUserProfile(UUID id, String name, String email, UserStatus status);
+    boolean updateUserProfile(UUID id, String name, String email, String password, UserStatus status);
 
     boolean deleteUser(UUID id);
 }

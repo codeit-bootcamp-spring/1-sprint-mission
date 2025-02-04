@@ -48,9 +48,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public boolean updateUserProfile(UUID id, String name, String email, UserStatus status) {
+    public boolean updateUserProfile(UUID id, String name, String email, String password, UserStatus status) {
         boolean updated = data.computeIfPresent(id, (key, user) -> {
-            user.update(name, email, status);
+            user.update(name, email, password, status);
             return user;
         }) != null;
         if (updated) saveData();
