@@ -23,7 +23,6 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
 
   private BasicUserService(UserRepository userRepository) {
-    System.out.println("created BasicUserService -> " + userRepository.getClass());
     this.userRepository = userRepository;
   }
 

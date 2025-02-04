@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.VoiceChannel;
 import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ChannelFactory {
 
   public ChatChannel createChatChannel(
