@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,8 @@ import java.util.Optional;
 import static com.sprint.mission.discodeit.constant.ChannelConstant.*;
 
 @Slf4j
+@Service
+@ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
 public class BasicChannelService implements ChannelService {
 
   private static volatile BasicChannelService instance;

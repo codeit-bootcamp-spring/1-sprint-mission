@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,8 @@ import java.util.Optional;
 import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_AVAILABLE_FOR_MESSAGE;
 
 @Slf4j
+@Service
+@ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
 public class BasicMessageService implements MessageServiceV2<ChatChannel> {
 
   private static volatile BasicMessageService instance;

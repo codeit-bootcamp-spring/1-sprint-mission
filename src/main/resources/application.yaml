@@ -1,0 +1,5 @@
+app:
+  repository:
+    type: "file"
+  service:
+    type: "basic"

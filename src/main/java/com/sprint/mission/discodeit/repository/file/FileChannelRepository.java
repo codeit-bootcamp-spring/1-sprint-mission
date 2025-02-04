@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.BaseChannel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.util.List;
@@ -11,7 +13,8 @@ import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.CHANNEL_FILE;
 
-
+@Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
 
   private static FileChannelRepository instance;

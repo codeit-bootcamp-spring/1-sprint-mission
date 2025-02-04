@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
 
+@Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
   private static FileMessageRepository instance;
