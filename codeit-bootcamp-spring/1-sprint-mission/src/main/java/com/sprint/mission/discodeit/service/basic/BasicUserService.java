@@ -14,19 +14,15 @@ import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserConverter;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserConverter converter;
-
-    public BasicUserService(
-            UserRepository userRepository,
-            UserConverter converter
-    ) {
-        this.userRepository = userRepository;
-        this.converter = converter;
-    }
 
     @Override
     public UserInfoResponse register(RegisterUserRequest registerUserRequest) {

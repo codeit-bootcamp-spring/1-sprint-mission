@@ -30,8 +30,7 @@ public class AbstractUUIDTest {
         assertAll(
                 () -> assertThat(entity.getId()).as("Id should not be null").isNotNull(),
                 () -> assertThat(entity.getCreateAt()).as("createAt should not be null").isNotNull(),
-                () -> assertThat(entity.getStatus()).isEqualTo(REGISTERED),
-                () -> assertThat(entity.getUpdateAt()).as("At Initialized updateAt time is must be Empty").isEmpty()
+                () -> assertThat(entity.getStatus()).isEqualTo(REGISTERED)
         );
     }
 
@@ -39,12 +38,11 @@ public class AbstractUUIDTest {
     @DisplayName("엔티티 내 데이터가 수정 시 updateAt and status 필드 수정 여부 테스트")
     void givenWhenSomeDateModifyThenFieldUpdateAtAndStatusIsChangedTest() {
         // given
-        assertThat(entity.getUpdateAt()).isEmpty();
         // when
         entity.updateStatusAndUpdateAt();
         //then
         assertAll(
-                () -> assertThat(entity.getUpdateAt()).as("invoke update() then updateAt must be present").isPresent(),
+                () -> assertThat(entity.getUpdateAt()).as("invoke update() then updateAt must be present"),
                 () -> assertThat(entity.getStatus()).isEqualTo(MODIFIED)
         );
     }

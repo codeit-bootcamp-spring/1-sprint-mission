@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.service.message.converter;
 import com.sprint.mission.discodeit.entity.message.DirectMessage;
 import com.sprint.mission.discodeit.entity.message.dto.DirectMessageInfoResponse;
 import com.sprint.mission.discodeit.entity.message.dto.DirectMessageInfoResponse.Builder;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DirectMessageConverter {
 
     public DirectMessageInfoResponse toDto(DirectMessage directMessage) {

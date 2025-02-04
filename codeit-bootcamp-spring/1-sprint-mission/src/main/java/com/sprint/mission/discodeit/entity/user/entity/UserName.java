@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Size;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
+import lombok.Getter;
 
+@Getter
 public class UserName implements Serializable {
 
     public static final int NAME_MIN_LENGTH = 3;
@@ -19,7 +21,7 @@ public class UserName implements Serializable {
             min = NAME_MIN_LENGTH, max = NAME_MAX_LENGTH,
             message = "'${validatedValue}' must be between {min} and {max} characters long"
     )
-    @NotNull    //TODO : => NotBlank , 테스트 코드 수정 후 변경
+    @NotNull
     private final String name;
 
     public UserName(String name) {
@@ -34,10 +36,6 @@ public class UserName implements Serializable {
     public UserName changeName(String name) {
         Preconditions.checkNotNull(name);
         return new UserName(name);
-    }
-
-    public String getName() {
-        return name;
     }
 
     @Override

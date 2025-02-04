@@ -11,22 +11,16 @@ import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.service.message.converter.DirectMessageConverter;
 import com.sprint.mission.discodeit.service.message.directMessage.DirectMessageService;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicDirectMessageService implements DirectMessageService {
 
     private final DirectMessageRepository directMessageRepository;
     private final UserRepository userRepository;
     private final DirectMessageConverter directMessageConverter;
-
-    private BasicDirectMessageService(
-            DirectMessageRepository directMessageRepository,
-            UserRepository userRepository,
-            DirectMessageConverter directMessageConverter
-    ) {
-        this.directMessageRepository = directMessageRepository;
-        this.userRepository = userRepository;
-        this.directMessageConverter = directMessageConverter;
-    }
 
     public static DirectMessageService getInstance(
             DirectMessageRepository directMessageRepository,

@@ -15,22 +15,16 @@ import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelConverter;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ChannelConverter channelConverter;
-
-    private BasicChannelService(
-            ChannelRepository channelRepository,
-            UserRepository userRepository,
-            ChannelConverter channelConverter
-    ) {
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-        this.channelConverter = channelConverter;
-    }
 
     public static ChannelService getInstance(UserRepository userRepository, ChannelRepository channelRepository) {
         return new BasicChannelService(channelRepository, userRepository, new ChannelConverter());

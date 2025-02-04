@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.repository.file.FileAbstractRepository;
 import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileUserRepository extends FileAbstractRepository<User, UUID> implements UserRepository {
     private static final String FILE_PATH_USER_NAME = "temp/file/user/user.ser";
     private static UserRepository FILE_USER_REPOSITORY_INSTANCE;

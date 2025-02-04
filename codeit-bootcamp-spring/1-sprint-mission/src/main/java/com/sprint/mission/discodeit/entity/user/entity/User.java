@@ -4,9 +4,12 @@ package com.sprint.mission.discodeit.entity.user.entity;
 import com.google.common.base.Preconditions;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public class User extends AbstractUUIDEntity {
 
     private UserName name;
@@ -32,17 +35,6 @@ public class User extends AbstractUUIDEntity {
         updateStatusAndUpdateAt();
     }
 
-    /**
-     *  유저에게 채널을 생성하는 책임이 있는 것이아니라,
-     *  다른 객체에 해당 작업을 위임, 그런데 메서드 명이 영...
-     *  이 부분 코드 리뷰 부탁드릴게요!
-     */
-
-    /**
-     * 유저의 참여 채널에 새로운 채널을 생성하는 메서드
-     * @param channelName
-     * @return
-     */
     public Channel openNewChannel(String channelName) {
         Preconditions.checkNotNull(channelName);
         var createdChannel = participatedChannels.createChannel(channelName, this);
@@ -57,10 +49,6 @@ public class User extends AbstractUUIDEntity {
         return targetChannel;
     }
 
-    /**
-     * 참여한 채널에서 나가는 메서드
-     * @param channelId
-     */
     public void exitParticipatedChannel(UUID channelId) {
         participatedChannels.exitChannelById(channelId);
     }
@@ -74,14 +62,12 @@ public class User extends AbstractUUIDEntity {
         return participatedChannels.findAllChannels();
     }
 
-    public String getName() {
-        return name.getName();
-    }
-
     public void unregister() {
         updateUnregistered();
     }
-
+    public String getUserName() {
+        return name.getName();
+    }
     @Override
     public String toString() {
         var format =
@@ -90,8 +76,8 @@ public class User extends AbstractUUIDEntity {
                         getId(),
                         getName(),
                         getStatus().toString(),
-                        getCreateAt(),
-                        getUpdateAt().orElse(0L),
+                        getCreateAt().toEpochMilli(),
+                        getUpdateAt().toEpochMilli(),
                         getParticipatedChannels()
                 );
 

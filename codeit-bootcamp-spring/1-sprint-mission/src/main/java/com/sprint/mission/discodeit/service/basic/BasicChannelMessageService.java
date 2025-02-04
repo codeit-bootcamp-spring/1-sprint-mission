@@ -14,25 +14,17 @@ import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.service.message.channelMessage.ChannelMessageService;
 import com.sprint.mission.discodeit.service.message.converter.ChannelMessageConverter;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelMessageService implements ChannelMessageService {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ChannelMessageRepository channelMessageRepository;
     private final ChannelMessageConverter converter;
-
-    private BasicChannelMessageService(
-            UserRepository userRepository,
-            ChannelRepository channelRepository,
-            ChannelMessageRepository channelMessageRepository,
-            ChannelMessageConverter converter
-    ) {
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-        this.channelMessageRepository = channelMessageRepository;
-        this.converter = converter;
-    }
 
     public static ChannelMessageService getInstance(
             UserRepository userRepository,

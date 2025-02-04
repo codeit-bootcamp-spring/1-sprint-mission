@@ -7,43 +7,28 @@ import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 import com.google.common.base.Preconditions;
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Optional;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
+@Getter
 public abstract class AbstractUUIDEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2898060967687082469L;
     private final UUID id;
 
-    private final Long createAt;
+    private final Instant createAt;
 
-    private Long updateAt = null;
+    private Instant updateAt;
 
     private Status status;
 
     protected AbstractUUIDEntity() {
         this.id = UUID.randomUUID();
         this.createAt = createUnixTimestamp();
+        this.updateAt = createUnixTimestamp();
         this.status = REGISTERED;
-    }
-
-    public Optional<Long> getUpdateAt() {
-        return Optional.ofNullable(updateAt);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreateAt() {
-        return createAt;
-    }
-
-    public Status getStatus() {
-        return status;
     }
 
     private void updateStatus(Status status) {
@@ -64,8 +49,8 @@ public abstract class AbstractUUIDEntity implements Serializable {
         return status != UNREGISTERED;
     }
 
-    private long createUnixTimestamp() {
-        return LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    private Instant createUnixTimestamp() {
+        return Instant.now();
     }
 
     @Override

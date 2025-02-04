@@ -4,10 +4,12 @@ import com.sprint.mission.discodeit.entity.message.DirectMessage;
 import com.sprint.mission.discodeit.repository.file.FileAbstractRepository;
 import com.sprint.mission.discodeit.repository.jcf.message.directMessage.DirectMessageRepository;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileDirectMessageRepository extends FileAbstractRepository<DirectMessage, UUID> implements
         DirectMessageRepository {
-    private static final String DIRECT_MESSAGE_FILE_PATH_NAME = "temp/file/user/channel.ser";
+    private static final String DIRECT_MESSAGE_FILE_PATH_NAME = "temp/file/message/directmessage.ser";
     private static FileDirectMessageRepository FILE_DIRECT_REPOSITORY_INSTANCE;
 
     protected FileDirectMessageRepository() {

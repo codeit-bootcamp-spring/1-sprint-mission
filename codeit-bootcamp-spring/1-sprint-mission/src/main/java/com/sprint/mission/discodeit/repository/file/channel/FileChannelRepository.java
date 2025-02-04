@@ -4,9 +4,12 @@ import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.repository.jcf.channel.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileAbstractRepository;
 import java.util.UUID;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class FileChannelRepository extends FileAbstractRepository<Channel, UUID> implements ChannelRepository {
-    private static final String CHANNEL_FILE_PATH_NAME = "temp/file/user/channel.ser";
+    private static final String CHANNEL_FILE_PATH_NAME = "temp/file/channel/channel.ser";
     private static ChannelRepository FILE_USER_REPOSITORY_INSTANCE;
 
     protected FileChannelRepository() {

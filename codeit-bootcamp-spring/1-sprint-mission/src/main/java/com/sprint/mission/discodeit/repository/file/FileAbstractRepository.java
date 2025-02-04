@@ -15,10 +15,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public abstract class FileAbstractRepository<T extends AbstractUUIDEntity, ID extends UUID>
-        extends InMemoryCrudRepository<T, ID>
-        implements Closeable {
+        extends InMemoryCrudRepository<T, ID> {
 
-    private File file;
+    private final File file;
 
     protected FileAbstractRepository(String filePath) {
         file = new File(filePath);
@@ -34,16 +33,14 @@ public abstract class FileAbstractRepository<T extends AbstractUUIDEntity, ID ex
                 FileInputStream fis = new FileInputStream(file);
                 ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
-            while (true) {
-                try {
-                    var readUser = (T) ois.readObject();
-                    store.put(readUser.getId(), readUser);
-                } catch (ClassNotFoundException e) {
-                    System.out.println(e.getMessage());
-                }
+            try {
+                store = (Map<UUID, T>) ois.readObject();
+            } catch (ClassNotFoundException e) {
+                System.out.println(e.getMessage());
             }
         } catch (IOException e) {
-            System.out.println("User loading exit");
+            System.out.println("loading exit");
+            throw new IllegalArgumentException();
         }
         return store;
     }
@@ -54,18 +51,11 @@ public abstract class FileAbstractRepository<T extends AbstractUUIDEntity, ID ex
                 FileOutputStream fos = new FileOutputStream(file);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
-
-            for (T value : store.values()) {
-                oos.writeObject(value);
-            }
+            oos.writeObject(store);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        saveToFile();
-    }
 }
 
