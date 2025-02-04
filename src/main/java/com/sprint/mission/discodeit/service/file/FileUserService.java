@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.Utils;
+import com.sprint.mission.discodeit.util.DateUtils;
 
 import java.io.*;
 import java.util.*;
@@ -11,7 +10,7 @@ import java.util.*;
 public class FileUserService implements UserService {
 
 
-    private final String fileName = "savedata/user.ser";
+    private static final String fileName = "savedata/user.ser";
     private final Map<UUID, User> userList;
 
     public FileUserService() {
@@ -25,7 +24,7 @@ public class FileUserService implements UserService {
         }
         User user = new User(userName);
         userList.put(user.getUserId(), user);
-        System.out.println(Utils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
+        System.out.println(DateUtils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
         saveFile();
         return user;
     }
@@ -51,6 +50,7 @@ public class FileUserService implements UserService {
         user.updateUsername(newName);
         user.updateUpdatedAt();
         System.out.println("유저 이름 변경: \"" + oriName + "\" -> \"" + newName + "\"");
+        saveFile();
         return user;
     }
 
@@ -59,6 +59,7 @@ public class FileUserService implements UserService {
         User user = readUser(id);
         if (userList.remove(id) != null) {
             System.out.println(user.getUserName() + " 유저가 삭제되었습니다.");
+            saveFile();
         } else {
             System.out.println(user.getUserName() + " 유저 삭제 실패하였습니다.");
         }
@@ -66,10 +67,8 @@ public class FileUserService implements UserService {
 
     //저장로직
 
-    public void saveFile(){
-        File file = new File(fileName);
-        try (ObjectOutputStream oos = new ObjectOutputStream
-                (new FileOutputStream(fileName))) {
+    private void saveFile(){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oos.writeObject(userList);
 
         } catch (IOException e) {
@@ -78,7 +77,7 @@ public class FileUserService implements UserService {
 
     }
 
-    public Map<UUID, User> loadFile(){
+    private Map<UUID, User> loadFile(){
 
         File file = new File(fileName);
 
@@ -86,8 +85,7 @@ public class FileUserService implements UserService {
             return new HashMap<>();
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream
-                (new FileInputStream(file)))
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file)))
         {
             return (Map<UUID, User>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {

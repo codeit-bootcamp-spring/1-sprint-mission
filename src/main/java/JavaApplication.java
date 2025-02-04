@@ -49,6 +49,9 @@ public class JavaApplication {
 
 
 
+        FileChannelRepository fileChannelRepository = new FileChannelRepository();
+        fileChannelRepository.save(channel1);
+
 //        //------------------채널 도메인
 //        System.out.println("*채널 도메인 test");
 //

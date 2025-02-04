@@ -2,9 +2,14 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.Utils;
+import com.sprint.mission.discodeit.util.DateUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class JCFUserService implements UserService {
 
@@ -21,7 +26,7 @@ public class JCFUserService implements UserService {
         }
         User user = new User(userName);
         userList.put(user.getUserId(), user);
-        System.out.println(Utils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
+        System.out.println(DateUtils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
         return user;
     }
 

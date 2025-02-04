@@ -9,7 +9,7 @@ import java.util.*;
 
 public class FileMessageService implements MessageService {
 
-    private final String fileName = "savedata/message.ser";
+    private static final String fileName = "savedata/message.ser";
     private final Map<UUID, Message> messageList;
 
     public FileMessageService() {
@@ -68,10 +68,8 @@ public class FileMessageService implements MessageService {
 
 
     //저장로직
-    public void saveFile(){
-        File file = new File(fileName);
-        try (ObjectOutputStream oos = new ObjectOutputStream
-                (new FileOutputStream(fileName))) {
+    private void saveFile(){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oos.writeObject(messageList);
 
         } catch (IOException e) {
@@ -81,7 +79,7 @@ public class FileMessageService implements MessageService {
     }
 
 
-    public Map<UUID, Message> loadFile(){
+    private Map<UUID, Message> loadFile(){
 
         File file = new File(fileName);
 
@@ -89,8 +87,7 @@ public class FileMessageService implements MessageService {
             return new HashMap<>();
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream
-                (new FileInputStream(file)))
+        try (ObjectInputStream ois = new ObjectInputStream (new FileInputStream(file)))
         {
             return (Map<UUID, Message>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {

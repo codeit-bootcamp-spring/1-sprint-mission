@@ -25,7 +25,7 @@ public class FileChannelService implements ChannelService {
      */
 
 
-    private final String fileName = "savedata/channel.ser";
+    private static final String fileName = "savedata/channel.ser";
     private final Map<UUID, Channel> channelList;
 
     public FileChannelService() {
@@ -92,10 +92,8 @@ public class FileChannelService implements ChannelService {
 
     //저장로직
 
-    public void saveFile(){
-        File file = new File(fileName);
-        try (ObjectOutputStream oos = new ObjectOutputStream
-                (new FileOutputStream(fileName))) {
+    private void saveFile(){
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
             oos.writeObject(channelList);
 
         } catch (IOException e) {
@@ -104,7 +102,7 @@ public class FileChannelService implements ChannelService {
 
     }
 
-    public Map<UUID, Channel> loadFile(){
+    private Map<UUID, Channel> loadFile(){
 
         File file = new File(fileName);
 
@@ -112,8 +110,7 @@ public class FileChannelService implements ChannelService {
             return new HashMap<>();
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream
-                (new FileInputStream(file)))
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file)))
         {
             return (Map<UUID, Channel>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
