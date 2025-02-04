@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
 
+@Service
 public class BasicMessageService implements MessageService {
 
     private final MessageValidator validationService;

@@ -6,10 +6,12 @@ import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+@Service
 public class BasicUserService implements UserService {
 
     private final UserValidator userValidator;

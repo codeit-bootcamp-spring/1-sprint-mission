@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
 
+@Service
 public class BasicChannelService implements ChannelService {
 
     private final ObserverManager observerManager;
