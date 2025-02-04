@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable, Entity {
+    private static final long serialVersionUID = 1L;
+
     private final long createdAt;
     private long updatedAt;
     private UUID id;
@@ -14,6 +17,7 @@ public class Message {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.fromUser = fromUser;
+        this.channel = channel;
     }
 
     //생성시간 리턴

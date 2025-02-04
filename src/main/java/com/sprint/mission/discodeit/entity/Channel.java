@@ -1,8 +1,13 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Channel {
+
+
+public class Channel implements Serializable, Entity {
+    private static final long serialVersionUID = 1L;
+
     private final long createdAt;
     private long updatedAt;
     private UUID id;
@@ -21,7 +26,7 @@ public class Channel {
     public long getUpdatedAt(){return this.updatedAt;}
     //업데이트시간 변경
     public void setUpdatedAt(){this.updatedAt = System.currentTimeMillis();}
-
+    //채널 uuid 리턴
     public UUID getId(){return this.id;}
     // 채널이름 리턴
     public String getChannelName(){
