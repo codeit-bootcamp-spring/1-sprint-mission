@@ -115,7 +115,8 @@ public class FileUserRepository implements UserRepository {
     public void deleteUserById(UUID id){
         String fileName = "users/" + id + ".ser";
         File userFile = new File(fileName);
-        userFile.delete();
-        System.out.println("deleteUserById 삭제 완료");
+        if(userFile.delete()){
+            System.out.println("deleteUserById 삭제 완료");
+        }
     }
 }
