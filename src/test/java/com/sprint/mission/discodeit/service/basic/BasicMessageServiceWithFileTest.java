@@ -2,16 +2,19 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class BasicMessageServiceWithFileTest {
 
@@ -27,7 +30,7 @@ public class BasicMessageServiceWithFileTest {
 
         Message message = messageService.createMessage("메세지", "하이", sender, receiver);
 
-        Assertions.assertEquals(message, messageRepository.findMessageById(message.getMessageId()));
+        assertEquals(message, messageRepository.findMessageById(message.getMessageId()));
     }
 
     @Test
@@ -41,7 +44,7 @@ public class BasicMessageServiceWithFileTest {
 
         Message findMessage = messageService.getMessageById(message1.getMessageId());
 
-        Assertions.assertEquals(message1, findMessage);
+        assertEquals(message1, findMessage);
     }
 
     @Test
@@ -59,8 +62,8 @@ public class BasicMessageServiceWithFileTest {
         Map<UUID, Message> allMessages = messageService.getAllMessages();
 
 
-        Assertions.assertEquals(message1, allMessages.get(message1.getMessageId()));
-        Assertions.assertEquals(message2, allMessages.get(message2.getMessageId()));
+        assertEquals(message1, allMessages.get(message1.getMessageId()));
+        assertEquals(message2, allMessages.get(message2.getMessageId()));
     }
 
     @Test
@@ -74,8 +77,8 @@ public class BasicMessageServiceWithFileTest {
 
         messageService.updateMessage(message2.getMessageId(), "newTitle", "newContent");
 
-        Assertions.assertEquals("newTitle", messageService.getMessageById(message2.getMessageId()).getMessageTitle());
-        Assertions.assertEquals("newContent", messageService.getMessageById(message2.getMessageId()).getMessageContent());
+        assertEquals("newTitle", messageService.getMessageById(message2.getMessageId()).getMessageTitle());
+        assertEquals("newContent", messageService.getMessageById(message2.getMessageId()).getMessageContent());
 
     }
 
@@ -84,12 +87,12 @@ public class BasicMessageServiceWithFileTest {
     void delete() {
         User sender = new User("sender", "sender@gamil.com", "asddsdasdsad");
         User receiver = new User("receiver", "receiver@gamil.com", "asddsdasdsadd12d21d");
-        Message message1 = messageService.createMessage("메세지", "하이", sender, receiver);
-        Message message2 = messageService.createMessage("메세지", "하이", receiver, sender);
+        Message message1 = messageService.createMessage("메세지1입니다.", "하이", sender, receiver);
+        Message message2 = messageService.createMessage("메세지2", "하이", receiver, sender);
 
         messageService.deleteMessage(message1.getMessageId());
 
-        Assertions.assertNull(messageService.getMessageById(message1.getMessageId()));
-
+        assertThrows(MessageNotFoundException.class,
+                () -> messageService.getMessageById(message1.getMessageId()));
     }
 }

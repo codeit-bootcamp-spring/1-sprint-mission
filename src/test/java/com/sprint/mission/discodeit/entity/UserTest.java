@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class UserTest {
         String email = "test@naver.com";
         String pw = "1231234";
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(name, email, pw));
+        assertThrows(UserNotFoundException.class, () -> userService.createUser(name, email, pw));
     }
 
     @Test
@@ -47,8 +48,8 @@ class UserTest {
         String email2 = "test@navercom";
         String pw = "1231234";
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(name, email1, pw));
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(name, email2, pw));
+        assertThrows(UserNotFoundException.class, () -> userService.createUser(name, email1, pw));
+        assertThrows(UserNotFoundException.class, () -> userService.createUser(name, email2, pw));
     }
 
     @Test
@@ -59,7 +60,7 @@ class UserTest {
         String pw1 = "";
         String pw2 = "123";
 
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(name, email, pw1));
-        assertThrows(IllegalArgumentException.class, () -> userService.createUser(name, email, pw2));
+        assertThrows(UserNotFoundException.class, () -> userService.createUser(name, email, pw1));
+        assertThrows(UserNotFoundException.class, () -> userService.createUser(name, email, pw2));
     }
 }

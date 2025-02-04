@@ -1,64 +1,81 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.factory.BaseEntityFactory;
 import com.sprint.mission.discodeit.factory.EntityFactory;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.validate.ChannelServiceValidator;
+import com.sprint.mission.discodeit.service.validate.MessageServiceValidator;
+import com.sprint.mission.discodeit.service.validate.ServiceValidator;
+import com.sprint.mission.discodeit.service.validate.UserServiceValidator;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> channelList;
-    private static EntityFactory entityFactory;
+    private final ChannelRepository channelRepository;
+    private static EntityFactory entityFactory = BaseEntityFactory.getInstance();
+
+    private final ServiceValidator<Channel> validator = new ChannelServiceValidator();
+    private final ServiceValidator<User> userValidator = new UserServiceValidator();
+    private final ServiceValidator<Message> messageValidator = new MessageServiceValidator();
 
     public JCFChannelService() {
-        channelList = new HashMap<>();
+        this.channelRepository = new JCFChannelRepository();
     }
 
-    public JCFChannelService(EntityFactory entityFactory) {
-        JCFChannelService.entityFactory = entityFactory;
-        this.channelList = new HashMap<>();
+    public JCFChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public Channel createChannel(String channelName, User owner, Map<UUID, User> userList) {
-        Channel channel = entityFactory.createChannel(channelName, owner, userList);
-        channelList.put(channel.getChannelId(), channel);
+        validator.isNullParam(channelName);
+        userValidator.entityValidate(owner);
+
+        Channel channel = validator.entityValidate(entityFactory.createChannel(channelName, owner, userList));
+
+        channelRepository.saveChannel(channel);
         return channel;
     }
 
     @Override
-    public Map<UUID, Channel> getChannelByName(String channelName) {
-        return channelList.entrySet().stream()
-                .filter(entry -> entry.getValue().getChannelName().equals(channelName))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-    }
-
-    @Override
     public Channel findChannelById(UUID id) {
-        return channelList.entrySet().stream()
-                .filter(entry -> entry.getValue().getChannelId().equals(id))
-                .findFirst()
-                .map(Map.Entry::getValue)
-                .orElseThrow(() -> new IllegalArgumentException("찾는 채널이 없습니다"));
+        return validator.entityValidate(channelRepository.findChannelById(id));
     }
 
 
     @Override
     public Map<UUID, Channel> getAllChannels() {
-        return channelList;
+        return validator.entityValidate(channelRepository.findAllChannel());
+    }
+
+    @Override
+    public Map<UUID, Channel> getChannelByName(String channelName) {
+        validator.isNullParam(channelName);
+
+        return getAllChannels().entrySet().stream()
+                .filter(entry -> entry.getValue().getChannelName().equals(channelName))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public Channel updateChannel(UUID channelUUID, String channelName, User changeOwnerUser) {
+        validator.isNullParam(channelName);
+        userValidator.entityValidate(changeOwnerUser);
+
         Channel findChannel = findChannelById(channelUUID);
 
         findChannel.updateChannelName(channelName);
         findChannel.updateOwnerUser(changeOwnerUser);
+
+        channelRepository.saveChannel(findChannel);
 
         return findChannel;
     }
@@ -67,36 +84,78 @@ public class JCFChannelService implements ChannelService {
     public void removeChannelById(UUID removeChannelUUID) {
         Channel channelById = findChannelById(removeChannelUUID);
 
-        channelList.remove(channelById.getChannelId());
+        channelRepository.removeChannelById(channelById.getChannelId());
     }
 
     @Override
     public void addUserChannel(UUID channelUUID, User addUser) {
+        userValidator.entityValidate(addUser);
+
         Channel channelById = findChannelById(channelUUID);
 
-        channelById.addUser(addUser); //
+        channelById.addUser(addUser);
+        channelRepository.saveChannel(channelById);
     }
 
     @Override
     public void kickUserChannel(UUID channelUUID, User kickUser) {
         Channel findChannel = findChannelById(channelUUID);
 
-        User findKickUser = channelList.get(findChannel.getChannelId())
-                .getChannelUsers().get(kickUser.getUserId());
+        User user = userValidator.entityValidate(findChannel.getChannelUsers().get(kickUser.getUserId()));
 
-        findChannel.removeUser(findKickUser);
+        findChannel.removeUser(user);
 
-        if (findChannel.getChannelOwnerUser().equals(findKickUser)) {
+        if (findChannel.getChannelOwnerUser().equals(user)) {
             findNextOwnerUser(findChannel);
         }
+
+        channelRepository.saveChannel(findChannel);
     }
 
     private void findNextOwnerUser(Channel findChannel) {
-        User nextOwnerUser = findChannel.getChannelUsers().entrySet().stream()
+        Channel channel = findChannelById(findChannel.getChannelId());
+
+
+        User nextOwnerUser = channel.getChannelUsers().entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(channel.getChannelOwnerUser().getUserId()))
                 .findAny()
                 .map(Map.Entry::getValue)
-                .orElseThrow(() -> new IllegalArgumentException("채널에 아무도 없습니다."));
+                .orElseThrow(() -> new UserNotFoundException("채널에 아무도 없습니다."));
 
-        findChannel.updateOwnerUser(nextOwnerUser);
+        channel.updateOwnerUser(nextOwnerUser);
+    }
+
+
+    @Override
+    public void addMessageInCh(UUID channelId, Message message) {
+        Message validMessage = messageValidator.entityValidate(message);
+        Channel findChannel = findChannelById(channelId);
+
+        findChannel.addMessageInChannel(validMessage);
+
+        channelRepository.saveChannel(findChannel);
+    }
+
+    @Override
+    public void removeMessageInCh(UUID channelId, Message removeMessage) {
+        Message message = messageValidator.entityValidate(removeMessage);
+        Channel findChannel = findChannelById(channelId);
+
+        findChannel.removeMessageInChannel(message.getMessageId());
+
+        channelRepository.saveChannel(findChannel);
+    }
+
+    @Override
+    public Message findChannelMessageById(UUID channelId, UUID messageId) {
+        Channel findChannel = findChannelById(channelId);
+        return messageValidator.entityValidate(findChannel.getChannelMessages().get(messageId));
+    }
+
+    @Override
+    public Map<UUID, Message> findChannelInMessageAll(UUID channelId) {
+        Channel findChannel = findChannelById(channelId);
+
+        return messageValidator.entityValidate(findChannel.getChannelMessages());
     }
 }

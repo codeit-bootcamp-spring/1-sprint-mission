@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,7 +12,7 @@ public class User extends BaseObject implements Serializable {
     private static final long serialVersionUID = 1L;
     private String userName;
     private String userEmail;
-    private String userPassword;
+    private transient String userPassword;
 
     public User(String userName, String userEmail, String userPassword) {
         super();
@@ -39,7 +41,7 @@ public class User extends BaseObject implements Serializable {
 
     private boolean checkUserName(String userName) {
         if (userName == null || userName.isEmpty()) {
-            throw new IllegalArgumentException("이름을 작성해주세요.");
+            throw new UserNotFoundException("이름을 작성해주세요.");
         }
         return true;
     }
@@ -48,9 +50,9 @@ public class User extends BaseObject implements Serializable {
         final String EMAIL_REGEX = "^[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$";
 
         if (userEmail == null || userEmail.isEmpty()) {
-            throw new IllegalArgumentException("이메일을 적어주세요.");
+            throw new UserNotFoundException("이메일을 적어주세요.");
         } else if (!userEmail.matches(EMAIL_REGEX)) {
-            throw new IllegalArgumentException("이메일 형식이 잘못되었습니다.");
+            throw new UserNotFoundException("이메일 형식이 잘못되었습니다.");
         }
 
         return true;
@@ -58,7 +60,7 @@ public class User extends BaseObject implements Serializable {
 
     private boolean checkUserPassword(String userPassword) {
         if (userPassword == null || userPassword.length() < 6) {
-            throw new IllegalArgumentException("비밀번호가 잘못되었습니다.");
+            throw new UserNotFoundException("비밀번호가 잘못되었습니다.");
         }
         return true;
     }
@@ -118,11 +120,13 @@ public class User extends BaseObject implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(userName, user.userName) && Objects.equals(userEmail, user.userEmail) && Objects.equals(userPassword, user.userPassword) && Objects.equals(getId(), user.getId());
+        return Objects.equals(getId(), user.getId()) &&
+                Objects.equals(userName, user.userName) &&
+                Objects.equals(userEmail, user.userEmail);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUserId(), userName, userEmail, userPassword);
+        return Objects.hash(getId(), userName, userEmail);
     }
 }

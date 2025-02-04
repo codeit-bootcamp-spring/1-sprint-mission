@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,11 +19,13 @@ import java.util.UUID;
 class BasicChannelServiceWithJCFTest {
 
     ChannelRepository channelRepository = new JCFChannelRepository();
-    ChannelService channelService = new BasicChannelService(channelRepository);
+
+    MessageService messageService = new BasicMessageService(new JCFMessageRepository());
+    ChannelService channelService = new BasicChannelService(channelRepository, messageService);
 
     @BeforeEach
     void init() {
-        channelService = new BasicChannelService(channelRepository);
+        channelService = new BasicChannelService(channelRepository, messageService);
     }
 
     @Test

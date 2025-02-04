@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ class BasicUserServiceWithFileTest {
     // 직렬화 저장소
     UserRepository userRepository = new FileUserRepository();
 
-    ChannelRepository channelRepository = new JCFChannelRepository();
+    ChannelRepository channelRepository = new FileChannelRepository();
 
     UserService userService = new BasicUserService(userRepository);
 
@@ -85,6 +86,7 @@ class BasicUserServiceWithFileTest {
 
         userService.deleteUser(user1.getUserId());
 
-        Assertions.assertEquals(null, userService.getUserById(user1.getUserId()));
+        Assertions.assertThrows(UserNotFoundException.class,
+                () -> userService.getUserById(user1.getUserId()));
     }
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -78,6 +79,6 @@ class BasicUserServiceWithJCFTest {
 
         userService.deleteUser(user1.getUserId());
 
-        Assertions.assertEquals(null, userService.getUserById(user1.getUserId()));
+        Assertions.assertThrows(UserNotFoundException.class, () -> userService.getUserById(user1.getUserId()));
     }
 }

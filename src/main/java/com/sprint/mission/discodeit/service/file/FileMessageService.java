@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.message.NullMessageTitleException;
 import com.sprint.mission.discodeit.factory.BaseEntityFactory;
 import com.sprint.mission.discodeit.factory.EntityFactory;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.validate.FileMessageServiceValidator;
+import com.sprint.mission.discodeit.service.validate.ServiceValidator;
+import com.sprint.mission.discodeit.service.validate.UserServiceValidator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,41 +16,54 @@ import java.util.UUID;
 
 public class FileMessageService implements MessageService, FileService<Message> {
     private static final String MESSAGE_PATH = "message.ser";
-    static EntityFactory ef;
+
+    private static final EntityFactory ef = BaseEntityFactory.getInstance();
+
+    private final ServiceValidator<Message> messageValidator = new FileMessageServiceValidator();
+
+    private final ServiceValidator<User> userValidator = new UserServiceValidator();
+
     private Map<UUID, Message> messageList = new HashMap<>();
 
-    public FileMessageService(EntityFactory ef) {
-        FileMessageService.ef = ef;
-    }
-
-    public FileMessageService() {
-        ef = BaseEntityFactory.getInstance();
-    }
 
     @Override
     public Message createMessage(String title, String content, User sender, User receiver) {
-        Message message = ef.createMessage(title, content, sender, receiver);
-        messageList.put(message.getMessageId(), message);
+        if (messageValidator.isNullParam(title)) {
+            throw new NullMessageTitleException();
+        }
 
-        save(MESSAGE_PATH, messageList);
+        User sendUser = userValidator.entityValidate(sender);
+        User receiveUser = userValidator.entityValidate(receiver);
+
+        Map<UUID, Message> messages = messageValidator.entityValidate(load(MESSAGE_PATH, messageList));
+
+        Message message = messageValidator.entityValidate(ef.createMessage(title, content, sendUser, receiveUser));
+
+        Map<UUID, Message> allMessages = getAllMessages();
+        allMessages.put(message.getMessageId(), message);
+        save(MESSAGE_PATH, allMessages);
 
         return message;
     }
 
     @Override
     public Message getMessageById(UUID messageId) {
-        Message message = messageList.get(messageId);
+        Map<UUID, Message> messages = getAllMessages();
 
-        return message;
+        return messageValidator.entityValidate(messages.get(messageId));
     }
 
     @Override
     public Map<UUID, Message> getAllMessages() {
-        return load(MESSAGE_PATH, messageList);
+        return messageValidator.entityValidate(load(MESSAGE_PATH, messageList));
     }
 
     @Override
     public Message updateMessage(UUID messageId, String newTitle, String newContent) {
+        if(messageValidator.isNullParam(newTitle,newContent)) {
+            throw new NullMessageTitleException();
+        }
+
         Message findMessage = getMessageById(messageId);
 
         findMessage.updateMessageTitle(newTitle);
@@ -59,10 +76,12 @@ public class FileMessageService implements MessageService, FileService<Message> 
 
     @Override
     public void deleteMessage(UUID messageId) {
-        Map<UUID, Message> load = load(MESSAGE_PATH, messageList);
+        Map<UUID, Message> allMessages = getAllMessages();
 
-        load.remove(messageId);
+        Message findMessage = messageValidator.entityValidate(allMessages.get(messageId));
 
-        save(MESSAGE_PATH, load);
+        allMessages.remove(findMessage.getMessageId());
+
+        save(MESSAGE_PATH, allMessages);
     }
 }

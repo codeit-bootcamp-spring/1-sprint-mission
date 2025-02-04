@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.factory.BaseEntityFactory;
 import com.sprint.mission.discodeit.factory.EntityFactory;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 public class ChannelTest {
     EntityFactory entityFactory = BaseEntityFactory.getInstance();
-    ChannelService channelService = new JCFChannelService(entityFactory);
+    ChannelService channelService = new JCFChannelService();
     Map<UUID, User> userList = new HashMap<>();
 
     @BeforeEach
@@ -30,10 +31,6 @@ public class ChannelTest {
         User user = new User("user1", "user1@mail.com", "user12345");
 
         channelService.createChannel("tit", user, new HashMap<>());
-
-//        Assertions.assertEquals(chName, ch1.getChannelName());
-//        Assertions.assertEquals(user, ch1.getChannelOwnerUser());
-//        Assertions.assertEquals(userList, ch1.getChannelUsers());
     }
 
     @Test
@@ -65,7 +62,7 @@ public class ChannelTest {
         String chName = "test";
         User user = new User("user1", "user1@mail.com", "user12345");
 
-        Assertions.assertThrows(IllegalAccessError.class, () -> channelService.createChannel(chName, null, userList));
+        Assertions.assertThrows(UserNotFoundException.class, () -> channelService.createChannel(chName, null, userList));
     }
 
     @Test
@@ -74,7 +71,7 @@ public class ChannelTest {
         User user = new User("user1", "user1@mail.com", "user12345");
         Channel channel = channelService.createChannel("test", user, Map.of(user.getUserId(), user));
 
-        Assertions.assertThrows(IllegalArgumentException.class, () -> channelService.kickUserChannel(channel.getChannelId(), user));
+        Assertions.assertThrows(UserNotFoundException.class, () -> channelService.kickUserChannel(channel.getChannelId(), user));
 
     }
 }

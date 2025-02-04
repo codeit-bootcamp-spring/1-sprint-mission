@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.message.NullMessageContentException;
+import com.sprint.mission.discodeit.exception.message.NullMessageTitleException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -21,7 +25,7 @@ public class Message extends BaseObject implements Serializable {
     }
 
     private void setMessageTitle(String title) {
-        checkMessageContent(title);
+        checkMessageTitle(title);
         this.messageTitle = title;
         setUpdatedAt();
     }
@@ -51,31 +55,37 @@ public class Message extends BaseObject implements Serializable {
         setUpdatedAt();
     }
 
+    private void checkMessageTitle(String messageTitle) {
+        if (messageTitle == null || messageTitle.isEmpty()) {
+            throw new NullMessageTitleException();
+        }
+
+    }
 
     private void checkMessageContent(String messageContent) {
         if (messageContent == null || messageContent.isEmpty()) {
-            throw new IllegalArgumentException("메시지 내용을 작성해주세요.");
+            throw new NullMessageContentException();
         }
 
     }
 
     private void checkSenderAndReceiver(User messageSendUser, User messageReceiveUser) {
         if (messageSendUser == null || messageReceiveUser == null) {
-            throw new IllegalArgumentException("메시지를 보내는 사람과 받는 사람을 작성해주세요.");
+            throw new UserNotFoundException();
         } else if (messageSendUser.equals(messageReceiveUser)) {
-            throw new IllegalArgumentException("메시지를 보내는 사람과 받는 사람이 같습니다.");
+            throw new UserNotFoundException("메시지를 보내는 사람과 받는 사람이 같습니다.");
         }
     }
 
     private void checkSender(User sender) {
         if (sender == null) {
-            throw new IllegalArgumentException("보낸 사람을 다시 지정하세요.");
+            throw new UserNotFoundException("보낸 사람을 다시 지정하세요.");
         }
     }
 
     private void checkReceiver(User receiver) {
         if (receiver == null) {
-            throw new IllegalArgumentException("받는 사람을 다시 지정하세요.");
+            throw new UserNotFoundException("받는 사람을 다시 지정하세요.");
         }
     }
 

@@ -9,9 +9,10 @@ import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
 
-    Map<UUID, User> userMap = new HashMap<>();
+    private Map<UUID, User> userMap;
 
     public JCFUserRepository() {
+        this.userMap = new HashMap<>();
     }
 
     public JCFUserRepository(Map<UUID, User> userMap) {
