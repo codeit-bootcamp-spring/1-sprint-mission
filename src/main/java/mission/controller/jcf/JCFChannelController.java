@@ -7,11 +7,13 @@ import mission.service.UserService;
 import mission.service.jcf.JCFChannelService;
 import mission.service.jcf.JCFMessageService;
 import mission.service.jcf.JCFUserService;
+import org.springframework.stereotype.Controller;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 
 public class JCFChannelController implements ChannelController {
 
