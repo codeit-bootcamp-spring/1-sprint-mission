@@ -18,7 +18,7 @@ public class FileChannelRepository implements ChannelRepository {
             try {
                 Files.createDirectories(directory);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Directory could not be created. directory : " + directory, e);
             }
         }
     }
@@ -38,7 +38,7 @@ public class FileChannelRepository implements ChannelRepository {
             oos.writeObject(channel);
             return true;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be saved.", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class FileChannelRepository implements ChannelRepository {
             ) {
                 return (Channel) ois.readObject();
             }  catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("File could not be loaded.", e);
             }
         } else {
             return null;
@@ -71,13 +71,13 @@ public class FileChannelRepository implements ChannelRepository {
                             ) {
                                 return (Channel) ois.readObject();
                             } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException("File could not be loaded.", e);
                             }
                         })
                         .toList();
                 return list;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to retrieve file list.", e);
             }
         } else {
             return new ArrayList<>();

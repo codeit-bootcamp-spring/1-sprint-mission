@@ -18,7 +18,7 @@ public class FileMessageRepository implements MessageRepository {
             try {
                 Files.createDirectories(directory);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Directory could not be created. directory : " + directory, e);
             }
         }
     }
@@ -38,7 +38,7 @@ public class FileMessageRepository implements MessageRepository {
             oos.writeObject(message);
             return true;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be saved.", e);
         }
     }
 
@@ -53,7 +53,7 @@ public class FileMessageRepository implements MessageRepository {
             ) {
                 return (Message) ois.readObject();
             }  catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("File could not be loaded.", e);
             }
         } else {
             return null;
@@ -70,14 +70,14 @@ public class FileMessageRepository implements MessageRepository {
                             ) {
                                 return (Message) ois.readObject();
                             } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException("File could not be loaded.", e);
                             }
                         })
                         .filter(m -> m.getChannel().getChannelName().equals(message.getChannel().getChannelName()))
                         .collect(Collectors.toList());
                 return list;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to retrieve file list.", e);
             }
         } else {
             return new ArrayList<>();
@@ -94,13 +94,13 @@ public class FileMessageRepository implements MessageRepository {
                             ) {
                                 return (Message) ois.readObject();
                             } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException("File could not be loaded.", e);
                             }
                         })
                         .toList();
                 return list;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to retrieve file list.", e);
             }
         } else {
             return new ArrayList<>();
@@ -116,7 +116,7 @@ public class FileMessageRepository implements MessageRepository {
                 return true;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be deleted.", e);
         }
         return false;
     }

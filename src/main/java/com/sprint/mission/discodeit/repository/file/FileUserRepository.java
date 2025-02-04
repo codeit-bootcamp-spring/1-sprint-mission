@@ -17,7 +17,7 @@ public class FileUserRepository implements UserRepository {
             try {
                 Files.createDirectories(directory);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Directory could not be created. directory : " + directory, e);
             }
         }
     }
@@ -37,7 +37,7 @@ public class FileUserRepository implements UserRepository {
             oos.writeObject(user);
             return true;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be saved.", e);
         }
     }
 
@@ -52,7 +52,7 @@ public class FileUserRepository implements UserRepository {
             ) {
                 return (User) ois.readObject();
             }  catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("File could not be loaded.", e);
             }
         } else {
             return null;
@@ -70,13 +70,13 @@ public class FileUserRepository implements UserRepository {
                             ) {
                                 return (User) ois.readObject();
                             } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException("File could not be loaded.", e);
                             }
                         })
                         .toList();
                 return list;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to retrieve file list.", e);
             }
         } else {
             return new ArrayList<>();
@@ -92,7 +92,7 @@ public class FileUserRepository implements UserRepository {
                 return true;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be deleted.", e);
         }
         return false;
     }

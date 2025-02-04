@@ -17,7 +17,7 @@ public class FileManager {
             try {
                 Files.createDirectories(directory);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Directory could not be created. directory : " + directory, e);
             }
         }
     }
@@ -31,7 +31,7 @@ public class FileManager {
         ) {
             oos.writeObject(data);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be saved.", e);
         }
     }
 
@@ -46,7 +46,7 @@ public class FileManager {
                 Object target = ois.readObject();
                 return data.cast(target);
             }  catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("File could not be loaded.", e);
             }
         } else {
             return null;
@@ -66,13 +66,13 @@ public class FileManager {
                                 Object data = ois.readObject();
                                 return (T) data;
                             } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
+                                throw new RuntimeException("File could not be loaded.", e);
                             }
                         })
                         .toList();
                 return list;
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to retrieve file list.", e);
             }
         } else {
             return new ArrayList<>();
@@ -86,7 +86,7 @@ public class FileManager {
                 Files.delete(filePath);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File could not be deleted.", e);
         }
     }
 }
