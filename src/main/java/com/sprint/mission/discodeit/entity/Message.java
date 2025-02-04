@@ -1,40 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Getter;
 
+import java.io.Serial;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+
+@Getter
 public class Message extends BaseEntity {
     @Serial
-    private static final long serialVersionUID = 4L;
+    private static final long serialVersionUID = 14L;
+    private final UUID authorId;
+    private final UUID channelId;
     private String content; //메시지 내용
-    private final User author; //작성자
-    private List<User> mentions; //멘션된 사용자 리스트
-    private final Channel channel; //메시지가 속한 채널
+    private Set<UUID> mentionedIds; //멘션된 사용자 리스트
 
-    public Message(String content, User author, Channel channel) {
+    public Message(String content, UUID authorId, UUID channelId) {
         super();
         this.content = content;
-        this.author = author;
-        this.channel = channel;
-        this.mentions = new ArrayList<>();
+        this.authorId = authorId;
+        this.channelId = channelId;
+        this.mentionedIds = new HashSet<>();
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public List<User> getMentions() {
-        return mentions;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-
-    public Channel getChannel() {
-        return channel;
+    public void addMentions(Set<UUID> mentionedIds) {
+        this.mentionedIds.addAll(mentionedIds);
     }
 
     public void update(String content) {
@@ -46,23 +38,15 @@ public class Message extends BaseEntity {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("메시지 {").append("내용 = '").append(content).append('\'')
-                .append(", 작성자 = ").append(author.getName())
-                .append(", 채녈명 = ").append(channel.getName())
-                .append(", 작성 시간 = ").append(getCreatedAt());
-
-        if (!mentions.isEmpty()) {
-            sb.append(", 맨션 = ").append(mentions.stream()
-                    .map(User::getName).toList());
-        }
-
-        if (getCreatedAt() != getUpdatedAt()) {
-            sb.append(", 수정 시간 = ").append(getUpdatedAt());
-        }
-
-        sb.append("}");
-        return sb.toString();
+        return String.format(
+                "메시지 {내용='%s', 작성자ID=%s, 채널ID=%s, 작성시간=%s%s%s}",
+                content,
+                authorId,
+                channelId,
+                getCreatedAt(),
+                mentionedIds.isEmpty() ? "" : ", 맨션=" + mentionedIds,
+                getCreatedAt().equals(getUpdatedAt()) ? "" : ", 수정시간=" + getUpdatedAt()
+        );
     }
 }
 

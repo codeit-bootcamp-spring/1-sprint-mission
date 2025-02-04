@@ -22,21 +22,25 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message sendMessage(Message newMessage) {
-        validateChannel(newMessage.getChannel().getId());
-        validateUser(newMessage.getAuthor().getId());
-        messageRepository.save(newMessage);
-        // mentions 인식 및 알림
-        List<User> mentionedUsers = parseMentions(newMessage).stream()
-                .map(userRepository::findByName)
-                .flatMap(Optional::stream)
-                .toList();
+        validateChannel(newMessage.getChannelId());
+        validateUser(newMessage.getAuthorId());
+        // messageRepository.save(newMessage);
+        Set<UUID> mentionedIds = parseMentions(newMessage.getContent());
 
-        newMessage.getMentions().clear();
-        newMessage.getMentions().addAll(mentionedUsers);
+        //불변성 보장
+        Message messageToSave = new Message(
+                newMessage.getContent(),
+                newMessage.getAuthorId(),
+                newMessage.getChannelId()
+        );
 
-        notifyMentions(newMessage.getAuthor(), mentionedUsers);
-        return newMessage;
+        messageToSave.addMentions(mentionedIds);
+
+        notifyMentions(newMessage.getAuthorId(), mentionedIds);
+
+        return messageRepository.save(messageToSave);
     }
+
     /**
      * @deprecated 새로운 sendMessage(Message newMessage) 사용을 권장합니다.
      * 메시지 전송 시, List<User> allUsers를 매번 파라미터로 넘겨주는 불필요함 개선
@@ -50,20 +54,20 @@ public class BasicMessageService implements MessageService {
     public List<Message> getChannelMessages(UUID channelId) {
         validateChannel(channelId);
 
-        return messageRepository.findAll().stream().filter(message -> message.getChannel().getId().equals(channelId)).toList();
+        return messageRepository.findAll().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
 
     @Override
-    public List<Message> getUserMessages(User author) {
-        validateUser(author.getId());
-        return messageRepository.findAll().stream().filter(m -> m.getAuthor().equals(author)).toList();
+    public List<Message> getUserMessages(UUID authorId) {
+        validateUser(authorId);
+        return messageRepository.findAll().stream().filter(m -> m.getAuthorId().equals(authorId)).toList();
     }
 
     @Override
     public boolean editMessage(UUID id, String updatedContent) {
         Optional<Message> byId = messageRepository.findById(id);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             Message message = byId.get();
             message.update(updatedContent);
             messageRepository.save(message);
@@ -78,23 +82,31 @@ public class BasicMessageService implements MessageService {
     }
 
     //맨션된 유저들 리스트에 추가
-    private Set<String> parseMentions(Message message) {
+    private Set<UUID> parseMentions(String content) {
         Pattern pattern = Pattern.compile("@(\\w+)"); // 닉네임 후보(@뒤에 연속되는 문자열)
-        Matcher matcher = pattern.matcher(message.getContent());
-        Set<String> mentionedNames = new HashSet<>();
+        Matcher matcher = pattern.matcher(content);
+        Set<UUID> mentionedIds = new HashSet<>();
         while (matcher.find()) {
             String name = matcher.group(1);
-            mentionedNames.add(name);
+            userRepository.findByName(name)
+                    .ifPresent(user ->
+                            mentionedIds.add(user.getId()));
         }
 
-        return mentionedNames;
+        return mentionedIds;
     }
 
-    private void notifyMentions(User sender, List<User> mentions) {
-        for (User user : mentions) {
-            // 콘솔로 맨션된 유저들에게 알림 출력
-            System.out.println("[" + sender.getName() + "]님이 [" + user.getName() + "]님을 멘션했어요!");
-        }
+    private void notifyMentions(UUID senderId, Set<UUID> mentionIds) {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(NoSuchElementException::new);
+
+        mentionIds.stream()
+                .map(userRepository::findById)
+                .flatMap(Optional::stream)// Optional이 비어있으면 해당 요소 제외
+                .forEach(user ->
+                        System.out.printf("[%s]님이 [%s]님을 멘션했어요!%n",
+                                sender.getName(), user.getName())
+                );
     }
 
     private void validateChannel(UUID channelId) {

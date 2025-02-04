@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -13,7 +14,7 @@ public interface MessageService {
 
     List<Message> getChannelMessages(UUID channelId);
 
-    List<Message> getUserMessages(User author);
+    List<Message> getUserMessages(UUID authorId);
 
     boolean editMessage(UUID id, String content);
 
