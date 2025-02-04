@@ -91,8 +91,9 @@ public class FileMessageRepository implements MessageRepository {
     public void deleteMessageById(UUID id) {
         String fileName =  MESSAGES_PATH + id.toString() + ".ser";
         File messageFile = new File(fileName);
-        messageFile.delete();
-        System.out.println("deleteMessageById 삭제 완료");
+        if(messageFile.delete()){
+            System.out.println("deleteMessageById 삭제 완료");
+        }
     }
 
     @Override
@@ -105,7 +106,4 @@ public class FileMessageRepository implements MessageRepository {
         System.out.println("deleteAllMessages 삭제 완료");
 
     }
-
-
-
 }
