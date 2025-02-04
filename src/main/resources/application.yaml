@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: discodeit
+
+data:
+  path:
+    base-dir: ./serialized
+    users: ${data.path.base-dir}/users.ser
+    channels: ${data.path.base-dir}/channels.ser
+    messages: ${data.path.base-dir}/messages.ser
+
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
