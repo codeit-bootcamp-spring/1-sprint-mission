@@ -23,7 +23,7 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
-import com.sprint.mission.discodeit.observer.ChannelObserver;
+import com.sprint.mission.discodeit.observer.service.ChannelObserver;
 import com.sprint.mission.discodeit.validation.ChannelValidtor;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 import com.sprint.mission.discodeit.validation.UserValidator;

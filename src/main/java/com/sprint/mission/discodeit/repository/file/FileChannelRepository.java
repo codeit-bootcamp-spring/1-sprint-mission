@@ -45,6 +45,9 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID uuid) {
+        if (!data.containsKey(uuid)){
+            System.out.println("존재하지 않는 채널");
+        }
         data.remove(uuid);
         saveDataToFile();
     }
