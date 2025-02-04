@@ -3,11 +3,11 @@ package com.sprint.mission;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.FileServiceFactory;
+import com.sprint.mission.discodeit.factory.FileServiceFactory;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.ServiceFactory;
+import com.sprint.mission.discodeit.factory.ServiceFactory;
 
 import java.util.List;
 import java.util.UUID;

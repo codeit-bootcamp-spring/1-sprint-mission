@@ -1,14 +1,9 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.Factory;
-import com.sprint.mission.discodeit.FileServiceFactory;
-import com.sprint.mission.discodeit.ServiceFactory;
+import com.sprint.mission.discodeit.factory.Factory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JcfChannelService;
 import com.sprint.mission.discodeit.service.jcf.JcfMessageService;
 import com.sprint.mission.discodeit.service.jcf.JcfUserService;

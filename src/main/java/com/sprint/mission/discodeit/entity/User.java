@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,31 +19,31 @@ public class User implements Serializable {
     @JsonProperty("userName")
     private String userName;
     @JsonProperty("createdAt")
-    private final long createdAt;
+    private final Instant createdAt;
     @JsonProperty("updatedAt")
-    private long updatedAt;
+    private Instant updatedAt;
 
     public User(String userName) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.userName = userName;
     }
     public User() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
     }
 
     public void update(String userName) {
         this.userName = userName;
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
 
-    public void setUpdatedAt(long updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
