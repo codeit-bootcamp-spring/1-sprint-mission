@@ -54,9 +54,7 @@ public class JCFChannelService implements ChannelService {
         System.out.println(channel);
     }
     public void printAllChannels(List<Channel> channels) {
-        for (Channel channel : channels) {
-            System.out.println(channel);
-        }
+        channels.forEach(System.out::println);
     }
 
     // 채널 삭제

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileUserRepository implements UserRepository {
-    public Path directory = Paths.get(System.getProperty("user.dir"), "data/user");
+    public static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data/user");
 
     // 초기화
     public void init(Path directory) {
@@ -24,8 +24,8 @@ public class FileUserRepository implements UserRepository {
 
     // 저장
     public boolean saveUser(User user) {
-        init(directory); // 초기화
-        Path filePath = directory.resolve(user.getId().toString().concat(".ser"));
+        init(DIRECTORY); // 초기화
+        Path filePath = DIRECTORY.resolve(user.getId().toString().concat(".ser"));
         if (Files.exists(filePath)) {
             deleteUser(user);
         }
@@ -43,7 +43,7 @@ public class FileUserRepository implements UserRepository {
 
     // 조회
     public User loadUser(User user) {
-        Path filePath = directory.resolve(user.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(user.getId().toString().concat(".ser"));
 
         if (Files.exists(filePath)) {
             try (
@@ -60,9 +60,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     public List<User> loadAllUser() {
-        if (Files.exists(directory)) {
+        if (Files.exists(DIRECTORY)) {
             try {
-                List<User> list = Files.list(directory)
+                List<User> list = Files.list(DIRECTORY)
                         .map(path -> {
                             try (
                                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -85,7 +85,7 @@ public class FileUserRepository implements UserRepository {
 
     // 삭제
     public boolean deleteUser(User user) {
-        Path filePath = directory.resolve(user.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(user.getId().toString().concat(".ser"));
         try {
             if (Files.exists(filePath)) {
                 Files.delete(filePath);

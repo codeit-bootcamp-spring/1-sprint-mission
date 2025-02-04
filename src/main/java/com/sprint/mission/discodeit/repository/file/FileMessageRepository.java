@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileMessageRepository implements MessageRepository {
-    public Path directory = Paths.get(System.getProperty("user.dir"), "data/messages");
+    public static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data/messages");
 
     // 초기화
     public void init(Path directory) {
@@ -25,8 +25,8 @@ public class FileMessageRepository implements MessageRepository {
 
     // 저장
     public boolean saveMessage(Message message) {
-        init(directory); // 초기화
-        Path filePath = directory.resolve(message.getId().toString().concat(".ser"));
+        init(DIRECTORY); // 초기화
+        Path filePath = DIRECTORY.resolve(message.getId().toString().concat(".ser"));
         if (Files.exists(filePath)) {
             deleteMessage(message);
         }
@@ -44,7 +44,7 @@ public class FileMessageRepository implements MessageRepository {
 
     // 조회
     public Message loadMessage(Message message) {
-        Path filePath = directory.resolve(message.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(message.getId().toString().concat(".ser"));
 
         if (Files.exists(filePath)) {
             try (
@@ -60,9 +60,9 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
     public List<Message> getMessagesByChannel(Message message) {
-        if (Files.exists(directory)) {
+        if (Files.exists(DIRECTORY)) {
             try {
-                List<Message> list = Files.list(directory)
+                List<Message> list = Files.list(DIRECTORY)
                         .map(path -> {
                             try (
                                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -84,9 +84,9 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
     public List<Message> loadAllMessages() {
-        if (Files.exists(directory)) {
+        if (Files.exists(DIRECTORY)) {
             try {
-                List<Message> list = Files.list(directory)
+                List<Message> list = Files.list(DIRECTORY)
                         .map(path -> {
                             try (
                                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -109,7 +109,7 @@ public class FileMessageRepository implements MessageRepository {
 
     // 삭제
     public boolean deleteMessage(Message message) {
-        Path filePath = directory.resolve(message.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(message.getId().toString().concat(".ser"));
         try {
             if (Files.exists(filePath)) {
                 Files.delete(filePath);

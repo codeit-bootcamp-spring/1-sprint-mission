@@ -10,7 +10,7 @@ import java.util.List;
 
 
 public class FileChannelRepository implements ChannelRepository {
-    public Path directory = Paths.get(System.getProperty("user.dir"), "data/channel");
+    public static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data/channel");
 
     // 초기화
     public void init(Path directory) {
@@ -25,8 +25,8 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 저장
     public boolean saveChannel(Channel channel) {
-        init(directory); // 초기화
-        Path filePath = directory.resolve(channel.getId().toString().concat(".ser"));
+        init(DIRECTORY); // 초기화
+        Path filePath = DIRECTORY.resolve(channel.getId().toString().concat(".ser"));
         if (Files.exists(filePath)) {
             deleteChannel(channel);
         }
@@ -44,7 +44,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 조회
     public Channel loadChannel(Channel channel) {
-        Path filePath = directory.resolve(channel.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(channel.getId().toString().concat(".ser"));
 
         if (Files.exists(filePath)) {
             try (
@@ -61,9 +61,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     public List<Channel> loadAllChannels() {
-        if (Files.exists(directory)) {
+        if (Files.exists(DIRECTORY)) {
             try {
-                List<Channel> list = Files.list(directory)
+                List<Channel> list = Files.list(DIRECTORY)
                         .map(path -> {
                             try (
                                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -86,7 +86,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 삭제
     public boolean deleteChannel(Channel channel) {
-        Path filePath = directory.resolve(channel.getId().toString().concat(".ser"));
+        Path filePath = DIRECTORY.resolve(channel.getId().toString().concat(".ser"));
         try {
             if (Files.exists(filePath)) {
                 Files.delete(filePath);

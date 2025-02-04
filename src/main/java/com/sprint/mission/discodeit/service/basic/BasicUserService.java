@@ -73,9 +73,7 @@ public class BasicUserService implements UserService {
         System.out.println(user);
     }
     public void printListUsers(List<User> users) {
-        for (User user : users) {
-            System.out.println(user);
-        }
+        users.forEach(System.out::println);
     }
 
     // 삭제

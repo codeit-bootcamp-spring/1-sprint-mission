@@ -59,9 +59,7 @@ public class JCFUserService implements UserService {
         System.out.println(user);
     }
     public void printListUsers(List<User> users) {
-        for (User user : users) {
-            System.out.println(user);
-        }
+        users.forEach(System.out::println);
     }
 
     // 유저 삭제

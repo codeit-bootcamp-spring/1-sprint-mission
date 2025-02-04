@@ -59,9 +59,7 @@ public class JCFMessageService implements MessageService {
         System.out.println(message);
     }
     public void printMessagesList(List<Message> messages) {
-        for (Message message : messages) {
-            System.out.println(message);
-        }
+        messages.forEach(System.out::println);
     }
 
     // 삭제
