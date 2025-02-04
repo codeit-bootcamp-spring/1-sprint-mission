@@ -21,7 +21,7 @@ public class User implements Serializable {
   private String email;
   private String nickname;
   private String phoneNumber;
-  private String profilePictureURL;
+  private String binaryContentId;
   private String description;
   private Instant createdAt;
   private Instant updatedAt;
@@ -33,7 +33,7 @@ public class User implements Serializable {
     this.email = builder.email;
     this.nickname = builder.nickname;
     this.phoneNumber = builder.phoneNumber;
-    this.profilePictureURL = builder.profilePictureURL != null ? builder.profilePictureURL : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
+    this.binaryContentId = builder.binaryContentId != null ? builder.binaryContentId : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
     this.description = builder.description;
     this.createdAt = Instant.now();
     this.updatedAt = Instant.now();
@@ -45,7 +45,7 @@ public class User implements Serializable {
     private final String email;
     private String nickname;
     private String phoneNumber;
-    private String profilePictureURL;
+    private String binaryContentId;
     private String description;
 
     public UserBuilder(String username, String password, String email) throws UserValidationException {
@@ -66,8 +66,8 @@ public class User implements Serializable {
       return this;
     }
 
-    public UserBuilder profilePictureURL(String profilePictureURL) {
-      this.profilePictureURL = profilePictureURL;
+    public UserBuilder binaryContentId(String binaryContentId ) {
+      this.binaryContentId = binaryContentId;
       return this;
     }
 

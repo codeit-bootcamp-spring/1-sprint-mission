@@ -4,10 +4,13 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
-public class ReadStatus {
+public class ReadStatus implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private final String UUID;
   private final String channelId;
   private final String userId;

@@ -4,11 +4,14 @@ import com.sprint.mission.discodeit.util.UserStatusType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 
 @Getter
-public class UserStatus {
+public class UserStatus implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private final String UUID;
   private final String userId;
   private final Instant createdAt;

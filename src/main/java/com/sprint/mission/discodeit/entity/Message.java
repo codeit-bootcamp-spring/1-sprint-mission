@@ -35,7 +35,7 @@ public class Message implements Serializable {
   private Boolean isEdited;
   private Instant createdAt;
   private Instant updatedAt;
-  private String contentImage;
+  private String binaryContentId;
   private String threadUUID;
 
   private Message(MessageBuilder builder) {
@@ -43,7 +43,7 @@ public class Message implements Serializable {
     this.userUUID = builder.userUUID;
     this.channelUUID = builder.channelUUID;
     this.content = builder.content;
-    this.contentImage = builder.contentImage;
+    this.binaryContentId = builder.binaryContentId;
     this.threadUUID = builder.threadUUID;
     this.isEdited = builder.isEdited;
     this.createdAt = builder.createdAt;
@@ -56,7 +56,7 @@ public class Message implements Serializable {
     private final String channelUUID;
     private final String content;
     private Boolean isEdited = false;
-    private String contentImage = "";
+    private String binaryContentId = "";
     private String threadUUID = "";
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
@@ -71,8 +71,8 @@ public class Message implements Serializable {
       this.content = content;
     }
 
-    public MessageBuilder contentImage(String contentImage) {
-      this.contentImage = contentImage == null ? "" : contentImage;
+    public MessageBuilder binaryContentId(String binaryContentId) {
+      this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
       return this;
     }
 
@@ -92,8 +92,8 @@ public class Message implements Serializable {
     this.updatedAt = Instant.now();
   }
 
-  public void setContentImage(String contentImage) {
-    this.contentImage = contentImage == null ? "" : contentImage;
+  public void setContentImage(String binaryContentId) {
+    this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
   }
 
   public void setIsEdited() {
@@ -107,7 +107,7 @@ public class Message implements Serializable {
         ", userUUID='" + userUUID + '\'' +
         ", channelUUID='" + channelUUID + '\'' +
         ", content='" + content + '\'' +
-        ", contentImage='" + contentImage + '\'' +
+        ", contentImage='" + binaryContentId + '\'' +
         '}';
   }
 }
