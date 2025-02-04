@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
 
     @Serial
@@ -34,18 +36,6 @@ public class User implements Serializable {
     public void update(String userName) {
         this.userName = userName;
         updatedAt = System.currentTimeMillis();
-    }
-    public long getCreatedAt() {
-        return createdAt;
-    }
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-    public String getUserName() {
-        return userName;
-    }
-    public UUID getUserId() {
-        return id;
     }
 
     public void setUserName(String userName) {

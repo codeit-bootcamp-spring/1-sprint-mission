@@ -15,14 +15,14 @@ public class JCFMessageRepository implements MessageRepository  {
 
     public UUID createMessage(UUID sender, String content) {
         Message message = new Message(sender, content);
-        messageMap.put(message.getMessageId(), message);
-        return message.getMessageId();
+        messageMap.put(message.getId(), message);
+        return message.getId();
     }
 
     public UUID createMessage(UUID id, UUID sender, String content) {
         Message message = new Message(sender, content);
         messageMap.put(id, message);
-        return message.getMessageId();
+        return message.getId();
     }
 
     public Message getMessage(UUID id) {
@@ -30,7 +30,7 @@ public class JCFMessageRepository implements MessageRepository  {
     }
 
     public List<Message> getMessagesByUserId(UUID userId) {
-        return getMessages().stream().filter(s -> s.getSender().equals(userId)).collect(Collectors.toList());
+        return getMessages().stream().filter(s -> s.getSenderId().equals(userId)).collect(Collectors.toList());
     }
 
     public List<Message> getMessages() {
@@ -57,8 +57,8 @@ public class JCFMessageRepository implements MessageRepository  {
     @Override
     public UUID save(UUID sender, String content) {
         Message message = new Message(sender, content);
-        messageMap.put(message.getMessageId(), message);
-        return message.getMessageId();
+        messageMap.put(message.getId(), message);
+        return message.getId();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class JCFMessageRepository implements MessageRepository  {
 
     @Override
     public List<Message> findMessagesById(UUID id) {
-        return getMessages().stream().filter(s -> s.getSender().equals(id)).collect(Collectors.toList());
+        return getMessages().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
     }
 
     @Override
@@ -95,7 +95,7 @@ public class JCFMessageRepository implements MessageRepository  {
     public void update(UUID id, String content) {
         Message message = findMessageById(id);
         message.update(content);
-        messageMap.replace(message.getMessageId(), message);
+        messageMap.replace(message.getId(), message);
         System.out.println("업데이트 메시지");
         System.out.println("message = " + findMessageById(id));
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.basic;
+package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -6,10 +6,14 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.UUID;
-
-public class BasicTest {
+@SpringBootApplication
+public class DiscodeitApplication {
     static User setupUser(UserService userService) {
         UUID userId = userService.createUser("woody");
         return userService.getUser(userId);
@@ -28,11 +32,11 @@ public class BasicTest {
 
     public static void main(String[] args) {
         // 서비스 초기화
-        // TODO Basic*Service 구현체를 초기화하세요.
-        BasicFactory basicFactory = new BasicFactory();
-        UserService userService = basicFactory.getUserService();
-        ChannelService channelService = basicFactory.getChannelService();
-        MessageService messageService = basicFactory.getMessageService();
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
 
         // 셋업
         User user = setupUser(userService);

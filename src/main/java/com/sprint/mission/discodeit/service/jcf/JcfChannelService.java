@@ -77,12 +77,12 @@ public class JcfChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
 
-        if (jcfChannelRepository.findAll().stream().map(Channel::getChannelId).toList().contains(channelId)) {
+        if (jcfChannelRepository.findAll().stream().map(Channel::getId).toList().contains(channelId)) {
             List<Message> collect = jcfChannelRepository.messages(channelId).stream().map(s -> jcfMessageService.getMessage(s)).toList();
             if(jcfChannelRepository.delete(channelId)){
                 for (Message message : collect) {
                     try {
-                        jcfMessageService.deleteMessage(message.getMessageId());
+                        jcfMessageService.deleteMessage(message.getId());
                     } catch (NullPointerException e) {
                     } //삭제라서 nullPointException 무시했습니다.
                     System.out.println("성공적으로 삭제 되었습니다.");

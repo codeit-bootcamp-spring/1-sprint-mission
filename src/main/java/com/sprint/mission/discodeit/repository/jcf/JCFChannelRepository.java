@@ -19,7 +19,7 @@ public class JCFChannelRepository implements ChannelRepository {
             System.out.println("채널을 찾을 수 없습니다.");
             return null;
         }
-        List<UUID> messageUuidList = messages.get(channel.getChannelId());
+        List<UUID> messageUuidList = messages.get(channel.getId());
         return new ArrayList<>(messageUuidList);
     }
     public void addMessage(UUID uuid, UUID messageId) {
@@ -39,9 +39,9 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public UUID save(String channelName) {
         Channel channel = new Channel(channelName);
-        list.put(channel.getChannelId(), channel);
-        messages.put(channel.getChannelId(), new ArrayList<>());
-        return channel.getChannelId();
+        list.put(channel.getId(), channel);
+        messages.put(channel.getId(), new ArrayList<>());
+        return channel.getId();
     }
 
     @Override

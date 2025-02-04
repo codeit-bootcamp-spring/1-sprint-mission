@@ -53,7 +53,7 @@ public class JcfUserService implements UserService {
 
     @Override
     public void updateUser(UUID id, String username) {
-        if(jcfUserRepository.findAll().stream().map(User::getUserId).toList().contains(id)){
+        if(jcfUserRepository.findAll().stream().map(User::getId).toList().contains(id)){
             jcfUserRepository.update(id, username);
         }else {
             System.out.println("유저를 찾을 수 없습니다.");
@@ -65,7 +65,7 @@ public class JcfUserService implements UserService {
         if(jcfUserRepository.findAll().contains(id)){
             List<Message> messageByUserId = jcfMessageService.getMessagesByUserId(id);
             for (Message message : messageByUserId) {
-                jcfMessageService.deleteMessage(message.getMessageId());
+                jcfMessageService.deleteMessage(message.getId());
             }
             jcfUserRepository.delete(id);
         } else {

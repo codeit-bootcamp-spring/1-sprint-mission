@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
-
+@Repository
 public class FileUserRepository implements UserRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\users.ser";
 
@@ -15,13 +16,13 @@ public class FileUserRepository implements UserRepository {
         if (userMap.values().stream().anyMatch(user -> user.getUserName().equals(userName))) {
             User user = userMap.get(userMap.keySet().stream().findFirst().get());
             System.out.println("이미 존재하는 사용자입니다.");
-            return user.getUserId(); // 중복된 사용자 이름이 있으면 처리 중단
+            return user.getId(); // 중복된 사용자 이름이 있으면 처리 중단
         }
         User user = new User(userName);
-        userMap.put(user.getUserId(), user);
+        userMap.put(user.getId(), user);
         saveToSer(FILE_NAME, userMap);
 
-        return user.getUserId();
+        return user.getId();
     }
 
     @Override
@@ -57,9 +58,9 @@ public class FileUserRepository implements UserRepository {
         if(userMap.containsKey(id)){
             System.out.println("유저 수정 중");
             User user = findUserById(id);
-            userMap.remove(user.getUserId());
+            userMap.remove(user.getId());
             user.update(username);
-            userMap.put(user.getUserId(), user);
+            userMap.put(user.getId(), user);
             saveToSer(FILE_NAME, userMap);
 
         }else {

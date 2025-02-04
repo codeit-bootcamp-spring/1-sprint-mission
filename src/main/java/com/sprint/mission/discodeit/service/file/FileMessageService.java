@@ -52,7 +52,7 @@ public class FileMessageService implements MessageService {
     }
     @Override
     public List<Message> getMessagesByUserId(UUID userId) {
-        List<Message> collect = getMessages().stream().filter(s -> s.getSender().equals(userId)).collect(Collectors.toList());
+        List<Message> collect = getMessages().stream().filter(s -> s.getSenderId().equals(userId)).collect(Collectors.toList());
         //return fileMessageRepository.findMessagesById(userId);
         System.out.println("collect = " + collect.size());
         return collect;
@@ -85,7 +85,7 @@ public class FileMessageService implements MessageService {
     public void deleteMessage(UUID id) {
         List<Message> messages = fileMessageRepository.findAll();
         //Map<UUID, Message> messageMap = loadFromSer(FILE_NAME);
-        if(messages.stream().map(Message::getMessageId).toList().contains(id)) {
+        if(messages.stream().map(Message::getId).toList().contains(id)) {
             //Message message = getMessage(id);
             fileMessageRepository.delete(id);
             fileChannelService.deleteMessage_in_Channel(id);

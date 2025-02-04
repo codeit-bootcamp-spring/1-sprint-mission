@@ -22,8 +22,8 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public UUID save(String userName) {
         User user = new User(userName);
-        map.put(user.getUserId(),user);
-        return user.getUserId();
+        map.put(user.getId(),user);
+        return user.getId();
     }
 
     @Override

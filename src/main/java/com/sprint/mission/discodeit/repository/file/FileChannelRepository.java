@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
-
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\channel.ser";
 
@@ -38,17 +39,17 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public UUID save(String channelName) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        if (channelMap.values().stream().anyMatch(channel -> channel.getChannelName().equals(channelName))) {
+        if (channelMap.values().stream().anyMatch(channel -> channel.getId().equals(channelName))) {
             System.out.println("이미 존재하는 채널입니다.");
-            Channel channel = channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getChannelName().equals(channelName)).findFirst().get());
-            return channel.getChannelId(); //존재하는 채널 UUID 반환
+            Channel channel = channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getId().equals(channelName)).findFirst().get());
+            return channel.getId(); //존재하는 채널 UUID 반환
         }
         System.out.println("채널 생성 중");
         Channel channel = new Channel(channelName);
-        channelMap.put(channel.getChannelId(), channel);
+        channelMap.put(channel.getId(), channel);
         saveToSer(FILE_NAME, channelMap);
 
-        return channel.getChannelId();
+        return channel.getId();
     }
 
     @Override
@@ -95,9 +96,9 @@ public class FileChannelRepository implements ChannelRepository {
         if(channelMap.containsKey(id)){
             System.out.println("채널 수정 중");
             Channel channel = findById(id);
-            channelMap.remove(channel.getChannelId());
+            channelMap.remove(channel.getId());
             channel.update(name);
-            channelMap.put(channel.getChannelId(), channel);
+            channelMap.put(channel.getId(), channel);
             saveToSer(FILE_NAME, channelMap);
 
         }else {

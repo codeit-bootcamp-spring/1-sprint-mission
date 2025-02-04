@@ -135,7 +135,7 @@ public class FileChannelService implements ChannelService {
             List<Message> collect = messages.get(channelId).stream().map(s -> fileMessageService.getMessage(s)).collect(Collectors.toList());
             for (Message message : collect) {
                 try {
-                    fileMessageService.deleteMessage(message.getMessageId());
+                    fileMessageService.deleteMessage(message.getId());
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }

@@ -3,11 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\message.ser";
     //private final Map<UUID, Message> messageMap;
@@ -75,10 +76,10 @@ public class FileMessageRepository implements MessageRepository {
         //Map<UUID, Message> userMap = loadFromSer(FILE_NAME);
         Map<UUID, Message> messageMap = FileSerializationUtil.loadFromSer(FILE_NAME);
         Message message = new Message(sender, content);
-        messageMap.put(message.getMessageId(), message);
+        messageMap.put(message.getId(), message);
         FileSerializationUtil.saveToSer(FILE_NAME, messageMap);
         //saveToSer(FILE_NAME, messageMap);
-        return message.getMessageId();
+        return message.getId();
     }
 
     @Override
@@ -99,7 +100,7 @@ public class FileMessageRepository implements MessageRepository {
             System.out.println("메시지를 찾을 수 없습니다.");
             return null;
         }
-        List<Message> collect = findAll().stream().filter(s -> s.getSender().equals(id)).collect(Collectors.toList());
+        List<Message> collect = findAll().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
         System.out.println("collect = " + collect.size());
         return collect;
     }

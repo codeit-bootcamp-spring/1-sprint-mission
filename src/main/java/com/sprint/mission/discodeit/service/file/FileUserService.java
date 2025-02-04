@@ -57,7 +57,7 @@ public class FileUserService implements UserService {
     @Override
     public void deleteUser(UUID id) {
         List<User> users = fileUserRepository.findAll();
-        if(users.stream().map(User::getUserId).toList().contains(id)){
+        if(users.stream().map(User::getId).toList().contains(id)){
             System.out.println("유저 삭제하기 전 유저가 쓴 메시지 객체 찾기");
             List<Message> messagesByUserId = fileMessageService.getMessagesByUserId(id);
 
@@ -65,7 +65,7 @@ public class FileUserService implements UserService {
             if(delete){
                 System.out.println("messagesByUserId = " + messagesByUserId);
                 for (Message message : messagesByUserId) {
-                    fileMessageService.deleteMessage(message.getMessageId());
+                    fileMessageService.deleteMessage(message.getId());
                 } 
             }else {
                 System.out.println("유저 삭제에 실패했습니다.");
