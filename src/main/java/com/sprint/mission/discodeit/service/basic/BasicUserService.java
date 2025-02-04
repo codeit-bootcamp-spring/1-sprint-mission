@@ -4,29 +4,18 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private static volatile BasicUserService instance;
+
     private final UserRepository userRepository;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    protected static BasicUserService getInstance(UserRepository userRepository) {
-        if (instance == null) {
-            synchronized (BasicUserService.class) {
-                if (instance == null) {
-                    instance = new BasicUserService(userRepository);
-                }
-            }
-        }
-        return instance;
-    }
 
     @Override
     public User register(User user) {

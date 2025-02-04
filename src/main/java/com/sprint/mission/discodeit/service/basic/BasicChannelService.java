@@ -4,29 +4,18 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    private static volatile BasicChannelService instance;
+
     private final ChannelRepository channelRepository;
-
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
-
-    protected static BasicChannelService getInstance(ChannelRepository channelRepository) {
-        if (instance == null) {
-            synchronized (BasicChannelService.class) {
-                if (instance == null) {
-                    instance = new BasicChannelService(channelRepository);
-                }
-            }
-        }
-        return instance;
-    }
 
     @Override
     public Channel createChannel(String name, String topic, ChannelType type) {

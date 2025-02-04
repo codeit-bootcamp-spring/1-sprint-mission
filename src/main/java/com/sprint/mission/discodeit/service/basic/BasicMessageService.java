@@ -6,33 +6,19 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private static volatile BasicMessageService instance;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-
-    public BasicMessageService(MessageRepository messageRepository, UserRepository userRepository, ChannelRepository channelRepository) {
-        this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
-    }
-
-    protected static BasicMessageService getInstance(MessageRepository messageRepository, UserRepository userRepository, ChannelRepository channelRepository) {
-        if (instance == null) {
-            synchronized (BasicMessageService.class) {
-                if (instance == null) {
-                    instance = new BasicMessageService(messageRepository, userRepository, channelRepository);
-                }
-            }
-        }
-        return instance;
-    }
 
     @Override
     public Message sendMessage(Message newMessage) {
