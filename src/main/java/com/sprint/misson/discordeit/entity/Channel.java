@@ -1,10 +1,12 @@
 package com.sprint.misson.discordeit.entity;
 
 import com.sprint.misson.discordeit.dto.ChannelDTO;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.*;
 
+@Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
     //객체 식별 id
@@ -35,7 +37,7 @@ public class Channel implements Serializable {
     public Channel(String channelName, ChannelType channelType, String description) {
         //id, createdAt, updateAt은 생성자에서 초기화
         this.id = UUID.randomUUID().toString();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.channelName = channelName;
         this.channelSort = ChannelSort.TEXT;
@@ -44,23 +46,11 @@ public class Channel implements Serializable {
         this.userList = new HashMap<>();
     }
 
-
-    public String getId() {
-        return id;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
     public void setChannelName(String channelName) {
         this.channelName = channelName;
     }
 
     //채널 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-    public Long getCreatedAt() {
-        return createdAt;
-    }
 
     public Long getUpdatedAt() {
         return updatedAt;
@@ -73,26 +63,13 @@ public class Channel implements Serializable {
     //채널 생성된 이후, 채널 종류를 변경할 수 없으므로 update 미구현
     //TODO - 고민
     //상속시켜서 음성채널, 보이스채널로 따로 구현해야?
-    public ChannelSort getChannelSort() {
-        return channelSort;
-    }
-
-    public ChannelType getChannelType(){ return channelType; }
 
     public void setChannelType(ChannelType channelType) {
         this.channelType = channelType;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public HashMap<String, User> getUserList() {
-        return userList;
     }
 
     public String toShortString() {

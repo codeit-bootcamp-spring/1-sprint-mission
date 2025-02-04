@@ -1,10 +1,12 @@
 package com.sprint.misson.discordeit.entity;
 
 import com.sprint.misson.discordeit.dto.UserDTO;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     //객체 식별용 id
@@ -43,20 +45,8 @@ public class User implements Serializable {
     }
 
 
-    public String getId() {
-        return id;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public void setEmail(String email) {
@@ -68,9 +58,6 @@ public class User implements Serializable {
     }
 
     //사용자가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-    public Long getCreatedAt() {
-        return createdAt;
-    }
 
     public Long getUpdatedAt() {
         return updatedAt;
@@ -80,24 +67,12 @@ public class User implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public UserStatus getUserStatus() {
-        return userStatus;
-    }
-
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
 
-    public AccountStatus getAccountStatus() {
-        return accountStatus;
-    }
-
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
     }
 
     public void setStatusMessage(String statusMessage) {

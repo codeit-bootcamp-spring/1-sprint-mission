@@ -1,8 +1,10 @@
 package com.sprint.misson.discordeit.entity;
 
+import lombok.Getter;
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     //객체 식별 id
@@ -27,29 +29,11 @@ public class Message implements Serializable {
         this.channelId = channel.getId();
     }
 
-    public String getId() {
-        return id;
-    }
-    public String getSender() {
-        return senderId;
-    }
-    //메세지가 생성된 이후, 보낸 사람을 변경할 수 없으므로 update 미구현
-    public String getSenderId() {
-        return senderId;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
     public void setContent(String content) {
         this.content = content;
     }
 
     //메세지가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-    public Long getCreatedAt() {
-        return createdAt;
-    }
 
     public Long getUpdatedAt() {
         return updatedAt;
@@ -60,10 +44,6 @@ public class Message implements Serializable {
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
-    public String getChannelId() {
-        return channelId;
-    }
-
 
     //추후에 추가할 것
     //멘션, 답장(reply)
