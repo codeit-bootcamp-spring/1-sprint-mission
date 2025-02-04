@@ -1,48 +1,56 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final List<Message>messageList = new ArrayList<>();
+    private final Map<UUID, Message> data;
 
-    @Override
-    public void save(Message message) {
-        if(message == null || message.getUserId() == null){
-            throw new IllegalArgumentException(" Message cannot be null. ");
-        }
-        messageList.add(message);
-        System.out.println("<<< Message saved successfully >>>");
+    public JCFMessageRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Message findByUuid(String messageUuid) {
-        if(messageUuid == null || messageUuid.isEmpty()){
-            throw new IllegalArgumentException(" Channel cannot be null or empty. ");
+    public Message save(Message message) {
+        this.data.put(message.getId(), message);
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        boolean exists = this.existsById(id);
+        if (!exists) {
+            throw new IllegalArgumentException("Message not found");
         }
-        return messageList.stream()
-                .filter(message -> message.getMessageUuid().equals(messageUuid))
-                .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("Message with UUID " +messageUuid + " not found."));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messageList);
+        List<Message> messages = this.data.values().stream().toList();
+        if(messages.isEmpty()) {
+            System.out.println("No message found");
+            return Collections.emptyList();
+        }
+        return messages;
+
     }
 
     @Override
-    public void delete(String messageUuid) {
-        boolean removed = messageList.removeIf(channel ->
-                channel.getMessageUuid().equals(messageUuid));
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
 
-        if (removed) {
-            System.out.println("Message with UUID " + messageUuid + " was deleted.");
-        } else {
-            System.out.println("Message with UUID " + messageUuid + " not found.");
+    @Override
+    public void deleteById(UUID id) {
+        boolean exists = this.existsById(id);
+        if(!exists) {
+            throw new IllegalArgumentException("Message not found");
         }
+        System.out.println("Message deleted: " + id);
+        this.data.remove(id);
     }
 }

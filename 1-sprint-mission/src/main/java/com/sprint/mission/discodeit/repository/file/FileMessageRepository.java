@@ -1,78 +1,100 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_PATH = "tmp/message.ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    @Override
-    public void save(Message message) {
-        List<Message> messageList= loadFromFile();
-        if(messageList.stream().anyMatch(message1 -> message1.getMessageUuid().equals(message.getMessageUuid()))){
-            throw new IllegalArgumentException("Duplicate Message UUID: " + message.getMessageUuid());
+    public FileMessageRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        messageList.add(message);
-        saveToFile(messageList);
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public Message findByUuid(String messageUuid) {
-        return loadFromFile().stream()
-                .filter(message -> message.getMessageUuid().equals(messageUuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Message with UUID " + messageUuid + " not found."));
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
     }
 
     @Override
     public List<Message> findAll() {
-        return loadFromFile();
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void delete(String messageUuid) {
-        List<Message>messageList = loadFromFile();
-        boolean removed = messageList.removeIf(message -> message.getMessageUuid().equals(messageUuid));
-        if(!removed){
-            throw new IllegalArgumentException("Message with UUID " + messageUuid + " not found.");
-        }
-        saveToFile(messageList);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
-
-    public List<Message>loadFromFile(){
-        File file = new File(FILE_PATH);
-        if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>();
-        }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (List<Message>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Initializing empty list.");
-            return new ArrayList<>();
-        }catch (EOFException e){
-            System.out.println("EOFException: File is empty or corrupted. Initializing empty list.");
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
-
-    public void saveToFile(List<Message>messageList){
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(messageList);
-        }catch (IOException e){
-            throw new RuntimeException("Failed to save messages to file.", e);
-        }
-    }
-
 }
-
-

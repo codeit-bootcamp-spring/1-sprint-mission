@@ -1,52 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
-    @Serial
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID messageUuid;
-    private final Long createdAt;
+    private UUID id;
+    private Long createdAt;
     private Long updatedAt;
-    private final String userId;
-    private String messageText;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-
-    public Message(String userId, String messageText) {
-        this.messageUuid = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.userId = userId;
-        this.messageText = messageText;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    // Getters
-    public String getMessageUuid() {
-        return messageUuid.toString();
+    public UUID getId() {
+        return id;
     }
 
-
-
-    public String getUserId() {
-        return userId;
+    public Long getCreatedAt() {
+        return createdAt;
     }
 
-    public String getMessageText() {
-        return messageText;
+    public Long getUpdatedAt() {
+        return updatedAt;
     }
 
-    // Setters
+    public String getContent() {
+        return content;
+    }
 
+    public UUID getChannelId() {
+        return channelId;
+    }
 
-    public void setMessageText(String messageText) {
-        if(messageText == null || messageText.isEmpty()){
-            throw new IllegalArgumentException("messageText cannot be null or empty");
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
         }
-        this.messageText = messageText;
-        updateUpdatedAt();
-    }
 
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

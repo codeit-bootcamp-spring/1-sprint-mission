@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.Optional;
 
 public class FileUserService implements UserService {
     private static FileUserService instance;
@@ -24,17 +25,19 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void createUser(User user) {
+    public User createUser(User user) {
         try {
             userRepository.save(user);
             System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
+            return user;
         } catch (IllegalArgumentException e) {
             System.out.println("Failed to create user >>>> " + e.getMessage());
+            return null;
         }
     }
 
     @Override
-    public User readUser(String userId) {
+    public Optional<User> readUser(String userId) {
         try {
             return userRepository.findById(userId);
         }catch (IllegalArgumentException e){
@@ -56,11 +59,11 @@ public class FileUserService implements UserService {
     @Override
     public void updateUser(String userId, String newUserName) {
         try {
-            User user = userRepository.findById(userId);
-            user.setUserName(newUserName);
+            Optional<User> user = userRepository.findById(userId);
+            user.get().setUserName(newUserName);
             userRepository.delete(userId);
-            userRepository.save(user);
-            System.out.println("User updated: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
+            userRepository.save(user.orElse(null));
+            System.out.println("User updated: " + user.get().getUserName() + " (ID: " + user.get().getUserId() + ")");
         }catch (IllegalArgumentException e){
             System.out.println("Failed to Update user >>>> " + e.getMessage());
         }
@@ -68,7 +71,7 @@ public class FileUserService implements UserService {
 
     @Override
     public void deleteUser(String userId) {
-        User user = userRepository.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         try {
             userRepository.delete(userId);
             System.out.println("User with ID " + userId + " deleted.");

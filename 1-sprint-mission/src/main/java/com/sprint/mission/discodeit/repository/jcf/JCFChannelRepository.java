@@ -1,50 +1,59 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class JCFChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> data;
 
-    private final List<Channel>channelList = new ArrayList<>();
-
-
-    @Override
-    public void save(Channel channel) {
-        if(channel == null || channel.getUserId() == null){
-            throw new IllegalArgumentException(" Channel cannot be null. ");
-        }
-        channelList.add(channel);
-        System.out.println("<<< Channel saved successfully >>>");
+    public JCFChannelRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Channel findByUuid(String channelUuid) {
-        if(channelUuid == null || channelUuid.isEmpty()){
-            throw new IllegalArgumentException(" Channel cannot be null or empty. ");
-        }
-        return channelList.stream()
-                .filter(channel -> channel.getChannelUuid().equals(channelUuid))
-                .findFirst()
-                .orElseThrow(() ->new IllegalArgumentException("Channel with UUID " +channelUuid + " not found."));
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
     }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        boolean exists = this.existsById(id);
+        if (!exists) {
+            throw new IllegalArgumentException("Channel not found");
+        }
+        return Optional.ofNullable(this.data.get(id));    }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channelList);
+        List<Channel> channels = this.data.values().stream().toList();
+        if(channels.isEmpty()) {
+            System.out.println("No channels found");
+            return Collections.emptyList();
+        }
+        return channels;
     }
+
+
 
     @Override
-    public void delete(String channelUuid) {
-        boolean removed = channelList.removeIf(channel ->
-                channel.getChannelUuid().equals(channelUuid));
+    public boolean existsById(UUID id) {
 
-        if (removed) {
-            System.out.println("Channel with UUID " + channelUuid + " was deleted.");
-        } else {
-            System.out.println("Channel with UUID " + channelUuid + " not found.");
-        }
+        return this.data.containsKey(id);
     }
+
+
+    @Override
+    public void deleteById(UUID id) {
+        boolean exists = this.existsById(id);
+        if(!exists) {
+            throw new IllegalArgumentException("Channel not found");
+        }
+        System.out.println("Channel deleted: " + id);
+        this.data.remove(id);
+    }
+
 }

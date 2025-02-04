@@ -1,79 +1,100 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final static String FILE_PATH = "tmp/channel.ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    @Override
-    public void save(Channel channel) {
-        List<Channel>channelList = loadFromFile();
-        //중복 확인
-        if(channelList.stream().anyMatch(c -> c.getChannelUuid().equals(channel.getChannelUuid()))){
-            throw new IllegalArgumentException("Duplicate Channel UUID: " + channel.getChannelUuid());
+    public FileChannelRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        channelList.add(channel);
-        saveToFile(channelList);
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public Channel findByUuid(String channelUuid) {
-        List<Channel> channelList = loadFromFile();
-        return channelList.stream()
-                .filter(channel -> channel.getChannelUuid().equals(channelUuid))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Channel with UUID " + channelUuid + " not found."));
+    public Channel save(Channel channel) {
+        Path path = resolvePath(channel.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return channel;
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
     public List<Channel> findAll() {
-        return loadFromFile();
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Channel) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void delete(String channelUuid) {
-        List<Channel>channelList = loadFromFile();
-        boolean removed = channelList.removeIf(channel -> channel.getChannelUuid().equals(channelUuid));
-        if(!removed){
-            throw new IllegalArgumentException("Channel with UUID " + channelUuid + " not found.");
-        }
-        saveToFile(channelList);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
-    private List<Channel>loadFromFile(){
-        File file = new File(FILE_PATH);
-        if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>();
-        }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (List<Channel>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Initializing empty list.");
-            return new ArrayList<>();
-        }catch (EOFException e){
-            System.out.println("EOFException: File is empty or corrupted. Initializing empty list.");
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
-
-    private void saveToFile(List<Channel>channelList){
-        try(ObjectOutputStream oos
-                    = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channelList);
-        }catch (IOException e){
-
-            throw new RuntimeException("Failed to save channels to file.", e);
-        }
-    }
-
 }

@@ -5,9 +5,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FileMessageService implements MessageService {
     private static FileMessageService instance;
@@ -28,7 +27,11 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void createMessage(Message message) {
-        if (userService.readUser(message.getUserId()) == null) {
+        if (userService.readUser(message.getUserId()).isEmpty()) {
+            System.out.println("Cannot create message. User with ID " + message.getUserId() + " does not exist.");
+            return;
+        }
+        if (userService.readUser(message.getUserId()).isEmpty()) {
             System.out.println("Cannot create message. User with ID " + message.getUserId() + " does not exist.");
             return;
         }
@@ -41,7 +44,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message readMessage(String messageUuid) {
+    public Optional<Message> readMessage(String messageUuid) {
         try {
             return messageRepository.findByUuid(messageUuid);
         }catch (IllegalArgumentException e){
@@ -62,11 +65,11 @@ public class FileMessageService implements MessageService {
     @Override
     public void updateMessage(String messageUuid, String newMessageText) {
         try {
-            Message message = messageRepository.findByUuid(messageUuid);
-            message.setMessageText(newMessageText);
+            Optional<Message> message = messageRepository.findByUuid(messageUuid);
+            message.get().setMessageText(newMessageText);
             messageRepository.delete(messageUuid);
-            messageRepository.save(message);
-            System.out.println("Message updated: " + message.getMessageText() + " (User ID: " + message.getUserId() + ")");
+            messageRepository.save(message.orElse(null));
+            System.out.println("Message updated: " + message.get().getMessageText() + " (User ID: " + message.get().getUserId() + ")");
         }catch (IllegalArgumentException e){
             System.out.println("Failed to Update Message >>>> " + e.getMessage());
         }

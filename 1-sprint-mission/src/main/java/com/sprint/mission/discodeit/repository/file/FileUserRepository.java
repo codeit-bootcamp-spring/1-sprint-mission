@@ -4,83 +4,97 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "tmp/users.ser";
-    private final List<User> userList;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
     public FileUserRepository() {
-        this.userList = loadFromFile();
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public void save(User user) {
-        if(userList.stream().anyMatch(u -> u.getUserId().equals(user.getUserId()))){
-            throw new IllegalArgumentException("Duplicate User ID: " + user.getUserId());
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
-        userList.add(user);
-        saveToFile();
+        return user;
     }
 
     @Override
-    public Optional<User> findById(String userId) {
-        User findUser = loadFromFile().stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
-        if(findUser == null){
-            throw new IllegalArgumentException("User with ID " +userId + " not found.");
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e.getMessage());
+            }
         }
-        return findUser;
+        return Optional.ofNullable(userNullable);
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(loadFromFile());
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void delete(String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be null or empty.");
-        }
-        userList.removeIf(user -> user.getUserId().equals(userId));
-        saveToFile();
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
-
-
-    private List<User> loadFromFile() {
-        File file = new File(FILE_PATH);
-        if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>();
-        }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (List<User>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Initializing empty list.");
-            return new ArrayList<>();
-        }catch (EOFException e){
-            System.out.println("EOFException: File is empty or corrupted. Initializing empty list.");
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos
-                     = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(userList);
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
         } catch (IOException e) {
-
-            throw new RuntimeException("Failed to save users to file.", e);
+            throw new RuntimeException(e);
         }
-
     }
-
 }

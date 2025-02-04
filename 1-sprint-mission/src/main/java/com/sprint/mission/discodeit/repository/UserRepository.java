@@ -4,11 +4,12 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserRepository {
-    void save(User user);
-    Optional<User> findById(String userId);
-    List<User>findAll();
-    void delete(String userId);
-
+    User save(User user);
+    Optional<User> findById(UUID id);
+    List<User> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
 }

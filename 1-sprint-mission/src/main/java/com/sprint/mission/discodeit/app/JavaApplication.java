@@ -5,15 +5,9 @@ package com.sprint.mission.discodeit.app;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -28,7 +22,7 @@ public class JavaApplication {
         // 서비스 생성
         JCFUserService userService = JCFUserService.getInstance(userRepository);
         JCFChannelService channelService = JCFChannelService.getInstance(channelRepository, userService);
-        JCFMessageService messageService = JCFMessageService.getInstance(messageRepository, userService);
+        JCFMessageService messageService = JCFMessageService.getInstance(messageRepository, , userService, );
 
         // 사용자 테스트
         System.out.println("<<<<< 사용자 테스트 >>>>>");

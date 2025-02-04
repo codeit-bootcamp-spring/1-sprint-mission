@@ -3,51 +3,52 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
-    private final List<User> userList = new ArrayList<>();
+    private final Map<UUID, User> data;
 
-
-    @Override
-    public void save(User user) {
-        if(user == null || user.getUserId() == null){
-            throw new IllegalArgumentException(" User or User ID cannot be null. ");
-        }
-        userList.add(user);
-        System.out.println("<<< User saved successfully >>>");
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
     @Override
-    public Optional<User> findById(String userId) {
-        if(userId == null || userId.isEmpty()){
-            throw new IllegalArgumentException(" User ID cannot be null or empty. ");
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        boolean exists = this.existsById(id);
+        if (!exists) {
+            throw new IllegalArgumentException("User not found");
         }
-        return userList.stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("User with ID " +userId + " not found."));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userList);
+        List<User> users = this.data.values().stream().toList();
+        if(users.isEmpty()) {
+            System.out.println("No users found");
+            return Collections.emptyList();
+        }
+        return users;
     }
 
     @Override
-    public void delete(String userId) {
-        boolean removed = userList.removeIf(channel ->
-                channel.getUserId().equals(userId));
-
-        if (removed) {
-            System.out.println("User ID with UUID " + userId + " was deleted.");
-        } else {
-            System.out.println("User ID with UUID " + userId + " not found.");
-        }
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
-
-
+    @Override
+    public void deleteById(UUID id) {
+        boolean exists = this.existsById(id);
+        if(!exists) {
+            throw new IllegalArgumentException("User not found");
+        }
+        System.out.println("User deleted: " + id);
+        this.data.remove(id);
+    }
 }

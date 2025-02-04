@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.UUID;
 
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
@@ -16,36 +16,35 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void createUser(User user) {
-        userRepository.save(user);
-        System.out.println("User created: " + user.getUserName() + " (ID: " + user.getUserId() + ")");
-
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        return userRepository.save(user);
     }
 
     @Override
-    public User readUser(String userId) {
+    public User find(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(()-> new NoSuchElementException("User with ID " + userId + " not found."));
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public List<User> readAllUsers() {
-        List<User>users = userRepository.findAll();
-        if(users.isEmpty()){
-            System.out.println(" No users found. ");
-        }
-        return users;
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
-    public void updateUser(String userId, String newUserName) {
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.setUserName(newUserName);
+        user.update(newUsername, newEmail, newPassword);
+        return userRepository.save(user);
     }
 
     @Override
-    public void deleteUser(String userId) {
-        userRepository.delete(userId);
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
+        }
+        userRepository.deleteById(userId);
     }
 }
