@@ -10,7 +10,7 @@ public interface MessageService {
     Message readMessage(UUID msgID);
     List<Message> readAllMessage();
     Message modifyMessage(UUID msgID, String content);
-    public void deleteMessage (UUID msgID);
+    void deleteMessage (UUID msgID);
 
 
 }

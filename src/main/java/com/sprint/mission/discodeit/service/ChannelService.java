@@ -15,6 +15,6 @@ public interface ChannelService {
 
     List<Channel> readAllChannel();
     Channel modifyChannel(UUID id, String name); //채널 네임 변경
-    public void deleteChannel (UUID id);
+    void deleteChannel (UUID id);
 
 }

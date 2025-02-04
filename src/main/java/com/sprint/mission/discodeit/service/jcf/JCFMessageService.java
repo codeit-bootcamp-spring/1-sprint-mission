@@ -4,68 +4,62 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
-    final List<Message> messagedata;
+
+    private final Map<UUID, Message> messageList;
 
     public JCFMessageService() {
-        this.messagedata = new ArrayList<>();
+        this.messageList = new HashMap<>();
     }
 
     @Override
     public Message createMessage(UUID userId, UUID channelId, String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("메시지 내용은 null 또는 빈 문자열일 수 없습니다.");
+        }
         Message message = new Message(userId, channelId, content);
-        messagedata.add(message);
-
+        messageList.put(message.getMsgId(), message);
+        System.out.println("메시지가 생성되었습니다: " + content);
         return message;
-
-
     }
 
     @Override
     public Message readMessage(UUID msgID) {
-        //id가 있는지 검증
-
-
-        return
-                this.messagedata.stream()
-                        .filter(msg -> msg.getMsgId().equals(msgID))
-                        .findFirst()
-                        .orElse(null); //없으면 null
-
+        return Optional.ofNullable(messageList.get(msgID))
+                .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다. ID: " + msgID));
     }
 
     @Override
     public List<Message> readAllMessage() {
-        return messagedata;
+        return new ArrayList<>(messageList.values());
     }
 
     @Override
     public Message modifyMessage(UUID msgID, String content) {
-        Message msg = readMessage(msgID);
-        String oriMsg=msg.getContent();
-        msg.updateContent(content);
-        msg.updateUpdatedAt();
-        System.out.println(msg.getUserID() + "님의 메시지 변경: \""+ oriMsg + "\" -> \"" +
-                content+  "\"");
-
-        return msg;
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("메시지 내용은 null 또는 빈 문자열일 수 없습니다.");
+        }
+        Message message = readMessage(msgID);
+        String oriContent = message.getContent();
+        message.updateContent(content);
+        message.updateUpdatedAt();
+        System.out.println("메시지가 변경되었습니다: \"" + oriContent + "\" -> \"" + content + "\"");
+        return message;
     }
 
     @Override
     public void deleteMessage(UUID msgID) {
-        String name= readMessage(msgID).getContent();
-        boolean isDeleted = this.messagedata.removeIf(msg -> msg.getMsgId().equals(msgID)); //메시지삭제
-
-        if(isDeleted) {
-            System.out.println(name + "님의 메시지가 삭제되었습니다.");
-
-        }else{
-            System.out.println(" 메시지 삭제 실패하였습니다.");
+        Message message = readMessage(msgID);
+        if (messageList.remove(msgID) != null) {
+            System.out.println("메시지가 삭제되었습니다: " + message.getContent());
+        } else {
+            System.out.println("메시지 삭제 실패: ID " + msgID);
         }
-
-
     }
 }
