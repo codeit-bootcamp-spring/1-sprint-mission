@@ -13,8 +13,20 @@ java {
     }
 }
 
-group = 'com.sprint.mission'
-version = '1.0-SNAPSHOT'
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'com/sprint/mission/discodeit/service/file/**'
+            exclude 'com/sprint/mission/discodeit/service/jcf/**'
+        }
+    }
+}
 
 repositories {
     mavenCentral()
