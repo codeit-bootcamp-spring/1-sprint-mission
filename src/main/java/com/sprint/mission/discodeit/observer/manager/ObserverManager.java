@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.observer.manager;
 
 import com.sprint.mission.discodeit.observer.Observer;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Component
 public class ObserverManager {
     private final List<Observer> observers = new ArrayList<>();
 

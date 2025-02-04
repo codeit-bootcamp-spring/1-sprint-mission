@@ -3,11 +3,12 @@ package com.sprint.mission.discodeit.validation;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
+@Component
 public class UserValidator {
 
     // 간단한 형태의 이메일 검증

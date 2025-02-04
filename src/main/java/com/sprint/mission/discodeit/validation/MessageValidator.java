@@ -6,9 +6,10 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
-
+@Component
 public class MessageValidator {
 
     private final ChannelService channelService;
