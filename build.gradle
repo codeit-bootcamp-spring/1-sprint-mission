@@ -1,10 +1,14 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group = 'com.sprint.mission'
 version = '1.0-SNAPSHOT'
 
+application {
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+}
 repositories {
     mavenCentral()
 }

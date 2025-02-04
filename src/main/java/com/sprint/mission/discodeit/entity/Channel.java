@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends BaseEntity {
+import java.io.Serializable;
+
+public class Channel extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
+
     private String name;        // 채널 이름
     private String description; // 채널 설명
     private User creator;       // 채널 생성자 (추가된 필드)
 
-    // 기존 생성자 유지
+    // 기존 생성자
     public Channel(String name, String description) {
         super();
         this.name = name;
@@ -45,6 +49,12 @@ public class Channel extends BaseEntity {
     // Getter for creator
     public User getCreator() {
         return creator;
+    }
+
+    // Setter for creator
+    public void updateCreator(User creator) {
+        this.creator = creator;
+        setUpdateAT(System.currentTimeMillis());
     }
 
     @Override

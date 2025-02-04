@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    private String content; // 메세지 내용
-    private UUID senderId;  // 발신자 id
-    private UUID channelId; // 채널 id
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
+
+    private String content;
+    private UUID senderId;
+    private UUID channelId;
 
     public Message(String content, UUID senderId, UUID channelId) {
         super();
@@ -14,22 +17,14 @@ public class Message extends BaseEntity {
         this.channelId = channelId;
     }
 
-    public String getContent() {
-        return content;
-    }
-
+    public String getContent() { return content; }
     public void updateContent(String content) {
         this.content = content;
         setUpdateAT(System.currentTimeMillis());
     }
 
-    public UUID getSenderId() {
-        return senderId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
+    public UUID getSenderId() { return senderId; }
+    public UUID getChannelId() { return channelId; }
 
     @Override
     public String toString() {
@@ -42,6 +37,4 @@ public class Message extends BaseEntity {
                 ", updatedAt=" + getUpdateAT() +
                 '}';
     }
-
 }
-
