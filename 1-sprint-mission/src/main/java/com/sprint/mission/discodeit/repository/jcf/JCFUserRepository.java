@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JCFUserRepository implements UserRepository {
     private final List<User> userList = new ArrayList<>();
@@ -20,7 +21,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(String userId) {
+    public Optional<User> findById(String userId) {
         if(userId == null || userId.isEmpty()){
             throw new IllegalArgumentException(" User ID cannot be null or empty. ");
         }

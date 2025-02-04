@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
@@ -21,7 +23,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel readChannel(String channelUuid) {
-        return channelRepository.findByUuid(channelUuid);
+        return channelRepository.findByUuid(channelUuid)
+                .orElseThrow(()-> new NoSuchElementException("Channel not found: " + channelUuid));
     }
 
     @Override
@@ -31,9 +34,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateChannel(String channelUuid, String newChannelTitle) {
-        channelRepository.delete(channelUuid);
-        channelRepository.save(channelRepository.findByUuid(channelUuid));
-        System.out.println("Channel updated: " + channelRepository.findByUuid(channelUuid).getChannelTitle() + " (UUID: " + channelUuid + ")");
+        Channel channel = channelRepository.findByUuid(channelUuid)
+                .orElseThrow(() -> new NoSuchElementException("Channel not found: " + channelUuid));
+        channel.setChannelTitle(newChannelTitle);
     }
 
     @Override

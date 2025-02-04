@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FileUserRepository implements UserRepository {
     private static final String FILE_PATH = "tmp/users.ser";
@@ -26,7 +26,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(String userId) {
+    public Optional<User> findById(String userId) {
         User findUser = loadFromFile().stream()
                 .filter(user -> user.getUserId().equals(userId))
                 .findFirst()

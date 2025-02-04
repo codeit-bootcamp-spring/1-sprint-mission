@@ -1,16 +1,24 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
-    public BasicMessageService(MessageRepository messageRepository) {
+    public BasicMessageService(MessageRepository messageRepository, UserRepository userRepository, ChannelRepository channelRepository) {
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.channelRepository = channelRepository;
     }
 
     @Override
@@ -21,7 +29,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message readMessage(String messageUuid) {
-        return messageRepository.findByUuid(messageUuid);
+
+         return messageRepository.findByUuid(messageUuid)
+                 .orElseThrow(() -> new NoSuchElementException("Message with UUID: " + messageUuid));
     }
 
     @Override
@@ -31,8 +41,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(String messageUuid, String newMessageText) {
-        messageRepository.delete(messageUuid);
-        messageRepository.save(new Message(messageUuid, newMessageText));
+        Message message = messageRepository.findByUuid(messageUuid)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageUuid + " not found"));
+        message.setMessageText(newMessageText);
         System.out.println("Message updated: " + newMessageText + " (UUID: " + messageUuid + ")");
     }
 
