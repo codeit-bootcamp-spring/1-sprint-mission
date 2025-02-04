@@ -2,19 +2,25 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.util.time.SystemTimeProvider;
 import com.sprint.mission.discodeit.util.time.TimeProvider;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
+
 
 public abstract class BaseEntity implements Serializable {
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 10L;
+    @Getter
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    @Getter
+    private final Instant createdAt;
+    @Getter
+    private Instant updatedAt;
     private transient TimeProvider timeProvider;
 
     public BaseEntity(){
@@ -24,24 +30,12 @@ public abstract class BaseEntity implements Serializable {
     public BaseEntity(TimeProvider timeProvider) {
         this.timeProvider = timeProvider;
         this.id = UUID.randomUUID();
-        this.createdAt = timeProvider.getCurrentTimeMillis();
+        this.createdAt = timeProvider.getCurrentTime();
         this.updatedAt = this.createdAt;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public void updateTimeStamp() {
-        updatedAt = timeProvider.getCurrentTimeMillis();
+        updatedAt = timeProvider.getCurrentTime();
     }
 
     @Override
