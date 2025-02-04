@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -19,8 +20,8 @@ public abstract class BaseChannel implements Serializable {
   private String channelName;
   private int maxNumberOfPeople;
   private String tag;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
   private Boolean isPrivate;
 
   BaseChannel(BaseChannelBuilder<?> builder) {
@@ -31,8 +32,8 @@ public abstract class BaseChannel implements Serializable {
     this.maxNumberOfPeople = builder.maxNumberOfPeople;
     this.tag = builder.tag;
     this.isPrivate = builder.isPrivate;
-    this.createdAt = LocalDateTime.now();
-    this.updatedAt = LocalDateTime.now();
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
   }
 
   public static abstract class BaseChannelBuilder<T extends BaseChannelBuilder<T>> {

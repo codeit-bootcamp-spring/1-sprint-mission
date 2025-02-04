@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageServiceV2;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageServiceV2<ChatChannel> {
 
   private static volatile BasicMessageService instance;
@@ -32,13 +34,6 @@ public class BasicMessageService implements MessageServiceV2<ChatChannel> {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
 
-  private BasicMessageService(MessageRepository messageRepository
-      , UserRepository userRepository
-      , ChannelRepository channelRepository) {
-    this.messageRepository = messageRepository;
-    this.userRepository = userRepository;
-    this.channelRepository = channelRepository;
-  }
 
   public static BasicMessageService getInstance(MessageRepository messageRepository
       , UserRepository userRepository

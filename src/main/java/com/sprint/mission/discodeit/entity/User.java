@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 
 @Getter
@@ -22,8 +23,8 @@ public class User implements Serializable {
   private String phoneNumber;
   private String profilePictureURL;
   private String description;
-  private Long createdAt;
-  private Long updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
 
   private User(UserBuilder builder) {
     this.UUID = UuidGenerator.generateUUID();
@@ -34,8 +35,8 @@ public class User implements Serializable {
     this.phoneNumber = builder.phoneNumber;
     this.profilePictureURL = builder.profilePictureURL != null ? builder.profilePictureURL : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
     this.description = builder.description;
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = System.currentTimeMillis();
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
   }
 
   public static class UserBuilder {

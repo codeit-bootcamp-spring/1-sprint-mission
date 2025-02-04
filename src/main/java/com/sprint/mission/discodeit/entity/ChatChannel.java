@@ -7,7 +7,6 @@ public class ChatChannel extends BaseChannel {
     super(builder);
   }
 
-
   public static class ChatChannelBuilder extends BaseChannelBuilder<ChatChannelBuilder> {
     public ChatChannelBuilder(String channelName) {
       super(channelName);
@@ -23,7 +22,6 @@ public class ChatChannel extends BaseChannel {
       return new ChatChannel(this);
     }
   }
-
 
   @Override
   public String toString() {

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +18,11 @@ import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
 @Service
 @ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
   private static volatile BasicUserService instance;
   private final UserRepository userRepository;
-
-  private BasicUserService(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   public static BasicUserService getInstance(UserRepository userRepository) {
     if (instance == null) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,11 +33,10 @@ public class Message implements Serializable {
   private String channelUUID;
   private String content;
   private Boolean isEdited;
-  private Long createdAt;
-  private Long updatedAt;
+  private Instant createdAt;
+  private Instant updatedAt;
   private String contentImage;
   private String threadUUID;
-  private Map<String, Reactions> messageReactions;
 
   private Message(MessageBuilder builder) {
     this.UUID = builder.UUID;
@@ -58,8 +58,8 @@ public class Message implements Serializable {
     private Boolean isEdited = false;
     private String contentImage = "";
     private String threadUUID = "";
-    private Long createdAt = System.currentTimeMillis();
-    private Long updatedAt = System.currentTimeMillis();
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
 
     public MessageBuilder(String userUUID, String channelUUID, String content) throws MessageValidationException {
       if (userUUID == null || channelUUID == null || content == null) {
@@ -89,7 +89,7 @@ public class Message implements Serializable {
   public void setContent(String content) {
     this.content = content;
     this.isEdited = true;
-    this.updatedAt = System.currentTimeMillis();
+    this.updatedAt = Instant.now();
   }
 
   public void setContentImage(String contentImage) {
