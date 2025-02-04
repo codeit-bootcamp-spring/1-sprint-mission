@@ -5,6 +5,7 @@ import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.entity.UserStatus;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface UserService {
@@ -32,7 +33,7 @@ public interface UserService {
     List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
-    User updateUser(String userId, UserDTO userDTO, long updatedAt);
+    User updateUser(String userId, UserDTO userDTO, Instant updatedAt);
 
     //삭제
     boolean deleteUser(String userId);

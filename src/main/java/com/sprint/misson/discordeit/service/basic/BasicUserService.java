@@ -10,6 +10,7 @@ import com.sprint.misson.discordeit.repository.UserRepository;
 import com.sprint.misson.discordeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 
@@ -67,7 +68,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {
         User user = userRepository.findById(userId);
 
         if (user == null) {

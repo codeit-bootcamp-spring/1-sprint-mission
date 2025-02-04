@@ -4,6 +4,7 @@ import com.sprint.misson.discordeit.dto.UserDTO;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -18,9 +19,9 @@ public class User implements Serializable {
     //비밀번호 -
     private transient String password;
     //생성 날짜 - 유닉스 타임스탬프
-    private final Long createdAt;
+    private final Instant createdAt;
     //수정 시간
-    private Long updatedAt;
+    private Instant updatedAt;
 
     //부가 기능 관련 필드
     //접속 상태
@@ -34,7 +35,7 @@ public class User implements Serializable {
 
     public User(String nickname, String email, String password, UserStatus userStatus, String statusMessage, AccountStatus accountStatus) {
         this.id = UUID.randomUUID().toString();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.nickname = nickname;
         this.email = email;
@@ -59,11 +60,7 @@ public class User implements Serializable {
 
     //사용자가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(long updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

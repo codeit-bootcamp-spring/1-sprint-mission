@@ -9,6 +9,7 @@ import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 
 public class FileUserService extends FileService implements UserService {
@@ -84,7 +85,7 @@ public class FileUserService extends FileService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {
         User user = getUserByUUID(userId);
 
         if (user == null) {

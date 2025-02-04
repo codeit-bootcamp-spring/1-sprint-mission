@@ -10,6 +10,7 @@ import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.UserService;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 
 public class FileChannelService extends FileService implements ChannelService {
@@ -62,7 +63,7 @@ public class FileChannelService extends FileService implements ChannelService {
     // todo
     // 변경사항 체크 로직 따로 뺄 수 있는지 확인
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO,long updatedAt) throws CustomException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
         Channel channel = getChannelByUUID(channelId);
 
         if (channel == null) {

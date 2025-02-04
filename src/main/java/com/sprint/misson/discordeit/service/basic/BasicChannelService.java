@@ -11,6 +11,7 @@ import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt) throws CustomException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);

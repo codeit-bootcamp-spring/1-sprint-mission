@@ -4,6 +4,7 @@ import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.Message;
 import com.sprint.misson.discordeit.entity.User;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface MessageService {
@@ -22,16 +23,16 @@ public interface MessageService {
     List<Message> getMessageByContent(String content);
 
     //다건 조회 - 작성자
-    List<Message> getMessageBySender(User sender);
+    List<Message> getMessageBySenderId(String senderId);
 
     //다건 조회 - 날짜
-    List<Message> getMessageByCreatedAt(Long createdAt);
+    List<Message> getMessageByCreatedAt(Instant createdAt);
 
     //다건 조회 - 특정 채널
     List<Message> getMessagesByChannel(Channel channel);
 
     //수정
-    Message updateMessage(String messageId, String newContent, long updatedAt);
+    Message updateMessage(String messageId, String newContent, Instant updatedAt);
 
     //삭제
     boolean deleteMessage(Message message);

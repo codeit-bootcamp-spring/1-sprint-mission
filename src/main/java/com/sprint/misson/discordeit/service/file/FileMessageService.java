@@ -10,6 +10,7 @@ import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.List;
 
 public class FileMessageService extends FileService implements MessageService {
@@ -76,13 +77,13 @@ public class FileMessageService extends FileService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessageBySender(User sender) {
-        return getMessages().stream().filter(m-> m.getSenderId().equals(sender.getId())).toList();
+    public List<Message> getMessageBySenderId(String senderId) {
+        return getMessages().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
     }
 
     @Override
-    public List<Message> getMessageByCreatedAt(Long createdAt) {
-        return getMessages().stream().filter(m-> m.getCreatedAt().equals(createdAt)).toList();
+    public List<Message> getMessageByCreatedAt(Instant createdAt) {
+        return getMessages().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
     }
 
     @Override
@@ -91,10 +92,7 @@ public class FileMessageService extends FileService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(String messageId, String newContent, long updatedAt) {
-        //todo - 모든 필드 검사해서 업데이트 해줘야하나?
-        //아니, 유저랑 채널 바뀌면 얘도 업데이트해야하는 문제 발생.
-        //그럴바엔 그냥 user도 id로 저장하는 방향이 나을 것 같다.
+    public Message updateMessage(String messageId, String newContent, Instant updatedAt) {
 
         Message message = getMessageByUUID(messageId);
 

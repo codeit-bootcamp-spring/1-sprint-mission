@@ -9,6 +9,7 @@ import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 
@@ -79,10 +80,9 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 특정 작성자
     @Override
-    public List<Message> getMessageBySender(User sender) throws CustomException {
+    public List<Message> getMessageBySenderId(String senderId) throws CustomException {
         try {
-            User userByUUID = userService.getUserByUUID(sender.getId());
-            return data.values().stream().filter(m -> m.getSender().equals(userByUUID)).toList();
+            return data.values().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
         } catch (Exception e) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -92,7 +92,7 @@ public class JCFMessageService implements MessageService {
     //todo
     //날짜 포멧 오류 등 예외 처리 필요-검색 시 기준을 날짜로 할지
     @Override
-    public List<Message> getMessageByCreatedAt(Long createdAt) {
+    public List<Message> getMessageByCreatedAt(Instant createdAt) {
         return data.values().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
     }
 
@@ -110,7 +110,7 @@ public class JCFMessageService implements MessageService {
 
     //수정
     @Override
-    public Message updateMessage(String messageId, String newContent, long updatedAt) throws CustomException {
+    public Message updateMessage(String messageId, String newContent, Instant updatedAt) throws CustomException {
 
         Message message = data.get(messageId);
 

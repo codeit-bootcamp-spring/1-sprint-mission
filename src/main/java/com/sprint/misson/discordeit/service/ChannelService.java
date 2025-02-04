@@ -5,6 +5,7 @@ import com.sprint.misson.discordeit.entity.Channel;
 import com.sprint.misson.discordeit.entity.ChannelType;
 import com.sprint.misson.discordeit.entity.User;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface ChannelService {
@@ -26,7 +27,7 @@ public interface ChannelService {
     List<Channel> getChannelByType(ChannelType channelType);
 
     //수정
-    Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt);
+    Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt);
 
     //삭제
     boolean deleteChannel(Channel channel);

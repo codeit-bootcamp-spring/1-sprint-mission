@@ -8,6 +8,7 @@ import com.sprint.misson.discordeit.entity.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
+import java.time.Instant;
 import java.util.*;
 
 public class JCFUserService implements UserService {
@@ -93,7 +94,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO, long updatedAt) throws CustomException {
+    public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {
         User user = data.get(userId);
 
         if (user == null) {

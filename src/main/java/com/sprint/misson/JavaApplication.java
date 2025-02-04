@@ -10,6 +10,7 @@ import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 import com.sprint.misson.discordeit.service.file.FileService;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -197,7 +198,7 @@ public class JavaApplication {
         System.out.println("* default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경하여 테스트 하였음");
         UserDTO userDTO = new UserDTO();
         userDTO.setUserStatus(UserStatus.INACTIVE);
-        userService.updateUser(user3.getId(), userDTO, System.currentTimeMillis());
+        userService.updateUser(user3.getId(), userDTO, Instant.now());
 
         System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
         userService.getUserByUserStatus(UserStatus.ACTIVE).forEach(User::displayShortInfo);
@@ -270,7 +271,7 @@ public class JavaApplication {
 
         System.out.println("\n4) 작성자로 조회(다건)");
         System.out.println("> user2(name=박유진)이 작성한 메세지 조회: ");
-        messageService.getMessageBySender(user2).forEach(Message::displayShortInfo);
+        messageService.getMessageBySenderId(user2.getId()).forEach(Message::displayShortInfo);
 
         //todo
         //없는 유저로 조회하는 경우
@@ -291,7 +292,7 @@ public class JavaApplication {
 
         try {
             System.out.println("\n> 수정 결과: ");
-            userService.updateUser(user1.getId(), userDto, System.currentTimeMillis()).displayFullInfo();
+            userService.updateUser(user1.getId(), userDto, Instant.now()).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -306,7 +307,7 @@ public class JavaApplication {
 
 
         System.out.println("\n> 수정 결과:");
-        System.out.println(channelService.updateChannel(channelByUUID.getId(), channelDTO, System.currentTimeMillis()).toFullString());
+        System.out.println(channelService.updateChannel(channelByUUID.getId(), channelDTO, Instant.now()).toFullString());
 
         System.out.println("\n\n--- Message 수정 ---");
         System.out.println("\n> msg1 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
@@ -314,7 +315,7 @@ public class JavaApplication {
         messageByUUID.displayFullInfo();
 
         System.out.println("\n> 수정 결과:");
-        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!",(System.currentTimeMillis())).displayFullInfo();
+        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!", Instant.now()).displayFullInfo();
 
         // 4. 삭제 테스트
         System.out.println("\n\n=== 4. 삭제 테스트 ===");
@@ -327,7 +328,7 @@ public class JavaApplication {
         messageService.getMessages().forEach(Message::displayShortInfo);
 
         User senderMsg = userService.getUsersByNickname("홍길동").get(0);
-        Message msgToDelete = messageService.getMessageBySender(senderMsg).get(0);
+        Message msgToDelete = messageService.getMessageBySenderId(senderMsg.getId()).get(0);
         System.out.println("\n-> Message 삭제 결과: " + messageService.deleteMessage(msgToDelete));
 
         System.out.println("\n> 삭제 후 메세지 목록: ");

@@ -11,6 +11,7 @@ import com.sprint.misson.discordeit.service.MessageService;
 import com.sprint.misson.discordeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -64,14 +65,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessageBySender(User sender) {
+    public List<Message> getMessageBySenderId(String senderId) {
         //여기 고민해보자
-        return messageRepository.findAll().stream().filter(m -> m.getSenderId().equals(sender.getId())).toList();
+        return messageRepository.findAll().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
     }
 
     @Override
-    public List<Message> getMessageByCreatedAt(Long createdAt) {
-        return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().longValue() == createdAt).toList();
+    public List<Message> getMessageByCreatedAt(Instant createdAt) {
+        return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().equals( createdAt)).toList();
     }
 
     @Override
@@ -80,7 +81,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(String messageId, String newContent, long updatedAt) throws CustomException {
+    public Message updateMessage(String messageId, String newContent, Instant updatedAt) throws CustomException {
         Message message = messageRepository.findById(messageId);
         if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);

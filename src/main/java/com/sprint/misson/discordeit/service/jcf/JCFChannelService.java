@@ -9,6 +9,7 @@ import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.ChannelService;
 import com.sprint.misson.discordeit.service.UserService;
 
+import java.time.Instant;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
@@ -59,7 +60,7 @@ public class JCFChannelService implements ChannelService {
 
     //수정
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, long updatedAt) throws CustomException {
+    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
         Channel channel = data.get(channelId);
 
         if (channel == null) {
