@@ -6,21 +6,23 @@ import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
     private final UserValidator userValidator;
     private final FileUserRepository fileUserRepository;
 
-    public BasicUserService(FileUserRepository fileUserRepository,UserValidator userValidator) {
-        this.userValidator = userValidator;
-        this.fileUserRepository = fileUserRepository;
-    }
+//    public BasicUserService(FileUserRepository fileUserRepository,UserValidator userValidator) {
+//        this.userValidator = userValidator;
+//        this.fileUserRepository = fileUserRepository;
+//    }
 
     @Override
     public User CreateUser(String name, String email, String iD , String password) {

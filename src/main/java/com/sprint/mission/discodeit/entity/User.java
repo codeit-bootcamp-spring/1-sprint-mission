@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
 
     @Serial
@@ -29,33 +32,6 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public UUID getuuID() {
-        return uuID;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword(){
-        return password;
-    }
-
-    public String getId() {
-        return iD;
-    }
 
     public void update(String email, String iD, String password){
         this.email = email;

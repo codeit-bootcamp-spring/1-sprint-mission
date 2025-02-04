@@ -69,7 +69,7 @@ public class DiscodeitApplication {
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author,String str){
 		Message message = messageService.createMsg(author,channel,str);
-		System.out.println("메시지 생성: " + message.getMsguuId());
+		System.out.println("메시지 생성: " + message.getUuId());
 	}
 
 
@@ -97,8 +97,9 @@ public class DiscodeitApplication {
 		allprintMessages(messageService.getAllMsg());
 
 
-		System.out.println("----------ch1 채널 삭제-----------");
-		channelService.deleteChannel(ch1.getuuId());
+		System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
+		channelService.deleteChannel(ch1.getChanneluuId());
+		System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
 		allprintChannel(channelService.getAllChannels());
 		allprintMessages(messageService.getAllMsg());
 	}

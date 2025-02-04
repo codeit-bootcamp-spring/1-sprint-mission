@@ -34,7 +34,7 @@ public class FileUserService implements UserService {
     public User CreateUser(String name, String email,String iD ,String password) {
         if (userValidator.validateUser(name, email, password, getAllUsers())) {
             User user = new User(name, email, iD, password);
-            data.put(user.getuuID(), user);
+            data.put(user.getUuID(), user);
             saveDataToFile();
             return user;
         }

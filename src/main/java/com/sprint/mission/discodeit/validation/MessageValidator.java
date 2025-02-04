@@ -43,8 +43,8 @@ public class MessageValidator {
 
     public boolean validateMessage(User user, Channel channel, String content) {
         boolean isContentValid = validateContent(content);
-        boolean isSenderValid = validateSender(user.getuuID());
-        boolean isDestinationChannelValid = validateDestinationChannel(channel.getuuId());
+        boolean isSenderValid = validateSender(user.getUuID());
+        boolean isDestinationChannelValid = validateDestinationChannel(channel.getChanneluuId());
 
         return isContentValid && isSenderValid && isDestinationChannelValid;
     }

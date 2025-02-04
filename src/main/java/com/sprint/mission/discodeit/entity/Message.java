@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Getter
 public class Message implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID msguuId;
+    private final UUID UuId;
     private final Channel destinationCh;
     private final Long createdAt;
     private Long updatedAt;
@@ -18,35 +21,12 @@ public class Message implements Serializable {
 
 
     public Message(User SendUser, Channel destinationCh, String content) {
-        this.msguuId = UUID.randomUUID();
+        this.UuId = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = this.createdAt;
         this.content = content;
         this.SendUser = SendUser;
         this.destinationCh = destinationCh;
-    }
-
-    public UUID getMsguuId() {
-        return msguuId;
-    }
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public User  SendUser() {
-        return SendUser;
-    }
-
-    public Channel getDestinationChannel() {
-        return destinationCh;
     }
 
     public void update(String content) {
@@ -58,7 +38,7 @@ public class Message implements Serializable {
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "Message{\n" +
-                "UUId=" + msguuId +
+                "UUId=" + UuId +
                 ", \ndestinationChannel : " + destinationCh.getChannelName() +
                 ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
                 ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) +

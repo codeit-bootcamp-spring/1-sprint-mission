@@ -39,7 +39,7 @@ public class FileChannelService implements ChannelService {
     public Channel createChannel(String chName){
         if(channelValidtor.isUniqueName(chName, getAllChannels())){
             Channel channel = new Channel(chName);
-            data.put(channel.getuuId(), channel);
+            data.put(channel.getChanneluuId(), channel);
             saveDataToFile();
             return channel;
         }

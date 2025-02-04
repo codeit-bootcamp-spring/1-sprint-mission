@@ -12,7 +12,7 @@ import java.util.UUID;
 public class ChannelValidtor {
 
     public boolean isUniqueName(String name, Map<UUID, Channel> channels) {
-        if (channels.values().stream().anyMatch(channel -> channel.getName().equals(name))) {
+        if (channels.values().stream().anyMatch(channel -> channel.getChannelName().equals(name))) {
             throw new CustomException(ExceptionText.DUPLICATE_NAME);
         }
         return true;

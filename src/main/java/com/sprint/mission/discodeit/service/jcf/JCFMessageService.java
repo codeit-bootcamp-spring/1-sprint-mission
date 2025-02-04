@@ -24,8 +24,8 @@ public class JCFMessageService implements MessageService {
     public Message createMsg(User user, Channel channel, String content) {
         if (validationService.validateMessage(user, channel, content)){
             Message msg = new Message(user, channel, content);
-            data.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
-            data.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
+            data.putIfAbsent(msg.getDestinationCh().getChanneluuId(), new HashMap<>());
+            data.get(msg.getDestinationCh().getChanneluuId()).put(msg.getUuId(), msg);
             return msg;
         }
         throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);

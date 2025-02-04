@@ -8,23 +8,25 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
     private final ObserverManager observerManager;
     private final ChannelValidtor channelValidtor;
     private final ChannelRepository fileChannelRepository;
 
-    public BasicChannelService (ObserverManager observerManager,ChannelValidtor channelValidtor,ChannelRepository fileChannelRepository){
-        this.observerManager = observerManager;
-        this.channelValidtor = channelValidtor;
-        this.fileChannelRepository = fileChannelRepository;
-    }
+//    public BasicChannelService (ObserverManager observerManager,ChannelValidtor channelValidtor,ChannelRepository fileChannelRepository){
+//        this.observerManager = observerManager;
+//        this.channelValidtor = channelValidtor;
+//        this.fileChannelRepository = fileChannelRepository;
+//    }
 
     @Override
     public Channel createChannel(String chName){

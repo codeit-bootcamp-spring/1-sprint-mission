@@ -22,7 +22,7 @@ public class JCFUserService implements UserService {
     public User CreateUser(String name, String email,String iD ,String password) {
         if (userValidator.validateUser(name, email, password, getAllUsers())){
             User user = new User(name, email, iD, password);
-            data.put(user.getuuID(), user);
+            data.put(user.getUuID(), user);
             return user;
         }
         throw new CustomException(ExceptionText.USER_CREATION_FAILED);
