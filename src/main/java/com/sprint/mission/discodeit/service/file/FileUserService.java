@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
-
     private final UserValidator validator;
     private final Path directory;
 
@@ -22,9 +21,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(String name, String email, String phoneNumber, String password) {
-        validator.validate(name, email, phoneNumber);
-        User user = new User(name, email, phoneNumber, password);
+    public User create(String name, String email, String password) {
+        validator.validate(name, email);
+        User user = new User(name, email, password);
         Path filePath = directory.resolve(user.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
@@ -80,10 +79,10 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void update(UUID userId, String name, String email, String phoneNumber) {
-        validator.validate(name, email, phoneNumber);
+    public void update(UUID userId, String name, String email) {
+        validator.validate(name, email);
         User user = find(userId);
-        user.update(name, email, phoneNumber);
+        user.update(name, email);
 
         Path filePath = directory.resolve(userId + ".ser");
         try (
@@ -127,11 +126,5 @@ public class FileUserService implements UserService {
     public void isDuplicateEmail(String email) {
         List<User> users = findAll();
         users.forEach(user -> user.isDuplicateEmail(email));
-    }
-
-    @Override
-    public void isDuplicatePhoneNumber(String phoneNumber) {
-        List<User> users = findAll();
-        users.forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

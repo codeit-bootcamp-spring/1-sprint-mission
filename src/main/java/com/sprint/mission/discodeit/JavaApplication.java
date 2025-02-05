@@ -25,7 +25,7 @@ public class JavaApplication {
 
     static void userCRUDTest(UserService userService) {
         // 생성
-        User user = userService.create("user", "user@codeit.com", "010-1111-1111", "qwer1234");
+        User user = userService.create("user", "user@codeit.com", "qwer1234");
         System.out.println("유저 생성");
         System.out.println(userService.getInfo(user.getId()));
         // 조회
@@ -35,7 +35,7 @@ public class JavaApplication {
         List<User> foundUsers = userService.findAll();
         System.out.println("유저 조회(다건): " + foundUsers.size() + System.lineSeparator());
         // 수정
-        userService.update(user.getId(), "uuuuser", "user@codeit.com", "010-1111-1111");
+        userService.update(user.getId(), "uuuuser", "user@codeit.com");
         System.out.println("유저 수정");
         System.out.println(userService.getInfo(user.getId()));
         // 삭제
@@ -88,7 +88,7 @@ public class JavaApplication {
     }
 
     static User setupUser(UserService userService) {
-        User user = userService.create("user", "user1@codeit.com", "010-1111-1112", "qwer1234");
+        User user = userService.create("user", "user1@codeit.com", "qwer1234");
         return user;
     }
 

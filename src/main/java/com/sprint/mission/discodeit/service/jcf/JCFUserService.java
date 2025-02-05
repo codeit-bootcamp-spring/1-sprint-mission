@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.*;
 
 public class JCFUserService implements UserService {
-
     private final UserValidator validator;
     private final Map<UUID, User> users;
 
@@ -25,11 +24,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User create(String name, String email, String phoneNumber, String password) {
-        validator.validate(name, email, phoneNumber);
+    public User create(String name, String email, String password) {
+        validator.validate(name, email);
         isDuplicateEmail(email);
-        isDuplicatePhoneNumber(phoneNumber);
-        User user = new User(name, email, phoneNumber, password);
+        User user = new User(name, email, password);
         users.put(user.getId() ,user);
         return user;
     }
@@ -54,11 +52,11 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void update(UUID userId, String name, String email, String phoneNumber) {
+    public void update(UUID userId, String name, String email) {
         User user = find(userId);
-        validator.validate(name, email, phoneNumber);
+        validator.validate(name, email);
 
-        user.update(name, email, phoneNumber);
+        user.update(name, email);
     }
 
     @Override
@@ -79,10 +77,5 @@ public class JCFUserService implements UserService {
     @Override
     public void isDuplicateEmail(String email) {
         users.values().forEach(user -> user.isDuplicateEmail(email));
-    }
-
-    @Override
-    public void isDuplicatePhoneNumber(String phoneNumber) {
-        users.values().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

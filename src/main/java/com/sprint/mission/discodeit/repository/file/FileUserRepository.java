@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-
     private final Path directory;
 
     public FileUserRepository() {
@@ -21,8 +20,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(String name, String email, String phoneNumber, String password) {
-        User user = new User(name, email, phoneNumber, password);
+    public User save(String name, String email, String password) {
+        User user = new User(name, email, password);
         Path filePath = directory.resolve(user.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
@@ -72,8 +71,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(User user, String name, String email, String phoneNumber) {
-        user.update(name, email, phoneNumber);
+    public void update(User user, String name, String email) {
+        user.update(name, email);
 
         Path filePath = directory.resolve(user.getId() + ".ser");
         try (

@@ -7,7 +7,7 @@ public class UserTest {
 
     @Test
     void 유저_비밀번호_정상_변경() {
-        User user = new User("name", "email@codeit.com", "010-1111-1111", "1234");
+        User user = new User("name", "email@codeit.com", "1234");
 
         // 비밀번호 확인, 새로운 비밀번호
         user.updatePassword("1234", "123");
@@ -15,7 +15,7 @@ public class UserTest {
 
     @Test
     void 유저_기존_비밀번호_잘못_입력() {
-        User user = new User("name", "email@codeit.com", "010-1111-1111", "1234");
+        User user = new User("name", "email@codeit.com", "1234");
 
         // 비밀번호 확인, 새로운 비밀번호
         assertThatThrownBy(() -> user.updatePassword("123", "123"))

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class JCFUserRepository implements UserRepository {
-
     private final Map<UUID, User> users;
 
     public JCFUserRepository() {
@@ -17,8 +16,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(String name, String email, String phoneNumber, String password) {
-        User user = new User(name, email, phoneNumber, password);
+    public User save(String name, String email, String password) {
+        User user = new User(name, email, password);
         users.put(user.getId() ,user);
         return user;
     }
@@ -34,8 +33,8 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(User user, String name, String email, String phoneNumber) {
-        user.update(name, email, phoneNumber);
+    public void update(User user, String name, String email) {
+        user.update(name, email);
     }
 
     @Override

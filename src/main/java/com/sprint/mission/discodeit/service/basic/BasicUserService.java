@@ -19,11 +19,10 @@ public class BasicUserService implements UserService {
     private final UserValidator validator;
 
     @Override
-    public User create(String name, String email, String phoneNumber, String password) {
-        validator.validate(name, email, phoneNumber);
+    public User create(String name, String email, String password) {
+        validator.validate(name, email);
         isDuplicateEmail(email);
-        isDuplicatePhoneNumber(phoneNumber);
-        return userRepository.save(name, email, phoneNumber, password);
+        return userRepository.save(name, email, password);
     }
 
     @Override
@@ -43,10 +42,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void update(UUID userId, String name, String email, String phoneNumber) {
-        validator.validate(name, email, phoneNumber);
+    public void update(UUID userId, String name, String email) {
+        validator.validate(name, email);
         User user = find(userId);
-        userRepository.update(user, name, email, phoneNumber);
+        userRepository.update(user, name, email);
     }
 
     @Override
@@ -65,10 +64,5 @@ public class BasicUserService implements UserService {
     @Override
     public void isDuplicateEmail(String email) {
         userRepository.findAll().forEach(user -> user.isDuplicateEmail(email));
-    }
-
-    @Override
-    public void isDuplicatePhoneNumber(String phoneNumber) {
-        userRepository.findAll().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

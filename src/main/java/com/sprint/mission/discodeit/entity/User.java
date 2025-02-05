@@ -17,16 +17,14 @@ public class User implements Serializable {
 
     private String name;
     private String email;
-    private String phoneNumber;
     private transient String password;
 
-    public User(String name, String email, String phoneNumber, String password) {
+    public User(String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.name = name;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
@@ -34,8 +32,8 @@ public class User implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    public void update(String name, String email, String phoneNumber) {
-        boolean updated = updateName(name) || updateEmail(email) || updatePhoneNumber(phoneNumber);
+    public void update(String name, String email) {
+        boolean updated = updateName(name) || updateEmail(email);
         if (updated) {
             updateUpdatedAt();
         }
@@ -57,14 +55,6 @@ public class User implements Serializable {
         return true;
     }
 
-    public boolean updatePhoneNumber(String phoneNumber) {
-        if (this.phoneNumber.equals(phoneNumber)) {
-            return false;
-        }
-        this.phoneNumber = phoneNumber;
-        return true;
-    }
-
     public void updatePassword(String originalPassword, String newPassword) {
         if (!BCrypt.checkpw(originalPassword, password) || BCrypt.checkpw(newPassword, password)) {
             throw new IllegalArgumentException("[ERROR] 비밀번호 변경에 실패하였습니다.");
@@ -78,19 +68,12 @@ public class User implements Serializable {
         }
     }
 
-    public void isDuplicatePhoneNumber(String phoneNumber) {
-        if (this.phoneNumber.equals(phoneNumber)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 번호입니다.");
-        }
-    }
-
     @Override
     public String toString() {
         return String.format(
                 name + "님의 정보입니다." + System.lineSeparator()
                         + "Name: " + name + System.lineSeparator()
                         + "Email: " + email + System.lineSeparator()
-                        + "Phone number: " + phoneNumber + System.lineSeparator()
         );
     }
 }
