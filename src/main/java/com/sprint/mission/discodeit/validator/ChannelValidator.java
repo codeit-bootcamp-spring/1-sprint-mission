@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.validator;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ChannelValidator implements Validator {
 
     public void validate(String name, String introduction) {
