@@ -1,7 +1,4 @@
-import discodeit.entity.User;
-import discodeit.service.ServiceFactory;
-import discodeit.service.UserService;
-import discodeit.service.jcf.JCFServiceFactory;
+import com.sprint.mission.discodeit.entity.User;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
