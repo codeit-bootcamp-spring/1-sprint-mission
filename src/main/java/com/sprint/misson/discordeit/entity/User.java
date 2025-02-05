@@ -27,7 +27,6 @@ public class User implements Serializable {
 
     //사용자 설정 상태 메세지
     private String statusMessage;
-
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     private AccountStatus accountStatus;
 
@@ -79,7 +78,7 @@ public class User implements Serializable {
     }
 
     public String toShortString() {
-        return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email + " / userStatus: " + userStatus + " / createdAt: " + createdAt;
+        return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email + " / userStatusId: " + userStatusId + " / createdAt: " + createdAt;
     }
 
     public void displayShortInfo() {
@@ -97,20 +96,18 @@ public class User implements Serializable {
 
         boolean isUpdated = false;
 
-        if (!nickname.equals(userDTO.getNickname()) && userDTO.getNickname() != null && !userDTO.getNickname().isEmpty()) {
-            setNickname(userDTO.getNickname());
+        if (!nickname.equals(userDTO.nickname()) && userDTO.nickname() != null && !userDTO.nickname().isEmpty()) {
+            setNickname(userDTO.nickname());
             isUpdated = true;
         }
-        if (!email.equals(userDTO.getEmail()) && userDTO.getEmail() != null && !userDTO.getEmail().isEmpty()) {
-            setEmail(userDTO.getEmail());
+        if (!email.equals(userDTO.email()) && userDTO.email() != null && !userDTO.email().isEmpty()) {
+            setEmail(userDTO.email());
             isUpdated = true;
         }
-        if (!userStatus.equals(userDTO.getUserStatus()) && userDTO.getUserStatus() != null) {
-            setUserStatus(userDTO.getUserStatus());
-            isUpdated = true;
-        }
-        if (!accountStatus.equals(userDTO.getAccountStatus()) && userDTO.getAccountStatus() != null) {
-            setAccountStatus(userDTO.getAccountStatus());
+        // UserStatus 분리로 삭제
+
+        if (!accountStatus.equals(userDTO.accountStatus()) && userDTO.accountStatus() != null) {
+            setAccountStatus(userDTO.accountStatus());
             isUpdated = true;
         }
         return isUpdated;
