@@ -1,20 +1,19 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFMessageService implements MessageService {
+public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   
-  public JCFMessageService() {
-    this.messageRepository = new JCFMessageRepository();
+  public BasicMessageService(MessageRepository messageRepository) {
+    this.messageRepository = messageRepository;
   }
   
   @Override
@@ -47,9 +46,10 @@ public class JCFMessageService implements MessageService {
   
   @Override
   public void updateMessage(UUID id, String newContent) {
-    messageRepository.findMessageById(id).ifPresentOrElse(m -> m.updateContent(newContent), () -> {
-      throw new IllegalArgumentException("message not found: " + id);
-    });
+    Message message = messageRepository.findMessageById(id)
+        .orElseThrow(() -> new NoSuchElementException("message not found: " + id));
+    message.updateContent(newContent);
+    messageRepository.save(message);
   }
   
   @Override

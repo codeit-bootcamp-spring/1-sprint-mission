@@ -1,16 +1,17 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.security.Encryptor;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFUserService implements UserService {
+public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final Encryptor encryptor;
   
-  public JCFUserService(UserRepository userRepository, Encryptor encryptor) {
+  public BasicUserService(UserRepository userRepository, Encryptor encryptor) {
     this.userRepository = userRepository;
     this.encryptor = encryptor;
   }
@@ -23,18 +24,16 @@ public class JCFUserService implements UserService {
   
   @Override
   public void updateUserName(UUID id, String newName) {
-    userRepository.findUserById(id)
-        .ifPresentOrElse(u -> u.updateName(newName), () -> {
-          throw new IllegalArgumentException("user not found: " + id);
-        });
+    User user = userRepository.findUserById(id)
+        .orElseThrow(() -> new NoSuchElementException("user not found: " + id));
+    user.updateName(newName);
   }
   
   @Override
   public void updateUserPassword(UUID id, String newPassword) {
-    userRepository.findUserById(id)
-        .ifPresentOrElse(u -> u.updatePassword(newPassword), () -> {
-          throw new IllegalArgumentException("user not found: " + id);
-        });
+    User user = userRepository.findUserById(id)
+        .orElseThrow(() -> new NoSuchElementException("user not found: " + id));
+    user.updatePassword(newPassword);
   }
   
   @Override
@@ -45,7 +44,6 @@ public class JCFUserService implements UserService {
   @Override
   public User findUserByName(String name) {
     return userRepository.findUserByName(name)
-        .orElseThrow(() -> new IllegalArgumentException("user not found: " + name));
+        .orElseThrow(() -> new NoSuchElementException("user not found: " + name));
   }
-  
 }

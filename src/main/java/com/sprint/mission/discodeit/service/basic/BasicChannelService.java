@@ -1,19 +1,18 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-public class JCFChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   
-  public JCFChannelService() {
-    this.channelRepository = new JCFChannelRepository();
+  public BasicChannelService(ChannelRepository channelRepository) {
+    this.channelRepository = channelRepository;
   }
   
   @Override
@@ -41,23 +40,27 @@ public class JCFChannelService implements ChannelService {
   
   @Override
   public void updateChannelName(UUID id, String newName) {
-    channelRepository.findChannelById(id)
-        .ifPresentOrElse(c -> c.updateName(newName), () -> {
-          throw new IllegalArgumentException("channel not found: " + id);
-        });
+    Channel channel = channelRepository.findChannelById(id)
+        .orElseThrow(() -> new NoSuchElementException("channel not found: " + id));
+    channel.updateName(newName);
+    channelRepository.save(channel);
   }
   
   @Override
-  public void updateMember(UUID id, List<User> members) { //유저 검증도 필요할 듯
-    channelRepository.findChannelById(id)
-        .ifPresentOrElse(c -> c.updateMembers(members), () -> {
-          throw new IllegalArgumentException("channel not found: " + id);
-        });
+  public void updateMember(UUID id, List<User> members) {
+    Channel channel = channelRepository.findChannelById(id)
+        .orElseThrow(() -> new NoSuchElementException("channel not found: " + id));
+    channel.updateMembers(members);
+    channelRepository.save(channel);
   }
   
   @Override
-  public void removeChannel(UUID channelId, User user) {
-    channelRepository.remove(channelId);
+  public void removeChannel(UUID channelId, User owner) {
+    if (channelRepository.findChannelById(channelId)
+        .map(channel -> channel.getOwner().equals(owner)).isPresent()) {
+      channelRepository.remove(channelId);
+    }
+    throw new IllegalArgumentException("삭제 권한이 없는 사용자입니다.");
+    
   }
-  
 }

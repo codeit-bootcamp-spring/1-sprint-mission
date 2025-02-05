@@ -1,21 +1,15 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFMessageService implements MessageService {
-  private final MessageRepository messageRepository;
-  
-  public JCFMessageService() {
-    this.messageRepository = new JCFMessageRepository();
-  }
+public class FileMessageService implements MessageService {
+  Map<UUID, Message> messageMap = new HashMap<>();
+  private MessageRepository messageRepository;
   
   @Override
   public Message findMessageById(UUID id) {
@@ -35,21 +29,24 @@ public class JCFMessageService implements MessageService {
   
   @Override
   public void sendCommonMessage(Channel channel, User sender, String content) {
-    Message message = Message.ofCommon(channel, sender, content);
-    messageRepository.save(message);
+    Message newMessage = Message.ofCommon(channel, sender, content);
+    messageMap.put(newMessage.getId(), newMessage);
+    messageRepository.save(newMessage);
   }
   
   @Override
   public void sendReplyMessage(Channel channel, User sender, String content) {
-    Message message = Message.ofReply(channel, sender, content);
-    messageRepository.save(message);
+    Message newMessage = Message.ofReply(channel, sender, content);
+    messageMap.put(newMessage.getId(), newMessage);
+    messageRepository.save(newMessage);
   }
   
   @Override
   public void updateMessage(UUID id, String newContent) {
-    messageRepository.findMessageById(id).ifPresentOrElse(m -> m.updateContent(newContent), () -> {
-      throw new IllegalArgumentException("message not found: " + id);
-    });
+    Message message = messageRepository.findMessageById(id)
+        .orElseThrow(() -> new NoSuchElementException("message not found: " + id));
+    message.updateContent(newContent);
+    messageRepository.save(message);
   }
   
   @Override
