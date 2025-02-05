@@ -1,12 +1,8 @@
 package com.sprint.misson.discordeit.config;
 
 import com.sprint.misson.discordeit.repository.*;
-import com.sprint.misson.discordeit.repository.file.FileChannelRepository;
-import com.sprint.misson.discordeit.repository.file.FileMessageRepository;
-import com.sprint.misson.discordeit.repository.file.FileUserRepository;
-import com.sprint.misson.discordeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.misson.discordeit.repository.jcf.JCFReadStatusRepository;
-import com.sprint.misson.discordeit.repository.jcf.JCFUserStatusRepository;
+import com.sprint.misson.discordeit.repository.file.*;
+import com.sprint.misson.discordeit.repository.jcf.*;
 import com.sprint.misson.discordeit.service.*;
 import com.sprint.misson.discordeit.service.basic.BasicBinaryContentService;
 import com.sprint.misson.discordeit.service.basic.BasicReadStatusService;
@@ -21,18 +17,16 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     @Bean
-    public UserRepository userRepository() {
-        return new FileUserRepository();
-    }
+    public UserRepository userRepository() {return new JCFUserRepository();}
 
     @Bean
     public ChannelRepository channelRepository() {
-        return new FileChannelRepository();
+        return new JCFChannelRepository();
     }
 
     @Bean
     public MessageRepository messageRepository() {
-        return new FileMessageRepository();
+        return new JCFMessageRepository();
     }
 
     @Bean
