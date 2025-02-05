@@ -3,14 +3,14 @@ package com.sprint.mission.discodeit.entity.channel;
 import com.google.common.base.Preconditions;
 import com.sprint.mission.discodeit.common.error.ErrorMessage;
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Getter
-public class Channel extends AbstractUUIDEntity {
+public class Channel extends BaseEntity {
 
     @NotNull
     @Size(
@@ -62,7 +62,7 @@ public class Channel extends AbstractUUIDEntity {
         if (isNotCreator) {
             throw ChannelException.ofErrorMessageAndCreatorName(
                     ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
-                    user.getUserName()
+                    user.getNicknameValue()
             );
         }
     }
@@ -73,7 +73,7 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public String getCreatorName() {
-        return creator.getUserName();
+        return creator.getNicknameValue();
     }
 
     @Override

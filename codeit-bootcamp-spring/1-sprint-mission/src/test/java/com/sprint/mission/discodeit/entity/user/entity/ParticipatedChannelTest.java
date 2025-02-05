@@ -197,7 +197,7 @@ class ParticipatedChannelTest {
 
             // then
             assertThat(throwable).isInstanceOf(ChannelException.class)
-                    .hasMessageContaining(notCreatorUser.getName());
+                        .hasMessageContaining(notCreatorUser.getNicknameValue());
         }
 
         @Test

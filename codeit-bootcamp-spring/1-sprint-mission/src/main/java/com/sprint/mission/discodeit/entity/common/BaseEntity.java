@@ -12,7 +12,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public abstract class AbstractUUIDEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -2898060967687082469L;
@@ -24,7 +24,7 @@ public abstract class AbstractUUIDEntity implements Serializable {
 
     private Status status;
 
-    protected AbstractUUIDEntity() {
+    protected BaseEntity() {
         this.id = UUID.randomUUID();
         this.createAt = createUnixTimestamp();
         this.updateAt = createUnixTimestamp();
@@ -61,7 +61,7 @@ public abstract class AbstractUUIDEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AbstractUUIDEntity that = (AbstractUUIDEntity) o;
+        BaseEntity that = (BaseEntity) o;
         return id.equals(that.id);
     }
 

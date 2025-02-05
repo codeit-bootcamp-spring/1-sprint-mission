@@ -3,35 +3,35 @@ package com.sprint.mission.discodeit.entity.user.entity;
 
 import com.google.common.base.Preconditions;
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
-import java.time.Instant;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
+import com.sprint.mission.discodeit.domain.user.Email;
+import com.sprint.mission.discodeit.domain.user.Nickname;
 import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
-public class User extends AbstractUUIDEntity {
+@ToString
+public class User extends BaseEntity {
 
-    private UserName name;
-
+    private Nickname name;
+    private Email email;
     private final ParticipatedChannel participatedChannels;
 
-    private User(UserName name, ParticipatedChannel channel) {
+    private User(Nickname name, ParticipatedChannel channel) {
         this.name = name;
         this.participatedChannels = channel;
     }
 
     public static User createFrom(String username) {
-        Preconditions.checkNotNull(username);
-        var userName = UserName.createFrom(username);
+        var userName = new Nickname(username);
         var participatedChannel = ParticipatedChannel.newDefault();
         return new User(userName, participatedChannel);
     }
 
     public void changeUserName(String newName) {
-        Preconditions.checkNotNull(newName);
-        var changedName = this.name.changeName(newName);
-        this.name = changedName;
+        this.name = new Nickname(newName);
         updateStatusAndUpdateAt();
     }
 
@@ -65,23 +65,10 @@ public class User extends AbstractUUIDEntity {
     public void unregister() {
         updateUnregistered();
     }
-    public String getUserName() {
-        return name.getName();
-    }
-    @Override
-    public String toString() {
-        var format =
-                String.format(
-                        "user info = [id : %s, name: %s, status : %s, createAt = %d, updateAt = %d], participatedChannel = {%s}",
-                        getId(),
-                        getName(),
-                        getStatus().toString(),
-                        getCreateAt().toEpochMilli(),
-                        getUpdateAt().toEpochMilli(),
-                        getParticipatedChannels()
-                );
 
-        return format;
+    public String getNicknameValue() {
+        return name.getValue();
     }
+
 }
 

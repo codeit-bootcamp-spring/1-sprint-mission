@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.entity.message;
 
 import com.sprint.mission.discodeit.entity.channel.Channel;
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import lombok.Getter;
 
 @Getter
-public class ChannelMessage extends AbstractUUIDEntity {
+public class ChannelMessage extends BaseEntity {
 
     private final Sender<User, Channel> sender;
 

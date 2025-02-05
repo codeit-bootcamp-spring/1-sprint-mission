@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.testdummy;
 
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 
-public class TestUUIDEntity extends AbstractUUIDEntity {
+public class TestUUIDEntity extends BaseEntity {
 }

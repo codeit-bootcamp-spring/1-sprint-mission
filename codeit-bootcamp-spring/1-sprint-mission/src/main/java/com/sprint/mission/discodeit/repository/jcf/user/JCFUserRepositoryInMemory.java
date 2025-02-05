@@ -14,7 +14,7 @@ public class JCFUserRepositoryInMemory extends InMemoryCrudRepository<User, UUID
     @Override
     public Optional<User> findByUsername(String username) {
         var findUser = findAll().stream()
-                .filter(user -> username.equals(user.getName()))
+                .filter(user -> username.equals(user.getNicknameValue()))
                 .findFirst();
 
         return findUser;

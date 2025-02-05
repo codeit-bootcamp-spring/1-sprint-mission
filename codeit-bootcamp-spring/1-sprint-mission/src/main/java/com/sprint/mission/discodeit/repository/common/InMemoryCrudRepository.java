@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.common;
 
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class InMemoryCrudRepository<T extends AbstractUUIDEntity, ID extends UUID>
+public abstract class InMemoryCrudRepository<T extends BaseEntity, ID extends UUID>
         implements CrudRepository<T, ID> {
 
     protected final Map<UUID, T> store = new HashMap<>();

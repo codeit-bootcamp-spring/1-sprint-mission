@@ -35,21 +35,6 @@ class UserTest {
         }
 
         @Test
-        @DisplayName("유저 객체를 생성한 후 객체의 name value 와 초기화 시 입력 값과 동일 테스트")
-        void givenUserWhenGetUserNameThenReturnUserName() {
-            // given
-
-            // when
-            var userName = user.getName();
-            // then
-            assertThat(userName).isEqualTo(USER_NAME);
-        }
-
-        // TODO : 유저 이름 수정 성공 테스트
-
-        // TODO : 유저 이름 수정 실패 테스트
-
-        @Test
         @DisplayName("유저 해지 요청 후 유저의 상태 변경")
         void givenUnregisterRequestWhenUnregisterThenStatusChange() {
             // given

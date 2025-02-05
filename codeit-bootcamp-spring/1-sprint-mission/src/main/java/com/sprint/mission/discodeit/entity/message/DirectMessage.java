@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.entity.message;
 
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
 import lombok.Getter;
 
 @Getter
-public class DirectMessage extends AbstractUUIDEntity {
+public class DirectMessage extends BaseEntity {
     // 보내는 방법을 추상화
     private final transient Sender<User, User> sender;
 

@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 public class AbstractUUIDTest {
 
-    private AbstractUUIDEntity entity;
+    private BaseEntity entity;
 
 
     @BeforeEach
@@ -51,8 +51,8 @@ public class AbstractUUIDTest {
     @DisplayName("동일한 UUID를 가진 객체간의 동등성 비교를 할 경우 True를 반환하는지 테스트")
     void givenCreateAbstractEntityAndEqualEntityWhenIsEqualsThenReturnTrueTest() throws Exception {
         // given
-        AbstractUUIDEntity entity1 = new TestUUIDEntity();
-        AbstractUUIDEntity entity2 = new TestUUIDEntity();
+        BaseEntity entity1 = new TestUUIDEntity();
+        BaseEntity entity2 = new TestUUIDEntity();
 
         UUID sameUUID = UUID.randomUUID();
 
@@ -62,7 +62,7 @@ public class AbstractUUIDTest {
         // then
         assertEquals(entity1, entity2, "Entities with the same UUID should be equal");
 
-        AbstractUUIDEntity entity3 = new TestUUIDEntity();
+        BaseEntity entity3 = new TestUUIDEntity();
         assertNotEquals(entity1, entity3, "Entities with different UUIDs should not be equal");
     }
 

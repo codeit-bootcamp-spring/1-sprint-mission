@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
+import com.sprint.mission.discodeit.entity.common.BaseEntity;
 import com.sprint.mission.discodeit.repository.common.InMemoryCrudRepository;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -14,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public abstract class FileAbstractRepository<T extends AbstractUUIDEntity, ID extends UUID>
+public abstract class FileAbstractRepository<T extends BaseEntity, ID extends UUID>
         extends InMemoryCrudRepository<T, ID> {
 
     private final File file;
