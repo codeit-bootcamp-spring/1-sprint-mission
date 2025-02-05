@@ -10,7 +10,6 @@ public interface UserStatusService {
 
     List<UserStatus> findAll();
 
-    //dto 필요
     boolean update(UserStatus userStatus);
 
     boolean updateByUserId(String userStatusId, UserStatus userStatus);
