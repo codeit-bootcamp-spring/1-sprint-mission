@@ -1,12 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.userService.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userService.UserDTO;
+import com.sprint.mission.discodeit.dto.userService.UserProfileImageRequest;
+import com.sprint.mission.discodeit.dto.userService.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -18,28 +24,70 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        return userRepository.save(user);
+    public User create(UserCreateRequest userRequest, UserProfileImageRequest profileImage) {
+        if (userRepository.existsByUsername(userRequest.username())) {
+            throw new IllegalArgumentException("Username already exists: " + userRequest.username());
+        }
+        if (userRepository.existsByEmail(userRequest.email())) {
+            throw new IllegalArgumentException("Email already exists: " + userRequest.email());
+        }
+        User user = new User(userRequest.username(), userRequest.email(), userRequest.password());
+        userRepository.save(user);
+
+        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+        userStatusRepository.save(userStatus);
+
+        if(profileImage != null && profileImage.data() != null) {
+            BinaryContent profile = new BinaryContent(user.getId(),null, profileImage.contentType(), profileImage.fileName(), profileImage.data());
+            binaryContentRepository.save(profile);
+        }
+        return user;
+
     }
 
     @Override
-    public User find(UUID userId) {
-        return userRepository.findById(userId)
+    public UserDTO find(UUID userId) {
+         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+
+        // UserStatus 가져오기
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElse(null);
+
+        //DTO 변환 후 반환
+        return UserDTO.from(user, userStatus);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDTO> findAll() {
+        List<User> users = userRepository.findAll();
+
+        return users.stream()
+                .map(user -> {
+                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
+                    return UserDTO.from(user, userStatus);
+                })
+                .toList();
+
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
-        return userRepository.save(user);
+    public UserDTO update(UserUpdateRequest userRequest, UserProfileImageRequest profileImage) {
+        User user = userRepository.findById(userRequest.userId())
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userRequest.userId() + " not found"));
+
+        // 사용자 정보 업데이트
+        user.update(userRequest.newUsername(), userRequest.newEmail(), userRequest.newPassword());
+
+        if(profileImage != null && profileImage.data() != null) {
+            BinaryContent profile = new BinaryContent(
+                    user.getId(),
+                    null,
+                    profileImage.contentType(),
+                    profileImage.fileName(),
+                    profileImage.data()
+            );
+            binaryContentRepository.save(profile);
+        }
     }
 
     @Override
