@@ -4,25 +4,23 @@ import lombok.Getter;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 public class User implements Serializable {
-
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String name;
     private String email;
     private String phoneNumber;
     private transient String password;
 
     public User(String name, String email, String phoneNumber, String password) {
-        long currentUnixTime = System.currentTimeMillis() / 1000;
         this.id = UUID.randomUUID();
-        this.createdAt = currentUnixTime;
-        this.updatedAt = currentUnixTime;
+        this.createdAt = Instant.now();
 
         this.name = name;
         this.email = email;
@@ -31,7 +29,7 @@ public class User implements Serializable {
     }
 
     public void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis() / 1000;
+        this.updatedAt = Instant.now();
     }
 
     public void update(String name, String email, String phoneNumber) {
