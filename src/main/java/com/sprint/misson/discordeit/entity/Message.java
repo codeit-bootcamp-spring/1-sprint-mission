@@ -3,6 +3,8 @@ package com.sprint.misson.discordeit.entity;
 import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -20,6 +22,8 @@ public class Message implements Serializable {
     private String content;
     //메세지가 생성된 채널
     private final String channelId;
+    //첨부 이미지 목록
+    private final Set<String> attachmentImageIds = new HashSet<>();
 
     public Message(User sender, String content, Channel channel) {
         this.id = UUID.randomUUID().toString();
