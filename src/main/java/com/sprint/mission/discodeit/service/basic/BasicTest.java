@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,9 +11,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.util.UUID;
 
 public class BasicTest {
-    static User setupUser(UserService userService) {
-        UUID userId = userService.createUser("woody");
-        return userService.getUser(userId);
+    static UserDto setupUser(UserService userService) {
+        return userService.createUser(new UserDto("woody", "woody@naver.com"));
     }
 
     static Channel setupChannel(ChannelService channelService) {
@@ -20,7 +20,7 @@ public class BasicTest {
         return channelService.getChannel(channelId);
     }
 
-    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+    static void messageCreateTest(MessageService messageService, Channel channel, UserDto author) {
         UUID messageId = messageService.createMessage(channel.getId(), "안녕");
         Message message = messageService.getMessage(messageId);
         System.out.println("메시지 생성: " + message.getId());
@@ -35,10 +35,10 @@ public class BasicTest {
         MessageService messageService = basicFactory.getMessageService();
 
         // 셋업
-        User user = setupUser(userService);
+        UserDto userDto = setupUser(userService);
         Channel channel = setupChannel(channelService);
         // 테스트
-        messageCreateTest(messageService, channel, user);
+        messageCreateTest(messageService, channel, userDto);
     }
 }
 

@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.Setter;
 
 import java.io.*;
 import java.util.*;
 
 public class FileUserService implements UserService {
+    @Setter
     private FileMessageService fileMessageService;
     private final FileUserRepository fileUserRepository;
     private static volatile FileUserService instance;
@@ -17,9 +20,6 @@ public class FileUserService implements UserService {
         this.fileUserRepository = new FileUserRepository();
     }
 
-    public void setFileMessageService(FileMessageService fileMessageService) {
-        this.fileMessageService = fileMessageService;
-    }
     public static FileUserService getInstance() {
         if (instance == null) {
             synchronized (FileUserService.class) {
@@ -32,24 +32,24 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public UUID createUser(String userName) {
-        return fileUserRepository.save(userName);
+    public UserDto createUser(UserDto userDto) {
+        return new UserDto(fileUserRepository.save(userDto.userName(), userDto.email()));
     }
 
     @Override
-    public User getUser(UUID id) {
-        return fileUserRepository.findUserById(id);
+    public UserDto getUser(UUID id) {
+        return new UserDto(fileUserRepository.findUserById(id));
     }
 
     @Override
-    public List<User> getUsers() {
-        List<User> collect = fileUserRepository.findAll();
-        return new ArrayList<>(collect);
+    public List<UserDto> getUsers() {
+        //List<User> collect = fileUserRepository.findAll();
+        return fileUserRepository.findAll().stream().map(UserDto::new).toList();
     }
 
     @Override
-    public void updateUser(UUID id, String username) {
-        fileUserRepository.update(id, username);
+    public void updateUser(UserDto userDto) {
+        fileUserRepository.update(userDto.id(), userDto.userName(), userDto.email());
         //리턴 생각해보기
 
     }

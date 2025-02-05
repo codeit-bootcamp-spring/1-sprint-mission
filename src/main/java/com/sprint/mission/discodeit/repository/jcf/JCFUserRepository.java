@@ -20,10 +20,10 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public UUID save(String userName) {
-        User user = new User(userName);
+    public User save(String userName, String email) {
+        User user = new User(userName, email);
         map.put(user.getId(),user);
-        return user.getId();
+        return user;
     }
 
     @Override
@@ -49,10 +49,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String username) {
+    public void update(UUID id, String username, String email) {
         if(map.containsKey(id)){
             User user = findUserById(id);
-            user.update(username);
+            user.update(username, email);
+            map.replace(id, user);
         }else {
             System.out.println("유저를 찾을 수 없습니다.");
         }

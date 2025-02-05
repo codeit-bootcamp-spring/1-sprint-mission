@@ -15,7 +15,7 @@ public class BasicFactory implements ServiceFactory {
 
     public BasicFactory() {
         super();
-        basicUserService = BasicUserService.getInstance(new FileUserRepository());
+        basicUserService = BasicUserService.getInstance(new FileUserRepository(), null, null); //여기는 구현체 만들고 넣기
         basicChannelService = BasicChannelService.getInstance(new FileChannelRepository());
         basicMessageService = BasicMessageService.getInstance(new FileMessageRepository());
     }

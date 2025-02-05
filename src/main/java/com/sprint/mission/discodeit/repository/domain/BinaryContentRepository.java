@@ -9,14 +9,12 @@ import java.util.UUID;
 
 @Repository
 public interface BinaryContentRepository {
-    void save(BinaryContent binaryContent);
+    BinaryContent save(BinaryContent binaryContent);
     BinaryContent findById(UUID id);
     BinaryContent findByDomainId(UUID domainId);
     List<BinaryContent> findAll();
-    void update(UUID id, File file);
+    void update(UUID id, BinaryContent binaryContent);
     void delete(UUID id);
     void deleteByDomainId(UUID domainId);
-
-
 
 }

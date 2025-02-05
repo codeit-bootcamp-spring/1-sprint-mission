@@ -19,7 +19,12 @@ public class BinaryContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
     private Instant createdAt;
-    private UUID domainId;
+    private UUID domainId; //UserProfile, Message's file
     private File file;
 
+    public BinaryContent(UUID domainId, File file) {
+        this.createdAt = Instant.now();
+        this.domainId = domainId;
+        this.file = file;
+    }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,22 +10,31 @@ import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.factory.ServiceFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public class FileServicesTestMain {
     public static void main(String[] args) {
         //factory 폴더를 만들어도 되는 지 몰라서 일단 discodit 아래에 두었습니다.
+        resetMessageFile("C:\\Users\\ypd06\\codit\\files\\channel.ser");
+        resetMessageFile("C:\\Users\\ypd06\\codit\\files\\message.ser");
+        resetMessageFile("C:\\Users\\ypd06\\codit\\files\\users.ser");
 
         ServiceFactory factory = new FileServiceFactory();
         FileUserService userService = (FileUserService) factory.getUserService();
         FileChannelService channelService = (FileChannelService) factory.getChannelService();
         FileMessageService messageService = (FileMessageService) factory.getMessageService();
 
-        UUID user1 = userService.createUser("Yang");
-        UUID user2 = userService.createUser("Kim");
-        UUID user3 = userService.createUser("Lee");
-        UUID user4 = userService.createUser("Han");
+        UserDto userDto1 = userService.createUser(new UserDto("Yang", "yang@naver.com"));
+        UserDto userDto2 = userService.createUser(new UserDto("Kim", "kim@naver.com"));
+        UserDto userDto3 = userService.createUser(new UserDto("Lee", "lee@naver.com"));
+        UserDto userDto4 = userService.createUser(new UserDto("Han", "han@naver.com"));
+        UUID user1 = userDto1.id();
+        UUID user2 = userDto2.id();
+        UUID user3 = userDto3.id();
+        UUID user4 = userDto4.id();
 
         UUID channel1 = channelService.createChannel("SBS");
         UUID channel2 = channelService.createChannel("KBS");
@@ -37,20 +47,20 @@ public class FileServicesTestMain {
         System.out.println(userService.getUser(user1));
         System.out.println("====================================================");
         System.out.println("유저 다건 조회");
-        List<User> users = userService.getUsers();
-        for (User user : users) {
+        List<UserDto> users = userService.getUsers();
+        for (UserDto user : users) {
             System.out.println(user);
         }
         System.out.println("====================================================");
         System.out.println("유저 수정");
-        userService.updateUser(user1, "Park");
+        userService.updateUser(new UserDto(user1, "Park", "Park@daum.net"));
         System.out.println(userService.getUser(user1));
         System.out.println("====================================================");
         //userService.fetchMap();
         //System.out.println("fetchMap 실행");
         System.out.println("유저 목록 출력");
         users = userService.getUsers();
-        for (User user : users) {
+        for (UserDto user : users) {
             System.out.println(user);
         }
         System.out.println("====================================================");
@@ -122,5 +132,16 @@ public class FileServicesTestMain {
         System.out.println("====================================================");
 
     }
-
+    private static void resetMessageFile(String filename) {
+        try {
+            File file = new File(filename);
+            if (file.exists()) {
+                file.delete();
+            }
+            file.createNewFile();
+            System.out.println("✅ '" + filename + "' 파일이 초기화되었습니다.");
+        } catch (IOException e) {
+            System.err.println("❌ 파일 초기화 중 오류 발생: " + e.getMessage());
+        }
+    }
 }

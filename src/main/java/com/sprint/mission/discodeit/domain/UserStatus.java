@@ -15,13 +15,15 @@ public class UserStatus {
     @Id
     @GeneratedValue
     private UUID id;
+    private UUID userId;
     private Instant createdAt;
     @Setter
     private Instant updatedAt;
 
     private Status status;
 
-    public UserStatus() {
+    public UserStatus(UUID userId) {
+        this.userId = userId;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.status = Status.ONLINE;
