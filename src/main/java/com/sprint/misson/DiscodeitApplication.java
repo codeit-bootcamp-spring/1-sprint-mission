@@ -117,7 +117,7 @@ public class DiscodeitApplication {
         System.out.println("\n* 심화 - 메세지 예외 처리");
 
         System.out.println("\n1) DB에 존재하지 않는 User로 메세지 생성 ");
-        User notExistUser = new User("없는유저", "noOne@test.com", "hello", UserStatus.ACTIVE, "없는 유저 상태", AccountStatus.UNVERIFIED);
+        User notExistUser = new User("없는유저", "noOne@test.com", "hello", "123454356", "없는 유저 상태", AccountStatus.UNVERIFIED);
         System.out.println("- 테스트 유저");
         notExistUser.displayShortInfo();
         System.out.println("> 결과: ");
