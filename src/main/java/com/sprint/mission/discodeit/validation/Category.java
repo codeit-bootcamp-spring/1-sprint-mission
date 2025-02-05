@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.validation;
+
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.io.Serial;
 import java.io.Serializable;

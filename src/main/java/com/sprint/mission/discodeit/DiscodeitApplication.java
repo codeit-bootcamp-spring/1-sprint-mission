@@ -8,46 +8,50 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.test.ChannelTest;
 import com.sprint.mission.discodeit.test.MessageTest;
 import com.sprint.mission.discodeit.test.UserTest;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.IOException;
 import java.util.UUID;
 
-public class JavaApplication {
+@SpringBootApplication
+public class DiscodeitApplication {
 
     public static void main(String[] args) throws IOException {
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         /**
          * User Test
          */
 
         // 필요한 인스턴스 생성
-        UserRepository userRepository = new JCFUserRepository();
-//        UserRepository userRepository = new FileUserRepository();
-        UserService userService = new BasicUserService(userRepository);
+//		UserRepository userRepository = new JCFUserRepository();
+        UserRepository userRepository = new FileUserRepository();
+        UserService userService = (UserService) context.getBean("basicUserService");
 
         // 유저 생성
         User user1 = UserTest.setUpUser(userService, userRepository);
         User user2 = UserTest.setUpUser(userService, userRepository);
+        User user3 = UserTest.setUpUser(userService, userRepository);
 
         // 테스트용 유저 UUID
         UUID user1Id = user1.getId();
         UUID user2Id = user2.getId();
+        UUID user3Id = user3.getId();
 
         // 유저 정보 변경
         UserTest.updateUser(user1Id, userService);
 
         // 유저 삭제
-//        UserTest.deleteUser(user2Id, userService);
+        UserTest.deleteUser(user3Id, userService);
 
 
         /**
@@ -56,7 +60,7 @@ public class JavaApplication {
 
         // 필요한 인스턴스 생성
         ChannelRepository channelRepository = new FileChannelRepository();
-        ChannelService channelService = new BasicChannelService();
+        ChannelService channelService = (ChannelService) context.getBean("basicChannelService");
 
         // 채널 생성
         Channel channel1 = ChannelTest.setUpChannel(user1, channelService, userService);
@@ -83,7 +87,7 @@ public class JavaApplication {
 
         // 필요한 인스턴스 생성
         MessageRepository messageRepository = new FileMessageRepository();
-        MessageService messageService = new BasicMessageService();
+        MessageService messageService = (MessageService) context.getBean("basicMessageService");
 
         // 메시지 생성
         Message message1 = MessageTest.setUpMessage(channel1, user1Id, messageService, channelService, userService);
@@ -97,4 +101,5 @@ public class JavaApplication {
         // 메시지 삭제
         MessageTest.deleteMessage(message1Id, messageService, channelService, userService);
     }
+
 }

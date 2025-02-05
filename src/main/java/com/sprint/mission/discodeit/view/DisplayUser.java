@@ -22,7 +22,7 @@ public class DisplayUser {
     public static void displayAllUserInfo(List<User> data) {
         data.stream()
                 // 정렬 시 @ 앞까지만 잘라서 오름차순
-                .sorted(Comparator.comparing(user -> user.getEmail().split("@")[0]))
+                .sorted(Comparator.comparing(user -> user.getEmail().toString().split("@")[0]))
                 .forEach(DisplayUser::displayUserInfo);
     }
 

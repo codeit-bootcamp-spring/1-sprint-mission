@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.view.DisplayChannel;
 import com.sprint.mission.discodeit.view.DisplayMessage;
 
 import java.io.BufferedReader;
@@ -15,6 +14,8 @@ import java.util.UUID;
 
 public class MessageTest {
 
+    private static int messageIndex = 1;
+
     // 메시지 생성
     public static Message setUpMessage(Channel channel, UUID writerId, MessageService messageService, ChannelService channelService, UserService userService) throws IOException {
 
@@ -23,11 +24,11 @@ public class MessageTest {
 //        System.out.println("메시지 내용 입력 :");
 //        String context = br.readLine();
 
-        String context = "테스트용 메시지입니다.";
+        String context = "테스트용 메시지" + (messageIndex++);
 
         Message message = new Message(channel, context, writerId);
 
-        messageService.craete(message);
+        messageService.create(message);
 
         System.out.println("================================================================================");
         System.out.println("메시지 생성 결과 : ");

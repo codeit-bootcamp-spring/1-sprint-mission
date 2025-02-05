@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.validation.Email;
 import com.sprint.mission.discodeit.validation.Password;
 import com.sprint.mission.discodeit.validation.PhoneNumber;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {             // 유저 정보
 
     @Serial
@@ -41,41 +43,6 @@ public class User implements Serializable {             // 유저 정보
         validationAndSetNickname(nickname);
         this.phoneNumber = new PhoneNumber(phoneNumber);
     }
-
-
-    // Getter 함수
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getEmail() {
-        return email.toString();
-    }
-
-    public String getPassword() {
-        return password.toString();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber.toString();
-    }
-
 
 
     // update 함수

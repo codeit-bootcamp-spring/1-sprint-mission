@@ -86,7 +86,7 @@
 
 1. **FileUserService 실행 시 RuntimeException 발생**
 
-   ![image.png](image/sprint2-troubleshooting1.png)
+   ![image.png](image/sprint2/sprint2-troubleshooting1.png)
 
    - 현재 validation 패키지에 있는 Email 클래스의 멤버 변수인 UserRepository 인터페이스가 직렬화 불가능이라 생기는 문제로 추정
       - transient 키워드 사용 → 해결
@@ -96,7 +96,7 @@
 
 2. **UserTest 클래스의 userService.updateEmail(id, email) 실행 시 NullPointerException 발생**
 
-   ![image.png](image/sprint2-troubleshooting2.png)
+   ![image.png](image/sprint2/sprint2-troubleshooting2.png)
 
    - 직렬화할 때 적용한 transient 키워드로 인해 역직렬화 시 userService가 null로 초기화되어 발생한 문제로 추정
       - readObject 메서드 사용
@@ -116,7 +116,7 @@
 
 3. **Category 클래스에서 NotSerializableException으로 인한 RuntimeException 발생**
 
-   ![image.png](image/sprint2-troubleshooting3.png)
+   ![image.png](image/sprint2/sprint2-troubleshooting3.png)
 
    - Category 클래스를 Serializable 구현체로 만듦
 
@@ -150,3 +150,59 @@
 2. display 관련 메서드 사용 시 너무 많은 매개 변수 필요 → 매개변수 줄이기
    > 참고: [[클린코드] 매개변수 개수](https://lordofkangs.tistory.com/196)
 3. JUnit을 활용한 테스트 코드 작성
+
+---
+
+### 스프린트 미션 3
+1. [Spring Initializr](https://start.spring.io/)를 통한 프로젝트 초기화
+   - 빌드 시스템 : Gradle-Groovy
+   - 언어 : Java 17
+   - Spring Boot 버전 : 3.4.2
+   - GroupId : com.sprint.mission
+   - ArtifactId, Name : discodeit
+   - packaging 형식 : Jar
+   - Dependency 추가 : Lombok, Spring Wep
+   - zip 파일 압축 해제 후 현재 프로젝트에 붙여넣기
+   - application.properties 파일을 yml 파일로 변경
+   - DiscodeitApplication 실행 테스트
+     - 실행 결과
+     
+       <img src="image/sprint3/DiscodeitApplication-first-test.png" width="300">
+
+2. Bean 선언
+   1. File*Repository 구현체를 Repository 인터페이스의 Bean으로 등록
+      - @Repository 어노테이션 작성
+   2. Basic*Service 구현체를 Service 인터페이스의 Bean으로 등록
+      - @Service 어노테이션 작성
+
+3. 테스트
+   1. 기존 JavaApplication의 main() 내부 코드를 DiscodeitApplication으로 붙여넣기
+   2. Spring Context를 통한 service 초기화
+   3. 실행되는지 확인
+4. Lombok 적용
+   1. entity getter()를 @Getter로 대체
+   2. Basic*Service의 생성자를 @RequiredArgsConstructor로 대체
+
+### 수정사항
+
+### 트러블 슈팅
+1. git add 시 CRLF 문제 발생
+   ```bash
+   tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
+      $ git add .
+      warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'build.gradle', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'gradle/wrapper/gradle-wrapper.properties', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'settings.gradle', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of '.gitattributes', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'src/main/resources/application.yml', LF will be replaced by CRLF the next time Git touches it
+      warning: in the working copy of 'src/test/java/com/sprint/mission/discodeit/DiscodeitApplicationTests.java', LF will be replaced by CRLF the next time Git touches it
+   ```
+   - Windows의 경우 line ending으로 CR(Carriage-Return, \r)과 LF(Line Feed, \n)을 사용하고, Unix와 Mac OS는 LF만 사용
+     - 이 차이로 인해 git에서 잘못 인식하여 생기는 문제
+     - 실제 코드는 변경되지 않았는데 CR/LF때문에 변경으로 착각함
+   - 해결
+     - 
+
+### 추후 수정할 부분

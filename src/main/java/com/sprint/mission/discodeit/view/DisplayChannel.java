@@ -21,7 +21,7 @@ public class DisplayChannel {
     public static void displayAllChannel(List<Channel> channels, UserService userService) {
 
         channels.stream()
-                .sorted(Comparator.comparing((Channel channel) -> userService.read(channel.getOwnerId()).getEmail().split("@")[0])
+                .sorted(Comparator.comparing((Channel channel) -> userService.read(channel.getOwnerId()).getEmail().toString().split("@")[0])
                         .thenComparing(Channel::getName))
                 .forEach(channel -> {
                     printChannel(userService, channel);

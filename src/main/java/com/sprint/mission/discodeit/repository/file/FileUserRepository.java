@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileUserRepository implements UserRepository, Serializable {
 
     @Serial

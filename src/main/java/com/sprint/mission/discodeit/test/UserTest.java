@@ -12,31 +12,35 @@ import java.util.UUID;
 
 public class UserTest {
 
+    // 유저 생성 시 자동으로 이메일, 이름, 닉네임을 다르게 하기 위한 필드
+    private static int userIndex = 1;
+
     // 유저 생성
     public static User setUpUser(UserService userService, UserRepository userRepository) throws IOException {
 
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-            System.out.println("이메일 입력 :");
-            String email = br.readLine();
+//            System.out.println("이메일 입력 :");
+//            String email = br.readLine();
+//
+//            System.out.println("비밀번호 입력 :");
+//            String password = br.readLine();
+//
+//            System.out.println("이름 입력 :");
+//            String name = br.readLine();
+//
+//            System.out.println("닉네임 입력 :");
+//            String nickname = br.readLine();
+//
+//            System.out.println("전화번호 입력 :");
+//            String phoneNumber = br.readLine();
 
-            System.out.println("비밀번호 입력 :");
-            String password = br.readLine();
-
-            System.out.println("이름 입력 :");
-            String name = br.readLine();
-
-            System.out.println("닉네임 입력 :");
-            String nickname = br.readLine();
-
-            System.out.println("전화번호 입력 :");
-            String phoneNumber = br.readLine();
-
-//        String email = "test@email.com";
-//        String password = "PWpw11!!";
-//        String name = "test_name";
-//        String nickname = "test_nickname";
-//        String phoneNumber = "010-0000-0000";
+        String email = "test" + userIndex + "@email.com";
+        String password = "PWpw11!!";
+        String name = "test_name" + userIndex;
+        String nickname = "test_nickname" + (userIndex++);
+        String phoneNumber = "010-0000-0000";
 
         User user = new User(email, password, name, nickname, phoneNumber, userRepository);
 

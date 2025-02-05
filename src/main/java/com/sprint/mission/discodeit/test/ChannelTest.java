@@ -13,6 +13,8 @@ import java.util.UUID;
 
 public class ChannelTest {
 
+    private static int channelIndex = 1;
+
     // 채널 생성
     public static Channel setUpChannel(User user, ChannelService channelService, UserService userService) throws IOException {
 
@@ -24,12 +26,12 @@ public class ChannelTest {
 //        System.out.println("채널 설명 입력 :");
 //        String explanation = br.readLine();
 
-        String name = "test";
-        String explanation = "테스트용 채널입니다.";
+        String name = "test" + channelIndex;
+        String explanation = "테스트용 채널" + (channelIndex++);
 
         Channel channel = new Channel(user, name, explanation);
 
-        channelService.craete(channel);
+        channelService.create(channel);
 
         System.out.println("================================================================================");
         System.out.println("채널 생성 결과 : ");

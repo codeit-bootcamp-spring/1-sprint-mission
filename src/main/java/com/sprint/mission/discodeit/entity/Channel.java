@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.validation.Category;
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {      // 채널 (게시판)
 
     @Serial
@@ -39,40 +43,6 @@ public class Channel implements Serializable {      // 채널 (게시판)
         members.add(ownerId);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
 
         this.category = new Category(this);  // 카테고리는 기본적으로 null로 설정
-    }
-
-
-    // Getter 함수
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public UUID getOwnerId() {
-        return ownerId;
-    }
-
-    public String getCategory() {
-        return category.toString();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public List<UUID> getMembers() {
-        return members;
     }
 
 

@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {                  // 메시지 (게시물)
 
     @Serial
@@ -26,32 +29,6 @@ public class Message implements Serializable {                  // 메시지 (�
         this.channelId = channel.getId();
         validationAndSetContext(context);
         this.writerId = writerId;
-    }
-
-
-    // Getter 함수
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-  
-    public UUID getWriterId() {
-        return writerId;
-    }
-
-    public String getContext() {
-        return context;
     }
 
 
