@@ -1,7 +1,4 @@
 package com.sprint.mission.discodeit.entity;
-
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class User {
@@ -9,25 +6,32 @@ public class User {
     final  private Long createdAt;
     private Long updatedAt;
     private String name;
-    private static final Set<UUID> existUserIdCheck = new HashSet<>();
 
 
-    public User(String name){
-        UUID instance;
-        do {
-            instance = UUID.randomUUID();
-        } while (existUserIdCheck.contains(instance));
-        this.id = instance;
-        existUserIdCheck.add(instance);
 
+    private User(String name){
+        this.id=UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.name=name;
     };
 
+    private User(UUID id, Long createdAt, Long updatedAt, String name){
+        this.id=id;
+        this.createdAt=createdAt;
+        this.updatedAt=updatedAt;
+        this.name=name;
+
+    }
+
     public static User createDefaultUser(String name){
         return new User(name);
     }
+    public static User createUserAll(UUID id, Long createdAt, Long updatedAt, String name){
+        return new User(id,createdAt,updatedAt,name);
+    }
+
+
 
     public UUID getId() {
         return id;
@@ -44,21 +48,18 @@ public class User {
         return name;
     }
 
-    public void setUpdatedAt() {
+    public void updateUpdatedAt() {
         this.updatedAt= System.currentTimeMillis();
     }
-    public void setName(String name){
+    public void updateName(String name){
         this.name= name;
     }
 
-    public void deleteExistUserId(){
-        existUserIdCheck.remove(this.id);
-    }
 
     @Override
     public String toString(){
         return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+
-                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
+                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))+"\n";
     }
 
 

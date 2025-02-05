@@ -1,7 +1,4 @@
 package com.sprint.mission.discodeit.entity;
-
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class Message {
@@ -10,21 +7,16 @@ public class Message {
     private Long updatedAt;
     private String title;
     private String messageBody;
-    private static final Set<UUID> existMessageIdCheck=new HashSet<>();
+    //private static final Set<UUID> existMessageIdCheck=new HashSet<>();
 
     private String senderName;
     private String receiverName;
     private UUID senderId;
     private UUID receiverId;
 
-    public Message(String title,String messageBody){
-        UUID instance;
-        do {
-            instance = UUID.randomUUID();
-        } while (existMessageIdCheck.contains(instance));
-        this.id = instance;
-        existMessageIdCheck.add(instance);
+    private Message(String title,String messageBody){
 
+        this.id = UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.title=title;
@@ -35,13 +27,30 @@ public class Message {
         this.receiverId =null;
 
     };
-    public static Message CreateDefaultMessage(String title,String messageBody){
+    private Message(UUID ID,Long createdAt,Long updatedAt,String title,String messageBody,
+                   String senderName,String receiverName, UUID senderId, UUID receiverId ){
+
+        this.id=ID;
+
+        this.createdAt= createdAt;
+        this.updatedAt=updatedAt;
+        this.title=title;
+        this.messageBody=messageBody;
+        this.senderName=senderName;
+        this.receiverName =receiverName;
+        this.senderId=senderId;
+        this.receiverId =receiverId;
+
+    };
+
+    public static Message createDefaultMessage(String title,String messageBody){
         return new Message(title,messageBody);
     }
-
-    public void deleteExistMessageId(){
-        existMessageIdCheck.remove(this.id);
+    public static Message createChannelAll(UUID ID,Long createdAt,Long updatedAt,String title,String messageBody,
+                                           String senderName,String receiverName, UUID senderId, UUID receiverId){
+        return new Message(ID,createdAt,updatedAt,title,messageBody,senderName,receiverName,senderId,receiverId);
     }
+
 
     public UUID getId() {
         return id;
@@ -66,16 +75,10 @@ public class Message {
     }
 
     public String getSenderName() {
-        if(this.senderName!=null)
-            return senderName;
-        else
-            return null;
+        return senderName;
     }
     public String getReceiverName() {
-        if(this.senderName!=null)
-            return senderName;
-        else
-            return null;
+        return senderName;
     }
 
 
@@ -86,24 +89,24 @@ public class Message {
     public UUID getReceiverID() {
         return receiverId;
     }
-    public void setReceiverID(UUID receiverId) {
+    public void updateReceiverID(UUID receiverId) {
         this.receiverId = receiverId;
     }
-    public void setSenderID(UUID senderId) {
+    public void updateSenderID(UUID senderId) {
         this.senderId = senderId;
     }
-    public void setReceiverName(String receiverName) {
+    public void updateReceiverName(String receiverName) {
         this.receiverName = receiverName;
     }
-    public void setSenderName(String senderName) {
+    public void updateSenderName(String senderName) {
         this.senderName = senderName;
     }
 
-    public void SetSender(UUID senderId,String senderName){
+    public void updateSender(UUID senderId, String senderName){
         this.senderName=senderName;
         this.senderId=senderId;
     }
-    public void SetReceiver(UUID receiverId,String receiverName){
+    public void updateReceiver(UUID receiverId, String receiverName){
         this.receiverName = receiverName;
         this.receiverId = receiverId;
     }
@@ -118,7 +121,8 @@ public class Message {
                 .append("\nReceiverName: ").append(receiverName)
                 .append(" ReceiverID: ").append(receiverId)
                 .append("\n제목: ").append(title)
-                .append(" Message: ").append(messageBody);
+                .append(" Message: ").append(messageBody)
+                .append("\n");
         return display.toString();
     }
 

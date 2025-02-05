@@ -1,33 +1,36 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService{
+public class JCFUserService implements UserService {
 
-    private final Map<UUID,User> userList=new TreeMap<>();
+    protected  Map<UUID,User> userList=new LinkedHashMap<>();
+    protected   final Set<UUID> existUserIdCheck = new HashSet<>();
 
     @Override
-    public void CreateUserDefault(String name) {
-        if(find_user(name).isEmpty()){
-            User new_user=User.createDefaultUser(name);
-            userList.put(new_user.getId(),new_user);
-        }
-        else{
-            System.out.println("이미 존재하는 이름입니다.");
-        }
+    public void createNewUser(String name) {
+        User newUser;
+        do {
+            newUser=User.createDefaultUser(name);
+        } while (existUserIdCheck.contains(newUser.getId()));
+        existUserIdCheck.add(newUser.getId());
+        userList.put(newUser.getId(),newUser);
+
+
     }
 
     @Override
-    public <T> String ReadUser(T key) {
+    public <T> String readUser(T key) {
         StringBuilder list=new StringBuilder();
-        TreeMap<UUID, User> foundUser=new TreeMap<>();
+        LinkedHashMap<UUID, User> foundUser=new LinkedHashMap<>();
 
         if (key instanceof String) {
-            foundUser = find_user((String) key);
+            foundUser = findUser((String) key);
         } else if (key instanceof UUID) {
-            foundUser = find_user((UUID) key);
+            foundUser = findUser((UUID) key);
         }
 
         for (User val : foundUser.values()) {
@@ -43,7 +46,7 @@ public class JCFUserService implements UserService{
 
 
     @Override
-    public String ReadUserAll() {
+    public String readUserAll() {
         StringBuilder list= new StringBuilder();
         for (User val : userList.values()) {
             list.append(val.toString());
@@ -55,33 +58,33 @@ public class JCFUserService implements UserService{
     }
 
     @Override
-    public boolean UpdateUserName(String name,String changeName) {
-        TreeMap<UUID,User> instance = find_user(name);
+    public boolean updateUserName(String name,String changeName) {
+        LinkedHashMap<UUID,User> instance = findUser(name);
         return updateUserNameInfo(instance,changeName);
     }
 
     @Override
-    public boolean UpdateUserName(UUID id,String changeName) {
-        TreeMap<UUID,User> instance = find_user(id);
+    public boolean updateUserName(UUID id,String changeName) {
+        LinkedHashMap<UUID,User> instance = findUser(id);
         return updateUserNameInfo(instance,changeName);
     }
 
     @Override
-    public boolean DeleteUser(UUID id) {
-        TreeMap<UUID,User> instance = find_user(id);
+    public boolean deleteUser(UUID id) {
+        LinkedHashMap<UUID,User> instance = findUser(id);
         return deleteUserInfo(instance);
     }
 
 
     @Override
-    public boolean DeleteUser(String name) {
-        TreeMap<UUID,User> instance = find_user(name);
+    public boolean deleteUser(String name) {
+        LinkedHashMap<UUID,User> instance = findUser(name);
         return deleteUserInfo(instance);
     }
 
 
-    private TreeMap<UUID,User> find_user(String name){
-        TreeMap<UUID,User> findUser=new TreeMap<>();
+    protected LinkedHashMap<UUID,User> findUser(String name){
+        LinkedHashMap<UUID,User> findUser=new LinkedHashMap<>();
         for (User user : userList.values()) {
             if (user.getName().equals(name)) {
                 findUser.put(user.getId(),user);
@@ -90,20 +93,20 @@ public class JCFUserService implements UserService{
         return findUser;
     }
 
-    private TreeMap<UUID,User> find_user(UUID id){
-        TreeMap<UUID,User> findUser=new TreeMap<>();
+    protected LinkedHashMap<UUID,User> findUser(UUID id){
+        LinkedHashMap<UUID,User> findUser=new LinkedHashMap<>();
         findUser.put(id,userList.get(id));
         return findUser;
     }
 
-    private boolean deleteUserInfo(TreeMap<UUID,User> instance){
+    protected boolean deleteUserInfo(LinkedHashMap<UUID,User> instance){
         if (instance==null||instance.isEmpty()) {
             System.out.println("해당하는 유저가 없습니다.");
             return false;
         }else if(instance.size()==1){
-            User find = instance.firstEntry().getValue();
-            find.deleteExistUserId();
-            userList.remove(find.getId());
+            User firstUser = instance.entrySet().iterator().next().getValue();
+            userList.remove(firstUser.getId());
+            existUserIdCheck.remove(firstUser.getId());
             System.out.println("성공적으로 삭제했습니다.");
             return true;
         }
@@ -113,14 +116,14 @@ public class JCFUserService implements UserService{
         }
     }
 
-    private boolean updateUserNameInfo(TreeMap<UUID,User> instance, String changeName) {
+    protected boolean updateUserNameInfo(LinkedHashMap<UUID,User> instance, String changeName) {
         if (instance==null||instance.isEmpty()) {
             System.out.println( "해당하는 유저가 없습니다.");
             return false;
         } else if (instance.size() == 1) {
-            User find = instance.firstEntry().getValue();
-            find.setName(changeName);
-            find.setUpdatedAt();
+            User firstUser = instance.entrySet().iterator().next().getValue();
+            firstUser.updateName(changeName);
+            firstUser.updateUpdatedAt();
             System.out.println("성공적으로 바꿨습니다.");
             return true;
         }else{

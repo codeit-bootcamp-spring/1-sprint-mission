@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 public class Channel {
@@ -12,26 +10,28 @@ public class Channel {
     private String channelName;
     private final ArrayList<User> userlist=new ArrayList<>();
     private final ArrayList<Message> messageslist=new ArrayList<>();
-    private static final Set<UUID> existChannelIdCheck = new HashSet<>();
 
-    public Channel(String channelName){
-        UUID instance;
-        do {
-            instance = UUID.randomUUID();
-        } while (existChannelIdCheck.contains(instance));
-        this.id = instance;
-        existChannelIdCheck.add(instance);
+
+    private Channel(String channelName){
+        this.id=UUID.randomUUID();
         this.createdAt= System.currentTimeMillis();
         this.updatedAt=null;
         this.channelName=channelName;
     };
-    public static Channel CreateDefaultChannel(String channelName){
+    private Channel(UUID id,Long createdAt,Long updatedAt,String channelName){
+        this.id=id;
+        this.createdAt= createdAt;
+        this.updatedAt=updatedAt;
+        this.channelName=channelName;
+    };
+    public static Channel createDefaultChannel(String channelName){
         return new Channel(channelName);
     }
 
-    public void deleteExistChannelId(){
-        existChannelIdCheck.remove(this.id);
+    public static Channel createChannelAll(UUID id,Long createdAt,Long updatedAt,String channelName){
+        return new Channel(id,createdAt,updatedAt,channelName);
     }
+
 
     public UUID getId() {
         return id;
@@ -48,10 +48,10 @@ public class Channel {
         return channelName;
     }
 
-    public void setUpdatedAt() {
+    public void updateUpdatedAt() {
         this.updatedAt= System.currentTimeMillis();
     }
-    public void setChannelName(String ChannelName){
+    public void updateChannelName(String ChannelName){
         this.channelName= ChannelName;
     }
 
@@ -70,7 +70,8 @@ public class Channel {
         display.append("ChannelName: ").append(channelName)
                 .append(" ID: ").append(id)
                 .append("\ncreatedAt: ").append(createdAt)
-                .append(" updatedAt: ").append(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()));
+                .append(" updatedAt: ").append(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))
+                .append("\n");
         return display.toString();
     }
 }
