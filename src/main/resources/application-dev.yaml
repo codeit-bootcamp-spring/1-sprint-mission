@@ -1,13 +1,8 @@
+server:
+  port: 8080
 spring:
   application:
     name: discodeit
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/discodeitDB
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
 logging:
   level:
     root: debug
