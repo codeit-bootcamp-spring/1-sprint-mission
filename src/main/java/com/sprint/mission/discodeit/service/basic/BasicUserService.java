@@ -1,38 +1,35 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
+
 import com.sprint.mission.discodeit.entity.BaseEntity;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Collection;
 import java.util.UUID;
 
-import com.sprint.mission.discodeit.io.InputHandler;
+public class BasicUserService implements UserService {
 
+    /**
+     * [x ] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
+     * => JCF랑 동일하게 작성했습니다
+     * [x ] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
+     * [x ] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
+     **/
 
-public class JCFUserService implements UserService {
-    // Scanner sc = new Scanner(System.in);
-    // private final HashMap<String, User> Users;
 
     private final UserRepository userRepository;
-
     // mocking 이용으로 추가
     private InputHandler inputHandler;
 
-    public JCFUserService(UserRepository userRepository, InputHandler inputHandler){
-        // 생성자에서 users 데이터 초기화
+    public BasicUserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        // mocking 이용으로 추가
-        this.inputHandler = inputHandler;
-    }
-
-    // mocking 이용으로 추가
-    public void setInputHandler(InputHandler inputHandler) {
         this.inputHandler = inputHandler;
     }
 
     @Override
-    public UUID createUser(String nickname){
+    public UUID createUser(String nickname) {
         User user = new User(nickname);
         // 인터페이스 구현체의 메서드 saveUser(User user) 이용
         userRepository.saveUser(user);
@@ -40,7 +37,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Collection<User> showAllUsers(){
+    public Collection<User> showAllUsers() {
         // 전체 유저 조희
         if (userRepository.getAllUsers().isEmpty()) {
             System.out.println("No users exists.\n");
@@ -52,7 +49,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserById(UUID id){
+    public User getUserById(UUID id) {
         return userRepository.findUserById(id)
                 .orElseGet( () -> {
                     System.out.println(" No  + " + id.toString() + " User exists.\n");
@@ -61,7 +58,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateUserNickname(UUID id){
+    public void updateUserNickname(UUID id) {
         String newNickname = inputHandler.getNewInput();
         userRepository.findUserById(id).ifPresent( user -> user.setNickname(newNickname));
         // 수정 시간 업데이트를 위해
@@ -69,7 +66,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void clearAllUsers(){
+    public void clearAllUsers() {
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             userRepository.deleteAllUsers();
@@ -77,7 +74,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void removeUserById(UUID id){
+    public void removeUserById(UUID id) {
         String keyword = inputHandler.getYesNOInput().toLowerCase();
         if(keyword.equals("y")){
             userRepository.deleteUserById(id);

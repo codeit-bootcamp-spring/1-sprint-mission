@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
@@ -10,8 +11,8 @@ public interface MessageRepository {
     void saveMessage(Message message);
 
     // 읽기
-    Message findMessageById(UUID id);
-    Map<UUID, Message> findAllMessages();
+    Optional<Message> findMessageById(UUID id);
+    Collection<Message> findAllMessages();
 
     // 삭제
     void deleteMessageById(UUID id);

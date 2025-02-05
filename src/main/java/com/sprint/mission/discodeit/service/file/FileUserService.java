@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,39 +22,28 @@ public class FileUserService implements UserService{
         this.inputHandler = inputHandler;
     }
 
+    @Override
     public UUID createUser(String nickname){
         User user = new User(nickname);
         fileUserRepository.saveUser(user);
         return user.getId();
     }
 
-//    // save
-//    public UUID save(User user){
-//        // FileIO + 객체 직렬화를 통한 데이터 저장
-//        // 개별로 아무데나 하지말고, 폴더 생성 후 저장하기
-//
-//    }
-
-//    // load
-//    public User load(UUID id){
-//
-//    }
-
     // Read : 전체 유저 조회, 특정 유저 조회
-    public int showAllUsers(){
+    @Override
+    public Collection<User> showAllUsers(){
         // users/ 아래 저장된 모든 파일을 불러온다.
         // fileUserRepository.getAllUsers();
-        return fileUserRepository.getAllUsers().size();
+        return fileUserRepository.getAllUsers();
     }
-    public User getUserById(UUID id){
-        System.out.println("getUserById   매개변수를 통해 들어옴    " + id);
-        User user = fileUserRepository.findUserById(id);
-        System.out.println("getUserById  findUserById(id) and that id      " + user.getId());
 
-        return user;
+    @Override
+    public User getUserById(UUID id){
+        return fileUserRepository.findUserById(id).orElse(null);
     }
 
     // Update : 특정 유저 닉네임 변경
+    @Override
     public void updateUserNickname(UUID id){
         String newNickname = inputHandler.getNewInput();
         // id 로 찾아와서, 레포지토리의 load하는 메서드를 거쳐서
@@ -70,15 +60,18 @@ public class FileUserService implements UserService{
         fileUserRepository.saveUser(user);
         //System.out.println("5             " +id);
 
-        User updatedUser = fileUserRepository.findUserById(id);
+        User updatedUser = fileUserRepository.findUserById(id).orElse(null);
         System.out.println("Updated User: " + updatedUser);
     }
 
 
     // Delete : 전체 유저 삭제, 특정 유저 삭제
+    @Override
     public void clearAllUsers(){
         fileUserRepository.deleteAllUsers();
     }
+
+    @Override
     public void removeUserById(UUID id){
         fileUserRepository.deleteUserById(id);
     }

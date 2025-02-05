@@ -15,6 +15,7 @@ public class User extends BaseEntity implements Serializable {
         }
         this.nickname = nickname;
     }
+
     public String getNickname(){
         return nickname;
     }
@@ -24,10 +25,14 @@ public class User extends BaseEntity implements Serializable {
         }
         this.nickname = nickname;
     }
+
+
     @Override
     public String toString(){
         return "\n"
                 + "nickname : " + nickname
+                + "\n"
+                + "User id : " + getId()
                 + "\n"
                 + "create at : " + getCreatedAt()
                 + "\n"
