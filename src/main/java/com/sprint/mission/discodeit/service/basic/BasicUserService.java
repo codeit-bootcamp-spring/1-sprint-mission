@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validator.UserValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,15 +13,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-
     private final UserRepository userRepository;
     private final UserValidator validator;
-
-    public BasicUserService(UserRepository userRepository, UserValidator validator) {
-        this.userRepository = userRepository;
-        this.validator = validator;
-    }
 
     @Override
     public User create(String name, String email, String phoneNumber, String password) {
