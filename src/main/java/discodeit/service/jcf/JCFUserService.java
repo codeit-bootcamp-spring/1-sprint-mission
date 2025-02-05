@@ -1,26 +1,19 @@
 package discodeit.service.jcf;
 
-import discodeit.Validator.UserValidator;
-import discodeit.entity.Channel;
+import discodeit.validator.UserValidator;
 import discodeit.entity.User;
-import discodeit.service.ChannelService;
-import discodeit.service.MessageService;
 import discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService {
 
     private final UserValidator validator;
-    private final List<User> users;
-    private ChannelService jcfChannelService;
-    private MessageService jcfMessageService;;
+    private final Map<UUID, User> users;
 
     private JCFUserService() {
-        validator = new UserValidator();
-        users = new ArrayList<>();
+        this.validator = new UserValidator();
+        this.users = new HashMap<>();
     }
 
     private static class JCFUserServiceHolder {
@@ -32,112 +25,64 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void updateChannelService(ChannelService jcfChannelService) {
-        this.jcfChannelService = jcfChannelService;
-    }
-
-    @Override
-    public void updateMessageService(MessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
-    }
-
-    @Override
-    public User createUser(String name, String email, String phoneNumber, String password) {
+    public User create(String name, String email, String phoneNumber, String password) {
         validator.validate(name, email, phoneNumber);
         isDuplicateEmail(email);
         isDuplicatePhoneNumber(phoneNumber);
-        User newUser = new User(name, email, phoneNumber, password);
-        users.add(newUser);
-        return newUser;
+        User user = new User(name, email, phoneNumber, password);
+        users.put(user.getId() ,user);
+        return user;
     }
 
     @Override
-    public User findById(UUID id) {
-        User findUser = findUser(id);
-        if (findUser == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
-        }
-        return findUser;
+    public User find(UUID userId) {
+        User foundUser = users.get(userId);
+
+        return Optional.ofNullable(foundUser)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
     }
 
     @Override
-    public User findUser(UUID id) {
-        return users.stream()
-                .filter(user -> user.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
+    public List<User> findAll() {
+        return users.values().stream().toList();
     }
 
     @Override
-    public String getInfo(User user) {
+    public String getInfo(UUID userId) {
+        User user = find(userId);
         return user.toString();
     }
 
     @Override
-    public void updateName(User user, String name) {
-        validator.validateName(name);
-        user.updateName(name);
-        user.updateUpdatedAt();
+    public void update(UUID userId, String name, String email, String phoneNumber) {
+        User user = find(userId);
+        validator.validate(name, email, phoneNumber);
+
+        user.update(name, email, phoneNumber);
     }
 
     @Override
-    public void updateEmail(User user, String email) {
-        validator.validateEmail(email);
-        isDuplicateEmail(email);
-        user.updateEmail(email);
-        user.updateUpdatedAt();
-    }
-
-    @Override
-    public void updatePhoneNumber(User user, String phoneNumber) {
-        validator.validatePhoneNumber(phoneNumber);
-        isDuplicatePhoneNumber(phoneNumber);
-        user.updatePhoneNumber(phoneNumber);
-        user.updateUpdatedAt();
-    }
-
-    @Override
-    public void updatePassword(User user, String originalPassword, String newPassword) {
+    public void updatePassword(UUID userId, String originalPassword, String newPassword) {
+        User user = find(userId);
         user.updatePassword(originalPassword, newPassword);
         user.updateUpdatedAt();
     }
 
     @Override
-    public void updateJoinedChannels(User user, Channel channel) {
-        user.updateJoinedChannels(channel);
-        user.updateUpdatedAt();
-    }
-
-    @Override
-    public void deleteUser(User user) {
-        // 가입된 채널인데 참여자 목록에 없으면 Owner -> 채널 자체를 삭제
-        List<Channel> joinedChannels = user.getJoinedChannels();
-        while (joinedChannels.size() != 0) {
-            try {
-                jcfChannelService.deleteParticipant(joinedChannels.get(0), user);
-            } catch (IllegalArgumentException e) {
-                jcfChannelService.deleteChannel(joinedChannels.get(0), user);
-            }
+    public void delete(UUID userId) {
+        if (!users.containsKey(userId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
-        users.remove(user);
-        user.withdraw();
-    }
-
-    @Override
-    public void deleteJoinedChannel(User user, Channel channel) {
-        user.deleteJoinedChannel(channel);
-        channel.deleteParticipant(user);
-        user.updateUpdatedAt();
-        channel.updateUpdatedAt();
+        users.remove(userId);
     }
 
     @Override
     public void isDuplicateEmail(String email) {
-        users.stream().forEach(user -> user.isDuplicateEmail(email));
+        users.values().forEach(user -> user.isDuplicateEmail(email));
     }
 
     @Override
     public void isDuplicatePhoneNumber(String phoneNumber) {
-        users.stream().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
+        users.values().forEach(user -> user.isDuplicatePhoneNumber(phoneNumber));
     }
 }

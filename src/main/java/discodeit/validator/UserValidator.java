@@ -1,4 +1,4 @@
-package discodeit.Validator;
+package discodeit.validator;
 
 import java.util.regex.Pattern;
 
@@ -29,13 +29,13 @@ public class UserValidator implements Validator {
 
     public void checkEmailFormat(String email) {
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalArgumentException("잘못된 이메일 형식입니다.");
+            throw new IllegalArgumentException("[ERROR] 잘못된 이메일 형식입니다.");
         }
     }
 
     public void checkPhoneNumberFormat(String phoneNumber) {
         if (!PHONE_NUMBER_PATTERN.matcher(phoneNumber).matches()) {
-            throw new IllegalArgumentException("잘못된 핸드폰 번호 형식입니다.");
+            throw new IllegalArgumentException("[ERROR] 잘못된 핸드폰 번호 형식입니다.");
         }
     }
 }

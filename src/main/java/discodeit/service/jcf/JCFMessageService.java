@@ -6,85 +6,89 @@ import discodeit.entity.User;
 import discodeit.service.ChannelService;
 import discodeit.service.MessageService;
 import discodeit.service.UserService;
+import discodeit.validator.MessageValidator;
+import discodeit.validator.Validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
-    private final List<Message> messages;
-    private UserService jcfUserService;
-    private ChannelService jcfChannelService;
+    private final Map<UUID, Message> messages;
+    private final MessageValidator validator;
+    private UserService userService;
+    private ChannelService channelService;
 
-    private JCFMessageService() {
-        messages = new ArrayList<>();
+    private JCFMessageService(UserService userService, ChannelService channelService) {
+        this.messages = new HashMap<>();
+        this.validator = new MessageValidator();
+        this.userService = userService;
+        this.channelService = channelService;
     }
 
     private static class JCFMessageServiceHolder {
-        private static final MessageService INSTANCE = new JCFMessageService();
+        private static MessageService instance;
+
+        private static void initialize(UserService userService, ChannelService channelService) {
+            instance = new JCFMessageService(userService, channelService);
+        }
+
+        private static MessageService getInstance() {
+            if (instance == null) {
+                throw new IllegalStateException("[ERROR] JCFMessageService is not initialized");
+            }
+            return instance;
+        }
+    }
+
+    public static void initialize(UserService userService, ChannelService channelService) {
+        JCFMessageServiceHolder.initialize(userService, channelService);
     }
 
     public static MessageService getInstance() {
-        return JCFMessageServiceHolder.INSTANCE;
+        return JCFMessageServiceHolder.getInstance();
     }
 
     @Override
-    public void updateUserService(UserService jcfUserService) {
-        this.jcfUserService = jcfUserService;
+    public Message create(String content, User sender, UUID channelId) {
+        userService.find(sender.getId());
+        channelService.find(channelId);
+        validator.validate(content);
+
+        Message message = new Message(content, sender, channelId);
+        messages.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public void updateChannelService(ChannelService jcfChannelService) {
-        this.jcfChannelService = jcfChannelService;
+    public Message find(UUID messageId) {
+        Message foundMessage = messages.get(messageId);
+
+        return Optional.ofNullable(foundMessage)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
     }
 
     @Override
-    public Message createMessage(Channel channel, String content, User sender) {
-        Message newMessage = new Message(content, sender);
-        messages.add(newMessage);
-        jcfChannelService.updateMessages(channel, newMessage);
-        return newMessage;
+    public List<Message> findAll() {
+        return messages.values().stream().toList();
     }
 
     @Override
-    public Message findById(UUID id) {
-        Message findMessage = findMessage(id);
-        if (findMessage == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
-        }
-        return findMessage;
-    }
-
-    @Override
-    public Message findMessage(UUID id) {
-        return messages.stream()
-                .filter(message -> message.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
-    }
-
-    @Override
-    public String getInfo(Message message) {
+    public String getInfo(UUID messageId) {
+        Message message = find(messageId);
         return message.toString();
     }
 
     @Override
-    public void updateContent(Message message, String content) {
+    public void update(UUID messageId, String content) {
+        Message message = find(messageId);
         message.updateContent(content);
-        message.updateUpdatedAt();
     }
 
     @Override
-    public void deleteMessage(Message message, Channel channel, User user) {
-        channel.deleteMessage(message, user);
-        messages.remove(message);
-    }
-
-    @Override
-    public void deleteAllMessages(List<Message> deleteMessages) {
-        for (Message deleteMessage : deleteMessages) {
-            messages.remove(deleteMessage);
+    public void delete(UUID messageId) {
+        if (!messages.containsKey(messageId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다.");
         }
+        messages.remove(messageId);
     }
 }

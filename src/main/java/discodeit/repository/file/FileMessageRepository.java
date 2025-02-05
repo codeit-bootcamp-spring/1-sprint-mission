@@ -1,0 +1,98 @@
+package discodeit.repository.file;
+
+import discodeit.entity.Message;
+import discodeit.entity.User;
+import discodeit.repository.MessageRepository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
+
+public class FileMessageRepository implements MessageRepository {
+
+    private final Path directory;
+
+    public FileMessageRepository() {
+        this.directory = Paths.get("src", "main", "resources", "data", "serialized", "messages");
+    }
+
+    @Override
+    public Message save(String content, User sender, UUID channelId) {
+        Message message = new Message(content, sender, channelId);
+        Path filePath = directory.resolve(message.getId() + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return message;
+    }
+
+    @Override
+    public Message find(UUID messageId) {
+        Path filePath = directory.resolve(messageId + ".ser");
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (Message) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Message> findAll() {
+        try {
+            List<Message> messages = Files.list(directory)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (Message) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return messages;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void update(Message message, String content) {
+        message.updateContent(content);
+
+        Path filePath = directory.resolve(message.getId() + ".ser");
+        try (
+                FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void delete(Message message) {
+        Path filePath = directory.resolve(message.getId() + ".ser");
+
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제에 실패하였습니다.");
+        }
+    }
+}

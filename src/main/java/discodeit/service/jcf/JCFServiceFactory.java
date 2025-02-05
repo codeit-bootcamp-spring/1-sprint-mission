@@ -11,45 +11,34 @@ public class JCFServiceFactory implements ServiceFactory {
         private static final ServiceFactory INSTANCE = new JCFServiceFactory();
     }
 
-    private final UserService jcfUserService;
-    private final ChannelService jcfChannelService;
-    private final MessageService jcfMessageService;
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final MessageService messageService;
 
     private JCFServiceFactory() {
-        jcfUserService = JCFUserService.getInstance();
-        jcfChannelService = JCFChannelService.getInstance();
-        jcfMessageService = JCFMessageService.getInstance();
+        this.userService = JCFUserService.getInstance();
+        this.channelService = JCFChannelService.getInstance();
 
-        setDependencies();
+        JCFMessageService.initialize(userService, channelService);
+        this.messageService = JCFMessageService.getInstance();
     }
 
     public static ServiceFactory getInstance() {
         return  JCFServiceFactoryHolder.INSTANCE;
     }
 
-    private void setDependencies() {
-        jcfUserService.updateChannelService(jcfChannelService);
-        jcfUserService.updateMessageService(jcfMessageService);
-
-        jcfChannelService.updateUserService(jcfUserService);
-        jcfChannelService.updateMessageService(jcfMessageService);
-
-        jcfMessageService.updateUserService(jcfUserService);
-        jcfMessageService.updateChannelService(jcfChannelService);
-    }
-
     @Override
     public UserService getUserService() {
-        return jcfUserService;
+        return userService;
     }
 
     @Override
     public ChannelService getChannelService() {
-        return jcfChannelService;
+        return channelService;
     }
 
     @Override
     public MessageService getMessageService() {
-        return jcfMessageService;
+        return messageService;
     }
 }

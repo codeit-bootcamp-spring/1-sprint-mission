@@ -20,52 +20,76 @@
     - 이메일
     - 핸드폰 번호
     - 비밀번호
-- 유저 탈퇴 기능
-    - 가입한 채널에서 자동 퇴장
-    - 메시지에서 **(알 수 없음)** 으로 표시
+- 유저 삭제 기능
+- 유저 객체 직렬화 기능 (.ser)
 
 ### 🍇 채널
 - 채널 생성 기능
     - 채널을 생성한 user를 owner로 지정
-- 채널 참가 기능
-- 채널 탈퇴 기능
-- owner 채널 조작 기능
-    - 채널 이름 변경
-    - 채널 소개 변경
-    - 채널 삭제
+- 채널 업데이트 기능
+  - 이름
+  - 소개
+- 채널 삭제 기능
+- 채널 객체 직렬화 기능 (.ser)
 
 ### 🍇 메시지
-- 채널에서 메시지 주고 받기 기능
 - 메시지 수정 기능
 - 메시지 삭제 기능
+- 메시지 객체 직렬화 기능 (.ser)
 
 ## 실행 결과 예시
 
 
 ```
-// 유저1 조회
-user1님의 정보입니다.
-Name: user1
-Email: user1@codeit.com
-Phone number: 010-1234-5678
-Joined Channels: 
+유저 생성
+user님의 정보입니다.
+Name: user
+Email: user@codeit.com
+Phone number: 010-1111-1111
 
-// 채널 조회
-channel1 | user1의 채널입니다.
-Owner: user1
-Participants: user2, user3
--- Messages -- 
-user1: 안녕하세요~
-user2: user2라고 합니다.
-user3: 잘 부탁하빈다. ^^
+유저 조회(단건)
+user님의 정보입니다.
+Name: user
+Email: user@codeit.com
+Phone number: 010-1111-1111
 
-// 유저2 회원 탈퇴, 유저3 메시지 수정
-channel1 | user1의 채널입니다.
-Owner: user1
-Participants: user3
--- Messages -- 
-user1: 안녕하세요~
-(알 수 없음): user2라고 합니다.
-user3: 잘 부탁합니다. ^^
+유저 조회(다건): 2
+
+유저 수정
+uuuuser님의 정보입니다.
+Name: uuuuser
+Email: user@codeit.com
+Phone number: 010-1111-1111
+
+유저 삭제: 1
+
+채널 생성
+공지 | 공지 채널입니다.
+Owner: user
+
+채널 조회(단건)
+공지 | 공지 채널입니다.
+Owner: user
+
+채널 조회(다건): 2
+
+채널 수정
+공지 | 공지입니다
+Owner: user
+
+채널 삭제: 1
+
+메시지 생성
+user: 안녕하세요.
+
+메시지 조회(단건)
+user: 안녕하세요.
+
+메시지 조회(다건): 2
+
+메시지 수정
+user: 반갑습니다.
+
+메시지 삭제: 1
 ```
 ---

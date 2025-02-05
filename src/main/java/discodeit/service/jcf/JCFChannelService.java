@@ -1,27 +1,20 @@
 package discodeit.service.jcf;
 
-import discodeit.Validator.ChannelValidator;
+import discodeit.validator.ChannelValidator;
 import discodeit.entity.Channel;
-import discodeit.entity.Message;
 import discodeit.entity.User;
 import discodeit.service.ChannelService;
-import discodeit.service.MessageService;
-import discodeit.service.UserService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFChannelService implements ChannelService {
 
     private final ChannelValidator validator;
-    private final List<Channel> channels;
-    private UserService jcfUserService;
-    private MessageService jcfMessageService;
+    private final Map<UUID, Channel> channels;
 
     private JCFChannelService() {
-        validator = new ChannelValidator();
-        channels = new ArrayList<>();
+        this.validator = new ChannelValidator();
+        this.channels = new HashMap<>();
     }
 
     private static class JCFChannelServiceHolder {
@@ -33,86 +26,43 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void updateUserService(UserService jcfUserService) {
-        this.jcfUserService = jcfUserService;
-    }
-
-    @Override
-    public void updateMessageService(MessageService jcfMessageService) {
-        this.jcfMessageService = jcfMessageService;
-    }
-
-    @Override
-    public Channel createChannel(String name, String introduction, User owner) {
+    public Channel create(String name, String introduction, User owner) {
         validator.validate(name, introduction);
-        Channel newChannel = new Channel(name, introduction, owner);
-        channels.add(newChannel);
-        jcfUserService.updateJoinedChannels(owner, newChannel);
-        return newChannel;
+        Channel channel = new Channel(name, introduction, owner);
+        channels.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
-        Channel findChannel = findChannel(id);
-        if (findChannel == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
-        return findChannel;
+    public Channel find(UUID channelId) {
+        Channel foundChannel = channels.get(channelId);
+
+        return Optional.ofNullable(foundChannel)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
     }
 
     @Override
-    public Channel findChannel(UUID id) {
-        return channels.stream()
-                .filter(channel -> channel.isIdEqualTo(id))
-                .findAny()
-                .orElse(null);
+    public List<Channel> findAll() {
+        return channels.values().stream().toList();
     }
 
     @Override
-    public String getInfo(Channel channel) {
+    public String getInfo(UUID channelId) {
+        Channel channel = find(channelId);
         return channel.toString();
     }
 
     @Override
-    public void updateName(Channel channel, String name, User user) {
-        validator.validateName(name);
-        channel.updateName(name, user);
-        channel.updateUpdatedAt();
+    public void update(UUID channelId, String name, String introduction) {
+        Channel channel = find(channelId);
+        validator.validate(name, introduction);
+
+        channel.update(name, introduction);
     }
 
     @Override
-    public void updateIntroduction(Channel channel, String introduction, User user) {
-        validator.validateIntroduction(introduction);
-        channel.updateIntroduction(introduction, user);
-        channel.updateUpdatedAt();
-    }
-
-    // 유저의 채널 가입은 이 메서드에서만 실행
-    @Override
-    public void updateParticipants(Channel channel, User user) {
-        channel.updateParticipants(user);
-        jcfUserService.updateJoinedChannels(user, channel);
-        channel.updateUpdatedAt();
-    }
-
-    @Override
-    public void updateMessages(Channel channel, Message message) {
-        channel.updateMessages(message);
-    }
-
-    @Override
-    public void deleteChannel(Channel channel, User user) {
-        channel.deleteAllParticipants(user);
-        jcfMessageService.deleteAllMessages(channel.getMessages());
-        channel.deleteAllMessages();
-        channels.remove(channel);
-    }
-
-    @Override
-    public void deleteParticipant(Channel channel, User user) {
-        channel.deleteParticipant(user);
-        user.deleteJoinedChannel(channel);
-        channel.updateUpdatedAt();
-        user.updateUpdatedAt();
+    public void delete(UUID channelId) {
+        Channel channel = find(channelId);
+        channels.remove(channel.getId());
     }
 }

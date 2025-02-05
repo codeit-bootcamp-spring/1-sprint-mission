@@ -1,22 +1,31 @@
 package discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private long createdAt;
     private long updatedAt;
     private String content;
     private User sender;
+    private UUID channelId;
 
-    public Message(String content, User sender) {
+    public Message(String content, User sender, UUID channelId) {
         long currentUnixTime = System.currentTimeMillis() / 1000;
-        id = UUID.randomUUID();
-        createdAt = currentUnixTime;
-        updatedAt = currentUnixTime;
+        this.id = UUID.randomUUID();
+        this.createdAt = currentUnixTime;
+        this.updatedAt = currentUnixTime;
 
         this.content = content;
         this.sender = sender;
+        this.channelId = channelId;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     public void updateUpdatedAt() {
@@ -24,17 +33,10 @@ public class Message {
     }
 
     public void updateContent(String content) {
-        this.content = content;
-    }
-
-    public void checkSender(User user) {
-        if (!sender.isIdEqualTo(user.getId())) {
-            throw new IllegalArgumentException("자신의 메시지만 삭제할 수 있습니다.");
+        if (!this.content.equals(content)) {
+            this.content = content;
+            updateUpdatedAt();
         }
-    }
-
-    public boolean isIdEqualTo(UUID id) {
-        return this.id.equals(id);
     }
 
     @Override
