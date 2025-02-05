@@ -100,6 +100,22 @@ public class FileUserRepository implements UserRepository {
                 .anyMatch(user -> user.getEmail().equals(email));
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return findAll().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
+
+
+
 
     @Override
     public void deleteById(UUID id) {
