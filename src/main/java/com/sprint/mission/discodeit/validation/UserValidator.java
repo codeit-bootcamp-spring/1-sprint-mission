@@ -38,16 +38,23 @@ public class UserValidator {
         return true;
     }
 
-    private boolean isUniqueName(String name, Map<UUID, User> users) {
+    private boolean checkNameUnique(String name, Map<UUID, User> users) {
         if (users.values().stream().anyMatch(user -> user.getName().equals(name))) {
             throw new CustomException(ExceptionText.DUPLICATE_NAME);
         }
         return true;// 중복 이름 예외
     }
 
+    private boolean checkEmailUnique(String email, Map<UUID, User> users){
+        if(users.values().stream().anyMatch(user -> user.getEmail().equals(email))){
+            throw new CustomException(ExceptionText.DUPLICATE_EMAIL);
+        }
+        return true;
+    }
 
 
     public boolean validateUser(String name, String email, String password, Map<UUID, User> users) {
-        return isValidName(name) && isValidEmail(email) && isValidPassword(password) && isUniqueName(name, users);
+        return isValidName(name) && isValidEmail(email) && isValidPassword(password)
+                && checkNameUnique(name, users) && checkEmailUnique(email, users);
     }
 }

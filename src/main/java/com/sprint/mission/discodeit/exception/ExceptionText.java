@@ -12,6 +12,7 @@ public enum ExceptionText {
     USER_CREATION_FAILED("유저 생성 실패"),
     MESSAGE_NOT_FOUND("등록된 메시지가 없습니다."),
     DUPLICATE_NAME("이미 동일한 이름이 존재합니다. "),
+    DUPLICATE_EMAIL("이미 동일한 이메일이 존재합니다."),
     CHANNEL_CREATION_FAILED("채널 생성 실패");
 
     private final String message;
