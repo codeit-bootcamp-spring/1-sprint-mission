@@ -10,7 +10,7 @@ public interface UserStatusService {
 
     List<UserStatus> findAll();
 
-    boolean update(UserStatus userStatus);
+    UserStatus create(UserStatus userStatus);
 
     boolean updateByUserId(String userStatusId, UserStatus userStatus);
 
