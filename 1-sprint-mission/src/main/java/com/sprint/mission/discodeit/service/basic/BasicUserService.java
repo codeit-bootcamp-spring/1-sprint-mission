@@ -17,34 +17,75 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
-        return userRepository.save(user);
+        try {
+            User newUser = new User(username, email, password);
+            if(userRepository.existsByEmail(email)){
+                throw new IllegalArgumentException("User already exists");
+            }
+            userRepository.save(newUser);
+            System.out.println("User created: " + username + " (email: " + email + ")");
+            return newUser;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to create user: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public User find(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        try {
+            return userRepository.findById(userId)
+                    .orElseThrow(()-> new IllegalArgumentException("User not found"));
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to read user: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        try {
+            List<User> users = userRepository.findAll();
+            if (users.isEmpty()) {
+                throw new IllegalStateException("No users found in the system.");
+            }
+            return users;
+        } catch (IllegalStateException e) {
+            System.out.println("Failed to read all users: " + e.getMessage());
+            return List.of();
+        }
     }
 
     @Override
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
-        return userRepository.save(user);
+        try {
+            User user = find(userId);
+            if(userRepository.existsByEmail(newEmail)){
+                throw new IllegalArgumentException("Email already exists");
+            }
+            if (userRepository.existsByPassword(newPassword)){
+                throw new IllegalArgumentException("Password already exists");
+            }
+            user.update(newUsername, newEmail, newPassword);
+            System.out.println("User updated: " + newUsername + " (Email: " + newEmail + ")");
+            userRepository.save(user);
+            return user;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to update user: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override
     public void delete(UUID userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " not found");
+        try {
+            if(!userRepository.existsById(userId)){
+                throw new IllegalArgumentException("User not found");
+            }
+            System.out.println("User deleted: " + find(userId).getEmail());
+            userRepository.deleteById(userId);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to delete user: " + e.getMessage());
         }
-        userRepository.deleteById(userId);
     }
 }

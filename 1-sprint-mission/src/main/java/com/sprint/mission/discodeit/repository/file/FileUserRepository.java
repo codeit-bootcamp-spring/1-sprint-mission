@@ -4,97 +4,83 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FileUserRepository implements UserRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private static final String FILE_PATH = "tmp/users.ser";
+    private final Map<UUID, User> userdata;
 
     public FileUserRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
+        this.userdata = loadFromFile();
     }
 
-    private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
-    }
 
     @Override
     public User save(User user) {
-        Path path = resolvePath(user.getId());
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(user);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        userdata.put(user.getId(), user);
+        saveToFile();
         return user;
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        User userNullable = null;
-        Path path = resolvePath(id);
-        if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                userNullable = (User) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        }
-        return Optional.ofNullable(userNullable);
+        return Optional.ofNullable(userdata.values().stream()
+                .filter(user -> user.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not found User")));
     }
 
     @Override
     public List<User> findAll() {
-        try {
-            return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (User) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return new ArrayList<>(userdata.values());
+    }
+
+
+    @Override
+    public void deleteById(UUID id) {
+        userdata.remove(id);
+        saveToFile();
+    }
+
+    @Override
+    public boolean existsByPassword(String password) {
+        return userdata.values().stream().anyMatch(user -> user.getPassword().equals(password));
     }
 
     @Override
     public boolean existsById(UUID id) {
-        Path path = resolvePath(id);
-        return Files.exists(path);
+        return userdata.containsKey(id);
     }
 
     @Override
-    public void deleteById(UUID id) {
-        Path path = resolvePath(id);
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public boolean existsByEmail(String email) {
+        return userdata.values().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    private Map<UUID, User> loadFromFile() {
+        File file = new File(FILE_PATH);
+        if (!file.exists()) {
+            return new HashMap<>();
+        }
+        try (ObjectInputStream ois =
+                     new ObjectInputStream(new FileInputStream(file))) {
+            return (Map<UUID, User>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            return new HashMap<>();
         }
     }
+
+    private void saveToFile() {
+        try (ObjectOutputStream oos
+                     = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+            oos.writeObject(userdata);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save users to file.", e);
+        }
+
+    }
+
+
+
 }

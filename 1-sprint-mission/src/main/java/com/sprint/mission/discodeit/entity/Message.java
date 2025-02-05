@@ -11,18 +11,17 @@ public class Message implements Serializable {
     private Long createdAt;
     private Long updatedAt;
     //
+    private User user;
+    private Channel channel;
     private String content;
-    //
-    private UUID channelId;
-    private UUID authorId;
 
-    public Message(String content, UUID channelId, UUID authorId) {
+
+    public Message(User user, Channel channel, String content) {
+        this.user = user;
+        this.channel = channel;
+        this.content = content;
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
-        //
-        this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
     }
 
     public UUID getId() {
@@ -41,13 +40,9 @@ public class Message implements Serializable {
         return content;
     }
 
-    public UUID getChannelId() {
-        return channelId;
-    }
+    public Channel getChannel() {return channel;}
 
-    public UUID getAuthorId() {
-        return authorId;
-    }
+    public User getUser() {return user;}
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;

@@ -5,63 +5,88 @@ package com.sprint.mission.discodeit.app;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
+
+import java.util.List;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        // 리포지토리 생성
-        JCFUserRepository userRepository = new JCFUserRepository();
-        JCFChannelRepository channelRepository = new JCFChannelRepository();
-        JCFMessageRepository messageRepository = new JCFMessageRepository();
+        FileUserRepository userRepository = new FileUserRepository();
+        FileChannelRepository channelRepository = new FileChannelRepository();
+        FileMessageRepository messageRepository = new FileMessageRepository();
 
-        // 서비스 생성
-        JCFUserService userService = JCFUserService.getInstance(userRepository);
-        JCFChannelService channelService = JCFChannelService.getInstance(channelRepository, userService);
-        JCFMessageService messageService = JCFMessageService.getInstance(messageRepository, , userService, );
+        // 서비스 계층에 주입
+        FileUserService userService = FileUserService.getInstance(userRepository);
+        FileChannelService channelService = FileChannelService.getInstance(channelRepository);
+        FileMessageService messageService = FileMessageService.getInstance(messageRepository,channelRepository, userRepository);
 
-        // 사용자 테스트
-        System.out.println("<<<<< 사용자 테스트 >>>>>");
-        User user1 = new User("Alice", "alice123");
-        User user2 = new User("Bob", "bob456");
+        //user 객체 생성, user 생성
+        System.out.println(" <<<< 유저 생성 >>>> ");
 
-        userService.createUser(user1);
-        userService.createUser(user2);
+        User user1 = userService.create("강병훈", "dkdkdk@", "12315");
+        User user2 = userService.create("John", "dddas@", "12122");
+        User user3 = userService.create("Bob", "xxxx@ccc.com", "1235567");
+        System.out.println();
+        List<User> users = userService.findAll();
+        for (User user : users) {
+            System.out.println(user.getEmail());
+        }
 
-        userService.updateUser("alice123", "AliceUpdated");
-        userService.deleteUser("bob456");
+        //사용자 업데이트
+        userService.update(user1.getId(), "kbh", "xjvm7001@xxx.com", "12125");
+        //사용자 삭제
+        userService.delete(user3.getId());
+        System.out.println();
+        // 사용자 출력
+        System.out.println(" <<<< All Users >>>>");
+        List<User> updateUsers = userService.findAll();
+        for (User user : updateUsers) {
+            System.out.println(user);
+        }
+        System.out.println();
 
-        userService.readAllUsers().forEach(user -> System.out.println("User: " + user.getUserName()));
+        //채널 생성
+        System.out.println(" <<<< 채널 생성 >>>> ");
+        Channel channel1 = channelService.create(user1, "공지", "공지 입니다");
+        Channel channel2 = channelService.create(user2, "공지1", "공지 입니다1");
 
-        // 채널 테스트
-        System.out.println("\n<<<<< 채널 테스트 >>>>>");
-        Channel channel1 = new Channel("Tech Talk", "alice123");
-        Channel channel2 = new Channel("Gaming Room", "alice123");
+        // 채널 조회
+        System.out.println(" <<<< All Channels >>>>");
+        List<Channel>channels  = channelService.findAll();
+        for (Channel channel : channels) {
+            System.out.println(channel.getName());
+        }
+        //채널 업데이트
+        channelService.update(channel1, "공지 new", "공지입니다 !");
+        //채널 삭제
+        channelService.delete(channel1);
+        System.out.println(" <<<< All Channels >>>>");
+        //수정된 채널 조회
+        List<Channel> channelNew = channelService.findAll();
+        for (Channel channel : channelNew) {
+            System.out.println(channel.getName());
+        }
 
-        channelService.createChannel(channel1);
-        channelService.createChannel(channel2);
+        System.out.println(" <<<< 메세지 생성 >>>> ");
+        //메세지 생성
+        Message messageUser1 = messageService.create(user1, channel2, "Hello World");
+        Message messageUser2 = messageService.create(user1, channel2, "Hi World");
+        //메세지 조회
+        System.out.println(" <<<< All Messages >>>>");
+        List<Message> messages = messageService.findAll();
+        for (Message message : messages) {
+            System.out.println(message.getContent());
+        }
 
-        channelService.updateChannel(channel1.getChannelUuid(), "Updated Tech Talk");
-        channelService.deleteChannel(channel2.getChannelUuid());
-
-        channelService.readAllChannels().forEach(channel -> System.out.println("Channel: " + channel.getChannelTitle()));
-
-        // 메시지 테스트
-        System.out.println("\n<<<<< 메시지 테스트 >>>>>");
-        Message message1 = new Message("alice123", "Welcome to Tech Talk!");
-        Message message2 = new Message("alice123", "Hello, everyone!");
-
-        messageService.createMessage(message1);
-        messageService.createMessage(message2);
-
-        messageService.updateMessage(message1.getMessageUuid(), "Updated Message Text");
-        messageService.deleteMessage(message2.getMessageUuid());
-
-        messageService.readAllMessages().forEach(message -> System.out.println("Message: " + message.getMessageText()));
+        messageService.delete(user1,channel2, messageUser1);
+        List<Message> newMessage = messageService.findAll();
+        for (Message message : newMessage) {
+            System.out.println(message.getContent());
+        }
     }
-
 }

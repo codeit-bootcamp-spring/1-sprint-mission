@@ -27,14 +27,18 @@ public class FileUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        User newUser = new User(username, email, password);
         try {
+            User newUser = new User(username, email, password);
+            if(userRepository.existsByEmail(email) == true){
+                throw new IllegalArgumentException("User already exists");
+            }
             userRepository.save(newUser);
             System.out.println("User created: " + username + " (email: " + email + ")");
+            return newUser;
         } catch (IllegalArgumentException e) {
             System.out.println("Failed to create user: " + e.getMessage());
+            return null;
         }
-        return newUser;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class FileUserService implements UserService {
             return userRepository.findById(userId)
                     .orElseThrow(()-> new IllegalArgumentException("User not found"));
         } catch (IllegalArgumentException e) {
-            System.out.println("Failed to Read user: " + e.getMessage());
+            System.out.println("Failed to read user: " + e.getMessage());
             return null;
         }
     }
@@ -66,6 +70,12 @@ public class FileUserService implements UserService {
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         try {
             User user = find(userId);
+            if(userRepository.existsByEmail(newEmail) == true){
+                throw new IllegalArgumentException("Email already exists");
+            }
+            if (userRepository.existsByPassword(newPassword) == true){
+                throw new IllegalArgumentException("Password already exists");
+            }
             user.update(newUsername, newEmail, newPassword);
             System.out.println("User updated: " + newUsername + " (Email: " + newEmail + ")");
             userRepository.save(user);
@@ -79,6 +89,9 @@ public class FileUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         try {
+            if(userRepository.existsById(userId) == false){
+                throw new IllegalArgumentException("User not found");
+            }
             System.out.println("User deleted: " + find(userId).getEmail());
             userRepository.deleteById(userId);
         } catch (IllegalArgumentException e) {

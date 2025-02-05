@@ -10,15 +10,15 @@ public class Channel implements Serializable {
     private Long createdAt;
     private Long updatedAt;
     //
-    private ChannelType type;
+    private User user;
     private String name;
     private String description;
 
-    public Channel(ChannelType type, String name, String description) {
+    public Channel(User user, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
         //
-        this.type = type;
+        this.user = user;
         this.name = name;
         this.description = description;
     }
@@ -35,8 +35,8 @@ public class Channel implements Serializable {
         return updatedAt;
     }
 
-    public ChannelType getType() {
-        return type;
+    public User getUser() {
+        return user;
     }
 
     public String getName() {
