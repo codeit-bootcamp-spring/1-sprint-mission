@@ -20,8 +20,8 @@ public class JCFUserRepository implements UserRepository {
 
 
     @Override
-    public User save(String userName, String email) {
-        User user = new User(userName, email);
+    public User save(String userName,String password, String email) {
+        User user = new User(userName,password, email);
         map.put(user.getId(),user);
         return user;
     }

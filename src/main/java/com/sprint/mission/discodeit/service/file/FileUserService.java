@@ -33,7 +33,7 @@ public class FileUserService implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        return new UserDto(fileUserRepository.save(userDto.userName(), userDto.email()));
+        return new UserDto(fileUserRepository.save(userDto.userName(), userDto.password(), userDto.email()));
     }
 
     @Override

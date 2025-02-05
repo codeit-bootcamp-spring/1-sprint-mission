@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    User save(String userName, String email);
+    User save(String userName,String password, String email);
 
     User findUserById(UUID id);
 

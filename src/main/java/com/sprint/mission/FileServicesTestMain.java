@@ -27,10 +27,10 @@ public class FileServicesTestMain {
         FileChannelService channelService = (FileChannelService) factory.getChannelService();
         FileMessageService messageService = (FileMessageService) factory.getMessageService();
 
-        UserDto userDto1 = userService.createUser(new UserDto("Yang", "yang@naver.com"));
-        UserDto userDto2 = userService.createUser(new UserDto("Kim", "kim@naver.com"));
-        UserDto userDto3 = userService.createUser(new UserDto("Lee", "lee@naver.com"));
-        UserDto userDto4 = userService.createUser(new UserDto("Han", "han@naver.com"));
+        UserDto userDto1 = userService.createUser(new UserDto("Yang","YangPassword", "yang@naver.com"));
+        UserDto userDto2 = userService.createUser(new UserDto("Kim","KimPassword", "kim@naver.com"));
+        UserDto userDto3 = userService.createUser(new UserDto("Lee","LeePassword", "lee@naver.com"));
+        UserDto userDto4 = userService.createUser(new UserDto("Han","HanPassword", "han@naver.com"));
         UUID user1 = userDto1.id();
         UUID user2 = userDto2.id();
         UUID user3 = userDto3.id();
@@ -53,7 +53,7 @@ public class FileServicesTestMain {
         }
         System.out.println("====================================================");
         System.out.println("유저 수정");
-        userService.updateUser(new UserDto(user1, "Park", "Park@daum.net"));
+        userService.updateUser(new UserDto(user1,"YangPassword", "Park", "Park@daum.net"));
         System.out.println(userService.getUser(user1));
         System.out.println("====================================================");
         //userService.fetchMap();

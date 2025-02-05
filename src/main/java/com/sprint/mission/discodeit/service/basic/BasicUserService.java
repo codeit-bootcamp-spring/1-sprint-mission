@@ -38,13 +38,10 @@ public class BasicUserService implements UserService {
     public UserDto createUser(UserDto paramUserDto) {
         UserDto userDto = vaildateUser(paramUserDto.userName(), paramUserDto.email());
         if (userDto != null) return userDto;
-        User savedUser = repository.save(paramUserDto.userName(), paramUserDto.email());
-        userStatusRepository.save(new UserStatus(savedUser.getId()));
+        User savedUser = repository.save(paramUserDto.userName(), paramUserDto.password(), paramUserDto.email());
+        UserStatus savedUserStatus = userStatusRepository.save(new UserStatus(savedUser.getId()));
         if( paramUserDto.binaryContent() != null ) { //이거 판단 기준 애매모호할 것 같은데?
             BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(savedUser.getId(), paramUserDto.binaryContent().getFile()));
-        }
-        if( paramUserDto.status() != null ) {
-            UserStatus savedUserStatus = userStatusRepository.save(new UserStatus(savedUser.getId()));
         }
         //return new UserDto(savedUser.getId(), savedUser.getCreatedAt(), savedUser.getUpdatedAt(), savedUser.getUserName(), savedUser.getEmail());
         return new UserDto(savedUser);

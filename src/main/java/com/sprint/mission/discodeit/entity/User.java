@@ -29,20 +29,26 @@ public class User implements Serializable {
     @JsonProperty("updatedAt")
     private String email;
 
+    private transient String password;
+    private int hashedPassword;
+    //직렬화 적용 안됨 -> 따로 Hash함수 적용해서 저장하고 
+    //password 받은 후 Hashing 한 결과와 저장 값과 비교해서 Auth 통과할 수 있도록
+    //검증 로직은 나중에 구현하자.. //AuthService
 
 
-
-    public User(String userName, String email) {
+    public User(String userName, String password, String email) {
         this.id = UUID.randomUUID();
+        this.userName = userName;
+        this.password = password;
+        this.hashedPassword = Objects.hashCode(password);
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
-        this.userName = userName;
         this.email = email;
     }
     public User() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-    }
+    } //사용처?
 
     public void update(String userName, String email) {
         this.userName = userName;

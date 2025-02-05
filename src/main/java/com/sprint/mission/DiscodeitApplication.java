@@ -16,7 +16,7 @@ import java.util.UUID;
 @SpringBootApplication
 public class DiscodeitApplication {
     static UserDto setupUser(UserService userService) {
-        return userService.createUser(new UserDto("woody", "woody@naver.com"));
+        return userService.createUser(new UserDto("woody","woodyPassword", "woody@naver.com"));
     }
 
     static Channel setupChannel(ChannelService channelService) {

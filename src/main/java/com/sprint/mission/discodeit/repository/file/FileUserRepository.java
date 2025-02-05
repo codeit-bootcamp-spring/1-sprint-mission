@@ -11,9 +11,9 @@ public class FileUserRepository implements UserRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\users.ser";
 
     @Override
-    public User save(String userName, String email) { //저장로직만 있어야하는데? 의문
+    public User save(String userName, String password,  String email) { //저장로직만 있어야하는데? 의문
         Map<UUID, User> userMap = loadFromSer(FILE_NAME);
-        User user = new User(userName, email);
+        User user = new User(userName,password, email);
         userMap.put(user.getId(), user);
         saveToSer(FILE_NAME, userMap);
 

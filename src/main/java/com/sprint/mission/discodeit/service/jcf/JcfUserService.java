@@ -35,7 +35,7 @@ public class JcfUserService implements UserService {
     public UserDto createUser(UserDto paramUserDto) {
         UserDto userDto = vaildateUser(paramUserDto.userName(), paramUserDto.email());
         if (userDto != null) return userDto;
-        User savedUser = jcfUserRepository.save(paramUserDto.userName(), paramUserDto.email());
+        User savedUser = jcfUserRepository.save(paramUserDto.userName(), paramUserDto.password(), paramUserDto.email());
         return new UserDto(savedUser);
     }
 
