@@ -190,14 +190,16 @@ public class DiscodeitApplication {
         System.out.println("> 닉네임에 \"박유진\"이 포함된 User 조회 결과: ");
         userService.getUsersByNickname("박유진").forEach(User::displayShortInfo);
 
-        System.out.println("\n5) 유저 상태로 조회(다건): ");
-        System.out.println("* default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경하여 테스트 하였음");
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserStatus(UserStatus.INACTIVE);
-        userService.updateUser(user3.getId(), userDTO, Instant.now());
+// UserStatus enum -> class 변경으로 인한 임시 주석 처리
+//        System.out.println("\n5) 유저 상태로 조회(다건): ");
+//        System.out.println("* default 는 ACTIVE 이므로 홍길동을 INACTIVE로 변경하여 테스트 하였음");
+//        UserDTO userDTO = new UserDTO(user3.getNickname(), user3.getEmail(), user3.getUserStatusId(), user3.getStatusMessage(), user3.getAccountStatus(), user3.getProfileImageId());
+//
+//        userService.updateUser(user3.getId(), userDTO, Instant.now());
 
-        System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
-        userService.getUserByUserStatus(UserStatus.ACTIVE).forEach(User::displayShortInfo);
+//        // UserStatus enum -> class 변경으로 인한 임시 주석 처리
+//        System.out.println("> 유저 상태에 활동중(ACTIVE)인 User 조회 결과: ");
+//        userService.getUserByUserStatus().forEach(User::displayShortInfo);
 
         System.out.println("\n\n--- Channel 조회 ---");
         System.out.println("\n1) 전체 목록 조회");

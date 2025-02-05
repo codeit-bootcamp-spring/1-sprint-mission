@@ -4,7 +4,7 @@ import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
-import com.sprint.misson.discordeit.entity.UserStatus;
+import com.sprint.misson.discordeit.entity.status.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
@@ -30,7 +30,8 @@ public class JCFUserService implements UserService {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
-        User newUser = new User(nickname, email, password, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
+        UserStatus userStatus = new UserStatus();
+        User newUser = new User(nickname, email, password, userStatus.getId(), null, AccountStatus.UNVERIFIED);
 
         //TODO - 추가 구현할만 한 기능
         //이메일 인증
@@ -86,12 +87,13 @@ public class JCFUserService implements UserService {
                 .toList();
     }
 
-    @Override
-    public List<User> getUserByUserStatus(UserStatus userStatus) {
-        return data.values().stream()
-                .filter(u -> u.getUserStatus().equals(userStatus))
-                .toList();
-    }
+    // UserStatus 변경으로 인한 임시 주석 처리
+//    @Override
+//    public List<User> getUserByUserStatus(UserStatus userStatus) {
+//        return data.values().stream()
+//                .filter(u -> u.getUserStatusId().equals(userStatus))
+//                .toList();
+//    }
 
     @Override
     public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {

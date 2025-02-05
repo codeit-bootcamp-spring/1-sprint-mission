@@ -22,8 +22,6 @@ public class User implements Serializable {
     private final Instant createdAt;
     //수정 시간
     private Instant updatedAt;
-
-    //부가 기능 관련 필드
     //접속 상태
     private UserStatus userStatus;
 

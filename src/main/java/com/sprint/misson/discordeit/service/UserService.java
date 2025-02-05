@@ -3,7 +3,6 @@ package com.sprint.misson.discordeit.service;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
-import com.sprint.misson.discordeit.entity.UserStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,7 +29,7 @@ public interface UserService {
     List<User> getUsersByAccountStatus(AccountStatus accountStatus);
 
     //다건 조회 - 사용자 상태
-    List<User> getUserByUserStatus(UserStatus userStatus);
+    //List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
     User updateUser(String userId, UserDTO userDTO, Instant updatedAt);
