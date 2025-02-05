@@ -9,11 +9,14 @@ import java.util.UUID;
 @Getter
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
+
     private String name;
     private String introduction;
+
     private User owner;
 
     public Channel(String name, String introduction, User owner) {

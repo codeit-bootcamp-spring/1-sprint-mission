@@ -10,9 +10,11 @@ import java.util.UUID;
 @Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
+
     private String name;
     private String email;
     private String phoneNumber;
