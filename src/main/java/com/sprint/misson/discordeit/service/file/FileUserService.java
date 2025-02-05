@@ -4,7 +4,7 @@ import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
 import com.sprint.misson.discordeit.entity.User;
-import com.sprint.misson.discordeit.entity.UserStatus;
+import com.sprint.misson.discordeit.entity.status.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.service.UserService;
 
@@ -32,7 +32,8 @@ public class FileUserService extends FileService implements UserService {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
-        User newUser = new User(nickname, email, password, UserStatus.ACTIVE, null, AccountStatus.UNVERIFIED);
+        UserStatus userStatus = new UserStatus();
+        User newUser = new User(nickname, email, password, userStatus.getId(), null, AccountStatus.UNVERIFIED);
 
         Path newUserPath = userDirectory.resolve(newUser.getId().concat(".ser"));
         save(newUserPath, newUser);

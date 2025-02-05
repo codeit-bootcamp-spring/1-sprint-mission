@@ -24,20 +24,21 @@ public class User implements Serializable {
     private Instant updatedAt;
     //접속 상태
     private UserStatus userStatus;
+    private String userStatusId;
 
     //사용자 설정 상태 메세지
     private String statusMessage;
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     private AccountStatus accountStatus;
 
-    public User(String nickname, String email, String password, UserStatus userStatus, String statusMessage, AccountStatus accountStatus) {
+    public User(String nickname, String email, String password, String userStatusId, String statusMessage, AccountStatus accountStatus) {
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
-        this.userStatus = userStatus;
+        this.userStatusId = userStatusId;
         this.statusMessage = statusMessage;
         this.accountStatus = accountStatus;
     }
@@ -61,8 +62,8 @@ public class User implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public void setUserStatus(UserStatus userStatus) {
-        this.userStatus = userStatus;
+    public void setUserStatus(String userStatusId) {
+        this.userStatusId = userStatusId;
     }
 
     public void setAccountStatus(AccountStatus accountStatus) {
