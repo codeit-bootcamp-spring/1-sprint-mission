@@ -111,7 +111,7 @@ public class JavaApplication {
         return new BasicChannelService(channelRepository, validator);
     }
 
-    static MessageService messageServiceInti(UserService userService, ChannelService channelService) {
+    static MessageService messageServiceInit(UserService userService, ChannelService channelService) {
         MessageRepository messageRepository = new JCFMessageRepository();
 //        MessageRepository messageRepository = new FileMessageRepository();
         MessageValidator validator = new MessageValidator();
@@ -122,7 +122,7 @@ public class JavaApplication {
         // 서비스 초기화
         UserService userService = userServiceInit();
         ChannelService channelService = channelServiceInit();
-        MessageService messageService = messageServiceInti(userService, channelService);
+        MessageService messageService = messageServiceInit(userService, channelService);
 
         // 셋업
         User user = setupUser(userService);
