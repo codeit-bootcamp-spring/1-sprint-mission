@@ -3,11 +3,13 @@ package com.sprint.misson.discordeit.service.basic;
 import com.sprint.misson.discordeit.code.ErrorCode;
 import com.sprint.misson.discordeit.dto.UserDTO;
 import com.sprint.misson.discordeit.entity.AccountStatus;
+import com.sprint.misson.discordeit.entity.BinaryContent;
 import com.sprint.misson.discordeit.entity.User;
 import com.sprint.misson.discordeit.entity.status.UserStatus;
 import com.sprint.misson.discordeit.exception.CustomException;
 import com.sprint.misson.discordeit.repository.UserRepository;
 import com.sprint.misson.discordeit.service.UserService;
+import com.sprint.misson.discordeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
 
     @Override
     public User create(String nickname, String email, String password) {
@@ -39,8 +42,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getUsers() {
+        for (User u : userRepository.findAll()) {
+            UserDTO userDTO = new UserDTO(u.getId(), u.getNickname(), u.getEmail(),
+                    userStatusService.findById(u.getUserStatusId()).isActive(), u.getStatusMessage(), u.getAccountStatus(), u.getProfileImageId());
+        }
+
+        return null;
     }
 
     @Override
@@ -71,10 +79,11 @@ public class BasicUserService implements UserService {
         return userRepository.findAll().stream().filter(user -> user.getAccountStatus().equals(accountStatus)).toList();
     }
 
-    @Override
-    public List<User> getUserByUserStatus(UserStatus userStatus) {
-        return userRepository.findAll().stream().filter(user -> user.getUserStatus().equals(userStatus)).toList();
-    }
+    //UserStatus 필드 변경으로 인한 임시 주석 처리
+//    @Override
+//    public List<User> getUserByUserStatus(UserStatus userStatus) {
+//        return userRepository.findAll().stream().filter(user -> user.getUserStatus().equals(userStatus)).toList();
+//    }
 
     @Override
     public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {

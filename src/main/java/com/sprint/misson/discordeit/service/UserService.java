@@ -13,7 +13,7 @@ public interface UserService {
     User create(String nickname, String email, String password);
 
     //모두 읽기
-    List<User> getUsers();
+    List<UserDTO> getUsers();
 
     //읽기
     //단건 조회 - UUID
