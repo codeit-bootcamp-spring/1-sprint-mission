@@ -1,11 +1,14 @@
 package com.srint.mission.discodeit.service.basic;
 
 import com.srint.mission.discodeit.entity.Channel;
+import com.srint.mission.discodeit.entity.ChannelType;
 import com.srint.mission.discodeit.entity.User;
 import com.srint.mission.discodeit.repository.ChannelRepository;
 import com.srint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
@@ -18,14 +21,19 @@ public class BasicChannelService implements ChannelService {
 
     //서비스 로직
     @Override
-    public UUID create(String channelName, User channelOwner) {
-        Channel channel = new Channel(channelName, channelOwner);
+    public UUID create(String name, String description, ChannelType type) {
+        if (!Channel.validation(name, description)) {
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
+        Channel channel = new Channel(name, description, type);
         return channelRepository.save(channel);
     }
 
     @Override
     public Channel read(UUID id) {
-        return channelRepository.findOne(id);
+        Channel findChannel = channelRepository.findOne(id);
+        return Optional.ofNullable(findChannel)
+                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
     }
 
     @Override
@@ -34,42 +42,32 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannelName(UUID id, User user,String channelName) {
+    public Channel updateName(UUID id, String channelName) {
         Channel findChannel = channelRepository.findOne(id);
-        if(!findChannel.getChannelOwner().userCompare(user)){
-            throw new IllegalStateException("채널 수정 권한이 없습니다.");
-        }
-        findChannel.setChannelName(channelName);
-        channelRepository.save(findChannel);
-        return findChannel;
-    }
-
-    @Override
-    public Channel joinChannel(UUID id, User user) {
-        Channel findChannel = channelRepository.findOne(id);
-        findChannel.setJoinedUsers(user);
+        findChannel.setName(channelName);
         channelRepository.update(findChannel);
         return findChannel;
     }
 
-    //특정 사용자 채널 탈퇴
     @Override
-    public UUID exitChannel(UUID id, User user) {
+    public Channel updateDescription(UUID id, String description){
         Channel findChannel = channelRepository.findOne(id);
-        findChannel.deleteJoinedUser(user);
-        user.deleteMyChannels(findChannel);
+        findChannel.setDescription(description);
         channelRepository.update(findChannel);
-        return findChannel.getId();
+        return findChannel;
     }
 
-    //채널삭제 사용자 권한
     @Override
-    public UUID deleteChannel(UUID id, User user) {
+    public Channel updateType(UUID id, ChannelType type){
         Channel findChannel = channelRepository.findOne(id);
-        if(!findChannel.getChannelOwner().userCompare(user)){
-            throw new IllegalStateException("채널 삭제 권한이 없습니다.");
-        }
-        findChannel.getJoinedUsers().forEach(u -> u.deleteMyChannels(findChannel));
-        return channelRepository.delete(id);
+        findChannel.setType(type);
+        channelRepository.update(findChannel);
+        return findChannel;
+    }
+
+    @Override
+    public UUID deleteChannel(UUID id) {
+        Channel findChannel = channelRepository.findOne(id);
+        return channelRepository.delete(findChannel.getId());
     }
 }

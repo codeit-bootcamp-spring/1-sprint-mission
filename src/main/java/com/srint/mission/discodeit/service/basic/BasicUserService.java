@@ -5,6 +5,8 @@ import com.srint.mission.discodeit.repository.UserRepository;
 import com.srint.mission.discodeit.service.UserService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
@@ -18,14 +20,18 @@ public class BasicUserService implements UserService {
     //서비스 로직
     @Override
     public UUID create(String username, String email, String password) {
-        validateDuplicateUser(email);
+        if(!User.validation(username, email, password)){
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
         User user = new User(username, email, password);
         return userRepository.save(user);
     }
 
     @Override
     public User read(UUID id) {
-        return userRepository.findOne(id);
+        User findUser = userRepository.findOne(id);
+        return Optional.ofNullable(findUser)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
     }
 
     @Override
@@ -60,20 +66,6 @@ public class BasicUserService implements UserService {
     @Override
     public UUID deleteUser(UUID id) {
         User findUser = userRepository.findOne(id);
-        if(!findUser.getMyChannels().isEmpty()){
-            findUser.getMyChannels().forEach(
-                    channel -> channel.deleteJoinedUser(findUser));
-        }
         return userRepository.delete(findUser.getId());
-
-    }
-
-    private void validateDuplicateUser(String email) {
-        if(!userRepository.findAll().isEmpty()){ //여기 로직 주의
-            List<User> users = userRepository.findAll();
-            if (users.stream().anyMatch(user-> email.equals((user.getEmail())))){
-                throw new IllegalStateException("이미 존재하는 이메일 입니다.");
-            }
-        }
     }
 }

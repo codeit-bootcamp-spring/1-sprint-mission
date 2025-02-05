@@ -12,6 +12,7 @@ public interface UserService {
     UUID save(User user);
     User findOne(UUID id);
     List<User> findAll();
+    UUID update(User user);
     UUID delete(UUID id);
 */
 

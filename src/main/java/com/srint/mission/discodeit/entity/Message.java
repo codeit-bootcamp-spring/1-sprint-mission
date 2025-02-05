@@ -11,16 +11,16 @@ public class Message implements Serializable {
     private long updatedAt;
 
     private String content;
-    private User user;
-    private Channel channel;
+    private UUID authorId;
+    private UUID channelId;
 
-    public Message(String content, User user, Channel channel) {
+    public Message(String content, UUID authorId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
 
         this.content = content;
-        this.user = user;
-        this.channel = channel;
+        this.authorId = authorId;
+        this.channelId = channelId;
     }
 
     public UUID getId() {
@@ -38,27 +38,34 @@ public class Message implements Serializable {
     public String getContent() {
         return content;
     }
-    public User getUser() {
-        return user;
+
+    public UUID getAuthorId() {
+        return authorId;
     }
 
-    public Channel getChannel(){
-        return channel;
+    public UUID getChannelId() {
+        return channelId;
     }
-
-    public void setMessageChannel(){
-        this.channel.getMessages().add(this);
-    }
-
 
     public void setUpdatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
     public void setContent(String content) {
+        if(content ==null && content.equals(this.content)){
+            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
+        }
         this.content = content;
         setUpdatedAt();
     }
+
+    public static boolean validation(String content){
+        if (content == null || content.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
 
     @Override
     public String toString() {
@@ -67,7 +74,8 @@ public class Message implements Serializable {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", content='" + content + '\'' +
-                ", user=" + user +
+                ", authorId=" + authorId +
+                ", channelId=" + channelId +
                 '}';
     }
 }

@@ -15,13 +15,14 @@ public interface MessageService {
     UUID save(Message message);
     Message findOne(UUID id);
     List<Message> findAll();
+    UUID update(Message message);
     UUID delete (UUID id);
 */
 
     //서비스 로직
-    UUID create(String content, User user, Channel channel);
+    UUID create(String content, UUID authorId, UUID channelId);
     Message read(UUID id);
     List<Message> readAll();
-    Message update(UUID id, String message, User user);
+    Message updateMessage(UUID id, String message, User user);
     UUID deleteMessage(UUID id, User user);
 }

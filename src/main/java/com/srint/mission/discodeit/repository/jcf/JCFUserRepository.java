@@ -13,39 +13,30 @@ public class JCFUserRepository implements UserRepository {
         data = new HashMap<>();
     }
 
-    //DB 로직
     public UUID save(User user) {
         data.put(user.getId(), user);
         return user.getId();
     }
 
     public User findOne(UUID id) {
-        if(!data.containsKey(id)){
-            throw new IllegalArgumentException("조회할 User을 찾지 못했습니다.");
-        }
         return data.get(id);
     }
 
     public List<User> findAll() {
-        if(data.isEmpty()){
+/*        if (data.isEmpty()) {
             return Collections.emptyList(); // 빈 리스트 반환
-        }
-        return data.values().stream().toList();
+        }*/
+        return new ArrayList<>(data.values());
     }
 
-    @Override
-    public UUID update(User user) {
+    public UUID update(User user){
         data.put(user.getId(), user);
         return user.getId();
     }
 
     public UUID delete(UUID id) {
-        if(!data.containsKey(id)){
-            throw new IllegalArgumentException("삭제할 User를 찾지 못했습니다.");
-        }
         data.remove(id);
         return id;
     }
-
 
 }

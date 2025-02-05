@@ -63,6 +63,7 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
+
     public UUID save(Message message) {
         data.put(message.getId(), message);
         saveDataToFile();
@@ -70,30 +71,23 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     public Message findOne(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("조회할 Message를 찾지 못했습니다.");
-        }
         return data.get(id);
     }
 
     public List<Message> findAll() {
-        if (data.isEmpty()) {
+/*        if(data.isEmpty()){
             return Collections.emptyList(); // 빈 리스트 반환
-        }
+        }*/
         return new ArrayList<>(data.values());
     }
 
-    @Override
-    public UUID update(Message message) {
+    public UUID update(Message message){
         data.put(message.getId(), message);
         saveDataToFile();
         return message.getId();
     }
 
     public UUID delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 Message를 찾지 못했습니다.");
-        }
         data.remove(id);
         saveDataToFile();
         return id;

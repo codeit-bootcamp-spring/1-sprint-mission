@@ -65,48 +65,49 @@ public class FileUserService implements UserService {
     }
 
     public UUID save(User user) {
-        if(!data.containsKey(user.getId())){
-            data.put(user.getId(), user);
-        }
+        data.put(user.getId(), user);
         saveDataToFile();
         return user.getId();
     }
 
     public User findOne(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("조회할 User를 찾지 못했습니다.");
-        }
         return data.get(id);
     }
 
     public List<User> findAll() {
-        if (data.isEmpty()) {
+/*        if (data.isEmpty()) {
             return Collections.emptyList(); // 빈 리스트 반환
-        }
+        }*/
         return new ArrayList<>(data.values());
     }
 
+    public UUID update(User user){
+        data.put(user.getId(), user);
+        saveDataToFile();
+        return user.getId();
+    }
+
     public UUID delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 User를 찾지 못했습니다.");
-        }
         data.remove(id);
         saveDataToFile();
         return id;
     }
 
-
-
+    //서비스 로직
     @Override
     public UUID create(String username, String email, String password) {
-        validateDuplicateUser(email);
+        if(!User.validation(username, email, password)){
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
         User user = new User(username, email, password);
         return save(user);
     }
 
     @Override
     public User read(UUID id) {
-        return findOne(id);
+        User findUser = findOne(id);
+        return Optional.ofNullable(findUser)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
     }
 
     @Override
@@ -118,7 +119,7 @@ public class FileUserService implements UserService {
     public User updateUserName(UUID id, String name) {
         User findUser = findOne(id);
         findUser.setUsername(name);
-        save(findUser);
+        update(findUser);
         return findUser;
     }
 
@@ -126,7 +127,7 @@ public class FileUserService implements UserService {
     public User updateEmail(UUID id, String email) {
         User findUser = findOne(id);
         findUser.setEmail(email);
-        save(findUser);
+        update(findUser);
         return findUser;
     }
 
@@ -134,27 +135,14 @@ public class FileUserService implements UserService {
     public User updatePassword(UUID id, String password) {
         User findUser = findOne(id);
         findUser.setPassword(password);
-        save(findUser);
+        update(findUser);
         return findUser;
     }
 
     @Override
     public UUID deleteUser(UUID id) {
         User findUser = findOne(id);
-        if (!findUser.getMyChannels().isEmpty()) {
-            findUser.getMyChannels().forEach(
-                    channel -> channel.deleteJoinedUser(findUser));
-        }
         return delete(findUser.getId());
-
     }
 
-    private void validateDuplicateUser(String email) {
-        if (!data.isEmpty()) {
-            List<User> users = findAll();
-            if (users.stream().anyMatch(user -> email.equals(user.getEmail()))) {
-                throw new IllegalStateException("이미 존재하는 이메일입니다.");
-            }
-        }
-    }
 }

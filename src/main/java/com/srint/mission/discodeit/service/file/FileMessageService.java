@@ -67,46 +67,49 @@ public class FileMessageService implements MessageService {
     }
 
     public UUID save(Message message) {
-        if(!data.containsKey(message.getId())){
-            data.put(message.getId(), message);
-        }
+        data.put(message.getId(), message);
         saveDataToFile();
         return message.getId();
     }
 
     public Message findOne(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("조회할 Message를 찾지 못했습니다.");
-        }
         return data.get(id);
     }
 
     public List<Message> findAll() {
-        if (data.isEmpty()) {
+/*        if(data.isEmpty()){
             return Collections.emptyList(); // 빈 리스트 반환
-        }
+        }*/
         return new ArrayList<>(data.values());
     }
 
+    public UUID update(Message message){
+        data.put(message.getId(), message);
+        saveDataToFile();
+        return message.getId();
+    }
+
     public UUID delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 Message를 찾지 못했습니다.");
-        }
         data.remove(id);
         saveDataToFile();
         return id;
     }
 
+
     @Override
-    public UUID create(String content, User user, Channel channel) {
-        Message message = new Message(content, user, channel);
-        message.setMessageChannel();
+    public UUID create(String content, UUID authorId, UUID channelId) {
+        if(!Message.validation(content)){
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
+        Message message = new Message(content, authorId, channelId);
         return save(message);
     }
 
     @Override
     public Message read(UUID id) {
-        return findOne(id);
+        Message findMessage = findOne(id);
+        return Optional.ofNullable(findMessage)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지가 없습니다."));
     }
 
     @Override
@@ -115,23 +118,22 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, String message, User user) {
+    public Message updateMessage(UUID id, String message, User user) {
         Message findMessage = findOne(id);
-        if (!findMessage.getUser().userCompare(user)) {
-            throw new IllegalStateException("Message 변경 권한이 없습니다.");
+        if(!user.userCompare(findMessage.getAuthorId())){
+            throw new IllegalStateException("message 변경 권한이 없습니다.");
         }
         findMessage.setContent(message);
-        save(findMessage);
+        update(findMessage);
         return findMessage;
     }
 
     @Override
     public UUID deleteMessage(UUID id, User user) {
         Message findMessage = findOne(id);
-        if (!findMessage.getUser().userCompare(user)) {
-            throw new IllegalStateException("Message 삭제 권한이 없습니다.");
+        if(!user.userCompare(findMessage.getAuthorId())){
+            throw new IllegalStateException("message 삭제 권한이 없습니다.");
         }
-        findMessage.getChannel().deleteMessage(findMessage);
         return delete(findMessage.getId());
     }
 }

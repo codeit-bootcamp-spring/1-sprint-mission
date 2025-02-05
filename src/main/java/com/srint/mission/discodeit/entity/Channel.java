@@ -12,85 +12,77 @@ public class Channel implements Serializable {
     private final long createdAt;
     private long updatedAt;
 
-    private String channelName;
-    private User channelOwner;
-    List<User> joinedUsers;
-    List<Message> messages;
+    private String name;
+    private String description;
+    private ChannelType type;
 
-    public Channel(String channelName, User channelOwner) {
+    public Channel(String name, String description, ChannelType type) {
 
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
 
-        this.channelName = channelName;
-        this.channelOwner = channelOwner;
-        joinedUsers = new ArrayList<>();
-        messages = new ArrayList<>();
+        this.name = name;
+        this.description = description;
+        this.type = type;
+    }
+
+    public static boolean validation(String name, String description){
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        if (description == null || description.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
     public long getCreatedAt() {
         return createdAt;
     }
 
-    public String getChannelName() {
-        return channelName;
-    }
-    public User getChannelOwner() {
-        return channelOwner;
+    public long getUpdatedAt() {
+        return updatedAt;
     }
 
-    public List<User> getJoinedUsers() {
-        return joinedUsers;
+    public String getName() {
+        return name;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public String getDescription() {
+        return description;
+    }
+
+    public ChannelType getType() {
+        return type;
     }
 
     public void setUpdatedAt() {
         this.updatedAt = Instant.now().getEpochSecond();
     }
 
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
+    public void setName(String name) {
+        if(name ==null && name.equals(this.name)){
+            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
+        }
+        this.name = name;
         setUpdatedAt();
     }
 
-    public void setChannelOwner(User channelOwner) {
-        this.channelOwner = channelOwner;
+    public void setDescription(String description) {
+        if(description ==null && description.equals(this.description)){
+            throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
+        }
+        this.description = description;
         setUpdatedAt();
     }
 
-    public void setJoinedUsers(User user){
-        if(joinedUsers.contains(user)){
-            throw new IllegalStateException("이미 채널에 존재하는 회원입니다.");
-        }
-        joinedUsers.add(user);
-        user.getMyChannels().add(this);
+    public void setType(ChannelType type) {
+        this.type = type;
         setUpdatedAt();
-    }
-
-    public void deleteMessage(Message message) {
-        if(!messages.contains(message)){
-            throw new IllegalStateException("채널에 존재하지 않는 메시지입니다.");
-        }
-        messages.remove(message);
-    }
-
-    public void deleteJoinedUser(User user){
-        if(!joinedUsers.contains(user)){
-            throw new IllegalStateException("가입하지 않은 채널입니다.");
-        }
-        joinedUsers.remove(user);
-        //user.getMyChannels().remove(this);
     }
 
     @Override
@@ -99,10 +91,9 @@ public class Channel implements Serializable {
                 "id=" + id +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
-                ", channelName='" + channelName + '\'' +
-                ", channelOwner=" + channelOwner +"\n"+
-                ", joinedUsers=" + joinedUsers +
-                ", messages=" + messages +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
                 '}';
     }
 }

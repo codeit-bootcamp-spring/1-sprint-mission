@@ -7,6 +7,8 @@ import com.srint.mission.discodeit.repository.MessageRepository;
 import com.srint.mission.discodeit.service.MessageService;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
@@ -18,15 +20,19 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public UUID create(String content, User user, Channel channel) {
-        Message message = new Message(content, user, channel);
-        message.setMessageChannel();
+    public UUID create(String content, UUID authorId, UUID channelId) {
+        if(!Message.validation(content)){
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
+        Message message = new Message(content, authorId, channelId);
         return messageRepository.save(message);
     }
 
     @Override
     public Message read(UUID id) {
-        return messageRepository.findOne(id);
+        Message findMessage = messageRepository.findOne(id);
+        return Optional.ofNullable(findMessage)
+                .orElseThrow(() -> new NoSuchElementException("해당 메시지가 없습니다."));
     }
 
     @Override
@@ -35,9 +41,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, String message, User user) {
+    public Message updateMessage(UUID id, String message, User user) {
         Message findMessage = messageRepository.findOne(id);
-        if(!findMessage.getUser().userCompare(user)){
+        if(!user.userCompare(findMessage.getAuthorId())){
             throw new IllegalStateException("message 변경 권한이 없습니다.");
         }
         findMessage.setContent(message);
@@ -48,10 +54,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public UUID deleteMessage(UUID id, User user) {
         Message findMessage = messageRepository.findOne(id);
-        if(!findMessage.getUser().userCompare(user)){
+        if(!user.userCompare(findMessage.getAuthorId())){
             throw new IllegalStateException("message 삭제 권한이 없습니다.");
         }
-        findMessage.getChannel().deleteMessage(findMessage);
         return messageRepository.delete(findMessage.getId());
     }
 }

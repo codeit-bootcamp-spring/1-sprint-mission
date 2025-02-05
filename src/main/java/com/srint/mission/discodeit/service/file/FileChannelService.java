@@ -1,6 +1,7 @@
 package com.srint.mission.discodeit.service.file;
 
 import com.srint.mission.discodeit.entity.Channel;
+import com.srint.mission.discodeit.entity.ChannelType;
 import com.srint.mission.discodeit.entity.User;
 import com.srint.mission.discodeit.service.ChannelService;
 
@@ -71,37 +72,44 @@ public class FileChannelService implements ChannelService {
     }
 
     public Channel findOne(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("조회할 Channel을 찾지 못했습니다.");
-        }
         return data.get(id);
     }
 
     public List<Channel> findAll() {
-        if (data.isEmpty()) {
+/*        if(data.isEmpty()){
             return Collections.emptyList(); // 빈 리스트 반환
-        }
+        }*/
         return new ArrayList<>(data.values());
     }
 
+    public UUID update(Channel channel){
+        data.put(channel.getId(), channel);
+        saveDataToFile();
+        return channel.getId();
+    }
+
     public UUID delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 Channel을 찾지 못했습니다.");
-        }
         data.remove(id);
         saveDataToFile();
         return id;
     }
 
+
+    //서비스 로직
     @Override
-    public UUID create(String channelName, User channelOwner) {
-        Channel channel = new Channel(channelName, channelOwner);
+    public UUID create(String name, String description, ChannelType type) {
+        if (!Channel.validation(name, description)) {
+            throw new IllegalArgumentException("잘못된 형식입니다.");
+        }
+        Channel channel = new Channel(name, description, type);
         return save(channel);
     }
 
     @Override
     public Channel read(UUID id) {
-        return findOne(id);
+        Channel findChannel = findOne(id);
+        return Optional.ofNullable(findChannel)
+                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
     }
 
     @Override
@@ -110,41 +118,33 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannelName(UUID id, User user, String channelName) {
+    public Channel updateName(UUID id, String channelName) {
         Channel findChannel = findOne(id);
-        if (!findChannel.getChannelOwner().userCompare(user)) {
-            throw new IllegalStateException("채널 수정 권한이 없습니다.");
-        }
-        findChannel.setChannelName(channelName);
-        save(findChannel);
+        findChannel.setName(channelName);
+        update(findChannel);
         return findChannel;
     }
 
     @Override
-    public Channel joinChannel(UUID id, User user) {
+    public Channel updateDescription(UUID id, String description){
         Channel findChannel = findOne(id);
-        findChannel.setJoinedUsers(user);
-        save(findChannel);
+        findChannel.setDescription(description);
+        update(findChannel);
         return findChannel;
     }
 
     @Override
-    public UUID exitChannel(UUID id, User user) {
+    public Channel updateType(UUID id, ChannelType type){
         Channel findChannel = findOne(id);
-        findChannel.deleteJoinedUser(user);
-        user.deleteMyChannels(findChannel);
-        save(findChannel);
-        return findChannel.getId();
+        findChannel.setType(type);
+        update(findChannel);
+        return findChannel;
     }
 
     @Override
-    public UUID deleteChannel(UUID id, User user) {
+    public UUID deleteChannel(UUID id) {
         Channel findChannel = findOne(id);
-        if (!findChannel.getChannelOwner().userCompare(user)) {
-            throw new IllegalStateException("채널 삭제 권한이 없습니다.");
-        }
-        findChannel.getJoinedUsers().forEach(u -> u.deleteMyChannels(findChannel));
-        return  delete(id);
+        return delete(findChannel.getId());
     }
 
 }

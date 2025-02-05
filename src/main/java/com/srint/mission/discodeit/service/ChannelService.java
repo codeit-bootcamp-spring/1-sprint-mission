@@ -1,6 +1,7 @@
 package com.srint.mission.discodeit.service;
 
 import com.srint.mission.discodeit.entity.Channel;
+import com.srint.mission.discodeit.entity.ChannelType;
 import com.srint.mission.discodeit.entity.Message;
 import com.srint.mission.discodeit.entity.User;
 
@@ -15,17 +16,17 @@ public interface ChannelService {
     UUID save(Channel channel);
     Channel findOne(UUID id);
     List<Channel> findAll();
+    UUID update(Channel channel);
     UUID delete (UUID id);
 */
 
     //서비스 로직
-    UUID create(String channelName, User channelOwner);
+    UUID create(String name, String description, ChannelType type);
     Channel read(UUID id);
     List<Channel> readAll();
-    Channel updateChannelName(UUID id, User user, String channelName);
-
-    Channel joinChannel(UUID id, User user);
-
-    UUID exitChannel(UUID id, User user);
-    UUID deleteChannel(UUID id, User user);
+    Channel updateName(UUID id, String name);
+    Channel updateDescription(UUID id, String description);
+    Channel updateType(UUID id, ChannelType type);
+    UUID deleteChannel(UUID id);
 }
+
