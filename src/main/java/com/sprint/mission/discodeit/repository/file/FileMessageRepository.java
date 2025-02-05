@@ -8,8 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILEPATH = "tmp/message.ser";
-    private final FileManager<Message> fileManager =  new FileManager<>(FILEPATH);
+    private static final String FILE_PATH = "tmp/message.ser";
+    private final FileManager<Message> fileManager =  new FileManager<>(FILE_PATH);
 
     public Message save(Message message) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
@@ -24,7 +24,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     public List<Message> findAll() {
-        return loadMessageListToFile();
+        return fileManager.loadListToFile();
     }
 
     public void delete(UUID messageId) {
@@ -38,12 +38,8 @@ public class FileMessageRepository implements MessageRepository {
         fileManager.saveListToFile(saveMessageList);
     }
 
-    private List<Message> loadMessageListToFile() {
-        return fileManager.loadListToFile();
-    }
-
     private Map<UUID, Message> loadMessageMapToFile() {
-        List<Message> loadMessageList = loadMessageListToFile();
+        List<Message> loadMessageList = fileManager.loadListToFile();
         if (loadMessageList.isEmpty()) {
             return new HashMap<>();
         }

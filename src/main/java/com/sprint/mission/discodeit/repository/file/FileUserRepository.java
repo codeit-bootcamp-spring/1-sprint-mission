@@ -8,8 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILEPATH = "tmp/user.ser";
-    private final FileManager<User> fileManager =  new FileManager<>(FILEPATH);
+    private static final String FILE_PATH = "tmp/user.ser";
+    private final FileManager<User> fileManager =  new FileManager<>(FILE_PATH);
 
     @Override
     public User save(User user) {
@@ -27,7 +27,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return loadUserListToFile();
+        return fileManager.loadListToFile();
     }
 
     @Override
@@ -42,12 +42,8 @@ public class FileUserRepository implements UserRepository {
         fileManager.saveListToFile(saveUserList);
     }
 
-    private List<User> loadUserListToFile() {
-        return fileManager.loadListToFile();
-    }
-
     private Map<UUID, User> loadUserMapToFile() {
-        List<User> loadUserList = loadUserListToFile();
+        List<User> loadUserList = fileManager.loadListToFile();
         if (loadUserList.isEmpty()) {
             return new HashMap<>();
         }

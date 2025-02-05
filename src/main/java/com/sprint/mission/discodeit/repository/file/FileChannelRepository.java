@@ -8,8 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class FileChannelRepository implements ChannelRepository {
-    private static final String FILEPATH = "tmp/channel.ser";
-    private final FileManager<Channel> fileManager =  new FileManager<>(FILEPATH);
+    private static final String FILE_PATH = "tmp/channel.ser";
+    private final FileManager<Channel> fileManager =  new FileManager<>(FILE_PATH);
 
     @Override
     public Channel save(Channel channel) {
@@ -27,7 +27,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return loadChannelListToFile();
+        return fileManager.loadListToFile();
     }
 
     @Override
@@ -42,12 +42,8 @@ public class FileChannelRepository implements ChannelRepository {
         fileManager.saveListToFile(saveChannelList);
     }
 
-    private List<Channel> loadChannelListToFile() {
-        return fileManager.loadListToFile();
-    }
-
     private Map<UUID, Channel> loadChannelMapToFile() {
-        List<Channel> loadChannelList = loadChannelListToFile();
+        List<Channel> loadChannelList = fileManager.loadListToFile();
         if (loadChannelList.isEmpty()) {
             return new HashMap<>();
         }

@@ -7,15 +7,15 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileManager<T> {
-    private final Path filePath;
+    private final Path FILE_PATH;
 
     public FileManager(String filePathInRoot) {
-        filePath = Paths.get(System.getProperty("user.dir"), filePathInRoot);
+        FILE_PATH = Paths.get(System.getProperty("user.dir"), filePathInRoot);
     }
 
     public void saveListToFile(List<T> saveList) {
         try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile(),false);
+                FileOutputStream fos = new FileOutputStream(FILE_PATH.toFile(),false);
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             for (T object : saveList) {
@@ -28,11 +28,11 @@ public class FileManager<T> {
 
     public List<T> loadListToFile() {
         List<T> data = new ArrayList<>();
-        if(!Files.exists(filePath)) {
+        if(!Files.exists(FILE_PATH)) {
             return data;
         }
         try (
-                FileInputStream fis = new FileInputStream(filePath.toFile());
+                FileInputStream fis = new FileInputStream(FILE_PATH.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis);
         ) {
             while (true) {
