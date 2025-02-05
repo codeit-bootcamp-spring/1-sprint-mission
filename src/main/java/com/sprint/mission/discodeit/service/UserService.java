@@ -6,16 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-
     User createUser(String name, String email, String password);
-
     List<User> getAllUserList();
-
-    User searchById(UUID userId);
-
-    void updateUserName(UUID userId, String newName);
-
-    void updateUserEmail(UUID userId, String newEmail);
-
-    void deleteUser(UUID userId);
+    User searchById(UUID id);
+    void updateUser(UUID id, String newName, String newEmail, String newPassword);
+    void deleteUser(UUID id);
 }

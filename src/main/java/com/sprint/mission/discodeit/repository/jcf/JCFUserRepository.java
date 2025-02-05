@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
@@ -15,21 +16,21 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         data.put(user.getId(), user);
-        return user; // 그대로 리턴 괜찮나? 조회해서 해야하나?
+        return user;
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
-        return Optional.ofNullable(data.get(userId)); // data.get(userId)만 하면 안되나?
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return data.values().stream().toList();
+        return data.values().stream().collect(Collectors.toList());
     }
 
     @Override
-    public void delete(UUID userId) {
-        data.remove(userId);
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 }

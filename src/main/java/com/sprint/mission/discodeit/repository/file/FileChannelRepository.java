@@ -20,9 +20,9 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
+    public Optional<Channel> findById(UUID id) {
         Map<UUID, Channel> savedChannelMap = loadChannelMapToFile();
-        return Optional.ofNullable(savedChannelMap.get(channelId));
+        return Optional.ofNullable(savedChannelMap.get(id));
     }
 
     @Override
@@ -31,14 +31,14 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID channelId) {
+    public void deleteById(UUID id) {
         Map<UUID, Channel> savedChannelMap = loadChannelMapToFile();
-        savedChannelMap.remove(channelId);
+        savedChannelMap.remove(id);
         saveChannelMapToFile(savedChannelMap);
     }
 
     private void saveChannelMapToFile(Map<UUID, Channel> saveChannelMap) {
-        List<Channel> saveChannelList = saveChannelMap.values().stream().toList();
+        List<Channel> saveChannelList = saveChannelMap.values().stream().collect(Collectors.toList());
         fileManager.saveListToFile(saveChannelList);
     }
 

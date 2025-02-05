@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -10,7 +8,6 @@ import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.UUID;
 
 public class BasicChannelService implements ChannelService {
@@ -25,9 +22,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(ChannelType channelType, String title, String description) {
+    public Channel createChannel(Channel.ChannelType channelType, String title, String description) {
         if (channelValidator.isValidTitle(title)) {
-            Channel newChannel = new Channel(channelType, title, description);
+            Channel newChannel = Channel.createChannel(channelType, title, description);
             channelRepository.save(newChannel);
             System.out.println("create channel: " + newChannel.getTitle());
             return newChannel;
@@ -41,67 +38,24 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel searchById(UUID channelId) {
-        return channelRepository.findById(channelId)
+    public Channel searchById(UUID id) {
+        return channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Channel does not exist"));
     }
 
     @Override
-    public void updateTitle(UUID channelId, String title) {
-        Channel channel = searchById(channelId);
-        if (channelValidator.isValidTitle(title)) {
-            channel.updateTitle(title);
+    public void updateChannel(UUID id, String title, String description) {
+        Channel channel = searchById(id);
+        if (channelValidator.isValidTitle(title) && channelValidator.isValidTitle(description)) {
+            channel.update(title, description);
             channelRepository.save(channel);
-            System.out.println("success update");
-        }
-    }
-
-    @Override
-    public void updateDescription(UUID channelId, String description) {
-        Channel channel = searchById(channelId);
-        if (channelValidator.isValidTitle(description)) {
-            channel.updateDescription(description);
-            channelRepository.save(channel);
-            System.out.println("success update");
+            System.out.println("success updateUser");
         }
     }
 
     @Override
     public void deleteChannel(UUID channelId) {
-        channelRepository.delete(channelId);
-    }
-
-    @Override
-    public List<User> getAllMemberList(UUID channelId) {
-        Channel channel = searchById(channelId);
-        return channel.getMemberList();
-    }
-
-    @Override
-    public void addMember(UUID channelId, UUID userId) {
-        User user = userService.searchById(userId);
-        Channel channel = searchById(channelId);
-        if (channel.getMemberList().contains(user)) {
-            System.out.println("user's already a channel member");
-        } else {
-            channel.addMember(user);
-            user.addChannel(channel);
-            channelRepository.save(channel);
-        }
-    }
-
-    @Override
-    public void deleteMember(UUID channelId, UUID userId) {
-        User user = userService.searchById(userId);
-        Channel channel = searchById(channelId);
-        if (channel.getMemberList().contains(user)) {
-            channel.removeMember(user);
-            user.removeChannel(channel);
-            System.out.println("success delete");
-            channelRepository.save(channel);
-        } else {
-            System.out.println("member does not exist");
-        }
+        channelRepository.deleteById(channelId);
     }
 
 }

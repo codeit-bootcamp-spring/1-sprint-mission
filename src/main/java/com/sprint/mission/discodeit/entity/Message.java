@@ -12,9 +12,13 @@ public class Message implements Serializable {
     private Channel channel;
     private User writer;
 
-    public Message(Channel channel, User writer, String content) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
+    public static Message createMessage(Channel channel, User writer, String content) {
+        return new Message(channel, writer, content);
+    }
+
+    private Message(Channel channel, User writer, String content) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
         this.channel = channel;
         this.writer = writer;
         this.content = content;
@@ -44,14 +48,16 @@ public class Message implements Serializable {
         return content;
     }
 
-    // update
-    public void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
-    }
+    public void update(String newContent) {
+        boolean isChanged = false;
+        if (!newContent.equals(this.content)) {
+            this.content = newContent;
+            isChanged = true;
+        }
 
-    public void updateContent(String updateContent) {
-        this.content = updateContent;
-        updateUpdatedAt();
+        if (isChanged) {
+            updatedAt = System.currentTimeMillis();
+        }
     }
 
     @Override

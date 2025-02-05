@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
     @Override
     public User createUser(String name, String email, String password) {
         if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
-            User newUser = new User(name, email, password);
+            User newUser = User.createUser(name, email, password);
             userRepository.save(newUser);
             System.out.println("create user: " + newUser.getName());
             return newUser;
@@ -33,32 +33,23 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User searchById(UUID userId) {
-        return userRepository.findById(userId) // Optional 을 받아서 처리
+    public User searchById(UUID id) {
+        return userRepository.findById(id) // Optional 을 받아서 처리
                 .orElseThrow(() -> new NoSuchElementException("user does not exist"));
     }
 
     @Override
-    public void deleteUser(UUID userId) {
-        userRepository.delete(userId);
-    }
-
-    @Override
-    public void updateUserName(UUID userId, String newName) {
-        User user = searchById(userId);
-        if (userValidator.isValidName(newName)) {
-            user.updateName(newName);
+    public void updateUser(UUID id, String newName, String newEmail, String newPassword) {
+        User user = searchById(id);
+        if (userValidator.isValidName(newName) && userValidator.isValidEmail(newEmail)) {
+            user.update(newName, newEmail, newPassword);
             userRepository.save(user);
-            System.out.println("success update");
+            System.out.println("success updateUser");
         }
     }
 
     @Override
-    public void updateUserEmail(UUID userId, String newEmail) {
-        User user = searchById(userId);
-        if (userValidator.isValidEmail(newEmail)) {
-            searchById(userId).updateEmail(newEmail);
-            System.out.println("success update");
-        }
+    public void deleteUser(UUID id) {
+        userRepository.deleteById(id);
     }
 }

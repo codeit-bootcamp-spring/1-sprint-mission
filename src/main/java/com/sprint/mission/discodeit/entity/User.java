@@ -13,12 +13,14 @@ public class User implements Serializable {
     private String name;
     private String email;
     private transient String password;
-    private List<Channel> channelList;
 
-    public User(String name, String email, String password) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        channelList = new ArrayList<>();
+    public static User createUser(String name, String email, String password) {
+        return new User(name, email, password);
+    }
+
+    private User(String name, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
         this.name = name;
         this.email = email;
         this.password = password;
@@ -44,39 +46,28 @@ public class User implements Serializable {
         return updatedAt;
     }
 
-    public List<Channel> getChannelList() {
-        return channelList;
-    }
+    public void update(String newName, String newEmail, String newPassword) {
+        boolean isChanged = false;
+        if (!newName.equals(this.name)) {
+            this.name = newName;
+            isChanged = true;
+        }
+        if (!newEmail.equals(this.email)) {
+            this.email = newEmail;
+            isChanged = true;
+        }
+        if (!newPassword.equals(this.password)) {
+            this.password = newPassword;
+            isChanged = true;
+        }
 
-    private void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
-    }
-
-    public void updateName(String name) {
-        this.name = name;
-        updateUpdatedAt();
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
-        updateUpdatedAt();
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
-        updateUpdatedAt();
-    }
-
-    public void addChannel(Channel newChannel) {
-        channelList.add(newChannel);
-    }
-
-    public void removeChannel(Channel removeChannel) {
-        channelList.remove(removeChannel);
+        if (isChanged) {
+            updatedAt = System.currentTimeMillis();
+        }
     }
 
     @Override
     public String toString() {
-        return "User{id:" + id + ",name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
+        return "User{id:" + id + ",name:" + name + ",email:" + email + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
     }
 }

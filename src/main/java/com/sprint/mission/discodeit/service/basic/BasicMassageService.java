@@ -32,7 +32,7 @@ public class BasicMassageService implements MessageService {
         User user = userService.searchById(writerId);
 
         if (messageValidator.inValidContent(content)) {
-            Message newMessage = new Message(channel, user, content);
+            Message newMessage = Message.createMessage(channel, user, content);
             messageRepository.save(newMessage);
             System.out.println("create message: " + content);
             return newMessage;
@@ -46,23 +46,23 @@ public class BasicMassageService implements MessageService {
     }
 
     @Override
-    public Message searchById(UUID messageId) {
-        return messageRepository.findById(messageId)
+    public Message searchById(UUID id) {
+        return messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("message does not exist"));
     }
 
     @Override
-    public void updateMessage(UUID messageId, String content) {
-        Message message = searchById(messageId);
+    public void updateMessage(UUID id, String content) {
+        Message message = searchById(id);
         if (messageValidator.inValidContent(content)) {
-            message.updateContent(content);
+            message.update(content);
             messageRepository.save(message);
-            System.out.println("success update");
+            System.out.println("success updateChannel");
         }
     }
 
     @Override
-    public void deleteMessage(UUID messageId) {
-        messageRepository.delete(messageId);
+    public void deleteMessage(UUID id) {
+        messageRepository.deleteById(id);
     }
 }

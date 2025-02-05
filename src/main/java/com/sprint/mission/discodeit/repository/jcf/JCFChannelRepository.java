@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
@@ -19,17 +20,17 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(data.get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return data.values().stream().toList();
+        return data.values().stream().collect(Collectors.toList());
     }
 
     @Override
-    public void delete(UUID channelId) {
-        data.remove(channelId);
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 }

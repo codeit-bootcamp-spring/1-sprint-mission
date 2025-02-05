@@ -6,14 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-
     Message createMessage(String content, UUID channelId, UUID writerId);
-
     List<Message> getAllMessageList();
-
-    Message searchById(UUID messageId);
-
-    void updateMessage(UUID messageId, String content);
-
-    void deleteMessage(UUID messageId);
+    Message searchById(UUID id);
+    void updateMessage(UUID id, String content);
+    void deleteMessage(UUID id);
 }

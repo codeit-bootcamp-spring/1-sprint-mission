@@ -20,9 +20,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(UUID userId) {
+    public Optional<User> findById(UUID id) {
         Map<UUID, User> savedUserMap = loadUserMapToFile();
-        return Optional.ofNullable(savedUserMap.get(userId));
+        return Optional.ofNullable(savedUserMap.get(id));
     }
 
     @Override
@@ -31,14 +31,14 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void deleteById(UUID id) {
         Map<UUID, User> savedUserMap = loadUserMapToFile();
-        savedUserMap.remove(userId);
+        savedUserMap.remove(id);
         saveUserMapToFile(savedUserMap);
     }
 
     private void saveUserMapToFile(Map<UUID, User> saveUserMap) {
-        List<User> saveUserList = saveUserMap.values().stream().toList();
+        List<User> saveUserList = saveUserMap.values().stream().collect(Collectors.toList());
         fileManager.saveListToFile(saveUserList);
     }
 

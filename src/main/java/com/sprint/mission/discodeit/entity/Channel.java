@@ -13,17 +13,22 @@ public class Channel implements Serializable {
     private String title;
     private String description;
     private ChannelType channelType;
-    private List<Message> messageList;
-    private List<User> memberList;
 
-    public Channel(ChannelType channelType, String title, String description) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
+    public enum ChannelType {
+        PUBLIC,
+        PRIVATE
+    }
+
+    public static Channel createChannel(ChannelType channelType, String title, String description) {
+        return new Channel(channelType, title, description);
+    }
+
+    private Channel(ChannelType channelType, String title, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = System.currentTimeMillis();
         this.title = title;
         this.description = description;
         this.channelType = channelType;
-        messageList = new ArrayList<>();
-        memberList = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -46,44 +51,19 @@ public class Channel implements Serializable {
         return description;
     }
 
-    public List<Message> getMessageList() {
-        return messageList;
-    }
-
-    public List<User> getMemberList() {
-        return memberList;
-    }
-
-    public void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
-    }
-
-    public void updateTitle(String title) {
-        this.title = title;
-        updateUpdatedAt();
-    }
-
-    public void updateDescription(String description) {
-        this.description = description;
-        updateUpdatedAt();
-    }
-
-    public void addMember(User newMember) {
-        memberList.add(newMember);
-        updateUpdatedAt();
-    }
-
-    public void removeMember(User newMember) {
-        memberList.remove(newMember);
-        updateUpdatedAt();
-    }
-
-    public void addMessage(Message newMessage) {
-        messageList.add(newMessage);
-    }
-
-    public void removeMessage(Message removeMessage) {
-        messageList.remove(removeMessage);
+    public void update(String newTitle, String newDescription) {
+        boolean isChanged = false;
+        if (!newTitle.equals(this.title)) {
+            this.title = newTitle;
+            isChanged = true;
+        }
+        if (!newDescription.equals(this.description)) {
+            this.description = newDescription;
+            isChanged = true;
+        }
+        if (isChanged) {
+            updatedAt = System.currentTimeMillis();
+        }
     }
 
     @Override

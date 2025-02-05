@@ -18,23 +18,23 @@ public class FileMessageRepository implements MessageRepository {
         return message;
     }
 
-    public Optional<Message> findById(UUID messageId) {
+    public Optional<Message> findById(UUID id) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
-        return Optional.ofNullable(savedMessageList.get(messageId));
+        return Optional.ofNullable(savedMessageList.get(id));
     }
 
     public List<Message> findAll() {
         return fileManager.loadListToFile();
     }
 
-    public void delete(UUID messageId) {
+    public void deleteById(UUID messageId) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
         savedMessageList.remove(messageId);
         saveMessageMapToFile(savedMessageList);
     }
 
     private void saveMessageMapToFile(Map<UUID, Message> saveMessageMap) {
-        List<Message> saveMessageList = saveMessageMap.values().stream().toList();
+        List<Message> saveMessageList = saveMessageMap.values().stream().collect(Collectors.toList());
         fileManager.saveListToFile(saveMessageList);
     }
 
