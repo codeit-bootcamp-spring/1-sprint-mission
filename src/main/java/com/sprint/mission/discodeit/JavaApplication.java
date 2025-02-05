@@ -1,9 +1,10 @@
+/*
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.config.ApplicationConfig;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
@@ -358,3 +359,4 @@ public class JavaApplication {
     }
   }
 }
+*/

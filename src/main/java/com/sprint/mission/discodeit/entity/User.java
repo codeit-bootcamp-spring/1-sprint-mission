@@ -48,21 +48,15 @@ public class User implements Serializable {
     private String binaryContentId;
     private String description;
 
-    public UserBuilder(String username, String password, String email) throws UserValidationException {
+    public UserBuilder(String username, String password, String email, String phoneNumber) throws UserValidationException {
       this.username = username;
       this.password = password;
       this.email = email;
+      this.phoneNumber = phoneNumber;
     }
 
     public UserBuilder nickname(String nickname) throws UserValidationException {
-
       this.nickname = nickname;
-      return this;
-    }
-
-    public UserBuilder phoneNumber(String phoneNumber) {
-      //TODO : 핸드폰 번호 검증 로직
-      this.phoneNumber = phoneNumber;
       return this;
     }
 

@@ -1,11 +1,14 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.*;
 
 public class JCFUserService implements UserService {
@@ -14,6 +17,7 @@ public class JCFUserService implements UserService {
 
   // TODO : private 으로 변경
   private final Map<String, User> data = new HashMap<>();
+
 
   private JCFUserService() {
   }
@@ -31,21 +35,35 @@ public class JCFUserService implements UserService {
 
 
   @Override
-  public User createUser(User user) {
-    if (!checkEmailDuplicate(user)) throw new IllegalArgumentException("중복된 이메일 입니다.");
-    if (!checkPhoneNumberDuplicate(user)) throw new IllegalArgumentException("중복된 전화번호 입니다.");
-    user.setPassword(PasswordEncryptor.hashPassword(user.getPassword()));
+  public User createUser(CreateUserDto userDto) {
+    if (!checkEmailDuplicate(userDto.email())) throw new IllegalArgumentException("중복된 이메일 입니다.");
+    if (!checkPhoneNumberDuplicate(userDto.phoneNumber())) throw new IllegalArgumentException("중복된 전화번호 입니다.");
+
+    User user = new User.UserBuilder(
+        userDto.username(),
+        PasswordEncryptor.hashPassword(userDto.password()),
+        userDto.email(),
+        userDto.phoneNumber()
+    )
+        .nickname(userDto.nickname())
+        .binaryContentId(userDto.binaryContentId())
+        .description(userDto.description())
+        .build();
+
+
+
     data.put(user.getUUID(), user);
+
     return user;
   }
 
   @Override
-  public Optional<User> readUserById(String id) {
+  public UserResponseDto findUserById(String id) {
     return Optional.ofNullable(data.get(id));
   }
 
   @Override
-  public List<User> readAllUsers() {
+  public List<UserResponseDto> findAllUsers() {
     return Collections.unmodifiableList(new ArrayList<>(data.values()));
   }
 
@@ -62,10 +80,10 @@ public class JCFUserService implements UserService {
       updatedUser.getEmail().ifPresent(originalUser::setEmail);
       updatedUser.getNickname().ifPresent(originalUser::setNickname);
       updatedUser.getPhoneNumber().ifPresent(originalUser::setPhoneNumber);
-      updatedUser.getProfilePictureURL().ifPresent(originalUser::setProfilePictureURL);
+      updatedUser.getProfileBinaryContentId().ifPresent(originalUser::setBinaryContentId);
       updatedUser.getDescription().ifPresent(originalUser::setDescription);
 
-      originalUser.setUpdatedAt(System.currentTimeMillis());
+      originalUser.setUpdatedAt(Instant.now());
     }
     data.put(id, originalUser);
   }
@@ -80,18 +98,19 @@ public class JCFUserService implements UserService {
     }
   }
 
-  private boolean checkEmailDuplicate(User newUser) {
+  private boolean checkEmailDuplicate(String email) {
     for (User currentUser : data.values()) {
-      if (currentUser.getEmail().equals(newUser.getEmail())) return false;
+      if (currentUser.getEmail().equals(email)) return false;
     }
 
     return true;
   }
 
-  private boolean checkPhoneNumberDuplicate(User newUser) {
+  private boolean checkPhoneNumberDuplicate(String phoneNumber) {
     for (User currentUser : data.values()) {
-      if (currentUser.getPhoneNumber().equals(newUser.getPhoneNumber())) return false;
+      if (currentUser.getPhoneNumber().equals(phoneNumber)) return false;
     }
     return true;
   }
 }
+*/

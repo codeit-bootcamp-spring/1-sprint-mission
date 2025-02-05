@@ -11,5 +11,5 @@ public class ChannelConstant {
   public static final String NOT_CHAT_CHANNEL = "채팅 채널이 아닙니다.";
   public static final String CHANNEL_NOT_FOUND = "채널을 찾지 못했습니다.";
   public static final String CHANNEL_NOT_AVAILABLE_FOR_MESSAGE = "음성 채널은 메시지를 보낼 수 없습니다.";
-
+  public static final String PRIVATE_CHANNEL_CANNOT_BE_UPDATED = "private 채널은 수정할 수 없습니다.";
 }

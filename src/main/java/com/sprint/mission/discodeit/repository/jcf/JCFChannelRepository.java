@@ -1,19 +1,22 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.BaseChannel;
-import com.sprint.mission.discodeit.entity.ChatChannel;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
 
   private static volatile JCFChannelRepository instance;
 
 
-  private final Map<String, BaseChannel> data;
+  private final Map<String, Channel> data;
 
   private JCFChannelRepository() {
     this.data = new ConcurrentHashMap<>();
@@ -31,23 +34,23 @@ public class JCFChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public BaseChannel save(BaseChannel baseChannel) {
-    data.put(baseChannel.getUUID(), baseChannel);
-    return baseChannel;
+  public Channel save(Channel channel) {
+    data.put(channel.getUUID(), channel);
+    return channel;
   }
 
   @Override
-  public Optional<BaseChannel> findById(String id) {
+  public Optional<Channel> findById(String id) {
     return Optional.ofNullable(data.get(id));
   }
 
   @Override
-  public List<BaseChannel> findAll() {
+  public List<Channel> findAll() {
     return new ArrayList<>(data.values());
   }
 
   @Override
-  public BaseChannel update(BaseChannel channel) {
+  public Channel update(Channel channel) {
     data.put(channel.getUUID(), channel);
     return channel;
   }

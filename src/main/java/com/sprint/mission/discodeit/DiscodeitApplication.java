@@ -1,8 +1,7 @@
+/*
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.dto.MessageUpdateDto;
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
@@ -15,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import javax.swing.text.html.Option;
 import java.io.File;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -62,67 +62,70 @@ public class DiscodeitApplication {
   static void userSimulation() {
 
     System.out.println("=== 유저 생성 및 조회 ===");
-    User user = null;
-    User user2 = null;
+    CreateUserDto user = null;
+    CreateUserDto user2 = null;
 
     try {
-      user = new User.UserBuilder("user1", "examplePwd", "example@gmail.com")
-          .nickname("exampleNickname")
-          .phoneNumber("01012345678")
-          .profilePictureURL("https://example-url.com")
-          .description("this is example description")
-          .build();
+      user = new CreateUserDto(
+          "user1",
+          "examplePwd",
+          "example@gmail.com",
+          "exampleNickname",
+          "01012345678",
+          null,
+          null,
+          null,
+          "this is example description");
+
     } catch (UserValidationException e) {
       System.out.println(e.getMessage());
     }
 
     try {
-      user2 = new User.UserBuilder("user2", "examplePwd2", "example2@gmail.com")
-          .nickname("exampleNick2")
-          .phoneNumber("01013345678")
-          .description("this is example description2")
-          .build();
+      user2 = new CreateUserDto(
+          "user2",
+          "examplePwd2",
+          "example2@gmail.com",
+          "exampleNick2",
+          "01013345678",
+          null,
+          null,
+          null,
+          "this is example description2"
+      );
     } catch (UserValidationException e) {
       System.out.println(e.getMessage());
     }
 
-    userService.createUser(user);
-    userService.createUser(user2);
+    User createdUser = userService.createUser(user);
+    User createdUser2 = userService.createUser(user2);
 
     // 유저 조회
-    String userId = user.getUUID();
-    User fetchedUser = userService.readUserById(userId).get();
+    String userId = createdUser.getUUID();
+    UserResponseDto fetchedUser = userService.findUserById(userId);
 
     System.out.println(fetchedUser);
 
     // 여러 유저 조회
-    List<User> users = userService.readAllUsers();
+    List<UserResponseDto> users = userService.findAllUsers();
 
     System.out.println("\n=== 여러 유저 조회 ===");
 
-    for (User u : users) {
+    for (UserResponseDto u : users) {
       System.out.println(u);
     }
 
     // 유저 정보 업데이트
     System.out.println("\n=== 유저 정보 업데이트 및 기존 유저와 동등성 ===");
-    UserUpdateDto updateDto = new UserUpdateDto(
-        Optional.of("changedUsername"),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty()
-    );
+    UserUpdateDto updateDto = new UserUpdateDto("updated", null,null,null,null,null,null,null,null);
 
     userService.updateUser(userId, updateDto, "examplePwd");
 
     // 업데이트 유저 출력
 
-    User updatedUser = userService.readUserById(userId).get();
+    User updatedUser = userService.findUserById(userId).get();
 
-    System.out.println("USERs : " + userService.readAllUsers().size());
+    System.out.println("USERs : " + userService.findAllUsers().size());
     System.out.println(fetchedUser);
 
     System.out.println(fetchedUser == updatedUser);
@@ -149,8 +152,8 @@ public class DiscodeitApplication {
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
     }
-    System.out.println("USERs : " + userService.readAllUsers().size());
-    System.out.println(userService.readUserById(userId).isEmpty());
+    System.out.println("USERs : " + userService.findAllUsers().size());
+    System.out.println(userService.findUserById(userId).isEmpty());
   }
 
   static void channelSimulation2() {
@@ -219,20 +222,25 @@ public class DiscodeitApplication {
 
     System.out.println("\n=== 메시지를 보낼 유저와 채널 생성 ===");
 
-    User user = null;
+    CreateUserDto user = null;
 
     try {
-      user = new User.UserBuilder("exampleUsername2", "examplePwd2", "exaample2@gmail.com")
-          .nickname("exampleNickname2")
-          .phoneNumber("01011345678")
-          .profilePictureURL("https://example-url.com2")
-          .description("this is example description2")
-          .build();
+      user = new CreateUserDto(
+          "user3",
+          "examplePwd3",
+          "example3@gmail.com",
+          "exampleNick3",
+          "01013345678",
+          null,
+          null,
+          null,
+          "this is example description3"
+      );
     } catch (UserValidationException e) {
       System.out.println(e.getMessage());
     }
 
-    userService.createUser(user);
+    User createdUser = userService.createUser(user);
 
     ChatChannel chatChannel = null;
     try {
@@ -266,7 +274,7 @@ public class DiscodeitApplication {
 
     try {
       message = new Message.MessageBuilder(
-          user.getUUID(),
+          createdUser.getUUID(),
           chatChannel.getUUID(),
           "this is first Chat"
       ).build();
@@ -276,9 +284,9 @@ public class DiscodeitApplication {
 
 
     try {
-      messageServiceV2.createMessage(user.getUUID(), message, chatChannel);
-      messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
-          user.getUUID(),
+      messageServiceV2.createMessage(createdUser.getUUID(), message, chatChannel);
+      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
+          createdUser.getUUID(),
           chatChannel.getUUID(),
           "this is second Chat"
       ).build(), chatChannel);
@@ -287,8 +295,8 @@ public class DiscodeitApplication {
     }
 
     try {
-      messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
-          user.getUUID(),
+      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
+          createdUser.getUUID(),
           chatChannel.getUUID(),
           "this is third Chat"
       ).build(), chatChannel);
@@ -297,8 +305,8 @@ public class DiscodeitApplication {
     }
 
     try {
-      messageServiceV2.createMessage(user.getUUID(), new Message.MessageBuilder(
-          user.getUUID(),
+      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
+          createdUser.getUUID(),
           chatChannel2.getUUID(),
           "this is second channel first Chat"
       ).build(), chatChannel2);
@@ -340,3 +348,4 @@ public class DiscodeitApplication {
     }
   }
 }
+*/

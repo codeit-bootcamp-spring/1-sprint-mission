@@ -35,7 +35,7 @@ public class Message implements Serializable {
   private Boolean isEdited;
   private Instant createdAt;
   private Instant updatedAt;
-  private String binaryContentId;
+  private String binaryContentId; // TODO: 삭제
   private String threadUUID;
 
   private Message(MessageBuilder builder) {

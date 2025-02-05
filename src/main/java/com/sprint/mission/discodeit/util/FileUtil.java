@@ -7,8 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileUtil {
+  static class AppendingObjectOutputStream extends ObjectOutputStream {
+
+    public AppendingObjectOutputStream(OutputStream out) throws IOException {
+      super(out);
+    }
+
+    @Override
+    protected void writeStreamHeader() throws IOException{
+
+    }
+  }
 
   public static <T> List<T> loadAllFromFile(String filePath, Class<T> clazz) {
+
     List<T> dataList = new ArrayList<>();
     File file = new File(filePath);
 
@@ -49,6 +61,22 @@ public class FileUtil {
       }
 
     } catch (IOException e) {
+      throw new FileException();
+    }
+  }
+
+  public static <T> void appendToFile(String filePath, List<T> data){
+
+    File file = new File(filePath);
+    boolean fileExists = file.exists() && file.length() > 0;
+    try(FileOutputStream fos = new FileOutputStream(filePath, true);
+    ObjectOutputStream oos = fileExists ? new AppendingObjectOutputStream(fos) : new ObjectOutputStream(fos)){
+
+      for(T obj : data){
+        oos.writeObject(obj);
+      }
+
+    }catch(IOException e){
       throw new FileException();
     }
   }

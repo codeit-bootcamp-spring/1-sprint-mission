@@ -11,7 +11,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.FileConstant.CHANNEL_FILE;
 import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
 @Repository

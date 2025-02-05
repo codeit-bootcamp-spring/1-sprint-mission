@@ -3,13 +3,17 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.exception.RequiredFieldEmptyException;
 import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
+@Getter
 public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
   private final String UUID;
+  private final String channelId;
   private final String userId;
   private final String messageId;
   private final String fileName;
@@ -22,6 +26,7 @@ public class BinaryContent implements Serializable {
     this.UUID = UuidGenerator.generateUUID();
     this.userId = builder.userId;
     this.messageId = builder.messageId;
+    this.channelId = builder.channelId;
     this.fileName = builder.fileName;
     this.fileType = builder.fileType;
     this.fileSize = builder.fileSize;
@@ -31,6 +36,7 @@ public class BinaryContent implements Serializable {
   public static class BinaryContentBuilder {
     private final String userId;
     private String messageId;
+    private String channelId;
     private final String fileName;
     private final FileType fileType;
     private final long fileSize;
@@ -49,8 +55,26 @@ public class BinaryContent implements Serializable {
       return this;
     }
 
+    public BinaryContentBuilder channelId(String channelId){
+      this.channelId = channelId;
+      return this;
+    }
+
     public BinaryContent build() {
       return new BinaryContent(this);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BinaryContent content = (BinaryContent) o;
+    return Objects.equals(UUID, content.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

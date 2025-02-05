@@ -1,10 +1,10 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.BaseChannel;
-import com.sprint.mission.discodeit.entity.ChatChannel;
+import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.VoiceChannel;
 import com.sprint.mission.discodeit.exception.ChannelValidationException;
 import com.sprint.mission.discodeit.exception.FileException;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -45,7 +45,7 @@ public class FileChannelService implements ChannelService {
   }
 
   @Override
-  public BaseChannel createChannel(BaseChannel channel) {
+  public Channel createChannel(Channel channel) {
     if (!checkIfChannelNameIsEmpty(channel.getChannelName())) {
       throw new ChannelValidationException();
     }
@@ -59,29 +59,29 @@ public class FileChannelService implements ChannelService {
   }
 
   @Override
-  public Optional<BaseChannel> getChannelById(String channelId){
-    List<BaseChannel> channels = loadAllChannel();
-    for(BaseChannel bc : channels){
+  public FindChannelResponseDto getChannelById(String channelId){
+    List<Channel> channels = loadAllChannel();
+    for(Channel bc : channels){
       if(bc.getUUID().equals(channelId)) return Optional.of(bc);
     }
     return Optional.empty();
   }
 
   @Override
-  public List<BaseChannel> getAllChannels() {
+  public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
     return loadAllChannel();
   }
 
   @Override
-  public List<BaseChannel> getChannelsByCategory(String categoryId) {
+  public List<Channel> getChannelsByCategory(String categoryId) {
     return null;
   }
 
   @Override
-  public void updateChannel(String channelId, ChannelUpdateDto updatedChannel) {
-    List<BaseChannel> channels = loadAllChannel();
+  public void updateChannel(ChannelUpdateDto updatedChannel) {
+    List<Channel> channels = loadAllChannel();
 
-    BaseChannel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
+    Channel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
 
     synchronized (channel) {
       updatedChannel.getChannelName().ifPresent(channel::setChannelName);
@@ -94,25 +94,25 @@ public class FileChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(String channelId) {
-    List<BaseChannel> channels = loadAllChannel();
-    BaseChannel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
+    List<Channel> channels = loadAllChannel();
+    Channel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
 
     channels.remove(channel);
     saveChannelToFile(channels);
   }
 
   @Override
-  public String generateInviteCode(BaseChannel channel) {
+  public String generateInviteCode(Channel channel) {
     return null;
   }
 
   @Override
-  public void setPrivate(BaseChannel channel) {
+  public void setPrivate(Channel channel) {
 
   }
 
   @Override
-  public void setPublic(BaseChannel channel) {
+  public void setPublic(Channel channel) {
 
   }
 
@@ -120,22 +120,22 @@ public class FileChannelService implements ChannelService {
     return !channelName.isEmpty();
   }
 
-  private boolean checkIfUserIsOwner(BaseChannel channel, User user) {
+  private boolean checkIfUserIsOwner(Channel channel, User user) {
     return true;
   }
 
-  private void saveChannelToFile(BaseChannel channel) throws FileException {
-    List<BaseChannel> channels = loadAllChannel();
+  private void saveChannelToFile(Channel channel) throws FileException {
+    List<Channel> channels = loadAllChannel();
     channels.add(channel);
     saveChannelToFile(channels);
   }
 
-  private void saveChannelToFile(List<BaseChannel> channels) {
+  private void saveChannelToFile(List<Channel> channels) {
     try (
         FileOutputStream fos = new FileOutputStream(CHANNEL_FILE);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
     ) {
-      for (BaseChannel channel : channels) {
+      for (Channel channel : channels) {
         oos.writeObject(channel);
       }
     } catch (IOException e) {
@@ -143,16 +143,16 @@ public class FileChannelService implements ChannelService {
     }
   }
 
-  private List<BaseChannel> loadAllChannel(){
-    List<BaseChannel> channelList = new ArrayList<>();
+  private List<Channel> loadAllChannel(){
+    List<Channel> channelList = new ArrayList<>();
     try (
         FileInputStream fos = new FileInputStream(CHANNEL_FILE);
         ObjectInputStream ois = new ObjectInputStream(fos)
     ) {
       while (true) {
         try {
-          BaseChannel baseChannel = (BaseChannel) ois.readObject();
-          channelList.add(baseChannel);
+          Channel channel = (Channel) ois.readObject();
+          channelList.add(channel);
         } catch (EOFException e) {
           break;
         } catch (ClassNotFoundException e) {
@@ -165,3 +165,4 @@ public class FileChannelService implements ChannelService {
     return channelList;
   }
 }
+*/

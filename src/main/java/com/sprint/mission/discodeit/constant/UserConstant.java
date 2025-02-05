@@ -16,4 +16,5 @@ public class UserConstant {
   public static final String PASSWORD_MATCH_ERROR = "비밀번호가 일치하지 않습니다.";
   public static final String DUPLICATE_EMAIL = "중복된 이메일 입니다.";
   public static final String DUPLICATE_PHONE = "중복된 번호입니다.";
+  public static final String DUPLICATE_NICKNAME = "중복된 nickname 입니다.";
 }

@@ -1,7 +1,9 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.BaseChannel;
+import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
@@ -10,7 +12,7 @@ import java.util.*;
 public class JCFChannelService implements ChannelService {
 
   private static volatile JCFChannelService channelRepository;
-  private final Map<String, BaseChannel> data;
+  private final Map<String, Channel> data;
 
   private JCFChannelService() {
     data = new HashMap<>();
@@ -28,7 +30,7 @@ public class JCFChannelService implements ChannelService {
   }
 
   @Override
-  public BaseChannel createChannel(BaseChannel channel) {
+  public Channel createChannel(Channel channel) {
     if (!checkIfChannelNameIsEmpty(channel.getChannelName())) {
       throw new IllegalArgumentException("채널명은 비어있을 수 없습니다.");
     }
@@ -37,23 +39,23 @@ public class JCFChannelService implements ChannelService {
   }
 
   @Override
-  public Optional<BaseChannel> getChannelById(String channelId) {
+  public FindChannelResponseDto getChannelById(String channelId) {
     return Optional.ofNullable(data.get(channelId));
   }
 
   @Override
-  public List<BaseChannel> getAllChannels() {
+  public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
     return Collections.unmodifiableList(new ArrayList<>(data.values()));
   }
 
   @Override
-  public List<BaseChannel> getChannelsByCategory(String categoryId) {
+  public List<Channel> getChannelsByCategory(String categoryId) {
     return null;
   }
 
   @Override
-  public void updateChannel(String channelId, ChannelUpdateDto updatedChannel) {
-    BaseChannel channel = data.get(channelId);
+  public void updateChannel(ChannelUpdateDto updatedChannel) {
+    Channel channel = data.get(channelId);
     //TODO: user 권한 확인
     //TODO: channel 존재하지 않을때
 
@@ -72,17 +74,17 @@ public class JCFChannelService implements ChannelService {
   }
 
   @Override
-  public String generateInviteCode(BaseChannel channel) {
+  public String generateInviteCode(Channel channel) {
     return null;
   }
 
   @Override
-  public void setPrivate(BaseChannel channel) {
+  public void setPrivate(Channel channel) {
 
   }
 
   @Override
-  public void setPublic(BaseChannel channel) {
+  public void setPublic(Channel channel) {
 
   }
 
@@ -90,7 +92,8 @@ public class JCFChannelService implements ChannelService {
     return !channelName.isEmpty();
   }
 
-  private boolean checkIfUserIsOwner(BaseChannel channel, User user) {
+  private boolean checkIfUserIsOwner(Channel channel, User user) {
     return true;
   }
 }
+*/

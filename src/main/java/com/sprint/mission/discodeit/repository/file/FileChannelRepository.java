@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.BaseChannel;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
@@ -34,28 +34,28 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public BaseChannel save(BaseChannel baseChannel) {
-    List<BaseChannel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, BaseChannel.class);
-    channels.add(baseChannel);
+  public Channel save(Channel channel) {
+    List<Channel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
+    channels.add(channel);
     FileUtil.saveAllToFile(CHANNEL_FILE, channels);
-    return baseChannel;
+    return channel;
   }
 
   @Override
-  public Optional<BaseChannel> findById(String id) {
-    List<BaseChannel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, BaseChannel.class);
+  public Optional<Channel> findById(String id) {
+    List<Channel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
     return channels.stream().filter(c -> c.getUUID().equals(id)).findAny();
   }
 
   @Override
-  public List<BaseChannel> findAll() {
-    return FileUtil.loadAllFromFile(CHANNEL_FILE, BaseChannel.class);
+  public List<Channel> findAll() {
+    return FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
   }
 
   @Override
-  public BaseChannel update(BaseChannel channel) {
-    List<BaseChannel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, BaseChannel.class);
-    BaseChannel targetChannel = channels.stream()
+  public Channel update(Channel channel) {
+    List<Channel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
+    Channel targetChannel = channels.stream()
         .filter(c -> c.getUUID().equals(channel.getUUID()))
         .findAny()
         .orElseThrow(() -> new ChannelNotFoundException());
@@ -67,8 +67,8 @@ public class FileChannelRepository implements ChannelRepository {
 
   @Override
   public void delete(String id) {
-    List<BaseChannel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, BaseChannel.class);
-    BaseChannel targetChannel = channels.stream()
+    List<Channel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
+    Channel targetChannel = channels.stream()
         .filter(c -> c.getUUID().equals(id))
         .findAny()
         .orElseThrow(() -> new ChannelNotFoundException());

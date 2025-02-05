@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,6 +60,14 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
+  public Message findLatestChannelMessage(String channelId) {
+    List<Message> messages = FileUtil.loadAllFromFile(MESSAGE_FILE, Message.class);
+    return messages.stream().filter(m -> m.getChannelUUID().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt))
+        .orElse(null);
+  }
+
+  @Override
   public Message update(Message message) {
     List<Message> messages = FileUtil.loadAllFromFile(MESSAGE_FILE, Message.class);
     Message targetMessage = messages.stream()
@@ -80,6 +89,13 @@ public class FileMessageRepository implements MessageRepository {
         .orElseThrow(() -> new MessageNotFoundException());
     messages.remove(targetMessage);
 
+    FileUtil.saveAllToFile(MESSAGE_FILE, messages);
+  }
+
+  @Override
+  public void deleteByChannel(String channelId) {
+    List<Message> messages = FileUtil.loadAllFromFile(MESSAGE_FILE, Message.class);
+    messages.removeIf(message->message.getChannelUUID().equals(channelId));
     FileUtil.saveAllToFile(MESSAGE_FILE, messages);
   }
 
