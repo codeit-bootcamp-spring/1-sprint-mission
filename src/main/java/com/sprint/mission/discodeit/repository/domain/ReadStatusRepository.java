@@ -11,11 +11,11 @@ import java.util.UUID;
 @Repository
 public interface ReadStatusRepository {
     void save(ReadStatus readStatus);
-    ReadStatus getReadStatusById(UUID id);
-    List<ReadStatus> getAllReadStatus();
-    List<ReadStatus> getReadStatusByUserId(UUID userId); //하나의 유저는 다수의 채널 정보 검색 가능
-    void deleteReadStatusById(UUID id);
-    void deleteReadStatusByUserId(UUID userId); //유저 아이디를 통한 채널 정보 통합 삭제
-    void updateReadStatus(UUID id, Instant now); //유저가 채널에 방문했을 떄 방문한 시각 업데이트
+    ReadStatus findById(UUID id);
+    List<ReadStatus> findAll();
+    List<ReadStatus> findAllByUserId(UUID userId); //하나의 유저는 다수의 채널 정보 검색 가능
+    void delete(UUID id);
+    void deleteByUserId(UUID userId); //유저 아이디를 통한 채널 정보 통합 삭제
+    void update(UUID id, Instant now); //유저가 채널에 방문했을 떄 방문한 시각 업데이트
 
 }

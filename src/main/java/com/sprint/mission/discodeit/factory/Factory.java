@@ -26,7 +26,7 @@ public class Factory {
         }
         if(name.equals("file")){
             this.fileUserService = FileUserService.getInstance();
-            this.fileChannelService = FileChannelService.getInstance();
+            this.fileChannelService = FileChannelService.getInstance(null);
             this.fileMessageService = com.sprint.mission.discodeit.service.file.FileMessageService.getInstance();
             this.fileUserService.setFileMessageService(fileMessageService);
             this.fileChannelService.setFileMessageService(fileMessageService);

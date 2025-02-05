@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.domain.ReadStatus;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -37,12 +40,20 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID save(String channelName) {
-        Channel channel = new Channel(channelName);
-        list.put(channel.getId(), channel);
-        messages.put(channel.getId(), new ArrayList<>());
-        return channel.getId();
-    }
+    public Channel save(String channelName, ChannelType type) {
+        Channel newChannel = new Channel(channelName, type);
+        list.put(newChannel.getId(), newChannel);
+        messages.put(newChannel.getId(), new ArrayList<>());
+        return newChannel;
+    }//Public
+
+    @Override
+    public Channel save(ChannelType type) {
+        Channel newChannel = new Channel(type);
+        list.put(newChannel.getId(), newChannel);
+        messages.put(newChannel.getId(), new ArrayList<>());
+        return newChannel;
+    }//Private
 
     @Override
     public Channel findById(UUID id) {
@@ -72,4 +83,5 @@ public class JCFChannelRepository implements ChannelRepository {
         channel.update(channelName);
         list.replace(id, channel);
     }
+
 }

@@ -1,7 +1,9 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.factory.FileServiceFactory;
@@ -36,11 +38,12 @@ public class FileServicesTestMain {
         UUID user3 = userDto3.id();
         UUID user4 = userDto4.id();
 
-        UUID channel1 = channelService.createChannel("SBS");
-        UUID channel2 = channelService.createChannel("KBS");
-        UUID channel3 = channelService.createChannel("MBC");
-
-
+        ChannelDto channelDto1 = channelService.createPublicChannel(new ChannelDto("SBS", ChannelType.PUBLIC));
+        ChannelDto channelDto2 = channelService.createPublicChannel(new ChannelDto("KBS", ChannelType.PUBLIC));
+        ChannelDto channelDto3 = channelService.createPublicChannel(new ChannelDto("MBC", ChannelType.PUBLIC));
+        UUID channel1 = channelDto1.id();
+        UUID channel2 = channelDto2.id();
+        UUID channel3 = channelDto3.id();
 
         System.out.println("====================================================");
         System.out.println("유저 단건 조회");
@@ -56,8 +59,6 @@ public class FileServicesTestMain {
         userService.updateUser(new UserDto(user1,"YangPassword", "Park", "Park@daum.net"));
         System.out.println(userService.getUser(user1));
         System.out.println("====================================================");
-        //userService.fetchMap();
-        //System.out.println("fetchMap 실행");
         System.out.println("유저 목록 출력");
         users = userService.getUsers();
         for (UserDto user : users) {
@@ -86,6 +87,7 @@ public class FileServicesTestMain {
         System.out.println("====================================================");
         System.out.println("채널 메시지 등록");
 
+        System.out.println(channelDto1);
         UUID message1 = channelService.addMessage_By_Channel(channel1, user4, "hello");
         System.out.println(message1 + " 등록완료");
         UUID message2 = channelService.addMessage_By_Channel(channel1, user3, "world");

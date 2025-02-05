@@ -1,9 +1,14 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.domain.ReadStatus;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.domain.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.Setter;
 
 import java.io.*;
 import java.util.*;
@@ -12,27 +17,27 @@ import java.util.stream.Collectors;
 public class FileChannelService implements ChannelService {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\channel.ser";
     private final Map<UUID, List<UUID>> messages = new HashMap<>(); //채널에서 보유 중인 메시지들 ( 변경 가능성 없음 )
+    @Setter
     private FileMessageService fileMessageService;
     private static volatile FileChannelService instance;
     private final FileChannelRepository fileChannelRepository;
+    private final ReadStatusRepository readStatusRepository;
 
-    private FileChannelService() {
+
+    private FileChannelService(ReadStatusRepository readStatusRepository) {
+        this.readStatusRepository = readStatusRepository;
         this.fileChannelRepository = new FileChannelRepository();
     }// Repository 한 번만 생성
 
-    public static FileChannelService getInstance() {
+    public static FileChannelService getInstance(ReadStatusRepository readStatusRepository) {
         if (instance == null) {
             synchronized (FileUserService.class) {
                 if (instance == null) {
-                    instance = new FileChannelService();
+                    instance = new FileChannelService(readStatusRepository);
                 }
             }
         }
         return instance;
-    }
-
-    public void setFileMessageService(FileMessageService fileMessageService) {
-        this.fileMessageService = fileMessageService;
     }
 
     public UUID addMessage_By_Channel(UUID channelId, UUID sender, String content) {
@@ -68,11 +73,16 @@ public class FileChannelService implements ChannelService {
         return new ArrayList<>(collect);
     }
 
-    //public FileChannelService(Map<UUID, Channel> list) {this.list = list;}
+    @Override
+    public ChannelDto createPrivateChannel(ChannelDto dto, List<UUID> userList) {
+        Channel savedChannel = fileChannelRepository.save(dto.type());
+        userList.forEach(userId -> readStatusRepository.save(new ReadStatus(userId, savedChannel.getId())));
+        return new ChannelDto(savedChannel);
+    }
 
     @Override
-    public UUID createChannel(String channelName) {
-        UUID id = fileChannelRepository.save(channelName);
+    public ChannelDto createPublicChannel(ChannelDto dto) {
+        Channel savedChannel = fileChannelRepository.save(dto.name(), dto.type());
 
         //Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
         /*if (channelMap.values().stream().anyMatch(channel -> channel.getChannelName().equals(channelName))) {
@@ -84,12 +94,12 @@ public class FileChannelService implements ChannelService {
         //System.out.println("채널 생성 중");
         //Channel channel = new Channel(channelName);
         //channelMap.put(channel.getChannelId(), channel);
-        if(!messages.containsKey(id)) {
-            messages.put(id, new ArrayList<>());
+        if(!messages.containsKey(savedChannel.getId())) {
+            messages.put(savedChannel.getId(), new ArrayList<>());
         }
         //saveToSer(FILE_NAME, channelMap);
 
-        return id;
+        return new ChannelDto(savedChannel);
     }
 
     @Override

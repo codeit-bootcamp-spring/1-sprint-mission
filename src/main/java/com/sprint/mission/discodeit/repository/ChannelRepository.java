@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.domain.ReadStatus;
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    UUID save(String channelName);
+    Channel save(String channelName, ChannelType type);
+    Channel save(ChannelType type);
     Channel findById(UUID id);
     List<Channel> findAll();
     boolean delete(UUID channelId);

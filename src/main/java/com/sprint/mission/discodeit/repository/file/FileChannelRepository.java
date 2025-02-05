@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\channel.ser";
@@ -37,25 +40,34 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public UUID save(String channelName) {
+    public Channel save(String channelName, ChannelType type) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        if (channelMap.values().stream().anyMatch(channel -> channel.getId().equals(channelName))) {
+        if (channelMap.values().stream().anyMatch(channel -> channel.getName().equals(channelName))) {
             System.out.println("이미 존재하는 채널입니다.");
-            Channel channel = channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getId().equals(channelName)).findFirst().get());
-            return channel.getId(); //존재하는 채널 UUID 반환
+            return channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getName().equals(channelName)).findFirst().get()); //존재하는 채널 UUID 반환
         }
         System.out.println("채널 생성 중");
-        Channel channel = new Channel(channelName);
+        Channel channel = new Channel(channelName, type);
         channelMap.put(channel.getId(), channel);
         saveToSer(FILE_NAME, channelMap);
 
-        return channel.getId();
-    }
+        return channel;
+    }//public
+
+    @Override
+    public Channel save(ChannelType type) {
+        Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
+        System.out.println("채널 생성 중");
+        Channel channel = new Channel(type);
+        channelMap.put(channel.getId(), channel);
+        saveToSer(FILE_NAME, channelMap);
+        return channel;
+    }//private
 
     @Override
     public Channel findById(UUID id) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        if(!channelMap.containsKey(id)){
+        if (!channelMap.containsKey(id)) {
             return null;
         }
         return channelMap.get(id);
@@ -93,7 +105,7 @@ public class FileChannelRepository implements ChannelRepository {
             System.out.println("이미 존재하는 채널입니다.");
             return;
         }*/
-        if(channelMap.containsKey(id)){
+        if (channelMap.containsKey(id)) {
             System.out.println("채널 수정 중");
             Channel channel = findById(id);
             channelMap.remove(channel.getId());
@@ -101,10 +113,11 @@ public class FileChannelRepository implements ChannelRepository {
             channelMap.put(channel.getId(), channel);
             saveToSer(FILE_NAME, channelMap);
 
-        }else {
+        } else {
             System.out.println("채널을 찾을 수 없습니다.");
         }
         //리턴해서 출력하는 방안 고려
     }
+
 
 }

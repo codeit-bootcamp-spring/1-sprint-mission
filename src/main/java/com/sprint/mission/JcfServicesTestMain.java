@@ -1,6 +1,8 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.factory.Factory;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -34,9 +36,13 @@ public class JcfServicesTestMain {
         UUID user3 = userDto3.id();
         UUID user4 = userDto4.id();
 
-        UUID channel1 = channelService.createChannel("SBS");
-        UUID channel2 = channelService.createChannel("KBS");
-        UUID channel3 = channelService.createChannel("MBC");
+        ChannelDto channelDto1 = channelService.createPublicChannel(new ChannelDto("SBS", ChannelType.PUBLIC));
+        ChannelDto channelDto2 = channelService.createPublicChannel(new ChannelDto("KBS", ChannelType.PUBLIC));
+        ChannelDto channelDto3 = channelService.createPublicChannel(new ChannelDto("MBC", ChannelType.PUBLIC));
+        UUID channel1 = channelDto1.id();
+        UUID channel2 = channelDto2.id();
+        UUID channel3 = channelDto3.id();
+
         System.out.println("====================================================");
         System.out.println("유저 단건 조회");
         System.out.println(userService.getUser(user1));

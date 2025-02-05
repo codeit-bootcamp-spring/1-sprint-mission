@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.domain.ReadStatus;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,13 +18,22 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
     private String name;
+    private final ChannelType type;
 
-    public Channel(String name) {
+    public Channel(String name, ChannelType type) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         this.name = name;
-    }
+        this.type = type;
+    }//for public type
+    public Channel(ChannelType type) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.name = null;
+        this.type = type;
+    }//for private type
 
     public Instant setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;

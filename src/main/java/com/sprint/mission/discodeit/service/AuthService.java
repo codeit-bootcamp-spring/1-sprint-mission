@@ -13,7 +13,7 @@ import java.util.List;
 public class AuthService {
     UserRepository repository;
 
-    public UserDto authenticate(String username, String password) {
+    public UserDto login(String username, String password) {
         List<User> users = repository.findAll();
         for (User user : users) {
             if(user.getUserName().equals(username) && user.getPassword().equals(password)) {

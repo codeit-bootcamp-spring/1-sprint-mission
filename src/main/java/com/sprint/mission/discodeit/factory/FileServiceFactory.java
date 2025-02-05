@@ -15,7 +15,7 @@ public class FileServiceFactory implements ServiceFactory {
     public FileServiceFactory() {
         super();
         fileUserService = FileUserService.getInstance();
-        fileChannelService = FileChannelService.getInstance();
+        fileChannelService = FileChannelService.getInstance(null);
         fileMessageService = FileMessageService.getInstance();
         fileUserService.setFileMessageService(fileMessageService);
         fileChannelService.setFileMessageService(fileMessageService);

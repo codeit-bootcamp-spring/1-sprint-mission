@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -51,9 +53,13 @@ public class JcfChannelService implements ChannelService {
     }
 
     @Override
-    public UUID createChannel(String channelName) {
+    public ChannelDto createPrivateChannel(ChannelDto dto, List<UUID> userList) {
+        return new ChannelDto(jcfChannelRepository.save(dto.type()));
+    }
 
-        return jcfChannelRepository.save(channelName);
+    @Override
+    public ChannelDto createPublicChannel(ChannelDto dto) {
+        return new ChannelDto(jcfChannelRepository.save(dto.name(), dto.type()));
     }
 
     @Override
