@@ -31,6 +31,13 @@ public class BasicUserService implements UserService {
         return userRepository.save(newUser);
     }
 
+    public User create(String nickname, String email, String password, BinaryContent profileImage) {
+        User user = create(nickname, email, password);
+        UserStatus userStatus = new UserStatus();
+        user.setUserStatus(userStatus.getId());
+        return user;
+    }
+
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();

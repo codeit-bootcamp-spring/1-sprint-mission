@@ -23,13 +23,21 @@ public class User implements Serializable {
     //수정 시간
     private Instant updatedAt;
     //접속 상태
-    private UserStatus userStatus;
+    //todo - 고민
+    //1. private String userStatusId로 할 경우
+    // - 장점: 책임 분리 가능,
+    // - 단점: 유저가 접속 중인지 아닌지 구분하기 위해 userStatusService에서 조회 -> isActive() 해서 온라인 상태 확인해야
+    //2. private UserStatus userStatus 로 할 경우
+    // - 장점: isActive()를 통해 바로 확인 가능
+    // - 단점: 책임 명확하지 않을 것 같음, DB 변경 시 호환 문제 예상됨, 만약 나중에 JPA 사용 시 UserStatus를 업데이트하면 User도 업데이트 되지 않을까?(잘모름)
     private String userStatusId;
 
     //사용자 설정 상태 메세지
     private String statusMessage;
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     private AccountStatus accountStatus;
+    //사용자 프로필 사진
+    private String profileImageId;
 
     public User(String nickname, String email, String password, String userStatusId, String statusMessage, AccountStatus accountStatus) {
         this.id = UUID.randomUUID().toString();
