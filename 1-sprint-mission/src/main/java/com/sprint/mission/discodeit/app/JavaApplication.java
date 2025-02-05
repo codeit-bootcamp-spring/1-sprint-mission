@@ -84,6 +84,9 @@ public class JavaApplication {
         }
 
         messageService.delete(user1,channel2, messageUser1);
+        messageService.update(user1,channel2,"Error message");
+
+        System.out.println(" <<<< All Messages >>>>");
         List<Message> newMessage = messageService.findAll();
         for (Message message : newMessage) {
             System.out.println(message.getContent());

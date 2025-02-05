@@ -10,17 +10,18 @@ import java.util.List;
 
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
-    public BasicChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
+
+    public BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
     }
 
     @Override
     public Channel create(User user, String name, String description) {
         try {
             Channel newChannel = new Channel(user, name, description);
-            if(!userRepository.existsById(user.getId())) {
+
+//            System.out.println("Checking if user exists: " + user.getEmail()); // 테스트 부분
+            if(channelRepository.existsByUser(user)) {
                 throw new IllegalArgumentException((user.getEmail() + " not exists"));
             }
             channelRepository.save(newChannel);
@@ -35,8 +36,11 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel find(User user) {
         try {
-            return channelRepository.findById(user.getId())
-                    .orElseThrow(()-> new IllegalArgumentException("Channel not found"));
+            return channelRepository.findAll().stream()
+                    .filter(channel -> channel.getUser().equals(user))
+                    .findFirst()
+                    .orElseThrow(()-> new IllegalArgumentException((user + " not exists")));
+
         }catch (IllegalArgumentException e){
             System.out.println("Failed to read channel: " + e.getMessage());
             return null;
@@ -59,7 +63,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel update(Channel channel, String newName, String newDescription) {
-        try {
+        try{
             Channel newChannel = find(channel.getUser());
             channel.update(newName, newDescription);
             channelRepository.save(channel);
@@ -83,5 +87,4 @@ public class BasicChannelService implements ChannelService {
             System.out.println("Failed to delete channel: " + e.getMessage());
         }
     }
-
 }

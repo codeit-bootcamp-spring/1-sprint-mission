@@ -19,7 +19,7 @@ public class BasicUserService implements UserService {
     public User create(String username, String email, String password) {
         try {
             User newUser = new User(username, email, password);
-            if(userRepository.existsByEmail(email)){
+            if(userRepository.existsByEmail(email) == true){
                 throw new IllegalArgumentException("User already exists");
             }
             userRepository.save(newUser);
@@ -60,10 +60,10 @@ public class BasicUserService implements UserService {
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         try {
             User user = find(userId);
-            if(userRepository.existsByEmail(newEmail)){
+            if(userRepository.existsByEmail(newEmail) == true){
                 throw new IllegalArgumentException("Email already exists");
             }
-            if (userRepository.existsByPassword(newPassword)){
+            if (userRepository.existsByPassword(newPassword) == true){
                 throw new IllegalArgumentException("Password already exists");
             }
             user.update(newUsername, newEmail, newPassword);
@@ -79,7 +79,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         try {
-            if(!userRepository.existsById(userId)){
+            if(userRepository.existsById(userId) == false){
                 throw new IllegalArgumentException("User not found");
             }
             System.out.println("User deleted: " + find(userId).getEmail());
@@ -88,4 +88,5 @@ public class BasicUserService implements UserService {
             System.out.println("Failed to delete user: " + e.getMessage());
         }
     }
+
 }

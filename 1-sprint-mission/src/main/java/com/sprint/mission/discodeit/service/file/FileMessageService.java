@@ -51,13 +51,12 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message find(User user, Channel channel, String content) {
+    public Message find(User user) {
         try {
-            if(channelRepository.existsByUser(user)) {
-                throw new IllegalArgumentException("Channel not found");
-            }
-            return messageRepository.findById(user.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            return messageRepository.findAll().stream()
+                    .filter(message -> message.getUser().equals(user))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(user + " not exists"));
         }catch (IllegalArgumentException e){
             System.out.println("Failed to read message11: " + e.getMessage());
             return null;
@@ -79,14 +78,24 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(User user, Channel channel, String content) {
+    public Message update(User user, Channel channel, String newContent) {
         try {
-            Message message= find(user, channel, content );
-            message.update(content);
-            System.out.println("Message updated: " + channel.getName()+ " / " +
-                    user.getEmail() + " : " + content);
-            messageRepository.save(message);
-            return message;
+            if(!userRepository.existsById(user.getId())){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(!channelRepository.existsByUser(channel.getUser())){
+                throw new IllegalArgumentException("Channel not found");
+            }
+            Message messageToUpdate = messageRepository.findAll().stream()
+                    .filter(message
+                            -> message.getUser().equals(user) && message.getChannel().equals(channel))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Message not found!!"));
+            messageToUpdate.update(newContent);
+            System.out.println("Message updated: " + channel.getName() + " / " +
+                    user.getEmail() + " : " + newContent);
+            return messageToUpdate;
+
         }catch (IllegalArgumentException e){
             System.out.println("Failed to update message: " + e.getMessage());
             return null;
@@ -102,7 +111,7 @@ public class FileMessageService implements MessageService {
             if(!channelRepository.existsByUser(channel.getUser())) {
                 throw new IllegalArgumentException("Channel not found");
             }
-            System.out.println("Message delete : " + find(user, channel, message.getContent()));
+            System.out.println("Message delete : " + find(user));
             messageRepository.deleteByMessage(message);
         }catch (IllegalArgumentException e){
             System.out.println("Failed to delete message: " + e.getMessage());

@@ -3,28 +3,33 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
 
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
-
-    public BasicMessageService(MessageRepository messageRepository) {
+    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
-
+        this.channelRepository = channelRepository;
+        this.userRepository = userRepository;
     }
     @Override
     public Message create(User user, Channel channel, String content) {
-        try {
-            Message newMessage = new Message(user, channel, content);
-            if(!messageRepository.existsByUser(user)) {
+        try{
+            if(!userRepository.existsById(user.getId())){
                 throw new IllegalArgumentException("User not found");
-            } else if (!messageRepository.existsByChannel(channel)) {
+            }
+            if(!channelRepository.existsByUser(channel.getUser())){
                 throw new IllegalArgumentException("Channel not found");
             }
+            Message newMessage = new Message(user, channel, content);
             messageRepository.save(newMessage);
             System.out.println("Message created >>> "+ channel.getName()+ " / " +
                     user.getEmail() + " : " + content);
@@ -36,15 +41,14 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message find(User user, Channel channel, String content) {
+    public Message find(User user) {
         try {
-            if(!messageRepository.existsByChannel(channel)) {
-                throw new IllegalArgumentException("Channel not found");
-            }
-            return messageRepository.findById(user.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            return messageRepository.findAll().stream()
+                    .filter(message -> message.getUser().equals(user))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException(user + " not exists"));
         }catch (IllegalArgumentException e){
-            System.out.println("Failed to read message: " + e.getMessage());
+            System.out.println("Failed to read message11: " + e.getMessage());
             return null;
         }
     }
@@ -64,14 +68,24 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(User user, Channel channel, String content) {
+    public Message update(User user, Channel channel, String newContent) {
         try {
-            Message message= find(user, channel,content );
-            message.update(content);
-            System.out.println("Message updated: " + channel.getName()+ " / " +
-                    user.getEmail() + " : " + content);
-            messageRepository.save(message);
-            return message;
+            if(!userRepository.existsById(user.getId())){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(!channelRepository.existsByUser(channel.getUser())){
+                throw new IllegalArgumentException("Channel not found");
+            }
+            Message messageToUpdate = messageRepository.findAll().stream()
+                    .filter(message
+                            -> message.getUser().equals(user) && message.getChannel().equals(channel))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("Message not found!!"));
+            messageToUpdate.update(newContent);
+            System.out.println("Message updated: " + channel.getName() + " / " +
+                    user.getEmail() + " : " + newContent);
+            return messageToUpdate;
+
         }catch (IllegalArgumentException e){
             System.out.println("Failed to update message: " + e.getMessage());
             return null;
@@ -81,12 +95,13 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(User user, Channel channel, Message message) {
         try {
-            if(!messageRepository.existsByUser(user)) {
+            if(!userRepository.existsById(user.getId())) {
                 throw new IllegalArgumentException("User not found");
             }
-            if(!messageRepository.existsByChannel(channel)) {
+            if(!channelRepository.existsByUser(channel.getUser())) {
                 throw new IllegalArgumentException("Channel not found");
             }
+            System.out.println("Message delete : " + find(user));
             messageRepository.deleteByMessage(message);
         }catch (IllegalArgumentException e){
             System.out.println("Failed to delete message: " + e.getMessage());
