@@ -199,10 +199,25 @@
       warning: in the working copy of 'src/main/resources/application.yml', LF will be replaced by CRLF the next time Git touches it
       warning: in the working copy of 'src/test/java/com/sprint/mission/discodeit/DiscodeitApplicationTests.java', LF will be replaced by CRLF the next time Git touches it
    ```
-   - Windows의 경우 line ending으로 CR(Carriage-Return, \r)과 LF(Line Feed, \n)을 사용하고, Unix와 Mac OS는 LF만 사용
+   - 원인
+     - Windows의 경우 line ending으로 CR(Carriage-Return, \r)과 LF(Line Feed, \n)을 사용하고, Unix와 Mac OS는 LF만 사용
      - 이 차이로 인해 git에서 잘못 인식하여 생기는 문제
      - 실제 코드는 변경되지 않았는데 CR/LF때문에 변경으로 착각함
    - 해결
      - 
+2.  git push 시 `non-fast-forward` 문제 발생
+   ```bash
+tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
+$ git push origin part1-한성지-sprint3
+To github.com:hyanyul/1-sprint-mission.git
+ ! [rejected]        part1-한성지-sprint3 -> part1-한성지-sprint3 (non-fast-forward)
+error: failed to push some refs to 'github.com:hyanyul/1-sprint-mission.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+   ```
+   - 원인
+     - 깃헙에 생성된 원격 저장소와 로컬에 생성된 저장소 간 공통분모가 없는 상태에서 병합하려는 시도로 인해 발생
 
 ### 추후 수정할 부분
