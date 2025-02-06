@@ -8,7 +8,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface MessageRepository {
-    Message createOrUpdateMessage(Message message) throws IOException;
+
+    Message create(Message message);
+
     Message findById(UUID id);
     Set<Message> findAll();
     Set<Message> findMessagesInChannel(Channel channel);
