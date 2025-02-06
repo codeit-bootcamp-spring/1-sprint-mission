@@ -2,27 +2,28 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+//@Repository
 public class JCFChannelRepository implements ChannelRepository {
-
     private final Map<UUID,Channel> data;
 
-    public JCFChannelRepository() {
-        this.data = Collections.synchronizedMap(new HashMap<>());
-    }
+   public JCFChannelRepository() {
+       data = new HashMap<>();
+   }
+
 
     @Override
-    public void createChannel(Channel channel) {
+    public Channel save(Channel channel) {
         data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
     public Optional<Channel> getChannelById(UUID id) {
-        Channel channelNullable=this.data.get(id);
-        return Optional.ofNullable(Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("Channel with " + id + " not found")));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
@@ -31,12 +32,10 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void updateChannel(UUID id, Channel updatedChannel) {
-        Channel existingChannel = data.get(id);
-        if (existingChannel != null) {
-            existingChannel.update(updatedChannel.getChannel(),updatedChannel.getDescription());
-        }
+    public boolean exitsById(UUID id) {
+        return this.data.containsKey(id);
     }
+
 
     @Override
     public void deleteChannel(UUID id) {

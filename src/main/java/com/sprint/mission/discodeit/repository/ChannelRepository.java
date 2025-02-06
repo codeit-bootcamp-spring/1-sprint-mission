@@ -8,18 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    //생성
-    void createChannel(Channel channel);
-
-    //읽기
+    Channel save(Channel channel);
     Optional<Channel> getChannelById(UUID id);
-
-    //모두 읽기
     List<Channel> getAllChannels();
-
-    //수정
-    void updateChannel(UUID id,Channel updatedChannel);
-
-    //삭제
+    boolean exitsById(UUID id);
     void deleteChannel(UUID id);
 }

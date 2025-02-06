@@ -2,9 +2,14 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import java.io.*;
-import java.util.*;
+import org.springframework.stereotype.Repository;
 
+import java.io.*;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+
+//@Repository
 public class FileMessageRepository implements MessageRepository {
     private final String FILE_PATH="message.ser";
     private final Map<UUID, Message> data;
@@ -14,16 +19,15 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void createMessage(Message message) {
+    public Message save(Message message) {
         data.put(message.getId(),message);
         saveDataToFile();
+        return message;
     }
 
     @Override
     public Optional<Message> getMessageById(UUID id) {
-        Message messageNullable=this.data.get(id);
-        return Optional.ofNullable(Optional.ofNullable(messageNullable)
-                .orElseThrow(() -> new NoSuchElementException("Messeage with id " + id + " not found")));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
@@ -32,13 +36,10 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void updateMessage(UUID id, Message updatedMessage) {
-        Message existingChannel = data.get(id);
-        if (existingChannel != null) {
-            existingChannel.update(updatedMessage.getContent());
-            saveDataToFile();
-        }
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
+
 
     @Override
     public void deleteMessage(UUID id) {
@@ -46,6 +47,37 @@ public class FileMessageRepository implements MessageRepository {
             throw new NoSuchElementException("Message with id "+id+" not found");
         }
         data.remove(id);
+        saveDataToFile();
+    }
+
+    @Override
+    public Optional<Instant> findLastMessageTimeByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo);
+    }
+
+    @Override
+    public List<Message> getMessagesByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        List<UUID> messageIds = data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .map(Message::getId)
+                .toList();
+
+        if (messageIds.isEmpty()) {
+            throw new NoSuchElementException("No messages found for channel ID: " + channelId);
+        }
+
+        messageIds.forEach(data::remove);
+        saveDataToFile();
     }
 
     // 데이터를 파일에 저장

@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+//@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final String FILE_PATH="channel.ser";
     private final Map<UUID, Channel> data;
@@ -16,16 +18,15 @@ public class FileChannelRepository implements ChannelRepository {
 
 
     @Override
-    public void createChannel(Channel channel) {
+    public Channel save(Channel channel) {
         data.put(channel.getId(), channel);
         saveDataToFile();
+        return channel;
     }
 
     @Override
     public Optional<Channel> getChannelById(UUID id) {
-        Channel channelNullable=this.data.get(id);
-        return Optional.ofNullable(Optional.ofNullable(channelNullable)
-                .orElseThrow(() -> new NoSuchElementException("Channel with " + id + " not found")));
+        return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
@@ -33,15 +34,11 @@ public class FileChannelRepository implements ChannelRepository {
         return new ArrayList<>(data.values());
     }
 
-
     @Override
-    public void updateChannel(UUID id, Channel updatedChannel) {
-        Channel existingChannel = data.get(id);
-        if (existingChannel != null) {
-            existingChannel.update(updatedChannel.getChannel(),updatedChannel.getDescription());
-            saveDataToFile();
-        }
+    public boolean exitsById(UUID id) {
+        return this.data.containsKey(id);
     }
+
 
     @Override
     public void deleteChannel(UUID id) {
@@ -49,6 +46,7 @@ public class FileChannelRepository implements ChannelRepository {
             throw new NoSuchElementException("Channel with id"+id+" not found");
         }
         data.remove(id);
+        saveDataToFile();
     }
 
     // 데이터를 파일에 저장

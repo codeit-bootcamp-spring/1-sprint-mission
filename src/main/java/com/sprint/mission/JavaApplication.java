@@ -1,129 +1,87 @@
-package com.sprint.mission;
+package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMassageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.Interface.AuthService;
+import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
+import com.sprint.mission.discodeit.service.Interface.*;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+import static com.sprint.mission.discodeit.entity.UserStatusType.*;
+
+@SpringBootApplication
 public class JavaApplication {
     public static void main(String[] args) {
-        // 서비스 초기화
-        UserRepository userRepository = new JCFUserRepository();
-        ChannelRepository channelRepository = new JCFChannelRepository();
-        MessageRepository messageRepository = new JCFMessageRepository();
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-//        UserRepository userRepository = new FileUserRepository();
-//        ChannelRepository channelRepository = new FileChannelRepository();
-//        MessageRepository messageRepository = new FileMessageRepository();
+        // 서비스 객체들 주입
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
+        ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
+        BinaryContentService binaryContentService = context.getBean(BinaryContentService.class);
+        AuthService authService = context.getBean(AuthService.class);
 
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMassageService(messageRepository);
+        // 1. 사용자 등록
+        User user1 = userService.createUser(new UserCreateRequestDTO("Alice", "alice@naver.com", "12345", null, "ONLINE"));
+        User user2 = userService.createUser(new UserCreateRequestDTO("Bob", "bob@naver.com", "67890", null, "ONLINE"));
+        displayEntityDetails(user1);
+        displayEntityDetails(user2);
 
-        // 사용자, 채널, 메시지 등록
-        System.out.println("등록");
-        User userTest = new User("Alice", "alice@naver.com", "12345");
-        userService.createUser(userTest);
-        displayEntityDetails(userService, userTest);
+        // 2. 채널 등록
+        List<UUID> members = new ArrayList<>();
+        members.add(user2.getId());
+        Channel channel1 = channelService.createPublicChannel(new PublicChannelCreateRequest(user1.getId(), "general", "General discussion"));
+        Channel channel2 = channelService.createPrivateChannel(new PrivateChannelCreateRequest(user1.getId(), members));
+        displayEntityDetails(channel1);
+        displayEntityDetails(channel2);
 
-        Channel channelTest = new Channel("testChannel", "test_description", userTest);
-        channelService.createChannel(channelTest);
-        displayEntityDetails(channelService, channelTest);
+        // 3. 메시지 등록
+        CreateMessageRequest messageRequest1 = new CreateMessageRequest("Hello everyone!", channel1.getId(), user1.getId());
+        CreateMessageRequest messageRequest2 = new CreateMessageRequest("Random thoughts here.", channel2.getId(), user2.getId());
+        Message message1 = messageService.createMessage(messageRequest1);
+        Message message2 = messageService.createMessage(messageRequest2);
+        displayEntityDetails(message1);
+        displayEntityDetails(message2);
 
-        Message messageTest = new Message("test_message", channelTest, userTest);
-        messageService.createMessage(messageTest);
-        displayEntityDetails(messageService, messageTest);
-        System.out.println();
+        // 4. 메시지 업데이트
+        UpdateMessageRequest updateRequest = new UpdateMessageRequest(message1.getId(), "Updated hello message");
+        messageService.updateMessage(updateRequest);
+        System.out.println("업데이트 후 조회");
+        displayEntityDetails(message1);
 
-        // 데이터 추가 및 전체 조회
-        System.out.println("데이터 추가 및 전체 조회");
-        addTestData(userService, channelService, messageService);
-        displayAllData(userService, channelService, messageService);
-        System.out.println();
+        // 5. 유저 상태 변경 (오프라인으로 전환)
+       // userService.updateUserStatus(user2.getId(), OFFLINE);
+      //  System.out.println("Bob의 상태: " + userService.getUserById(user2.getId()).get().getStatus());  // OFFLINE
 
-        // 데이터 업데이트
-        updateEntity(userService, userTest, "UpdatedAlice", "alice@naver.com", "1234567");
-        updateEntity(channelService, channelTest, "updateChannel", "update_test_description", userTest);
-        updateEntity(messageService, messageTest, "update_message", userTest, channelTest);
-        System.out.println();
-
-        // 데이터 삭제 및 결과 확인
-        userService.deleteUser(userTest.getId());
-        channelService.deleteChannel(channelTest.getId());
-        messageService.deleteMessage(messageTest.getId());
-
+        // 6. 유저 삭제 및 관련 데이터 삭제
+        userService.deleteUser(user1.getId());
+        channelService.deleteChannel(channel1.getId());
+        messageService.deleteMessage(message2.getId());
         System.out.println("삭제 후 전체 조회");
-        displayAllData(userService, channelService, messageService);
+        // displayAllData(userService, channelService, messageService);
     }
 
-    // 공통된 엔티티 출력 로직을 한 메서드로 통합
-    private static <T> void displayEntityDetails(Object service, T entity) {
-        String entityDetails = entity.toString();  // entity에 대한 기본 출력 (필요 시 추가로 포맷 가능)
-        System.out.println(entityDetails);
+    private static <T> void displayEntityDetails(T entity) {
+        System.out.println(entity.toString());
     }
 
-    private static void addTestData(UserService userService, ChannelService channelService, MessageService messageService) {
-        User user2 = new User("Bob", "bob@naver.com", "12345");
-        User user3 = new User("James", "james@naver.com", "12345");
-
-        userService.createUser(user2);
-        userService.createUser(user3);
-
-        Channel channel2 = new Channel("test2Channel", "test_description", user2);
-        Channel channel3 = new Channel("test3Channel", "test_description", user3);
-
-        channelService.createChannel(channel2);
-        channelService.createChannel(channel3);
-
-        Message message2 = new Message("test_message2", channel2, user2);
-        Message message3 = new Message("test_message3", channel3, user3);
-
-        messageService.createMessage(message2);
-        messageService.createMessage(message3);
-    }
-
+    // 전체 데이터를 확인하는 메서드 (주석 처리된 코드)
+    /*
     private static void displayAllData(UserService userService, ChannelService channelService, MessageService messageService) {
         System.out.println("All Users: " + userService.getAllUsers());
-        System.out.println("All Channels: " + channelService.getAllChannels());
-        System.out.println("All Messages: " + messageService.getAllMessage());
+        System.out.println("All Channels: " + channelService.findAllChannels());
+        System.out.println("All Messages: " + messageService.findAllMessages());
     }
-
-    private static void updateEntity(UserService userService, User user, String newName, String newEmail, String newPassword) {
-        userService.updateUser(user.getId(), new User(newName, newEmail, newPassword));
-        System.out.println("Updated User: " + newName);
-    }
-
-    private static void updateEntity(ChannelService channelService, Channel channel, String newChannelName, String newDescription, User newCreator) {
-        channelService.updateChannel(channel.getId(), new Channel(newChannelName, newDescription, newCreator));
-        System.out.println("Updated Channel: " + newChannelName);
-    }
-
-    private static void updateEntity(MessageService messageService, Message message, String newContent, User newSender, Channel newChannel) {
-        messageService.updateMessage(message.getId(), new Message(newContent, newChannel, newSender));
-        System.out.println("Updated Message: " + newContent);
-    }
-
-    // 포맷된 날짜 출력
-    private static String formatDate(long timestamp) {
-        Date date = new Date(timestamp);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return dateFormat.format(date);
-    }
+    */
 }

@@ -2,19 +2,23 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+//@Repository
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID,User> data;
 
     public JCFUserRepository() {
-        this.data = Collections.synchronizedMap(new HashMap<>());
+        data=new HashMap<>();
     }
 
+
     @Override
-    public void createUser(User user) {
+    public User save(User user) {
         this.data.put(user.getId(), user);
+        return user;
     }
 
 
@@ -29,15 +33,23 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateUser(UUID id, User updateUser) {
-        User existingUser = data.get(id);
-        if (existingUser != null) {
-            existingUser.update(updateUser.getName(), updateUser.getEmail(), updateUser.getPassword());
-        }
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
+
 
     @Override
     public void deleteUser(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.data.containsKey(email);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return this.data.containsKey(name);
     }
 }
