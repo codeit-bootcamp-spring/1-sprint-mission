@@ -5,32 +5,27 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
-
     @Override
     public Channel create(User user, String name, String description) {
-        try {
-            Channel newChannel = new Channel(user, name, description);
-
-//            System.out.println("Checking if user exists: " + user.getEmail()); // 테스트 부분
-            if(channelRepository.existsByUser(user)) {
-                throw new IllegalArgumentException((user.getEmail() + " not exists"));
-            }
-            channelRepository.save(newChannel);
-            System.out.println("Channel created: " + name + " (설명: " + description + ")");
-            return newChannel;
-        }catch (IllegalArgumentException e){
-            System.out.println(e.getMessage());
-            return null;
+        if (channelRepository.existsByUser(user)) {
+            throw new IllegalArgumentException(user.getEmail() + " not exists");
         }
+
+        Channel newChannel = new Channel(user, name, description);
+        channelRepository.save(newChannel);
+
+        System.out.println("Channel created: " + name + " (설명: " + description + ")");
+        return newChannel;
     }
 
     @Override

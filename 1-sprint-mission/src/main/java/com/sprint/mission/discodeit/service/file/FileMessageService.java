@@ -32,22 +32,19 @@ public class FileMessageService implements MessageService {
 
     @Override
     public Message create(User user, Channel channel, String content) {
-        try {
-            if(!userRepository.existsById(user.getId())){
-                throw new IllegalArgumentException("User not found");
-            }
-            if(!channelRepository.existsByUser(channel.getUser())){
-                throw new IllegalArgumentException("Channel not found");
-            }
-            Message newMessage = new Message(user, channel, content);
-            messageRepository.save(newMessage);
-            System.out.println("Message created >>> "+ channel.getName()+ " / " +
-                    user.getEmail() + " : " + content);
-            return newMessage;
-        }catch (IllegalArgumentException e){
-            System.out.println(e.getMessage());
-            return null;
+        if(!userRepository.existsById(user.getId())) {
+            throw new IllegalArgumentException("User not found");
         }
+        if(!channelRepository.existsByUser(channel.getUser())) {
+            throw new IllegalArgumentException("Channel not found");
+        }
+
+        Message newMessage = new Message(user, channel, content);
+        messageRepository.save(newMessage);
+
+        System.out.println("Message created >>> " + channel.getName() + " / " +
+                user.getEmail() + " : " + content);
+        return newMessage;
     }
 
     @Override

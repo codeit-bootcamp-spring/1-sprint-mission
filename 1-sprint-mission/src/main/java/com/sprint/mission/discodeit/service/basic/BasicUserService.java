@@ -3,32 +3,29 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Override
     public User create(String username, String email, String password) {
-        try {
-            User newUser = new User(username, email, password);
-            if(userRepository.existsByEmail(email) == true){
-                throw new IllegalArgumentException("User already exists");
-            }
-            userRepository.save(newUser);
-            System.out.println("User created: " + username + " (email: " + email + ")");
-            return newUser;
-        } catch (IllegalArgumentException e) {
-            System.out.println("Failed to create user: " + e.getMessage());
-            return null;
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("User with email " + email + " already exists");
         }
+
+        User newUser = new User(username, email, password);
+        userRepository.save(newUser);
+
+        System.out.println("User created: " + username + " (email: " + email + ")");
+        return newUser;
     }
 
     @Override
@@ -60,10 +57,10 @@ public class BasicUserService implements UserService {
     public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
         try {
             User user = find(userId);
-            if(userRepository.existsByEmail(newEmail) == true){
+            if(userRepository.existsByEmail(newEmail)){
                 throw new IllegalArgumentException("Email already exists");
             }
-            if (userRepository.existsByPassword(newPassword) == true){
+            if (userRepository.existsByPassword(newPassword)){
                 throw new IllegalArgumentException("Password already exists");
             }
             user.update(newUsername, newEmail, newPassword);
@@ -79,7 +76,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         try {
-            if(userRepository.existsById(userId) == false){
+            if(!userRepository.existsById(userId)){
                 throw new IllegalArgumentException("User not found");
             }
             System.out.println("User deleted: " + find(userId).getEmail());

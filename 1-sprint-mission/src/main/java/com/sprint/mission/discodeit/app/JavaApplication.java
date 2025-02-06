@@ -76,6 +76,7 @@ public class JavaApplication {
         //메세지 생성
         Message messageUser1 = messageService.create(user1, channel2, "Hello World");
         Message messageUser2 = messageService.create(user1, channel2, "Hi World");
+        Message messageUser3 = messageService.create(user1, channel2, "1231451");
         //메세지 조회
         System.out.println(" <<<< All Messages >>>>");
         List<Message> messages = messageService.findAll();

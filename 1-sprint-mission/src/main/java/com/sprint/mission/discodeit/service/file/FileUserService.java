@@ -27,18 +27,15 @@ public class FileUserService implements UserService {
 
     @Override
     public User create(String username, String email, String password) {
-        try {
-            User newUser = new User(username, email, password);
-            if(userRepository.existsByEmail(email) == true){
-                throw new IllegalArgumentException("User already exists");
-            }
-            userRepository.save(newUser);
-            System.out.println("User created: " + username + " (email: " + email + ")");
-            return newUser;
-        } catch (IllegalArgumentException e) {
-            System.out.println("Failed to create user: " + e.getMessage());
-            return null;
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("User already exists");
         }
+
+        User newUser = new User(username, email, password);
+        userRepository.save(newUser);
+
+        System.out.println("User created: " + username + " (email: " + email + ")");
+        return newUser;
     }
 
     @Override
