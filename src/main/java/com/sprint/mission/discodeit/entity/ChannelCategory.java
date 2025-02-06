@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 
-public enum ChannelSort implements Serializable {
+public enum ChannelCategory implements Serializable {
     TEXT,
     VOICE
 }

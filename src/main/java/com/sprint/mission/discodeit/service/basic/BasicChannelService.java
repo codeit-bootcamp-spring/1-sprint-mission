@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -11,7 +12,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,17 +21,17 @@ public class BasicChannelService implements ChannelService {
     private final UserService userService;
 
     @Override
-    public Channel create(ChannelType channelType, String name, String description) {
-        return channelRepository.save(new Channel(name, channelType, description));
+    public Channel create(CreateChannelDto createChannelDto) {
+        return channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
     }
 
     @Override
-    public List<Channel> getChannels() {
+    public List<Channel> findAll() {
         return channelRepository.findAll();
     }
 
     @Override
-    public Channel getChannelByUUID(String channelId) throws CustomException {
+    public Channel findById(String channelId) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -40,44 +40,27 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannelsByName(String channelName) throws CustomException {
-        return channelRepository.findAll().stream().filter( c -> c.getChannelName().contains(channelName)).toList();
+    public List<Channel> findAllByChannelName(String channelName) throws CustomException {
+        return channelRepository.findAll().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
     }
 
     @Override
-    public List<Channel> getChannelByType(ChannelType channelType) {
-        return channelRepository.findAll().stream().filter( c -> c.getChannelType().equals(channelType)).toList();
+    public List<Channel> findByChannelType(ChannelType channelType) {
+        return channelRepository.findAll().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
     }
 
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
+    public Channel updateChannel(String channelId,UpdateChannelDto updateChannelDto) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
-        } else if (channelDTO == null) {
+        } else if (updateChannelDto == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
-        //변경 여부 체크
-        boolean isUpdated = false;
-
-        // 채널 이름 변경 처리
-        String newChannelName = channelDTO.getChannelName();
-        if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(channel.getChannelName())) {
-            channel.setChannelName(newChannelName);
-            isUpdated = true;
-        }
-
-        // 상태 변경 처리
-        ChannelType newChannelType = channelDTO.getChannelType();
-        if (channel.getChannelType() != newChannelType && newChannelType !=null){
-            channel.setChannelType(newChannelType);
-            isUpdated = true;
-        }
-
         // 변경사항이 있는 경우에만 업데이트 시간 설정
-        if (isUpdated) {
-            channel.setUpdatedAt(updatedAt);
+        if (channel.isUpdated(updateChannelDto)) {
+            channel.setUpdatedAt(updateChannelDto.updatedAt());
         }
         return channelRepository.save(channel);
     }
@@ -93,7 +76,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<User> getUsersInChannel(Channel channel) throws CustomException {
+    public List<User> findAllUserInChannel(Channel channel) throws CustomException {
         Channel ch = channelRepository.findById(channel.getId());
         if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);

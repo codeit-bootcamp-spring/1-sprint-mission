@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,7 +11,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.List;
 
 public class FileChannelService extends FileService implements ChannelService {
@@ -25,8 +25,8 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(name, type, description);
+    public Channel create(CreateChannelDto createChannelDto) {
+        Channel channel = new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description());
         String channelId = channel.getId();
         //저장
         Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
@@ -36,13 +36,13 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannels() {
+    public List<Channel> findAll() {
         return load(channelDirectory);
     }
 
     @Override
-    public Channel getChannelByUUID(String channelId) throws CustomException {
-        Channel ch = getChannels().stream().filter(channel -> channel.getId().equals(channelId)).findFirst().orElse(null);
+    public Channel findById(String channelId) throws CustomException {
+        Channel ch = findAll().stream().filter(channel -> channel.getId().equals(channelId)).findFirst().orElse(null);
 
         if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -51,30 +51,28 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public List<Channel> getChannelsByName(String channelName) {
-        return getChannels().stream().filter(channel -> channel.getChannelName().contains(channelName)).toList();
+    public List<Channel> findAllByChannelName(String channelName) {
+        return findAll().stream().filter(channel -> channel.getChannelName().contains(channelName)).toList();
     }
 
     @Override
-    public List<Channel> getChannelByType(ChannelType channelType) {
-        return getChannels().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
+    public List<Channel> findByChannelType(ChannelType channelType) {
+        return findAll().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
     }
 
-    // todo
-    // 변경사항 체크 로직 따로 뺄 수 있는지 확인
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
-        Channel channel = getChannelByUUID(channelId);
+    public Channel updateChannel(String channelId, UpdateChannelDto updateChannelDto) throws CustomException {
+        Channel channel = findById(channelId);
 
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
-        } else if (channelDTO == null) {
+        } else if (updateChannelDto == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
         // 변경사항이 있는 경우에만 업데이트 시간 설정
-        if (channel.isUpdated(channelDTO)) {
-            channel.setUpdatedAt(updatedAt);
+        if (channel.isUpdated(updateChannelDto)) {
+            channel.setUpdatedAt(updateChannelDto.updatedAt());
             Path channelPath = channelDirectory.resolve(channelId.concat(".ser"));
             save(channelPath, channel);
         }
@@ -84,7 +82,7 @@ public class FileChannelService extends FileService implements ChannelService {
 
     @Override
     public boolean deleteChannel(Channel channel) {
-        Channel ch = getChannelByUUID(channel.getId());
+        Channel ch = findById(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -93,8 +91,8 @@ public class FileChannelService extends FileService implements ChannelService {
     }
 
     @Override
-    public List<User> getUsersInChannel(Channel channel) {
-        Channel ch = getChannelByUUID(channel.getId());
+    public List<User> findAllUserInChannel(Channel channel) {
+        Channel ch = findById(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -106,7 +104,7 @@ public class FileChannelService extends FileService implements ChannelService {
     public boolean addUserToChannel(String channelId, String userId) throws CustomException {
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사
-            Channel c = getChannelByUUID(channelId);
+            Channel c = findById(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
             User u = userService.getUserByUUID(userId);
             c.getUserList().put(u.getId(), u);

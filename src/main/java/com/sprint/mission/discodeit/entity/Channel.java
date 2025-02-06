@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -20,7 +20,7 @@ public class Channel implements Serializable {
     private Instant updatedAt;
 
     //채널 종류 - 음성, 텍스트 todo - 필드명 변경
-    private final ChannelSort channelSort;
+    private final ChannelCategory channelCategory;
 
     //채널 공개 여부
     private ChannelType channelType;
@@ -35,13 +35,13 @@ public class Channel implements Serializable {
     //채널 주제
     //접근 권한
 
-    public Channel(String channelName, ChannelType channelType, String description) {
+    public Channel(String channelName, ChannelType channelType, ChannelCategory channelCategory,String description) {
         //id, createdAt, updateAt은 생성자에서 초기화
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.channelName = channelName;
-        this.channelSort = ChannelSort.TEXT;
+        this.channelCategory = channelCategory;
         this.channelType = channelType;
         this.description = description;
         this.userList = new HashMap<>();
@@ -74,7 +74,7 @@ public class Channel implements Serializable {
     }
 
     public String toFullString() {
-        return toShortString() + " / channelSort: " + channelSort + " / description: " + description + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
+        return toShortString() + " / channelSort: " + channelCategory + " / description: " + description + " / createdAt: " + createdAt + " / updatedAt: " + updatedAt;
     }
 
     public void displayFullInfo() {
@@ -85,23 +85,23 @@ public class Channel implements Serializable {
         System.out.println(toShortString());
     }
 
-    public boolean isUpdated(ChannelDTO channelDTO) {
+    public boolean isUpdated(UpdateChannelDto updateChannelDto) {
         //변경 여부 체크
         boolean isUpdated = false;
 
-        String newChannelName = channelDTO.getChannelName();
+        String newChannelName = updateChannelDto.channelName();
         if (newChannelName != null && !newChannelName.isEmpty() && !newChannelName.equals(channelName)) {
             channelName = newChannelName;
             isUpdated = true;
         }
 
-        ChannelType newChannelType = channelDTO.getChannelType();
+        ChannelType newChannelType = updateChannelDto.channelType();
         if (newChannelType != null && channelType != newChannelType) {
             channelType = newChannelType;
             isUpdated = true;
         }
 
-        String newDescription = channelDTO.getDescription();
+        String newDescription = updateChannelDto.description();
         if (newDescription != null && !newDescription.isEmpty() && !newDescription.equals(description)) {
             description = newDescription;
             isUpdated = true;

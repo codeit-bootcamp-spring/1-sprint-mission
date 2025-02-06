@@ -36,7 +36,7 @@ public class JCFMessageService implements MessageService {
 
         try {
             User userByUUID = userService.getUserByUUID(userId);
-            Channel channelByUUID = channelService.getChannelByUUID(channelId);
+            Channel channelByUUID = channelService.findById(channelId);
             if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
                 System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
@@ -100,7 +100,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public List<Message> getMessagesByChannel(Channel channel) throws CustomException {
         try {
-            Channel channelByUUID = channelService.getChannelByUUID(channel.getId());
+            Channel channelByUUID = channelService.findById(channel.getId());
             return data.values().stream().filter(m -> m.getChannelId().equals(channelByUUID.getId())).toList();
         } catch (Exception e) {
             System.out.println("Failed to get messages. Channel: " + channel.getId() + " Message: " + e.getMessage());

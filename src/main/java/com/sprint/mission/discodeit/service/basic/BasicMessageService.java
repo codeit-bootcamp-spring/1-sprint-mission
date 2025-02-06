@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
 
         try {
             User userByUUID = userService.getUserByUUID(userId);
-            Channel channelByUUID = channelService.getChannelByUUID(channelId);
+            Channel channelByUUID = channelService.findById(channelId);
             if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
                 System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);

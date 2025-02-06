@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,7 +10,6 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.time.Instant;
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
@@ -24,21 +24,21 @@ public class JCFChannelService implements ChannelService {
 
     //생성
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(name, type, description);
+    public Channel create(CreateChannelDto createChannelDto) {
+        Channel channel = new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description());
         data.put(channel.getId(), channel);
         return channel;
     }
 
     //모두 조회
     @Override
-    public List<Channel> getChannels() {
+    public List<Channel> findAll() {
         return data.values().stream().toList();
     }
 
     //단일 조회 - UUID
     @Override
-    public Channel getChannelByUUID(String channelId) throws CustomException {
+    public Channel findById(String channelId) throws CustomException {
         Channel channel = data.get(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
@@ -48,30 +48,30 @@ public class JCFChannelService implements ChannelService {
 
     //다건 조회 - 채널 타입
     @Override
-    public List<Channel> getChannelByType(ChannelType channelType) {
+    public List<Channel> findByChannelType(ChannelType channelType) {
         return data.values().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
     }
 
     //다건 조회 - 채널명
     @Override
-    public List<Channel> getChannelsByName(String channelName) {
+    public List<Channel> findAllByChannelName(String channelName) {
         return data.values().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
     }
 
     //수정
     @Override
-    public Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt) throws CustomException {
+    public Channel updateChannel(String channelId,UpdateChannelDto updateChannelDto) throws CustomException {
         Channel channel = data.get(channelId);
 
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND, String.format("Channel with id %s not found", channelId));
-        } else if (channelDTO == null) {
+        } else if (updateChannelDto == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
         // 변경사항이 있는 경우에만 업데이트 시간 설정
-        if (channel.isUpdated(channelDTO)) {
-            channel.setUpdatedAt(updatedAt);
+        if (channel.isUpdated(updateChannelDto)) {
+            channel.setUpdatedAt(updateChannelDto.updatedAt());
         }
         return channel;
     }
@@ -83,7 +83,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<User> getUsersInChannel(Channel channel) throws CustomException {
+    public List<User> findAllUserInChannel(Channel channel) throws CustomException {
         Channel ch = data.get(channel.getId());
         if (ch == null) {
             System.out.println("Channel with id " + channel.getId() + " not found");
@@ -97,7 +97,7 @@ public class JCFChannelService implements ChannelService {
         //유저를 채널에 추가
         try {
             //해당 채널이 DB에 존재하는 채널인지 검사
-            Channel c = getChannelByUUID(channelId);
+            Channel c = findById(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
             User u = userService.getUserByUUID(userId);
             c.getUserList().put(u.getId(), u);

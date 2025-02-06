@@ -1,38 +1,38 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.time.Instant;
 import java.util.List;
 
 public interface ChannelService {
 
     //생성
-    Channel create(ChannelType channelType, String name, String description);
+    Channel create(CreateChannelDto createChannelDto);
 
     //모두 읽기
-    List<Channel> getChannels();
+    List<Channel> findAll();
 
     //읽기
     //단건 조회 - UUID
-    Channel getChannelByUUID(String channelId);
+    Channel findById(String channelId);
 
     //다건 조회 - name
-    List<Channel> getChannelsByName(String channelName);
+    List<Channel> findAllByChannelName(String channelName);
 
     //다건 조회 - 채널 타입
-    List<Channel> getChannelByType(ChannelType channelType);
+    List<Channel> findByChannelType(ChannelType channelType);
 
     //수정
-    Channel updateChannel(String channelId, ChannelDTO channelDTO, Instant updatedAt);
+    Channel updateChannel(String channelId, UpdateChannelDto updateChannelDto);
 
     //삭제
     boolean deleteChannel(Channel channel);
 
-    List<User> getUsersInChannel(Channel channel);
+    List<User> findAllUserInChannel(Channel channel);
 
     //고민
     //근데 String으로 id만 받는게 맞는것 같다.
