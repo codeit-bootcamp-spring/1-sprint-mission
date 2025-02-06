@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -28,7 +29,7 @@ public class JCFUserRepository implements UserRepository {
     return data;
   }
 
-  public void updateOne(User user, String name, int age, char gender) {
+  public void updateOne(User user, String name, int age, Gender gender) {
     if (user != null) {
       user.update(name, age, gender);
     } else {

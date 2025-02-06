@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Gender;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public interface UserService {
 
   List<User> readAllUsers();
 
-  void updateUser(User user, String name, int age, char gender);
+  void updateUser(User user, String name, int age, Gender gender);
 
   void deleteUser(UUID id);
 }

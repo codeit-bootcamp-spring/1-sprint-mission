@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.*;
@@ -30,7 +30,7 @@ public class FileUserRepository implements UserRepository {
     return new ArrayList<>(data);
   }
 
-  public void updateOne(User user, String name, int age, char gender) {
+  public void updateOne(User user, String name, int age, Gender gender) {
     if (user != null) {
       user.update(name, age, gender);
     } else {

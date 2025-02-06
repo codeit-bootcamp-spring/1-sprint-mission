@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-  void createChannel(Channel channel);
+  boolean createChannel(Channel channel);
 
   Optional<Channel> readChannel(UUID id);
 

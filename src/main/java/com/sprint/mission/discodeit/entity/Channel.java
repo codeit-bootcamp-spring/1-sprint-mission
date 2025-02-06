@@ -41,7 +41,7 @@ public class Channel {
     this.name = name;
     this.topic = topic;
     this.updatedAt = System.currentTimeMillis();
-  }
+  } // Repository 계층으로 넣을 예정
 
   @Override
   public String toString() {

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
@@ -35,7 +36,7 @@ public class FileUserService implements UserService {
   }
 
   @Override
-  public void updateUser(User user, String name, int age, char gender) {
+  public void updateUser(User user, String name, int age, Gender gender) {
     userRepository.updateOne(user, name, age, gender);
     saveData();
   }

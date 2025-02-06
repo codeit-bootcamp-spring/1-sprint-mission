@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+// User 파일이 Gender 파일과 같은 패키지 안에 있으므로 따로 임포트하지 않아도 됨
 import java.io.Serializable;
+import java.util.UUID;
+
 
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -11,9 +13,9 @@ public class User implements Serializable {
   private Long updatedAt;
   private String name;
   private int age;
-  private char gender;
+  private Gender gender;
 
-  public User(String name, int age, char gender) {
+  public User(String name, int age, Gender gender) {
     this.id = UUID.randomUUID();
     this.createdAt = System.currentTimeMillis();
     this.updatedAt = this.createdAt;
@@ -42,11 +44,11 @@ public class User implements Serializable {
     return age;
   }
 
-  public char getGender() {
+  public Gender getGender() {
     return gender;
   }
 
-  public void update(String name, int age, char gender) {
+  public void update(String name, int age, Gender gender) {
     this.name = name;
     this.age = age;
     this.gender = gender;

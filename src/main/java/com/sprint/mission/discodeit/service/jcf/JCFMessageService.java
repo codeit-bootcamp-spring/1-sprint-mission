@@ -13,8 +13,10 @@ public class JCFMessageService implements MessageService {
   }
 
   @Override
-  public void createMessage(Message message) {
-    data.add(message);
+  public boolean createMessage(Message message) {
+    if (message == null)
+      return false;
+    return data.add(message);
   }
 
   @Override
