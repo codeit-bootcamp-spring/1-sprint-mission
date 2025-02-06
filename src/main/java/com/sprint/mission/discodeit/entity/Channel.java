@@ -16,14 +16,16 @@ public class Channel implements Serializable {
     private ChannelType type;
     private String name;
     private String description;
+    private String password;
 
-    public Channel(ChannelType type, String name, String description) {
+    public Channel(ChannelType type, String name, String description, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
         this.type = type;
         this.name = name;
         this.description = description;
+        this.password = password;
     }
 
     public void update(String newName, String newDescription) {

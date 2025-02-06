@@ -13,4 +13,12 @@ public interface ReadStatusRepository {
     List<ReadStatus> findAllByUserId(UUID userId);
 
     void deleteByUserIdAndChannelId(UUID userId, UUID channelId);
+
+    void deleteByChannelId(UUID channelId);
+
+    List<UUID> findUserIdsByChannelId(UUID channelId);
+
+    boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
+
+
 }

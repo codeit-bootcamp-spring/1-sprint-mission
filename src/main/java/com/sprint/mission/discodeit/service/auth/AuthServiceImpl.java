@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.auth;
 
-import com.sprint.mission.discodeit.dto.AuthService.LoginRequest;
+import com.sprint.mission.discodeit.dto.authService.LoginRequest;
 import com.sprint.mission.discodeit.dto.userService.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.basic.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDTO login(LoginRequest loginRequest) {
-        User user = userRepository.findByusername(loginRequest.username())
+        User user = userRepository.findByUsername(loginRequest.username())
                 .orElseThrow(() -> new NoSuchElementException("iNVALID USERNAME OR PASSWORD"));
 
         if (!user.getPassword().equals(loginRequest.password())) {
