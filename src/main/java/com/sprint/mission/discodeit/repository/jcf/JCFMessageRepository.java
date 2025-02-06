@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
     Map<UUID, Message> messageMap = new HashMap<>();
@@ -15,17 +16,25 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return messageMap.get(messageId);
+    public Message findByMessageId(UUID messageId) {
+        return messageMap.get(messageId);  // 메시지 아이디로 메시지 찾기
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageMap.values());
+    public List<Message> findByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public void deleteByMessageId(UUID messageId) {
         messageMap.remove(messageId);
     }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        messageMap.values().removeIf(message -> message.getChannelId().equals(channelId));
+    }
+
 }

@@ -15,8 +15,15 @@ public class JCFUserReposiroty implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public User findByUserId(UUID userId) {
         return userMap.get(userId);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return userMap.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override
@@ -27,5 +34,15 @@ public class JCFUserReposiroty implements UserRepository {
     @Override
     public void delete(UUID userId) {
         userMap.remove(userId);
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userMap.values().stream().anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userMap.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }

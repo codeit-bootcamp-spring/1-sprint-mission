@@ -2,13 +2,18 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+@Repository
+@Primary
 public class FileUserRepository implements UserRepository {
     private static final String USER_JSON_FILE = "tmp/users.json";
     private final ObjectMapper mapper;
@@ -19,6 +24,7 @@ public class FileUserRepository implements UserRepository {
         //Json 파싱을 위해 ObjectMapper 생성
         mapper = new ObjectMapper();
         userMap = new HashMap<>();
+        mapper.registerModule(new JavaTimeModule());
     }
 
     @Override
@@ -30,8 +36,15 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public User findByUserId(UUID userId) {
         return loadUserFromJson().get(userId);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return loadUserFromJson().values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override
@@ -46,6 +59,18 @@ public class FileUserRepository implements UserRepository {
             userMap.remove(userId);
             saveUsersToJson(userMap);
         }
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return loadUserFromJson().values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return loadUserFromJson().values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 
     private Map<UUID, User> loadUserFromJson() {
