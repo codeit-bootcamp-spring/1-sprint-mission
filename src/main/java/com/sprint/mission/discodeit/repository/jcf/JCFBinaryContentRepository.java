@@ -74,4 +74,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
   public void deleteById(String id) {
     data.remove(id);
   }
+
+  @Override
+  public void clear() {
+    data.clear();
+  }
 }

@@ -31,6 +31,7 @@ public class FileUtil {
         throw new RuntimeException("Failed to create file: " + filePath, e);
       }
     }
+
     try (FileInputStream fis = new FileInputStream(file);
          ObjectInputStream ois = new ObjectInputStream(fis)) {
 

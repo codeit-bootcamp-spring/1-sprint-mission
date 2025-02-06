@@ -17,22 +17,6 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
 
-  private static FileUserRepository instance;
-
-  private FileUserRepository() {
-  }
-
-  public static FileUserRepository getInstance() {
-    if (instance == null) {
-      synchronized (FileUserRepository.class) {
-        if (instance == null) {
-          instance = new FileUserRepository();
-        }
-      }
-    }
-    return instance;
-  }
-
   @Override
   public User create(User user) {
     List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);

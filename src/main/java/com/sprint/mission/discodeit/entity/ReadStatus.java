@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 
 @Getter
 public class ReadStatus implements Serializable {
@@ -30,5 +31,18 @@ public class ReadStatus implements Serializable {
   public void updateLastReadAt(){
     updatedAt = Instant.now();
     lastReadAt = Instant.now();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    ReadStatus status = (ReadStatus) o;
+    return Objects.equals(UUID, status.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

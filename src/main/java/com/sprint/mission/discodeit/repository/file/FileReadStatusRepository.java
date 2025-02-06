@@ -21,6 +21,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     List<ReadStatus> statuses = FileUtil.loadAllFromFile(READ_STATUS_FILE, ReadStatus.class);
     statuses.removeIf(s -> s.getUUID().equals(status.getUUID()));
     statuses.add(status);
+    FileUtil.saveAllToFile(READ_STATUS_FILE, statuses);
     return status;
   }
 
@@ -38,7 +39,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     List<ReadStatus> statuses = FileUtil.loadAllFromFile(READ_STATUS_FILE, ReadStatus.class);
 
     return statuses.stream()
-        .filter(status -> status.getUUID().equals(userId))
+        .filter(status -> status.getUserId().equals(userId))
         .toList();
   }
 

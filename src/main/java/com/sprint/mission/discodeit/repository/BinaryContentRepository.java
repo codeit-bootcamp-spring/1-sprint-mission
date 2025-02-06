@@ -17,4 +17,5 @@ public interface BinaryContentRepository {
   void deleteByUserId(String userId);
   void deleteByMessageId(String messageId);
   void deleteById(String id);
+  void clear();
 }

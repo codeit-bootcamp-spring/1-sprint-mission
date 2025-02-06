@@ -17,22 +17,6 @@ import static com.sprint.mission.discodeit.constant.FileConstant.CHANNEL_FILE;
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
 
-  private static FileChannelRepository instance;
-
-  private FileChannelRepository() {
-  }
-
-  public static FileChannelRepository getInstance() {
-    if (instance == null) {
-      synchronized (FileChannelRepository.class) {
-        if (instance == null) {
-          instance = new FileChannelRepository();
-        }
-      }
-    }
-    return instance;
-  }
-
   @Override
   public Channel save(Channel channel) {
     List<Channel> channels = FileUtil.loadAllFromFile(CHANNEL_FILE, Channel.class);
@@ -78,6 +62,7 @@ public class FileChannelRepository implements ChannelRepository {
 
   @Override
   public void clear() {
+
     File file = new File(CHANNEL_FILE);
     if (file.exists()) {
       file.delete();

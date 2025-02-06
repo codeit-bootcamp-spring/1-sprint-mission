@@ -1,48 +1,20 @@
-/*
-package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.*;
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.ChannelValidationException;
-import com.sprint.mission.discodeit.exception.MessageValidationException;
-import com.sprint.mission.discodeit.exception.UserValidationException;
-import com.sprint.mission.discodeit.factory.ChannelFactory;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageServiceV2;
-import com.sprint.mission.discodeit.service.UserService;
+package com.sprint.mission;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.swing.text.html.Option;
-import java.io.File;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import static com.sprint.mission.discodeit.constant.FileConstant.*;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.sprint.mission.discodeit.repository.file", "com.sprint.mission.discodeit.repository.jcf"})
 public class DiscodeitApplication {
 
-  private static ChannelService channelService;
-  private static UserService userService;
-  private static MessageServiceV2<ChatChannel> messageServiceV2;
-  private static ChannelFactory channelFactory;
-
   public static void main(String[] args) {
-    ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-    channelService = context.getBean(ChannelService.class);
-    userService = context.getBean(UserService.class);
-    messageServiceV2 = context.getBean(MessageServiceV2.class);
-    channelFactory = context.getBean(ChannelFactory.class);
-
-    setup();
-    userSimulation();
-    channelSimulation2();
-    messageSimulation2();
+    SpringApplication.run(DiscodeitApplication.class, args);
   }
-
+}
+/*
   private static void setup() {
     File file = new File(MESSAGE_FILE);
     File file2 = new File(USER_FILE);
@@ -57,7 +29,7 @@ public class DiscodeitApplication {
     if (file3.exists()) {
       file3.delete();
     }
-  }
+  }}
 
   static void userSimulation() {
 

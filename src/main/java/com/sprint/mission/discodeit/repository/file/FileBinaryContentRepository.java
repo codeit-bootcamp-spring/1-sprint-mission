@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import static com.sprint.mission.discodeit.constant.FileConstant.BINARY_CONTENT_FILE;
 
 @Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
   private List<BinaryContent> getFromFile(){
@@ -101,5 +103,10 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     List<BinaryContent> contents = getFromFile();
     contents.removeIf(content -> content.getUUID().equals(id));
     writeToFile(contents);
+  }
+
+  @Override
+  public void clear() {
+
   }
 }
