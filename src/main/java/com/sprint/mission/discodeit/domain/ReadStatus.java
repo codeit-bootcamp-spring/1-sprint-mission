@@ -17,7 +17,8 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public class ReadStatus {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private UUID id;
     private UUID userId;
     private UUID channelId;
@@ -43,4 +44,8 @@ public class ReadStatus {
         this.updatedAt = Instant.now();
     }
 
+    @Override
+    public String toString() {
+        return "ReadStatus{" + "id=" + id + ", userId=" + userId + ", channelId=" + channelId + ", lastReadAt=" + lastReadAt + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    }
 }

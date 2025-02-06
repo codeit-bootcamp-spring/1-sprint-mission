@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 @Repository
+@Profile("File")
 public class FileMessageRepository implements MessageRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\message.ser";
     //private final Map<UUID, Message> messageMap;

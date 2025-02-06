@@ -1,21 +1,25 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
-import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
+@Profile("Jcf")
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> list; //채널 리스트
+    private final Map<UUID, Channel> map; //채널 리스트
     private final Map<UUID, List<UUID>> messages = new HashMap<>();
     //private JcfMessageService jcfMessageService;
     //private static volatile JcfChannelService instance;
 
-    public JCFChannelRepository(Map<UUID, Channel> list) {
-        this.list = list;
+    //public JCFChannelRepository(Map<UUID, Channel> map) {this.map = map;}
+    public JCFChannelRepository() {
+        this.map = new HashMap<>();
     }
+
     public List<UUID> messages(UUID uuid) {
         Channel channel = findById(uuid);
         if (channel == null) {
@@ -25,6 +29,7 @@ public class JCFChannelRepository implements ChannelRepository {
         List<UUID> messageUuidList = messages.get(channel.getId());
         return new ArrayList<>(messageUuidList);
     }
+
     public void addMessage(UUID uuid, UUID messageId) {
         Channel channel = findById(uuid);
         if (channel == null) {
@@ -36,13 +41,13 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     public boolean validationUUID(UUID channelId) {
-        return list.containsKey(channelId);
+        return map.containsKey(channelId);
     }
 
     @Override
     public Channel save(String channelName, ChannelType type) {
         Channel newChannel = new Channel(channelName, type);
-        list.put(newChannel.getId(), newChannel);
+        map.put(newChannel.getId(), newChannel);
         messages.put(newChannel.getId(), new ArrayList<>());
         return newChannel;
     }//Public
@@ -50,26 +55,26 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public Channel save(ChannelType type) {
         Channel newChannel = new Channel(type);
-        list.put(newChannel.getId(), newChannel);
+        map.put(newChannel.getId(), newChannel);
         messages.put(newChannel.getId(), new ArrayList<>());
         return newChannel;
     }//Private
 
     @Override
     public Channel findById(UUID id) {
-        return list.get(id);
+        return map.get(id);
     }
 
     @Override
     public List<Channel> findAll() {
-        List<Channel> collect = list.values().stream().toList();
+        List<Channel> collect = map.values().stream().toList();
         return new ArrayList<>(collect);
     }
 
     @Override
     public boolean delete(UUID channelId) {
-        if (list.containsKey(channelId)) {
-            list.remove(channelId);
+        if (map.containsKey(channelId)) {
+            map.remove(channelId);
             return true;
         } else {
             System.out.println("채널을 찾을 수 없습니다.");
@@ -81,7 +86,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public void update(UUID id, String channelName) {
         Channel channel = findById(id);
         channel.update(channelName);
-        list.replace(id, channel);
+        map.replace(id, channel);
     }
 
 }

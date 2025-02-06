@@ -13,4 +13,7 @@ public record ChannelDto(UUID id, String name, ChannelType type, Instant created
     public ChannelDto(String name, ChannelType type){
         this(null, name, type,null, null);
     }
+    public ChannelDto(ChannelType type){
+        this(null, null, type,null, null);
+    }
 }

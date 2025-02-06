@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,4 +16,6 @@ public interface ChannelRepository {
     List<Channel> findAll();
     boolean delete(UUID channelId);
     void update(UUID id, String name);
+    void addMessage(UUID uuid, UUID messageId);
+    List<UUID> messages(UUID channelId);
 }

@@ -21,18 +21,6 @@ public class BasicUserService implements UserService {
     private final UserRepository repository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private static volatile BasicUserService instance;
-
-    public static BasicUserService getInstance(UserRepository repository, UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository) {
-        if (instance == null) {
-            synchronized (BasicUserService.class) {
-                if (instance == null) {
-                    instance = new BasicUserService(repository, userStatusRepository, binaryContentRepository);
-                }
-            }
-        }
-        return instance;
-    }
 
     @Override
     public UserDto createUser(UserDto paramUserDto) {
