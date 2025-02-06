@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.FileConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,27 +18,30 @@ import java.util.*;
 @Repository
 @Primary
 public class FileChannelRepository implements ChannelRepository {
-    private static final String CHANNEL_JSON_FILE = "tmp/channels.json";
+
+    private final String channelJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, Channel> channelMap;
 
-    public FileChannelRepository() {
+    @Autowired
+    public FileChannelRepository(FileConfig fileConfig) {
+        this.channelJsonFile = fileConfig.getChannelJsonPath();
         mapper = new ObjectMapper();
-        channelMap = new HashMap<>();
         mapper.registerModule(new JavaTimeModule());
+        channelMap = new HashMap<>();
     }
 
     @Override
-    public Channel save(Channel channel) {
+    public Optional<Channel> save(Channel channel) {
         channelMap = loadChannelFromJson();
         channelMap.put(channel.getId(), channel);
         saveChannelToJson(channelMap);
-        return channel;
+        return Optional.of(channel);
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return loadChannelFromJson().get(channelId);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(loadChannelFromJson().get(channelId));
     }
 
     @Override
@@ -54,7 +60,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     private Map<UUID, Channel> loadChannelFromJson() {
         Map<UUID, Channel> map = new HashMap<>();
-        File file = new File(CHANNEL_JSON_FILE);
+        File file = new File(channelJsonFile);
         if (!file.exists()) {
             return map;
         }
@@ -62,16 +68,16 @@ public class FileChannelRepository implements ChannelRepository {
             map = mapper.readValue(file, new TypeReference<Map<UUID, Channel>>() {
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
 
     private void saveChannelToJson(Map<UUID, Channel> channelMap) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(CHANNEL_JSON_FILE), channelMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(channelJsonFile), channelMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }

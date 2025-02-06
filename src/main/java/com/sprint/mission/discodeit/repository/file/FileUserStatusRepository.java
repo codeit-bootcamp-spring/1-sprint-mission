@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.FileConfig;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,15 +18,17 @@ import java.util.*;
 @Repository
 @Primary
 public class FileUserStatusRepository implements UserStatusRepository {
-    private static final String USER_STATUS_JSON_FILE = "tmp/userStatuses.json";
+
+    private final String userStatusJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, UserStatus> userStatusMap;
-    
-    public FileUserStatusRepository() {
-        //Json 파싱을 위해 ObjectMapper 생성
+
+    @Autowired
+    public FileUserStatusRepository(FileConfig fileConfig) {
+        this.userStatusJsonFile = fileConfig.getUserStatusJsonPath();
         mapper = new ObjectMapper();
-        userStatusMap = new HashMap<>();
         mapper.registerModule(new JavaTimeModule());
+        userStatusMap = new HashMap<>();
     }
 
     @Override
@@ -34,8 +39,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findByUserId(UUID userId) {
-        return userStatusMap.get(userId);
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return Optional.ofNullable(userStatusMap.get(userId));
     }
 
     @Override
@@ -51,23 +56,23 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     private Map<UUID, UserStatus> loadUserStatusesFromJson() {
         Map<UUID, UserStatus> map = new HashMap<>();
-        File file = new File(USER_STATUS_JSON_FILE);
+        File file = new File(userStatusJsonFile);
         if (!file.exists()) {
             return map;
         }
         try {
             map = mapper.readValue(file, new TypeReference<Map<UUID, UserStatus>>() {});
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
 
     private void saveUserStatusesToJson(Map<UUID, UserStatus> userStatusMap) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(USER_STATUS_JSON_FILE), userStatusMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(userStatusJsonFile), userStatusMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }

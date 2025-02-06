@@ -1,14 +1,14 @@
-package com.sprint.mission.discodeit.dto.Channel;
+package com.sprint.mission.discodeit.dto.channel;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelCreateRequest(
+public record PublicChannelCreateRequest(
         String name,
         String description,
         ChannelType channelType,
-        List<UUID> participantIds
+        List<UUID> participants
 ) {
 }

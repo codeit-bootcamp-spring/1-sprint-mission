@@ -17,8 +17,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findByUserId(UUID userId) {
-        return store.get(userId);
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return Optional.ofNullable(store.get(userId));
     }
 
     @Override

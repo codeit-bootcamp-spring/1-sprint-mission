@@ -15,29 +15,29 @@ public class Message implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    private String content;
+    private String message;
     private UUID authorId;
     private UUID channelId;
-    private List<UUID> attachmentIds;
+    private List<byte[]> content;
 
     public Message() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
 
-    public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentIds) {
+    public Message(String message, UUID authorId, UUID channelId, List<byte[]> content) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
-        this.content = content;
+        this.message = message;
         this.authorId = authorId;
         this.channelId = channelId;
-        this.attachmentIds = attachmentIds;
+        this.content = content;
     }
 
-    public void update(String content, List<UUID> attachmentIds) {
-        this.content = content;
+    public void update(String message, List<byte[]> content) {
+        this.message = message;
         this.updatedAt = Instant.now();
-        this.attachmentIds = attachmentIds;
+        this.content = content;
     }
 }

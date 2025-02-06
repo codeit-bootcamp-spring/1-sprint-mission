@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -16,33 +13,30 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusMap = new HashMap<>();
 
     @Override
-    public ReadStatus save(ReadStatus readStatus) {
+    public Optional<ReadStatus> save(ReadStatus readStatus) {
         readStatusMap.put(readStatus.getId(), readStatus);
-        return readStatus;
+        return Optional.of(readStatus);
     }
 
     @Override
-    public ReadStatus findByUserId(UUID userId) {
+    public Optional<ReadStatus> findByUserId(UUID userId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public ReadStatus findByChannelId(UUID channelId) {
+    public Optional<ReadStatus> findByChannelId(UUID channelId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -53,8 +47,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return readStatusMap.get(id);
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(readStatusMap.get(id));
     }
 
     @Override

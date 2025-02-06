@@ -9,14 +9,14 @@ public class JCFUserReposiroty implements UserRepository {
     private final Map<UUID, User> userMap = new HashMap<>();
 
     @Override
-    public User save(User user) {
+    public Optional<User> save(User user) {
         userMap.put(user.getId(), user);
-        return user;
+        return Optional.of(user);
     }
 
     @Override
-    public User findByUserId(UUID userId) {
-        return userMap.get(userId);
+    public Optional<User> findByUserId(UUID userId) {
+        return Optional.ofNullable(userMap.get(userId));
     }
 
     @Override

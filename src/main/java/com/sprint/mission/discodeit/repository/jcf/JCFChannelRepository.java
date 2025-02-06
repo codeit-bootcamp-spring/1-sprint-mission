@@ -9,14 +9,14 @@ public class JCFChannelRepository implements ChannelRepository {
     Map<UUID, Channel> channelMap = new HashMap<>();
 
     @Override
-    public Channel save(Channel channel) {
+    public Optional<Channel> save(Channel channel) {
         channelMap.put(channel.getId(), channel);
-        return channel;
+        return Optional.of(channel);
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return channelMap.get(channelId);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override

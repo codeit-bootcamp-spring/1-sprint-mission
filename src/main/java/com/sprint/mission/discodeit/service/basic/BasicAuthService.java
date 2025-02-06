@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +26,18 @@ public class BasicAuthService implements AuthService {
         if (user.isEmpty() || !user.get().getPassword().equals(request.password())) {
             throw new IllegalArgumentException("올바르지 않은 아이디나 비밀번호입니다.");
         }
-        UserStatus userStatus = userStatusRepository.findByUserId(user.get().getId());
-        userStatus.update(Instant.now());
-        userStatusRepository.save(userStatus);
-        boolean isOnline = userStatus.isOnline();
+        Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.get().getId());
+        userStatus.get().update(Instant.now());
+        userStatusRepository.save(userStatus.orElse(null));
+        boolean isOnline = userStatus.get().isOnline();
         // UserDto 변환 후 반환
-        return new UserDto(user.get().getId(), user.get().getUsername(), user.get().getEmail(), user.get().getPhoneNumber(), isOnline);
+        return new UserDto(
+                user.get().getId(),
+                user.get().getUsername(),
+                user.get().getEmail(),
+                user.get().getPhoneNumber(),
+                isOnline,
+                user.get().getCreatedAt(),
+                user.get().getUpdatedAt());
     }
 }

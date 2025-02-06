@@ -3,62 +3,61 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.FileConfig;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
 @Primary
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private static final String READ_STATUS_JSON_FILE = "tmp/readStatuses.json";
+    private final String readStatusJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, ReadStatus> readStatusMap;
 
-    public FileReadStatusRepository() {
+    @Autowired
+    public FileReadStatusRepository(FileConfig fileConfig) {
+        this.readStatusJsonFile = fileConfig.getReadStatusJsonPath();
         mapper = new ObjectMapper();
-        readStatusMap = loadReadStatusesFromJson();
         mapper.registerModule(new JavaTimeModule());
+        readStatusMap = loadReadStatusesFromJson();
     }
 
     @Override
-    public ReadStatus save(ReadStatus readStatus) {
+    public Optional<ReadStatus> save(ReadStatus readStatus) {
         readStatusMap.put(readStatus.getId(), readStatus);
         saveReadStatusesToJson(readStatusMap);
-        return readStatus;
+        return Optional.of(readStatus);
     }
 
     @Override
-    public ReadStatus findByUserId(UUID userId) {
+    public Optional<ReadStatus> findByUserId(UUID userId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public ReadStatus findByChannelId(UUID channelId) {
+    public Optional<ReadStatus> findByChannelId(UUID channelId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
-    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
         return readStatusMap.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     @Override
@@ -69,8 +68,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return readStatusMap.get(id);
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(readStatusMap.get(id));
     }
 
     @Override
@@ -93,23 +92,23 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     private Map<UUID, ReadStatus> loadReadStatusesFromJson() {
         Map<UUID, ReadStatus> map = new HashMap<>();
-        File file = new File(READ_STATUS_JSON_FILE);
+        File file = new File(readStatusJsonFile);
         if (!file.exists()) {
             return map;
         }
         try {
             map = mapper.readValue(file, new TypeReference<Map<UUID, ReadStatus>>() {});
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
 
     private void saveReadStatusesToJson(Map<UUID, ReadStatus> readStatusMap) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(READ_STATUS_JSON_FILE), readStatusMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(readStatusJsonFile), readStatusMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }

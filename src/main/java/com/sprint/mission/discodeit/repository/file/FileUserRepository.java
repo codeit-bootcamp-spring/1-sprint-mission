@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.FileConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,29 +18,31 @@ import java.util.*;
 @Repository
 @Primary
 public class FileUserRepository implements UserRepository {
-    private static final String USER_JSON_FILE = "tmp/users.json";
+
+    private final String userJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, User> userMap;
 
-
-    public FileUserRepository() {
+    @Autowired
+    public FileUserRepository(FileConfig fileConfig) {
+        this.userJsonFile = fileConfig.getUserJsonPath();
         //Json 파싱을 위해 ObjectMapper 생성
         mapper = new ObjectMapper();
-        userMap = new HashMap<>();
         mapper.registerModule(new JavaTimeModule());
+        userMap = new HashMap<>();
     }
 
     @Override
-    public User save(User user) {
+    public Optional<User> save(User user) {
         userMap = loadUserFromJson();
         userMap.put(user.getId(), user);
         saveUsersToJson(userMap);
-        return user;
+        return Optional.of(user);
     }
 
     @Override
-    public User findByUserId(UUID userId) {
-        return loadUserFromJson().get(userId);
+    public Optional<User> findByUserId(UUID userId) {
+        return Optional.ofNullable(loadUserFromJson().get(userId));
     }
 
     @Override
@@ -75,7 +80,7 @@ public class FileUserRepository implements UserRepository {
 
     private Map<UUID, User> loadUserFromJson() {
         Map<UUID, User> map = new HashMap<>();
-        File file = new File(USER_JSON_FILE);
+        File file = new File(userJsonFile);
         if (!file.exists()) {
             return map;
         }
@@ -84,7 +89,7 @@ public class FileUserRepository implements UserRepository {
             map = mapper.readValue(file, new TypeReference<Map<UUID, User>>() {
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
@@ -92,9 +97,9 @@ public class FileUserRepository implements UserRepository {
     private void saveUsersToJson(Map<UUID, User> userMap) {
         try {
             // json 데이터를 보기좋게(pretty print) 정렬하여 저장
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(USER_JSON_FILE), userMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(userJsonFile), userMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }

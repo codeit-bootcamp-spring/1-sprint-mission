@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.FileConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,27 +18,29 @@ import java.util.*;
 @Repository
 @Primary
 public class FileMessageRepository implements MessageRepository {
-    private static final String MESSAGE_JSON_FILE = "tmp/messages.json";
+    private final String messageJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, Message> messageMap;
 
-    public FileMessageRepository() {
+    @Autowired
+    public FileMessageRepository(FileConfig fileConfig) {
+        this.messageJsonFile = fileConfig.getMessageJsonPath();
         mapper = new ObjectMapper();
-        messageMap = new HashMap<>();
         mapper.registerModule(new JavaTimeModule());
+        messageMap = new HashMap<>();
     }
 
     @Override
-    public Message save(Message message) {
+    public Optional<Message> save(Message message) {
         messageMap = loadMessageFromJson();
         messageMap.put(message.getId(), message);
         saveMessageToJson(messageMap);
-        return message;
+        return Optional.of(message);
     }
 
     @Override
-    public Message findByMessageId(UUID messageId) {
-        return loadMessageFromJson().get(messageId);
+    public Optional<Message> findByMessageId(UUID messageId) {
+        return Optional.ofNullable(loadMessageFromJson().get(messageId));
     }
 
     @Override
@@ -63,7 +68,7 @@ public class FileMessageRepository implements MessageRepository {
 
     private Map<UUID, Message> loadMessageFromJson() {
         Map<UUID, Message> map = new HashMap<>();
-        File file = new File(MESSAGE_JSON_FILE);
+        File file = new File(messageJsonFile);
         if (!file.exists()) {
             return map;
         }
@@ -71,16 +76,16 @@ public class FileMessageRepository implements MessageRepository {
             map = mapper.readValue(file, new TypeReference<Map<UUID, Message>>() {
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
 
     private void saveMessageToJson(Map<UUID, Message> messageMap) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(MESSAGE_JSON_FILE), messageMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(messageJsonFile), messageMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }
