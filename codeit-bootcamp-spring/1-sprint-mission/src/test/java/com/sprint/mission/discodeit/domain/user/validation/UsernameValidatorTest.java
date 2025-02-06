@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.domain.user.validation;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.sprint.mission.discodeit.domain.user.exception.UserNameInvalidException;
 import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
