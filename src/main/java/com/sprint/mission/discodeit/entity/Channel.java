@@ -13,12 +13,14 @@ public class Channel implements Serializable, Entity {
     private UUID id;
     private String channelName;
     private ArrayList<User> members;
+    private ChannelType type;
 
-    public Channel(String channelName) {
+    public Channel(ChannelType type, String channelName) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.channelName = channelName;
         this.members = new ArrayList<>();
+        this.type = type;
     }
     //생성시간 리턴
     public long getCreatedAt(){return this.createdAt;}
@@ -37,6 +39,10 @@ public class Channel implements Serializable, Entity {
         this.channelName = channelName;
         this.setUpdatedAt();
     }
+    //타입 리턴
+    public ChannelType getType(){
+        return this.type;
+    }
     //채널에 속한 멤버 리스트 반환
     public ArrayList<User> getMembers(){
         return this.members;
@@ -45,11 +51,6 @@ public class Channel implements Serializable, Entity {
     //채널에 속한 멤버 리스트 교체
     public void setMembers(ArrayList<User> members){
         this.members = members;
-        this.setUpdatedAt();
-    }
-    //채널에 멤버 한명 추가
-    public void addMember(User user){
-        this.members.add(user);
         this.setUpdatedAt();
     }
 

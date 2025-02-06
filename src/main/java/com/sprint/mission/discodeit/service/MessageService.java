@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface MessageService {
     HashMap<UUID, Message> getMessagesMap();
 
-    UUID createMessage(UUID fromUserId, UUID channelId, String content);
+    UUID createMessage(UUID authorId, UUID channelId, String content);
 
     Message getMessageById(UUID messageId);
 

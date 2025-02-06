@@ -22,7 +22,7 @@ public class JCFMessageRepository implements MessageRepository {
         return JCFMessageRepositoryHolder.INSTANCE;
     }
 
-    // I/O로 생성된 모든 메세지 객체가 담기는 해쉬맵 반환
+    // 모든 메세지 객체가 담기는 해쉬맵 반환
     @Override
     public HashMap<UUID, Message> getMessagesMap() {
         return messagesMap;
@@ -37,7 +37,7 @@ public class JCFMessageRepository implements MessageRepository {
         return messagesMap.get(messageId);
     }
 
-    // 특정 메세지 객체 여부 확인 후 삭제. 불값 반환
+    // 특정 메세지 객체 여부 확인 후 삭제.
     @Override
     public boolean deleteMessage(UUID Id) {
         if (messagesMap.containsKey(Id) == false) {
@@ -66,12 +66,4 @@ public class JCFMessageRepository implements MessageRepository {
         return true;
     }
 
-    // 전달받은 메세지맵 null 여부 확인 후 기존 메세지맵에 추가.
-    public boolean addMessages(HashMap<UUID, Message> messages) {
-        if (messages == null) {
-            return false;
-        }
-        messagesMap.putAll(messages);
-        return true;
-    }
 }

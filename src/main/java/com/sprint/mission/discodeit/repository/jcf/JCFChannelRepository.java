@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.HashMap;
@@ -10,21 +11,21 @@ public class JCFChannelRepository implements ChannelRepository {
 
     // 모든 채널 객체가 담기는 해쉬맵
     private static final HashMap<UUID, Channel> channelsMap = new HashMap<UUID, Channel>();
-
     // 외부에서 생성자 접근 불가
     private JCFChannelRepository() {}
-
     // 레포지토리 객체 LazyHolder 싱글톤 구현.
     private static class JCFChannelRepositoryHolder {
         private static final JCFChannelRepository INSTANCE = new JCFChannelRepository();
     }
-
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static JCFChannelRepository getInstance() {
         return JCFChannelRepositoryHolder.INSTANCE;
     }
 
-    // I/O로 생성된 모든 채널 객체가 담기는 해쉬맵 반환
+
+
+
+    // 모든 채널 객체가 담기는 해쉬맵 반환
     @Override
     public HashMap<UUID, Channel> getChannelsMap() {
         return channelsMap;
@@ -68,6 +69,14 @@ public class JCFChannelRepository implements ChannelRepository {
         return true;
     }
 
+    @Override
+    public boolean addChannelMember(UUID channelId, User member){;
+        if (channelId==null || member==null) {
+            return false;
+        }
+        channelsMap.get(channelId).getMembers().add(member);
+        return true;
+    }
 
 
 }

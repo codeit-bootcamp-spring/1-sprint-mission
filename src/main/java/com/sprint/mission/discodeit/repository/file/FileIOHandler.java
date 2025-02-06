@@ -27,7 +27,7 @@ public class FileIOHandler {
 
     //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
     public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName) {
-        if (entityMap == null || entityMap.isEmpty() == true || fileName == null) {
+        if (entityMap == null || fileName == null) {
             return false;
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
@@ -35,7 +35,6 @@ public class FileIOHandler {
             ObjectOutputStream oos = new ObjectOutputStream(fos))
         {
             oos.writeObject(entityMap);
-            System.out.println("Serialization successful: File saved at " + fileName+".ser");
             return true;
         } catch (Exception e) {
             e.printStackTrace();

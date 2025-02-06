@@ -13,11 +13,12 @@ public class Message implements Serializable, Entity {
     private String content;
 
 
-    public Message(User fromUser, Channel channel, String content){
+    public Message(User User, Channel channel, String content){
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
-        this.fromUser = fromUser;
+        this.fromUser = User;
         this.channel = channel;
+        this.content = content;
     }
 
     //생성시간 리턴
@@ -29,7 +30,7 @@ public class Message implements Serializable, Entity {
     //id 리턴
     public UUID getId(){return this.id;}
     //메세지 보낸이 리턴
-    public User getFromUser(){return this.fromUser;}
+    public User getAuthor(){return this.fromUser;}
     //메세지가 보여질 채널 리턴
     public Channel getChannel(){return this.channel;}
     //메세지 내용 리턴
