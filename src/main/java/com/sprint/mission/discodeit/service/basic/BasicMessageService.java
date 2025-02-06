@@ -6,28 +6,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-
-    private static final BasicMessageService basicMessageService = new BasicMessageService();
 
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
-
-    private BasicMessageService() {
-        this.channelRepository = FileChannelRepository.getInstance();
-        this.messageRepository = FileMessageRepository.getInstance();
-    }
-
-    public static BasicMessageService getInstance() {
-        return basicMessageService;
-    }
 
     @Override
     public Message createMessage(MessageDto messageDto) {

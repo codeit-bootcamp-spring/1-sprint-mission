@@ -4,7 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,23 +13,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final FileChannelRepository fileChannelRepository = new FileChannelRepository();
     private static final Path filePath;
-    private final UserRepository userRepository;
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "channels");
         FileManager.createDirectory(filePath);
-    }
-
-    private FileChannelRepository() {
-        userRepository = FileUserRepository.getInstance();
-    }
-
-    public static FileChannelRepository getInstance() {
-        return fileChannelRepository;
     }
 
     @Override

@@ -3,27 +3,20 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-    private static final BasicUserService basicUserService = new BasicUserService();
-
     private final UserRepository userRepository;
-
-    private BasicUserService() {
-        this.userRepository = FileUserRepository.getInstance();
-    }
-
-    public static BasicUserService getInstance() {
-        return basicUserService;
-    }
 
     @Override
     public User createUser(UserDto userDto) {

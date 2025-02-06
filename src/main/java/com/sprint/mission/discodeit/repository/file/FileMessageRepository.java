@@ -3,8 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,23 +13,15 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class FileMessageRepository implements MessageRepository {
 
-    private static final FileMessageRepository fileMessageRepository = new FileMessageRepository();
     private static final Path filePath;
-    private final ChannelRepository channelRepository;
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "messages");
         FileManager.createDirectory(filePath);
-    }
-
-    private FileMessageRepository() {
-        channelRepository = FileChannelRepository.getInstance();
-    }
-
-    public static FileMessageRepository getInstance() {
-        return fileMessageRepository;
     }
 
     @Override

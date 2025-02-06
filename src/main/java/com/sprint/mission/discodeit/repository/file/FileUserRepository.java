@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,20 +14,15 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
 
-    private static final FileUserRepository fileUserRepository = new FileUserRepository();
     private static final Path filePath;
 
     static {
         filePath = Paths.get(System.getProperty("user.dir"), "users");
         FileManager.createDirectory(filePath);
-    }
-
-    private FileUserRepository() {}
-
-    public static FileUserRepository getInstance() {
-        return fileUserRepository;
     }
 
     @Override
