@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -23,15 +23,7 @@ public class User implements Serializable {
     //수정 시간
     private Instant updatedAt;
     //접속 상태
-    //todo - 고민
-    //1. private String userStatusId로 할 경우
-    // - 장점: 책임 분리 가능,
-    // - 단점: 유저가 접속 중인지 아닌지 구분하기 위해 userStatusService에서 조회 -> isActive() 해서 온라인 상태 확인해야
-    //2. private UserStatus userStatus 로 할 경우
-    // - 장점: isActive()를 통해 바로 확인 가능
-    // - 단점: 책임 명확하지 않을 것 같음, DB 변경 시 호환 문제 예상됨, 만약 나중에 JPA 사용 시 UserStatus를 업데이트하면 User도 업데이트 되지 않을까?(잘모름)
     private String userStatusId;
-
     //사용자 설정 상태 메세지
     private String statusMessage;
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
@@ -50,7 +42,6 @@ public class User implements Serializable {
         this.statusMessage = statusMessage;
         this.accountStatus = accountStatus;
     }
-
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
@@ -98,25 +89,25 @@ public class User implements Serializable {
         System.out.println(toFullString());
     }
 
-    public boolean isUpdated(UserDTO userDTO) {
-        if (userDTO == null) {
+    public boolean isUpdated(UpdateUserDto updateUserDto) {
+        if (updateUserDto == null) {
             return false;
         }
 
         boolean isUpdated = false;
 
-        if (!nickname.equals(userDTO.nickname()) && userDTO.nickname() != null && !userDTO.nickname().isEmpty()) {
-            setNickname(userDTO.nickname());
+        if (!nickname.equals(updateUserDto.nickname()) && updateUserDto.nickname() != null && !updateUserDto.nickname().isEmpty()) {
+            setNickname(updateUserDto.nickname());
             isUpdated = true;
         }
-        if (!email.equals(userDTO.email()) && userDTO.email() != null && !userDTO.email().isEmpty()) {
-            setEmail(userDTO.email());
+        if (!email.equals(updateUserDto.email()) && updateUserDto.email() != null && !updateUserDto.email().isEmpty()) {
+            setEmail(updateUserDto.email());
             isUpdated = true;
         }
         // UserStatus 분리로 삭제
 
-        if (!accountStatus.equals(userDTO.accountStatus()) && userDTO.accountStatus() != null) {
-            setAccountStatus(userDTO.accountStatus());
+        if (!accountStatus.equals(updateUserDto.accountStatus()) && updateUserDto.accountStatus() != null) {
+            setAccountStatus(updateUserDto.accountStatus());
             isUpdated = true;
         }
         return isUpdated;

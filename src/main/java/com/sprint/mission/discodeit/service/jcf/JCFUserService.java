@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.time.Instant;
 import java.util.*;
 
 public class JCFUserService implements UserService {
@@ -47,12 +46,12 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> getUsers() {
-        return new ArrayList<>(data.values());
+    public List<User> findAll() {
+        return data.values().stream().toList();
     }
 
     @Override
-    public User getUserByUUID(String userId) throws CustomException {
+    public User findById(String userId) throws CustomException {
 
         User user = data.get(userId);
 
@@ -63,7 +62,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) throws CustomException {
+    public User findByEmail(String email) throws CustomException {
 
         User user = data.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
 
@@ -74,14 +73,14 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public List<User> getUsersByNickname(String nickname) {
+    public List<User> findAllContainsNickname(String nickname) {
         return data.values().stream()
                 .filter(u -> u.getNickname().contains(nickname))
                 .toList();
     }
 
     @Override
-    public List<User> getUsersByAccountStatus(AccountStatus accountStatus) {
+    public List<User> findAllByAccountStatus(AccountStatus accountStatus) {
         return data.values().stream()
                 .filter(u -> u.getAccountStatus().equals(accountStatus))
                 .toList();
@@ -96,14 +95,14 @@ public class JCFUserService implements UserService {
 //    }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {
+    public User updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
         User user = data.get(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
-        if (user.isUpdated(userDTO)) {
-            user.setUpdatedAt(updatedAt);
+        if (user.isUpdated(updateUserDto)) {
+            user.setUpdatedAt(updateUserDto.updatedAt());
         }
         return user;
     }

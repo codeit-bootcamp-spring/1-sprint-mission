@@ -90,7 +90,7 @@ public class BasicChannelService implements ChannelService {
             //해당 채널이 DB에 존재하는 채널인지 검사
             Channel c = channelRepository.findById(channelId);
             //해당 유저가 DB에 존재하는 유저인지 검사
-            User u = userService.getUserByUUID(userId);
+            User u = userService.findById(userId);
             c.getUserList().put(u.getId(), u);
             channelRepository.save(c);
             return true;

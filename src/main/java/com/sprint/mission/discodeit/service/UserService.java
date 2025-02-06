@@ -1,40 +1,39 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
+import com.sprint.mission.discodeit.entity.User;
 
-import java.time.Instant;
 import java.util.List;
 
 public interface UserService {
 
     //생성
-    CreateUserDto create(String nickname, String email, String password);
+    User create(String nickname, String email, String password);
 
     //모두 읽기
-    List<CreateUserDto> getUsers();
+    List<User> findAll();
 
     //읽기
     //단건 조회 - UUID
-    CreateUserDto getUserByUUID(String userId);
+    User findById(String userId);
 
     //단건 조회 - 이메일로 조회
-    CreateUserDto getUserByEmail(String email);
+    User findByEmail(String email);
 
     //다건 조회 - 닉네임
-    List<CreateUserDto> getUsersByNickname(String nickname);
+    List<User> findAllContainsNickname(String nickname);
 
     //다건 조회 - 계정 상태
-    List<CreateUserDto> getUsersByAccountStatus(AccountStatus accountStatus);
+    List<User> findAllByAccountStatus(AccountStatus accountStatus);
 
     //다건 조회 - 사용자 상태
-    //List<UserDTO> getUserByUserStatus(UserStatus userStatus);
+    //List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
-    CreateUserDto updateUser(String userId, CreateUserDto createUserDto, Instant updatedAt);
+    User updateUser(String userId, UpdateUserDto updateUserDto);
 
     //삭제
     boolean deleteUser(String userId);
-
-
+    
 }

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,10 +9,8 @@ import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 
@@ -20,7 +18,6 @@ import java.util.List;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final UserStatusService userStatusService;
 
     @Override
     public User create(String nickname, String email, String password) {
@@ -42,17 +39,12 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserDTO> getUsers() {
-        for (User u : userRepository.findAll()) {
-            UserDTO userDTO = new UserDTO(u.getId(), u.getNickname(), u.getEmail(),
-                    userStatusService.findById(u.getUserStatusId()).isActive(), u.getStatusMessage(), u.getAccountStatus(), u.getProfileImageId());
-        }
-
-        return null;
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
-    public User getUserByUUID(String userId) throws CustomException {
+    public User findById(String userId) throws CustomException {
         User user = userRepository.findById(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
@@ -61,7 +53,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) throws CustomException {
+    public User findByEmail(String email) throws CustomException {
         User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with email %s not found", email));
@@ -70,13 +62,17 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> getUsersByNickname(String nickname) {
-        return userRepository.findAll().stream().filter(user -> user.getNickname().contains(nickname)).toList();
+    public List<User> findAllContainsNickname(String nickname) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getNickname().contains(nickname))
+                .toList();
     }
 
     @Override
-    public List<User> getUsersByAccountStatus(AccountStatus accountStatus) {
-        return userRepository.findAll().stream().filter(user -> user.getAccountStatus().equals(accountStatus)).toList();
+    public List<User> findAllByAccountStatus(AccountStatus accountStatus) {
+        return userRepository.findAll().stream()
+                .filter(user -> user.getAccountStatus().equals(accountStatus))
+                .toList();
     }
 
     //UserStatus 필드 변경으로 인한 임시 주석 처리
@@ -86,20 +82,20 @@ public class BasicUserService implements UserService {
 //    }
 
     @Override
-    public User updateUser(String userId, UserDTO userDTO, Instant updatedAt) throws CustomException {
+    public User updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
         User user = userRepository.findById(userId);
 
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
-        } else if (userDTO == null) {
+        } else if (updateUserDto == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
         }
 
-        if (user.isUpdated(userDTO)) {
-            user.setUpdatedAt(updatedAt);
+        if (user.isUpdated(updateUserDto)) {
+            user.setUpdatedAt(updateUserDto.updatedAt());
         }
 
-        return userRepository.save(user);
+        return user;
     }
 
     @Override
