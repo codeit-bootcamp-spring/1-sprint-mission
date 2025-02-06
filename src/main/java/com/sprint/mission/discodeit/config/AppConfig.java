@@ -60,7 +60,7 @@ public class AppConfig {
 
     @Bean
     public UserService userService() {
-        return new BasicUserService(userRepository(), userStatusService());
+        return new BasicUserService(userRepository());
     }
 
     @Bean
