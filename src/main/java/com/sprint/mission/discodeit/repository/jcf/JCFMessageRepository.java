@@ -26,7 +26,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findMessage(UUID messageId) {
+    public Message findById(UUID messageId) {
         return Optional.ofNullable(data.get(messageId))
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 message입니다."));
     }

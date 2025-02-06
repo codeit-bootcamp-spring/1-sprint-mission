@@ -25,7 +25,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel readChannel(UUID channelId) {
-        return channelRepository.findChannel(channelId);
+        return channelRepository.findById(channelId);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void updateChannel(UUID channelId, ChannelDto channelDto) {
-        Channel channel = channelRepository.findChannel(channelId);
+        Channel channel = channelRepository.findById(channelId);
         channel.updateName(channelDto.getName());
         channel.updateDescription(channelDto.getDescription());
         channelRepository.updateChannel(channel);
@@ -43,14 +43,14 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void addUser(UUID channelId, UUID userId) {
-        Channel channel = channelRepository.findChannel(channelId);
-        channel.addUser(userRepository.findUser(userId));
+        Channel channel = channelRepository.findById(channelId);
+        channel.addUser(userRepository.findById(userId));
         channelRepository.updateChannel(channel);
     }
 
     @Override
     public void deleteUser(UUID channelId, UUID userId) {
-        Channel channel = channelRepository.findChannel(channelId);
+        Channel channel = channelRepository.findById(channelId);
         channel.deleteUser(userId);
         channelRepository.updateChannel(channel);
     }

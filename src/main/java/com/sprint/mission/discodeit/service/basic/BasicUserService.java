@@ -27,7 +27,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User readUser(UUID userId) {
-        return userRepository.findUser(userId);
+        return userRepository.findById(userId);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
-        User user = userRepository.findUser(userId);
+        User user = userRepository.findById(userId);
         user.updateName(userDto.getName());
         user.updateLoginId(userDto.getLoginId());
         user.updatePassword(generatePassword(userDto.getPassword()));

@@ -22,7 +22,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message createMessage(MessageDto messageDto) {
-        Channel channel = channelRepository.findChannel(messageDto.getChannel().getId());
+        Channel channel = channelRepository.findById(messageDto.getChannel().getId());
         User user = channel.getUser(messageDto.getWriter().getId());
         Message message = Message.of(user, messageDto.getContent(), channel);
         return messageRepository.save(message);
@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message readMessage(UUID messageId) {
-        return messageRepository.findMessage(messageId);
+        return messageRepository.findById(messageId);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String content) {
-        Message message = messageRepository.findMessage(messageId);
+        Message message = messageRepository.findById(messageId);
         message.updateContent(content);
         messageRepository.updateMessage(message);
     }

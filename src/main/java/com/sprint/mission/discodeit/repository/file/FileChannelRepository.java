@@ -38,7 +38,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findChannel(UUID channelId) {
+    public Channel findById(UUID channelId) {
         Path path = filePath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {

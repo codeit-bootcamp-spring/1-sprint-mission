@@ -39,7 +39,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findUser(UUID userId) {
+    public User findById(UUID userId) {
         Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {

@@ -38,7 +38,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findMessage(UUID messageId) {
+    public Message findById(UUID messageId) {
         Path path = filePath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {

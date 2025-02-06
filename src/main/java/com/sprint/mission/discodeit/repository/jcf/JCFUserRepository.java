@@ -26,7 +26,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findUser(UUID userId) {
+    public User findById(UUID userId) {
         return Optional.ofNullable(data.get(userId))
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
     }
