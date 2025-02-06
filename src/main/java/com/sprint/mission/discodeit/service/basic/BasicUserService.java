@@ -4,17 +4,18 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
+
     private final UserRepository userRepository;
     private final UserValidator userValidator;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userValidator = new UserValidator();
-        this.userRepository = userRepository;
-    }
 
     @Override
     public User createUser(String name, String email, String password) {

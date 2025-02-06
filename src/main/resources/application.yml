@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Discodeit
+
+server:
+  port: 8080

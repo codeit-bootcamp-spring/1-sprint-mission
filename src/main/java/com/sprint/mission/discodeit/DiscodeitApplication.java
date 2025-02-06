@@ -1,17 +1,26 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.*;
-import com.sprint.mission.discodeit.repository.jcf.*;
-import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMassageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-public class JavaApplication {
+@SpringBootApplication
+public class DiscodeitApplication {
 
     static User setupUser(UserService userService) {
         User user = userService.createUser("woody", "woody@codeit.com", "woody1234");
@@ -29,30 +38,18 @@ public class JavaApplication {
     }
 
     public static void main(String[] args) {
-
-        // jcf
-//        System.out.println("===Use JCF Repository===");
-//        UserRepository userRepository = new JCFUserRepository();
-//        ChannelRepository channelRepository = new JCFChannelRepository();
-//        MessageRepository messageRepository = new JCFMessageRepository();
-
-        // file
-        System.out.println("===Use File Repository===");
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
         // 서비스 초기화
-        // TODO Basic*Service 구현체를 초기화하세요.
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMassageService(messageRepository, channelService, userService);
+        // TODO context에서 Bean을 조회하여 각 서비스 구현체 할당 코드 작성하세요.
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
 
         // 셋업
         User user = setupUser(userService);
         Channel channel = setupChannel(channelService);
         // 테스트
         messageCreateTest(messageService, channel, user);
-
     }
 }

@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.validation;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserValidator {
     private static final String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
 

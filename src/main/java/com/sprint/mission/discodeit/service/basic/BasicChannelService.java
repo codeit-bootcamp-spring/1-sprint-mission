@@ -3,22 +3,24 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator channelValidator;
-    private final UserService userService;
 
-    public BasicChannelService(ChannelRepository channelRepository, UserService userService) {
+    public BasicChannelService(
+            @Qualifier("fileChannelRepository") ChannelRepository channelRepository
+    ) {
         this.channelValidator = new ChannelValidator();
         this.channelRepository = channelRepository;
-        this.userService = userService;
     }
 
     @Override

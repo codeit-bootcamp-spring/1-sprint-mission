@@ -8,18 +8,25 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
 public class BasicMassageService implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageValidator messageValidator;
     private final UserService userService;
     private final ChannelService channelService;
 
-    public BasicMassageService(MessageRepository messageRepository, ChannelService channelService, UserService userService) {
+    public BasicMassageService(
+            @Qualifier("fileMessageRepository") MessageRepository messageRepository,
+            ChannelService channelService,
+            UserService userService
+    ) {
         this.messageValidator = new MessageValidator();
         this.messageRepository = messageRepository;
         this.userService = userService;

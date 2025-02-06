@@ -2,11 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Repository
+@Primary
 public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "tmp/message.ser";
     private final FileManager<Message> fileManager =  new FileManager<>(FILE_PATH);
