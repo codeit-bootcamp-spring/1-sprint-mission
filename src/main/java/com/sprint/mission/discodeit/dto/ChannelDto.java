@@ -1,18 +1,9 @@
 package com.sprint.mission.discodeit.dto;
 
-import lombok.Getter;
+import lombok.Value;
 
-@Getter
+@Value(staticConstructor = "of")
 public class ChannelDto {
-    private String name;
-    private String description;
-
-    private ChannelDto(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public static ChannelDto of(String name, String description) {
-        return new ChannelDto(name, description);
-    }
+    String name;
+    String description;
 }
