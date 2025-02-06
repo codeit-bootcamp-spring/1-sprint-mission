@@ -1,23 +1,31 @@
 package com.sprint.mission.discodeit.domain.user.validation;
 
-import org.springframework.util.Assert;
+import com.sprint.mission.discodeit.domain.user.exception.NickNameInvalidException;
+import com.sprint.mission.discodeit.global.error.ErrorCode;
+import java.util.Objects;
+import java.util.Set;
 
 public class NicknameValidator {
-    private static final int MAX_LENGTH = 15;
-    private static final int MIN_LENGTH = 1;
-    private static final String LENGTH_ERROR_MESSAGE = "닉네임은 " + MIN_LENGTH + " ~ " + MAX_LENGTH + "제한입니다. : 입력한 이름 길이 = ";
+    private static final int MAX_LENGTH = 32;
+    private static final Set<String> FORBIDDEN_WORDS = Set.of(
+            "admin", "moderator", "discord", "system", "root", "bot", "mod",
+            "운영자", "관리자", "봇"
+    );
 
     public static void validate(String value) {
-        Assert.notNull(value, "닉네임은 필수입니다.");
+        if (Objects.isNull(value)) {
+            throw new NickNameInvalidException(ErrorCode.NICKNAME_REQUIRED, "");
+        }
 
-        if (value.isBlank() || value.length() > MAX_LENGTH || value.length() < MIN_LENGTH) {
-            throw new IllegalArgumentException(provideLengthNameErrorMessage(value));
+        if (value.isBlank() || value.length() > MAX_LENGTH) {
+            throw new NickNameInvalidException(ErrorCode.INVALID_NICKNAME_LENGTH, value);
+        }
+
+        String lowerCase = value.toLowerCase();
+        for (String word : FORBIDDEN_WORDS) {
+            if (lowerCase.contains(word)) {
+                throw new NickNameInvalidException(ErrorCode.INVALID_NICKNAME_FORMAT, value);
+            }
         }
     }
-
-    // TODO 에러 관리 따로 관리하기.
-    private static String provideLengthNameErrorMessage(String value) {
-        return LENGTH_ERROR_MESSAGE + value.length();
-    }
-
 }

@@ -14,7 +14,7 @@ public class Nickname {
 
     public Nickname(String value) {
         NicknameValidator.validate(value);
-        this.value = value;
+        this.value = value.trim();
     }
 
 }
