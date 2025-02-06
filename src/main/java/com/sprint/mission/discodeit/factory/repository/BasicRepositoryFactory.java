@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.factory.repository;
 
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.*;
 
 
 public class BasicRepositoryFactory implements RepositoryFactory {
@@ -18,6 +14,9 @@ public class BasicRepositoryFactory implements RepositoryFactory {
     private UserRepository userRepository;
     private ChannelRepository channelRepository;
     private MessageRepository messageRepository;
+    private UserStatusRepository userStatusRepository;
+    private ReadStatusRepository readStatusRepository;
+    private BinaryContentRepository binaryContentRepository;
     private final String mode;
 
     public static BasicRepositoryFactory getInstance(String mode) {
@@ -32,6 +31,9 @@ public class BasicRepositoryFactory implements RepositoryFactory {
         this.userRepository = createUserRepository();
         this.channelRepository = createChannelRepository();
         this.messageRepository = createMessageRepository();
+        this.userStatusRepository = createUserStatusRepository();
+        this.readStatusRepository = createReadStatusRepository();
+        this.binaryContentRepository = createBinaryContentRepository();
     }
 
 
@@ -72,6 +74,44 @@ public class BasicRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
+    public UserStatusRepository createUserStatusRepository() {
+        if(userStatusRepository == null){
+            if(mode.equals("jcf")){
+                userStatusRepository = new JCFUserStatusRepository();
+            }
+//            else if(mode.equals("file")){
+//                userStatusRepository = new FileUserStatusRepository();
+//            }
+        }
+        return userStatusRepository;
+    }
+
+    @Override
+    public ReadStatusRepository createReadStatusRepository() {
+        if(readStatusRepository == null){
+            if(mode.equals("jcf")){
+                readStatusRepository = new JCFReadStatusRepository();
+            }
+//            else if(mode.equals("file")){
+//                userStatusRepository = new FileUserStatusRepository();
+//            }
+        }
+        return readStatusRepository;    }
+
+    @Override
+    public BinaryContentRepository createBinaryContentRepository() {
+        if(binaryContentRepository == null){
+            if(mode.equals("jcf")){
+                binaryContentRepository = new JCFBinaryContentRepository();
+            }
+//            else if(mode.equals("file")){
+//                userStatusRepository = new FileUserStatusRepository();
+//            }
+        }
+        return binaryContentRepository;
+    }
+
+    @Override
     public UserRepository getUserRepository() {
         return userRepository;
     }
@@ -84,5 +124,20 @@ public class BasicRepositoryFactory implements RepositoryFactory {
     @Override
     public MessageRepository getMessageRepository() {
         return messageRepository;
+    }
+
+    @Override
+    public UserStatusRepository getUserStatusRepository() {
+        return userStatusRepository;
+    }
+
+    @Override
+    public ReadStatusRepository getReadStatusRepository() {
+        return readStatusRepository;
+    }
+
+    @Override
+    public BinaryContentRepository getBinaryContentRepository() {
+        return binaryContentRepository;
     }
 }

@@ -2,12 +2,8 @@ package com.sprint.mission.discodeit.factory.service;
 
 import com.sprint.mission.discodeit.factory.repository.BasicRepositoryFactory;
 import com.sprint.mission.discodeit.factory.repository.RepositoryFactory;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.*;
 
 public class BasicServiceFactory implements ServiceFactory {
     private static BasicServiceFactory instance;
@@ -15,10 +11,16 @@ public class BasicServiceFactory implements ServiceFactory {
     private UserService userService;
     private ChannelService channelService;
     private MessageService messageService;
+    private UserStatusService userStatusService;
+    private ReadStatusService readStatusService;
+    private BinaryContentService binaryContentService;
     private final RepositoryFactory repositoryFactory;
 
     private BasicServiceFactory(String mode) {
         this.repositoryFactory = BasicRepositoryFactory.getInstance(mode);
+        this.userStatusService = new BasicUserStatusService(repositoryFactory.getUserStatusRepository());
+        this.readStatusService = new BasicReadStatusService(repositoryFactory.getReadStatusRepository());
+        this.binaryContentService = new BasicBinaryContentService(repositoryFactory.getBinaryContentRepository());
         this.userService = new BasicUserService(repositoryFactory.getUserRepository());
         this.channelService = new BasicChannelService(repositoryFactory.getChannelRepository(), userService);
         this.messageService = new BasicMessageService(repositoryFactory.getMessageRepository(), userService, channelService);
@@ -45,4 +47,20 @@ public class BasicServiceFactory implements ServiceFactory {
     public MessageService getMessageService() {
         return messageService;
     }
+
+    @Override
+    public UserStatusService getUserStatusService() {
+        return userStatusService;
+    }
+
+    @Override
+    public ReadStatusService getReadStatusService() {
+        return readStatusService;
+    }
+
+    @Override
+    public BinaryContentService getBinaryContentService() {
+        return binaryContentService;
+    }
+
 }
