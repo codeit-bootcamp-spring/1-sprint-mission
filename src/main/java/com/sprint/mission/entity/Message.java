@@ -1,101 +1,52 @@
 package com.sprint.mission.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.aspectj.weaver.ast.Instanceof;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable, Comparable<Message> {
 
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final String firstId;
+    private final UUID userId;
+    private final UUID channelId;
+
+    @Setter
     private String message;
 
-    private User writer;
-    private Channel writedAt;
+    private final Instant createAt;
 
-    private final LocalDateTime createAt;
-    private LocalDateTime updateAt;
-
-    public Channel getWritedAt() {
-        return writedAt;
-    }
-
-    public void setWritedAt(Channel writedAt) {
-        this.writedAt = writedAt;
-    }
+    @Setter
+    private Instant updateAt;
 
     // 무조건 메시지는 CREATE로 생성하도록
-    protected Message(String message) {
+    protected Message(UUID channelId, UUID userId, String message) {
+        this.userId = userId;
+        this.channelId = channelId;
         this.message = message;
         id = UUID.randomUUID();
         firstId = id.toString().split("-")[0];
-        createAt = LocalDateTime.now();
+        createAt = Instant.now();
     }
 
-    public static Message createMessage(Channel channel, User user, String message) {
-        Message mess = new Message(message);
-        mess.setWriter(user);
-        mess.setWritedAt(channel);
-        mess.setMessage(message);
-        user.addMessage(mess);
-        channel.addMessage(mess);
-        return mess;
+    public static Message createMessage(UUID channelId, UUID userId, String message) {
+        return new Message(channelId, userId, message);
     }
 
     public void removeMessage(){
-        writer.deleteMessage(this);
-        writedAt.deleteMessage(this);
+
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-        updateAt = LocalDateTime.now();
-    }
-
-    public User getWriter() {
-        return writer;
-    }
-
-    private void setWriter(User writer) {
-        this.writer = writer;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    @Override
-    public String toString() {
-        return "[채널: " + writedAt.getName() + "]" + " {작성자: " + writer.getName() +
-                "} => " + message;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Message message1 = (Message) o;
-        return Objects.equals(id, message1.id) && Objects.equals(message, message1.message) && Objects.equals(createAt, message1.createAt) && Objects.equals(updateAt, message1.updateAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, message, createAt, updateAt);
-    }
+    // 나중에, equals hashcode
 
     @Override
     public int compareTo(Message otherMessage) {
