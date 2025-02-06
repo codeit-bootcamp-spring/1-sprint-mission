@@ -57,13 +57,13 @@ public class JCFMessageService implements MessageService {
 
     //모두 읽기
     @Override
-    public List<Message> getMessages() {
+    public List<Message> findAll() {
         return data.values().stream().toList();
     }
 
     //단일 조회 - uuid
     @Override
-    public Message getMessageByUUID(String messageId) throws CustomException {
+    public Message findById(String messageId) throws CustomException {
         Message message = data.get(messageId);
         if (message == null) {
             System.out.println("Message with id " + messageId + " not found");
@@ -74,13 +74,13 @@ public class JCFMessageService implements MessageService {
 
     //다건 조회 - 내용
     @Override
-    public List<Message> getMessageByContent(String content) {
+    public List<Message> findAllContainsContent(String content) {
         return data.values().stream().filter(m -> m.getContent().contains(content)).toList();
     }
 
     //다건 조회 - 특정 작성자
     @Override
-    public List<Message> getMessageBySenderId(String senderId) throws CustomException {
+    public List<Message> findAllBySenderId(String senderId) throws CustomException {
         try {
             return data.values().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
         } catch (Exception e) {
@@ -92,13 +92,13 @@ public class JCFMessageService implements MessageService {
     //todo
     //날짜 포멧 오류 등 예외 처리 필요-검색 시 기준을 날짜로 할지
     @Override
-    public List<Message> getMessageByCreatedAt(Instant createdAt) {
+    public List<Message> findAllByCreatedAt(Instant createdAt) {
         return data.values().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
     }
 
     //다건 조회 - 특정 채널
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) throws CustomException {
+    public List<Message> findAllByChannelId(Channel channel) throws CustomException {
         try {
             Channel channelByUUID = channelService.findById(channel.getId());
             return data.values().stream().filter(m -> m.getChannelId().equals(channelByUUID.getId())).toList();

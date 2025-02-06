@@ -50,33 +50,33 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessages() {
+    public List<Message> findAll() {
         return messageRepository.findAll();
     }
 
     @Override
-    public Message getMessageByUUID(String messageId) {
+    public Message findById(String messageId) {
         return messageRepository.findById(messageId);
     }
 
     @Override
-    public List<Message> getMessageByContent(String content) {
+    public List<Message> findAllContainsContent(String content) {
         return messageRepository.findAll().stream().filter(m -> m.getContent().contains(content)).toList();
     }
 
     @Override
-    public List<Message> getMessageBySenderId(String senderId) {
+    public List<Message> findAllBySenderId(String senderId) {
         //여기 고민해보자
         return messageRepository.findAll().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
     }
 
     @Override
-    public List<Message> getMessageByCreatedAt(Instant createdAt) {
+    public List<Message> findAllByCreatedAt(Instant createdAt) {
         return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().equals( createdAt)).toList();
     }
 
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) {
+    public List<Message> findAllByChannelId(Channel channel) {
         return messageRepository.findAll().stream().filter(m -> m.getChannelId().equals(channel.getId())).toList();
     }
 

@@ -58,13 +58,13 @@ public class FileMessageService extends FileService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessages() {
+    public List<Message> findAll() {
         return FileService.load(messageDirectory);
     }
 
     @Override
-    public Message getMessageByUUID(String messageId) throws CustomException {
-        Message message = getMessages().stream().filter(m -> m.getId().equals(messageId)).findFirst().orElse(null);
+    public Message findById(String messageId) throws CustomException {
+        Message message = findAll().stream().filter(m -> m.getId().equals(messageId)).findFirst().orElse(null);
         if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", messageId));
         }
@@ -72,29 +72,29 @@ public class FileMessageService extends FileService implements MessageService {
     }
 
     @Override
-    public List<Message> getMessageByContent(String content) {
-        return getMessages().stream().filter(m -> m.getContent().contains(content)).toList();
+    public List<Message> findAllContainsContent(String content) {
+        return findAll().stream().filter(m -> m.getContent().contains(content)).toList();
     }
 
     @Override
-    public List<Message> getMessageBySenderId(String senderId) {
-        return getMessages().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
+    public List<Message> findAllBySenderId(String senderId) {
+        return findAll().stream().filter(m -> m.getSenderId().equals(senderId)).toList();
     }
 
     @Override
-    public List<Message> getMessageByCreatedAt(Instant createdAt) {
-        return getMessages().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
+    public List<Message> findAllByCreatedAt(Instant createdAt) {
+        return findAll().stream().filter(m -> m.getCreatedAt().equals(createdAt)).toList();
     }
 
     @Override
-    public List<Message> getMessagesByChannel(Channel channel) {
-        return getMessages().stream().filter(m-> m.getChannelId().equals(channel.getId())).toList();
+    public List<Message> findAllByChannelId(Channel channel) {
+        return findAll().stream().filter(m-> m.getChannelId().equals(channel.getId())).toList();
     }
 
     @Override
     public Message updateMessage(String messageId, String newContent, Instant updatedAt) {
 
-        Message message = getMessageByUUID(messageId);
+        Message message = findById(messageId);
 
         if (message == null) {
             System.out.println("Failed to update message. Message not found.");
@@ -114,7 +114,7 @@ public class FileMessageService extends FileService implements MessageService {
 
     @Override
     public boolean deleteMessage(Message message) {
-        Message msg = getMessageByUUID(message.getId());
+        Message msg = findById(message.getId());
 
         if (msg == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND, String.format("Message with id %s not found", message.getId()));

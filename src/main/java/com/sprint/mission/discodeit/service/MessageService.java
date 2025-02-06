@@ -13,22 +13,22 @@ public interface MessageService {
     Message create(String content, String channelId, String userId);
 
     //모두 읽기
-    List<Message> getMessages();
+    List<Message> findAll();
 
     //읽기
-    Message getMessageByUUID(String messageId);
+    Message findById(String messageId);
 
     //다건 조회 - 내용
-    List<Message> getMessageByContent(String content);
+    List<Message> findAllContainsContent(String content);
 
     //다건 조회 - 작성자
-    List<Message> getMessageBySenderId(String senderId);
+    List<Message> findAllBySenderId(String senderId);
 
     //다건 조회 - 날짜
-    List<Message> getMessageByCreatedAt(Instant createdAt);
+    List<Message> findAllByCreatedAt(Instant createdAt);
 
     //다건 조회 - 특정 채널
-    List<Message> getMessagesByChannel(Channel channel);
+    List<Message> findAllByChannelId(Channel channel);
 
     //수정
     Message updateMessage(String messageId, String newContent, Instant updatedAt);
