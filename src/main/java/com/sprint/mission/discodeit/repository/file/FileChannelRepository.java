@@ -18,6 +18,7 @@ import java.util.UUID;
 public class FileChannelRepository implements ChannelRepository {
 
     private static final Path filePath;
+    private final String FILE_EXTENSION = ".ser";
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "channels");
@@ -26,7 +27,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(Channel channel) {
-        Path path = filePath.resolve(channel.getId().toString().concat(".ser"));
+        Path path = filePath.resolve(channel.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(channel);
@@ -38,7 +39,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findChannel(UUID channelId) {
-        Path path = filePath.resolve(channelId.toString().concat(".ser"));
+        Path path = filePath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (Channel) ois.readObject();
@@ -72,7 +73,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        Path path = filePath.resolve(channelId.toString().concat(".ser"));
+        Path path = filePath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

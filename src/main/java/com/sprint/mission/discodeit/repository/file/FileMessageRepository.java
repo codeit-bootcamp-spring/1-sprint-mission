@@ -18,6 +18,7 @@ import java.util.UUID;
 public class FileMessageRepository implements MessageRepository {
 
     private static final Path filePath;
+    private final String FILE_EXTENSION = ".ser";
 
     static {
         filePath = Path.of(System.getProperty("user.dir"), "messages");
@@ -26,7 +27,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        Path path = filePath.resolve(message.getId().toString().concat(".ser"));
+        Path path = filePath.resolve(message.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(message);
@@ -38,7 +39,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findMessage(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(".ser"));
+        Path path = filePath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (Message) ois.readObject();
@@ -72,7 +73,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(".ser"));
+        Path path = filePath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

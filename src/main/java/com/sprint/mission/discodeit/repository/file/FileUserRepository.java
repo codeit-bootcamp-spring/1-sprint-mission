@@ -19,6 +19,7 @@ import java.util.UUID;
 public class FileUserRepository implements UserRepository {
 
     private static final Path filePath;
+    private final String FILE_EXTENSION = ".ser";
 
     static {
         filePath = Paths.get(System.getProperty("user.dir"), "users");
@@ -27,7 +28,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        Path path = filePath.resolve(user.getId().toString().concat(".ser"));
+        Path path = filePath.resolve(user.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(user);
@@ -39,7 +40,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findUser(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(".ser"));
+        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (User)ois.readObject();
@@ -73,7 +74,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(".ser"));
+        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {
