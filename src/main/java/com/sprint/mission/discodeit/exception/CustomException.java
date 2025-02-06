@@ -12,11 +12,8 @@ public class CustomException extends RuntimeException {
     }
 
     //상세메세지와 함께 사용
-    //리팩토링 필요
-    //TODO - 고민
-    //ErrorCode에 이미 이유가 적혀있는데, 굳이 detail 메세지를 직접 작성할 필요가 있을까?
     public CustomException(ErrorCode errorCode, String detailMessage) {
-        super(detailMessage);
+        super(errorCode.getMessage() + ": " + detailMessage);
         this.errorCode = errorCode;
     }
 
