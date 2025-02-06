@@ -2,42 +2,63 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.PassWordFormatException;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 설계의 주안점 : 1. 하나의 단위행동을 할 때, 영향력이 전파되며 일어나는 일을 직접 메소드 호출 하는것이 아닌, 근본적인 메소드 호출 하나로 최대한 해결하려고 시도
- * ex 1) 채널 삭제 -> 채널 삭제, 채널에 속한 메시지 전부 삭제(msgDB), 채널에 참가하던 유저들에 대해, 참가중인 채널리스트에서 해당 채널 삭제(User.Attending),
+ * 설계의 주안점 : DB-Service를 2 tier 구조로 가져가면, 매 crud마다 계속 file system까지 가서 데이터를 조회해야 한다.
+ * IO Bound문제의 해결을 위해, sprint mission 1에 사용했던 JCF를, 캐시의 역할처럼 이용해서, IO시간을 줄인다.
+ * naive(현재) : 프로그램이 시작하면, 일단 파일 시스템에 있는 데이터를 전부 다 JCF에 불러온다.
+ * 일련의 crud작업을 Service-JCF캐시를 통해 진행한다.
+ * 작업이 끝난 뒤, JCF의 값을 파일시스템에 덮어씌운다.
+ * 모든 구현체의 앞단에 인터페이스를 배치하고 lvalue를 인터페이스로 받은 뒤 다형성을 이용한 메소드를 실행시켜 유지보수성을 향상시키고,
+ * 서비스 로직의 독립성을 보장한다
+ * File*Repository(File System. work as DB) <-> *Repository(impl) <-> *Service(impl) <-> Basic*Service(Service with cache(JCF))
  *
- * ex 2) 유저 삭제 -> 유저 삭제, 유저가 참여하던 채널들에 대해, 채널의 참가자 리스트에서 해당 유저 삭제(Channel.chUL),
- * 채널의 props인 해당 채널에 작성된 메시지에서, 유저가 쓴 메시지 삭제(ch.chMsgList), 유저가 주인인 채널 삭제
- * 메시지 리스트에서 유저가 쓴 메시지 삭제(msgDB.msgList) -> by 완전탐색
- * (**이렇게 구현 못함(유저가 참여하던 채널들만 순회하며, 유저가 작성한
- * 메시지 삭제(메시지리스트 완전탐색 피하기)) -> 메시지 리스트가 메시지 uuid로 만든 map이니까 이런건 불가)
+ * 리팩토링이 필요한 부분
+ * 크기를 고려하지 않은 상황이기 때문에, DB의 모든내용을 JCF에 한번에 다 담으려 시도하다가 Out Of Memory가 발생할 여지가 있다.
+ * => 개선을 위해서 실재 캐시가 동작하듯 약속된 크기만큼씩만 데이터를 가져오고, cache miss가 나면 DB까지 가서 캐시를 교체하는 방식으로 리팩토링 필요
  *
- *
- * 2. 성능을 고려한 멤버필드 (Channel props -> channelUserList, channelMessageList)...
+ * 성능을 고려한 멤버필드 (Channel props -> channelUserList, channelMessageList)...-> 삭제 필요
  *  디스코드 서비스에서 가장 많이 사용하는게 채널입장해서 채팅 -> 채널의 유저, 메시지모음은 빨라야 할 것 같다(완탐 -> Hash)
  * -> 독립적으로 작동하는 느낌. crud 마다 혹시 바뀌어야하는지 고민하면서 머리 아파지는 상황
  *
- *  설계 변화 : 1. 필요해 보이는 독립 멤버필드 마음대로 + 클래스간 연결 될 수 있는(마치 db fk처럼) 멤버필드 난립 -> 구현 난이도 너무 올라감
- *           2. (커밋 히스토리에 순환참조 문제로 존재) 독립 멤버필드 줄이기 + composition -> 순환참조 이슈. 해결법?
- *           3. Singleton [*]
- *
- * 3. 리플랙션을 통한 유지보수성 : updatable props 증가 시 리플랙션이 없다면, dbms에서 # of updateFunc == # of updatable props로 계속 업데이트 필요?
- * 쓰면 엔티티 클래스만 유지보수하면 해결 (사실 별로 안 중요한거 같기도 한 기능)
+ * => JPA로 독립적인 로직 코드구현(정합성 문제)은 해결 가능하지만, 이렇게 '*대다' 구조를 사용하면, 메모리에 올리는 과정에서 OOM이 일어날 위험이 있다.
+ * -> JPA가 있다고 해도, *대다를 위한 멤버필드의 사용은 피하자.
  */
 public class JavaApplication {
     public static void main(String[] args) throws PassWordFormatException {
-        JCFUserService userDB = JCFUserService.getInstance();
-        JCFChannelService channelDB = JCFChannelService.getInstance();
-        JCFMessageService messageDB = JCFMessageService.getInstance();
+        UserService userDB = BasicUserService.getInstance();
+        ChannelService channelDB = BasicChannelService.getInstance();
+        MessageService messageDB = BasicMessageService.getInstance();
 
+        UserRepository userFile = FileUserRepository.getInstance();
+        ChannelRepository channelFile = FileChannelRepository.getInstance();
+        MessageRepository messageFile = FileMessageRepository.getInstance();
 
+        userDB.setUserList(userFile.load());
+        channelDB.setChannelList(channelFile.load());
+        messageDB.setMessageList(messageFile.load());
+        // 프로그램 실행 직후, 파일(db)의 내용을 JCF(캐시)로 전부 가져온다.
+        //이후 crud 과정은, sprint1과 동일
+
+        System.out.println("==========printing DB contents==========");
+        ((BasicUserService) userDB).printing();
+        ((BasicChannelService) channelDB).printing();
+        ((BasicMessageService) messageDB).printing();
 
         //userDB.createUser(new User.Builder().buildEmail("a@b"). ... .build()); -> 하고싶었는데, user A, B, C alias가 필요.
         //없으면 -> sout(userDB.getUserList().~~find userA -> by traversing userList using PKable props(ex email)
@@ -89,32 +110,33 @@ public class JavaApplication {
          * D, E, F user -> ch_2
          * G, H, I user -> ch_3
          */
-        List<User> channelUserList_1 = new ArrayList<>();
-        List<User> channelUserList_2 = new ArrayList<>();
-        List<User> channelUserList_3 = new ArrayList<>();
-        List<Message> channelMessageList_1 = new ArrayList<>();
-        List<Message> channelMessageList_2 = new ArrayList<>();
-        List<Message> channelMessageList_3 = new ArrayList<>();
-        Channel c1 = new Channel.Builder().buildOwner(A).buildUpdatedAt().buildChannelName("channel_1").buildChannelUserList(channelUserList_1).buildChannelMessageList(channelMessageList_1).build();
-        Channel c2 = new Channel.Builder().buildOwner(D).buildUpdatedAt().buildChannelName("channel_2").buildChannelUserList(channelUserList_2).buildChannelMessageList(channelMessageList_2).build();
-        Channel c3 = new Channel.Builder().buildOwner(G).buildUpdatedAt().buildChannelName("channel_3").buildChannelUserList(channelUserList_3).buildChannelMessageList(channelMessageList_3).build();
+//        List<User> channelUserList_1 = new ArrayList<>();
+//        List<User> channelUserList_2 = new ArrayList<>();
+//        List<User> channelUserList_3 = new ArrayList<>();
+//        List<Message> channelMessageList_1 = new ArrayList<>();
+//        List<Message> channelMessageList_2 = new ArrayList<>();
+//        List<Message> channelMessageList_3 = new ArrayList<>();
+        Channel c1 = new Channel.Builder().buildOwner(A).buildUpdatedAt().buildChannelName("channel_1")/*.buildChannelUserList(channelUserList_1).buildChannelMessageList(channelMessageList_1)*/.build();
+        Channel c2 = new Channel.Builder().buildOwner(D).buildUpdatedAt().buildChannelName("channel_2")/*.buildChannelUserList(channelUserList_2).buildChannelMessageList(channelMessageList_2)*/.build();
+        Channel c3 = new Channel.Builder().buildOwner(G).buildUpdatedAt().buildChannelName("channel_3")/*.buildChannelUserList(channelUserList_3).buildChannelMessageList(channelMessageList_3)*/.build();
         channelDB.createChannel(c1);
         channelDB.createChannel(c2);
         channelDB.createChannel(c3);
-        channelDB.participateChannel(B, c1.getId());
-        channelDB.participateChannel(C, c1.getId());
-        channelDB.participateChannel(E, c2.getId());
-        channelDB.participateChannel(F, c2.getId());
-        channelDB.participateChannel(H, c3.getId());
-        channelDB.participateChannel(I, c3.getId());
+        ((BasicChannelService) channelDB).participateChannel(B, c1.getId());
+        ((BasicChannelService) channelDB).participateChannel(C, c1.getId());
+        ((BasicChannelService) channelDB).participateChannel(E, c2.getId());
+        ((BasicChannelService) channelDB).participateChannel(F, c2.getId());
+        ((BasicChannelService) channelDB).participateChannel(H, c3.getId());
+        ((BasicChannelService) channelDB).participateChannel(I, c3.getId());
 
         System.out.println("==========Channel Information==========");
-        System.out.println(channelDB.getChannelList().get(c1.getId()).toString());
-        System.out.println(channelDB.getChannelList().get(c2.getId()).toString());
-        System.out.println(channelDB.getChannelList().get(c3.getId()).toString());
+        System.out.println(((BasicChannelService) channelDB).getChannelList().get(c1.getId()).toString());
+        System.out.println(((BasicChannelService) channelDB).getChannelList().get(c2.getId()).toString());
+        System.out.println(((BasicChannelService) channelDB).getChannelList().get(c3.getId()).toString());
 
         System.out.println("==========Update Channel Information==========");
-        channelDB.updateChannelField(channelDB.getChannelList().get(c1.getId()).getId(), "channelName", "channel_1_mod");
+        channelDB.updateChannelField(((BasicChannelService) channelDB).getChannelList().get(c1.getId()).getId(), "channelName", "channel_1_mod");
+
         channelDB.updateChannelField(c2.getId(), "owner", F);
 
         System.out.println("==========Modified Channel Information==========");
@@ -161,7 +183,7 @@ public class JavaApplication {
 
         System.out.println("2. Delete c2, message of channel 2 will flush, user channel attending list related to c2 will update automatically");
         channelDB.deleteChannel(c2.getId());
-       // System.out.println(channelDB.getChannelList().get(c2.getId()).getChannelMessageList().toString());
+
         System.out.println(userDB.getUserList().get(D.getId()).toString());
         System.out.println(userDB.getUserList().get(E.getId()).toString());
         System.out.println(userDB.getUserList().get(F.getId()).toString());
@@ -175,12 +197,19 @@ public class JavaApplication {
         userDB.deleteUserById(G.getId()); // 고려해야 하는 상황 : Graham은 자기 소유의 채널도 있다. null 오류같은걸로 꼬였으면 메시지 삭제, 채널삭제(nested action) 겹치면서
         //꼬일 수 있는 위험도 있는 유저. -> 통과
 
-        userDB.printing();
-        channelDB.printing();
-        messageDB.printing();
+        ((BasicUserService) userDB).printing();
+        ((BasicChannelService) channelDB).printing();
+        ((BasicMessageService) messageDB).printing();
+
         System.out.println("==========Independent Field==========");
         System.out.println(c3.getChannelMessageList());
         System.out.println(c3.getChannelUserList());
+
+
+        userFile.save(userDB.getUserList());
+        channelFile.save(channelDB.getChannelList());
+        messageFile.save(messageDB.getMessageList());
+
 
 
 
