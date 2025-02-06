@@ -6,23 +6,20 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.domain.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ReadStatusService implements ReadStatusRepository {
+public class ReadStatusService{
     //사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다. 사용자의 온라인 상태를 확인하기 위해 활용합니다.
-    private final ReadStatusRepository readStatusRepository;
+    private final com.sprint.mission.discodeit.repository.ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    @Override
     public void save(ReadStatusDto readStatusDto) {
         if (readStatusDto.channelId() == null || readStatusDto.userId() == null) {
             throw new IllegalStateException("채널 아이디, 유저 아이디가 없습니다.");
@@ -37,7 +34,6 @@ public class ReadStatusService implements ReadStatusRepository {
         }
     }
 
-    @Override
     public ReadStatus findById(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id);
         if (readStatus == null) {
@@ -47,17 +43,14 @@ public class ReadStatusService implements ReadStatusRepository {
         return readStatus;
     }
 
-    @Override
     public List<ReadStatus> findAll() {
         return readStatusRepository.findAll();
     }
 
-    @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId);
     }
 
-    @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
@@ -67,7 +60,6 @@ public class ReadStatusService implements ReadStatusRepository {
         return readStatusRepository.findAllByChannelId(channelId);
     }
 
-    @Override
     public void delete(UUID id) {
         if(readStatusRepository.findById(id)!=null) {
             readStatusRepository.delete(id);
@@ -75,7 +67,6 @@ public class ReadStatusService implements ReadStatusRepository {
         }else System.out.println("아이디를 찾을 수 없습니다.");
     }
 
-    @Override
     public void deleteByUserId(UUID userId) {
         if(readStatusRepository.findAllByUserId(userId).stream().findAny().isPresent()) {
             readStatusRepository.deleteByUserId(userId);
@@ -84,7 +75,6 @@ public class ReadStatusService implements ReadStatusRepository {
         readStatusRepository.deleteByUserId(userId);
     }
 
-    @Override
     public void deleteByChannelId(UUID channelId) {
         if(readStatusRepository.findAllByChannelId(channelId).stream().findAny().isPresent()) {
             readStatusRepository.deleteByChannelId(channelId);
@@ -93,7 +83,6 @@ public class ReadStatusService implements ReadStatusRepository {
         readStatusRepository.deleteByChannelId(channelId);
     }
 
-    @Override
     public void update(ReadStatusDto readStatusDto) {
         if(readStatusRepository.findById(readStatusDto.id())!=null) {
             readStatusRepository.update(readStatusDto);
