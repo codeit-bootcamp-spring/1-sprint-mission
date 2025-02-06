@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -14,6 +16,7 @@ public class BinaryContent implements Serializable {
     private final Instant createdAt;
 
     private UUID userId;
+    @Setter
     private UUID messageId;
     private String fileName;
     private String mimeType;
@@ -30,4 +33,6 @@ public class BinaryContent implements Serializable {
         this.mimeType = mimeType;
         this.data = content.clone();
     }
+
+
 }

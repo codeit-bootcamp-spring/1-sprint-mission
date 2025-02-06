@@ -20,5 +20,7 @@ public interface ReadStatusRepository {
 
     boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
 
+    void deleteByMessageId(UUID messageId);
+
 
 }

@@ -13,7 +13,9 @@ public interface BinaryContentRepository {
 
     List<BinaryContent> findAllByUserId(UUID userId);
 
-    List<BinaryContent> findAllBymessageId(UUID messageId);
+    List<BinaryContent> findAllByMessageId(UUID messageId);
 
-    void deleteById(UUID id);
+    void deleteById(UUID id); //  개별 파일 삭제
+
+    void deleteByMessageId(UUID messageId); //  특정 메시지에 속한 모든 파일 삭제
 }
