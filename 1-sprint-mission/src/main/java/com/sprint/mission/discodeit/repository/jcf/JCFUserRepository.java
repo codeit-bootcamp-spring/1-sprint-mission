@@ -45,6 +45,14 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userData.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not User Found")));
+    }
+
+    @Override
     public boolean existsByPassword(String password) {
         return userData.values().stream().anyMatch(user -> user.getPassword().equals(password));
     }

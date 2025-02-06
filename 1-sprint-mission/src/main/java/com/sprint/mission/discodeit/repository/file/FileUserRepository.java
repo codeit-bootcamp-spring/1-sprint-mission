@@ -65,6 +65,14 @@ public class FileUserRepository implements UserRepository {
         return userdata.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userdata.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not User Found")));
+    }
+
     private Map<UUID, User> loadFromFile() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
