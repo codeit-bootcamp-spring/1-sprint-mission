@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class Message implements Serializable, Comparable<Message> {
 
     private static final long serialVersionUID = 1L;
@@ -20,12 +21,9 @@ public class Message implements Serializable, Comparable<Message> {
     private final UUID userId;
     private final UUID channelId;
 
-    @Setter
     private String message;
 
     private final Instant createAt;
-
-    @Setter
     private Instant updateAt;
 
     // 무조건 메시지는 CREATE로 생성하도록
@@ -40,10 +38,6 @@ public class Message implements Serializable, Comparable<Message> {
 
     public static Message createMessage(UUID channelId, UUID userId, String message) {
         return new Message(channelId, userId, message);
-    }
-
-    public void removeMessage(){
-
     }
 
     // 나중에, equals hashcode

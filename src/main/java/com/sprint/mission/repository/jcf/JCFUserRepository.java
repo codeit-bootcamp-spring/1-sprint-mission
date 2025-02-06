@@ -3,9 +3,12 @@ package com.sprint.mission.repository.jcf;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.exception.NotFoundId;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data = new HashMap<>();
@@ -13,9 +16,8 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         data.put(user.getId(), user); // 바로 반환하면 null
-        return data.get(user.getId());
+        return user;
     }
-
 
     @Override
     public User findById(UUID userId) {
@@ -27,15 +29,14 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Set<User> findAll() {
-        return new HashSet<>(data.values());
+    public List<User> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
     public void delete(User deletingUser) {
         // id, name, password 검증은 R.M에서 끝
-        deletingUser.removeAllChannel();
-        System.out.printf("닉네임 %s는 사라집니다.", deletingUser.getName());
-        data.remove(deletingUser.getId());
+        User remove = data.remove(deletingUser.getId());
+        if (remove != null) log.info("닉네임 {}는 사라집니다.", deletingUser.getName());
     }
 }

@@ -22,17 +22,18 @@ import java.util.Random;
 @Aspect
 public class BasicTrace_AOP {
 
+    // 이거 나중에 C-S-R 단계별 화살표 적용하기
 
-    private static final ChannelController channelController = new JCFChannelController();
-    private static final UserController userController = new JCFUserController();
-    private static final MessageController messageController = new JCFMessageController();
+    @Pointcut("execution(* com.sprint.mission.controller.*())")
+    public void controllerMethod(){}
 
+    @Pointcut("execution(* com.sprint.mission.service.*())")
+    public void serviceMethod(){}
 
-    @Pointcut("execution(* com.sprint.mission..*())")
-    public void allMethod(){}
+    @Pointcut("execution(* com.sprint.mission.controller.*())")
+    public void repositoryMethod(){}
 
-
-    @Around("allMethod()")
+    @Around("controllerMethod() || serviceMethod() || repositoryMethod()")
     public Object doTrace(ProceedingJoinPoint joinPoint){
 
         String methodName = joinPoint.getSignature().getName();
@@ -50,7 +51,12 @@ public class BasicTrace_AOP {
         }
     }
 
+
+
     static class Test {
+        private static final ChannelController channelController = new JCFChannelController();
+        private static final UserController userController = new JCFUserController();
+        private static final MessageController messageController = new JCFMessageController();
 
         public static void main(String[] args) {
             List<User> userList = userCreateTest(3);

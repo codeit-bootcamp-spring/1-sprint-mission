@@ -20,13 +20,13 @@ public class JCFUserService implements UserService {
     }
 
     @Override // 닉네임 중복 허용
-    public User createOrUpdate(User user) {
+    public User create(User user) {
         return userRepository.save(user);
     }
 
     @Override
     public User update(User user) {
-        return createOrUpdate(user);
+        return create(user);
     }
 
     @Override
@@ -35,14 +35,12 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public Set<User> findAll() {
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
     @Override
     public void delete(User user) {
-        user.getChannelsImmutable().stream()
-                        .forEach(channel -> channel.removeUser(user));
         userRepository.delete(user);
     }
 //

@@ -5,52 +5,41 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.security.UnresolvedPermission;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
+@Setter
 public class Channel implements Serializable {
 
     private static final long serialVersionUID = 2L;
 
     private final UUID id;
-    private final String firstId; // 콘솔창 용
-    @Setter
-    private String name;
+    private final String firstId;
+
     private String description;
-
-    @Setter
-    private Instant updatedAt;
+    private String name;
     private final Instant createdAt;
+    private Instant updatedAt;
 
-    public Channel(String name) {
-        this.name = name;
+    private final List<User> userList = new ArrayList<>();
+
+    public Channel(String name, String description) {
         this.id = UUID.randomUUID();
-        String idAsString = id.toString();
-        this.firstId = idAsString.split("-")[0];
+        this.firstId = id.toString().split("-")[0];
+        this.name = name;
+        this.description = description;
         this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Channel channel = (Channel) o;
-        return Objects.equals(id, channel.id) && Objects.equals(firstId, channel.firstId) && Objects.equals(name, channel.name)
-                && Objects.equals(createdAt, channel.createdAt) && Objects.equals(updatedAt, channel.updatedAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstId, name, createdAt, updatedAt);
-    }
-
-    @Override
-    public String toString() {
-        return  "`[" + firstId + "]" +
-                " 채널명: " + name +
-                ", 유저 수: " +'`';
+    // 양방향은 channel에서만
+    public void addUser(User user){
+        if (userList.contains(user)){
+            userList.add(user);
+            user.getChannels().add(this);
+        }
     }
 }

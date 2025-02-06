@@ -5,6 +5,7 @@ import com.sprint.mission.entity.User;
 import com.sprint.mission.service.jcf.JCFChannelService;
 import com.sprint.mission.service.jcf.JCFUserService;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,13 +16,15 @@ public class JCFUserController implements UserController {
     private final JCFChannelService channelService = JCFChannelService.getInstance();
 
     @Override
-    public User create(String name, String password) {
-        return userService.createOrUpdate(new User(name, password));
+    public User create(String name, String password, String email) {
+        return userService.create(new User(name, password, email));
     }
 
     @Override
-    public User updateUserNamePW(UUID id, String newName, String password) {
-        return userService.update(userService.findById(id).setNamePassword(newName, password));
+    public User updateAll(UUID id, String newName, String password, String email) {
+        User updatingUser = userService.findById(id);
+        updatingUser.setAll(newName, password, email);
+        return userService.update(updatingUser);
     }
 
     @Override
@@ -30,15 +33,15 @@ public class JCFUserController implements UserController {
     }
 
     @Override
-    public Set<User> findAll() {
+    public List<User> findAll() {
         return userService.findAll();
     }
 
     @Override
-    public Set<User> findUsersByName(String findName){
+    public List<User> findUsersByName(String findName){
         return userService.findAll().stream()
                 .filter(user -> user.getName().equals(findName))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -46,11 +49,6 @@ public class JCFUserController implements UserController {
         return userService.findAll().stream()
                 .filter(user -> user.getName().equals(name) && user.getPassword().equals(password))
                 .findAny().orElse(null);
-    }
-
-    @Override
-    public Set<User> findUsersInChannel(UUID channelId) {
-        return channelService.findById(channelId).getUsersImmutable();
     }
 
     @Override
