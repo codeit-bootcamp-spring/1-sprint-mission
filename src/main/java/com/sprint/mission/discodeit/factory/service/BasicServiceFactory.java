@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.factory.repository.BasicRepositoryFactory;
 import com.sprint.mission.discodeit.factory.repository.RepositoryFactory;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.service.basic.*;
+import lombok.Getter;
 
+@Getter
 public class BasicServiceFactory implements ServiceFactory {
     private static BasicServiceFactory instance;
 
@@ -48,19 +50,5 @@ public class BasicServiceFactory implements ServiceFactory {
         return messageService;
     }
 
-    @Override
-    public UserStatusService getUserStatusService() {
-        return userStatusService;
-    }
-
-    @Override
-    public ReadStatusService getReadStatusService() {
-        return readStatusService;
-    }
-
-    @Override
-    public BinaryContentService getBinaryContentService() {
-        return binaryContentService;
-    }
 
 }
