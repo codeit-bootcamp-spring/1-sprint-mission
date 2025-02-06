@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -16,6 +16,12 @@ public class FileUserRepository implements UserRepository {
         this.userdata = loadFromFile();
     }
 
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userdata.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
 
     @Override
     public User save(User user) {

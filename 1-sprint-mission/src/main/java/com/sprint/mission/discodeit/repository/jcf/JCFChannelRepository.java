@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 

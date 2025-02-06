@@ -28,9 +28,9 @@ public class JavaApplication {
         //user 객체 생성, user 생성
         System.out.println(" <<<< 유저 생성 >>>> ");
 
-        User user1 = userService.create("강병훈", "dkdkdk@", "12315");
-        User user2 = userService.create("John", "dddas@", "12122");
-        User user3 = userService.create("Bob", "xxxx@ccc.com", "1235567");
+        User user1 = userService.create(, "강병훈", , "dkdkdk@");
+        User user2 = userService.create(, "John", , "dddas@");
+        User user3 = userService.create(, "Bob", , "xxxx@ccc.com");
         System.out.println();
         List<User> users = userService.findAll();
         for (User user : users) {
@@ -38,7 +38,7 @@ public class JavaApplication {
         }
 
         //사용자 업데이트
-        userService.update(user1.getId(), "kbh", "xjvm7001@xxx.com", "12125");
+        userService.update(, user1.getId(), , "kbh");
         //사용자 삭제
         userService.delete(user3.getId());
         System.out.println();

@@ -4,13 +4,12 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
-import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
     private static JCFMessageService instance;

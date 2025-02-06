@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 
 import java.util.*;
 
@@ -17,6 +16,12 @@ public class JCFUserRepository implements UserRepository {
     public User save(User user) {
         userData.put(user.getId(), user);
         return user;
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userData.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
 
     @Override

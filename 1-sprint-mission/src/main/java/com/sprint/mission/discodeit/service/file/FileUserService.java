@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.request.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.request.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.UserDTO;
+import com.sprint.mission.discodeit.dto.request.UserProfileImageDTO;
 import com.sprint.mission.discodeit.entity.User;
 
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class FileUserService implements UserService {
@@ -26,7 +29,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User create(String username, String email, String password) {
+    public UserDTO create(UserCreateDTO userCreateDTO, UserProfileImageDTO userProfileImageDTO) {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("User already exists");
         }
@@ -39,7 +42,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User find(UUID userId) {
+    public UserDTO find(UUID userId) {
         try {
             return userRepository.findById(userId)
                     .orElseThrow(()-> new IllegalArgumentException("User not found"));
@@ -50,7 +53,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<UserDTO> findAll() {
         try {
             List<User> users = userRepository.findAll();
             if (users.isEmpty()) {
@@ -64,7 +67,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+    public UserDTO update(UserUpdateDTO userUpdateDTO, UserProfileImageDTO userProfileImageDTO) {
         try {
             User user = find(userId);
             if(userRepository.existsByEmail(newEmail) == true){

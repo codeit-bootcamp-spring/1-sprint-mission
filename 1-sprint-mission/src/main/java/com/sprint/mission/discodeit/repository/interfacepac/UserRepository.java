@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository;
+package com.sprint.mission.discodeit.repository.interfacepac;
 
 import com.sprint.mission.discodeit.entity.User;
 
@@ -13,5 +13,6 @@ public interface UserRepository {
     boolean existsById(UUID id);
     boolean existsByEmail(String email);
     boolean existsByPassword(String password);
+    boolean existsByUsername(String username);
     void deleteById(UUID id);
 }

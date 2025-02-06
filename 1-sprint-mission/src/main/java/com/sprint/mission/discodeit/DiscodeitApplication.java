@@ -27,9 +27,9 @@ public class DiscodeitApplication {
 //		messageCreatTest(user, channel, messageService);
 		System.out.println(" <<<< 유저 생성 >>>> ");
 
-		User user1 = userService.create("강병훈", "123123132@", "12315");
-		User user2 = userService.create("John", "qddjddk@", "12122");
-		User user3 = userService.create("Bob", "a123213kd", "1235567");
+		User user1 = userService.create(, "강병훈", , "123123132@");
+		User user2 = userService.create(, "John", , "qddjddk@");
+		User user3 = userService.create(, "Bob", , "a123213kd");
 		System.out.println();
 		List<User> users = userService.findAll();
 		for (User u : users) {
@@ -37,7 +37,7 @@ public class DiscodeitApplication {
 		}
 
 		//사용자 업데이트
-		userService.update(user1.getId(), "kbh", "xjvm7001@xxx.com", "12125");
+		userService.update(, user1.getId(), , "kbh");
 		//사용자 삭제
 		userService.delete(user3.getId());
 		System.out.println();
@@ -94,7 +94,7 @@ public class DiscodeitApplication {
 	}
 
 	private static User setupUser(UserService userService) {
-		User user = userService.create("Bob", "1234@xxx.xxx", "192933");
+		User user = userService.create(, "Bob", , "1234@xxx.xxx");
 		return user;
 	}
 

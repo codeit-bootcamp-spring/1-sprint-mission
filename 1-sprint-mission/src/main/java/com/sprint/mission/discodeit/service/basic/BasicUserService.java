@@ -1,14 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.request.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.UserDTO;
+import com.sprint.mission.discodeit.dto.request.UserProfileImageDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,71 +23,96 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(String username, String email, String password) {
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("User with email " + email + " already exists");
+    public UserDTO create(UserCreateDTO userCreateDTO, UserProfileImageDTO userProfileImageDTO) {
+        if (userRepository.existsByEmail(userCreateDTO.email()) ||
+                userRepository.existsByUsername(userCreateDTO.username())) {
+            throw new IllegalArgumentException("User with email " + userCreateDTO.email() + " already exists");
         }
 
-        User newUser = new User(username, email, password);
+        User newUser = new User(userCreateDTO.username(),userCreateDTO.email() ,userCreateDTO.password() );
         userRepository.save(newUser);
 
-        System.out.println("User created: " + username + " (email: " + email + ")");
-        return newUser;
-    }
-
-    @Override
-    public User find(UUID userId) {
-        try {
-            return userRepository.findById(userId)
-                    .orElseThrow(()-> new IllegalArgumentException("User not found"));
-        } catch (IllegalArgumentException e) {
-            System.out.println("Failed to read user: " + e.getMessage());
-            return null;
+        if(userProfileImageDTO != null & userProfileImageDTO.imageData() != null) {
+            BinaryContent binaryContent = new BinaryContent(newUser, userProfileImageDTO.imageData());
+            binaryContentRepository.save(profileImage); // 레포지토리 미구현 나중에 수정 해야함.
         }
+
+        UserStatus userStatus = new UserStatus(newUser);
+        System.out.println("User created: " + userCreateDTO.username() + " (email: " + userCreateDTO.email() + ")");
+        userStatusRepositoty.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
+        boolean isOnline = userStatus.isOnline();
+        return new UserDTO(newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getCreatedAt(), newUser.getUpdatedAt(), isOnline);
     }
 
     @Override
-    public List<User> findAll() {
-        try {
-            List<User> users = userRepository.findAll();
-            if (users.isEmpty()) {
-                throw new IllegalStateException("No users found in the system.");
-            }
-            return users;
-        } catch (IllegalStateException e) {
-            System.out.println("Failed to read all users: " + e.getMessage());
-            return List.of();
-        }
+    public UserDTO find(UUID userId) {
+       //사용자 찾고
+        User user = userRepository.findById(userId)
+               .orElseThrow(()-> new IllegalArgumentException("User not found"));
+       // 온라인 상태 확인
+        boolean isOnline = userStatusRepository.findByUser(user)
+                .map(UserStatus::isOnline)
+                .orElse(false);
+        //변환 반환
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+    public List<UserDTO> findAll() {
+        return userRepository.findAll().stream()
+                .map(user -> {
+                    boolean isOnline = userStatusRepository.findByUser(user)
+                            .map(UserStatus::isOnline)
+                            .orElse(false);
+                    return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDTO update(UserUpdateDTO userUpdateDTO, UserProfileImageDTO userProfileImageDTO) {
         try {
-            User user = find(userId);
-            if(userRepository.existsByEmail(newEmail)){
-                throw new IllegalArgumentException("Email already exists");
+            //사용자 찾고
+            User user = userRepository.findById(userUpdateDTO.id())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            //중복체크
+            if(userRepository.existsByEmail(userUpdateDTO.newEmail())){
+                throw new IllegalArgumentException("Email already exits " + userUpdateDTO.newEmail());
             }
-            if (userRepository.existsByPassword(newPassword)){
-                throw new IllegalArgumentException("Password already exists");
-            }
-            user.update(newUsername, newEmail, newPassword);
-            System.out.println("User updated: " + newUsername + " (Email: " + newEmail + ")");
+            //업데이트
+            user.update(userUpdateDTO.newUsername(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
             userRepository.save(user);
-            return user;
-        } catch (IllegalArgumentException e) {
-            System.out.println("Failed to update user: " + e.getMessage());
-            return null;
+            //프로필 이미지 (선택적으로)
+            if(userProfileImageDTO != null & userProfileImageDTO.imageData() != null) {
+                binaryContentRepository.findByUserId(user.getId()) // 레포지토리 미구현 수정해야함.
+                        .ifPrenset(binaryContentRepository::delete);
+                BinaryContent binaryContent = new BinaryContent(user, userProfileImageDTO.imageData());
+                binaryContentRepository.save(profileImage);
+            }
+            boolean isOnline = userStatusRepository.findByUser(user)
+                    .map(UserStatus::isOnline)
+                    .orElse(false);
+            return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
+        }catch (IllegalArgumentException e){
+            System.out.println("Failed to update user " + e.getMessage());
+            throw e;
         }
     }
 
     @Override
     public void delete(UUID userId) {
         try {
-            if(!userRepository.existsById(userId)){
-                throw new IllegalArgumentException("User not found");
-            }
-            System.out.println("User deleted: " + find(userId).getEmail());
+            //사용자 찾고
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            //관련 데이터 삭제
+            binaryContentRepository.findByUserId(user.getId()).ifPresent(binaryContentRepository::delete); // 레포지터리 미구현 확인
+            userStatusRepository.findByUser(user).ifPresent(userStatusRepository::delete); // 미구현 확인 해야함
+            //user 삭제
             userRepository.deleteById(userId);
+            System.out.println("User deleted: " + user.getEmail());
         } catch (IllegalArgumentException e) {
             System.out.println("Failed to delete user: " + e.getMessage());
         }

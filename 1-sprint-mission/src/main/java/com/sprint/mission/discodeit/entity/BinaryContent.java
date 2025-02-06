@@ -8,13 +8,11 @@ import java.util.UUID;
 public class BinaryContent {
     private UUID id;
     private User user;
-    private Message message;
     private byte[] data;
 
-    public BinaryContent(User user, Message message) {
+    public BinaryContent(User user, byte[] data) {
         this.id = UUID.randomUUID();
         this.user = user;
-        this.message = message;
         this.data = data;
     }
 }
