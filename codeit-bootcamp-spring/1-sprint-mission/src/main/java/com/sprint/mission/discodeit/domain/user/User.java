@@ -4,12 +4,13 @@ import com.sprint.mission.discodeit.domain.user.enums.EmailSubscriptionStatus;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.Builder;
 
 public class User {
 
     private final UUID id;
     private final Nickname nickname;
-    private final Nickname username;
+    private final Username username;
     private final Email email;
     private final Password password;
     private final BirthDate birthDate;
@@ -17,13 +18,14 @@ public class User {
     private final LocalDateTime updatedAt;
     private final EmailSubscriptionStatus emailSubscriptionStatus;
 
+    @Builder
     public User(
-            Nickname nickname,
-            Nickname username,
-            Email email,
-            Password password,
-            BirthDate birthDate,
-            EmailSubscriptionStatus emailSubscriptionStatus
+        Nickname nickname,
+        Username username,
+        Email email,
+        Password password,
+        BirthDate birthDate,
+        EmailSubscriptionStatus emailSubscriptionStatus
     ) {
         this.id = UUID.randomUUID();
         this.createdAt = LocalDateTime.now();
@@ -40,36 +42,20 @@ public class User {
         return id;
     }
 
-    public Nickname getNickname() {
-        return nickname;
-    }
-
     public Email getEmail() {
         return email;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getUsernameValue() {
+        return this.username.getValue();
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public String getNicknameValue() {
+        return this.nickname.getValue();
     }
 
-    public Nickname getUsername() {
-        return username;
-    }
-
-    public Password getPassword() {
-        return password;
-    }
-
-    public BirthDate getBirthDate() {
-        return birthDate;
-    }
-
-    public EmailSubscriptionStatus getEmailSubscriptionStatus() {
-        return emailSubscriptionStatus;
+    public String getEmailValue() {
+        return this.email.getValue();
     }
 
     @Override
