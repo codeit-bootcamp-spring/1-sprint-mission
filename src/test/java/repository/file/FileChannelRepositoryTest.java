@@ -1,4 +1,4 @@
-package repository;
+package repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;

@@ -1,4 +1,4 @@
-package repository;
+package repository.file;
 
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.entity.BinaryContent;

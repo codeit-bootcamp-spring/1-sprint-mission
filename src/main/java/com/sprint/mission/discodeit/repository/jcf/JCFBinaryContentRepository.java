@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,14 +50,14 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
   @Override
   public List<BinaryContent> findByChannel(String channelId) {
     return data.values().stream()
-        .filter(content -> content.getChannelId().equals(channelId))
+        .filter(content -> Objects.equals(content.getChannelId(), channelId))
         .toList();
   }
 
   @Override
   public List<BinaryContent> findByMessageId(String messageId) {
     return data.values().stream()
-        .filter(content -> content.getMessageId().equals(messageId))
+        .filter(content -> Objects.equals(content.getMessageId(), messageId))
         .toList();
   }
 
@@ -67,7 +68,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
   @Override
   public void deleteByMessageId(String messageId) {
-    data.values().removeIf(content -> content.getMessageId().equals(messageId));
+    data.values().removeIf(content -> Objects.equals(content.getMessageId(), messageId));
   }
 
   @Override

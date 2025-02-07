@@ -48,4 +48,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
   public void deleteById(String id) {
     data.remove(id);
   }
+  @Override
+  public void clear(){
+    data.clear();
+  }
 }

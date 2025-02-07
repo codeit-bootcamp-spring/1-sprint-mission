@@ -7,13 +7,14 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Getter
 public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
   private final String UUID;
-  private final String channelId;
+  private String channelId;
   private final String userId;
   private final String messageId;
   private final String fileName;
@@ -76,5 +77,18 @@ public class BinaryContent implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(UUID);
+  }
+
+  @Override
+  public String toString() {
+    return "BinaryContent{" +
+        "channelId='" + channelId + '\'' +
+        ", userId='" + userId + '\'' +
+        ", messageId='" + messageId + '\'' +
+        ", fileName='" + fileName + '\'' +
+        ", fileType=" + fileType +
+        ", fileSize=" + fileSize +
+        ", data=" + Arrays.toString(data) +
+        '}';
   }
 }

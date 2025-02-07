@@ -12,26 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
+  private final Map<String, Channel> data = new ConcurrentHashMap<>();
 
-  private static volatile JCFChannelRepository instance;
-
-
-  private final Map<String, Channel> data;
-
-  private JCFChannelRepository() {
-    this.data = new ConcurrentHashMap<>();
-  }
-
-  public static JCFChannelRepository getInstance() {
-    if (instance == null) {
-      synchronized (JCFChannelRepository.class) {
-        if (instance == null) {
-          instance = new JCFChannelRepository();
-        }
-      }
-    }
-    return instance;
-  }
 
   @Override
   public Channel save(Channel channel) {

@@ -14,24 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
 
-  private static volatile JCFMessageRepository instance;
+  private final Map<String, Message> data = new ConcurrentHashMap<>();
 
-  private final Map<String, Message> data;
-
-  private JCFMessageRepository() {
-    this.data = new ConcurrentHashMap<>();
-  }
-
-  public static JCFMessageRepository getInstance() {
-    if (instance == null) {
-      synchronized (JCFMessageRepository.class) {
-        if (instance == null) {
-          instance = new JCFMessageRepository();
-        }
-      }
-    }
-    return instance;
-  }
 
   @Override
   public Message create(Message message) {

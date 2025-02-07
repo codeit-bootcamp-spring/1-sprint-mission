@@ -1,4 +1,4 @@
-package repository;
+package repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -145,7 +145,7 @@ public class FileUserStatusRepositoryTest {
     fileUtilMock.verify(() ->
           FileUtil.saveAllToFile(eq(USER_STATUS_FILE), argThat((List<UserStatus> list) ->
                 list.stream().noneMatch(status -> status.getUUID().equals(userStatus1.getUUID()))
-              )), times(1)
+              )), times(4)
         );
   }
 }

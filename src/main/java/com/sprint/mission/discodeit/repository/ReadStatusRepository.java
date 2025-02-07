@@ -16,5 +16,6 @@ public interface ReadStatusRepository {
 
   void deleteByUserId(String id);
   void deleteByChannelId(String channelId);
+  void clear();
 
 }

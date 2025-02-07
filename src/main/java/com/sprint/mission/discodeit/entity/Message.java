@@ -33,7 +33,7 @@ public class Message implements Serializable {
   private String channelUUID;
   private String content;
   private Boolean isEdited;
-  private Instant createdAt;
+  private final Instant createdAt;
   private Instant updatedAt;
   private String binaryContentId; // TODO: 삭제
   private String threadUUID;
@@ -58,7 +58,7 @@ public class Message implements Serializable {
     private Boolean isEdited = false;
     private String binaryContentId = "";
     private String threadUUID = "";
-    private Instant createdAt = Instant.now();
+    private final Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
 
     public MessageBuilder(String userUUID, String channelUUID, String content) throws MessageValidationException {

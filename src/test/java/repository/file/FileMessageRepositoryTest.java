@@ -1,4 +1,4 @@
-package repository;
+package repository.file;
 
 
 import com.sprint.mission.discodeit.entity.Message;
@@ -19,6 +19,7 @@ import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
 import static org.assertj.core.api.Assertions.*;
@@ -51,7 +52,7 @@ public class FileMessageRepositoryTest {
   }
 
   @BeforeEach
-  void setUp(){
+  void setUp() throws InterruptedException {
 
     repository.clear();
 
@@ -60,7 +61,7 @@ public class FileMessageRepositoryTest {
         "channelUUID",
         "this is content"
     ).build();
-
+    TimeUnit.MILLISECONDS.sleep(50);
     message2 = new Message.MessageBuilder(
         "userUUID",
         "channelUUID",

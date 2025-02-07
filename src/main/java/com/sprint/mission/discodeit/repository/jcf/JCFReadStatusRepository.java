@@ -64,4 +64,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
   public void deleteByChannelId(String channelId) {
     data.values().removeIf(status -> status.getChannelId().equals(channelId));
   }
+
+  @Override
+  public void clear() {
+    data.clear();
+  }
 }

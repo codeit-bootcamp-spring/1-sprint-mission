@@ -79,4 +79,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     statuses.removeIf(status -> status.getChannelId().equals(channelId));
     FileUtil.saveAllToFile(READ_STATUS_FILE, statuses);
   }
+
+  @Override
+  public void clear(){
+
+  }
 }

@@ -14,4 +14,5 @@ public interface UserStatusRepository {
   List<UserStatus> findAll();
   void deleteByUserId(String id);
   void deleteById(String id);
+  void clear();
 }

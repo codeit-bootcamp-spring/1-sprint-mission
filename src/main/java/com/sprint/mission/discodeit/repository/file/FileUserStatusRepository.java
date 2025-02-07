@@ -63,4 +63,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
     statuses.removeIf(status->status.getUUID().equals(id));
     FileUtil.saveAllToFile(USER_STATUS_FILE, statuses);
   }
+
+  @Override
+  public void clear() {
+
+  }
 }

@@ -1,4 +1,4 @@
-package repository;
+package repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
