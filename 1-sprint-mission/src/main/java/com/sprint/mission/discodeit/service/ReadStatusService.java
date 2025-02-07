@@ -99,7 +99,7 @@ public class ReadStatusService {
                 .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
         // 삭제
         readStatusRepository.deleteById(readStatusId);
-        
+
         System.out.println("ReadStatus deleted : " + readStatusId);
     }
 }

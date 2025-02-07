@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.interfacepac.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(binaryContent); // 레포지토리 미구현 나중에 수정 해야함.
         }
 
-        UserStatus userStatus = new UserStatus(newUser);
+        UserStatus userStatus = new UserStatus(newUser, Instant.now());
         System.out.println("User created: " + userCreateDTO.username() + " (email: " + userCreateDTO.email() + ")");
         userStatusRepository.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
         boolean isOnline = userStatus.isOnline();

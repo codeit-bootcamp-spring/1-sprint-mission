@@ -11,14 +11,16 @@ public class UserStatus {
     private User user;
     private Instant lastSeenAt;
 
-    public UserStatus(User user) {
+    public UserStatus(User user, Instant lastSeenAt) {
         this.id = UUID.randomUUID();
         this.user = user;
         this.lastSeenAt = lastSeenAt;
     }
 
-    public void updateLastSeenAt() {
-        this.lastSeenAt = Instant.now();
+    public void updateLastSeenAt(Instant newLastActiveAt) {
+        if(newLastActiveAt.isAfter(this.lastSeenAt)) {
+            this.lastSeenAt = newLastActiveAt;
+        }
     }
 
     public boolean isOnline() {
