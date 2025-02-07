@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.interfacepac.ChannelService;
 
 import java.util.List;
 import java.util.UUID;

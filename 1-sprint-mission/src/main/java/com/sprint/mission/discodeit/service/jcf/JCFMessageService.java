@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.interfacepac.MessageService;
 
 import java.util.List;
 import java.util.UUID;

@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.response.user.UserDTO;
 import com.sprint.mission.discodeit.dto.request.user.UserProfileImageDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.interfacepac.UserService;
 
 
 import java.util.List;

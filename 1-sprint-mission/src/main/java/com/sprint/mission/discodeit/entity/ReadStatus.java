@@ -22,8 +22,11 @@ public class ReadStatus {
         this.lastReadAt = lastReadAt;
     }
 
-    public void updateRedaTime() {
-        this.lastReadAt = Instant.now();
+    public void updateReadTime(Instant newLastReadAt) {
+        if(newLastReadAt.isAfter(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+        }
+
     }
 
 }

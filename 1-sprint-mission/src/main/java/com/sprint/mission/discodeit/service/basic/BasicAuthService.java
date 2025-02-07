@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
-import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.interfacepac.AuthService;
 
 public class BasicAuthService implements AuthService {
 

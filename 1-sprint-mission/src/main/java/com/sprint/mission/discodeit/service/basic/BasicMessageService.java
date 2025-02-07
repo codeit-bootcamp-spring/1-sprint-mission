@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentReposit
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.interfacepac.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

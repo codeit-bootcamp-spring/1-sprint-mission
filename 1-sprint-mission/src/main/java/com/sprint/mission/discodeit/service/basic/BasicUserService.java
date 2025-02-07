@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.interfacepac.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

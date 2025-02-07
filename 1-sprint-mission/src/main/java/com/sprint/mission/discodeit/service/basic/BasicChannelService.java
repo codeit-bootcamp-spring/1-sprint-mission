@@ -12,7 +12,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.interfacepac.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

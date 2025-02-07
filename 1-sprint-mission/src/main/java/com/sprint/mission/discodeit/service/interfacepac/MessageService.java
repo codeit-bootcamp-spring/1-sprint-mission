@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.interfacepac;
 
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
