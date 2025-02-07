@@ -1,20 +1,20 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository implements UserRepository {
 
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
     String mainUserRepository = "User\\mainOIUserRepository";
 
 
-    // 외부에서 생성자 접근 불가
+    /* 외부에서 생성자 접근 불가
     private FileUserRepository() {
         fileIOHandler.serializeHashMap(new HashMap<UUID, User>(), mainUserRepository);
     }
@@ -25,7 +25,7 @@ public class FileUserRepository implements UserRepository {
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static FileUserRepository getInstance() {
         return FileUserRepository.FileUserRepositoryHolder.INSTANCE;
-    }
+    }*/
 
 
 

@@ -7,24 +7,20 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private ChannelRepository channelRepository;
-    private UserRepository userRepository;
-
-    public BasicChannelService(ChannelRepository channelRepository, UserRepository userRepository) {
-        this.channelRepository = channelRepository;
-        this.userRepository = userRepository;
-    }
-
-
-
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
 
 
@@ -56,12 +52,12 @@ public class BasicChannelService implements ChannelService {
 
     //채널 생성 후 채널맵에 객체 넣어줌.
     @Override
-    public UUID createChannel(ChannelType type, String channelName) {
+    public UUID createChannel(ChannelType type, String channelName, String description) {
         if (channelName == null){
             System.out.println("채널 생성 실패. 입력값을 확인해주세요.");
             return null;
         }
-        Channel newChannel = new Channel(type, channelName);
+        Channel newChannel = new Channel(type, channelName, description);
         channelRepository.addChannel(newChannel);
         System.out.println(channelName + " 채널 생성 성공!");
         return newChannel.getId();

@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
@@ -14,7 +15,7 @@ public class FileMessageRepository implements MessageRepository {
 
 
 
-    // 외부에서 생성자 접근 불가
+    /* 외부에서 생성자 접근 불가
     private FileMessageRepository() {
         fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), mainMessageRepository);
     }
@@ -26,7 +27,7 @@ public class FileMessageRepository implements MessageRepository {
     public static FileMessageRepository getInstance() {
         return FileMessageRepositoryHolder.INSTANCE;
     }
-
+    */
 
 
 

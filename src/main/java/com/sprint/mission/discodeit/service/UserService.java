@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public interface UserService {
-    UUID createUser(String userName);
+    UUID createUser(String userName, String email,String password);
 
     HashMap<UUID, User> getUsersMap();
 

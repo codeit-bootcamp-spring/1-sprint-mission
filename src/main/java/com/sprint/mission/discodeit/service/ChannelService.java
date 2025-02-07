@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public interface ChannelService {
-    UUID createChannel(ChannelType type, String channelName);
+    UUID createChannel(ChannelType type, String channelName, String description);
 
     HashMap<UUID, Channel> getChannelsMap();
 

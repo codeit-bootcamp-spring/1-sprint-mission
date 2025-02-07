@@ -3,9 +3,12 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
@@ -13,7 +16,7 @@ public class FileChannelRepository implements ChannelRepository {
 
 
 
-    // 외부에서 생성자 접근 불가
+    /* 외부에서 생성자 접근 불가
     private FileChannelRepository() {
         fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), mainChannelRepository);
     }
@@ -24,7 +27,7 @@ public class FileChannelRepository implements ChannelRepository {
     // 외부에서 호출 가능한 싱글톤 인스턴스.
     public static FileChannelRepository getInstance() {
         return FileChannelRepository.FileChannelRepositoryHolder.INSTANCE;
-    }
+    } */
 
 
 
