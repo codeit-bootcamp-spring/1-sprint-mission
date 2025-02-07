@@ -5,54 +5,48 @@ import com.sprint.mission.entity.Channel;
 import com.sprint.mission.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.exception.DuplicateName;
+import org.springframework.stereotype.Service;
 
 
 import java.util.*;
 
+@Service
 public class JCFChannelService implements ChannelService {
 
     private final JCFChannelRepository channelRepository = new JCFChannelRepository();
 
-    private static JCFChannelService jcfChannelService;
-    private JCFChannelService(){}
-    public static JCFChannelService getInstance(){
-        if (jcfChannelService == null) return jcfChannelService = new JCFChannelService();
-        else return jcfChannelService;
+    //@Override
+    public Channel create(Channel channel) {
+        return channelRepository.save(channel);
     }
 
-    @Override
-    public Channel createOrUpdate(Channel channel) {
-        return channelRepository.create(channel);
-    }
-
-    @Override
+    //@Override
     public Channel update(Channel updatingChannel, String newName) {
         updatingChannel.setName(newName);
-        return createOrUpdate(updatingChannel);
-        // 클래스 내 메서드 활용(레포지토리 Map 덮어쓰기 가능)
+        return create(updatingChannel);
     }
 
-    @Override
+    //@Override
     public Channel findById(UUID id) {
         return channelRepository.findById(id);
     }
 
-    @Override
+    //@Override
     public Set<Channel> findAll() {
         return channelRepository.findAll();
     }
 
-    @Override
+    //@Override
     public void delete(Channel channel) {
-        channel.getUsersImmutable().stream()
-                        .forEach(user -> user.removeChannel(channel));
+        //channel.getUsersImmutable().stream().forEach(user -> user.removeChannel(channel));
+        //deletingChannel.removeAllUser();
         channelRepository.delete(channel);
     }
 
     /**
      * 중복 검증
      */
-    @Override
+    //@Override
     public void validateDuplicateName(String name) {
         boolean isDuplicate = findAll().stream()
                 .anyMatch(channel -> channel.getName().equals(name));

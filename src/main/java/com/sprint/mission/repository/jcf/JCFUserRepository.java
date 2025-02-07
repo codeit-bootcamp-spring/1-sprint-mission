@@ -4,11 +4,13 @@ import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.exception.NotFoundId;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Repository
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data = new HashMap<>();
@@ -38,5 +40,9 @@ public class JCFUserRepository implements UserRepository {
         // id, name, password 검증은 R.M에서 끝
         User remove = data.remove(deletingUser.getId());
         if (remove != null) log.info("닉네임 {}는 사라집니다.", deletingUser.getName());
+    }
+
+    public boolean existsById(UUID id){
+        return data.containsKey(id);
     }
 }

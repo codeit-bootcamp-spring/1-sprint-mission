@@ -18,11 +18,13 @@ public class Channel implements Serializable {
 
     private final UUID id;
     private final String firstId;
-
-    private String description;
-    private String name;
     private final Instant createdAt;
     private Instant updatedAt;
+
+    private ChannelType type;
+    private String description;
+    private String name;
+
 
     private final List<User> userList = new ArrayList<>();
 
@@ -40,6 +42,7 @@ public class Channel implements Serializable {
         if (userList.contains(user)){
             userList.add(user);
             user.getChannels().add(this);
+            user.changeReadStatus(this); // 흠 등록과 동시에 넣는게 흠
         }
     }
 }

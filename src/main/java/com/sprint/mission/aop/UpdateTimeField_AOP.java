@@ -42,7 +42,7 @@ public class UpdateTimeField_AOP {
 
             case Message message -> {
                 message.setUpdateAt(Instant.now());
-                log.info("[AOP] Message {} updateAt: {}", message.getMessage(), message.getUpdateAt());
+                log.info("[AOP] Message {} updateAt: {}", message.getContent(), message.getUpdateAt());
             }
 
             default -> log.info("업데이트 지원하지 않는 객체 타입: {}",target.getClass().getSimpleName());

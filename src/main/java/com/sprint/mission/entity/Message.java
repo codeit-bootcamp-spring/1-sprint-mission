@@ -2,12 +2,9 @@ package com.sprint.mission.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.aspectj.weaver.ast.Instanceof;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -21,7 +18,7 @@ public class Message implements Serializable, Comparable<Message> {
     private final UUID userId;
     private final UUID channelId;
 
-    private String message;
+    private String content;
 
     private final Instant createAt;
     private Instant updateAt;
@@ -30,7 +27,7 @@ public class Message implements Serializable, Comparable<Message> {
     protected Message(UUID channelId, UUID userId, String message) {
         this.userId = userId;
         this.channelId = channelId;
-        this.message = message;
+        this.content = message;
         id = UUID.randomUUID();
         firstId = id.toString().split("-")[0];
         createAt = Instant.now();

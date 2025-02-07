@@ -4,48 +4,43 @@ import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.Message;
 import com.sprint.mission.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-public class JCFMessageService implements MessageService {
+@Service
+@RequiredArgsConstructor
+public class JCFMessageService {
 
-    private final JCFMessageRepository messageRepository = new JCFMessageRepository();
+    private final JCFMessageRepository messageRepository;
 
-    private static JCFMessageService jcfMessageService;
-    private JCFMessageService(){}
-    public static JCFMessageService getInstance(){
-        if(jcfMessageService == null) return jcfMessageService = new JCFMessageService();
-        else return jcfMessageService;
+    public Message create(Message message) {
+        return messageRepository.save(message);
     }
 
-    @Override
-    public Message createOrUpdate(Message message) {
-        return messageRepository.createOrUpdateMessage(message);
-    }
-
-    @Override
     public Message update(UUID messageId, String newMassage){
         Message updatingMessage = findById(messageId);
-        updatingMessage.setMessage(newMassage);
-        return createOrUpdate(updatingMessage);
+        updatingMessage.setContent(newMassage);
+        return messageRepository.save(updatingMessage);
     }
 
-    @Override
+    //@Override
     public Message findById(UUID messageId){
-        return messageRepository.findById(messageId);
+        return messageRepository.findById(messageId).orElse(null);
     }
 
-    @Override
-    public Set<Message> findAll() {
+    //@Override
+    public List<Message> findAll() {
         return messageRepository.findAll();
     }
 
-    @Override
-    public Set<Message> findMessagesInChannel(Channel channel) {
-        return messageRepository.findMessagesInChannel(channel);
-    }
+//    //@Override
+//    public List<Message> findMessagesInChannel(Channel channel) {
+//        return messageRepository.findMessagesInChannel(channel);
+//    }
 
-    @Override
+    //@Override
     public void delete(UUID messageId) {
         messageRepository.delete(messageId);
     }

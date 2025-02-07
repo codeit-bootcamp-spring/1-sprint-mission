@@ -3,15 +3,17 @@ package com.sprint.mission.repository.jcf;
 import com.sprint.mission.entity.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.service.exception.NotFoundId;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> data = new HashMap<>();
 
     @Override
-    public Channel create(Channel channel) {
+    public Channel save(Channel channel) {
         // optional no
         return data.put(channel.getId(), channel);
     }
@@ -31,11 +33,14 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(Channel deletingChannel) {
-        deletingChannel.removeAllUser();
-        System.out.printf("채널명 %s는 사라집니다.", deletingChannel.getName());
 
-        // 그 채널에서 생겼던 메시지도 삭제해야될지, 그래도 기록으로 보관하니 삭제하지 말지
-        //List<Message> messagesInChannel = findMessageInChannel(channelId);
+        System.out.printf("채널명 %s는 사라집니다.", deletingChannel.getName());
         data.remove(deletingChannel.getId());
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
+    }
 }
+

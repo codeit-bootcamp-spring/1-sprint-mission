@@ -23,16 +23,21 @@ public class User implements Serializable {
     private String name;
     private String email;
     private String password;
+    //private UserStatus userStatus;
 
     private final Instant createAt;
     private Instant updateAt;
 
     private final List<Channel> channels = new ArrayList<>();
 
+    // 읽은거 STATUS
+    private final ReadStatus readStatus; // 흠...
+
     public User(String name, String password, String email){
         this.name = name;
         this.password = password;
         this.email = email;
+        this.readStatus = new ReadStatus();
         this.id = UUID.randomUUID();
         this.firstId = id.toString().split("-")[0];
         this.createAt = Instant.now();
@@ -43,6 +48,12 @@ public class User implements Serializable {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public void changeReadStatus(Channel channel){
+        if (channels.contains(channel)){
+            readStatus.updateReadTime(channel);
+        }
     }
 
     @Override
