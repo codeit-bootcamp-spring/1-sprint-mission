@@ -12,8 +12,8 @@ public class JCFMessageReplsitory implements MessageRepository {
     private final Map<UUID, Map<UUID, Message>> data = new HashMap<>();
 
     public void save(Message message) {
-        data.putIfAbsent(message.getDestinationCh().getChanneluuId(), new HashMap<>());
-        data.get(message.getDestinationCh().getChanneluuId()).put(message.getUuId(), message);
+        data.putIfAbsent(message.getDestinationCh().getId(), new HashMap<>());
+        data.get(message.getDestinationCh().getId()).put(message.getUuId(), message);
     }
 
     @Override

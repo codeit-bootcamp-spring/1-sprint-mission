@@ -29,7 +29,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void save(Channel channel) {
-        data.put(channel.getChanneluuId(), channel);
+        data.put(channel.getId(), channel);
         saveDataToFile();
     }
 

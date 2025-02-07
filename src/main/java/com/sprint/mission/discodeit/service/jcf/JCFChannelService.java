@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
-import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,21 +15,23 @@ public class JCFChannelService implements ChannelService {
 
     private final HashMap<UUID, Channel> data = new HashMap<>();
     private final ObserverManager observerManager;
-    private final ChannelValidtor channelValidtor;
+    private final ChannelValidator channelValidator;
 
 
-    public JCFChannelService(ObserverManager observerManager, ChannelValidtor channelValidtor) {
+    public JCFChannelService(ObserverManager observerManager, ChannelValidator channelValidator) {
         this.observerManager = observerManager;
-        this.channelValidtor = channelValidtor;
+        this.channelValidator = channelValidator;
     }
     @Override
     public Channel createChannel(ChannelType type, String name, String description){
-        if(channelValidtor.isUniqueName(name, getAllChannels())){
-            Channel channel = new Channel(type,name, description);
-            data.put(channel.getChanneluuId(), channel);
-            return channel;
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        throw new CustomException(ExceptionText.CHANNEL_CREATION_FAILED);
+        Channel channel = new Channel(type, name, description);
+        data.put(channel.getChanneluuId(), channel);
+        return channel;
     }
 
     @Override

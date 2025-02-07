@@ -13,7 +13,7 @@ public class ChannelObserver implements Observer {
         this.messageService = messageService;
     }
     @Override
-    public void update(UUID uuid) {
-        messageService.deleteAllMessagesForChannel(uuid);
+    public void update(UUID id) {
+        messageService.deleteAllMessagesForChannel(id);
     }
 }

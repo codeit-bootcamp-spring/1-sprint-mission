@@ -3,10 +3,9 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
-import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -22,29 +21,31 @@ import java.util.logging.Logger;
 public class FileChannelService implements ChannelService {
 
     private final ObserverManager observerManager;
-    private final ChannelValidtor channelValidtor;
+    private final ChannelValidator channelValidator;
     private final HashMap<UUID, Channel> data = new HashMap<>();
     private static final Logger LOGGER = Logger.getLogger(FileChannelService.class.getName());
     private final Path directory = Paths.get(System.getProperty("user.dir"), "Data/channel_data");
     private final String fileName = "channel_data.ser";
 
     public FileChannelService
-            (ObserverManager observerManager,ChannelValidtor channelValidtor){
+            (ObserverManager observerManager, ChannelValidator channelValidator){
         this.observerManager = observerManager;
-        this.channelValidtor = channelValidtor;
+        this.channelValidator = channelValidator;
         init(directory);
         loadDataFromFile();
     }
 
     @Override
     public Channel createChannel(ChannelType type, String name, String description){
-        if(channelValidtor.isUniqueName(name, getAllChannels())){
-            Channel channel = new Channel(type, name, description);
-            data.put(channel.getChanneluuId(), channel);
-            saveDataToFile();
-            return channel;
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        throw new CustomException(ExceptionText.CHANNEL_CREATION_FAILED);
+        Channel channel = new Channel(type, name, description);
+        data.put(channel.getId(), channel);
+        saveDataToFile();
+        return channel;
     }
 
     @Override

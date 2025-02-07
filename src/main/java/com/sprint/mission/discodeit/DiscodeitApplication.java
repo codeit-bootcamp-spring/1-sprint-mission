@@ -99,7 +99,7 @@ public class DiscodeitApplication {
 
 
 		System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
-		channelService.deleteChannel(ch1.getChanneluuId());
+		channelService.deleteChannel(ch1.getId());
 		System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
 		allprintChannel(channelService.getAllChannels());
 		allprintMessages(messageService.getAllMsg());

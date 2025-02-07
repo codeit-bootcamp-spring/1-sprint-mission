@@ -6,18 +6,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ObserverRegistrar {
 
-    private final Observer ChannelObserverService;
+    private final Observer channelObserverService;
     private final ObserverManager observerManager;
 
     public ObserverRegistrar(Observer channelObserverService, ObserverManager observerManager){
-        this.ChannelObserverService = channelObserverService;
+        this.channelObserverService = channelObserverService;
         this.observerManager = observerManager;
         add();
 
     }
 
     private void add(){
-        observerManager.addObserver(ChannelObserverService);
+        observerManager.addObserver(channelObserverService);
     }
 
 }

@@ -7,7 +7,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 import com.sprint.mission.discodeit.validation.UserValidator;
 
@@ -34,7 +34,7 @@ public interface Factory {
     //Validator
     UserValidator createUserValidator();
 
-    ChannelValidtor createChannelValidator();
+    ChannelValidator createChannelValidator();
 
     MessageValidator createMessageValidator();
 

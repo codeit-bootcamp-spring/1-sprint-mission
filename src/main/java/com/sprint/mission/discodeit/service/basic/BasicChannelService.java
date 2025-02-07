@@ -3,12 +3,10 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.validation.ChannelValidtor;
+import com.sprint.mission.discodeit.validation.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,17 +18,19 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
 
     private final ObserverManager observerManager;
-    private final ChannelValidtor channelValidtor;
+    private final ChannelValidator channelValidator;
     private final ChannelRepository fileChannelRepository;
 
     @Override
     public Channel createChannel(ChannelType type, String name, String description){
-        if(channelValidtor.isUniqueName(name, fileChannelRepository.findAll())){
-            Channel ch1 = new Channel(type,name, description);
-            fileChannelRepository.save(ch1);
-            return ch1;
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        throw new CustomException(ExceptionText.CHANNEL_CREATION_FAILED);
+        Channel ch1 = new Channel(type,name, description);
+        fileChannelRepository.save(ch1);
+        return ch1;
     }
 
     @Override
