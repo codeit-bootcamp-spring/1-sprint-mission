@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,7 +17,9 @@ import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileMessageRepository implements MessageRepository {
+public class FileMessageRepository implements MessageRepository{
+
+
 
   @Override
   public Message create(Message message) {

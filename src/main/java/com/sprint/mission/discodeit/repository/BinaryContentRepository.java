@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.List;
 import java.util.Optional;
 
-public interface BinaryContentRepository {
+public interface BinaryContentRepository extends BaseRepository<BinaryContent, String>{
   BinaryContent save(BinaryContent binaryContent);
   List<BinaryContent> saveMultipleBinaryContent(List<BinaryContent> binaryContents);
   Optional<BinaryContent> findById(String id);

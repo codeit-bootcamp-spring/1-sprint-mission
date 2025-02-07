@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface MessageRepository {
+public interface MessageRepository extends BaseRepository<Message,String> {
   Message create(Message message);
   Optional<Message> findById(String id);
   List<Message> findByChannel(String channelId);

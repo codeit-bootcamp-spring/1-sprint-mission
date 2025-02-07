@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
-public class JCFChannelRepository implements ChannelRepository {
+public class JCFChannelRepository implements ChannelRepository{
 
   private final Map<String, Channel> data = new ConcurrentHashMap<>();
 

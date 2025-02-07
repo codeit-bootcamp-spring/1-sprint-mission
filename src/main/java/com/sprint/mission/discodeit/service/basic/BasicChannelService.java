@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,19 +35,16 @@ public class BasicChannelService implements ChannelService {
 
   private final ReadStatusService readStatusService;
 
+  private final EntityValidator entityValidator;
+
   private final ChannelRepository channelRepository;
-  private final UserRepository userRepository;
   private final MessageRepository messageRepository;
 
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
 
     // User 존재 여부 검증
-    channelDto.userIds().stream().filter(id -> userRepository.findById(id).isEmpty()).findAny().ifPresent(
-        id -> {
-          throw new UserNotFoundException();
-        }
-    );
+    channelDto.userIds().forEach(id -> entityValidator.findOrThrow(User.class, id, new UserNotFoundException()));
 
     // Channel 객체 생성
     Channel channel = new Channel.ChannelBuilder(null, channelDto.channelType())
@@ -96,8 +95,7 @@ public class BasicChannelService implements ChannelService {
    */
   @Override
   public FindChannelResponseDto getChannelById(String channelId) {
-    Channel channel = channelRepository.findById(channelId)
-        .orElseThrow(ChannelNotFoundException::new);
+    Channel channel = entityValidator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
 
     List<String> userIds = getParticipatingUsersByChannel(channelId);
 

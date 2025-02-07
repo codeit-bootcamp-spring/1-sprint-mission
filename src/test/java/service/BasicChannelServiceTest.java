@@ -14,14 +14,13 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import org.assertj.core.api.Assertions;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
@@ -40,6 +39,8 @@ public class BasicChannelServiceTest {
   private UserRepository userRepository;
   @Mock
   private MessageRepository messageRepository;
+  @Mock
+  private EntityValidator validator;
   @InjectMocks
   private BasicChannelService channelService;
   private Channel privateChannel;
@@ -75,9 +76,8 @@ public class BasicChannelServiceTest {
         List.of(mockUser1.getUUID(), mockUser2.getUUID())
     );
 
-    when(userRepository.findById(mockUser1.getUUID())).thenReturn(Optional.of(mockUser1));
-    when(userRepository.findById(mockUser2.getUUID())).thenReturn(Optional.of(mockUser2));
-
+    when(validator.findOrThrow(eq(User.class), eq(mockUser1.getUUID()), any(UserNotFoundException.class))).thenReturn(mockUser1);
+    when(validator.findOrThrow(eq(User.class), eq(mockUser2.getUUID()), any(UserNotFoundException.class))).thenReturn(mockUser2);
 
     PrivateChannelResponseDto responseDto = channelService.createPrivateChannel(channelDto);
 
@@ -86,11 +86,10 @@ public class BasicChannelServiceTest {
     assertThat(responseDto.serverId()).isEqualTo("server1");
     assertThat(responseDto.channelType()).isEqualTo(Channel.ChannelType.VOICE);
 
-
-    verify(userRepository, times(2)).findById(any());
     verify(channelRepository, times(1)).save(any());
 
     ArgumentCaptor<CreateReadStatusDto> captor = ArgumentCaptor.forClass(CreateReadStatusDto.class);
+
     verify(readStatusService, times(2)).create(captor.capture(), eq(true));
 
     List<CreateReadStatusDto> capturedValues = captor.getAllValues();
@@ -108,7 +107,8 @@ public class BasicChannelServiceTest {
         List.of(mockUser1.getUUID())
     );
 
-    when(userRepository.findById(mockUser1.getUUID())).thenReturn(Optional.empty());
+    when(validator.findOrThrow(eq(User.class), eq(mockUser1.getUUID()), any(UserNotFoundException.class))).thenThrow(UserNotFoundException.class);
+
 
     assertThatThrownBy(() -> channelService.createPrivateChannel(channelDto)).isInstanceOf(UserNotFoundException.class);
     verifyNoInteractions(channelRepository);
@@ -137,7 +137,8 @@ public class BasicChannelServiceTest {
 
   @Test
   void testGetChannelById_Success_PrivateChannel(){
-    when(channelRepository.findById(privateChannel.getUUID())).thenReturn(Optional.ofNullable(privateChannel));
+    when(validator.findOrThrow(eq(Channel.class), eq(privateChannel.getUUID()), any(ChannelNotFoundException.class))).thenReturn(privateChannel);
+
     when(readStatusService.findAllByChannelId(privateChannel.getUUID())).thenReturn(List.of(new ReadStatus(privateChannel.getUUID(), mockUser1.getUUID())));
 
     FindChannelResponseDto responseDto = channelService.getChannelById(privateChannel.getUUID());
@@ -146,14 +147,14 @@ public class BasicChannelServiceTest {
     assertThat(responseDto.channelId()).isEqualTo(privateChannel.getUUID());
     assertThat(responseDto.userIds()).containsOnly(mockUser1.getUUID());
 
-    verify(channelRepository, times(1)).findById(privateChannel.getUUID());
     verify(readStatusService, times(1)).findAllByChannelId(privateChannel.getUUID());
     verify(messageRepository, times(1)).findLatestChannelMessage(privateChannel.getUUID());
   }
 
   @Test
   void testGetChannelById_Success_PublicChannel(){
-    when(channelRepository.findById(publicChannel.getUUID())).thenReturn(Optional.ofNullable(publicChannel));
+    when(validator.findOrThrow(eq(Channel.class), eq(publicChannel.getUUID()), any(ChannelNotFoundException.class))).thenReturn(publicChannel);
+    //when(channelRepository.findById(publicChannel.getUUID())).thenReturn(Optional.ofNullable(publicChannel));
 
     FindChannelResponseDto responseDto = channelService.getChannelById(publicChannel.getUUID());
 
@@ -161,18 +162,17 @@ public class BasicChannelServiceTest {
     assertThat(responseDto.userIds()).isEmpty();
     assertThat(responseDto.channelId()).isEqualTo(publicChannel.getUUID());
 
-    verify(channelRepository, times(1)).findById(publicChannel.getUUID());
+
     verify(readStatusService, times(1)).findAllByChannelId(publicChannel.getUUID());
     verify(messageRepository, times(1)).findLatestChannelMessage(publicChannel.getUUID());
   }
 
   @Test
   void testGetChannelById_Fail_ChannelNotFound(){
-    when(channelRepository.findById(anyString())).thenReturn(Optional.empty());
+
+    when(validator.findOrThrow(eq(Channel.class), anyString(), any(ChannelNotFoundException.class))).thenThrow(ChannelNotFoundException.class );
 
     assertThatThrownBy(() -> channelService.getChannelById(privateChannel.getUUID())).isInstanceOf(ChannelNotFoundException.class);
-
-    verify(channelRepository, times(1)).findById(privateChannel.getUUID());
   }
 
   @Test

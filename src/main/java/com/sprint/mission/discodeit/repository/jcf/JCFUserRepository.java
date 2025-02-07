@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 
-public class JCFUserRepository implements UserRepository {
+public class JCFUserRepository implements UserRepository{
 
   private final Map<String, User> data = new ConcurrentHashMap<>();
 

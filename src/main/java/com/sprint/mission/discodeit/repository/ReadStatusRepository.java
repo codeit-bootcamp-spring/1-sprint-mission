@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReadStatusRepository {
+public interface ReadStatusRepository extends BaseRepository<ReadStatus,String>{
 
   ReadStatus save(ReadStatus status);
   Optional<ReadStatus> findById(String id);

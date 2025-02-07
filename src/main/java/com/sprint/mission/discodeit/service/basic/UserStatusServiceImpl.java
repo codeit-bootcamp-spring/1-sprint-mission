@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.validator.UserValidator;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +22,12 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 public class UserStatusServiceImpl implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
-  private final UserValidator userValidator;
+  private final EntityValidator validator;
 
   @Override
   public UserStatus create(CreateUserStatusDto dto) {
-    userValidator.throwIfNoSuchUserId(dto.userId());
+
+    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
 
     if (userStatusRepository.findByUserId(dto.userId()).isPresent()) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
@@ -57,12 +60,11 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatus updateByUserId(String userId, UpdateUserStatusDto dto) {
 
-    userValidator.throwIfNoSuchUserId(userId);
+    validator.findOrThrow(User.class, userId, new UserNotFoundException());
 
     UserStatus status = find(dto.uuid());
 
     status.updateLastOnline();
-
 
     return status;
   }

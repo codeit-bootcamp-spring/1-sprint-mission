@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
@@ -14,7 +15,7 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_STATUS_FIL
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileUserStatusRepository implements UserStatusRepository {
+public class FileUserStatusRepository implements UserStatusRepository{
 
 
   @Override

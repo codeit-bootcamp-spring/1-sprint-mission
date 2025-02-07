@@ -15,7 +15,7 @@ import static com.sprint.mission.discodeit.constant.FileConstant.CHANNEL_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileChannelRepository implements ChannelRepository {
+public class FileChannelRepository implements ChannelRepository{
 
   @Override
   public Channel save(Channel channel) {

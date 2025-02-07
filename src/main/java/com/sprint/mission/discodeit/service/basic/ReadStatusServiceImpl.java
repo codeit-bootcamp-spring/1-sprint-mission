@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
@@ -9,6 +11,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,32 +26,19 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 public class ReadStatusServiceImpl implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
-  private final UserRepository userRepository;
-  private final ChannelRepository channelRepository;
+  private final EntityValidator validator;
 
   @Override
   public ReadStatus create(CreateReadStatusDto dto, boolean skipValidation) {
 
     if (!skipValidation) {
-      validateUserExists(dto.userId());
-      validateChannelExists(dto.channelId());
+      validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
+      validator.findOrThrow(Channel.class, dto.channelId(), new ChannelNotFoundException());
     }
 
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
 
     return readStatusRepository.save(new ReadStatus(dto.channelId(), dto.userId()));
-  }
-
-  private void validateChannelExists(String channelId) {
-    if (channelRepository.findById(channelId).isEmpty()) {
-      throw new ChannelNotFoundException();
-    }
-  }
-
-  private void validateUserExists(String userId) {
-    if (userRepository.findById(userId).isEmpty()) {
-      throw new UserNotFoundException();
-    }
   }
 
   private void validateDuplicateUserChannelStatus(String userId, String channelId) {

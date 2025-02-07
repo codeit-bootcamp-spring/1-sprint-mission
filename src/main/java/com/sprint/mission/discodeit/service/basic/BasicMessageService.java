@@ -7,13 +7,13 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
-import com.sprint.mission.discodeit.exception.MessageValidationException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,41 +30,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-  private static volatile BasicMessageService instance;
   private final MessageRepository messageRepository;
-  private final UserRepository userRepository;
-  private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
-
-  public static BasicMessageService getInstance(MessageRepository messageRepository
-      , UserRepository userRepository
-      , ChannelRepository channelRepository
-      , BinaryContentRepository binaryContentRepository) {
-    if (instance == null) {
-      synchronized (BasicMessageService.class) {
-        if (instance == null) {
-          instance = new BasicMessageService(messageRepository, userRepository, channelRepository, binaryContentRepository);
-        }
-      }
-    }
-    return instance;
-  }
+  private final EntityValidator validator;
 
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto) {
 
     // 사용자 검증
-    if (userRepository.findById(messageDto.userId()).isEmpty()) {
-      log.error("user not valid={}", messageDto.userId());
-      throw new MessageValidationException();
-    }
+    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
 
     // 채널 검증
-    if (channelRepository.findById(messageDto.channelId()).isEmpty()) {
-      log.error("user not valid={}", messageDto.channelId());
-      throw new MessageValidationException();
-    }
+    validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
 
     Message message = new Message.MessageBuilder(messageDto.userId(), messageDto.channelId(), messageDto.content()).build();
 

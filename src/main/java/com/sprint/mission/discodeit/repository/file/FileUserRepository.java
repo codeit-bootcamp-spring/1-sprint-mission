@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -15,8 +16,7 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileUserRepository implements UserRepository {
-
+public class FileUserRepository implements UserRepository{
   @Override
   public User create(User user) {
     List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
@@ -45,10 +45,12 @@ public class FileUserRepository implements UserRepository {
   @Override
   public User update(User user) {
     List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+
     User targetUser = users.stream()
         .filter(u -> u.getUUID().equals(user.getUUID()))
         .findAny()
         .orElseThrow(() -> new UserNotFoundException());
+
     users.remove(targetUser);
     users.add(user);
     FileUtil.saveAllToFile(USER_FILE, users);

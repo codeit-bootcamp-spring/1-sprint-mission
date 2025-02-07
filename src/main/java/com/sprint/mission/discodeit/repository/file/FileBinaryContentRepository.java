@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,7 +16,7 @@ import static com.sprint.mission.discodeit.constant.FileConstant.BINARY_CONTENT_
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileBinaryContentRepository implements BinaryContentRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository{
 
   private List<BinaryContent> getFromFile(){
     return FileUtil.loadAllFromFile(BINARY_CONTENT_FILE, BinaryContent.class);

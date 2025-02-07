@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
-public class JCFMessageRepository implements MessageRepository {
+public class JCFMessageRepository implements MessageRepository{
 
   private final Map<String, Message> data = new ConcurrentHashMap<>();
 

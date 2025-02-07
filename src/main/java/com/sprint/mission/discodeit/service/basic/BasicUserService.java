@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FileTypeProcessor;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -29,22 +30,11 @@ import static com.sprint.mission.discodeit.constant.UserConstant.*;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-  private static volatile BasicUserService instance;
-
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
 
-  public static BasicUserService getInstance(UserRepository userRepository, UserStatusRepository userStatusRepository, BinaryContentRepository binaryContentRepository) {
-    if (instance == null) {
-      synchronized (BasicUserService.class) {
-        if (instance == null) {
-          instance = new BasicUserService(userRepository, userStatusRepository, binaryContentRepository);
-        }
-      }
-    }
-    return instance;
-  }
+  private final EntityValidator validator;
 
   /**
    * 사용자를 생성하는 메서드.
@@ -142,9 +132,7 @@ public class BasicUserService implements UserService {
   @Override
   public UserResponseDto findUserById(String id) {
 
-    User user = userRepository.findById(id).orElseThrow(
-        UserNotFoundException::new
-    );
+    User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
     UserStatus status = userStatusRepository.findByUserId(id).orElseGet(
         () -> createStatusIfNotExists(id)
@@ -176,9 +164,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void updateUser(String id, UserUpdateDto updatedUser, String originalPassword) {
-    User originalUser = userRepository.findById(id).orElseThrow(
-        () -> new UserNotFoundException()
-    );
+    User originalUser = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
     if (!PasswordEncryptor.checkPassword(originalPassword, originalUser.getPassword()))
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
@@ -213,7 +199,9 @@ public class BasicUserService implements UserService {
 
   @Override
   public void deleteUser(String id, String password) {
-    User user = userRepository.findById(id).get();
+
+    User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
+
     if (!PasswordEncryptor.checkPassword(password, user.getPassword()))
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
     userRepository.delete(id);

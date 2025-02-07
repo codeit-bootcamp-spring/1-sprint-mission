@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.validator.UserValidator;
+import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +21,12 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 public class BinaryContentServiceImpl implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
-  private final UserValidator userValidator;
-
+  private final EntityValidator validator;
 
   @Override
   public BinaryContent create(CreateBinaryContentDto dto) {
 
-    userValidator.throwIfNoSuchUserId(dto.userId());
+    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
 
     BinaryContent binaryContent = new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).build();
 
