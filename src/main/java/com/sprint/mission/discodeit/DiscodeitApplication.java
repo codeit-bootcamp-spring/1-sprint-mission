@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.Interface.AuthService;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
@@ -18,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprint.mission.discodeit.entity.UserStatusType.*;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -54,12 +55,23 @@ public class DiscodeitApplication {
         displayEntityDetails(message1);
         displayEntityDetails(message2);
 
+        //유저 업데이트
+        UserUpdateRequestDTO updateRequest=new UserUpdateRequestDTO(user1.getId(),"Updatealice",user1.getEmail(),user1.getPassword(),null);
+        userService.updateUser(updateRequest);
+        System.out.println("유저 업데이트 후 조회");
+        displayAllData(userService,channelService,messageService);
+
         // 메시지 업데이트 (DTO 활용)
-        UpdateMessageRequest updateRequest = new UpdateMessageRequest(message1.getId(), "Updated hello message");
-        messageService.updateMessage(updateRequest);
-        System.out.println("업데이트 후 조회");
-        displayEntityDetails(message1);
-        //displayAllData(userService, channelService, messageService);
+        UpdateMessageRequest updateMessageRequest = new UpdateMessageRequest(message1.getId(), "Updated hello message");
+        messageService.updateMessage(updateMessageRequest);
+        System.out.println("메시지 업데이트 후 조회");
+        displayAllData(userService, channelService, messageService);
+
+        //채널 업데이트(DTO 할용)
+        ChannelUpdateRequest updateChannelRequest=new ChannelUpdateRequest(channel1.getId(),channel1.getChannelName(),"Update Channel");
+        channelService.updateChannel(updateChannelRequest);
+        System.out.println("채널 업데이트 후 조회");
+        displayAllData(userService, channelService, messageService);
 
         // 삭제 (연관 데이터 포함)
         userService.deleteUser(user1.getId());
@@ -75,7 +87,7 @@ public class DiscodeitApplication {
     }
 
     private static void displayAllData(UserService userService, ChannelService channelService, MessageService messageService) {
-        System.out.println("All Users: " + userService.getAllUsers());
+        System.out.println("All Users: " + userService.findAllUsers());
         System.out.println("All Channels: " + channelService.getAllChannels());
         System.out.println("All Messages: " + messageService.getAllMessages());
     }

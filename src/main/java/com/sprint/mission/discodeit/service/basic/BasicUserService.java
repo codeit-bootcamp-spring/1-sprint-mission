@@ -44,7 +44,7 @@ public class BasicUserService implements UserService {
         userStatusRepository.save(status);
 
         if(request.getProfileImage() != null){
-            BinaryContent profile=new BinaryContent(user.getId(),request.getProfileImage());
+            BinaryContent profile=new BinaryContent(user.getId(),null,request.getProfileImage());
             binaryContentRepository.save(profile);
         }
         return user;
@@ -78,6 +78,11 @@ public class BasicUserService implements UserService {
                 }).collect(Collectors.toList());
     }
 
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.getAllUsers();
+    }
+
 
     @Override
     public User updateUser(UserUpdateRequestDTO request) {
@@ -88,7 +93,7 @@ public class BasicUserService implements UserService {
 
         if (request.getNewProfileImage() != null){
             binaryContentRepository.deleteByUserId(request.getUserId());
-            BinaryContent newProfile=new BinaryContent(request.getUserId(),request.getNewProfileImage());
+            BinaryContent newProfile=new BinaryContent(request.getUserId(),null,request.getNewProfileImage());
             binaryContentRepository.save(newProfile);
         }
 

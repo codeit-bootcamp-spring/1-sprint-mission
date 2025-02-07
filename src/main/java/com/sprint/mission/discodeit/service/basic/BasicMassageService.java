@@ -38,7 +38,7 @@ public class BasicMassageService implements MessageService {
         Message savedMessage=messageRepository.save(message);
         if(request.getAttachments()!=null){
             for (byte[] fileData : request.getAttachments()) {
-                BinaryContent binaryContent=new BinaryContent(request.getAuthorId(),fileData);
+                BinaryContent binaryContent=new BinaryContent(null,request.getAuthorId(),fileData);
                 binaryContentRepository.save(binaryContent);
             }
         }

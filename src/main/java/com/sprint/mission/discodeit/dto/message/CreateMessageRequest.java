@@ -8,6 +8,7 @@ import java.util.UUID;
 
 @Getter
 public class CreateMessageRequest {
+    private UUID messageId;
     private String content;
     private UUID channelId;
     private UUID authorId;

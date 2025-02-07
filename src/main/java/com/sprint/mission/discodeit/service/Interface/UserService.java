@@ -18,6 +18,7 @@ public interface UserService {
 
     //모두 읽기
     List<UserResponseDTO> getAllUsers();
+    List<User> findAllUsers();
 
     //수정
     User updateUser(UserUpdateRequestDTO request);
