@@ -35,6 +35,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public User findbyId(UUID id) {
+        return userList.get(id);
+    }
+
+    @Override
     public Map<UUID, User> load() {
         File file = new File(fileName);
 

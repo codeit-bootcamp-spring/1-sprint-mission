@@ -3,6 +3,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -51,6 +53,31 @@ public class JavaApplication {
 
         FileChannelRepository fileChannelRepository = new FileChannelRepository();
         fileChannelRepository.save(channel1);
+
+
+        
+        //Basic*Service 테스트
+        JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
+        BasicChannelService basicChannelService = new BasicChannelService(jcfChannelRepository);
+
+        //채널 추가
+        Channel newChannel = basicChannelService.createChannel("newChannel");
+        Channel newChannel2 = basicChannelService.createChannel("newChannel2");
+        System.out.println(basicChannelService.readChannel(newChannel.getChannelId()).getChannelName());
+        System.out.println(basicChannelService.readChannel(newChannel2.getChannelId()).getChannelName());
+
+        //모두 로드
+        System.out.println(basicChannelService.readAllChannel());
+
+        //이름 변경
+        System.out.println(basicChannelService.modifyChannel(newChannel2.getChannelId(), "newChannel3"));
+        System.out.println(basicChannelService.readChannel(newChannel2.getChannelId()).getChannelName());
+
+        //채널 삭제
+        basicChannelService.deleteChannel(newChannel2.getChannelId());
+        System.out.println(basicChannelService.readAllChannel());
+
+
 
 //        //------------------채널 도메인
 //        System.out.println("*채널 도메인 test");

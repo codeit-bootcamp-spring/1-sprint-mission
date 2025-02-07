@@ -11,6 +11,7 @@ public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> userList;
 
+
     public JCFUserRepository() {
         this.userList = new HashMap<>();
     }
@@ -19,6 +20,11 @@ public class JCFUserRepository implements UserRepository {
     public User save(User user) {
         userList.put(user.getUserId(), user);
         return user;
+    }
+
+    @Override
+    public User findbyId(UUID id) {
+        return userList.get(id);
     }
 
     @Override

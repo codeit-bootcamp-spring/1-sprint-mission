@@ -22,6 +22,11 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel findById(UUID id) {
+        return channelList.get(id);
+    }
+
+    @Override
     public Map<UUID, Channel> load() {
         return channelList;
     }

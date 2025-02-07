@@ -35,6 +35,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
+    public Message findById(UUID id) {
+        return messageList.get(id);
+    }
+
+    @Override
     public Map<UUID, Message> load() {
         File file = new File(fileName);
 

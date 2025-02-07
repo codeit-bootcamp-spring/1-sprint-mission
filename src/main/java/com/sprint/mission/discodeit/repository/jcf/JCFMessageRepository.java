@@ -9,25 +9,30 @@ import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
 
-    private final Map<UUID, Message> messagelList;
+    private final Map<UUID, Message> messageList;
 
     public JCFMessageRepository() {
-        this.messagelList = new HashMap<>();
+        this.messageList = new HashMap<>();
+    }
+
+    @Override
+    public Message findById(UUID id) {
+        return messageList.get(id);
     }
 
     @Override
     public Message save(Message message) {
-        messagelList.put(message.getMsgId(), message);
+        messageList.put(message.getMsgId(), message);
         return message;
     }
 
     @Override
     public Map<UUID, Message> load() {
-        return messagelList;
+        return messageList;
     }
 
     @Override
     public void delete(UUID id) {
-        messagelList.remove(id);
+        messageList.remove(id);
     }
 }

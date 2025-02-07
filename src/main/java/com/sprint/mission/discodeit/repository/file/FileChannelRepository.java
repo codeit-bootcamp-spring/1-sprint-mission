@@ -17,6 +17,7 @@ public class FileChannelRepository implements ChannelRepository {
 
 
 
+
     private static final String fileName = "savedata/channel.ser";
     private final Map<UUID, Channel> channelList;
 
@@ -33,6 +34,12 @@ public class FileChannelRepository implements ChannelRepository {
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패 : " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Channel findById(UUID id) {
+        load();
+        return channelList.get(id);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public interface UserRepository {
     User save(User user);
+    User findbyId(UUID uuid);
     Map<UUID, User> load();
     void delete(UUID id);
 }
