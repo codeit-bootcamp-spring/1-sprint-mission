@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.util.ArrayList;
@@ -15,12 +14,10 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
 
     private final HashMap<UUID, Channel> data = new HashMap<>();
-    private final ObserverManager observerManager;
     private final ChannelValidator channelValidator;
 
 
-    public JCFChannelService(ObserverManager observerManager, ChannelValidator channelValidator) {
-        this.observerManager = observerManager;
+    public JCFChannelService(ChannelValidator channelValidator) {
         this.channelValidator = channelValidator;
     }
     @Override
@@ -68,6 +65,5 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void delete(UUID uuid){
         data.remove(uuid);
-        observerManager.channelDeletionEvent(uuid);
     }
 }

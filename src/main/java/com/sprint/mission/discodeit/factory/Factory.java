@@ -1,6 +1,4 @@
 package com.sprint.mission.discodeit.factory;
-import com.sprint.mission.discodeit.observer.Observer;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -52,10 +50,4 @@ public interface Factory {
     MessageRepository createJCFMessageRepository();
 
     MessageRepository createFileMessageRepository();
-
-
-    //Observer
-    ObserverManager createObserverManager();
-
-    Observer createChannelObserver();
 }

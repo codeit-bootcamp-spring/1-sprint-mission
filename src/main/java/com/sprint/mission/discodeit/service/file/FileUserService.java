@@ -33,13 +33,14 @@ public class FileUserService implements UserService {
     public User createUser(String name, String email,String iD ,String password) {
         try{
             userValidator.validateUser(name, email, password);
+            User user = new User(name, email, iD, password);
+            data.put(user.getId(), user);
+            saveDataToFile();
+            return user;
         }catch (CustomException e){
             System.out.println("유저생성 실패 ->" + e.getMessage());
+            return null;
         }
-        User user = new User(name, email, iD, password);
-        data.put(user.getId(), user);
-        saveDataToFile();
-        return user;
     }
 
 

@@ -85,17 +85,17 @@ public class DiscodeitApplication {
         Channel ch2 = DiscodeitApplication.setupChannel2(channelService);
         DiscodeitApplication.allPrintChannel(channelService.findAll());
 
-//		messageCreateTest(messageService,ch1.getId(),user1.getId(),"user1이 ch1으로 보내는 메시지");
-//		messageCreateTest(messageService,ch1.getId(),user2.getId(),"user2이 ch1으로 보내는 메시지");
-//		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user1이 ch2으로 보내는 메시지");
-//		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user2이 ch2으로 보내는 메시지");
+		messageCreateTest(messageService,ch1.getId(),user1.getId(),"user1이 ch1으로 보내는 메시지");
+		messageCreateTest(messageService,ch1.getId(),user2.getId(),"user2이 ch1으로 보내는 메시지");
+		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user1이 ch2으로 보내는 메시지");
+		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user2이 ch2으로 보내는 메시지");
         DiscodeitApplication.allprintMessages(messageService.findAll());
 
 
-        System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
-        channelService.delete(ch1.getId());
-        System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
-        DiscodeitApplication.allPrintChannel(channelService.findAll());
-        DiscodeitApplication.allprintMessages(messageService.findAll());
+//        System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
+//        channelService.delete(ch1.getId());
+//        System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
+//        DiscodeitApplication.allPrintChannel(channelService.findAll());
+//        DiscodeitApplication.allprintMessages(messageService.findAll());
     }
 }

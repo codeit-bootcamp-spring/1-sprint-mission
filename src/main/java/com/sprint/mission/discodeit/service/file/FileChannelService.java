@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
 import java.io.*;
@@ -18,7 +17,6 @@ import java.util.logging.Logger;
 
 public class FileChannelService implements ChannelService {
 
-    private final ObserverManager observerManager;
     private final ChannelValidator channelValidator;
     private final HashMap<UUID, Channel> data = new HashMap<>();
     private static final Logger LOGGER = Logger.getLogger(FileChannelService.class.getName());
@@ -26,8 +24,7 @@ public class FileChannelService implements ChannelService {
     private final String fileName = "channel_data.ser";
 
     public FileChannelService
-            (ObserverManager observerManager, ChannelValidator channelValidator){
-        this.observerManager = observerManager;
+            (ChannelValidator channelValidator){
         this.channelValidator = channelValidator;
         init(directory);
         loadDataFromFile();
@@ -37,26 +34,30 @@ public class FileChannelService implements ChannelService {
     public Channel createPublicChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
+            Channel ch1 = new Channel(ChannelType.PUBLIC,name, description);
+            data.put(ch1.getId(), ch1);
+            saveDataToFile();
+            return ch1;
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+            return null;
         }
-        Channel ch1 = new Channel(ChannelType.PUBLIC,name, description);
-        data.put(ch1.getId(), ch1);
-        saveDataToFile();
-        return ch1;
+
     }
 
     @Override
     public Channel createPrivateChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
+            Channel ch1 = new Channel(ChannelType.PRIVATE,name, description);
+            data.put(ch1.getId(), ch1);
+            saveDataToFile();
+            return ch1;
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+            return null;
         }
-        Channel ch1 = new Channel(ChannelType.PRIVATE,name, description);
-        data.put(ch1.getId(), ch1);
-        saveDataToFile();
-        return ch1;
+
     }
 
 
@@ -83,7 +84,6 @@ public class FileChannelService implements ChannelService {
     @Override
     public void delete(UUID uuid){
         data.remove(uuid);
-        observerManager.channelDeletionEvent(uuid);// 채널 삭제 시 이름을 전달
     }
 
     // 디렉토리 초기화

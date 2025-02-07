@@ -71,6 +71,7 @@ public class FileMessageService implements MessageService {
         msg.update(newContent);
         saveDataToFile();
         System.out.println("Message content has been updated --> ("+ newContent + ")");
+        return null;
     }
 
     @Override

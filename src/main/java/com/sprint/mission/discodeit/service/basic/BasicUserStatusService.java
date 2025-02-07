@@ -29,13 +29,13 @@ public class BasicUserStatusService implements UserStatusService {
         try {
             userValidator.CheckUser(idData.userId());
             userStatusValidator.CheckUserHasUserStatus(idData.userId());
+            UserStatus user = new UserStatus(idData.userId());
+            userStatusRepository.save(user);
+            return user;
         }catch (CustomException e){
             System.out.println("userStatus 생성 실패 -> "+ e.getMessage());
+            return null;
         }
-        UserStatus user = new UserStatus(idData.userId());
-        userStatusRepository.save(user);
-        return user;
-
     }
 
     @Override
@@ -59,11 +59,11 @@ public class BasicUserStatusService implements UserStatusService {
         try {
             userValidator.CheckUser(idData.userId());
             userStatusValidator.nullCheckUserHasUserStatus(idData.userId());
+            UserStatus userStatus = userStatusRepository.findByUserId(idData.userId());
+            userStatus.updateLastAccessed(timeData.currentTime());
         }catch (CustomException e){
             System.out.println("userStatus Update 실패 -> "+ e.getMessage());
         }
-        UserStatus userStatus = userStatusRepository.findByUserId(idData.userId());
-        userStatus.updateLastAccessed(timeData.currentTime());
     }
     @Override
     public void delete(UUID id){

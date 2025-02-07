@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
@@ -18,7 +17,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private final ObserverManager observerManager;
     private final ChannelValidator channelValidator;
     private final ChannelRepository channelRepository;
 
@@ -26,12 +24,13 @@ public class BasicChannelService implements ChannelService {
     public Channel createPublicChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
+            Channel ch = new Channel(ChannelType.PUBLIC,name, description);
+            channelRepository.save(ch);
+            return ch;
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+            return null;
         }
-        Channel ch = new Channel(ChannelType.PUBLIC,name, description);
-        channelRepository.save(ch);
-        return ch;
     }
 
     // PRIVATE 채널 생성
@@ -39,12 +38,13 @@ public class BasicChannelService implements ChannelService {
     public Channel createPrivateChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
+            Channel ch = new Channel(ChannelType.PRIVATE, name, description);
+            channelRepository.save(ch);
+            return ch;
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+            return null;
         }
-        Channel ch = new Channel(ChannelType.PRIVATE, name, description);
-        channelRepository.save(ch);
-        return ch;
     }
 
     @Override
@@ -71,6 +71,5 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("Channel with id " + channelId + " not found");
         }
-        observerManager.channelDeletionEvent(channelId);  // 채널 삭제 시 이름을 전달
     }
 }
