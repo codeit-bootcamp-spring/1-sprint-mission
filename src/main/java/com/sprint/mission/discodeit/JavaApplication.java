@@ -43,16 +43,16 @@ public class JavaApplication {
         MessageRepository messageRepository = new FileMessageRepository();
 
         // 서비스 초기화
-        // TODO Basic*Service 구현체를 초기화하세요.
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMassageService(messageRepository, channelService, userService);
-
-        // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
-        // 테스트
-        messageCreateTest(messageService, channel, user);
+//        // TODO Basic*Service 구현체를 초기화하세요.
+//        UserService userService = new BasicUserService(userRepository);
+//        ChannelService channelService = new BasicChannelService(channelRepository);
+//        MessageService messageService = new BasicMassageService(messageRepository, channelService, userService);
+//
+//        // 셋업
+//        User user = setupUser(userService);
+//        Channel channel = setupChannel(channelService);
+//        // 테스트
+//        messageCreateTest(messageService, channel, user);
 
     }
 }

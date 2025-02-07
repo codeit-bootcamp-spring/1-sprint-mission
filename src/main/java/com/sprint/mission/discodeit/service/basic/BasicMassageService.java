@@ -8,7 +8,8 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,22 +17,13 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class BasicMassageService implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageValidator messageValidator;
     private final UserService userService;
     private final ChannelService channelService;
-
-    public BasicMassageService(
-            @Qualifier("fileMessageRepository") MessageRepository messageRepository,
-            ChannelService channelService,
-            UserService userService
-    ) {
-        this.messageValidator = new MessageValidator();
-        this.messageRepository = messageRepository;
-        this.userService = userService;
-        this.channelService = channelService;
-    }
 
     @Override
     public Message createMessage(String content, UUID channelId, UUID writerId) {
@@ -41,7 +33,7 @@ public class BasicMassageService implements MessageService {
         if (messageValidator.inValidContent(content)) {
             Message newMessage = Message.createMessage(channel, user, content);
             messageRepository.save(newMessage);
-            System.out.println("create message: " + content);
+            log.info("Create Message: {}", newMessage);
             return newMessage;
         }
         return null;
@@ -55,7 +47,7 @@ public class BasicMassageService implements MessageService {
     @Override
     public Message searchById(UUID id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("message does not exist"));
+                .orElseThrow(() -> new NoSuchElementException("Message does not exist"));
     }
 
     @Override
@@ -64,7 +56,7 @@ public class BasicMassageService implements MessageService {
         if (messageValidator.inValidContent(content)) {
             message.update(content);
             messageRepository.save(message);
-            System.out.println("success updateChannel");
+            log.info("update message: {}", message);
         }
     }
 

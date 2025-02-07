@@ -4,7 +4,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,23 +13,18 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator channelValidator;
-
-    public BasicChannelService(
-            @Qualifier("fileChannelRepository") ChannelRepository channelRepository
-    ) {
-        this.channelValidator = new ChannelValidator();
-        this.channelRepository = channelRepository;
-    }
 
     @Override
     public Channel createChannel(Channel.ChannelType channelType, String title, String description) {
         if (channelValidator.isValidTitle(title)) {
             Channel newChannel = Channel.createChannel(channelType, title, description);
             channelRepository.save(newChannel);
-            System.out.println("create channel: " + newChannel.getTitle());
+            log.info("Create Channel: {}", newChannel);
             return newChannel;
         }
         return null;
@@ -51,7 +47,7 @@ public class BasicChannelService implements ChannelService {
         if (channelValidator.isValidTitle(title) && channelValidator.isValidTitle(description)) {
             channel.update(title, description);
             channelRepository.save(channel);
-            System.out.println("success updateUser");
+            log.info("Update Channel : {}", channel);
         }
     }
 
