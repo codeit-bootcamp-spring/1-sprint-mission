@@ -22,7 +22,7 @@ public class FileMessageService implements MessageService {
             throw new IllegalArgumentException("메시지 내용은 null 또는 빈 문자열일 수 없습니다.");
         }
         Message message = new Message(userId, channelId, content);
-        messageList.put(message.getMsgId(), message);
+        messageList.put(message.getId(), message);
         System.out.println("메시지가 생성되었습니다: " + content);
         saveFile();
         return message;

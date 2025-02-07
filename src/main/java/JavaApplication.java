@@ -37,17 +37,17 @@ public class JavaApplication {
 
         Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
         Channel channel3 = fileChannelService.createChannel("ch_fileIO_3");
-        Channel channel2=  fileChannelService.readChannel(channel1.getChannelId());
+        Channel channel2=  fileChannelService.readChannel(channel1.getId());
 
 
-        System.out.println(channel1.getChannelId());
-        System.out.println(channel2.getChannelId());
+        System.out.println(channel1.getId());
+        System.out.println(channel2.getId());
 
         System.out.println(channel2.getChannelName());
 
         User user1 = fileUserService.createUser("user1");
 
-        Message message1 = fileMessageService.createMessage(user1.getUserId(), channel1.getChannelId(),"message1");
+        Message message1 = fileMessageService.createMessage(user1.getId(), channel1.getId(),"message1");
 
 
 
@@ -63,18 +63,18 @@ public class JavaApplication {
         //채널 추가
         Channel newChannel = basicChannelService.createChannel("newChannel");
         Channel newChannel2 = basicChannelService.createChannel("newChannel2");
-        System.out.println(basicChannelService.readChannel(newChannel.getChannelId()).getChannelName());
-        System.out.println(basicChannelService.readChannel(newChannel2.getChannelId()).getChannelName());
+        System.out.println(basicChannelService.readChannel(newChannel.getId()).getChannelName());
+        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
 
         //모두 로드
         System.out.println(basicChannelService.readAllChannel());
 
         //이름 변경
-        System.out.println(basicChannelService.modifyChannel(newChannel2.getChannelId(), "newChannel3"));
-        System.out.println(basicChannelService.readChannel(newChannel2.getChannelId()).getChannelName());
+        System.out.println(basicChannelService.modifyChannel(newChannel2.getId(), "newChannel3"));
+        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
 
         //채널 삭제
-        basicChannelService.deleteChannel(newChannel2.getChannelId());
+        basicChannelService.deleteChannel(newChannel2.getId());
         System.out.println(basicChannelService.readAllChannel());
 
 
@@ -96,7 +96,7 @@ public class JavaApplication {
 //            System.out.println("오류 발생: " + e.getMessage());
 //        }
 //        //채널 명 변경
-//        jcfChannelService.modifyChannel(channel1.getChannelId(), "ch12");
+//        jcfChannelService.modifyChannel(channel1.getId(), "ch12");
 //
 //        //모두 읽기
 //        List<Channel> channelList = jcfChannelService.readAllChannel();
@@ -106,7 +106,7 @@ public class JavaApplication {
 //        }
 ////
 ////        //채널 삭제
-////        jcfChannelService.deleteChannel(channel2.getChannelId());
+////        jcfChannelService.deleteChannel(channel2.getId());
 //        //모두 읽기
 //        System.out.println("모든 채널을 출력합니다.");
 //        for (Channel ch : channelList) {
@@ -149,10 +149,10 @@ public class JavaApplication {
 //        /////////메시지 테스트
 //
 //        System.out.println("\n------------\n*메시지 도메인 test");
-//        Message message1 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "안녕하세요");
-//        Message message2 = jcfMessageService.createMessage(user2.getUserId(), channel1.getChannelId(), "야옹야옹");
-//        Message message3 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "반가워요~");
-//        Message message4 = jcfMessageService.createMessage(user3.getUserId(), channel1.getChannelId(), "잘지내요~");
+//        Message message1 = jcfMessageService.createMessage(user3.getUserId(), channel1.getId(), "안녕하세요");
+//        Message message2 = jcfMessageService.createMessage(user2.getUserId(), channel1.getId(), "야옹야옹");
+//        Message message3 = jcfMessageService.createMessage(user3.getUserId(), channel1.getId(), "반가워요~");
+//        Message message4 = jcfMessageService.createMessage(user3.getUserId(), channel1.getId(), "잘지내요~");
 //
 //
 //        //메시지 조회

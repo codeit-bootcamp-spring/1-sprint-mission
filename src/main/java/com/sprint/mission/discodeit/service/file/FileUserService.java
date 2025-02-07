@@ -23,7 +23,7 @@ public class FileUserService implements UserService {
             throw new IllegalArgumentException("유저 이름은 null 또는 빈 문자열일 수 없습니다.");
         }
         User user = new User(userName);
-        userList.put(user.getUserId(), user);
+        userList.put(user.getId(), user);
         System.out.println(DateUtils.transTime(user.getCreatedAt()) + " " + user.getUserName() + " 유저가 생성되었습니다.");
         saveFile();
         return user;

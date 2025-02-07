@@ -39,7 +39,7 @@ public class FileChannelService implements ChannelService {
         }
 
         Channel channel = new Channel(name);
-        channelList.put(channel.getChannelId(), channel);
+        channelList.put(channel.getId(), channel);
         System.out.println("채널명: " + channel.getChannelName() + " 채널이 추가되었습니다.");
         saveFile();
         return channel;

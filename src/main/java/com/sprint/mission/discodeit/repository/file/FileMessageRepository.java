@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,9 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
-
-
     private static final String fileName = "savedata/message.ser";
     private final Map<UUID, Message> messageList;
 

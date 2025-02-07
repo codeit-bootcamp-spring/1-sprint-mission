@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,10 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
-
-
-
 
     private static final String fileName = "savedata/channel.ser";
     private final Map<UUID, Channel> channelList;

@@ -1,12 +1,15 @@
 package com.sprint.mission.discodeit.entity;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
+@Getter
+@Setter
 public class User implements Serializable  {
-
 
     private static final Long serialVersionUID = 1L;
     private UUID id ;
@@ -18,20 +21,6 @@ public class User implements Serializable  {
         this.id = UUID.randomUUID();
         this.userName = userName;
         this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
-    }
-
-    //get
-    public UUID getUserId(){
-        return this.id;
-    }
-    public String getUserName(){
-        return this.userName;
-    }
-    public long getCreatedAt(){
-        return this.createdAt;
-    }
-    public long getUpdatedAt(){
-        return this.updatedAt;
     }
 
     //update
