@@ -5,33 +5,32 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.Username;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
 
-    Map<UUID, User> store = new HashMap<>();
-    Set<Email> emails = new HashSet<>();
-    Set<Username> usernames = new HashSet<>();
+    Map<UUID, User> uuidUsers = new HashMap<>();
+    Map<Email, User> emailUsers = new HashMap<>();
+    Map<Username, User> usernameUsers = new HashMap<>();
 
     @Override
     public User save(User user) {
-        store.put(user.getId(), user);
-        emails.add(user.getEmail());
+        uuidUsers.put(user.getId(), user);
+        emailUsers.put(user.getEmail(), user);
+        usernameUsers.put(user.getUsername(), user);
         return user;
     }
 
     @Override
     public boolean isExistByEmail(Email email) {
-        return emails.contains(email);
+        return emailUsers.containsKey(email);
     }
 
     @Override
     public boolean isExistByUsername(Username username) {
-        return usernames.contains(username);
+        return usernameUsers.containsKey(username);
     }
 }
