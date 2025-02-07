@@ -11,35 +11,42 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
+//사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다. 사용자의 온라인 상태를 확인하기 위해 활용합니다.
+
 
     @Serial
     private static final long serialVersionUID = 1L;
     private final Instant createdAtl;
     private Instant updatedAt;
     private Instant lastAccessedAt;
-    private final User user;
-    private final UUID uuID;
+    private boolean status;
+    private final UUID userId;
+    private final UUID id;
 
 
-    public UserStatus(User user){
-        this.uuID = UUID.randomUUID();
+    public UserStatus(UUID userId){
+        this.id= UUID.randomUUID();
         this.createdAtl = Instant.now();
         this.updatedAt = this.createdAtl;
-        this.user = user;
+        this.userId = userId;
     }
 
-    // 유저 접속시 AccessedAt 초기화
-    public void updateLastAccessed() {
-        this.lastAccessedAt = Instant.now();
+    public void updateLastAccessed(Instant currentTime) {
+        this.lastAccessedAt = currentTime;
         this.updatedAt = this.lastAccessedAt; // updatedAt도 같이 업데이트!
     }
 
-    // 아래의 코드는 음 비지니스 로직에 더 가까운것 같아서 음 수정을 해야 할 것 같음....
-    public boolean isUserOnline() {
+
+    private boolean isUserOnline(Instant currentTime) {
         if (lastAccessedAt == null) {
-            return false; // 마지막 접속 기록이 없으면 오프라인, 생성하고 접속하지 않았다면 null
+            return false; //
         }
-        return Duration.between(lastAccessedAt, Instant.now()).toMinutes() < 5;
+        // 5분 이내면 true, 5분이 지났으면 false
+        return Duration.between(lastAccessedAt, currentTime).toMinutes() < 5;
+    }
+
+    public void statusUpdate(Instant currentTime){
+        status = isUserOnline(currentTime);
     }
 
 }

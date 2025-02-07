@@ -14,29 +14,29 @@ public class User implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID uuID;
+    private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
     private final String name;
     private String email;
     private String password;
-    private String iD;
+    private String accountId;
 
 
     public User(String name, String email,String iD ,String password){
-        this.uuID = UUID.randomUUID();
+        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.name = name;
         this.email = email;
-        this.iD = iD;
+        this.accountId = iD;
         this.password = password;
     }
 
 
     public void update(String email, String iD, String password){
         this.email = email;
-        this.iD = iD;
+        this.accountId = iD;
         this.password = password;
         updatedAt = Instant.now();
     }
@@ -45,13 +45,12 @@ public class User implements Serializable {
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "User{\n" +
-                "UUID : " + uuID +
+                "UUID : " + id +
                 ", \ncreatedAt : " + createdAt +
                 ", \nupdatedAt : " + updatedAt +
                 ", \nname : " + name +
                 ", \nemail : " + email +
-                ", \nid : " + iD + "\n}";
+                ", \nid : " + accountId + "\n}";
     }
-
 
 }

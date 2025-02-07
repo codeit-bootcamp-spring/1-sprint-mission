@@ -31,14 +31,16 @@ public class FileUserService implements UserService {
 
 
     @Override
-    public User CreateUser(String name, String email,String iD ,String password) {
-        if (userValidator.validateUser(name, email, password, getAllUsers())) {
-            User user = new User(name, email, iD, password);
-            data.put(user.getUuID(), user);
-            saveDataToFile();
-            return user;
+    public User createUser(String name, String email,String iD ,String password) {
+        try{
+            userValidator.validateUser(name, email, password);
+        }catch (CustomException e){
+            System.out.println("유저생성 실패 ->" + e.getMessage());
         }
-        throw new CustomException(ExceptionText.USER_CREATION_FAILED);
+        User user = new User(name, email, iD, password);
+        data.put(user.getId(), user);
+        saveDataToFile();
+        return user;
     }
 
 

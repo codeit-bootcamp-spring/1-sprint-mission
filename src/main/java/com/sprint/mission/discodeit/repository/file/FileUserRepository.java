@@ -30,7 +30,7 @@ public class FileUserRepository implements UserRepository {
 
 
     public void save(User user) {
-        data.put(user.getUuID(), user);
+        data.put(user.getId(), user);
         saveDataToFile();
     }
 

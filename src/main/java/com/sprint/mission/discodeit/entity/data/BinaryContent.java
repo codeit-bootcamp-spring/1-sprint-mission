@@ -15,6 +15,7 @@ public class BinaryContent {
     private final String fileName;
     private final String fileType;
 
+    // 레포지토리에 저장시 음 User 프로필인지,Message 첨부파일지 구분해서 저장하게..?
 
     public BinaryContent(String filename,String fileType, UUID targetUUID, byte[] data){
         this.targetUUID = targetUUID;
