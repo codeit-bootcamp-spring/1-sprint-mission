@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record BinaryContentDto(
-        UUID id,
+        UUID contentId,
         UUID userId,
         UUID messageId,
         Instant createdAt,

@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.FileConfig;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +51,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
     public void deleteByUserId(UUID userId) {
         userStatusMap.remove(userId);
         saveUserStatusesToJson(userStatusMap);
+    }
+
+    @Override
+    public boolean existsByUserId(UUID userId) {
+        return loadUserStatusesFromJson().containsKey(userId);
     }
 
     private Map<UUID, UserStatus> loadUserStatusesFromJson() {

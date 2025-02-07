@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.FileConfig;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -31,11 +30,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Optional<Message> save(Message message) {
+    public Message save(Message message) {
         messageMap = loadMessageFromJson();
         messageMap.put(message.getId(), message);
         saveMessageToJson(messageMap);
-        return Optional.of(message);
+        return message;
     }
 
     @Override

@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.FileConfig;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -33,10 +32,10 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         store.put(binaryContent.getId(), binaryContent);
         saveBinaryContentsToJson(store);
-        return Optional.of(binaryContent);
+        return binaryContent;
     }
 
     @Override

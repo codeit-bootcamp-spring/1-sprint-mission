@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.FileConfig;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -33,11 +32,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> save(User user) {
+    public User save(User user) {
         userMap = loadUserFromJson();
         userMap.put(user.getId(), user);
         saveUsersToJson(userMap);
-        return Optional.of(user);
+        return user;
     }
 
     @Override

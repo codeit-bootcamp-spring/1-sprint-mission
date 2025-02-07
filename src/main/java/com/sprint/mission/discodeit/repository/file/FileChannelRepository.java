@@ -3,11 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.FileConfig;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -32,11 +31,11 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> save(Channel channel) {
+    public Channel save(Channel channel) {
         channelMap = loadChannelFromJson();
         channelMap.put(channel.getId(), channel);
         saveChannelToJson(channelMap);
-        return Optional.of(channel);
+        return channel;
     }
 
     @Override

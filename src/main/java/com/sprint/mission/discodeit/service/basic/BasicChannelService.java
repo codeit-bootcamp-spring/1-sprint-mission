@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -33,7 +34,7 @@ public class BasicChannelService implements ChannelService {
             channel.addParticipant(userId);
             readStatusRepository.save(new ReadStatus(userId, channel.getId()));
         }
-        return changeToDto(Optional.of(channel), Instant.now());
+        return changeToDto(channel, Instant.now());
     }
 
     @Override
@@ -44,12 +45,13 @@ public class BasicChannelService implements ChannelService {
             channel.addParticipant(userId);
             readStatusRepository.save(new ReadStatus(userId, channel.getId()));
         }
-        return changeToDto(Optional.of(channel), Instant.now());
+        return changeToDto(channel, Instant.now());
     }
 
     @Override
     public ChannelDto findById(UUID channelId) {
-        Optional<Channel> channel = channelRepository.findById(channelId);
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Channel not found."));
         Instant lastReadTime = readStatusRepository.findByChannelId(channelId)
                 .map(ReadStatus::getLastReadTime)
                 .orElse(Instant.now());
@@ -65,7 +67,7 @@ public class BasicChannelService implements ChannelService {
                     Instant lastReadTime = readStatusRepository.findByUserId(userId)
                             .map(ReadStatus::getLastReadTime)
                             .orElse(Instant.now());
-                    return changeToDto(Optional.of(channel), lastReadTime);
+                    return changeToDto(channel, lastReadTime);
                 })
                 .collect(Collectors.toList());
     }
@@ -73,12 +75,13 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto update(ChannelUpdateRequest request) {
         // 채널 정보 조회
-        Optional<Channel> channel = channelRepository.findById(request.id());
+        Channel channel = channelRepository.findById(request.ChannelId())
+                .orElseThrow(() -> new ResourceNotFoundException("Channel not found."));
         // PRIVATE 채널은 수정할 수 없습니다.
-        if (channel.get().getChannelType() == ChannelType.PRIVATE) {
+        if (channel.getChannelType() == ChannelType.PRIVATE) {
             throw new UnsupportedOperationException("PRIVATE 채널은 수정할 수 없습니다.");
         }
-        Optional<ReadStatus> existingReadStatuses = readStatusRepository.findByChannelId(request.id());
+        Optional<ReadStatus> existingReadStatuses = readStatusRepository.findByChannelId(request.ChannelId());
         Set<UUID> existingUserIds = existingReadStatuses.stream()
                 .map(ReadStatus::getUserId)
                 .collect(Collectors.toSet());
@@ -86,12 +89,12 @@ public class BasicChannelService implements ChannelService {
         // 새로 추가된 사용자에 대한 ReadStatus 저장
         for (UUID userId : request.participants()) {
             if (!existingUserIds.contains(userId)) { // 기존 사용자가 아닌 경우만 추가
-                channel.get().addParticipant(userId);
-                readStatusRepository.save(new ReadStatus(userId, channel.get().getId()));
+                channel.addParticipant(userId);
+                readStatusRepository.save(new ReadStatus(userId, channel.getId()));
             }
         }
         // Channel 엔티티 업데이트
-        channel.get().update(request.name(), request.description(), request.channelType());
+        channel.update(request.name(), request.description(), request.channelType());
 
         // 마지막 읽은 시간 조회 (모든 참여자 중 가장 오래된 시간)
         Instant lastReadTime = existingReadStatuses.stream()
@@ -110,15 +113,15 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteByChannelId(channelId);
     }
 
-    private static ChannelDto changeToDto(Optional<Channel> channel, Instant lastReadTime) {
+    private static ChannelDto changeToDto(Channel channel, Instant lastReadTime) {
         return new ChannelDto(
-                channel.get().getId(),
-                channel.get().getName(),
-                channel.get().getDescription(),
-                channel.get().getChannelType(),
-                channel.get().getCreatedAt(),
-                channel.get().getUpdatedAt(),
-                new ArrayList<>(channel.get().getParticipants()),
+                channel.getId(),
+                channel.getName(),
+                channel.getDescription(),
+                channel.getChannelType(),
+                channel.getCreatedAt(),
+                channel.getUpdatedAt(),
+                new ArrayList<>(channel.getParticipants()),
                 lastReadTime
         );
     }

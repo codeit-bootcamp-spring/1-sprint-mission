@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit;
+package com.sprint.mission.discodeit.config;
 
 import lombok.Getter;
 import lombok.Setter;

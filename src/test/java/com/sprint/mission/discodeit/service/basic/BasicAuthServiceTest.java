@@ -43,7 +43,7 @@ class BasicAuthServiceTest {
 
         // Then
         assertNotNull(result); // 결과가 null이 아님을 확인
-        assertEquals(user.getId(), result.id()); // UserDto의 ID가 올바른지 확인
+        assertEquals(user.getId(), result.userId()); // UserDto의 ID가 올바른지 확인
         assertEquals(user.getUsername(), result.username()); // UserDto의 username이 올바른지 확인
         assertEquals(user.getEmail(), result.email()); // UserDto의 email이 올바른지 확인
         assertEquals(user.getPhoneNumber(), result.phoneNumber()); // UserDto의 phoneNumber가 올바른지 확인

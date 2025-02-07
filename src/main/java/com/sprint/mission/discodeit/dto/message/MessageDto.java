@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageDto(
-        UUID id,
+        UUID messageId,
         UUID userId,
         UUID channelId,
         String message,

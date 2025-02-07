@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelDto (
-    UUID id,
+    UUID ChannelId,
     String name,
     String description,
     ChannelType channelType,

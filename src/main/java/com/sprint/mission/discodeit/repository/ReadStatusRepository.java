@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusRepository {
-    Optional<ReadStatus> save(ReadStatus readStatus);
+    ReadStatus save(ReadStatus readStatus);
     Optional<ReadStatus> findByChannelId(UUID channelId);
     Optional<ReadStatus> findByUserId(UUID userId);
     Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);

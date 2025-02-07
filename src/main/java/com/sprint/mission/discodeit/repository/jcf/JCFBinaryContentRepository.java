@@ -13,12 +13,12 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     private final Map<UUID, BinaryContent> store = new HashMap<>();
 
     @Override
-    public Optional<BinaryContent> save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         if (binaryContent.getId() == null) {
             throw new IllegalArgumentException("BinaryContent ID cannot be null.");
         }
         store.put(binaryContent.getId(), binaryContent);
-        return Optional.of(binaryContent);
+        return binaryContent;
     }
 
     @Override

@@ -37,10 +37,10 @@ public class DiscodeitApplication {
 
 		// 유저 생성
 		UserDto createdUser = userService.create(userCreateRequest);
-		System.out.println("유저 생성: " + createdUser.id());
+		System.out.println("유저 생성: " + createdUser.userId());
 
 		// 유저 조회 (단건)
-		UserDto foundUser = userService.findByUserId(createdUser.id());
+		UserDto foundUser = userService.findByUserId(createdUser.userId());
 		System.out.println("유저 조회(단건): " + foundUser);
 
 		// 유저 조회 (다건)
@@ -49,7 +49,7 @@ public class DiscodeitApplication {
 
 		// 유저 수정 요청 DTO
 		UserUpdateRequest userUpdateRequest = new UserUpdateRequest(
-				createdUser.id(),
+				createdUser.userId(),
 				"홍길동",
 				"example@gmail.com",
 				"01056785678",
@@ -62,7 +62,7 @@ public class DiscodeitApplication {
 		System.out.println("유저 수정: 이름: " + updatedUser.username() + ", 이메일: " + updatedUser.email() + ", 번호: " + updatedUser.phoneNumber());
 
 		// 유저 삭제
-		userService.delete(createdUser.id());
+		userService.delete(createdUser.userId());
 		List<UserDto> foundUsersAfterDelete = userService.findAll();
 		System.out.println("유저 삭제(남은 유저): " + foundUsersAfterDelete.size());
 	}
@@ -87,11 +87,11 @@ public class DiscodeitApplication {
 		// 채널 생성
 		ChannelDto createdPrivateChannel = channelService.createPrivateChannel(privatechannelCreateRequest);
 		ChannelDto createdPublicChannel = channelService.createPublicChannel(publicChannelCreateRequest);
-		System.out.println("채널 생성: " + createdPrivateChannel.id());
-		System.out.println("채널 생성: " + createdPublicChannel.id());
+		System.out.println("채널 생성: " + createdPrivateChannel.ChannelId());
+		System.out.println("채널 생성: " + createdPublicChannel.ChannelId());
 
 		// 채널 조회 (단건)
-		ChannelDto foundChannel = channelService.findById(createdPrivateChannel.id());
+		ChannelDto foundChannel = channelService.findById(createdPrivateChannel.ChannelId());
 		System.out.println("채널 조회(단건): " + foundChannel);
 
 		// 채널 조회 (다건)
@@ -100,7 +100,7 @@ public class DiscodeitApplication {
 
 		// 채널 수정 요청 DTO
 		ChannelUpdateRequest channelUpdateRequest = new ChannelUpdateRequest(
-				createdPublicChannel.id(),
+				createdPublicChannel.ChannelId(),
 				"스프링",
 				"modify 스프린트 미션 3",
 				ChannelType.PUBLIC,
@@ -112,8 +112,8 @@ public class DiscodeitApplication {
 		System.out.println("채널 수정: 이름: " + updatedChannel.name() + ", 설명: " + updatedChannel.description() + ", 타입: " + updatedChannel.channelType());
 
 		// 채널 삭제
-		channelService.delete(createdPrivateChannel.id());
-		channelService.delete(createdPublicChannel.id());
+		channelService.delete(createdPrivateChannel.ChannelId());
+		channelService.delete(createdPublicChannel.ChannelId());
 
 		// 남아있는 채널 조회
 		List<ChannelDto> remainingChannels = channelService.findAllByUserId(userId);
@@ -137,7 +137,7 @@ public class DiscodeitApplication {
 
 		// 메시지 생성
 		MessageDto createdMessage = messageService.create(messageCreateRequest);
-		System.out.println("메시지 생성: " + createdMessage.id());
+		System.out.println("메시지 생성: " + createdMessage.messageId());
 
 		// 메시지 조회 (단건)
 		List<MessageDto> foundMessage = messageService.findAllByChannelId(channelId);
@@ -149,7 +149,7 @@ public class DiscodeitApplication {
 
 		// 메시지 수정 요청 DTO
 		MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(
-				createdMessage.id(),
+				createdMessage.messageId(),
 				userId,
 				"반갑습니다.",
 				List.of(UUID.nameUUIDFromBytes(new byte[]{1, 2, 3})),
@@ -164,7 +164,7 @@ public class DiscodeitApplication {
 		System.out.println("메시지 수정: " + updatedMessage);
 
 		// 메시지 삭제
-		messageService.delete(createdMessage.id());
+		messageService.delete(createdMessage.messageId());
 		List<MessageDto> foundMessagesAfterDelete = messageService.findAllByChannelId(UUID.randomUUID());
 		System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
 	}

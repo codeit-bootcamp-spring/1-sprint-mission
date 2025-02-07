@@ -9,9 +9,9 @@ public class JCFUserReposiroty implements UserRepository {
     private final Map<UUID, User> userMap = new HashMap<>();
 
     @Override
-    public Optional<User> save(User user) {
+    public User save(User user) {
         userMap.put(user.getId(), user);
-        return Optional.of(user);
+        return user;
     }
 
     @Override
@@ -38,11 +38,13 @@ public class JCFUserReposiroty implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
-        return userMap.values().stream().anyMatch(user -> user.getUsername().equals(username));
+        return userMap.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return userMap.values().stream().anyMatch(user -> user.getEmail().equals(email));
+        return userMap.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 }

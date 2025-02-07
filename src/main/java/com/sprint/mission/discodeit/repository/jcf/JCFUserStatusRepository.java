@@ -30,4 +30,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public void deleteByUserId(UUID userId) {
         store.remove(userId);
     }
+
+    @Override
+    public boolean existsByUserId(UUID userId) {
+        return store.containsKey(userId);
+    }
 }

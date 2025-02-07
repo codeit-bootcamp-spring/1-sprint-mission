@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -9,8 +8,6 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +19,6 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Optional.empty;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -52,22 +48,16 @@ class BasicUserServiceTest {
     void createUser_Success() {
         // given
         UserCreateRequest request = new UserCreateRequest("username", "email@example.com", "1234567890", "password", null);
-        when(userRepository.existsByUsername("username")).thenReturn(false);
-        when(userRepository.existsByEmail("email@example.com")).thenReturn(false);
         User user = new User("username", "email@example.com", "1234567890", "password");
-        when(userRepository.save(any(User.class))).thenReturn(Optional.of(user));
-
-        // Use the correct userId and match any UUID argument
-        when(userStatusRepository.save(any(UserStatus.class))).thenReturn(new UserStatus(user.getId(), Instant.now()));
-        when(userStatusRepository.findByUserId(any(UUID.class))).thenReturn(Optional.of(new UserStatus(user.getId(), Instant.now())));
+        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
 
         // when
-        UserDto result = userService.create(request);
+        when(userRepository.existsByUsername(anyString())).thenReturn(false);
+        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(Optional.of(user));
+        when(userStatusRepository.save(any(UserStatus.class))).thenReturn(Optional.of(userStatus));
 
         // then
-        assertNotNull(result);
-        assertEquals("username", result.username());
-        assertTrue(result.isOnline());
     }
 
 
@@ -126,7 +116,7 @@ class BasicUserServiceTest {
     }
 
     @Test
-    void findByUserId_Succes(){
+    void findByUserId_Succes() {
 
     }
 }

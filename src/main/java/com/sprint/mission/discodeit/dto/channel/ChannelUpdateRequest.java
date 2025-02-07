@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelUpdateRequest(
-        UUID id,
+        UUID ChannelId,
         String name,
         String description,
         ChannelType channelType,
