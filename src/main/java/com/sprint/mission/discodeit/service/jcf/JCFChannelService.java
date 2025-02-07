@@ -7,8 +7,9 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -23,37 +24,49 @@ public class JCFChannelService implements ChannelService {
         this.channelValidator = channelValidator;
     }
     @Override
-    public Channel createChannel(ChannelType type, String name, String description){
+    public Channel createPublicChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        Channel channel = new Channel(type, name, description);
-        data.put(channel.getChanneluuId(), channel);
-        return channel;
+        Channel ch = new Channel(ChannelType.PUBLIC,name, description);
+        data.put(ch.getId(), ch);
+        return ch;
+    }
+    @Override
+    public Channel createPrivateChannel(String name, String description){
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+        }
+        Channel ch = new Channel(ChannelType.PRIVATE,name, description);
+        data.put(ch.getId(), ch);
+        return ch;
     }
 
     @Override
-    public Channel getChannel(UUID uuid){
-        return data.get(uuid);
+    public Channel find(UUID id){
+        return data.get(id);
     }
 
     @Override
-    public Map<UUID, Channel> getAllChannels() {
-        return new HashMap<>(data);
+    public List<Channel> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateChannel(UUID uuId, String name, String description ){
-        Channel channel = getChannel(uuId);
+    public Channel update(UUID uuId, String name, String description ){
+        Channel channel = find(uuId);
         if (channel != null) {
             channel.update(name, description);
         }
+        return null;
     }
 
     @Override
-    public void deleteChannel(UUID uuid){
+    public void delete(UUID uuid){
         data.remove(uuid);
         observerManager.channelDeletionEvent(uuid);
     }

@@ -10,7 +10,8 @@ import com.sprint.mission.discodeit.validation.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -19,41 +20,57 @@ public class BasicChannelService implements ChannelService {
 
     private final ObserverManager observerManager;
     private final ChannelValidator channelValidator;
-    private final ChannelRepository fileChannelRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
-    public Channel createChannel(ChannelType type, String name, String description){
+    public Channel createPublicChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        Channel ch1 = new Channel(type,name, description);
-        fileChannelRepository.save(ch1);
-        return ch1;
+        Channel ch = new Channel(ChannelType.PUBLIC,name, description);
+        channelRepository.save(ch);
+        return ch;
     }
 
+    // PRIVATE 채널 생성
     @Override
-    public Channel getChannel(UUID uuid){
-        return fileChannelRepository.findById(uuid);
-    }
-
-    @Override
-    public Map<UUID, Channel> getAllChannels() {
-        return fileChannelRepository.findAll();
-    }
-
-    @Override
-    public void updateChannel(UUID uuId, String name,String description ){
-        Channel channel = fileChannelRepository.findById(uuId);
-        if (channel != null) {
-            channel.update(name, description);
+    public Channel createPrivateChannel(String name, String description){
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
+        Channel ch = new Channel(ChannelType.PRIVATE, name, description);
+        channelRepository.save(ch);
+        return ch;
     }
 
     @Override
-    public void deleteChannel(UUID uuid){
-        fileChannelRepository.delete(uuid);
-        observerManager.channelDeletionEvent(uuid);  // 채널 삭제 시 이름을 전달
+    public Channel find(UUID channelId){
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
+
+    @Override
+    public Channel update(UUID channelId, String newName,String newDescription ){
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        channel.update(newName, newDescription);
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public void delete(UUID channelId){
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
+        observerManager.channelDeletionEvent(channelId);  // 채널 삭제 시 이름을 전달
     }
 }

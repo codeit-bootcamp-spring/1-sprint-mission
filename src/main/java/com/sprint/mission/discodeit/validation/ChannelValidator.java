@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 @Component
@@ -15,9 +16,11 @@ public class ChannelValidator {
     private final ChannelRepository channelRepository;
 
     public void isUniqueName(String name) {
-        Map<UUID, Channel> channels = channelRepository.findAll();
-        if (channels.values().stream().anyMatch(channel -> channel.getName().equals(name))) {
+        List<Channel> channels = channelRepository.findAll();
+        // List<Channel>에서 이름이 중복되는지 확인
+        if (channels.stream().anyMatch(channel -> channel.getName().equals(name))) {
             throw new CustomException(ExceptionText.NAME_DUPLICATE);
         }
     }
+
 }

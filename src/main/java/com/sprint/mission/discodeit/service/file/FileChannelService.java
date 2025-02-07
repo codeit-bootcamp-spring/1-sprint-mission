@@ -11,9 +11,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,38 +34,54 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(ChannelType type, String name, String description){
+    public Channel createPublicChannel(String name, String description){
         try {
             channelValidator.isUniqueName(name);
         }catch (CustomException e){
             System.out.println("Channel 생성 실패 -> "+ e.getMessage());
         }
-        Channel channel = new Channel(type, name, description);
-        data.put(channel.getId(), channel);
+        Channel ch1 = new Channel(ChannelType.PUBLIC,name, description);
+        data.put(ch1.getId(), ch1);
         saveDataToFile();
-        return channel;
+        return ch1;
     }
 
     @Override
-    public Channel getChannel(UUID uuid){
-        return data.get(uuid);
+    public Channel createPrivateChannel(String name, String description){
+        try {
+            channelValidator.isUniqueName(name);
+        }catch (CustomException e){
+            System.out.println("Channel 생성 실패 -> "+ e.getMessage());
+        }
+        Channel ch1 = new Channel(ChannelType.PRIVATE,name, description);
+        data.put(ch1.getId(), ch1);
+        saveDataToFile();
+        return ch1;
+    }
+
+
+
+    @Override
+    public Channel find(UUID id){
+        return data.get(id);
     }
 
     @Override
-    public Map<UUID, Channel> getAllChannels() {
-        return new HashMap<>(data);
+    public List<Channel> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateChannel(UUID uuId, String name,String description ){
-        Channel channel = getChannel(uuId);
+    public Channel update(UUID uuId, String name,String description ){
+        Channel channel = find(uuId);
         if (channel != null) {
             channel.update(name, description);
         }
+        return null;
     }
 
     @Override
-    public void deleteChannel(UUID uuid){
+    public void delete(UUID uuid){
         data.remove(uuid);
         observerManager.channelDeletionEvent(uuid);// 채널 삭제 시 이름을 전달
     }

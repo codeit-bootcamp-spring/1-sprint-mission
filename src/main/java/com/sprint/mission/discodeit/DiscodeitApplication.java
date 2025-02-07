@@ -4,9 +4,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.observer.service.ChannelObserver;
-import com.sprint.mission.discodeit.observer.Observer;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -17,6 +14,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,12 +35,12 @@ public class DiscodeitApplication {
 
 
 	static Channel setupChannel(ChannelService channelService){
-		Channel ch = channelService.createChannel(ChannelType.PUBLIC,"CH.1","테스트 채널 1");
+		Channel ch = channelService.createPublicChannel("CH.1","테스트 채널 1");
 		return ch;
 	}
 
 	static Channel setupChannel2(ChannelService channelService){
-		Channel ch = channelService.createChannel(ChannelType.PUBLIC,"CH.2", "테스트 채널 2");
+		Channel ch = channelService.createPrivateChannel("CH.2", "테스트 채널 2");
 		return ch;
 	}
 
@@ -52,8 +50,8 @@ public class DiscodeitApplication {
 			System.out.println("-----------------------------------------------");
 		}
 	}
-	static void allprintChannel(Map<UUID, Channel> data){
-		for(Channel channel : data.values()){
+	static void allPrintChannel(List<Channel> data){
+		for(Channel channel : data){
 			System.out.println(channel);
 			System.out.println("-----------------------------------------------");
 		}
@@ -89,7 +87,7 @@ public class DiscodeitApplication {
 
 		Channel ch1 = setupChannel(channelService);
 		Channel ch2 = setupChannel2(channelService);
-		allprintChannel(channelService.getAllChannels());
+		allPrintChannel(channelService.findAll());
 
 		messageCreateTest(messageService,ch1,user1,"user1이 ch1으로 보내는 메시지");
 		messageCreateTest(messageService,ch1,user2,"user2이 ch1으로 보내는 메시지");
@@ -99,9 +97,9 @@ public class DiscodeitApplication {
 
 
 		System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
-		channelService.deleteChannel(ch1.getId());
+		channelService.delete(ch1.getId());
 		System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
-		allprintChannel(channelService.getAllChannels());
+		allPrintChannel(channelService.findAll());
 		allprintMessages(messageService.getAllMsg());
 	}
 }

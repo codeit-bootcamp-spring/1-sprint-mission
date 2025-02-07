@@ -35,7 +35,7 @@ public class MessageValidator {
     }
 
     public boolean validateDestinationChannel(UUID uuid) {
-        if (channelService.getChannel(uuid) == null) {
+        if (channelService.find(uuid) == null) {
             throw new CustomException(ExceptionText.CHANNEL_NOT_FOUND);
         }
         return true;
@@ -43,8 +43,8 @@ public class MessageValidator {
 
     public boolean validateMessage(User user, Channel channel, String content) {
         boolean isContentValid = validateContent(content);
-        boolean isSenderValid = validateSender(user.getUuID());
-        boolean isDestinationChannelValid = validateDestinationChannel(channel.getChanneluuId());
+        boolean isSenderValid = validateSender(user.getId());
+        boolean isDestinationChannelValid = validateDestinationChannel(channel.getId());
 
         return isContentValid && isSenderValid && isDestinationChannelValid;
     }
