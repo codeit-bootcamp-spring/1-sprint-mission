@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.UUID;
 //사용자가 언제 마지막으로 채널에 접속했는 지 기록
 @Repository
 @RequiredArgsConstructor
+@Profile("File")
 public class ReadStatusFileRepositoryImpl implements ReadStatusRepository {
 
     @Override

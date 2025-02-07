@@ -1,25 +1,19 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 @Repository
 @Profile("Jcf")
-
 public class JCFUserRepository implements UserRepository {
     public final Map<UUID,User> map;
-    //private JcfMessageService jcfMessageService; //수정 예정
-    private static volatile JCFUserRepository instance;
 
-    public JCFUserRepository(Map<UUID, User> list) {
-        this.map = list;
+    public JCFUserRepository() {
+        this.map = new HashMap<>();
     }
-
 
     @Override
     public User save(String userName,String password, String email) {

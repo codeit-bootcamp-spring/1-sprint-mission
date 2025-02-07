@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.domain.ReadStatus;
-import lombok.Getter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -11,14 +15,22 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.PRIVATE)
+    private  UUID id;
 
-    private final Instant createdAt;
+    @Setter(AccessLevel.PRIVATE)
+    private Instant createdAt;
+
     private Instant updatedAt;
     private String name;
-    private final ChannelType type;
+
+    @Setter(AccessLevel.PRIVATE)
+    private ChannelType type;
 
     public Channel(String name, ChannelType type) {
         this.id = UUID.randomUUID();
@@ -34,6 +46,13 @@ public class Channel implements Serializable {
         this.name = null;
         this.type = type;
     }//for private type
+
+    public Channel(UUID id, Instant createdAt, ChannelType type) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.type = type;
+    }
+
 
     public Instant setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;

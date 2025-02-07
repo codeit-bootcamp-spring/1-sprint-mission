@@ -27,4 +27,8 @@ public class BinaryContent {
         this.domainId = domainId;
         this.file = file;
     }
+    public BinaryContent update(File file) {
+        this.file = file;
+        return this;
+    }
 }

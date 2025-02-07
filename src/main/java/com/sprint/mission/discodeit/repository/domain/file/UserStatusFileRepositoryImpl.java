@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class UserStatusFileRepositoryImpl implements UserStatusRepository {
     @Override
-    public UserStatus save(UserStatusDto userStatusDto) throws IllegalAccessException {
+    public UserStatus save(UserStatusDto userStatusDto) {
         return null;
     }
 
@@ -38,8 +38,4 @@ public class UserStatusFileRepositoryImpl implements UserStatusRepository {
 
     }
 
-    @Override
-    public void updateByUserId(UUID id) {
-
-    }
 }

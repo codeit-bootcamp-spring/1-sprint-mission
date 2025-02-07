@@ -19,7 +19,7 @@ public interface MessageRepository {
 
     void initializeMessage(Message message);*/
 
-    UUID save(UUID sender, String content);
+    UUID save(UUID sender,UUID channelId, String content);
     Message findMessageById(UUID id);
     List<Message> findMessagesById(UUID id);
     List<Message> findAll();

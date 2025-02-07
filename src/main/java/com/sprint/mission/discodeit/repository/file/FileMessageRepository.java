@@ -74,10 +74,10 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public UUID save(UUID sender, String content) {
+    public UUID save(UUID sender,UUID channelId,  String content) {
         //Map<UUID, Message> userMap = loadFromSer(FILE_NAME);
         Map<UUID, Message> messageMap = FileSerializationUtil.loadFromSer(FILE_NAME);
-        Message message = new Message(sender, content);
+        Message message = new Message(sender,channelId, content);
         messageMap.put(message.getId(), message);
         FileSerializationUtil.saveToSer(FILE_NAME, messageMap);
         //saveToSer(FILE_NAME, messageMap);

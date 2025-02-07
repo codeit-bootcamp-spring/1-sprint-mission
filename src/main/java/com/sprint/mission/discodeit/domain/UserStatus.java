@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.domain;
 
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -28,11 +30,20 @@ public class UserStatus {
         this.updatedAt = Instant.now();
         this.status = Status.ONLINE;
     }
-
-    public Status isOnline(){
-        return Duration.between(updatedAt, Instant.now()).toMinutes() <= 5 ? Status.ONLINE : Status.OFFLINE;
+    public UserStatus updateFields(UserStatusDto userStatusDto) { //현재 시각이던 과거 시간이던 필드 업데이트
+        if(userStatusDto.updatedAt() != null) { this.updatedAt = userStatusDto.updatedAt();}
+        if (this.updatedAt != null) { 
+            Instant fiveMinutesAgo = Instant.now().minusSeconds(300);
+            this.status = this.updatedAt.isBefore(fiveMinutesAgo) ? Status.OFFLINE : Status.ONLINE;
+        }       
+        return this;
     }
-    public void updateStatus() {
-        this.updatedAt = Instant.now();
+
+    public UserStatus checkStatus() { //Status 상태 계산 후 반환
+        if (this.updatedAt != null) {
+            Instant fiveMinutesAgo = Instant.now().minusSeconds(300);
+            this.status = this.updatedAt.isBefore(fiveMinutesAgo) ? Status.OFFLINE : Status.ONLINE;
+        }
+        return this;
     }
 }

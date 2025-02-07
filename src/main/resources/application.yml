@@ -1,2 +1,14 @@
-payment:
-  type: transfer
+spring:
+  profiles:
+    active: Jcf
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: ""
+    driver-class-name: ""
+    username: ""
+    password: ""

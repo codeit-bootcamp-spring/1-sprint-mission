@@ -11,4 +11,7 @@ public record UserStatusDto(UUID id, UUID userId, Instant createdAt,Instant upda
     public UserStatusDto(UserStatus userStatus) {
         this(userStatus.getId(), userStatus.getUserId(), userStatus.getCreatedAt(), userStatus.getUpdatedAt(), userStatus.getStatus());
     }
+    public UserStatusDto (UUID userId) {
+        this(null, userId, null, null, null);
+    }
 }

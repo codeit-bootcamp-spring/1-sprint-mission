@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.UserStatus;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -26,22 +28,12 @@ public class BasicUserService implements UserService {
         UserDto userDto = vaildateUser(paramUserDto.userName(), paramUserDto.email());
         if (userDto != null) return userDto;
         User savedUser = repository.save(paramUserDto.userName(), paramUserDto.password(), paramUserDto.email());
-        UserStatus savedUserStatus = userStatusRepository.save(new UserStatus(savedUser.getId()));
-        if( paramUserDto.binaryContent() != null ) { //이거 판단 기준 애매모호할 것 같은데?
-            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(savedUser.getId(), paramUserDto.binaryContent().getFile()));
+        UserStatus savedUserStatus = userStatusRepository.save(new UserStatusDto(savedUser.getId()));
+        if( paramUserDto.binaryContent() != null ) { //User 당 하나의 프로필 가짐
+            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContentDto(savedUser.getId(), paramUserDto.binaryContent().getFile()));
         }
-        //return new UserDto(savedUser.getId(), savedUser.getCreatedAt(), savedUser.getUpdatedAt(), savedUser.getUserName(), savedUser.getEmail());
         return new UserDto(savedUser);
     }
-
-    /*public UserDto createUser(String userName, String email, File file) { //선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
-        UserDto userDto = vaildateUser(userName, email);
-        if (userDto != null) return userDto;
-        User savedUser = repository.save(userName, email);
-        UserStatus savedUserStatus = userStatusRepository.save(new UserStatus(savedUser.getId()));
-        BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContent(savedUser.getId(), file));
-        return new UserDto(savedUser, savedUserStatus, null);
-    }*/
 
     private UserDto vaildateUser(String userName, String email) {
         List<User> users = repository.findAll();

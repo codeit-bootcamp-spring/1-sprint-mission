@@ -7,24 +7,25 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 //implements MessageRepository
 @Repository
 @Profile("Jcf")
-public class JCFMessageRepository implements MessageRepository  {
+public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageMap;
 
     public JCFMessageRepository() {
         this.messageMap = new HashMap<>();
     }
 
-    public UUID createMessage(UUID sender, String content) {
-        Message message = new Message(sender, content);
+    public UUID createMessage(UUID sender, UUID channelId, String content) {
+        Message message = new Message(sender, channelId, content);
         messageMap.put(message.getId(), message);
         return message.getId();
     }
 
-    public UUID createMessage(UUID id, UUID sender, String content) {
-        Message message = new Message(sender, content);
+    public UUID createMessage(UUID id, UUID sender, UUID channelId, String content) {
+        Message message = new Message(sender, channelId, content);
         messageMap.put(id, message);
         return message.getId();
     }
@@ -45,7 +46,7 @@ public class JCFMessageRepository implements MessageRepository  {
         if (messageMap.containsKey(id)) {
             Message message = messageMap.get(id);
             message.update(content);
-        }else {
+        } else {
             System.out.println("메시지를 찾을 수 없습니다.");
         }
     }
@@ -53,14 +54,14 @@ public class JCFMessageRepository implements MessageRepository  {
     public void deleteMessage(UUID id) {
         if (messageMap.containsKey(id)) {
             messageMap.remove(id);
-        }else {
+        } else {
             System.out.println("메시지를 찾을 수 없습니다.");
         }
     }
 
     @Override
-    public UUID save(UUID sender, String content) {
-        Message message = new Message(sender, content);
+    public UUID save(UUID sender,UUID channelId, String content) {
+        Message message = new Message(sender,channelId, content);
         messageMap.put(message.getId(), message);
         return message.getId();
     }
@@ -83,13 +84,13 @@ public class JCFMessageRepository implements MessageRepository  {
 
     @Override
     public boolean delete(UUID messageId) {
-        if(messageMap.containsKey(messageId)){
+        if (messageMap.containsKey(messageId)) {
             //Message message = messageMap.get(messageId);
             //initializeMessage(message);
             messageMap.replace(messageId, new Message());
             messageMap.remove(messageId);
             return true;
-        }else {
+        } else {
             System.out.println("메시지를 찾을 수 없습니다.");
             return false;
         }

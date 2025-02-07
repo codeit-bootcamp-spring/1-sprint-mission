@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.ChannelFindAllDto;
 import com.sprint.mission.discodeit.dto.ChannelFindDto;
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -30,7 +31,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto create(ChannelDto dto, List<UUID> userList) {
         //private 신청 검토
         Channel savedChannel = channelRepository.save(dto.type());
-        userList.forEach(userId -> readStatusRepository.save(new ReadStatus(userId, savedChannel.getId())));
+        userList.forEach(userId -> readStatusRepository.save(new ReadStatusDto(null, userId, savedChannel.getId(), null, null, null)));
         return new ChannelDto(savedChannel);
     }
 

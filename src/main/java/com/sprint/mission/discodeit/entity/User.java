@@ -1,6 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +15,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@Entity
 public class User implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
     @JsonProperty("userId")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final UUID id;
     @Setter
     @JsonProperty("userName")
