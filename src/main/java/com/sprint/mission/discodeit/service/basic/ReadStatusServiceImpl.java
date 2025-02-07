@@ -35,6 +35,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
+
     return readStatusRepository.save(new ReadStatus(dto.channelId(), dto.userId()));
   }
 

@@ -31,24 +31,11 @@ import static com.sprint.mission.discodeit.constant.ChannelConstant.PRIVATE_CHAN
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-  private static volatile BasicChannelService instance;
-
   private final ReadStatusService readStatusService;
 
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final MessageRepository messageRepository;
-
-  public static BasicChannelService getInstance(ChannelRepository channelRepository, UserRepository userRepository, ReadStatusService readStatusService, MessageRepository messageRepository) {
-    if (instance == null) {
-      synchronized (BasicChannelService.class) {
-        if (instance == null) {
-          instance = new BasicChannelService(readStatusService, channelRepository, userRepository, messageRepository);
-        }
-      }
-    }
-    return instance;
-  }
 
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
@@ -111,6 +98,7 @@ public class BasicChannelService implements ChannelService {
   public FindChannelResponseDto getChannelById(String channelId) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(ChannelNotFoundException::new);
+
     List<String> userIds = getParticipatingUsersByChannel(channelId);
 
     Instant lastMessageTime = findLatestMessageTimeByChannel(channelId);

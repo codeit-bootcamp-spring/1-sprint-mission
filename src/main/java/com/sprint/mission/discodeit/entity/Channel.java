@@ -50,7 +50,7 @@ public class Channel implements Serializable {
 
     public ChannelBuilder(String channelName, ChannelType channelType) {
       if (channelName == null || channelName.isEmpty()) {
-        throw new ChannelValidationException();
+        this.channelName = "";
       }
       this.channelName = channelName;
       this.channelType = channelType;

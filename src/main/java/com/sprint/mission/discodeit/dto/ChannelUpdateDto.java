@@ -17,7 +17,7 @@ public class ChannelUpdateDto {
   private Integer maxNumberOfPeople;
 
 
-  public ChannelUpdateDto(String channelId, String channelName, Integer maxNumberOfPeople, String tag, Boolean isPrivate) {
+  public ChannelUpdateDto(String channelId, String channelName, Integer maxNumberOfPeople) {
     this.channelId = channelId;
     this.channelName = channelName;
     this.maxNumberOfPeople = maxNumberOfPeople;
