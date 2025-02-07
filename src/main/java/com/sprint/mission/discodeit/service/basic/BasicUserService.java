@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.dto.userService.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public User create(UserCreateRequest userRequest, UserProfileImageRequest profileImage) {
@@ -78,7 +82,7 @@ public class BasicUserService implements UserService {
         // 사용자 정보 업데이트
         user.update(userRequest.newUsername(), userRequest.newEmail(), userRequest.newPassword());
 
-        if(profileImage != null && profileImage.data() != null) {
+        if (profileImage != null && profileImage.data() != null) {
             BinaryContent profile = new BinaryContent(
                     user.getId(),
                     null,
@@ -88,7 +92,11 @@ public class BasicUserService implements UserService {
             );
             binaryContentRepository.save(profile);
         }
+
+        // ✅ 반환값 추가 (UserDTO로 변환하여 반환)
+        return UserDTO.from(user, userStatusRepository.findByUserId(user.getId()).orElse(null));
     }
+
 
     @Override
     public void delete(UUID userId) {

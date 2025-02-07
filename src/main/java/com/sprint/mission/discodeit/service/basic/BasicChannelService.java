@@ -37,17 +37,17 @@ public class BasicChannelService implements ChannelService {
     }
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
-        if(request.password() == null || request.password().isBlank()) {
+        if (request.password() == null || request.password().isBlank()) {
             throw new IllegalArgumentException("Password is required");
         }
-        Channel channel = new Channel(ChannelType.PRIVATE, "Private Channel", "Private dscription", request.password());
+        Channel channel = new Channel(ChannelType.PRIVATE, "Private Channel", "Private description", request.password());
 
-        for(UUID userId : request.userIds()) {
+        for (UUID userId : request.userIds()) {
             if (!userRepository.existsById(userId)) {
                 throw new IllegalArgumentException("User with id " + userId + " not found");
             }
 
-            ReadStatus readStatus = new ReadStatus(userId, channel.getId(), null);
+            ReadStatus readStatus = new ReadStatus(userId, channel.getId(), null, null); // ✅ 수정됨
             readStatusRepository.save(readStatus);
         }
         return channel;
@@ -87,6 +87,11 @@ public class BasicChannelService implements ChannelService {
                     return ChannelDTO.from(channel, lastMessageAt.orElse(null), participantUserIds);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Instant findLastMessageAtByChannelId(UUID channelId) {
+        return messageRepository.findLastMessageAtByChannelId(channelId).orElse(null);
     }
 
     @Override
