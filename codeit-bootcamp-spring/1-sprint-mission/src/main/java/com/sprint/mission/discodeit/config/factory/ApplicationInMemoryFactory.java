@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.config.factory;
 
-import com.sprint.mission.discodeit.db.channel.ChannelRepository;
-import com.sprint.mission.discodeit.db.channel.ChannelRepositoryInMemory;
-import com.sprint.mission.discodeit.db.message.ChannelMessage.ChannelMessageRepository;
-import com.sprint.mission.discodeit.db.message.ChannelMessage.ChannelMessageRepositoryInMemory;
-import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepository;
-import com.sprint.mission.discodeit.db.message.directMessage.DirectMessageRepositoryInMemory;
-import com.sprint.mission.discodeit.db.user.UserRepository;
-import com.sprint.mission.discodeit.db.user.UserRepositoryInMemory;
+import com.sprint.mission.discodeit.repository.jcf.channel.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.channel.JCFChannelRepositoryInMemory;
+import com.sprint.mission.discodeit.repository.jcf.message.ChannelMessage.ChannelMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.message.ChannelMessage.JCFChannelMessageRepositoryInMemory;
+import com.sprint.mission.discodeit.repository.jcf.message.directMessage.DirectMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.message.directMessage.JCFDirectMessageRepositoryInMemory;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.JCFUserRepositoryInMemory;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
@@ -40,10 +40,10 @@ public class ApplicationInMemoryFactory implements AppFactory {
                 new ApplicationInMemoryFactory();
     }
     private ApplicationInMemoryFactory() {
-        this.userRepository = UserRepositoryInMemory.getInstance();
-        this.channelRepository = ChannelRepositoryInMemory.getChannelRepositoryInMemory();
-        this.directMessageRepository = DirectMessageRepositoryInMemory.getInstance();
-        this.channelMessageRepository = ChannelMessageRepositoryInMemory.getInstance();
+        this.userRepository = JCFUserRepositoryInMemory.getInstance();
+        this.channelRepository = JCFChannelRepositoryInMemory.getChannelRepositoryInMemory();
+        this.directMessageRepository = JCFDirectMessageRepositoryInMemory.getInstance();
+        this.channelMessageRepository = JCFChannelMessageRepositoryInMemory.getInstance();
 
         this.userService = JCFUserService.getInstance(userRepository);
         this.channelService = JCFChannelService.getInstance(userRepository, channelRepository);

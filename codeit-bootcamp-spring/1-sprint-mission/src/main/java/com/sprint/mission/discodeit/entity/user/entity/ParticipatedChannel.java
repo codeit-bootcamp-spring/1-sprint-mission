@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity.user.entity;
 
-import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_PARTICIPATED_CHANNEL;
+import static com.sprint.mission.discodeit.common.error.ErrorCode.USER_NOT_PARTICIPATED_CHANNEL;
 
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
 import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.entity.common.Status;
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ParticipatedChannel {
+public class ParticipatedChannel implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -2880824194029612128L;
 
     private final Map<UUID, Channel> participatedChannels;
 
@@ -36,7 +41,7 @@ public class ParticipatedChannel {
         var participatedChannels =
                 this.participatedChannels.values()
                         .stream()
-                        .filter(Channel::isNotUnregistered)
+                        .filter(Channel::isRegistered)
                         .toList();
 
         return Collections.unmodifiableList(participatedChannels);
@@ -47,14 +52,15 @@ public class ParticipatedChannel {
         return Optional.ofNullable(foundParticipatedChannel);
     }
 
-    public Optional<Channel> findByChannelIdNotUnregisteredOrThrow(UUID channelId) {
+    public Optional<Channel> getUnregisteredChannelById(UUID channelId) {
         var foundChannel =
                 findByChannelId(channelId)
                         .orElseThrow(
-                                () -> ChannelException.ofErrorMessageAndNotExistChannelId(USER_NOT_PARTICIPATED_CHANNEL, channelId));
+                                () -> ChannelException.ofNotFound(USER_NOT_PARTICIPATED_CHANNEL, channelId));
 
         var unregisteredReturnNullOrFoundChannel =
-                foundChannel.getStatus() == Status.UNREGISTERED ? null : foundChannel;
+                foundChannel.isRegistered() ? foundChannel : null;
+
 
         return Optional.ofNullable(unregisteredReturnNullOrFoundChannel);
     }
@@ -63,7 +69,7 @@ public class ParticipatedChannel {
     public Optional<Channel> findByName(String name) {
         var foundChannelByName = participatedChannels.values()
                 .stream()
-                .filter(channel -> channel.isStatusNotUnregisteredAndEqualsTo(name))
+                .filter(channel -> channel.isRegisteredAndNameEqual(name))
                 .findFirst();
 
         return foundChannelByName;
@@ -71,9 +77,9 @@ public class ParticipatedChannel {
 
     public Channel changeChannelNameOrThrow(UUID channelId, String newName, User user) {
         var foundChannel =
-                findByChannelIdNotUnregisteredOrThrow(channelId)
+                getUnregisteredChannelById(channelId)
                         .orElseThrow(
-                                () -> UserException.ofErrorMessageAndId(USER_NOT_PARTICIPATED_CHANNEL,
+                                () -> UserException.ofNotJoinChannel(USER_NOT_PARTICIPATED_CHANNEL,
                                         channelId.toString()));
 
         foundChannel.changeName(newName, user);

@@ -28,7 +28,6 @@ public class DirectMessage extends AbstractUUIDEntity {
                     receiver1.getName(),
                     message
             );
-            System.out.println(format);
         };
 
         return new DirectMessage(sender, message, messageSender, messageReceiver);

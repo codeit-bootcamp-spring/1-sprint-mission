@@ -29,7 +29,7 @@ public class User extends AbstractUUIDEntity {
         Preconditions.checkNotNull(newName);
         var changedName = this.name.changeName(newName);
         this.name = changedName;
-        updateStatusAndUpdateAt();
+        updateModified();
     }
 
     /**
@@ -86,8 +86,9 @@ public class User extends AbstractUUIDEntity {
     public String toString() {
         var format =
                 String.format(
-                        "user info = [id : %s, status : %s, createAt = %d, updateAt = %d], participatedChannel = {%s}",
+                        "user info = [id : %s, name: %s, status : %s, createAt = %d, updateAt = %d], participatedChannel = {%s}",
                         getId(),
+                        getName(),
                         getStatus().toString(),
                         getCreateAt(),
                         getUpdateAt().orElse(0L),

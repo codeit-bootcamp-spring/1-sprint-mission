@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import static com.sprint.mission.discodeit.common.error.ErrorMessage.CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.common.error.ErrorMessage.USER_NOT_FOUND;
+import static com.sprint.mission.discodeit.common.error.ErrorCode.CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.common.error.ErrorCode.USER_NOT_FOUND;
 
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.common.error.user.UserException;
-import com.sprint.mission.discodeit.db.channel.ChannelRepository;
-import com.sprint.mission.discodeit.db.user.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.channel.ChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.user.UserRepository;
 import com.sprint.mission.discodeit.entity.channel.dto.ChangeChannelNameRequest;
 import com.sprint.mission.discodeit.entity.channel.dto.ChannelResponse;
 import com.sprint.mission.discodeit.entity.channel.dto.CreateNewChannelRequest;
@@ -66,7 +66,7 @@ public class JCFChannelService implements ChannelService {
     public void deleteChannelByChannelIdOrThrow(DeleteChannelRequest request) {
         var foundChannel = channelRepository.findById(request.channelId())
                 .orElseThrow(
-                        () -> ChannelException.ofErrorMessageAndNotExistChannelId(
+                        () -> ChannelException.ofNotFound(
                                 CHANNEL_NOT_FOUND,
                                 request.channelId())
                 );
@@ -79,7 +79,7 @@ public class JCFChannelService implements ChannelService {
 
     private User findUserByIdOrThrow(UUID id) {
         var foundUser = userRepository.findById(id)
-                .filter(User::isNotUnregistered)
+                .filter(User::isRegistered)
                 .orElseThrow(() -> UserException.of(USER_NOT_FOUND));
 
         return foundUser;

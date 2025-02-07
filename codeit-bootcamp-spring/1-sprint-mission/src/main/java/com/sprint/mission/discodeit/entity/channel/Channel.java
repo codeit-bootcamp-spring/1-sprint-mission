@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity.channel;
 
 import com.google.common.base.Preconditions;
-import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.ErrorCode;
 import com.sprint.mission.discodeit.common.error.channel.ChannelException;
 import com.sprint.mission.discodeit.entity.common.AbstractUUIDEntity;
 import com.sprint.mission.discodeit.entity.user.entity.User;
@@ -50,43 +50,43 @@ public class Channel extends AbstractUUIDEntity {
     }
 
     public void changeName(String newName, User user) {
-        checkCreatorEqualsOrThrow(user);
+        checkCreatorOrThrow(user);
 
         channelName = newName;
-        updateStatusAndUpdateAt();
+        updateModified();
     }
 
     public void deleteChannel(User user) {
-        checkCreatorEqualsOrThrow(user);
+        checkCreatorOrThrow(user);
 
         updateUnregistered();
     }
 
-    public boolean isStatusNotUnregisteredAndEqualsTo(String channelName) {
-        return isNotUnregistered() && this.channelName.equals(channelName);
+    public boolean isRegisteredAndNameEqual(String channelName) {
+        return isRegistered() && this.channelName.equals(channelName);
     }
 
     public String getChannelName() {
         return channelName;
     }
 
-    private void checkCreatorEqualsOrThrow(User user) {
-        var isNotCreator = isNotCreator(user);
+    private void checkCreatorOrThrow(User user) {
+        var isCreator = isCreator(user);
 
-        if (isNotCreator) {
-            throw ChannelException.ofErrorMessageAndCreatorName(
-                    ErrorMessage.CHANNEL_NOT_EQUAL_CREATOR,
+        if (!isCreator) {
+            throw ChannelException.ofNotCreatorName(
+                    ErrorCode.CHANNEL_NOT_EQUAL_CREATOR,
                     user.getName()
             );
         }
     }
 
-    private boolean isNotCreator(User user) {
+    private boolean isCreator(User user) {
         Preconditions.checkNotNull(user);
-        return !creator.equals(user);
+        return creator.equals(user);
     }
 
-    public String getCreator() {
+    public String getCreatorName() {
         return creator.getName();
     }
 

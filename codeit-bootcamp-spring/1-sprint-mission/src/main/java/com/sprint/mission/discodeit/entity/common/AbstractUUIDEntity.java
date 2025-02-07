@@ -5,13 +5,17 @@ import static com.sprint.mission.discodeit.entity.common.Status.REGISTERED;
 import static com.sprint.mission.discodeit.entity.common.Status.UNREGISTERED;
 
 import com.google.common.base.Preconditions;
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class AbstractUUIDEntity {
+public abstract class AbstractUUIDEntity implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = -2898060967687082469L;
     private final UUID id;
 
     private final Long createAt;
@@ -48,7 +52,7 @@ public abstract class AbstractUUIDEntity {
         this.updateAt = createUnixTimestamp();
     }
 
-    public void updateStatusAndUpdateAt() {
+    public void updateModified() {
         updateStatus(MODIFIED);
     }
 
@@ -56,7 +60,7 @@ public abstract class AbstractUUIDEntity {
         updateStatus(UNREGISTERED);
     }
 
-    public boolean isNotUnregistered() {
+    public boolean isRegistered() {
         return status != UNREGISTERED;
     }
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.common.error.channel;
 
-import com.sprint.mission.discodeit.common.error.ErrorMessage;
+import com.sprint.mission.discodeit.common.error.ErrorCode;
 import java.util.UUID;
 
 public class ChannelException extends RuntimeException {
@@ -13,28 +13,28 @@ public class ChannelException extends RuntimeException {
         super(message, cause);
     }
 
-    public static ChannelException of(ErrorMessage message) {
-        return new ChannelException(message.getMessage());
+    public static ChannelException of(ErrorCode message) {
+        return new ChannelException(message.getErrorMessage());
     }
 
-    public static ChannelException ofErrorMessageAndNotExistChannelId(ErrorMessage message, UUID causeInputParameter) {
+    public static ChannelException ofNotFound(ErrorCode message, UUID causeInputParameter) {
         var format =
                 String.format(
                         "%s : input Channel Id = %s",
-                        message.getMessage(),
+                        message.getErrorMessage(),
                         causeInputParameter.toString()
                 );
 
         return new ChannelException(format);
     }
 
-    public static ChannelException ofErrorMessageAndCreatorName(
-            ErrorMessage message,
+    public static ChannelException ofNotCreatorName(
+            ErrorCode message,
             String creatorName
     ) {
         var format = String.format(
                 "%s : 채널 생성자 %s 가 아닙니다.",
-                message.getMessage(), creatorName
+                message.getErrorMessage(), creatorName
         );
 
         return new ChannelException(format);
