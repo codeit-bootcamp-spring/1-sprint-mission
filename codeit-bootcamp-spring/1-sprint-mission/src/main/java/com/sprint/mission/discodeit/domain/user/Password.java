@@ -1,18 +1,25 @@
 package com.sprint.mission.discodeit.domain.user;
 
-import com.sprint.mission.discodeit.domain.user.validation.PasswordValidator;
-import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString(of = "value")
 public class Password {
 
-    private final String value;
+    private String value;
 
     public Password(String value) {
-        PasswordValidator.validate(value);
         this.value = value;
     }
 
+    public void changePassword(String encodedPassword) {
+        setValue(encodedPassword);
+    }
+
+    private void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }

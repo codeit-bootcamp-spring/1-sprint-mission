@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.application.service;
 
 import com.sprint.mission.discodeit.application.dto.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.service.user.UserService;
 import com.sprint.mission.discodeit.domain.user.exception.AlreadyUserExistsException;
 import com.sprint.mission.discodeit.fake.FakeFactory;
 import com.sprint.mission.discodeit.fake.domain.user.StubUser;

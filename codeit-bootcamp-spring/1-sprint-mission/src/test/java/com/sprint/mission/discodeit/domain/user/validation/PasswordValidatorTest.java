@@ -31,7 +31,7 @@ class PasswordValidatorTest {
     void 비밀번호_정규식_생성_검증_에러throw(String password) {
         //given
         // when
-        Throwable catchThrow = catchThrowable(() -> PasswordValidator.validate(password));
+        Throwable catchThrow = catchThrowable(() -> PasswordValidator.validateOrThrow(password));
         // then
         assertThat(catchThrow).isInstanceOf(PassWordInvalidException.class);
     }

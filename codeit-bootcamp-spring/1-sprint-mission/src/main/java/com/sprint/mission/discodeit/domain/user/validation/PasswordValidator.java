@@ -11,7 +11,7 @@ public class PasswordValidator {
     private final static String PASSWORD_REX = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&*()_+])\\S{8,}$";
     private final static Pattern PASSWORD_PATTERN = Pattern.compile(PASSWORD_REX);
 
-    public static void validate(String password) {
+    public static void validateOrThrow(String password) {
         if (Objects.isNull(password) || password.isEmpty()) {
             throw new PassWordInvalidException(ErrorCode.PASSWORD_REQUIRED, "");
         }

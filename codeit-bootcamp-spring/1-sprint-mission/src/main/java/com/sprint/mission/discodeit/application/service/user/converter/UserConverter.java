@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.application.service.converter;
+package com.sprint.mission.discodeit.application.service.user.converter;
 
 import com.sprint.mission.discodeit.application.dto.JoinUserReqeustDto;
 import com.sprint.mission.discodeit.application.dto.UserResponseDto;
