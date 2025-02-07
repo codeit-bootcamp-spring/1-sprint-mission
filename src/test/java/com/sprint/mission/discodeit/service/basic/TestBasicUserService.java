@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,8 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +31,7 @@ public class TestBasicUserService {
 
     @Test
     void createUserTest() {
-        UserCreateRequestDTO request = new UserCreateRequestDTO("Alice", "alice@naver.com", "12345",null, "ONLINE");
+        UserCreateRequestDto request = new UserCreateRequestDto("Alice", "alice@naver.com", "12345",null, "ONLINE");
         User createdUser = basicUserService.createUser(request);
         // when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 

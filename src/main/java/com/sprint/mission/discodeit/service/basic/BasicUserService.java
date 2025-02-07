@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
-import com.sprint.mission.discodeit.dto.user.UserResponseDTO;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDTO;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -27,17 +27,13 @@ public class BasicUserService implements UserService {
     @Autowired
     private final UserRepository userRepository;
     @Autowired
-    private final UserStatusRepository userStatusRepository;
-    @Autowired
-    private final BinaryContentRepository binaryContentRepository;
-    @Autowired
     private BinaryContentService binaryContentService;
     @Autowired
     private UserStatusService userStatusService;
 
 
     @Override
-    public User createUser(UserCreateRequestDTO request) {
+    public User createUser(UserCreateRequestDto request) {
         if(userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("Email already in use");
         }
@@ -58,7 +54,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<UserResponseDTO> getUserById(UUID id) {
+    public Optional<UserResponseDto> getUserById(UUID id) {
         Optional<User> userOptional = userRepository.getUserById(id);
 
         // 조회된 사용자가 존재하면 UserResponseDTO로 변환
@@ -69,19 +65,19 @@ public class BasicUserService implements UserService {
                     .orElse(false);
 
             // UserResponseDTO 생성 후 반환
-            return new UserResponseDTO(user.getName(), user.getEmail(), isOnline);
+            return new UserResponseDto(user.getName(), user.getEmail(), isOnline);
         });
     }
 
     @Override
-    public List<UserResponseDTO> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userRepository.getAllUsers().stream()
                 .map(user -> {
                     String userStatus=user.getUserStatus();
                     boolean isOline=Optional.ofNullable(userStatus)
                             .map((String t) -> UserStatus.isOnline())
                             .orElse(false);
-                    return new UserResponseDTO(user.getName(),user.getEmail(),isOline);
+                    return new UserResponseDto(user.getName(),user.getEmail(),isOline);
                 }).collect(Collectors.toList());
     }
 
@@ -92,7 +88,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User updateUser(UserUpdateRequestDTO request) {
+    public User updateUser(UserUpdateRequestDto request) {
         User user=userRepository.getUserById(request.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User not fount"));
         user.update(request.getNewName(), request.getNewEmail(), request.getNewPassword());

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequest;
-import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(CreateReadStatusRequest request) {
+    public ReadStatus create(CreateReadStatusRequestDto request) {
         if (!channelRepository.existsById(request.getChannelid())){
             throw new NoSuchElementException("channel not found");
         }
@@ -56,7 +55,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UpdateReadStatusRequest request) {
+    public ReadStatus update(UpdateReadStatusRequestDto request) {
         ReadStatus readStatus=readStatusRepository.findById(request.getId())
                 .orElseThrow(()->new NoSuchElementException("ReadStatus id not found"));
         ReadStatus updateReadStatus=new ReadStatus(request.getId(),request.getChannelId());
@@ -72,14 +71,5 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     @Override
     public void deleteByChannelId(UUID id) {
         readStatusRepository.deleteByChannelId(id);
-    }
-
-
-    @Override
-    public void addMembersToChannel(UUID channelId, List<UUID> memberIds) {
-        List<ReadStatus> readStatuses = memberIds.stream()
-                .map(memberId -> new ReadStatus(memberId, channelId))
-                .collect(Collectors.toList());
-        readStatusRepository.saveReadStatus(readStatuses);
     }
 }

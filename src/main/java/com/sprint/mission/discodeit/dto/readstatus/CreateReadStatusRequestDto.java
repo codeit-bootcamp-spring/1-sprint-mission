@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
-public class CreateReadStatusRequest {
+public class CreateReadStatusRequestDto {
     private UUID userid;
     private UUID channelid;
 }

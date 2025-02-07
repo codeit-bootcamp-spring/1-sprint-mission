@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.Interface.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +18,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
+    @Autowired
     private final UserStatusRepository userStatusRepository;
+    @Autowired
     private final UserRepository userRepository;
 
 

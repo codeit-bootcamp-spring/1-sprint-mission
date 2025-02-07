@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
@@ -26,7 +26,7 @@ public class BasicMassageService implements MessageService {
 
 
     @Override
-    public Message createMessage(CreateMessageRequest request) {
+    public Message createMessage(CreateMessageRequestDto request) {
         Message message=new Message(request.getContent(),request.getChannelId(),request.getAuthorId());
         Message savedMessage=messageRepository.save(message);
         if(request.getAttachments()!=null){
@@ -58,7 +58,7 @@ public class BasicMassageService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(UpdateMessageRequest request) {
+    public Message updateMessage(UpdateMessageRequestDto request) {
         Message message = messageRepository.getMessageById(request.getMessageId())
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + request.getMessageId() + " not found"));
         message.update(request.getNewContent());

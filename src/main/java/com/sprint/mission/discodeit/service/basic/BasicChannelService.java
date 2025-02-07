@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -43,7 +43,7 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel createPublicChannel(PublicChannelCreateRequest request) {
+    public Channel createPublicChannel(PublicChannelCreateRequestDto request) {
         if (!userRepository.existsById(request.getUserId())) {
             throw new IllegalArgumentException("User not found");
         }
@@ -52,14 +52,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
+    public Channel createPrivateChannel(PrivateChannelCreateRequestDto request) {
         if (!userRepository.existsById(request.getUserId())) {
             throw new IllegalArgumentException("User not found");
         }
         Channel channel=new Channel(PRIVATE,null,null,request.getUserId());
         Channel savedChannel=channelRepository.save(channel);
 
-        readStatusService.addMembersToChannel(savedChannel.getId(),request.getMembers());
+        CreateReadStatusRequestDto requestDto=new CreateReadStatusRequestDto(request.getUserId(),savedChannel.getId());
+        readStatusService.create(requestDto);
 
         return channelRepository.save(channel);
     }
@@ -101,7 +102,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(ChannelUpdateRequest request) {
+    public Channel updateChannel(ChannelUpdateRequestDto request) {
         Channel channel = channelRepository.getChannelById(request.getChannelId())
                 .orElseThrow(() -> new NoSuchElementException("Channel not found"));
 
