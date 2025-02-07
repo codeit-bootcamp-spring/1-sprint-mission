@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface MessageService {
-    Message create(User user, Channel channel, String content);
+    MessageResponseDTO create(MessageCreateDTO messageCreateDTO);
     Message find(User user);
     List<Message> findAll();
-    Message update(User user, Channel channel, String content);
-    void delete(User user, Channel channel, Message message);
+    List<MessageResponseDTO> findMessagesByChannelId(UUID channelId);
+    MessageResponseDTO update(MessageUpdateDTO updateDTO);
+    void delete(UUID messageId);
 }

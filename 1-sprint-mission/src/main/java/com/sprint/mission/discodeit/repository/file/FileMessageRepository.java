@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
@@ -43,6 +44,13 @@ public class FileMessageRepository implements MessageRepository {
         return allMessages;
     }
 
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageData.values().stream()
+                .flatMap(List::stream)
+                .filter(message -> message.getChannel().getId().equals(channelId))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void deleteByMessage(Message message) {
@@ -60,6 +68,14 @@ public class FileMessageRepository implements MessageRepository {
     public void deleteByChannel(Channel channel) {
         messageData.values()
                 .forEach(messages -> messages.removeIf(message -> message.getChannel().equals(channel)));
+        saveToFile();
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
+        messageData.values()
+                .forEach(messages
+                        -> messages.removeIf(message -> message.getId().equals(messageId)));
         saveToFile();
     }
 

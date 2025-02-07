@@ -13,11 +13,12 @@ public interface MessageRepository {
     //
     Optional<Message> findById(UUID id);
     List<Message> findAll();
+    List<Message> findAllByChannelId(UUID channelId);   //특정채널 메세지 전부 찾기
     //
     boolean existsByUser(User user);
     boolean existsByChannel(Channel channel);
     //
     void deleteByMessage(Message message);
     void deleteByChannel(Channel channel);
-
+    void deleteById(UUID messageId);
 }

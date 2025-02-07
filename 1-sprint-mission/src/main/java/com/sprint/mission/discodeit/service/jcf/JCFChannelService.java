@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.jcf;
 
 
 
-import com.sprint.mission.discodeit.dto.request.ChannelUpdateDTO;
-import com.sprint.mission.discodeit.dto.response.ChannelResponseDTO;
+import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.channel.ChannelResponseDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;

@@ -2,17 +2,21 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
+import java.nio.file.Path;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent {
+public class BinaryContent implements Serializable {
     private UUID id;
     private User user;
-    private byte[] data;
+    private String filename;
+    private byte[] fileData;
 
-    public BinaryContent(User user, byte[] data) {
+    public BinaryContent(User user, String filename, byte[] fileData) {
         this.id = UUID.randomUUID();
         this.user = user;
-        this.data = data;
+        this.filename = filename;
+        this.fileData = fileData;
     }
 }

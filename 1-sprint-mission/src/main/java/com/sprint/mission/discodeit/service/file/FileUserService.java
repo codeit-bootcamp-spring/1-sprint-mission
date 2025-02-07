@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.request.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.request.UserUpdateDTO;
-import com.sprint.mission.discodeit.dto.response.UserDTO;
-import com.sprint.mission.discodeit.dto.request.UserProfileImageDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.user.UserDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserProfileImageDTO;
 import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.request.UserUpdateDTO;
-import com.sprint.mission.discodeit.dto.response.UserDTO;
-import com.sprint.mission.discodeit.dto.request.UserProfileImageDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.user.UserDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserProfileImageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,9 +36,10 @@ public class BasicUserService implements UserService {
         User newUser = new User(userCreateDTO.username(),userCreateDTO.email() ,userCreateDTO.password() );
         userRepository.save(newUser);
 
-        if(userProfileImageDTO != null & userProfileImageDTO.imageData() != null) {
-            BinaryContent binaryContent = new BinaryContent(newUser, userProfileImageDTO.imageData());
-            binaryContentRepository.save(profileImage); // 레포지토리 미구현 나중에 수정 해야함.
+        assert userProfileImageDTO != null;
+        if(userProfileImageDTO.imageData() != null) {
+            BinaryContent binaryContent = new BinaryContent(newUser, userProfileImageDTO.fileName(),userProfileImageDTO.imageData());
+            binaryContentRepository.save(binaryContent); // 레포지토리 미구현 나중에 수정 해야함.
         }
 
         UserStatus userStatus = new UserStatus(newUser);
@@ -88,12 +88,13 @@ public class BasicUserService implements UserService {
             //업데이트
             user.update(userUpdateDTO.newUsername(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
             userRepository.save(user);
-            //프로필 이미지 (선택적으로)
-            if(userProfileImageDTO != null & userProfileImageDTO.imageData() != null) {
+            //프로필 이미지 저장 (선택적으로)
+            assert userProfileImageDTO != null;
+            if(userProfileImageDTO.imageData() != null) {
                 binaryContentRepository.findByUserId(user.getId()) // 레포지토리 미구현 수정해야함.
                         .ifPrenset(binaryContentRepository::delete);
-                BinaryContent binaryContent = new BinaryContent(user, userProfileImageDTO.imageData());
-                binaryContentRepository.save(profileImage);
+                BinaryContent binaryContent = new BinaryContent(user, userProfileImageDTO.fileName(),userProfileImageDTO.imageData());
+                binaryContentRepository.save(binaryContent);
             }
             boolean isOnline = userStatusRepository.findByUser(user)
                     .map(UserStatus::isOnline)

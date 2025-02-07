@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class FileMessageService implements MessageService {
     private static FileMessageService instance;
@@ -31,7 +33,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message create(User user, Channel channel, String content) {
+    public Message create(MessageCreateDTO messageCreateDTO) {
         if(!userRepository.existsById(user.getId())) {
             throw new IllegalArgumentException("User not found");
         }
@@ -75,7 +77,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(User user, Channel channel, String newContent) {
+    public MessageResponseDTO update(MessageUpdateDTO updateDTO) {
         try {
             if(!userRepository.existsById(user.getId())){
                 throw new IllegalArgumentException("User not found");
@@ -100,7 +102,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void delete(User user, Channel channel, Message message) {
+    public void delete(UUID messageId) {
         try {
             if(!userRepository.existsById(user.getId())) {
                 throw new IllegalArgumentException("User not found");
@@ -109,7 +111,7 @@ public class FileMessageService implements MessageService {
                 throw new IllegalArgumentException("Channel not found");
             }
             System.out.println("Message delete : " + find(user));
-            messageRepository.deleteByMessage(message);
+            messageRepository.deleteByMessage(messageId);
         }catch (IllegalArgumentException e){
             System.out.println("Failed to delete message: " + e.getMessage());
         }

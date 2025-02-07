@@ -74,9 +74,9 @@ public class JavaApplication {
 
         System.out.println(" <<<< 메세지 생성 >>>> ");
         //메세지 생성
-        Message messageUser1 = messageService.create(user1, channel2, "Hello World");
-        Message messageUser2 = messageService.create(user1, channel2, "Hi World");
-        Message messageUser3 = messageService.create(user1, channel2, "1231451");
+        Message messageUser1 = messageService.create(user1);
+        Message messageUser2 = messageService.create(user1);
+        Message messageUser3 = messageService.create(user1);
         //메세지 조회
         System.out.println(" <<<< All Messages >>>>");
         List<Message> messages = messageService.findAll();
@@ -84,8 +84,8 @@ public class JavaApplication {
             System.out.println(message.getContent());
         }
 
-        messageService.delete(user1,channel2, messageUser1);
-        messageService.update(user1,channel2,"Error message");
+        messageService.delete(messageUser1);
+        messageService.update(user1);
 
         System.out.println(" <<<< All Messages >>>>");
         List<Message> newMessage = messageService.findAll();
