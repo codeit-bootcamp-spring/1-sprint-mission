@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.user.CreatedUserDataDTO;
 import com.sprint.mission.discodeit.dto.ProfileImageDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -22,14 +24,9 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserValidator userValidator;
-    private final FileUserRepository fileUserRepository;
-    private final UserStatusService basicUserStatusService;
+    private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
     private final BinaryContentService binaryContentService;
-
-//    public BasicUserService(FileUserRepository fileUserRepository,UserValidator userValidator) {
-//        this.userValidator = userValidator;
-//        this.fileUserRepository = fileUserRepository;
-//    }
 
     @Override
     public User createUser(String name, String email, String iD , String password) {
@@ -39,7 +36,7 @@ public class BasicUserService implements UserService {
             System.out.println("유저생성 실패 ->" + e.getMessage());
         }
             User user = new User(name, email, iD, password);
-            fileUserRepository.save(user);
+            userRepository.save(user);
             return user;
 
     }
@@ -51,14 +48,14 @@ public class BasicUserService implements UserService {
             System.out.println("유저생성 실패 -> " + e.getMessage());
         }
         User user = new User(data.name(), data.email(), data.id(), data.password());
-        fileUserRepository.save(user);
+        userRepository.save(user);
 
         if(proFile != null){
             binaryContentService.created(proFile);
         }
         // 유저생성하고 UserStatus를 같이 생성합니다.
         UserIdDTO statusDTO = new UserIdDTO(user.getId());
-        basicUserStatusService.created(statusDTO);
+        userStatusService.created(statusDTO);
         return user;
 
     }
@@ -67,26 +64,29 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User getUser(UUID uuid) {
-        return fileUserRepository.findById(uuid);
+    public User find(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
     @Override
-    public HashMap<UUID, User> getAllUsers() {
-        return fileUserRepository.findAll();
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
-    public void updateUser(UUID uuid, String email, String id, String password) {
-        User user = fileUserRepository.findById(uuid);
-        if (user != null) {
-            user.update(email, id, password);
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-    }
-
-    @Override
-    public void deleteUser(UUID uuid) {
-        fileUserRepository.delete(uuid);
-    //추가적으로 유저 객체를 삭제시 해당되는 UserStatus 객체로 삭제하도록
+        userRepository.deleteById(userId);
     }
 }

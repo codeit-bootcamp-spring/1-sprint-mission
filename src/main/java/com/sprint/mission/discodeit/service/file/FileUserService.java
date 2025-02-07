@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
@@ -45,26 +44,27 @@ public class FileUserService implements UserService {
 
 
     @Override
-    public User getUser(UUID uuid) {
+    public User find(UUID uuid) {
         return data.get(uuid);
     }
 
     @Override
-    public HashMap<UUID, User> getAllUsers() {
-        return new HashMap<>(data);
+    public List<User> findAll() {
+        return new ArrayList<User>(data.values());
     }
 
     @Override
-    public void updateUser(UUID uuid, String email, String id, String password) {
-        User user = getUser(uuid);
+    public User update(UUID uuid, String email, String id, String password) {
+        User user = find(uuid);
         if (user != null) {
             user.update(email, id, password);
         }
         saveDataToFile();
+        return null;
     }
 
     @Override
-    public void deleteUser(UUID uuid) {
+    public void delete(UUID uuid) {
         data.remove(uuid);
         saveDataToFile();
     }

@@ -2,18 +2,18 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
 
-    User createUser(String name, String email,String iD ,String password);
+    User createUser(String name, String email, String iD ,String password);
 
-    User getUser(UUID uuid);
+    User find(UUID uuid);
 
-    HashMap<UUID, User> getAllUsers();
+    List<User> findAll();
 
-    void updateUser(UUID uuid, String email, String iD, String password);
+    User update(UUID uuid, String email, String iD, String password);
 
-    void deleteUser(UUID uuid);
+    void delete(UUID uuid);
 }

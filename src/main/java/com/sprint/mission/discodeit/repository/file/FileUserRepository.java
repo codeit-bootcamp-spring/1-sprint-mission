@@ -8,86 +8,102 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Repository
 public class FileUserRepository implements UserRepository {
 
-    private final HashMap<UUID, User> data = new HashMap<>();
-    private static final Logger LOGGER = Logger.getLogger(FileUserRepository.class.getName());
-    private final Path directory = Paths.get(System.getProperty("user.dir"), "Data/user_data");
-    private final String fileName = "user_data.ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
 
     public FileUserRepository(){
-        init(directory);  // 파일 디렉토리 초기화
-        loadDataFromFile();// 데이터 파일에서 불러오기
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        init(DIRECTORY);  // 파일 디렉토리 초기화
     }
-
-
-    public void save(User user) {
-        data.put(user.getId(), user);
-        saveDataToFile();
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public User findById(UUID uuid) {
-        return data.get(uuid);
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override
-    public HashMap<UUID, User> findAll() {
-        return new HashMap<>(data);
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
     }
 
     @Override
-    public void delete(UUID uuid) {
-        data.remove(uuid);
-        saveDataToFile();
+    public List<User> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // 디렉토리 초기화
-    private void init(Path directory) {
-        if (!Files.exists(directory)) {
+    private void init(Path DIRECTORY) {
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage());
+                throw new RuntimeException(e);
             }
         }
     }
 
-    //전체 HashMap을 직렬화하여 파일에 저장
-    private void saveDataToFile() {
-        Path filePath = directory.resolve(fileName);
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
-            oos.writeObject(data);  // Map<UUID, User>만 직렬화하여 저장
-        } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패: " + e.getMessage());
-        }
-    }
-
-    // 파일에서 직렬화된 객체를 불러오기
-    private void loadDataFromFile() {
-        Path filePath = directory.resolve(fileName);
-        if (Files.exists(filePath)) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
-                // Unchecked cast 경고를 피하기 위해 Map<UUID, User>로 안전하게 캐스팅
-                Object readObject = ois.readObject();
-                if (readObject instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<UUID, User> loadedData = (Map<UUID, User>) readObject;
-                    data.putAll(loadedData);  // 직렬화된 Map<UUID, User>을 로드
-                } else {
-                    throw new RuntimeException("잘못된 데이터 형식");
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                LOGGER.log(Level.WARNING, "파일 로드 실패", e);
-            }
-        }
-    }
 }

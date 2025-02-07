@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -44,8 +43,8 @@ public class DiscodeitApplication {
 		return ch;
 	}
 
-	static void allPrintUser(Map<UUID, User> data){
-		for(User user  : data.values()){
+	static void allPrintUser(List<User> data){
+		for(User user  : data){
 			System.out.println(user);
 			System.out.println("-----------------------------------------------");
 		}
@@ -57,49 +56,46 @@ public class DiscodeitApplication {
 		}
 	}
 
-	static void allprintMessages( Map<UUID, Map<UUID, Message>> data){
-		for (Map<UUID, Message> channelMessages : data.values()) {
-			for (Message message : channelMessages.values()) {
-				System.out.println(message);
-				System.out.println("===============================================");
+	static void allprintMessages( List<Message> data){
+		for (Message message: data) {
+			System.out.println(message);
+			System.out.println("===============================================");
 			}
 		}
-	}
 
-	static void messageCreateTest(MessageService messageService, Channel channel, User author,String str){
-		Message message = messageService.createMsg(author,channel,str);
-		System.out.println("메시지 생성: " + message.getUuId());
-	}
+    static void messageCreateTest(MessageService messageService,UUID channelId, UUID authorId, String content){
+        Message message = messageService.createMsg(content,channelId,authorId);
+        System.out.println("메시지 생성: " + message.getId());
+    }
 
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-	public static void main(String[] args) {
-		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-
-		UserService userService = context.getBean(BasicUserService.class);
-		ChannelService channelService = context.getBean(BasicChannelService.class);
-		MessageService messageService = context.getBean(BasicMessageService.class);
+        UserService userService = context.getBean(BasicUserService.class);
+        ChannelService channelService = context.getBean(BasicChannelService.class);
+        MessageService messageService = context.getBean(BasicMessageService.class);
 
 
 
-		User user1 = setupUser(userService);
-		User user2 = setupUser2(userService);
-		allPrintUser(userService.getAllUsers());
+        User user1 = DiscodeitApplication.setupUser(userService);
+        User user2 = DiscodeitApplication.setupUser2(userService);
+        DiscodeitApplication.allPrintUser(userService.findAll());
 
-		Channel ch1 = setupChannel(channelService);
-		Channel ch2 = setupChannel2(channelService);
-		allPrintChannel(channelService.findAll());
+        Channel ch1 = DiscodeitApplication.setupChannel(channelService);
+        Channel ch2 = DiscodeitApplication.setupChannel2(channelService);
+        DiscodeitApplication.allPrintChannel(channelService.findAll());
 
-		messageCreateTest(messageService,ch1,user1,"user1이 ch1으로 보내는 메시지");
-		messageCreateTest(messageService,ch1,user2,"user2이 ch1으로 보내는 메시지");
-		messageCreateTest(messageService,ch2,user2,"user1이 ch2으로 보내는 메시지");
-		messageCreateTest(messageService,ch2,user2,"user2이 ch2으로 보내는 메시지");
-		allprintMessages(messageService.getAllMsg());
+//		messageCreateTest(messageService,ch1.getId(),user1.getId(),"user1이 ch1으로 보내는 메시지");
+//		messageCreateTest(messageService,ch1.getId(),user2.getId(),"user2이 ch1으로 보내는 메시지");
+//		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user1이 ch2으로 보내는 메시지");
+//		messageCreateTest(messageService,ch2.getId(),user2.getId(),"user2이 ch2으로 보내는 메시지");
+        DiscodeitApplication.allprintMessages(messageService.findAll());
 
 
-		System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
-		channelService.delete(ch1.getId());
-		System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
-		allPrintChannel(channelService.findAll());
-		allprintMessages(messageService.getAllMsg());
-	}
+        System.out.println("----------ch1 채널 삭제후 모든 채널 조회-----------");
+        channelService.delete(ch1.getId());
+        System.out.println("----------ch1 채널 삭제후 메시지 조회----------");
+        DiscodeitApplication.allPrintChannel(channelService.findAll());
+        DiscodeitApplication.allprintMessages(messageService.findAll());
+    }
 }

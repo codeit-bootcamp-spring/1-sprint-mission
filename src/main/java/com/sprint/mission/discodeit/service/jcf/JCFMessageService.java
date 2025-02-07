@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 
@@ -21,18 +19,18 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message createMsg(User user, Channel channel, String content) {
-        if (validationService.validateMessage(user, channel, content)){
-            Message msg = new Message(user, channel, content);
-            data.putIfAbsent(msg.getDestinationCh().getChanneluuId(), new HashMap<>());
-            data.get(msg.getDestinationCh().getChanneluuId()).put(msg.getUuId(), msg);
+    public Message createMsg(String content, UUID channelId, UUID authorId){
+        if (validationService.validateMessage(authorId, channelId, content)){
+            Message msg = new Message(content,channelId,authorId);
+            data.putIfAbsent(msg.getChannelId(), new HashMap<>());
+            data.get(msg.getChannelId()).put(msg.getId(), msg);
             return msg;
         }
         throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
     }
 
     @Override
-    public Message getMessage(UUID msgUuid) {
+    public Message find(UUID msgUuid) {
         for (Map<UUID, Message> channelMessages : data.values()) {
             if (channelMessages.containsKey(msgUuid)) {
                 return channelMessages.get(msgUuid);
@@ -43,19 +41,26 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Map<UUID, Map<UUID, Message>> getAllMsg() {
-        return  new HashMap<>(data);
+    public List<Message> findAll() {
+        List<Message> allMessages = new ArrayList<>();
+
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            allMessages.addAll(channelMessages.values()); // 각 채널의 모든 메시지를 추가
+        }
+
+        return allMessages;
     }
 
     @Override
-    public void updateMsg(UUID msgUuid, String newContent) {
-        Message msg = getMessage(msgUuid);
+    public Message update(UUID msgUuid, String newContent) {
+        Message msg = find(msgUuid);
         msg.update(newContent);
         System.out.println("Message content has been updated --> ("+ newContent + ")");
+        return null;
     }
 
     @Override
-    public void deleteMsg(UUID msgUuid) {
+    public void delete(UUID msgUuid) {
         for (Map<UUID, Message> channelMessages : data.values()) {
             if (channelMessages.containsKey(msgUuid)) {
                 channelMessages.remove(msgUuid);
@@ -63,14 +68,5 @@ public class JCFMessageService implements MessageService {
             }
         }
         System.out.println("Message not found: " + msgUuid);
-    }
-
-    @Override
-    public void deleteAllMessagesForChannel(UUID channelUuid) {
-        if (!data.containsKey(channelUuid)) {
-            System.out.println("No messages found for channel ID");
-        }
-        data.remove(channelUuid);
-        System.out.println("All messages for channel "+ "'" + channelUuid +"'" +" have been deleted.");
     }
 }

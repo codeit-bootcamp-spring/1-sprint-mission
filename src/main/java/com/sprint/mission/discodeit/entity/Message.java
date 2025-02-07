@@ -10,40 +10,42 @@ import java.util.*;
 
 @Getter
 public class Message implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID UuId;
-    private final Channel destinationCh;
+
+    private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
+
     private String content;
-    private final User SendUser;
 
+    private final UUID channelId;
+    private final UUID authorId;
 
-    public Message(User SendUser, Channel destinationCh, String content) {
-        this.UuId = UUID.randomUUID();
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+
         this.updatedAt = this.createdAt;
         this.content = content;
-        this.SendUser = SendUser;
-        this.destinationCh = destinationCh;
+        this.authorId = authorId;
+        this.channelId = channelId;
     }
 
-    public void update(String content) {
-        this.content = content;
+    public void update(String newContent) {
+        this.content = newContent;
         this.updatedAt = Instant.now(); // 수정 시간을 갱신
     }
 
     @Override
     public String toString() {
         return "Message{\n" +
-                "UUId=" + UuId +
-                ", \ndestinationChannel : " + destinationCh.getChannelName() +
+                "UUId=" + id +
+                ", \ndestinationChannel ID : " + channelId +
                 ", \ncreatedAt : " + createdAt +
                 ", \nupdatedAt : " + updatedAt +
                 ", \ncontent : " + content + '\'' +
-                ", \nsendUser : " + SendUser.getName() + "\n}";
+                ", \nsendUser ID : " + authorId + "\n}";
     }
 
 }
