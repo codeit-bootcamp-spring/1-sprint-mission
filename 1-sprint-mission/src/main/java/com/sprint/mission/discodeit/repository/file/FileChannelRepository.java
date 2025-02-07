@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         List<Channel> channels = new ArrayList<>();
         channels.add(channel);
-        channelData.put(channel.getUser(), channels);
+        channelData.put(channel.getOwner(), channels);
         saveToFile();
         return channel;
     }
@@ -46,14 +47,21 @@ public class FileChannelRepository implements ChannelRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Channel> findAllByType(ChannelType type) {
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getType() ==type)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public void deleteByChannel(Channel channel) {
-        List<Channel> channels = channelData.get(channel.getUser());
+        List<Channel> channels = channelData.get(channel.getOwner());
         if(channels != null) {
             channels.remove(channel);
             if(channels.isEmpty()) {
-                channelData.remove(channel.getUser());
+                channelData.remove(channel.getOwner());
             }
             saveToFile();
         }
@@ -64,7 +72,25 @@ public class FileChannelRepository implements ChannelRepository {
     public boolean existsByUser(User user) {
         return channelData.values().stream()
                 .flatMap(List::stream)
-                .anyMatch(channel -> channel.getUser().equals(user));
+                .anyMatch(channel -> channel.getOwner().equals(user));
+    }
+
+
+    @Override
+    public List<Channel> findAllByOwnerAndType(User owner, ChannelType type) {
+        return channelData.getOrDefault(owner, new ArrayList<>())
+                .stream()
+                .filter(channel -> channel.getType() == type)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getOwner().getId().equals(userId) ||
+                        (channel.getType() == ChannelType.PRIVATE))
+                .collect(Collectors.toList());
     }
 
     private Map<User, List<Channel>> loadFromFile() {

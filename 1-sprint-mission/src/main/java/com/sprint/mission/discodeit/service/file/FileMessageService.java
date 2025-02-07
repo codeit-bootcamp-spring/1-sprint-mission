@@ -35,7 +35,7 @@ public class FileMessageService implements MessageService {
         if(!userRepository.existsById(user.getId())) {
             throw new IllegalArgumentException("User not found");
         }
-        if(!channelRepository.existsByUser(channel.getUser())) {
+        if(!channelRepository.existsByUser(channel.getOwner())) {
             throw new IllegalArgumentException("Channel not found");
         }
 
@@ -80,7 +80,7 @@ public class FileMessageService implements MessageService {
             if(!userRepository.existsById(user.getId())){
                 throw new IllegalArgumentException("User not found");
             }
-            if(!channelRepository.existsByUser(channel.getUser())){
+            if(!channelRepository.existsByUser(channel.getOwner())){
                 throw new IllegalArgumentException("Channel not found");
             }
             Message messageToUpdate = messageRepository.findAll().stream()
@@ -105,7 +105,7 @@ public class FileMessageService implements MessageService {
             if(!userRepository.existsById(user.getId())) {
                 throw new IllegalArgumentException("User not found");
             }
-            if(!channelRepository.existsByUser(channel.getUser())) {
+            if(!channelRepository.existsByUser(channel.getOwner())) {
                 throw new IllegalArgumentException("Channel not found");
             }
             System.out.println("Message delete : " + find(user));

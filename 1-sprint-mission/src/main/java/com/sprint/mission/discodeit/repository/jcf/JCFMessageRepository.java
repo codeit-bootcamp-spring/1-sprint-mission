@@ -48,6 +48,11 @@ public class JCFMessageRepository implements MessageRepository {
         }
     }
 
+    @Override
+    public void deleteByChannel(Channel channel) {
+        messageData.values()
+                .forEach(allMessages -> allMessages.removeIf(message -> message.getChannel().equals(channel)));
+    }
 
     @Override
     public boolean existsByChannel(Channel channel) {

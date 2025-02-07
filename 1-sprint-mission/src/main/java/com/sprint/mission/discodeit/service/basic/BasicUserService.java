@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.dto.request.UserProfileImageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
+
 
     @Override
     public UserDTO create(UserCreateDTO userCreateDTO, UserProfileImageDTO userProfileImageDTO) {
@@ -39,7 +44,7 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = new UserStatus(newUser);
         System.out.println("User created: " + userCreateDTO.username() + " (email: " + userCreateDTO.email() + ")");
-        userStatusRepositoty.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
+        userStatusRepository.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
         boolean isOnline = userStatus.isOnline();
         return new UserDTO(newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getCreatedAt(), newUser.getUpdatedAt(), isOnline);
     }

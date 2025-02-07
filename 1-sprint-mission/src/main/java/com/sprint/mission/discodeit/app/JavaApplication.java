@@ -57,17 +57,17 @@ public class JavaApplication {
 
         // 채널 조회
         System.out.println(" <<<< All Channels >>>>");
-        List<Channel>channels  = channelService.findAll();
+        List<Channel>channels  = channelService.findAllByUserId();
         for (Channel channel : channels) {
             System.out.println(channel.getName());
         }
         //채널 업데이트
-        channelService.update(channel1, "공지 new", "공지입니다 !");
+        channelService.update(channel1);
         //채널 삭제
         channelService.delete(channel1);
         System.out.println(" <<<< All Channels >>>>");
         //수정된 채널 조회
-        List<Channel> channelNew = channelService.findAll();
+        List<Channel> channelNew = channelService.findAllByUserId();
         for (Channel channel : channelNew) {
             System.out.println(channel.getName());
         }

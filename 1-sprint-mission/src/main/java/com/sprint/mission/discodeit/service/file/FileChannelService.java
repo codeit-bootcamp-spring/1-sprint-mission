@@ -1,11 +1,16 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.request.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.response.ChannelResponseDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class FileChannelService implements ChannelService {
 
@@ -33,7 +38,7 @@ public class FileChannelService implements ChannelService {
             throw new IllegalArgumentException(user.getEmail() + " not exists");
         }
 
-        Channel newChannel = new Channel(user, name, description);
+        Channel newChannel = new Channel(user, name, description, );
         channelRepository.save(newChannel);
 
         System.out.println("Channel created: " + name + " (설명: " + description + ")");
@@ -41,10 +46,10 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel find(User user) {
+    public ChannelResponseDTO find(UUID channelId) {
         try {
             return channelRepository.findAll().stream()
-                    .filter(channel -> channel.getUser().equals(user))
+                    .filter(channel -> channel.getOwner().equals(user))
                     .findFirst()
                     .orElseThrow(()-> new IllegalArgumentException((user + " not exists")));
 
@@ -55,7 +60,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<ChannelResponseDTO> findAllByUserId(UUID userId) {
         try {
             List<Channel> channels = channelRepository.findAll();
             if (channels.isEmpty()) {
@@ -69,9 +74,9 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(Channel channel, String newName, String newDescription) {
+    public ChannelResponseDTO update(ChannelUpdateDTO updateDTO) {
         try{
-            Channel newChannel = find(channel.getUser());
+            Channel newChannel = find(channel.getOwner());
             channel.update(newName, newDescription);
             channelRepository.save(channel);
             System.out.println("Channel updated: " + newName + " (Description: " + newDescription + ")");
@@ -85,14 +90,24 @@ public class FileChannelService implements ChannelService {
     @Override
     public void delete(Channel channel) {
         try {
-            if(!channelRepository.existsByUser(channel.getUser())) {
+            if(!channelRepository.existsByUser(channel.getOwner())) {
                 throw new IllegalArgumentException((channel.getName() + " not exists"));
             }
-            System.out.println("Channel deleted: " + find(channel.getUser()).getName());
+            System.out.println("Channel deleted: " + find(channel.getOwner()).getName());
             channelRepository.deleteByChannel(channel);
         }catch (IllegalArgumentException e){
             System.out.println("Failed to delete channel: " + e.getMessage());
         }
+    }
+
+    @Override
+    public ChannelResponseDTO createPrivateChannel(PrivateChannelCreateDTO requestDTO) {
+        return null;
+    }
+
+    @Override
+    public ChannelResponseDTO createPublicChannel(PublicChannelCreateDTO requestDTO) {
+        return null;
     }
 
 }

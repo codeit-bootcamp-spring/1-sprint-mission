@@ -56,6 +56,12 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
+    @Override
+    public void deleteByChannel(Channel channel) {
+        messageData.values()
+                .forEach(messages -> messages.removeIf(message -> message.getChannel().equals(channel)));
+        saveToFile();
+    }
 
     @Override
     public boolean existsByChannel(Channel channel) {
