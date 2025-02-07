@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,20 +52,18 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        try {
-            return Files.list(filePath)
-                    .map(path -> {
-                        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-                            Object data = ois.readObject();
-                            return (User) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new FileIOException("users 읽기 실패");
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new FileIOException("users 읽기 실패");
+        File[] files = filePath.toFile().listFiles();
+        List<User> users = new ArrayList<>(100);
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                User user = (User) ois.readObject();
+                users.add(user);
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("users 읽기 실패");
+            }
         }
+        return users;
     }
 
     @Override

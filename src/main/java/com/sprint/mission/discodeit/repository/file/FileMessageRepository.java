@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,20 +51,18 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        try {
-            return Files.list(filePath)
-                    .map(path -> {
-                        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-                            Object data = ois.readObject();
-                            return (Message) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new FileIOException("messages 읽기 실패");
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new FileIOException("messages 읽기 실패");
+        File[] files = filePath.toFile().listFiles();
+        List<Message> messages = new ArrayList<>(100);
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                Message message = (Message) ois.readObject();
+                messages.add(message);
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("messages 읽기 실패");
+            }
         }
+        return messages;
     }
 
     @Override
