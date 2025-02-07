@@ -3,7 +3,7 @@ package com.sprint.mission.service.dto.request;
 import lombok.Getter;
 
 @Getter
-public class CreateUserDto {
+public class UserDtoForCreate {
 
     private String username;
     private String password;
@@ -11,7 +11,7 @@ public class CreateUserDto {
     // 프로필 이미지
     private byte[] profileImg;
 
-    public CreateUserDto(String username, String password, String email) {
+    public UserDtoForCreate(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;

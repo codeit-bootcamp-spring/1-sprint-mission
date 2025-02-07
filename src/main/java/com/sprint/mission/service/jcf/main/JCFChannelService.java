@@ -2,14 +2,22 @@ package com.sprint.mission.service.jcf.main;
 
 
 import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.ChannelType;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.service.ChannelService;
+import com.sprint.mission.service.dto.request.ChannelDto;
+import com.sprint.mission.service.dto.response.FindChannelDto;
+import com.sprint.mission.service.dto.response.FindPrivateChannelDto;
+import com.sprint.mission.service.dto.response.FindPublicChannelDto;
 import com.sprint.mission.service.exception.DuplicateName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,25 +27,43 @@ public class JCFChannelService implements ChannelService {
     private final JCFUserService userService;
 
     //@Override
-    public Channel create(Channel channel) {
+    public Channel create(ChannelDto dto) {
+        // PRIVATE 채널을 생성할 때:
+        //[ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+        // ????? 채널을 생성했는데 어떻게 바로 User가 있지???
+        Channel channel = new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
         return channelRepository.save(channel);
     }
 
     //@Override
-    public Channel update(Channel updatingChannel, String newName) {
-        updatingChannel.setName(newName);
-        return create(updatingChannel);
+    public Channel update(ChannelDto dto) {
+        Channel updatingChannel = channelRepository.findById(dto.getChannelId());
+        updatingChannel.setName(dto.getName());
+        updatingChannel.setChannelType(dto.getChannelType());
+        updatingChannel.setDescription(dto.getDescription());
+        return channelRepository.save(updatingChannel);
     }
 
     //@Override
-    public Channel findById(UUID id) {
-        return channelRepository.findById(id);
+    public FindChannelDto findById(UUID id) {
+        Channel findChannel = channelRepository.findById(id);
+        return getFindChannelDto(findChannel);
     }
 
     //@Override
-    public Set<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<FindChannelDto> findAll() {
+        return channelRepository.findAll().stream().map(JCFChannelService::getFindChannelDto)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
+
+    private static FindChannelDto getFindChannelDto(Channel findChannel) {
+        if (findChannel.getChannelType().equals(ChannelType.PRIVATE)){
+            return new FindPrivateChannelDto(findChannel);
+        } else  {
+            return new FindPublicChannelDto(findChannel);
+        }
+    }
+
 
     //@Override
     public void delete(Channel channel) {
@@ -45,6 +71,26 @@ public class JCFChannelService implements ChannelService {
         //deletingChannel.removeAllUser();
         channelRepository.delete(channel);
     }
+
+    public void addUser(User user, Channel channel){
+        channel.addUser(user);
+    }
+
+    public Map<User, Instant> lastReadTimeList(Channel channel){
+        if (channel.getChannelType().equals(ChannelType.PUBLIC)){
+            return new HashMap<>();
+        }
+
+        List<User> userList = channel.getUserList();
+        Map<User, Instant> readTimeMap = new HashMap<>();
+        for (User user : userList) {
+            Instant lastRead = user.getReadStatus().findLastReadByChannel(channel);
+            readTimeMap.put(user, lastRead);
+        }
+        return readTimeMap;
+    }
+
+
 
     /**
      * 중복 검증

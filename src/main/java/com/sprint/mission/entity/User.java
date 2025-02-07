@@ -18,7 +18,6 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private final String firstId;
 
     private String name;
     private String email;
@@ -39,7 +38,6 @@ public class User implements Serializable {
         this.email = email;
         this.readStatus = new ReadStatus();
         this.id = UUID.randomUUID();
-        this.firstId = id.toString().split("-")[0];
         this.createAt = Instant.now();
         this.updateAt = Instant.now();
     }
@@ -70,6 +68,6 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + firstId + "]" + "'" + name + "'";
+        return "[" + name + "]" + "=> email: " + email + ", password" + password;
     }
 }

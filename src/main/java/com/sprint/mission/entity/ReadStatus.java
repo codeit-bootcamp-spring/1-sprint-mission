@@ -11,9 +11,11 @@ public class ReadStatus {
     // 채널요청 시 여기에 저장되게??
     Map<Channel, Instant> lastReadChannel = new HashMap<>();
 
-    // 1:多
-    void updateReadTime(Channel channel){
+    public void updateReadTime(Channel channel){
         lastReadChannel.put(channel, Instant.now());
     }
 
+    public Instant findLastReadByChannel(Channel channel){
+        return lastReadChannel.get(channel);
+    }
 }

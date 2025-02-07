@@ -9,8 +9,7 @@ import java.util.*;
 @Repository
 public class JCFMessageRepository implements MessageRepository{
 
-    // TreeSet 선택 1. 모든 채널의 메시지는 무수히 많을 것 2. 시간 순서 필요
-    private final Map<UUID, Message> data = new HashMap<>();
+    private final Map<UUID, Message> data = new TreeMap<>();
 
     @Override
     public Message save(Message message){

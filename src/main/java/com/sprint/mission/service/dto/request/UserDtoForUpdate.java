@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Getter
-public class UpdateUserDto {
+public class UserDtoForUpdate {
 
 
     private UUID userId;
@@ -17,7 +17,7 @@ public class UpdateUserDto {
     @Setter
     private BinaryProfileContent profileContent;
 
-    public UpdateUserDto(String username, String password, String email) {
+    public UserDtoForUpdate(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;

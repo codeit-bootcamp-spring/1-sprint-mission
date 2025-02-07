@@ -1,12 +1,13 @@
 package com.sprint.mission.service.jcf.main;
 
 
+import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.entity.UserStatus;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.dto.request.BinaryContentDto;
-import com.sprint.mission.service.dto.request.CreateUserDto;
-import com.sprint.mission.service.dto.request.UpdateUserDto;
+import com.sprint.mission.service.dto.request.UserDtoForCreate;
+import com.sprint.mission.service.dto.request.UserDtoForUpdate;
 import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
@@ -24,7 +25,7 @@ public class JCFUserService {
     private final UserStatusService userStatusService;
 
     // 닉네임 중복 허용
-    public User create(CreateUserDto userDto) {
+    public User create(UserDtoForCreate userDto) {
         // USERNAME, EMAIL 중복 허용 안함 <<<< 나중에
         User user = new User(userDto.getUsername(), userDto.getPassword(), userDto.getEmail());
 
@@ -40,7 +41,7 @@ public class JCFUserService {
     }
 
 
-    public User update(UpdateUserDto dto) {
+    public User update(UserDtoForUpdate dto) {
         User updatingUser = userRepository.findById(dto.getUserId());
         updatingUser.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
 
@@ -79,6 +80,12 @@ public class JCFUserService {
         userStatusService.delete(user.getId());
         profileService.delete(user.getId());
     }
+
+    public void joinChannel(User user, Channel channel){
+        user.changeReadStatus(channel);
+    }
+
+
 //
 //    @Override 닉네임 중복 허용 안할 시
 //    public void validateDuplicateName(String name) {
