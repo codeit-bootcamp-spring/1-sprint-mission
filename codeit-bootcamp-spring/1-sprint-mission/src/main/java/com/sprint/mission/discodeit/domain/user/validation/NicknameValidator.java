@@ -14,7 +14,7 @@ public class NicknameValidator {
     );
 
     private static final String VALID_NICK_NAME_REGEX =
-            "^(?!.*\\s)[\\p{L}\\p{N}\\p{P}\\p{S}\\p{So}]{1,32}$\n";
+            "^(?!.*\\s)[\\p{L}\\p{N}\\p{P}\\p{S}\\p{So}]{1,32}$";
     private static final Pattern VALID_NICK_NAME_PATTERN = Pattern.compile(VALID_NICK_NAME_REGEX);
 
     public static void validate(String value) {
