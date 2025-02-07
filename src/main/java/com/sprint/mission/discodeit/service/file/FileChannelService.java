@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -36,9 +37,9 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createChannel(String chName){
-        if(channelValidtor.isUniqueName(chName, getAllChannels())){
-            Channel channel = new Channel(chName);
+    public Channel createChannel(ChannelType type, String name, String description){
+        if(channelValidtor.isUniqueName(name, getAllChannels())){
+            Channel channel = new Channel(type, name, description);
             data.put(channel.getChanneluuId(), channel);
             saveDataToFile();
             return channel;
@@ -57,10 +58,10 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID uuId, String name ){
+    public void updateChannel(UUID uuId, String name,String description ){
         Channel channel = getChannel(uuId);
         if (channel != null) {
-            channel.update(name);
+            channel.update(name, description);
         }
     }
 

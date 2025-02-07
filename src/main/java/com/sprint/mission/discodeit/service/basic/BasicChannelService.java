@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.observer.manager.ObserverManager;
@@ -22,16 +23,10 @@ public class BasicChannelService implements ChannelService {
     private final ChannelValidtor channelValidtor;
     private final ChannelRepository fileChannelRepository;
 
-//    public BasicChannelService (ObserverManager observerManager,ChannelValidtor channelValidtor,ChannelRepository fileChannelRepository){
-//        this.observerManager = observerManager;
-//        this.channelValidtor = channelValidtor;
-//        this.fileChannelRepository = fileChannelRepository;
-//    }
-
     @Override
-    public Channel createChannel(String chName){
-        if(channelValidtor.isUniqueName(chName, fileChannelRepository.findAll())){
-            Channel ch1 = new Channel(chName);
+    public Channel createChannel(ChannelType type, String name, String description){
+        if(channelValidtor.isUniqueName(name, fileChannelRepository.findAll())){
+            Channel ch1 = new Channel(type,name, description);
             fileChannelRepository.save(ch1);
             return ch1;
         }
@@ -49,10 +44,10 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(UUID uuId, String name ){
+    public void updateChannel(UUID uuId, String name,String description ){
         Channel channel = fileChannelRepository.findById(uuId);
         if (channel != null) {
-            channel.update(name);
+            channel.update(name, description);
         }
     }
 

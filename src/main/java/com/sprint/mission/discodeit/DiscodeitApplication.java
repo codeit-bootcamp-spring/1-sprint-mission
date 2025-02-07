@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.observer.service.ChannelObserver;
@@ -36,12 +37,12 @@ public class DiscodeitApplication {
 
 
 	static Channel setupChannel(ChannelService channelService){
-		Channel ch = channelService.createChannel("CH.1");
+		Channel ch = channelService.createChannel(ChannelType.PUBLIC,"CH.1","테스트 채널 1");
 		return ch;
 	}
 
 	static Channel setupChannel2(ChannelService channelService){
-		Channel ch = channelService.createChannel("CH.2");
+		Channel ch = channelService.createChannel(ChannelType.PUBLIC,"CH.2", "테스트 채널 2");
 		return ch;
 	}
 
