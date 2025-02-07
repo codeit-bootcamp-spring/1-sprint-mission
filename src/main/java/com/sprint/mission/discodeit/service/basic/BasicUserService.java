@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
-@Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 

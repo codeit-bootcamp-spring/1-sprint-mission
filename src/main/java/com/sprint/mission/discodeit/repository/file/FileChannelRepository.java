@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
