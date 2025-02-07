@@ -40,6 +40,27 @@ public class FileUserRepository implements UserRepository {
 	}
 
 	@Override
+	public Optional<User> findByUserid(String userid) {
+		return findAll().stream()
+			.filter(u -> u.getUserid().equals(userid))
+			.findFirst();
+	}
+
+	@Override
+	public Optional<User> findByEmail(String email) {
+		return findAll().stream()
+			.filter(u -> u.getEmail().equals(email))
+			.findFirst();
+	}
+
+	@Override
+	public Optional<User> findByUsername(String username) {
+		return findAll().stream()
+			.filter(u -> u.getUserid().equals(username))
+			.findFirst();
+	}
+
+	@Override
 	public List<User> findAll() {
 		return fileStorage.load(ROOT_DIR);
 	}

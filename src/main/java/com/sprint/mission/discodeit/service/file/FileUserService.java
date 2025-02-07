@@ -1,18 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.FileStorage;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
-
+/*
 public class FileUserService implements UserService {
     private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
     private static final String USER_FILE = "user.ser";
@@ -83,4 +71,4 @@ public class FileUserService implements UserService {
         }
         return removed;
     }
-}
+}*/
