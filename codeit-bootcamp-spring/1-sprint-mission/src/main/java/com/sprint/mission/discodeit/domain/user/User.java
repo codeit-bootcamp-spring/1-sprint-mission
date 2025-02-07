@@ -42,6 +42,10 @@ public class User {
         return id;
     }
 
+    public Username getUsername() {
+        return username;
+    }
+
     public Email getEmail() {
         return email;
     }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.repository.user;
+package com.sprint.mission.discodeit.fake.repository;
 
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.User;
@@ -9,10 +9,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public class InMemoryUserRepository implements UserRepository {
+public class FakeUserRepository implements UserRepository {
 
     Map<UUID, User> store = new HashMap<>();
     Set<Email> emails = new HashSet<>();
@@ -22,6 +20,7 @@ public class InMemoryUserRepository implements UserRepository {
     public User save(User user) {
         store.put(user.getId(), user);
         emails.add(user.getEmail());
+        usernames.add(user.getUsername());
         return user;
     }
 
