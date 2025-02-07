@@ -1,14 +1,12 @@
 package com.sprint.mission.entity;
 
 
-import lombok.AccessLevel;
+import com.sprint.mission.service.dto.request.UserDtoForRequest;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.swing.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -42,17 +40,22 @@ public class User implements Serializable {
         this.updateAt = Instant.now();
     }
 
+    public static User createUserByDto(UserDtoForRequest dto){
+        return new User(dto.getUsername(), dto.getPassword(), dto.getEmail());
+    }
+
+
     public void setAll(String name, String password, String email) {
         this.password = password;
         this.name = name;
         this.email = email;
     }
 
-    public void changeReadStatus(Channel channel){
-        if (channels.contains(channel)){
-            readStatus.updateReadTime(channel);
-        }
+    public void changeReadStatus(UUID channelId){
+         readStatus.updateReadTime(channelId);
     }
+
+
 
     @Override
     public boolean equals(Object o) {

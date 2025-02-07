@@ -1,16 +1,18 @@
 package com.sprint.mission.service.dto.response;
 
 import com.sprint.mission.entity.User;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
 
+@Getter
 public class FindUserDto {
 
-    private String name;
-    private String email;
-    private Instant createAt;
-    private Instant updateAt;
+    private final String name;
+    private final String email;
+    private final Instant createAt;
+    private final Instant updateAt;
 
     @Setter
     private boolean isOnline;

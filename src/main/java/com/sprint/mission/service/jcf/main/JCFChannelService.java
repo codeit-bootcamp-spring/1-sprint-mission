@@ -76,28 +76,28 @@ public class JCFChannelService implements ChannelService {
         channel.addUser(user);
     }
 
-    public Map<User, Instant> lastReadTimeList(Channel channel){
-        if (channel.getChannelType().equals(ChannelType.PUBLIC)){
+
+
+
+    public Map<User, Instant> lastReadTimeListInChannel(UUID channelId){
+        Channel findChannel = channelRepository.findById(channelId);
+        if (findChannel.getChannelType().equals(ChannelType.PUBLIC)){
             return new HashMap<>();
         }
 
-        List<User> userList = channel.getUserList();
         Map<User, Instant> readTimeMap = new HashMap<>();
-        for (User user : userList) {
-            Instant lastRead = user.getReadStatus().findLastReadByChannel(channel);
+        for (User user : findChannel.getUserList()) {
+            Instant lastRead = user.getReadStatus().findLastReadByChannel(channelId);
             readTimeMap.put(user, lastRead);
         }
         return readTimeMap;
     }
 
-
-
     /**
      * 중복 검증
      */
-    //@Override
     public void validateDuplicateName(String name) {
-        boolean isDuplicate = findAll().stream()
+        boolean isDuplicate = channelRepository.findAll().stream()
                 .anyMatch(channel -> channel.getName().equals(name));
         if (isDuplicate) {
             throw new DuplicateName(

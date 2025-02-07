@@ -13,7 +13,7 @@ public interface MessageRepository {
 
     Message save(Message message);
 
-    Optional<Message> findById(UUID id);
+    Message findById(UUID id);
     List<Message> findAll();
     void delete(UUID messageId);
 

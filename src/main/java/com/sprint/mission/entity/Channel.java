@@ -38,9 +38,16 @@ public class Channel implements Serializable {
         if (!userList.contains(user)){
             userList.add(user);
             user.getChannels().add(this);
-            user.changeReadStatus(this); // 흠 등록과 동시에 넣는게 흠
+            user.changeReadStatus(id); // 흠 등록과 동시에 넣는게 흠
         }
     }
+
+    public void dropUser(User user){
+        if (userList.contains(user)){
+
+        }
+    }
+
 
     public int countUser(){
         return userList.size();

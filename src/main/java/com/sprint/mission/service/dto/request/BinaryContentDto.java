@@ -1,5 +1,6 @@
 package com.sprint.mission.service.dto.request;
 
+import com.sprint.mission.entity.BinaryContent;
 import lombok.Getter;
 
 import java.util.UUID;
@@ -8,12 +9,14 @@ import java.util.UUID;
 public class BinaryContentDto {
 
     private UUID id;
-    private byte[] bytes;
+    private BinaryContent binaryContent;
 
-    public BinaryContentDto(UUID id, byte[] bytes) {
-        this.bytes = bytes;
+    public BinaryContentDto(UUID id, BinaryContent binaryContent) {
+        this.id = id;
+        this.binaryContent = binaryContent;
     }
-//
+
+    //
 //    public BinaryContentDto BinaryUserContentDto(UUID userId, byte[] bytes){
 //        BinaryContentDto bcd = new BinaryContentDto(bytes);
 //        bcd.userId = userId;

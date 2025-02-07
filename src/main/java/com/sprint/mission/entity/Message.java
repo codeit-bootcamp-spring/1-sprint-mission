@@ -33,7 +33,7 @@ public class Message implements Serializable, Comparable<Message> {
 
     public static Message createMessage(Channel channel, User user, String message) {
         Message createdMessage = new Message(channel, user, message);
-        channel.updateLastMessageTime(); // 채널에서 메시지 마지막으로 읽은 시간 초기화
+        channel.updateLastMessageTime(); // 채널에서 메시지 마지막 시간 초기화
         return createdMessage;
     }
 
