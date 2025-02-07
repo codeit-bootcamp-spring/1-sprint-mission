@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -65,15 +66,15 @@ public class JavaApplication {
         System.out.println("===== channelServiceTest =====\n");
 
         System.out.println("===== channel 생성 =====");
-        Channel codeit = channelService.createChannel(ChannelDto.of("codeit", "codeit channel"));
-        Channel spring = channelService.createChannel(ChannelDto.of("spring", "spring channel"));
+        Channel codeit = channelService.createChannel(ChannelDto.of(ChannelType.PUBLIC, "codeit", "codeit channel"));
+        Channel spring = channelService.createChannel(ChannelDto.of(ChannelType.PRIVATE, "spring", "spring channel"));
 
         System.out.println("===== 등록된 channel =====");
         channelService.readAll().stream().forEach(System.out::println);
         System.out.println();
 
         System.out.println("===== codeit channel 이름 변경 =====");
-        channelService.updateChannel(codeit.getId(), ChannelDto.of("newCodeit", "codeit channel"));
+        channelService.updateChannel(codeit.getId(), ChannelDto.of(ChannelType.PUBLIC, "newCodeit", "codeit channel"));
         System.out.println(channelService.readChannel(codeit.getId()));
         System.out.println();
 

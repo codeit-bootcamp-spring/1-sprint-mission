@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.service.UserService;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +45,7 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(ChannelDto channelDto) {
-        return writeChannelToFile(Channel.of(channelDto.getName(), channelDto.getDescription()));
+        return writeChannelToFile(Channel.of(channelDto.getType(), channelDto.getName(), channelDto.getDescription()));
     }
 
     private Channel writeChannelToFile(Channel channel) {
@@ -92,6 +91,7 @@ public class FileChannelService implements ChannelService {
     @Override
     public void updateChannel(UUID channelId, ChannelDto channelDto) {
         Channel channel = readChannel(channelId);
+        channel.updateType(channelDto.getType());
         channel.updateName(channelDto.getName());
         channel.updateDescription(channelDto.getDescription());
         writeChannelToFile(channel);

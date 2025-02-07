@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -26,7 +25,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(ChannelDto channelDto) {
-        Channel channel = Channel.of(channelDto.getName(), channelDto.getDescription());
+        Channel channel = Channel.of(channelDto.getType(), channelDto.getName(), channelDto.getDescription());
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -45,6 +44,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void updateChannel(UUID channelId, ChannelDto channelDto) {
         Channel channel = readChannel(channelId);
+        channel.updateType(channelDto.getType());
         channel.updateName(channelDto.getName());
         channel.updateDescription(channelDto.getDescription());
     }

@@ -18,7 +18,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createChannel(ChannelDto channelDto) {
-        return channelRepository.save(Channel.of(channelDto.getName(), channelDto.getDescription()));
+        return channelRepository.save(Channel.of(channelDto.getType(), channelDto.getName(), channelDto.getDescription()));
     }
 
     @Override
@@ -34,6 +34,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void updateChannel(UUID channelId, ChannelDto channelDto) {
         Channel channel = channelRepository.findById(channelId);
+        channel.updateType(channelDto.getType());
         channel.updateName(channelDto.getName());
         channel.updateDescription(channelDto.getDescription());
         channelRepository.updateChannel(channel);
