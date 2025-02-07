@@ -1,4 +1,4 @@
-package com.sprint.mission.repository.jcf;
+package com.sprint.mission.repository.jcf.main;
 
 import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository

@@ -1,4 +1,4 @@
-package com.sprint.mission.repository.jcf;
+package com.sprint.mission.repository.jcf.main;
 
 import com.sprint.mission.entity.Message;
 import com.sprint.mission.repository.MessageRepository;

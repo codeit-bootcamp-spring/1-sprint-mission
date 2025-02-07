@@ -1,7 +1,7 @@
-package com.sprint.mission.service.jcf;
+package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.entity.UserStatus;
-import com.sprint.mission.repository.jcf.UserStatusRepository;
+import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,32 +11,30 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserStatusService {
 
-    private final UserStatusRepository statusRepository;
     private final UserStatusRepository userStatusRepository;
 
-    // DTO로 파라미터 그룹화...???
+    // DTO로 파라미터 그룹화...??? 필요없다
     public void create(UUID userId){
-        if (statusRepository.isExistById(userId)){
-            throw new RuntimeException();
+        if (userStatusRepository.isExistById(userId)){
+            throw new RuntimeException("cannot create userStatus : already exist userStatus");
         } else {
-            statusRepository.save(new UserStatus(userId));
+            userStatusRepository.save(new UserStatus(userId));
         }
     }
 
-
     public UserStatus findById(UUID userId){
-        return statusRepository.findById(userId);
+        return userStatusRepository.findById(userId);
     }
 
     public List<UserStatus> findAll(){
-        return statusRepository.findAll();
+        return userStatusRepository.findAll();
     }
 
     // 이건 DTO가 필요없는거 같은데
     public void update(UUID userId){
-        UserStatus updatingUserStatus = statusRepository.findById(userId);
+        UserStatus updatingUserStatus = userStatusRepository.findById(userId);
         updatingUserStatus.join();
-        statusRepository.save(updatingUserStatus);
+        userStatusRepository.save(updatingUserStatus);
     }
 
     public void delete(UUID userId){

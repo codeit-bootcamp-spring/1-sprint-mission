@@ -1,12 +1,12 @@
-package com.sprint.mission.repository.jcf;
+package com.sprint.mission.repository.jcf.addOn;
 
-import com.sprint.mission.entity.BinaryContent;
+import com.sprint.mission.entity.BinaryProfileContent;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
 @Repository
-public class BinaryContentRepository {
+public class BinaryProfileRepository {
 
     //create
     //[ ] DTO를 활용해 파라미터를 그룹화합니다.
@@ -17,18 +17,18 @@ public class BinaryContentRepository {
     //delete
     //[ ] id로 삭제합니다.
 
-    private final Map<UUID, BinaryContent> data = new HashMap<>();
+    private final Map<UUID, BinaryProfileContent> data = new HashMap<>();
 
 
-    public void save(BinaryContent binaryContent){
+    public void save(BinaryProfileContent binaryContent){
         data.put(binaryContent.getId(), binaryContent);
     }
 
-    public BinaryContent findById(UUID id){
+    public BinaryProfileContent findById(UUID id){
         return data.get(id);
     }
 
-    public List<BinaryContent> findAllByIdIn(){
+    public List<BinaryProfileContent> findAllByIdIn(){
         return new ArrayList<>(data.values());
     }
 

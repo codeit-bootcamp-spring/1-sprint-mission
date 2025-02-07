@@ -1,9 +1,7 @@
-package com.sprint.mission.service.jcf;
+package com.sprint.mission.service.jcf.main;
 
-import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.Message;
-import com.sprint.mission.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.service.MessageService;
+import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

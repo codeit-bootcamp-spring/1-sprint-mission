@@ -1,19 +1,22 @@
-package com.sprint.mission.service.jcf;
+package com.sprint.mission.service.jcf.main;
 
 
 import com.sprint.mission.entity.Channel;
-import com.sprint.mission.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.exception.DuplicateName;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class JCFChannelService implements ChannelService {
 
-    private final JCFChannelRepository channelRepository = new JCFChannelRepository();
+    private final JCFChannelRepository channelRepository;
+    private final JCFUserService userService;
 
     //@Override
     public Channel create(Channel channel) {
