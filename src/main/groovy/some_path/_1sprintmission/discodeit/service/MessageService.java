@@ -9,12 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void create(Message message, Channel channel, User sender);
+    void create(Channel channel, User sender,Message message);
     Optional<Message> read(UUID id);
     List<Message> readAll();
-    List<Message> readAllByChannel();
-
-    List<Message> readAllByChannel(UUID channelId, User user);
 
     void update(UUID id, Message updatedMessage);
     void delete(UUID id);
