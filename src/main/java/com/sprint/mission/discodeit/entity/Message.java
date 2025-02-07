@@ -3,28 +3,29 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private long createdAt;
-    private long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String content;
-    private Channel channel;
-    private User writer;
+    private UUID channelId;
+    private UUID userId;
 
-    public static Message createMessage(Channel channel, User writer, String content) {
-        return new Message(channel, writer, content);
+    public static Message createMessage(String content, UUID channelId, UUID userId) {
+        return new Message(content, channelId, userId);
     }
 
-    private Message(Channel channel, User writer, String content) {
+    private Message(String content, UUID channelId, UUID userId) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.channel = channel;
-        this.writer = writer;
+        this.createdAt = Instant.now();
         this.content = content;
+        this.channelId = channelId;
+        this.userId = userId;
     }
 
     public void update(String newContent) {
@@ -35,12 +36,12 @@ public class Message implements Serializable {
         }
 
         if (isChanged) {
-            updatedAt = System.currentTimeMillis();
+            this.updatedAt = Instant.now();
         }
     }
 
     @Override
     public String toString() {
-        return "Message{id:" + id + ",channel:" + channel.getTitle() + ",writer:" + writer.getName() + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+        return "Message{id:" + id + ",channel:" + channelId + ",user:" + userId + ",content:" + content + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
     }
 }

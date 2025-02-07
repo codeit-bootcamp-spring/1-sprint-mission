@@ -26,12 +26,12 @@ public class BasicMassageService implements MessageService {
     private final ChannelService channelService;
 
     @Override
-    public Message createMessage(String content, UUID channelId, UUID writerId) {
+    public Message createMessage(String content, UUID channelId, UUID userId) {
         Channel channel = channelService.searchById(channelId);
-        User user = userService.searchById(writerId);
+        User user = userService.searchById(userId);
 
         if (messageValidator.inValidContent(content)) {
-            Message newMessage = Message.createMessage(channel, user, content);
+            Message newMessage = Message.createMessage(content, channelId, userId);
             messageRepository.save(newMessage);
             log.info("Create Message: {}", newMessage);
             return newMessage;
