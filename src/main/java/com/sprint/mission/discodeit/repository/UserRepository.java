@@ -9,9 +9,9 @@ public interface UserRepository {
 
   User create(User user);
   Optional<User> findById(String id);
+  Optional<User> findByUsername(String username);
   List<User> findAll();
   User update(User user);
   void delete(String userId);
-
   void clear();
 }

@@ -32,6 +32,12 @@ public class FileUserRepository implements UserRepository {
   }
 
   @Override
+  public Optional<User> findByUsername(String username) {
+    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    return users.stream().filter(u -> u.getUsername().equals(username)).findAny();
+  }
+
+  @Override
   public List<User> findAll() {
     return FileUtil.loadAllFromFile(USER_FILE, User.class);
   }
