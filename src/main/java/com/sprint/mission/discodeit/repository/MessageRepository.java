@@ -13,9 +13,7 @@ public interface MessageRepository {
     List<Message> getAllMessage();
     boolean existsById(UUID id);
     void deleteMessage(UUID id);
-
     Optional<Instant> findLastMessageTimeByChannelId(UUID id);
     List<Message> getMessagesByChannelId(UUID channelId);
-
     void deleteByChannelId(UUID id);
 }

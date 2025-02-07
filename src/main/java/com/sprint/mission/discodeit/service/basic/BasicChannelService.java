@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.ChannelService;
+import com.sprint.mission.discodeit.service.Interface.MessageService;
+import com.sprint.mission.discodeit.service.Interface.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,10 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
     @Autowired
     private final ReadStatusRepository readStatusRepository;
+    @Autowired
+    private MessageService messageService;
+    @Autowired
+    private ReadStatusService readStatusService;
 
 
     @Override
@@ -53,11 +59,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel=new Channel(PRIVATE,null,null,request.getUserId());
         Channel savedChannel=channelRepository.save(channel);
 
-        List<ReadStatus> readStatuses = request.getMembers().stream()
-                .map(memberId -> new ReadStatus(memberId, savedChannel.getId()))
-                .collect(Collectors.toList());
-
-        readStatusRepository.saveReadStatus(readStatuses);
+        readStatusService.addMembersToChannel(savedChannel.getId(),request.getMembers());
 
         return channelRepository.save(channel);
     }
@@ -112,11 +114,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID id) {
-        if (!channelRepository.exitsById(id)) {
+        if (!channelRepository.existsById(id)) {
             throw new NoSuchElementException("Channel not found");
         }
-        messageRepository.deleteByChannelId(id);
-        readStatusRepository.deleteByChannelId(id);
+        messageService.deleteByChannelId(id);
+        readStatusService.deleteByChannelId(id);
         channelRepository.deleteChannel(id);
     }
 }

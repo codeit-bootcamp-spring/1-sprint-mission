@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -8,6 +9,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,7 @@ public class BasicMassageService implements MessageService {
     @Autowired
     private final MessageRepository messageRepository;
     @Autowired
-    private final UserRepository userRepository;
-    @Autowired
-    private final ChannelRepository channelRepository;
-    @Autowired
-    private final BinaryContentRepository binaryContentRepository;
-
+    private BinaryContentService binaryContentService;
 
 
     @Override
@@ -38,8 +35,8 @@ public class BasicMassageService implements MessageService {
         Message savedMessage=messageRepository.save(message);
         if(request.getAttachments()!=null){
             for (byte[] fileData : request.getAttachments()) {
-                BinaryContent binaryContent=new BinaryContent(null,request.getAuthorId(),fileData);
-                binaryContentRepository.save(binaryContent);
+                BinaryContentCreateRequest binaryContentCreateRequest=new BinaryContentCreateRequest(request.getAuthorId(),fileData);
+                binaryContentService.createProfile(binaryContentCreateRequest);
             }
         }
         return savedMessage;
@@ -75,8 +72,13 @@ public class BasicMassageService implements MessageService {
 
     @Override
     public void deleteMessage(UUID id) {
-        binaryContentRepository.deleteByUserId(id);
+        binaryContentService.deleteByMessageId(id);
         messageRepository.deleteMessage(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelID) {
+        messageRepository.deleteByChannelId(channelID);
     }
 
 }

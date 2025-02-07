@@ -8,10 +8,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentService {
-    void createProfile(UUID userId, byte[] data);
-    void createMessage(UUID messageId, byte[] data);
+    void createProfile(BinaryContentCreateRequest request);
+    void createMessage(BinaryContentCreateRequest request);
     Optional<BinaryContent> find(UUID id);
     List<BinaryContent> findAllByIdIn(List<UUID> ids);
     void delete(UUID id);
+    void deleteByMessageId(UUID id);
     void deleteByUserId(UUID id);
 }

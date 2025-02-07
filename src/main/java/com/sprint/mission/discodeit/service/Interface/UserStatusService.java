@@ -15,4 +15,5 @@ public interface UserStatusService {
     void update(UserStatusUpdateRequest request);
     void updateByUserId(UUID userId, String  status);
     void delete(UUID id);
+    void deleteByUserId(UUID userId);
 }

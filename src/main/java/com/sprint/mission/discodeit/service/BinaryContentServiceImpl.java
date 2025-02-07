@@ -16,27 +16,32 @@ import java.util.UUID;
 @Service
 public class BinaryContentServiceImpl implements BinaryContentService {
 
+    private final BinaryContentService binaryContentService;
     private BinaryContentRepository binaryContentRepository;
     private UserRepository userRepository;
     private MessageRepository messageRepository;
 
+    public BinaryContentServiceImpl(BinaryContentService binaryContentService) {
+        this.binaryContentService = binaryContentService;
+    }
+
+    //UUID userId, byte[] data
     @Override
-    public void createProfile(UUID userId, byte[] data) {
-        if (!userRepository.existsById(userId)) {
+    public void createProfile(BinaryContentCreateRequest request) {
+        if (!userRepository.existsById(request.getUserId())) {
             throw new NoSuchElementException("User not found");
         }
-
-        BinaryContent binaryContent = new BinaryContent(userId, null, data);
+        BinaryContent binaryContent = new BinaryContent(request.getUserId(), null, request.getData());
         binaryContentRepository.save(binaryContent);
     }
 
     @Override
-    public void createMessage(UUID messageId, byte[] data) {
-        if (!messageRepository.existsById(messageId)) {
+    public void createMessage(BinaryContentCreateRequest request) {
+        if (!messageRepository.existsById(request.getMessageId())) {
             throw new NoSuchElementException("Message not found");
         }
 
-        BinaryContent binaryContent = new BinaryContent(null, messageId, data);
+        BinaryContent binaryContent = new BinaryContent(null, request.getMessageId(), request.getData());
         binaryContentRepository.save(binaryContent);
     }
 
@@ -53,6 +58,11 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Override
     public void delete(UUID id) {
         binaryContentRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByMessageId(UUID id) {
+        binaryContentRepository.deleteByMessageId(id);
     }
 
     @Override

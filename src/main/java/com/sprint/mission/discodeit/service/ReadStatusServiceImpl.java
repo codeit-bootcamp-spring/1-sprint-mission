@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
     @Override
     public ReadStatus create(CreateReadStatusRequest request) {
-        if (!channelRepository.exitsById(request.getChannelid())){
+        if (!channelRepository.existsById(request.getChannelid())){
             throw new NoSuchElementException("channel not found");
         }
         if(!userRepository.existsById(request.getUserid())){
@@ -66,5 +67,19 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     @Override
     public void delete(UUID id) {
         readStatusRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID id) {
+        readStatusRepository.deleteByChannelId(id);
+    }
+
+
+    @Override
+    public void addMembersToChannel(UUID channelId, List<UUID> memberIds) {
+        List<ReadStatus> readStatuses = memberIds.stream()
+                .map(memberId -> new ReadStatus(memberId, channelId))
+                .collect(Collectors.toList());
+        readStatusRepository.saveReadStatus(readStatuses);
     }
 }

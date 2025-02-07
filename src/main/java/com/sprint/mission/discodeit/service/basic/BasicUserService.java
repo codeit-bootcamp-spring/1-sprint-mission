@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.user.UserResponseDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.UserService;
+import com.sprint.mission.discodeit.service.Interface.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,10 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     @Autowired
     private final BinaryContentRepository binaryContentRepository;
+    @Autowired
+    private BinaryContentService binaryContentService;
+    @Autowired
+    private UserStatusService userStatusService;
 
 
     @Override
@@ -40,12 +48,12 @@ public class BasicUserService implements UserService {
         User user = new User(request.getName(),request.getEmail(),request.getPassword());
         userRepository.save(user);
 
-        UserStatus status=new UserStatus(user.getId(),request.getStatus());
-        userStatusRepository.save(status);
+        UserStatusRequest userStatusRequest=new UserStatusRequest(user.getId(), request.getStatus());
+        userStatusService.create(userStatusRequest);
 
-        if(request.getProfileImage() != null){
-            BinaryContent profile=new BinaryContent(user.getId(),null,request.getProfileImage());
-            binaryContentRepository.save(profile);
+        if(request.getProfileImage() != null) {
+            BinaryContentCreateRequest binaryRequest=new BinaryContentCreateRequest(user.getId(), request.getProfileImage());
+            binaryContentService.createProfile(binaryRequest);
         }
         return user;
     }
@@ -92,9 +100,9 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
 
         if (request.getNewProfileImage() != null){
-            binaryContentRepository.deleteByUserId(request.getUserId());
-            BinaryContent newProfile=new BinaryContent(request.getUserId(),null,request.getNewProfileImage());
-            binaryContentRepository.save(newProfile);
+            binaryContentService.deleteByUserId(user.getId());
+            BinaryContentCreateRequest binaryRequest=new BinaryContentCreateRequest(user.getId(), request.getNewProfileImage());
+            binaryContentService.createProfile(binaryRequest);
         }
 
         return user;
@@ -106,8 +114,8 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException("User with id not fount");
         }
         userRepository.deleteUser(id);
-        userStatusRepository.deleteByUserId(id);
-        binaryContentRepository.deleteByUserId(id);
+        userStatusService.deleteByUserId(id);
+        binaryContentService.deleteByUserId(id);
     }
 
 }

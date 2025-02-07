@@ -70,4 +70,9 @@ public class UserStatusServiceImpl implements UserStatusService {
         }
         userStatusRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
+    }
 }

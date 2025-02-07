@@ -35,7 +35,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean exitsById(UUID id) {
+    public boolean existsById(UUID id) {
         return this.data.containsKey(id);
     }
 

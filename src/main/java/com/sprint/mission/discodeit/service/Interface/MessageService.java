@@ -24,4 +24,5 @@ public interface MessageService {
 
     //삭제
     void deleteMessage(UUID id);
+    void deleteByChannelId(UUID channelID);
 }
