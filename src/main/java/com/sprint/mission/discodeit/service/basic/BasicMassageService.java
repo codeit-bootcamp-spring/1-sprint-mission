@@ -1,14 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +31,8 @@ public class BasicMassageService implements MessageService {
         Message savedMessage=messageRepository.save(message);
         if(request.getAttachments()!=null){
             for (byte[] fileData : request.getAttachments()) {
-                BinaryContentCreateRequest binaryContentCreateRequest=new BinaryContentCreateRequest(request.getAuthorId(),fileData);
-                binaryContentService.createProfile(binaryContentCreateRequest);
+                BinaryContentCreateRequestDto binaryContentCreateRequestDto =new BinaryContentCreateRequestDto(request.getAuthorId(),fileData);
+                binaryContentService.createProfile(binaryContentCreateRequestDto);
             }
         }
         return savedMessage;

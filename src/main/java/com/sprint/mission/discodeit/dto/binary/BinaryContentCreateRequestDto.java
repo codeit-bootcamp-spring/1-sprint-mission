@@ -7,12 +7,12 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
-public class BinaryContentCreateRequest {
+public class BinaryContentCreateRequestDto {
     private UUID userId;
     private byte[] data;
     private UUID messageId;
 
-    public BinaryContentCreateRequest(UUID authorId, byte[] data) {
+    public BinaryContentCreateRequestDto(UUID authorId, byte[] data) {
         this.userId = authorId;
         this.data = data;
     }

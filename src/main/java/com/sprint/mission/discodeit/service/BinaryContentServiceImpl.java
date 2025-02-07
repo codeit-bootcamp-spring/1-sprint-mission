@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,20 +16,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
 
-    private final BinaryContentService binaryContentService;
+    @Autowired
     private BinaryContentRepository binaryContentRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private MessageRepository messageRepository;
-
-    public BinaryContentServiceImpl(BinaryContentService binaryContentService) {
-        this.binaryContentService = binaryContentService;
-    }
 
     //UUID userId, byte[] data
     @Override
-    public void createProfile(BinaryContentCreateRequest request) {
+    public void createProfile(BinaryContentCreateRequestDto request) {
         if (!userRepository.existsById(request.getUserId())) {
             throw new NoSuchElementException("User not found");
         }
@@ -36,7 +37,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     @Override
-    public void createMessage(BinaryContentCreateRequest request) {
+    public void createMessage(BinaryContentCreateRequestDto request) {
         if (!messageRepository.existsById(request.getMessageId())) {
             throw new NoSuchElementException("Message not found");
         }

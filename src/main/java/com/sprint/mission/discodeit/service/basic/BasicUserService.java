@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDTO;
 import com.sprint.mission.discodeit.dto.user.UserResponseDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -52,7 +51,7 @@ public class BasicUserService implements UserService {
         userStatusService.create(userStatusRequest);
 
         if(request.getProfileImage() != null) {
-            BinaryContentCreateRequest binaryRequest=new BinaryContentCreateRequest(user.getId(), request.getProfileImage());
+            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), request.getProfileImage());
             binaryContentService.createProfile(binaryRequest);
         }
         return user;
@@ -101,7 +100,7 @@ public class BasicUserService implements UserService {
 
         if (request.getNewProfileImage() != null){
             binaryContentService.deleteByUserId(user.getId());
-            BinaryContentCreateRequest binaryRequest=new BinaryContentCreateRequest(user.getId(), request.getNewProfileImage());
+            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), request.getNewProfileImage());
             binaryContentService.createProfile(binaryRequest);
         }
 
