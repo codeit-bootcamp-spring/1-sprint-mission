@@ -8,11 +8,13 @@ public enum ErrorCode {
     INVALID_NICKNAME_LENGTH(400, "유저 이름은 2~32자 이내여야 합니다.", "U002"),
     INVALID_PASSWORD_LENGTH(400, "비밀번호는 8~20자 이내여야 합니다.", "U004"),  // 비밀번호 길이 오류
     WEAK_PASSWORD(400, "비밀번호는 대문자, 숫자, 특수문자를 포함해야 합니다.", "U008"),
+    UNDERAGE_SIGNUP_REGISTERED(400, "13세 이상만 회원가입이 가능합니다.", "U009"),
 
     USERNAME_REQUIRED(400, "유저 이름은 필수입니다.", "U104"),
     NICKNAME_REQUIRED(400, "닉네임은 필수입니다.", "U105"),
     EMAIL_REQUIRED(400, "이메일은 필수입니다.", "U106"),
     PASSWORD_REQUIRED(400, "비밀번호는 필수 입력값입니다.", "U107"),
+    BIRTHDATE_REQUIRED(400, "생년월일은 필수 입력값입니다.", "U108"),
 
     INVALID_EMAIL_FORMAT(400, "이메일 형식이 올바르지 않습니다", "U203"),
     INVALID_USERNAME_FORMAT(400, "유저 이름에 허용되지 않은 문자가 포함되어 있습니다.", "U205"),

@@ -26,6 +26,7 @@ class NicknameValidatorTest {
             "hello admin!",       // 금지된 단어 포함
             "AdminUser",          // 금지된 단어 포함 (대소문자 무시)
             "DISCORD🔥",         // 금지된 단어 포함 (대소문자 무시)
+            "papago good",
             "root_user",          // 금지된 단어 포함 (관리자 권한 관련)
             "system_mod",         // 금지된 단어 포함
             "운영자",              // 한글 운영자 금지

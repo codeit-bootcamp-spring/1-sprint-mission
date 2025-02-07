@@ -14,7 +14,7 @@ public class Username {
 
     public Username(String value) {
         UsernameValidator.validate(value);
-        this.value = value.trim();
+        this.value = value.toLowerCase();
     }
 
 }

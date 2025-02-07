@@ -14,10 +14,11 @@ public class EmailValidator {
 
 
     public static void valid(String email) {
-        if (Objects.isNull(email)) {
+        if (Objects.isNull(email) || email.isBlank()) {
             throw new EmailInvalidException(ErrorCode.EMAIL_REQUIRED, "");
         }
-        if (email.isBlank() || !EMAIL_PATTERN.matcher(email).matches()) {
+
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new EmailInvalidException(ErrorCode.INVALID_EMAIL_FORMAT, email);
         }
 

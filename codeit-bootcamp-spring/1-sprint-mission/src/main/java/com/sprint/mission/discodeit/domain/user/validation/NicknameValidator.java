@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.user.exception.NickNameInvalidExcepti
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public class NicknameValidator {
     private static final int MAX_LENGTH = 32;
@@ -12,13 +13,21 @@ public class NicknameValidator {
             "운영자", "관리자", "봇"
     );
 
+    private static final String VALID_NICK_NAME_REGEX =
+            "^(?!.*\\s)[\\p{L}\\p{N}\\p{P}\\p{S}\\p{So}]{1,32}$\n";
+    private static final Pattern VALID_NICK_NAME_PATTERN = Pattern.compile(VALID_NICK_NAME_REGEX);
+
     public static void validate(String value) {
-        if (Objects.isNull(value)) {
+        if (Objects.isNull(value) || value.isBlank()) {
             throw new NickNameInvalidException(ErrorCode.NICKNAME_REQUIRED, "");
         }
 
-        if (value.isBlank() || value.length() > MAX_LENGTH) {
+        if (value.length() > MAX_LENGTH) {
             throw new NickNameInvalidException(ErrorCode.INVALID_NICKNAME_LENGTH, value);
+        }
+
+        if (!VALID_NICK_NAME_PATTERN.matcher(value).matches()) {
+            throw new NickNameInvalidException(ErrorCode.INVALID_NICKNAME_FORMAT, value);
         }
 
         String lowerCase = value.toLowerCase();

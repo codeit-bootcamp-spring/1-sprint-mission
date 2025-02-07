@@ -36,7 +36,7 @@ class UsernameValidatorTest {
             "봇",                     // 봇 계정 금지
     })
     @MethodSource("usernameOverLengthProvider")
-    void testMethodNameHere(String username) {
+    void 유저_이름_제한_검증_에러throw(String username) {
         //given
         // when
         Throwable catchThrowable = Assertions.catchThrowable(() -> UsernameValidator.validate(username));

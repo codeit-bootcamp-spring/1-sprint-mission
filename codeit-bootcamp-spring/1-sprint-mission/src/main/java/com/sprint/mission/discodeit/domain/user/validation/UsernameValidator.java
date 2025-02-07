@@ -20,7 +20,7 @@ public class UsernameValidator {
 
 
     public static void validate(final String username) {
-        if (Objects.isNull(username)) {
+        if (Objects.isNull(username) || username.isBlank()) {
             throw new UserNameInvalidException(ErrorCode.USERNAME_REQUIRED, "");
         }
 

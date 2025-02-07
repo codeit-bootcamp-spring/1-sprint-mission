@@ -14,6 +14,6 @@ public class Email {
 
     public Email(String email) {
         EmailValidator.valid(email);
-        this.value = email.trim();
+        this.value = email;
     }
 }

@@ -24,7 +24,7 @@ class UsernameTest {
         // when
         Username createUsername = new Username(username);
         // then
-        assertThat(createUsername.getValue()).isEqualTo(username);
+        assertThat(createUsername.getValue()).isEqualToIgnoringCase(username);
     }
 
 }
