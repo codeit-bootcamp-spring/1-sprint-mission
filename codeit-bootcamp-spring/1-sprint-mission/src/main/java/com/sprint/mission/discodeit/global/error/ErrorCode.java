@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.global.error;
 
 public enum ErrorCode {
 
+    // common
+    NOT_FOUND(404, "요청한 데이터를 찾을 수 없습니다.", "C004"),
 
     // User Domain
     INVALID_USERNAME_LENGTH(400, "유저 이름은 1~32자 이내여야 합니다.", "U001"),
@@ -23,7 +25,7 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(400, "이미 사용중인 이메일입니다.", "U307"),
     DUPLICATE_USERNAME(400, "이미 존재하는 유저이름입니다.", "U308"),
 
-
+    INVALID_CREDENTIALS(400, "아이디 또는 비밀번호가 일치하지 않습니다.", "U501")
     ;
 
     private final int status;

@@ -20,12 +20,12 @@ public class User {
 
     @Builder
     public User(
-        Nickname nickname,
-        Username username,
-        Email email,
-        Password password,
-        BirthDate birthDate,
-        EmailSubscriptionStatus emailSubscriptionStatus
+            Nickname nickname,
+            Username username,
+            Email email,
+            Password password,
+            BirthDate birthDate,
+            EmailSubscriptionStatus emailSubscriptionStatus
     ) {
         this.id = UUID.randomUUID();
         this.createdAt = LocalDateTime.now();
@@ -60,6 +60,10 @@ public class User {
 
     public String getEmailValue() {
         return this.email.getValue();
+    }
+
+    public String getPasswordValue() {
+        return this.password.getValue();
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.domain.user.Username;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +23,12 @@ public class InMemoryUserRepository implements UserRepository {
         emailUsers.put(user.getEmail(), user);
         usernameUsers.put(user.getUsername(), user);
         return user;
+    }
+
+    @Override
+    public Optional<User> findOneByEmail(Email email) {
+        User foundUser = emailUsers.get(email);
+        return Optional.ofNullable(foundUser);
     }
 
     @Override
