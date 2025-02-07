@@ -19,9 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -100,9 +98,8 @@ public class BasicMessageService implements MessageService {
     return channelMessages.stream()
         .map(
             message -> MessageResponseDto
-                .fromBinaryContent(message, messageIdToBinaryContentMap.get(message.getUUID())))
+                .fromBinaryContent(message, messageIdToBinaryContentMap.getOrDefault(message.getUUID(), Collections.emptyList())))
         .toList();
-
   }
 
   @Override
@@ -123,6 +120,7 @@ public class BasicMessageService implements MessageService {
     return MessageResponseDto.fromBinaryContent(originalMessage, updatedContents);
   }
 
+  // TODO : messageId 가 아닌 Message 자체를 넘기도록 (지금 중복임)
   private List<BinaryContent> findAndUpdateBinaryContent(String messageId, String userId, List<BinaryContentDto> binaryDtos) {
 
     List<BinaryContent> originalBinaryContent = binaryContentRepository.findByMessageId(messageId);
