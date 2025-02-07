@@ -8,6 +8,8 @@ import java.util.UUID;
 public interface ReadStatusRepository {
     ReadStatus save(ReadStatus readStatus);
 
+    Optional<ReadStatus> findById(UUID Id);
+
     Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
 
     List<ReadStatus> findAllByUserId(UUID userId);
@@ -22,5 +24,5 @@ public interface ReadStatusRepository {
 
     void deleteByMessageId(UUID messageId);
 
-
+    void deleteById(UUID id);
 }
