@@ -26,9 +26,13 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findOneById(UUID id) {
+        return Optional.ofNullable(uuidUsers.get(id));
+    }
+
+    @Override
     public Optional<User> findOneByEmail(Email email) {
-        User foundUser = emailUsers.get(email);
-        return Optional.ofNullable(foundUser);
+        return Optional.ofNullable(emailUsers.get(email));
     }
 
     @Override
