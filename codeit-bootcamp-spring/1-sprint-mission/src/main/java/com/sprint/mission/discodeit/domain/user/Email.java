@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.domain.user;
 
-import com.sprint.mission.discodeit.domain.user.validation.EmailValidator;
+import com.sprint.mission.discodeit.domain.user.exception.EmailInvalidException;
+import com.sprint.mission.discodeit.global.error.ErrorCode;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -10,10 +13,22 @@ import lombok.ToString;
 @ToString(of = {"value"})
 public class Email {
 
+    private final static String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z]{2,7})+$";
+    private final static Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
+
     private final String value;
 
     public Email(String email) {
-        EmailValidator.valid(email);
+        valid(email);
         this.value = email;
+    }
+
+    public void valid(String email) {
+        if (Objects.isNull(email) || email.isBlank()) {
+            throw new EmailInvalidException(ErrorCode.EMAIL_REQUIRED, "");
+        }
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new EmailInvalidException(ErrorCode.INVALID_EMAIL_FORMAT, email);
+        }
     }
 }

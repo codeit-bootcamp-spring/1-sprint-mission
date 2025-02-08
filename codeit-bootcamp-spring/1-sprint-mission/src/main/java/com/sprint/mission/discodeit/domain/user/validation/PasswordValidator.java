@@ -15,11 +15,9 @@ public class PasswordValidator {
         if (Objects.isNull(password) || password.isEmpty()) {
             throw new PassWordInvalidException(ErrorCode.PASSWORD_REQUIRED, "");
         }
-
         if (password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH) {
             throw new PassWordInvalidException(ErrorCode.INVALID_PASSWORD_LENGTH, password);
         }
-
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
             throw new PassWordInvalidException(ErrorCode.WEAK_PASSWORD, password);
         }
