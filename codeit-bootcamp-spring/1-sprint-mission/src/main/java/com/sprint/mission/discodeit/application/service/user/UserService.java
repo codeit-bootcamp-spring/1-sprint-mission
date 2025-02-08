@@ -39,8 +39,8 @@ public class UserService {
     }
 
     public UserResponseDto join(JoinUserReqeustDto requestDto) {
-        checkEmailAlreadyUsedOrThrow(requestDto.email());
-        checkUsernameAlreadyUsedOrThrow(requestDto.username());
+        throwEmailAlreadyUsed(requestDto.email());
+        throwUsernameAlreadyUsed(requestDto.username());
         PasswordValidator.validateOrThrow(requestDto.password());
         User savedUser = userRepository.save(toUserWithPasswordEncode(requestDto));
         return userConverter.toDto(savedUser);
@@ -59,13 +59,13 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND));
     }
 
-    private void checkEmailAlreadyUsedOrThrow(String email) {
+    private void throwEmailAlreadyUsed(String email) {
         if (userRepository.isExistByEmail(new Email(email))) {
             throw new AlreadyUserExistsException(ErrorCode.DUPLICATE_EMAIL, email);
         }
     }
 
-    private void checkUsernameAlreadyUsedOrThrow(String username) {
+    private void throwUsernameAlreadyUsed(String username) {
         if (userRepository.isExistByUsername(new Username(username))) {
             throw new AlreadyUserExistsException(ErrorCode.DUPLICATE_USERNAME, username);
         }
