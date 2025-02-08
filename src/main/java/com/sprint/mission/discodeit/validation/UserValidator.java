@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -37,8 +38,8 @@ public class UserValidator {
         return true;
     }
 
-    private boolean isUniqueName(String name, Map<UUID, User> users) {
-        if (users.values().stream().anyMatch(user -> user.getName().equals(name))) {
+    private boolean isUniqueName(String name, List<User> users) {
+        if (users.stream().anyMatch(user -> user.getUsername().equals(name))) {
             throw new CustomException(ExceptionText.DUPLICATE_NAME);
         }
         return true;// 중복 이름 예외
@@ -46,7 +47,7 @@ public class UserValidator {
 
 
 
-    public boolean validateUser(String name, String email, String password, Map<UUID, User> users) {
+    public boolean validateUser(String name, String email, String password, List<User> users) {
         return isValidName(name) && isValidEmail(email) && isValidPassword(password) && isUniqueName(name, users);
     }
 }

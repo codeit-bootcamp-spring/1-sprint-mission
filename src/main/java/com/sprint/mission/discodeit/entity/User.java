@@ -1,36 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.UUID;
 
 public class User implements Serializable {
-
-    @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID uuID;
-    private final Long createdAt;
+
+    private UUID id;
+    private Long createdAt;
     private Long updatedAt;
-    private final String name;
+    //
+    private String username;
     private String email;
     private String password;
-    private String iD;
 
-
-    public User(String name, String email,String iD ,String password){
-        this.uuID = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.name = name;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
         this.email = email;
-        this.iD = iD;
         this.password = password;
     }
 
-    public UUID getuuID() {
-        return uuID;
+    public UUID getId() {
+        return id;
     }
 
     public Long getCreatedAt() {
@@ -41,40 +36,35 @@ public class User implements Serializable {
         return updatedAt;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
-    public String getId() {
-        return iD;
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
-
-    public void update(String email, String iD, String password){
-        this.email = email;
-        this.iD = iD;
-        this.password = password;
-        updatedAt = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "User{\n" +
-                "UUID : " + uuID +
-                ", \ncreatedAt : " + sdf.format(new Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new Date(updatedAt)) +
-                ", \nname : " + name +
-                ", \nemail : " + email +
-                ", \nid : " + iD + "\n}";
-    }
-
-
 }

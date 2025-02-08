@@ -31,11 +31,11 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message createMsg(User user, Channel channel, String content) {
-        if (validationService.validateMessage(user, channel, content)){
-            Message msg = new Message(user, channel, content);
-            data.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
-            data.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        if (validationService.validateMessage(authorId, channelId, content)){
+            Message msg = new Message(content, channelId, authorId);
+            data.putIfAbsent(msg.getChannelId(), new HashMap<>());
+            data.get(msg.getChannelId()).put(msg.getId(), msg);
             saveDataToFile();
             return msg;
         }
@@ -43,50 +43,47 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message getMessage(UUID msgUuid) {
+    public Message find(UUID messageId) {
         for (Map<UUID, Message> channelMessages : data.values()) {
-            if (channelMessages.containsKey(msgUuid)) {
-                return channelMessages.get(msgUuid);
+            if (channelMessages.containsKey(messageId)) {
+                return channelMessages.get(messageId);
             }
         }
-        System.out.println("Message with ID " + msgUuid + " not found.");
+        System.out.println("Message with ID " + messageId + " not found.");
         return null;
     }
 
     @Override
-    public Map<UUID, Map<UUID, Message>> getAllMsg() {
-        return  new HashMap<>(data);
+    public List<Message> findAll() {
+        List<Message> messages = new ArrayList<>();
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            messages.addAll(channelMessages.values()); // 각 채널의 메시지들을 추가
+        }
+        return messages;
     }
 
     @Override
-    public void updateMsg(UUID msgUuid, String newContent) {
-        Message msg = getMessage(msgUuid);
+    public Message update(UUID messageId, String newContent) {
+        Message msg = find(messageId);
         msg.update(newContent);
         saveDataToFile();
         System.out.println("Message content has been updated --> ("+ newContent + ")");
+        saveDataToFile();
+        return msg;
     }
 
     @Override
-    public void deleteMsg(UUID msgUuid) {
+    public void delete(UUID messageId) {
         for (Map<UUID, Message> channelMessages : data.values()) {
-            if (channelMessages.containsKey(msgUuid)) {
-                channelMessages.remove(msgUuid);
+            if (channelMessages.containsKey(messageId)) {
+                channelMessages.remove(messageId);
                 saveDataToFile();
-                System.out.println("Message " + msgUuid + " deleted.");
+                System.out.println("Message " + messageId + " deleted.");
             }
         }
-        System.out.println("Message not found: " + msgUuid);
+        System.out.println("Message not found: " + messageId);
     }
 
-    @Override
-    public void deleteAllMessagesForChannel(UUID channelUuid) {
-        if (!data.containsKey(channelUuid)) {
-            System.out.println("No messages found for channel ID");
-        }
-        data.remove(channelUuid);
-        saveDataToFile();
-        System.out.println("All messages for channel "+ "'" + channelUuid +"'" +" have been deleted.");
-    }
     // 디렉토리 초기화
     private void init(Path directory) {
         if (!Files.exists(directory)) {

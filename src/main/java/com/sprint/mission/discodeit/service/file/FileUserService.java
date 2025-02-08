@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.service.file;
+
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
@@ -14,10 +15,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class FileUserService implements UserService {
 
-    private final HashMap<UUID, User> data = new HashMap<>();
+    private final Map<UUID, User> data = new HashMap<>();
     private final UserValidator userValidator;
     private static final Logger LOGGER = Logger.getLogger(FileUserRepository.class.getName());
     private final Path directory = Paths.get(System.getProperty("user.dir"), "Data/user_data");
@@ -29,45 +29,45 @@ public class FileUserService implements UserService {
         loadDataFromFile();
     }
 
-
     @Override
-    public User CreateUser(String name, String email,String iD ,String password) {
-        if (userValidator.validateUser(name, email, password, getAllUsers())) {
-            User user = new User(name, email, iD, password);
-            data.put(user.getuuID(), user);
+    public User create(String username, String email, String password) {
+        if (userValidator.validateUser(username, email, password, findAll())) {
+            User user = new User(username, email, password);
+            data.put(user.getId(), user);
             saveDataToFile();
             return user;
         }
         throw new CustomException(ExceptionText.USER_CREATION_FAILED);
     }
 
-
     @Override
-    public User getUser(UUID uuid) {
-        return data.get(uuid);
+    public User find(UUID userId) {
+        return data.get(userId);
     }
 
     @Override
-    public HashMap<UUID, User> getAllUsers() {
-        return new HashMap<>(data);
+    public List<User> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateUser(UUID uuid, String email, String id, String password) {
-        User user = getUser(uuid);
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User user = find(userId);
         if (user != null) {
-            user.update(email, id, password);
+            user.update(newUsername,newEmail,newPassword);
         }
-        saveDataToFile();
+        throw new CustomException(ExceptionText.USER_NOT_FOUND);
     }
 
     @Override
-    public void deleteUser(UUID uuid) {
-        data.remove(uuid);
-        saveDataToFile();
+    public void delete(UUID userId) {
+        if (data.remove(userId) != null) {
+            saveDataToFile();
+        } else {
+            throw new CustomException(ExceptionText.USER_NOT_FOUND);
+        }
     }
 
-    // 디렉토리 초기화
     private void init(Path directory) {
         if (!Files.exists(directory)) {
             try {
@@ -78,27 +78,24 @@ public class FileUserService implements UserService {
         }
     }
 
-    //전체 HashMap을 직렬화하여 파일에 저장
     private void saveDataToFile() {
         Path filePath = directory.resolve(fileName);
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
-            oos.writeObject(data);  // Map<UUID, User>만 직렬화하여 저장
+            oos.writeObject(data);
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패: " + e.getMessage());
         }
     }
 
-    // 파일에서 직렬화된 객체를 불러오기
     private void loadDataFromFile() {
         Path filePath = directory.resolve(fileName);
         if (Files.exists(filePath)) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
-                // Unchecked cast 경고를 피하기 위해 Map<UUID, User>로 안전하게 캐스팅
                 Object readObject = ois.readObject();
                 if (readObject instanceof Map) {
                     @SuppressWarnings("unchecked")
                     Map<UUID, User> loadedData = (Map<UUID, User>) readObject;
-                    data.putAll(loadedData);  // 직렬화된 Map<UUID, User>을 로드
+                    data.putAll(loadedData);
                 } else {
                     throw new RuntimeException("잘못된 데이터 형식");
                 }
@@ -107,5 +104,4 @@ public class FileUserService implements UserService {
             }
         }
     }
-
 }

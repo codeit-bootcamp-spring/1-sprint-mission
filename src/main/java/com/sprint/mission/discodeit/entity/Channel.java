@@ -1,30 +1,30 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class Channel implements Serializable {
-
-    @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID channeluuId;
-    private final Long createdAt;
+    private UUID id;
+    private Long createdAt;
     private Long updatedAt;
-    private String channelName;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
 
-
-
-    public Channel(String channelName) {
-        this.channeluuId = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.channelName = channelName;
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
-
-    public UUID getuuId(){
-        return channeluuId;
+    public UUID getId() {
+        return id;
     }
 
     public Long getCreatedAt() {
@@ -35,27 +35,31 @@ public class Channel implements Serializable {
         return updatedAt;
     }
 
-    public String getChannelName() {
-        return channelName;
+    public ChannelType getType() {
+        return type;
     }
 
-    public void update(String channelName) {
-        this.channelName = channelName;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
+    public String getName() {
+        return name;
     }
 
-    public String getName(){
-        return channelName;
+    public String getDescription() {
+        return description;
     }
 
-    @Override
-    public String toString() {
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "Channel{\n" +
-                "UUId : " + channeluuId +
-                ", \nchannelName : " + channelName +
-                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) + "\n}";
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
+    }
 }

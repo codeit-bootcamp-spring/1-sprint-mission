@@ -1,30 +1,30 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
 
-public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
+public class JCFMessageRepository implements MessageRepository {
+    private final Map<UUID, Message> data;
 
-    public JCFUserRepository() {
+    public JCFMessageRepository() {
         this.data = new HashMap<>();
     }
 
     @Override
-    public User save(User user) {
-        this.data.put(user.getId(), user);
-        return user;
+    public Message save(Message message) {
+        this.data.put(message.getId(), message);
+        return message;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<Message> findById(UUID id) {
         return Optional.ofNullable(this.data.get(id));
     }
 
     @Override
-    public List<User> findAll() {
+    public List<Message> findAll() {
         return this.data.values().stream().toList();
     }
 

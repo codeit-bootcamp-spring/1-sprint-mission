@@ -1,26 +1,23 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.observer.manager.ObserverManager;
 import com.sprint.mission.discodeit.validation.ChannelValidtor;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 public class FileChannelService implements ChannelService {
 
-    private final ObserverManager observerManager;
     private final ChannelValidtor channelValidtor;
     private final HashMap<UUID, Channel> data = new HashMap<>();
     private static final Logger LOGGER = Logger.getLogger(FileChannelService.class.getName());
@@ -28,18 +25,17 @@ public class FileChannelService implements ChannelService {
     private final String fileName = "channel_data.ser";
 
     public FileChannelService
-            (ObserverManager observerManager,ChannelValidtor channelValidtor){
-        this.observerManager = observerManager;
+            (ChannelValidtor channelValidtor){
         this.channelValidtor = channelValidtor;
         init(directory);
         loadDataFromFile();
     }
 
     @Override
-    public Channel createChannel(String chName){
-        if(channelValidtor.isUniqueName(chName, getAllChannels())){
-            Channel channel = new Channel(chName);
-            data.put(channel.getuuId(), channel);
+    public Channel create(ChannelType type, String name, String description){
+        if(channelValidtor.isUniqueName(name, findAll())){
+            Channel channel = new Channel(type,name,description);
+            data.put(channel.getId(), channel);
             saveDataToFile();
             return channel;
         }
@@ -47,27 +43,28 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public Channel getChannel(UUID uuid){
+    public Channel find(UUID uuid){
         return data.get(uuid);
     }
 
     @Override
-    public Map<UUID, Channel> getAllChannels() {
-        return new HashMap<>(data);
+    public List<Channel> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateChannel(UUID uuId, String name ){
-        Channel channel = getChannel(uuId);
+    public Channel update(UUID channelId, String newName, String newDescription){
+        Channel channel = find(channelId);
         if (channel != null) {
-            channel.update(name);
+            channel.update(newName,newDescription);
+            return channel;
         }
+        return null;
     }
 
     @Override
-    public void deleteChannel(UUID uuid){
-        data.remove(uuid);
-        observerManager.channelDeletionEvent(uuid);// 채널 삭제 시 이름을 전달
+    public void delete(UUID channelId){
+        data.remove(channelId);
     }
 
     // 디렉토리 초기화
@@ -108,5 +105,4 @@ public class FileChannelService implements ChannelService {
             }
         }
     }
-
 }

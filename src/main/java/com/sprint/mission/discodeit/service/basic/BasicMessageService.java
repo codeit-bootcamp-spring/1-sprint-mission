@@ -1,61 +1,65 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.validation.MessageValidator;
 
-import java.util.Map;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BasicMessageService implements MessageService {
+    private final MessageRepository messageRepository;
+    //
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
-    private final MessageValidator validationService;
-    private final MessageRepository fileMessageRepository;
-
-    public BasicMessageService(MessageValidator messageValidator,MessageRepository fileMessageRepository) {
-        this.validationService = messageValidator;
-        this.fileMessageRepository = fileMessageRepository;
+    public BasicMessageService(MessageRepository messageRepository, ChannelRepository channelRepository, UserRepository userRepository) {
+        this.messageRepository = messageRepository;
+        this.channelRepository = channelRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public Message createMsg(User user, Channel channel, String content) {
-        if (validationService.validateMessage(user, channel, content)){
-            Message msg = new Message(user, channel, content);
-            fileMessageRepository.save(msg);
-            return msg;
+    public Message create(String content, UUID channelId, UUID authorId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel not found with id " + channelId);
         }
-        throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("Author not found with id " + authorId);
+        }
+
+        Message message = new Message(content, channelId, authorId);
+        return messageRepository.save(message);
     }
 
     @Override
-    public Message getMessage(UUID msgUuid) {
-        return fileMessageRepository.findById(msgUuid);
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public Map<UUID, Map<UUID, Message>> getAllMsg() {
-        return fileMessageRepository.findAll();
+    public List<Message> findAll() {
+        return messageRepository.findAll();
     }
 
     @Override
-    public void updateMsg(UUID msgId, String newContent) {
-        Message msg = fileMessageRepository.findById(msgId);
-        msg.update(newContent);
-        System.out.println("Message content has been updated --> ("+ newContent + ")");
+    public Message update(UUID messageId, String newContent) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+        return messageRepository.save(message);
     }
 
     @Override
-    public void deleteMsg(UUID msgUuid) {
-        fileMessageRepository.delete(msgUuid);
-    }
-
-    @Override
-    public void deleteAllMessagesForChannel(UUID channelUuid) {
-        fileMessageRepository.deleteAllMessagesForChannel(channelUuid);
+    public void delete(UUID messageId) {
+        if (!messageRepository.existsById(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
+        }
+        messageRepository.deleteById(messageId);
     }
 }

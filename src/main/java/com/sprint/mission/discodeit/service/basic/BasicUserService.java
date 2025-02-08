@@ -1,56 +1,50 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.exception.ExceptionText;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.validation.UserValidator;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
+    private final UserRepository userRepository;
 
-    private final UserValidator userValidator;
-    private final FileUserRepository fileUserRepository;
-
-    public BasicUserService(FileUserRepository fileUserRepository,UserValidator userValidator) {
-        this.userValidator = userValidator;
-        this.fileUserRepository = fileUserRepository;
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public User CreateUser(String name, String email, String iD , String password) {
-        if (userValidator.validateUser(name, email, password, fileUserRepository.findAll())) {
-            User user = new User(name, email, iD, password);
-            fileUserRepository.save(user);
-            return user;
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User find(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        throw new CustomException(ExceptionText.USER_CREATION_FAILED);
-    }
-
-
-    @Override
-    public User getUser(UUID uuid) {
-        return fileUserRepository.findById(uuid);
-    }
-
-    @Override
-    public HashMap<UUID, User> getAllUsers() {
-        return fileUserRepository.findAll();
-    }
-
-    @Override
-    public void updateUser(UUID uuid, String email, String id, String password) {
-        User user = fileUserRepository.findById(uuid);
-        if (user != null) {
-            user.update(email, id, password);
-        }
-    }
-
-    @Override
-    public void deleteUser(UUID uuid) {
-        fileUserRepository.delete(uuid);
+        userRepository.deleteById(userId);
     }
 }

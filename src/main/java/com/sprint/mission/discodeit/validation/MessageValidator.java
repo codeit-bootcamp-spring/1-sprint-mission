@@ -27,23 +27,23 @@ public class MessageValidator {
     }
 
     public boolean validateSender(UUID uuid) {
-        if (userService.getUser(uuid) == null) {
+        if (userService.find(uuid) == null) {
             throw new CustomException(ExceptionText.USER_NOT_FOUND);
         }
         return true;
     }
 
     public boolean validateDestinationChannel(UUID uuid) {
-        if (channelService.getChannel(uuid) == null) {
+        if (channelService.find(uuid) == null) {
             throw new CustomException(ExceptionText.CHANNEL_NOT_FOUND);
         }
         return true;
     }
 
-    public boolean validateMessage(User user, Channel channel, String content) {
+    public boolean validateMessage(UUID userId, UUID channelId, String content) {
         boolean isContentValid = validateContent(content);
-        boolean isSenderValid = validateSender(user.getuuID());
-        boolean isDestinationChannelValid = validateDestinationChannel(channel.getuuId());
+        boolean isSenderValid = validateSender(userId);
+        boolean isDestinationChannelValid = validateDestinationChannel(channelId);
 
         return isContentValid && isSenderValid && isDestinationChannelValid;
     }

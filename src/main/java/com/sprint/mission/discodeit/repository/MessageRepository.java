@@ -1,21 +1,15 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
-
-    void save(Message message);
-
-    Message findById(UUID uuid);
-
-    Map<UUID, Map<UUID, Message>> findAll();
-
-    void delete(UUID uuid);
-
-    void deleteAllMessagesForChannel(UUID channelId);
+    Message save(Message message);
+    Optional<Message> findById(UUID id);
+    List<Message> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
 }

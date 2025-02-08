@@ -18,11 +18,12 @@ public class JCFUserService implements UserService {
         this.userValidator = userValidator;
     }
 
+
     @Override
-    public User CreateUser(String name, String email,String iD ,String password) {
-        if (userValidator.validateUser(name, email, password, getAllUsers())){
-            User user = new User(name, email, iD, password);
-            data.put(user.getuuID(), user);
+    public User create(String name, String email, String password) {
+        if (userValidator.validateUser(name, email, password, findAll())){
+            User user = new User(name, email,password);
+            data.put(user.getId(), user);
             return user;
         }
         throw new CustomException(ExceptionText.USER_CREATION_FAILED);
@@ -30,25 +31,27 @@ public class JCFUserService implements UserService {
 
 
     @Override
-    public User getUser(UUID uuid) {
+    public User find(UUID uuid) {
         return data.get(uuid);
     }
 
     @Override
-    public HashMap<UUID, User> getAllUsers() {
-        return new HashMap<>(data);
+    public List<User> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
-    public void updateUser(UUID uuid, String email, String id, String password) {
-        User user = getUser(uuid);
+    public User update(UUID uuid, String email, String id, String password) {
+        User user = find(uuid);
         if (user != null) {
             user.update(email, id, password);
+            return user;
         }
+        return null;
     }
 
     @Override
-    public void deleteUser(UUID uuid) {
+    public void delete(UUID uuid) {
         data.remove(uuid);
     }
 
