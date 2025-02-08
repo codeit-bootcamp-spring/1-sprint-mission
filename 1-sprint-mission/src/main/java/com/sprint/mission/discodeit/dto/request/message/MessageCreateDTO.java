@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.request.message;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.util.List;
@@ -10,6 +11,6 @@ public record MessageCreateDTO(
         UUID userId,
         UUID channelId,
         String content,
-        List<BinaryContentDTO> attachments
+        List<BinaryContentCreateDTO> attachments
 ) {
 }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
@@ -42,12 +43,19 @@ public class BasicMessageService implements MessageService {
         Message newMessage = new Message(user, channel, messageCreateDTO.content());
         messageRepository.save(newMessage);
 
-        //첨부파일 저장
-        List<BinaryContent>attachments = new ArrayList<>();
-        for(BinaryContentDTO fileDTO : messageCreateDTO.attachments()) {
-            BinaryContent binaryContent = new BinaryContent(user, fileDTO.filename(), fileDTO.fileData());
-            binaryContentRepository.save(binaryContent);
-            attachments.add(binaryContent);
+        //첨부파일 저장(선택적으로)
+        List<BinaryContent> attachments = new ArrayList<>();
+        if (messageCreateDTO.attachments() != null && !messageCreateDTO.attachments().isEmpty()) {
+            attachments = messageCreateDTO.attachments().stream()
+                    .map(fileDTO -> new BinaryContent(
+                            UUID.randomUUID(),
+                            user,
+                            fileDTO.filename(),
+                            fileDTO.contentType(),
+                            fileDTO.fileData()
+                    ))
+                    .toList();
+            attachments.forEach(binaryContentRepository::save);
         }
         // 메시지 응답 DTO 반환
         return new MessageResponseDTO(
@@ -119,15 +127,23 @@ public class BasicMessageService implements MessageService {
         //메세지 조회
         Message messageToUpdate = messageRepository.findById(updateDTO.messageId())
                 .orElseThrow(() -> new IllegalArgumentException("Message not found"));
-        //메세지 내용 업데이트
+        //메세지 내용 업데이트, 저장
         messageToUpdate.update(updateDTO.newContent());
+        messageRepository.save(messageToUpdate);
         //첨부파일 처리(선택 변경)
-        if (updateDTO.attachments() != null || updateDTO.attachments().isEmpty()) {
+        if (updateDTO.attachments() != null && !updateDTO.attachments().isEmpty()) {
             //기존 첨부파일 삭제
             binaryContentRepository.deleteByMessageId(messageToUpdate.getId());
             //새로운 첨부파일 저장
             List<BinaryContent> newAttachments = updateDTO.attachments().stream()
-                    .map(fileDTO -> new BinaryContent(messageToUpdate.getUser(), fileDTO.filename(), fileDTO.fileData()))
+                    .map(fileDTO -> new BinaryContent(
+                            UUID.randomUUID(),
+                            messageToUpdate.getUser(),
+                            fileDTO.filename(),
+                            fileDTO.contentType(),
+                            fileDTO.fileData()
+
+                    ))
                     .toList();
             newAttachments.forEach(binaryContentRepository::save);
         }

@@ -37,17 +37,30 @@ public class BasicUserService implements UserService {
         User newUser = new User(userCreateDTO.username(),userCreateDTO.email() ,userCreateDTO.password() );
         userRepository.save(newUser);
 
-        assert userProfileImageDTO != null;
-        if(userProfileImageDTO.imageData() != null) {
-            BinaryContent binaryContent = new BinaryContent(newUser, userProfileImageDTO.fileName(),userProfileImageDTO.imageData());
+
+        if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
+            BinaryContent binaryContent = new BinaryContent(
+                    UUID.randomUUID(),
+                    newUser,
+                    userProfileImageDTO.fileName(),
+                    "image/jpeg",
+                    userProfileImageDTO.imageData()
+            );
             binaryContentRepository.save(binaryContent); // 레포지토리 미구현 나중에 수정 해야함.
         }
 
         UserStatus userStatus = new UserStatus(newUser, Instant.now());
         System.out.println("User created: " + userCreateDTO.username() + " (email: " + userCreateDTO.email() + ")");
         userStatusRepository.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
+
         boolean isOnline = userStatus.isOnline();
-        return new UserDTO(newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getCreatedAt(), newUser.getUpdatedAt(), isOnline);
+        return new UserDTO(newUser.getId(),
+                newUser.getUsername(),
+                newUser.getEmail(),
+                newUser.getCreatedAt(),
+                newUser.getUpdatedAt(),
+                isOnline
+        );
     }
 
     @Override
@@ -90,11 +103,16 @@ public class BasicUserService implements UserService {
             user.update(userUpdateDTO.newUsername(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
             userRepository.save(user);
             //프로필 이미지 저장 (선택적으로)
-            assert userProfileImageDTO != null;
-            if(userProfileImageDTO.imageData() != null) {
+            if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
                 binaryContentRepository.findByUserId(user.getId()) // 레포지토리 미구현 수정해야함.
                         .ifPrenset(binaryContentRepository::delete);
-                BinaryContent binaryContent = new BinaryContent(user, userProfileImageDTO.fileName(),userProfileImageDTO.imageData());
+                BinaryContent binaryContent = new BinaryContent(
+                        UUID.randomUUID(),
+                        user,
+                        userProfileImageDTO.fileName(),
+                        "image/jpeg",
+                        userProfileImageDTO.imageData()
+                );
                 binaryContentRepository.save(binaryContent);
             }
             boolean isOnline = userStatusRepository.findByUser(user)
