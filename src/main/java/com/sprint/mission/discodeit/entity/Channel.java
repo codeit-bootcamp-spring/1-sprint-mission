@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -15,13 +16,13 @@ public class Channel implements Serializable  {
     private static final Long serialVersionUID = 1L;
     private final UUID id ;
     private String channelName;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public Channel(String channelName){
         this.id = UUID.randomUUID();
         this.channelName = channelName;
-        this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
+        this.createdAt =  Instant.now();
     }
 
     //update
@@ -30,7 +31,7 @@ public class Channel implements Serializable  {
         this.updateUpdatedAt();
     }
     public void updateUpdatedAt(){
-        this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
+        this.updatedAt=Instant.now();  //업데이트 시간
     }
 
 
