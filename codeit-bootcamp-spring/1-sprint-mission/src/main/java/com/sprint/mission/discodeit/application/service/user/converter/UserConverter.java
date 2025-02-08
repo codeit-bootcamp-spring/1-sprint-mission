@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.application.service.user.converter;
 
-import com.sprint.mission.discodeit.application.dto.JoinUserReqeustDto;
-import com.sprint.mission.discodeit.application.dto.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.Nickname;

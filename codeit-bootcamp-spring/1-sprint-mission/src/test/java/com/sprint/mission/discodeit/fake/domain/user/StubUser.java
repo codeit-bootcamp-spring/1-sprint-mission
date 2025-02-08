@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.fake.domain.user;
 
-import com.sprint.mission.discodeit.application.dto.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.Nickname;

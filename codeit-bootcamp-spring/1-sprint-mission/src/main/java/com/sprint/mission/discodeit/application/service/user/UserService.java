@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.application.service.user;
 
 import com.sprint.mission.discodeit.application.auth.PasswordEncoder;
-import com.sprint.mission.discodeit.application.dto.JoinUserReqeustDto;
-import com.sprint.mission.discodeit.application.dto.LoginRequestDto;
-import com.sprint.mission.discodeit.application.dto.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.user.ChangePasswordRequestDto;
+import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.dto.user.LoginRequestDto;
+import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
@@ -57,6 +58,13 @@ public class UserService {
     public User findOneByIdOrThrow(UUID uuid) {
         return userRepository.findOneById(uuid)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND));
+    }
+
+    public void changePassword(UUID userId, ChangePasswordRequestDto requestDto) {
+        PasswordValidator.validateOrThrow(requestDto.password());
+        User foundUser = findOneByIdOrThrow(userId);
+        foundUser.updatePassword(passwordEncoder.encode(requestDto.password()));
+        userRepository.save(foundUser);
     }
 
     private void throwEmailAlreadyUsed(String email) {

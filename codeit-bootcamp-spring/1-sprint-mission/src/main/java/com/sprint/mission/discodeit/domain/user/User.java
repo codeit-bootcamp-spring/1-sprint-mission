@@ -38,6 +38,10 @@ public class User {
         this.emailSubscriptionStatus = emailSubscriptionStatus;
     }
 
+    public void updatePassword(String encodedPassword) {
+        password.changePassword(encodedPassword);
+    }
+
     public UUID getId() {
         return id;
     }
