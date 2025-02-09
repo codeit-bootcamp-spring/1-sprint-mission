@@ -10,7 +10,6 @@ public interface BinaryContentRepository {
 
     UUID save(BinaryContent binaryContent);
     BinaryContent findOne(UUID id);
-    List<BinaryContent> findAll();
-    UUID update(BinaryContent binaryContent);
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
     UUID delete(UUID id);
 }
