@@ -15,5 +15,12 @@ public class BinaryContent {
     private String contentType;
 
 
-
+    public BinaryContent(UUID userId, UUID messageId, byte[] data, String contentType) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.userId = userId;
+        this.messageId = messageId;
+        this.data = data;
+        this.contentType = contentType;
+    }
 }

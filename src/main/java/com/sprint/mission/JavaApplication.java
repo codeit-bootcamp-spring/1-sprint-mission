@@ -21,10 +21,10 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        basicServiceTest();
+        //basicServiceTest();
     }
 
-    public static void basicServiceTest(){
+/*    public static void basicServiceTest(){
         UserService userService = new BasicUserService(new JCFUserRepository());
         ChannelService channelService = new BasicChannelService(new JCFChannelRepository());
         MessageService messageService = new BasicMessageService(new JCFMessageRepository());
@@ -139,6 +139,6 @@ public class JavaApplication {
         messageService.readAll().forEach(System.out::println);
         System.out.println();
 
-    }
+    }*/
 }
 
