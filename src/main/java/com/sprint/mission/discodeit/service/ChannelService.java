@@ -9,14 +9,6 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-/*
-    //db 로직
-    UUID save(Channel channel);
-    Channel findOne(UUID id);
-    List<Channel> findAll();
-    UUID update(Channel channel);
-    UUID delete (UUID id);
-*/
 
     //서비스 로직
     UUID create(String name, String description, ChannelType type);

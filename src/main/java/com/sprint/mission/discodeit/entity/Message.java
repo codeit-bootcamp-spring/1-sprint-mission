@@ -7,8 +7,8 @@ import java.util.UUID;
 public class Message implements Serializable {
 
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     private String content;
     private UUID authorId;
@@ -16,7 +16,7 @@ public class Message implements Serializable {
 
     public Message(String content, UUID authorId, UUID channelId) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
 
         this.content = content;
         this.authorId = authorId;
@@ -27,11 +27,11 @@ public class Message implements Serializable {
         return id;
     }
 
-    public long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
@@ -48,7 +48,7 @@ public class Message implements Serializable {
     }
 
     public void setUpdatedAt() {
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now();
     }
 
     public void setMessage(String content) {

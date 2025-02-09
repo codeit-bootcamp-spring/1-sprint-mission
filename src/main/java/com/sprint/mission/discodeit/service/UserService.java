@@ -7,14 +7,6 @@ import java.util.UUID;
 
 public interface UserService {
 
-/*
-    //DB로직
-    UUID save(User user);
-    User findOne(UUID id);
-    List<User> findAll();
-    UUID update(User user);
-    UUID delete(UUID id);
-*/
 
     UUID create(String username, String email, String password);
     User read(UUID id);
