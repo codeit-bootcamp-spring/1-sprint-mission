@@ -71,25 +71,22 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void deleteByUserId(UUID userId) {
         store = loadBinaryContentsFromJson();
-        if (store.containsKey(userId)){
-            store.remove(userId);
-            saveBinaryContentsToJson(store);
-        }
+        store.values().removeIf(binaryContent -> binaryContent.getUserId().equals(userId));
+        saveBinaryContentsToJson(store);
     }
 
     @Override
     public void deleteByMessageId(UUID messageId) {
         store = loadBinaryContentsFromJson();
-        if (store.containsKey(messageId)){
-            store.remove(messageId);
-            saveBinaryContentsToJson(store);
-        }
+        store.values()
+                .removeIf(binaryContent -> binaryContent.getMessageId().equals(messageId));
+        saveBinaryContentsToJson(store);
     }
 
     @Override
     public void deleteByContentId(UUID contentId) {
         store = loadBinaryContentsFromJson();
-        if (store.containsKey(contentId)){
+        while (store.containsKey(contentId)){
             store.remove(contentId);
             saveBinaryContentsToJson(store);
         }

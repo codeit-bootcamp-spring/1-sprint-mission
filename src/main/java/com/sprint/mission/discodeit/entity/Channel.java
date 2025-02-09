@@ -4,9 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class Channel implements Serializable {
@@ -19,7 +17,7 @@ public class Channel implements Serializable {
     private String name;
     private String description;
     private ChannelType channelType;
-    private Set<UUID> participants = new HashSet<>();
+    private List<UUID> participants = new LinkedList<>();
 
     public Channel() {
         this.id = UUID.randomUUID();
@@ -35,14 +33,18 @@ public class Channel implements Serializable {
         this.channelType = channelType;
     }
 
-    public void update(String name, String description, ChannelType channelType) {
+    public void update(String name, String description, ChannelType channelType, List<UUID> participants) {
         this.name = name;
         this.description = description;
         this.channelType = channelType;
         updatedAt = Instant.now();
     }
 
-    public void addParticipant(UUID userId) {
+    public void addParticipant(UUID userId){
         participants.add(userId);
+    }
+
+    public void removeParticipant(UUID userId){
+        participants.remove(userId);
     }
 }

@@ -6,18 +6,17 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validation.ValidateUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,20 +26,14 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final ValidateUser validateUser;
 
     @Override
     public UserDto create(UserCreateRequest request) {
-        // username, email 중복 검사
-        if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateResourceException("Username already exists.");
-        }
-        if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateResourceException("Email already exists.");
-        }
-        // user 저장
+        validateUser.validateUser(request.username(), request.email(), request.phoneNumber(), request.password());
+
         User user = new User(request.username(), request.email(), request.phoneNumber(), request.password());
         userRepository.save(user);
-        // user 상태 저장
         UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
         userStatusRepository.save(userStatus);
         // profileImage가 있을 경우 binaryContent에 저장
@@ -54,50 +47,48 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDto findByUserId(UUID userId) {
-        // userId로 user 찾기
-        User user = userRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
-
-        // userStatus 찾기
-        boolean isOnline = userStatusRepository.findByUserId(user.getId()).map(UserStatus::isOnline).orElse(false);
-        // Dto로 반환
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
         return changeToDto(user, isOnline);
     }
 
     @Override
     public List<UserDto> findAll() {
-        // 모든 유저 조회
         List<User> users = userRepository.findAll();
-        // Dto로 반환
-        return users.stream().map(user -> changeToDto(user, userStatusRepository.findByUserId(user.getId()).map(UserStatus::isOnline).orElse(false))).collect(Collectors.toList());
+        return users.stream()
+                .map(user -> changeToDto(user, userStatusRepository.findByUserId(user.getId())
+                        .map(UserStatus::isOnline)
+                        .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."))))
+                .collect(Collectors.toList());
     }
 
     @Override
     public UserDto update(UserUpdateRequest request) {
-        if (userRepository.existsByUsername(request.username())) {
-            throw new DuplicateResourceException("Username already exists.");
-        }
-        if (userRepository.existsByEmail(request.email())) {
-            throw new DuplicateResourceException("Email already exists.");
-        }
-        User user = userRepository.findByUserId(request.userId()).orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        // user 업데이트
+        validateUser.validateUser(request.username(), request.email(), request.phoneNumber(), request.password());
+
+        User user = userRepository.findByUserId(request.userId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         user.update(request.username(), request.email(), request.phoneNumber(), request.password());
         if (request.profileImage() != null) {
-            Optional<BinaryContent> findBinaryContent = binaryContentRepository.findProfileByUserId(user.getId());
-            if (findBinaryContent.isPresent()) {
-                binaryContentRepository.deleteByContentId(findBinaryContent.get().getId());
-            }
+            binaryContentRepository.findProfileByUserId(user.getId())
+                    .ifPresent(binaryContent -> binaryContentRepository.deleteByContentId(binaryContent.getId()));
             BinaryContent binaryContent = new BinaryContent(user.getId(), null, request.profileImage());
             binaryContentRepository.save(binaryContent);
         }
 
-        boolean isOnline = userStatusRepository.findByUserId(user.getId()).map(UserStatus::isOnline).orElse(false);
+        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
         return changeToDto(user, isOnline);
     }
 
     @Override
     public void delete(UUID userId) {
-        userRepository.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        userRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         binaryContentRepository.deleteByUserId(userId);
         userStatusRepository.deleteByUserId(userId);
         userRepository.delete(userId);

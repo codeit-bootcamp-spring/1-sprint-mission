@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record PrivateChannelCreateRequest(
-        ChannelType type,
+        ChannelType channelType,
         List<UUID> participants
 ) {
 }

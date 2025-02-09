@@ -6,7 +6,7 @@ import java.util.UUID;
 public record MessageUpdateRequest(
         UUID messageId,
         UUID userId,
-        String newMessage,
-        List<UUID> deletedContentIds,
-        List<byte[]> newContent
+        UUID channelId,
+        String message,
+        List<byte[]> content
 ) {}

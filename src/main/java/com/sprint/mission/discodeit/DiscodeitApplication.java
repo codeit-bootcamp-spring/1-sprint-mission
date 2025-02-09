@@ -69,19 +69,28 @@ public class DiscodeitApplication {
 
 	static void channelCRUDTest(ChannelService channelService, UserService userService) {
 		// 사용자 생성 요청 DTO
-		UUID userId = UUID.randomUUID();
+		UserCreateRequest userCreateRequest = new UserCreateRequest(
+				"이병규",
+				"buzzin2426@gmail.com",
+				"01012341234",
+				"qwer!@34",
+				null // 프로필 이미지가 없을 경우
+		);
+
+		// 유저 생성
+		UserDto createdUser = userService.create(userCreateRequest);
 
 		// 채널 생성 요청 DTO
 		PrivateChannelCreateRequest privatechannelCreateRequest = new PrivateChannelCreateRequest(
 				ChannelType.PRIVATE,
-				List.of(userId)
+				List.of(createdUser.userId())
 		);
 
 		PublicChannelCreateRequest publicChannelCreateRequest = new PublicChannelCreateRequest(
 				"코드잇",
 				"스프린트 미션 3",
 				ChannelType.PUBLIC,
-				List.of(userId)
+				List.of(createdUser.userId())
 		);
 
 		// 채널 생성
@@ -95,7 +104,7 @@ public class DiscodeitApplication {
 		System.out.println("채널 조회(단건): " + foundChannel);
 
 		// 채널 조회 (다건)
-		List<ChannelDto> foundChannels = channelService.findAllByUserId(userId); // 예시로 랜덤 userId
+		List<ChannelDto> foundChannels = channelService.findAllByUserId(createdUser.userId()); // 예시로 랜덤 userId
 		System.out.println("채널 조회(다건): " + foundChannels);
 
 		// 채널 수정 요청 DTO
@@ -104,7 +113,7 @@ public class DiscodeitApplication {
 				"스프링",
 				"modify 스프린트 미션 3",
 				ChannelType.PUBLIC,
-				List.of(userId)
+				List.of(createdUser.userId())
 		);
 
 		// 채널 수정
@@ -114,20 +123,41 @@ public class DiscodeitApplication {
 		// 채널 삭제
 		channelService.delete(createdPrivateChannel.ChannelId());
 		channelService.delete(createdPublicChannel.ChannelId());
+		// 유저 삭제
+		userService.delete(createdUser.userId());
 
 		// 남아있는 채널 조회
-		List<ChannelDto> remainingChannels = channelService.findAllByUserId(userId);
+		List<ChannelDto> remainingChannels = channelService.findAllByUserId(createdUser.userId());
 		System.out.println("남아있는 채널 목록: " + remainingChannels);
 	}
 
-	static void messageCRUDTest(MessageService messageService, UserService userService) {
+	static void messageCRUDTest(MessageService messageService, UserService userService, ChannelService channelService) {
 
-		UUID userId = UUID.randomUUID();
-		UUID channelId = UUID.randomUUID();
+		// 사용자 생성 요청 DTO
+		UserCreateRequest userCreateRequest = new UserCreateRequest(
+				"이병규",
+				"buzzin2426@gmail.com",
+				"01012341234",
+				"qwer!@34",
+				null // 프로필 이미지가 없을 경우
+		);
+
+		// 유저 생성
+		UserDto createdUser = userService.create(userCreateRequest);
+		// 채널 생성
+		PublicChannelCreateRequest publicChannelCreateRequest = new PublicChannelCreateRequest(
+				"코드잇",
+				"스프린트 미션 3",
+				ChannelType.PUBLIC,
+				List.of(createdUser.userId())
+		);
+
+		// 채널 생성
+		ChannelDto createdPublicChannel = channelService.createPublicChannel(publicChannelCreateRequest);
 		// 메시지 생성 요청 DTO
 		MessageCreateRequest messageCreateRequest = new MessageCreateRequest(
-				userId,
-				channelId,
+				createdUser.userId(),
+				createdPublicChannel.ChannelId(),
 				"안녕하세요.",
 				List.of(
 				new byte[]{1, 2, 3},
@@ -140,19 +170,19 @@ public class DiscodeitApplication {
 		System.out.println("메시지 생성: " + createdMessage.messageId());
 
 		// 메시지 조회 (단건)
-		List<MessageDto> foundMessage = messageService.findAllByChannelId(channelId);
+		List<MessageDto> foundMessage = messageService.findAllByChannelId(createdPublicChannel.ChannelId());
 		System.out.println("메시지 조회(단건): " + foundMessage);
 
 		// 메시지 조회 (다건)
-		List<MessageDto> foundMessages = messageService.findAllByChannelId(channelId);
+		List<MessageDto> foundMessages = messageService.findAllByChannelId(createdPublicChannel.ChannelId());
 		System.out.println("메시지 조회(다건): " + foundMessages.size());
 
 		// 메시지 수정 요청 DTO
 		MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(
 				createdMessage.messageId(),
-				userId,
+				createdUser.userId(),
+				createdPublicChannel.ChannelId(),
 				"반갑습니다.",
-				List.of(UUID.nameUUIDFromBytes(new byte[]{1, 2, 3})),
 				List.of(
 						new byte[]{5, 5, 5},
 						new byte[]{1}
@@ -167,6 +197,12 @@ public class DiscodeitApplication {
 		messageService.delete(createdMessage.messageId());
 		List<MessageDto> foundMessagesAfterDelete = messageService.findAllByChannelId(UUID.randomUUID());
 		System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
+
+		// 채널 삭제
+		channelService.delete(createdPublicChannel.ChannelId());
+
+		// 유저 삭제
+		userService.delete(createdUser.userId());
 	}
 
 	public static void main(String[] args) {
@@ -181,7 +217,7 @@ public class DiscodeitApplication {
 		System.out.println();
 		channelCRUDTest(channelService, userService);
 		System.out.println();
-		messageCRUDTest(messageService, userService);
+		messageCRUDTest(messageService, userService, channelService);
 	}
 }
 

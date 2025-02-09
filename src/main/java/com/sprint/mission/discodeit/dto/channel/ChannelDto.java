@@ -13,6 +13,5 @@ public record ChannelDto (
     ChannelType channelType,
     Instant createdAt,
     Instant updatedAt,
-    List<UUID> participantIds,
-    Instant lastMessageTime
+    List<UUID> participantIds
 ) {}

@@ -7,9 +7,4 @@ public record BinaryContentCreateRequest(
         UUID messageId,
         byte[] content
 ) {
-    public BinaryContentCreateRequest {
-        if (content == null || content.length == 0) {
-            throw new IllegalArgumentException("Content cannot be empty.");
-        }
-    }
 }
