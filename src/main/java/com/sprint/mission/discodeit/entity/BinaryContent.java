@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,11 +17,11 @@ public class BinaryContent {
     private final UUID contentId; //메시지 혹은 유저 아이디 -> User나 Message가 생성하면, 이 아이디를 참조할 필요가 없다.
     private final String filePath; //file 경로 문자열로 생각했는데, 다른 좋은 타입이 있을까?
 
-    public BinaryContent(UUID contentId, String filePath){
+    public BinaryContent(BinaryContentCreateDTO binaryContentCreateDTO) {
         this.id=UUID.randomUUID();
-        this.contentId=contentId;
         this.createdAt=Instant.now();
-        this.filePath=filePath;
+        this.contentId=binaryContentCreateDTO.contentId();
+        this.filePath=binaryContentCreateDTO.filePath();
     }
 
 

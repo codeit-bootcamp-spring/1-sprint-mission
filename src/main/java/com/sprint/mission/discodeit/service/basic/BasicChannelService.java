@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +16,20 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
-
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
+    private final ReadStatusService readStatusService;
 
     @Override
-    public Channel createChannel(String name) {
-        Channel channel = new Channel(name);
+    public Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
+        Channel channel = new Channel(channelCreateDTO, ChannelType.PRIVATE);
+        //ReadStatus서비스 가져와서 크리에이트?
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
+        Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
         return channelRepository.save(channel);
     }
 

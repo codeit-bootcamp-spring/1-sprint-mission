@@ -1,13 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.AuthUserDTO;
+import com.sprint.mission.discodeit.dto.AuthUserDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;

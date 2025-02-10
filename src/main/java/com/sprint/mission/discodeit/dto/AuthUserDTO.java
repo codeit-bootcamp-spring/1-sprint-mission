@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto;
 
 public record AuthUserDTO
         (String name,

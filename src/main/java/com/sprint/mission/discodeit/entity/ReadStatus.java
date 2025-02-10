@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -15,13 +16,21 @@ public class ReadStatus {
     private final Instant createdAt;
     private Instant updatedAt;
 
+    private final UUID channelId;
     private final UUID userId;
-    private Map<UUID, Instant> channelLastReadTimes;//채널별 마지막 읽은 시간 저장
+    private Instant channelLastReadTimes;//채널별 마지막 읽은 시간 저장
 
 
-    public ReadStatus(UUID userId){
+    public ReadStatus(UUID channelId, UUID userId){
         this.id=UUID.randomUUID();
-        this.userId=userId;
         this.createdAt=Instant.now();
+        this.updatedAt=createdAt;
+
+        this.userId=userId;
+        this.channelId=channelId;
+    }
+
+    public void update() {
+        this.channelLastReadTimes=Instant.now();
     }
 }

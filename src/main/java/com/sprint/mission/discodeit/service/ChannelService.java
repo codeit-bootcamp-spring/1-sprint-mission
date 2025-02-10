@@ -1,15 +1,16 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
 
-    //채널에 대한 CURD.
-
-    Channel createChannel(String name);
+    Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO, ChannelType type);
+    Channel createPublicChannel(ChannelCreateDTO channelCreateDTO, ChannelType type);
 
     Channel readChannel(UUID id);
 

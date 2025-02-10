@@ -31,6 +31,8 @@ public class User implements Serializable {
     public User(UserCreateDTO userCreateDTO){
         this.id = UUID.randomUUID();
         this.createdAt =  Instant.now();
+        this.updatedAt=createdAt;
+
         this.userName = userCreateDTO.name();
         this.password=userCreateDTO.password();
         this.email=userCreateDTO.email();

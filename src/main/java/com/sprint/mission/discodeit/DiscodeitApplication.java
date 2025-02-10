@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -21,8 +23,9 @@ public class DiscodeitApplication {
 	}
 
 	static Channel setupChannel(ChannelService channelService) {
-		Channel channel = channelService.createChannel("공지채널");
-		return channel;
+	//	Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널", ), ChannelType.PUBLIC);
+	///	return channel;
+		return null;
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {

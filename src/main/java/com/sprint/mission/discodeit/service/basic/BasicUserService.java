@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
@@ -33,26 +35,41 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User readUser(UUID userId) {
-        return userRepository.findbyId(userId);
+    public UserFindDTO findUserDTO(UUID userId) {
+        User user = userRepository.findbyId(userId);
+        UserFindDTO userFindDTO = new UserFindDTO(user);
+        return userFindDTO;
+    }
+
+    //내부 사용전용
+    private User findbyId(UUID userId) {
+        User user = userRepository.findbyId(userId);
+        return user;
+    }
+
+    private List<User> findAll(){
+        return new ArrayList<>(userRepository.load().values());
     }
 
     @Override
-    public List<User> readAllUser() {
-        List<User> userList = new ArrayList<>(userRepository.load().values());
-        return userList;
+    public List<UserFindDTO> findAllUserDTO() {
+        List<User> userList = findAll();
+        List<UserFindDTO> userFindDTOS = userList.stream()
+                .map(user-> new UserFindDTO(user))
+                .collect(Collectors.toList());
+        return userFindDTOS;
     }
 
     @Override
     public User updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
-        User user = userRepository.findbyId(userID);
+        User user = findbyId(userID);
         user.updateUser(userUpdateDTO);
         return userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID userID) {
-        User user = readUser(userID);
+        User user = findbyId(userID);
         user.deleteUserStatus();
         user.deleteBinaryContent();
         userRepository.delete(userID);
