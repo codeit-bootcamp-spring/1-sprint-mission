@@ -15,37 +15,40 @@ import java.time.Instant;
 @Component
 public class UpdateTimeField_AOP {
 
-    @Pointcut("execution(* com.sprint.mission.entity..*set*(..))")
-    public void updating(){}
+//    @Pointcut("execution(* com.sprint.mission..*create*(..))")
+//    public void create(){}
 
-    @Pointcut("execution(* com.sprint.mission.entity..*add*(..))")
-    public void add(){}
+    @Pointcut("execution(* com.sprint.mission.repository..*del*(..))")
+    public void delete(){}
 
-    @Pointcut("execution(* com.sprint.mission.entity..*remove*(..))")
-    public void remove(){}
+    @Pointcut("execution(* com.sprint.mission.repository..save(..))")
+    public void save(){}
 
-    @AfterReturning("updating() || add() || remove()")
+    @AfterReturning("delete() || save()")
     public void setTimeLog(JoinPoint joinPoint){
-        Object target = joinPoint.getTarget();
+        Object[] args = joinPoint.getArgs();
 
-        switch (target){
 
-            case User user -> {
-                user.setUpdateAt(Instant.now());
-                log.info("[AOP] User {} updateAt: {}", user.getName(), user.getUpdateAt());
+        for (Object target : args) {
+            switch (target){
+
+                case User user -> {
+                    user.setUpdateAt(Instant.now());
+                    log.info("[AOP for UpdateAt] User {} updateAt: {}", user.getName(), user.getUpdateAt());
+                }
+
+                case Channel channel -> {
+                    channel.setUpdatedAt(Instant.now());
+                    log.info("[AOP for UpdateAt] Channel {} updateAt: {}", channel.getName(), channel.getUpdatedAt());
+                }
+
+                case Message message -> {
+                    message.setUpdateAt(Instant.now());
+                    log.info("[AOP for UpdateAt] Message {} updateAt: {}", message.getContent(), message.getUpdateAt());
+                }
+
+                default -> log.info("Fail to update UpdateAt Filed : 지원하지 않는 객체 타입 {}",target.getClass().getSimpleName());
             }
-
-            case Channel channel -> {
-                channel.setUpdatedAt(Instant.now());
-                log.info("[AOP] Channel {} updateAt: {}", channel.getName(), channel.getUpdatedAt());
-            }
-
-            case Message message -> {
-                message.setUpdateAt(Instant.now());
-                log.info("[AOP] Message {} updateAt: {}", message.getContent(), message.getUpdateAt());
-            }
-
-            default -> log.info("업데이트 지원하지 않는 객체 타입: {}",target.getClass().getSimpleName());
         }
     }
 }

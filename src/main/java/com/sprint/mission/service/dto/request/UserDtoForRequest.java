@@ -19,4 +19,14 @@ public class UserDtoForRequest {
         this.password = password;
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return "UserDtoForRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", profileImg=" + profileImg +
+                '}';
+    }
 }

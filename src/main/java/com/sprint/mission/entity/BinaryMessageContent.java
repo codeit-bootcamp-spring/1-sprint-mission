@@ -25,4 +25,5 @@ public class BinaryMessageContent implements BinaryContent {
         this.createdAt = Instant.now();
         this.bytes = bytes;
     }
+
 }

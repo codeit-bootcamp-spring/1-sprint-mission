@@ -25,7 +25,7 @@ public class BinaryProfileService {
 
 
     public void create(BinaryContentDto dto){
-        repository.save(new BinaryProfileContent(dto.getId(), dto.getBytes()));
+        repository.save(new BinaryProfileContent(dto.getId(), dto.getBinaryContent().getBytes()));
     }
 
     public void findById(UUID messageId){

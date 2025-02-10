@@ -1,5 +1,6 @@
 package com.sprint.mission.repository.jcf.main;
 
+import com.sprint.mission.aop.annotation.TraceAnnotation;
 import com.sprint.mission.entity.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.exception.NotFoundId;
@@ -10,6 +11,7 @@ import java.util.*;
 
 @Slf4j
 @Repository
+@TraceAnnotation
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data = new HashMap<>();

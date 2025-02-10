@@ -1,6 +1,8 @@
 package com.sprint.mission.service.jcf.main;
 
 
+import com.sprint.mission.aop.annotation.TraceAnnotation;
+import com.sprint.mission.aop.annotation.ValidTraceAnnotation;
 import com.sprint.mission.entity.*;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.dto.request.BinaryContentDto;
@@ -9,20 +11,22 @@ import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@TraceAnnotation
 public class JCFUserService {
 
     private final JCFUserRepository userRepository;
     private final BinaryProfileService profileService;
     private final UserStatusService userStatusService;
 
-    // 닉네임 중복 허용
-    public void create(UserDtoForRequest userDto) {
+    // create 후 userId를 기반으로 테스트하기 위해 dto 반환 x (할거면 나중에 컨트롤러에서)
+    public User create(UserDtoForRequest userDto) {
         isDuplicateNameEmail(userDto);
 
         User user = User.createUserByDto(userDto);
@@ -34,8 +38,10 @@ public class JCFUserService {
         // UserStatus 생성
         userStatusService.create(user.getId());
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
+
+    @TraceAnnotation
 
     public void update(UUID userId, UserDtoForRequest dto) {
         isDuplicateNameEmail(dto);
@@ -60,6 +66,7 @@ public class JCFUserService {
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
+    @TraceAnnotation
     public List<FindUserDto> findAll() {
         List<User> allUser = userRepository.findAll();
         List<FindUserDto> findUserDtos = new ArrayList<>();
@@ -87,7 +94,7 @@ public class JCFUserService {
 
     public void outChannel(UUID userId, UUID channelId) {}
 
-    private void isDuplicateNameEmail(UserDtoForRequest userDto) {
+    protected void isDuplicateNameEmail(UserDtoForRequest userDto) {
         List<User> allUser = userRepository.findAll();
         boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(userDto.getUsername()));
         if (isDuplicateName) throw new IllegalStateException(String.format("Duplicate Name: %s", userDto.getUsername()));

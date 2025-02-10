@@ -1,5 +1,6 @@
 package com.sprint.mission.service.jcf.addOn;
 
+import com.sprint.mission.entity.BinaryContent;
 import com.sprint.mission.entity.BinaryMessageContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryMessageRepository;
 import com.sprint.mission.service.dto.request.BinaryContentDto;
@@ -37,7 +38,7 @@ public class BinaryMessageService {
     }
 
     public void create(BinaryContentDto dto){
-        repository.save(new BinaryMessageContent(dto.getId(), dto.getBytes()));
+        repository.save(new BinaryMessageContent(dto.getId(), dto.getBinaryContent().getBytes()));
     }
 
 }
