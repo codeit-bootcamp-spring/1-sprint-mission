@@ -27,14 +27,14 @@ public class BasicAuthService implements AuthService {
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getUserId())
                         .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
         userStatus.update(Instant.now());
         userStatusRepository.save(userStatus);
         boolean isOnline = userStatus.isOnline();
         // UserDto 변환 후 반환
         return new UserDto(
-                user.getId(),
+                user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhoneNumber(),

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-@Primary
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final String binaryContentJsonFile;
@@ -24,7 +24,9 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Autowired
     public FileBinaryContentRepository(FileConfig fileConfig) {
-        this.binaryContentJsonFile = fileConfig.getBinaryContentJsonPath();
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getBinaryContentJsonPath();
+        this.binaryContentJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         store = loadBinaryContentsFromJson();

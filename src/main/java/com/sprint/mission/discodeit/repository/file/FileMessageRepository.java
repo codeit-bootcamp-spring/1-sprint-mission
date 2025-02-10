@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-@Primary
 public class FileMessageRepository implements MessageRepository {
     private final String messageJsonFile;
     private final ObjectMapper mapper;
@@ -23,7 +23,9 @@ public class FileMessageRepository implements MessageRepository {
 
     @Autowired
     public FileMessageRepository(FileConfig fileConfig) {
-        this.messageJsonFile = fileConfig.getMessageJsonPath();
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getMessageJsonPath();
+        this.messageJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         messageMap = new HashMap<>();

@@ -11,7 +11,7 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
+    private final UUID userId;
     private final Instant createdAt;
     private Instant updatedAt;
 
@@ -21,12 +21,12 @@ public class User implements Serializable {
     private String password;
 
     public User() {
-        this.id = UUID.randomUUID();
+        this.userId = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
 
     public User(String username, String email, String phoneNumber, String password) {
-        this.id = UUID.randomUUID();
+        this.userId = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.username = username;

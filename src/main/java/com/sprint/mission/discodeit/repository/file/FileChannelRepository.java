@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-@Primary
 public class FileChannelRepository implements ChannelRepository {
 
     private final String channelJsonFile;
@@ -24,7 +22,9 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Autowired
     public FileChannelRepository(FileConfig fileConfig) {
-        this.channelJsonFile = fileConfig.getChannelJsonPath();
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getChannelJsonPath();
+        this.channelJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         channelMap = new HashMap<>();

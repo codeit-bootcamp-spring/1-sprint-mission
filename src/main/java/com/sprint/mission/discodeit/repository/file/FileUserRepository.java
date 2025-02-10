@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-@Primary
 public class FileUserRepository implements UserRepository {
 
     private final String userJsonFile;
@@ -24,8 +24,9 @@ public class FileUserRepository implements UserRepository {
 
     @Autowired
     public FileUserRepository(FileConfig fileConfig) {
-        this.userJsonFile = fileConfig.getUserJsonPath();
-        //Json 파싱을 위해 ObjectMapper 생성
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getUserJsonPath();
+        this.userJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         userMap = new HashMap<>();
@@ -34,7 +35,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         userMap = loadUserFromJson();
-        userMap.put(user.getId(), user);
+        userMap.put(user.getUserId(), user);
         saveUsersToJson(userMap);
         return user;
     }

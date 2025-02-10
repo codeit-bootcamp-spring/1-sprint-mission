@@ -34,11 +34,11 @@ public class BasicUserService implements UserService {
 
         User user = new User(request.username(), request.email(), request.phoneNumber(), request.password());
         userRepository.save(user);
-        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
+        UserStatus userStatus = new UserStatus(user.getUserId(), Instant.now());
         userStatusRepository.save(userStatus);
         // profileImage가 있을 경우 binaryContent에 저장
         if (request.profileImage() != null) {
-            BinaryContent binaryContent = new BinaryContent(user.getId(), null, request.profileImage());
+            BinaryContent binaryContent = new BinaryContent(user.getUserId(), null, request.profileImage());
             binaryContentRepository.save(binaryContent);
         }
         // Dto로 반환
@@ -49,7 +49,7 @@ public class BasicUserService implements UserService {
     public UserDto findByUserId(UUID userId) {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
-        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+        boolean isOnline = userStatusRepository.findByUserId(user.getUserId())
                 .map(UserStatus::isOnline)
                 .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
         return changeToDto(user, isOnline);
@@ -59,7 +59,7 @@ public class BasicUserService implements UserService {
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(user -> changeToDto(user, userStatusRepository.findByUserId(user.getId())
+                .map(user -> changeToDto(user, userStatusRepository.findByUserId(user.getUserId())
                         .map(UserStatus::isOnline)
                         .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."))))
                 .collect(Collectors.toList());
@@ -73,13 +73,13 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         user.update(request.username(), request.email(), request.phoneNumber(), request.password());
         if (request.profileImage() != null) {
-            binaryContentRepository.findProfileByUserId(user.getId())
-                    .ifPresent(binaryContent -> binaryContentRepository.deleteByContentId(binaryContent.getId()));
-            BinaryContent binaryContent = new BinaryContent(user.getId(), null, request.profileImage());
+            binaryContentRepository.findProfileByUserId(user.getUserId())
+                    .ifPresent(binaryContent -> binaryContentRepository.deleteByContentId(binaryContent.getUserId()));
+            BinaryContent binaryContent = new BinaryContent(user.getUserId(), null, request.profileImage());
             binaryContentRepository.save(binaryContent);
         }
 
-        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+        boolean isOnline = userStatusRepository.findByUserId(user.getUserId())
                 .map(UserStatus::isOnline)
                 .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
         return changeToDto(user, isOnline);
@@ -95,6 +95,6 @@ public class BasicUserService implements UserService {
     }
 
     private UserDto changeToDto(User user, boolean isOnline) {
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), isOnline, user.getCreatedAt(), user.getUpdatedAt());
+        return new UserDto(user.getUserId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), isOnline, user.getCreatedAt(), user.getUpdatedAt());
     }
 }

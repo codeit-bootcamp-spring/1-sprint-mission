@@ -6,10 +6,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "file")
+@ConfigurationProperties(prefix = "discodeit.repository")
 @Getter
 @Setter
 public class FileConfig {
+
+    private String type;
+    private String fileDirectory = ".discodeit";
+
     private String binaryContentJsonPath;
     private String channelJsonPath;
     private String messageJsonPath;
@@ -17,3 +21,5 @@ public class FileConfig {
     private String userJsonPath;
     private String userStatusJsonPath;
 }
+
+

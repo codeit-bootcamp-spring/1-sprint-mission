@@ -2,10 +2,14 @@ spring:
   application:
     name: discodeit
 
-file:
-  binaryContent-json-path: "tmp/binaryContents.json"
-  channel-json-path: "tmp/channels.json"
-  message-json-path: "tmp/messages.json"
-  readStatus-json-path: "tmp/readStatuses.json"
-  user-json-path: "tmp/users.json"
-  userStatus-json-path: "tmp/userStatuses.json"
+discodeit:
+  repository:
+    type: file  # jcf | file
+    file-directory: .discodeit
+    binaryContent-json-path: "binaryContents.json"
+    channel-json-path: "channels.json"
+    message-json-path: "messages.json"
+    readStatus-json-path: "readStatuses.json"
+    user-json-path: "users.json"
+    userStatus-json-path: ".userStatuses.json"
+

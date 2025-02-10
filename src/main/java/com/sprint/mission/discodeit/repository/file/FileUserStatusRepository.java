@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 
 @Repository
-@Primary
 public class FileUserStatusRepository implements UserStatusRepository {
 
     private final String userStatusJsonFile;
@@ -24,7 +24,9 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Autowired
     public FileUserStatusRepository(FileConfig fileConfig) {
-        this.userStatusJsonFile = fileConfig.getUserStatusJsonPath();
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getUserStatusJsonPath();
+        this.userStatusJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         userStatusMap = new HashMap<>();

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +17,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-@Primary
 public class FileReadStatusRepository implements ReadStatusRepository {
 
     private final String readStatusJsonFile;
@@ -25,7 +25,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Autowired
     public FileReadStatusRepository(FileConfig fileConfig) {
-        this.readStatusJsonFile = fileConfig.getReadStatusJsonPath();
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getReadStatusJsonPath();
+        this.readStatusJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         readStatusMap = loadReadStatusesFromJson();
