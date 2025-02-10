@@ -42,8 +42,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   }
 
   private void validateDuplicateUserChannelStatus(String userId, String channelId) {
-    if (readStatusRepository.findByUserId(userId).stream()
-        .anyMatch(status -> status.getChannelId().equals(channelId))) {
+    boolean exists = readStatusRepository.findByUserId(userId).stream()
+        .anyMatch(status -> status.getChannelId().equals(channelId));
+
+    if (exists) {
       log.info("이미 존재하는 user + channel status 입니다={} + {}", userId, channelId);
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
