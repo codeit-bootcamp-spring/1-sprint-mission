@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -37,14 +37,13 @@ public class BasicChannelService implements ChannelService {
 		Channel existChannel = channelRepository.findById(channelId)
 			.orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + channelId));
 
-		User existUser = userService.readUser(userId)
-			.orElseThrow(() -> new IllegalArgumentException("User does not exist: " + userId));
+		UserResponse existUser = userService.findUser(userId);
 
 		existChannel.addParticipant(userId, existUser);
 		channelRepository.save(existChannel);
 
 		System.out.println(existChannel.toString());
-		System.out.println(existChannel.getName() + " 채널에 " + existUser.getUsername() + " 유저 추가 완료\n");
+		System.out.println(existChannel.getName() + " 채널에 " + existUser.username() + " 유저 추가 완료\n");
 	}
 
 	@Override

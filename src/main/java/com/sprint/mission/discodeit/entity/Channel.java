@@ -5,17 +5,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.dto.response.UserResponse;
+
 import lombok.Getter;
 
 @Getter
 public class Channel extends BaseEntity {
 	private String name;
 	private String description;
-	private Map<UUID, User> participants;
+	private Map<UUID, UserResponse> participants;
 	private List<Message> messageList;
 	private ChannelType channelType;
 
-	public Channel(String name, String description, Map<UUID, User> participants, List<Message> messageList,
+	public Channel(String name, String description, Map<UUID, UserResponse> participants, List<Message> messageList,
 		ChannelType channelType) {
 		super();
 		this.name = name;
@@ -33,14 +35,14 @@ public class Channel extends BaseEntity {
 		this.description = description;
 	}
 
-	public void addParticipant(UUID userId, User user) {
+	public void addParticipant(UUID userId, UserResponse userResponse) {
 		if (participants.containsKey(userId)) {
 			throw new IllegalArgumentException("User already in channel: " + userId);
 		}
-		participants.put(userId, user);
+		participants.put(userId, userResponse);
 	}
 
-	public void updateParticipants(Map<UUID, User> participants) {
+	public void updateParticipants(Map<UUID, UserResponse> participants) {
 		this.participants = participants;
 	}
 

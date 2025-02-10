@@ -6,9 +6,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -30,14 +30,12 @@ public class BasicMessageService implements MessageService {
 		}
 
 		// User가 실제로 존재하는지 확인
-		User author = userService.readUser(message.getAuthor().getId())
-			.orElseThrow(() -> new IllegalArgumentException("Author does not exist: "
-				+ message.getAuthor().getId()));
+		UserResponse author = userService.findUser(message.getAuthor().getId());
 		//Channel이 실제로 존재하는지 확인
 		Channel channel = channelService.readChannel(message.getChannel().getId())
 			.orElseThrow(() -> new IllegalArgumentException("Channel does not exist: " + message.getChannel().getId()));
 
-		if (!channel.getParticipants().containsKey(author.getId())) {
+		if (!channel.getParticipants().containsKey(author.userid())) {
 			throw new IllegalArgumentException(
 				"Author is not a participant of the channel: " + message.getChannel().getId());
 		}
