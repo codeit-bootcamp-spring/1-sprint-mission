@@ -21,6 +21,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public User createUser(UserCreateDTO userCreateDTO) {
+        if (isNameExist(userCreateDTO.name())) {
+            throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
+        }
+        if (isEmailExist(userCreateDTO.email())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
+        }
         User user = new User(userCreateDTO);
         userRepository.save(user);
         return user;

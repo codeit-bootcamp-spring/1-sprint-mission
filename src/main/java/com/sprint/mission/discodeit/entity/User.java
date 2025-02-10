@@ -28,18 +28,12 @@ public class User implements Serializable {
     private UserStatus userStatus;
     private BinaryContent binaryContent;
 
-//    public User(String userName){
-//        this.id = UUID.randomUUID();
-//        this.userName = userName;
-//        this.createdAt =  Instant.now();
-//        userStatus = new UserStatus(this.id);
-//    }
-
-
     public User(UserCreateDTO userCreateDTO){
         this.id = UUID.randomUUID();
-        this.userName = userCreateDTO.name();
         this.createdAt =  Instant.now();
+        this.userName = userCreateDTO.name();
+        this.password=userCreateDTO.password();
+        this.email=userCreateDTO.email();
         this.userStatus = new UserStatus(this.id);
         updateBinaryContent(userCreateDTO.filePath());
     }
