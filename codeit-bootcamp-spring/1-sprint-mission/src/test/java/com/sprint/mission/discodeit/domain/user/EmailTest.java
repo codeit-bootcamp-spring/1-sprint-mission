@@ -52,7 +52,7 @@ class EmailTest {
             "abc@.com",         // 도메인 앞부분 없음
             "abc@exam_ple.com", // 언더스코어 포함 (일반적으로 허용되지 않음)
     })
-    void 이메일_생성_Invalid값_에러throw(String email) {
+    void 이메일_생성_Invalid_값_에러throw(String email) {
         //given
         // when
         Throwable throwable = Assertions.catchThrowable(() -> new Email(email));

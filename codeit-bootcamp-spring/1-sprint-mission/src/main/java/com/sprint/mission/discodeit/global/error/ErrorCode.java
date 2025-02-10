@@ -49,5 +49,4 @@ public enum ErrorCode {
     public String getDescription() {
         return description;
     }
-
 }

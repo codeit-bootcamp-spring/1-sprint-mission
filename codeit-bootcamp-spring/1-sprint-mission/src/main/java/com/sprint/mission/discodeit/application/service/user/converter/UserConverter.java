@@ -21,7 +21,7 @@ public class UserConverter {
             .email(new Email(requestDto.email()))
             .password(new Password(requestDto.password()))
             .birthDate(new BirthDate(requestDto.birthDate()))
-            .emailSubscriptionStatus(EmailSubscriptionStatus.UNSUBSCRIBED)  // TODO 이넘 타입 dto에서 어떻게 받아서 넘겨야하나.
+            .emailSubscriptionStatus(EmailSubscriptionStatus.UNSUBSCRIBED)
             .build();
     }
 
