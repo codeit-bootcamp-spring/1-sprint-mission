@@ -10,7 +10,7 @@ import java.util.function.Function;
 
 public enum UserServiceType {
     JCF(JCFUserService::new),
-    FILE(FileUserService::new)
+    FILE(FileUserService::new),
     ;
 
     private final Function<UserRepository, UserService> function;

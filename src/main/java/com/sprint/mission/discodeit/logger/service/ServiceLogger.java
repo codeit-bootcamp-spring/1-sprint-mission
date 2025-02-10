@@ -80,8 +80,4 @@ public class ServiceLogger {
         LOGGER.info(message);
     }
 
-    public void info(String message, UUID id) {
-        LOGGER.info(message + ", ID: " + id.toString());
-    }
-
 }
