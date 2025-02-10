@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -128,7 +127,7 @@ public class UserStatusService {
 
     public void delete(UUID userStatusId){
         //userStatus 조회
-        if(!userStatusRepository.existsById(userStatusId)){
+        if(!userStatusRepository.existsByUserStatusId(userStatusId)){
             throw new IllegalArgumentException("UserStatus not found");
         }
         //삭제

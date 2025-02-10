@@ -8,16 +8,20 @@ import java.util.UUID;
 public record BinaryContentDTO(
         UUID id,
         UUID userId,
+        UUID messageId,
         String filename,
         String contentType,
+        byte[] fileData,
         Instant createdAt
 ) {
     public static BinaryContentDTO fromEntity(BinaryContent binaryContent) {
         return new BinaryContentDTO(
                 binaryContent.getId(),
-                binaryContent.getUser().getId(),
+                binaryContent.getUserId(),
+                binaryContent.getMessageId(),
                 binaryContent.getFilename(),
                 binaryContent.getContentType(),
+                binaryContent.getFileData(),
                 binaryContent.getCreatedAt()
         );
     }

@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import com.sprint.mission.discodeit.service.interfacepac.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
@@ -33,28 +35,31 @@ public class BasicUserService implements UserService {
                 userRepository.existsByUsername(userCreateDTO.username())) {
             throw new IllegalArgumentException("User with email " + userCreateDTO.email() + " already exists");
         }
-
+        // 새 사용자 생성, 저장
         User newUser = new User(userCreateDTO.username(),userCreateDTO.email() ,userCreateDTO.password() );
         userRepository.save(newUser);
 
-
+        // 프로필 이미지 저장 (선택적)
         if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
             BinaryContent binaryContent = new BinaryContent(
                     UUID.randomUUID(),
-                    newUser,
+                    newUser.getId(),
+                    null,
                     userProfileImageDTO.fileName(),
                     "image/jpeg",
                     userProfileImageDTO.imageData()
             );
-            binaryContentRepository.save(binaryContent); // 레포지토리 미구현 나중에 수정 해야함.
+            binaryContentRepository.save(binaryContent);
         }
-
+        //사용자 상태 생성, 저장
         UserStatus userStatus = new UserStatus(newUser, Instant.now());
-        System.out.println("User created: " + userCreateDTO.username() + " (email: " + userCreateDTO.email() + ")");
-        userStatusRepository.save(userStatus); // 레포지토리 미구현 나중에 수정해야함.
+        userStatusRepository.save(userStatus);
 
         boolean isOnline = userStatus.isOnline();
-        return new UserDTO(newUser.getId(),
+        log.info("User created: {} (email: {})", userCreateDTO.username(), userCreateDTO.email());
+
+        return new UserDTO(
+                newUser.getId(),
                 newUser.getUsername(),
                 newUser.getEmail(),
                 newUser.getCreatedAt(),
@@ -83,20 +88,27 @@ public class BasicUserService implements UserService {
                     boolean isOnline = userStatusRepository.findByUser(user)
                             .map(UserStatus::isOnline)
                             .orElse(false);
-                    return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
+                    return new UserDTO(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getCreatedAt(),
+                            user.getUpdatedAt(),
+                            isOnline
+                    );
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public UserDTO update(UserUpdateDTO userUpdateDTO, UserProfileImageDTO userProfileImageDTO) {
-        try {
             //사용자 찾고
             User user = userRepository.findById(userUpdateDTO.id())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
             //중복체크
-            if(userRepository.existsByEmail(userUpdateDTO.newEmail())){
+            if(!user.getEmail().equals(userUpdateDTO.newEmail()) &&
+                    userRepository.existsByEmail(userUpdateDTO.newEmail())){
                 throw new IllegalArgumentException("Email already exits " + userUpdateDTO.newEmail());
             }
             //업데이트
@@ -104,11 +116,13 @@ public class BasicUserService implements UserService {
             userRepository.save(user);
             //프로필 이미지 저장 (선택적으로)
             if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
-                binaryContentRepository.findByUserId(user.getId()) // 레포지토리 미구현 수정해야함.
-                        .ifPrenset(binaryContentRepository::delete);
+                //기존 이미지 삭제 , 이미지 저장
+                binaryContentRepository.deleteByUserId(user.getId());
+
                 BinaryContent binaryContent = new BinaryContent(
                         UUID.randomUUID(),
-                        user,
+                        user.getId(),
+                        null,
                         userProfileImageDTO.fileName(),
                         "image/jpeg",
                         userProfileImageDTO.imageData()
@@ -118,29 +132,33 @@ public class BasicUserService implements UserService {
             boolean isOnline = userStatusRepository.findByUser(user)
                     .map(UserStatus::isOnline)
                     .orElse(false);
-            return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
-        }catch (IllegalArgumentException e){
-            System.out.println("Failed to update user " + e.getMessage());
-            throw e;
-        }
+            return new UserDTO(user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getCreatedAt(),
+                    user.getUpdatedAt(),
+                    isOnline
+            );
     }
 
     @Override
     public void delete(UUID userId) {
-        try {
             //사용자 찾고
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
+            //관련 데이터 삭제(첨부파일, 유저 상태)
+            if(binaryContentRepository.existsByUserId(userId)){
+                binaryContentRepository.deleteByUserId(user.getId());
+            }
+            if(userStatusRepository.existByUserId(userId)){
+                userStatusRepository.deleteByUserId(user.getId());
+            }
 
-            //관련 데이터 삭제
-            binaryContentRepository.findByUserId(user.getId()).ifPresent(binaryContentRepository::delete); // 레포지터리 미구현 확인
-            userStatusRepository.findByUser(user).ifPresent(userStatusRepository::delete); // 미구현 확인 해야함
+
             //user 삭제
             userRepository.deleteById(userId);
-            System.out.println("User deleted: " + user.getEmail());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Failed to delete user: " + e.getMessage());
+            log.info("User: {} deleted", userId);
         }
-    }
+
 
 }

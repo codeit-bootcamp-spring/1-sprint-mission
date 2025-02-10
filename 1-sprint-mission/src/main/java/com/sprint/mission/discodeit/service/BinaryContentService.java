@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -7,12 +8,15 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BinaryContentService {
@@ -27,38 +31,33 @@ public class BinaryContentService {
         //새로운 binaryContent 생성, 저장
         BinaryContent binaryContent = new BinaryContent(
                 UUID.randomUUID(),
-                user,
+                user.getId(),
+                createDTO.messageId(),
                 createDTO.filename(),
-                createDTO.contentType(),
+                "application/octet-stream",
                 createDTO.fileData()
         );
         binaryContentRepository.save(binaryContent);
 
         // DTO 변환 반환
-        return new BinaryContentResponseDTO(
-                binaryContent.getId(),
-                binaryContent.getUser().getId(),
-                binaryContent.getFilename(),
-                binaryContent.getContentType(),
-                binaryContent.getCreatedAt()
-        );
+        return BinaryContentResponseDTO.fromEntity(binaryContent);
     }
 
-    public BinaryContentResponseDTO find(UUID binaryContentId){
+    public BinaryContentDTO find(UUID binaryContentId){
         // ID 기준으로 조회
         BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
                 .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
         //DTO 변환 반환
-        return BinaryContentResponseDTO.fromEntity(binaryContent);
+        return BinaryContentDTO.fromEntity(binaryContent);
     }
 
     public List<BinaryContentResponseDTO> findAllByIdIn(List<UUID> binaryContentIds){
-        // id 목록 기반으로 조회
-        List<BinaryContent> binaryContents = binaryContentRepository.findAllByIdIn(binaryContentIds);
-        //조회된 데이터 DTO 변환 반환
-        return binaryContents.stream()
+        if(binaryContentIds.isEmpty()){
+            return List.of();
+        }
+        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
                 .map(BinaryContentResponseDTO::fromEntity)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public void delete(UUID binaryContentId){
@@ -69,6 +68,6 @@ public class BinaryContentService {
         binaryContentRepository.delete(binaryContent);
 
         System.out.println("BinaryContent deleted: " + binaryContentId);
-
+        log.info("BinaryContent deleted: {}", binaryContentId);
     }
 }

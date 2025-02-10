@@ -20,6 +20,7 @@ public interface ReadStatusRepository {
     List<Channel>findChannelsByUser(User Owner);
     List<UUID>findUserIdsByChannel(Channel channel);
     Optional<ReadStatus> findById(UUID id);
+    Optional<ReadStatus> findByUserAndChannel(User user, Channel channel);
     //
      boolean existsByUserAndChannel(User user, Channel channel);
     //

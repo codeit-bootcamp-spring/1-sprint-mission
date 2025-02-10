@@ -15,7 +15,7 @@ public record BinaryContentResponseDTO(
     public static BinaryContentResponseDTO fromEntity(BinaryContent binaryContent) {
         return new BinaryContentResponseDTO(
                 binaryContent.getId(),
-                binaryContent.getUser().getId(),
+                binaryContent.getUserId(),
                 binaryContent.getFilename(),
                 binaryContent.getContentType(),
                 binaryContent.getCreatedAt()

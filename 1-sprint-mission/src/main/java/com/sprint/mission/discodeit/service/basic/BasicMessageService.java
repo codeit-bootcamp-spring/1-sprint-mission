@@ -1,26 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
-import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
-import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.repository.interfacepac.*;
 import com.sprint.mission.discodeit.service.interfacepac.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
@@ -28,6 +25,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final ReadStatusRepository readStatusRepository;
 
 
 
@@ -35,10 +33,10 @@ public class BasicMessageService implements MessageService {
     public MessageResponseDTO create(MessageCreateDTO messageCreateDTO) {
         //사용자 조회
         User user = userRepository.findById(messageCreateDTO.userId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new IllegalArgumentException("User not found" + messageCreateDTO.userId()));
         //채널 조회
         Channel channel = channelRepository.findById(messageCreateDTO.channelId())
-                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found" + messageCreateDTO.channelId()));
         //메세지 생성
         Message newMessage = new Message(user, channel, messageCreateDTO.content());
         messageRepository.save(newMessage);
@@ -49,19 +47,27 @@ public class BasicMessageService implements MessageService {
             attachments = messageCreateDTO.attachments().stream()
                     .map(fileDTO -> new BinaryContent(
                             UUID.randomUUID(),
-                            user,
+                            user.getId(),
+                            newMessage.getId(),
                             fileDTO.filename(),
-                            fileDTO.contentType(),
+                            "application/octet-stream",
                             fileDTO.fileData()
                     ))
                     .toList();
             attachments.forEach(binaryContentRepository::save);
         }
+        //readStatus 업데이트
+        ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
+                .orElseGet(() -> new ReadStatus(user, channel, Instant.now()));
+
+        readStatus.updateReadTime(newMessage.getCreatedAt());
+        readStatusRepository.save(readStatus);
+
         // 메시지 응답 DTO 반환
         return new MessageResponseDTO(
                 newMessage.getId(),
-                newMessage.getUser().getId(),
-                newMessage.getChannel().getId(),
+                user.getId(),
+                channel.getId(),
                 newMessage.getContent(),
                 attachments.stream().map(BinaryContentDTO::fromEntity).toList(),
                 newMessage.getCreatedAt()
@@ -85,27 +91,35 @@ public class BasicMessageService implements MessageService {
     public List<Message> findAll() {
         try {
             List<Message> messages = messageRepository.findAll();
+
             if (messages.isEmpty()) {
                 throw new IllegalStateException("No messages found in the system.");
             }
             return messages;
-        }catch (IllegalStateException e){
+
+        }catch (IllegalArgumentException e){
             System.out.println("Failed to read all messages: " + e.getMessage());
-            return List.of();
         }
+
+        return List.of();
     }
 
     @Override
     public List<MessageResponseDTO> findMessagesByChannelId(UUID channelId) {
         //채널 확인
-        Channel channel = channelRepository.findById(channelId)
+        channelRepository.findById(channelId)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+
         //특정 채널 메서지 조회
-        List<Message> messages = messageRepository.findAllByChannelId(channelId);// 이 부분 구현 해야함!!!!!
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        if(messages.isEmpty()) {
+            return List.of();
+        }
         // 메시지를 DTO로 변환 반환
-        return messages.stream().map(message -> {
+        return messages.stream()
+                .map(message -> {
             // 메세지에 연결되어있는 첨부파일 가져오기
-            List<BinaryContentDTO> attachments = binaryContentRepository.findByMessageId(message.getId())
+            List<BinaryContentDTO> attachments = binaryContentRepository.findAllByMessageId(message.getId())
                     .stream()
                     .map(BinaryContentDTO::fromEntity)  //BinaryContent -> BinaryContentDTO로 타입 변경.
                     .toList();
@@ -138,21 +152,31 @@ public class BasicMessageService implements MessageService {
             List<BinaryContent> newAttachments = updateDTO.attachments().stream()
                     .map(fileDTO -> new BinaryContent(
                             UUID.randomUUID(),
-                            messageToUpdate.getUser(),
+                            messageToUpdate.getUser().getId(),
+                            messageToUpdate.getId(),
                             fileDTO.filename(),
-                            fileDTO.contentType(),
+                            "application/octet-stream",
                             fileDTO.fileData()
 
                     ))
                     .toList();
             newAttachments.forEach(binaryContentRepository::save);
         }
+        ReadStatus readStatus = readStatusRepository.findById(updateDTO.messageId())
+                .orElseGet(() -> new ReadStatus(
+                        messageToUpdate.getUser(),
+                        messageToUpdate.getChannel(),
+                        Instant.now()
+                ));
+        readStatus.updateReadTime(Instant.now());
+        readStatusRepository.save(readStatus);
+
         return new MessageResponseDTO(
                 messageToUpdate.getId(),
                 messageToUpdate.getUser().getId(),
                 messageToUpdate.getChannel().getId(),
                 messageToUpdate.getContent(),
-                binaryContentRepository.findByMessageId(messageToUpdate.getId())
+                binaryContentRepository.findAllByMessageId(messageToUpdate.getId())
                         .stream()
                         .map(BinaryContentDTO::fromEntity)
                         .toList(),
@@ -171,7 +195,7 @@ public class BasicMessageService implements MessageService {
         //메시지 삭제
         messageRepository.deleteById(messageId);
 
-        System.out.println("Message deleted: " + messageId);
+       log.info("Message deleted: {}", messageId);
 
     }
 }
