@@ -2,17 +2,31 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 //@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private final String FILE_PATH="readStatus.ser";
+    private final Path DIRECTORY;
+    private final Path FILE_PATH;
     private final Map<UUID, ReadStatus> data;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(@Value("${discodeit.repository.file.storage-path}")String storagePath) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), storagePath,"ReadStatus");
+        this.FILE_PATH = DIRECTORY.resolve("readStatus.ser");
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create directory: " + DIRECTORY, e);
+            }
+        }
         this.data = loadDataFromFile();
     }
 
@@ -71,8 +85,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     // 데이터를 파일에 저장
     private void saveDataToFile() {
-        File file = new File(FILE_PATH);
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH.toFile()))) {
             oos.writeObject(data);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save data to file: " + e.getMessage(), e);
@@ -81,7 +94,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     // 파일에서 데이터를 로드
     private Map<UUID, ReadStatus> loadDataFromFile() {
-        File file = new File(FILE_PATH);
+        File file = FILE_PATH.toFile();
         if (!file.exists()) {
             return new HashMap<>();
         }

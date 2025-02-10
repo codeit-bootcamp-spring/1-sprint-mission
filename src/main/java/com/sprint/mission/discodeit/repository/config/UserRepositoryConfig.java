@@ -24,12 +24,13 @@ public class UserRepositoryConfig {
 
     @Bean
     public UserRepository userRepository(
-            @Value("${discodeit.repository.type}") String repositoryType
+            @Value("${discodeit.repository.type}") String repositoryType,
+            @Value("${discodeit.repository.file.storage-path}") String storagePath
     ) {
-        if (repositoryType.equals("jcf")) {
+        if ("jcf".equalsIgnoreCase(repositoryType)) {
             return new JCFUserRepository();
-        } else {
-            return new FileUserRepository();
+        }else {
+            return new FileUserRepository(storagePath);
         }
     }
 }

@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.repository.config;
 
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +13,13 @@ import org.springframework.context.annotation.Configuration;
 public class MessageRepositoryConfig {
     @Bean
     public MessageRepository messageRepository(
-            @Value("${discodeit.repository.type}") String repositoryType
+            @Value("${discodeit.repository.type}") String repositoryType,
+            @Value("${discodeit.repository.file.storage-path}") String storagePath
     ) {
-        if (repositoryType.equals("jcf")) {
+        if ("jcf".equalsIgnoreCase(repositoryType)) {
             return new JCFMessageRepository();
-        } else {
-            return new FileMessageRepository();
+        }else {
+            return new FileMessageRepository(storagePath);
         }
     }
 }

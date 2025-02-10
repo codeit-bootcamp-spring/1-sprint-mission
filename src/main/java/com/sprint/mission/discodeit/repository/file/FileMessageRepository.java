@@ -2,19 +2,34 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 //@Repository
 public class FileMessageRepository implements MessageRepository {
-    private final String FILE_PATH="message.ser";
+    private final Path DIRECTORY;
+    private final Path FILE_PATH;
     private final Map<UUID, Message> data;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(@Value("${discodeit.repository.file.storage-path}")String storagePath) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), storagePath,"Message");
+        this.FILE_PATH = DIRECTORY.resolve("message.ser");
+
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create directory: " + DIRECTORY, e);
+            }
+        }
         this.data=loadDataFromFile();
     }
 
@@ -82,7 +97,7 @@ public class FileMessageRepository implements MessageRepository {
 
     // 데이터를 파일에 저장
     private void saveDataToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH.toFile()))) {
             oos.writeObject(data);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save data to file: " + e.getMessage(), e);
@@ -91,7 +106,7 @@ public class FileMessageRepository implements MessageRepository {
 
     // 파일에서 데이터를 로드
     private Map<UUID, Message> loadDataFromFile() {
-        File file = new File(FILE_PATH);
+        File file = FILE_PATH.toFile();
         if (!file.exists()) {
             return new HashMap<>();
         }
