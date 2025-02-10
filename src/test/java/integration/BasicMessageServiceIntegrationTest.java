@@ -44,8 +44,6 @@ public class BasicMessageServiceIntegrationTest {
   private UserService userService;
   @Autowired
   private ChannelService channelService;
-  @Autowired
-  private BinaryContentService binaryContentService;
 
   private User user;
   private PrivateChannelResponseDto channel, channel2;
