@@ -4,6 +4,7 @@ import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.service.UserService;
@@ -41,7 +42,6 @@ public class BasicUserServiceIntegrationTest {
     userDto2 = new CreateUserDto(
         "username2","pwd2","email2@email.com","nickname2","01012341233",new byte[]{1}, "image2", "jpg", "description1"
     );
-
   }
 
   @Test
@@ -190,5 +190,29 @@ public class BasicUserServiceIntegrationTest {
     userService.updateUser(user.getUUID(), updateDto, "pwd1");
 
     assertThatThrownBy(() -> userService.updateUser(user.getUUID(), updateDto, "pwd1")).isInstanceOf(UserValidationException.class);
+  }
+
+  @Test
+  void 프로필_사진을_등록하고_불러올수_있다(){
+    User user = userService.createUser(
+        new CreateUserDto(
+            "newUser",
+            "newPwd",
+            "new@email.com",
+            "newNickname",
+            "01098765432",
+            new byte[]{1,2,3},
+            "profileImage",
+            "jpg","description"
+        )
+    );
+
+    UserResponseDto responseDto = userService.findUserById(user.getUUID());
+    BinaryContent profileImage = responseDto.profilePicture();
+
+    assertThat(profileImage.getUserId()).isEqualTo(user.getUUID());
+    assertThat(profileImage.getFileName()).isEqualTo("profileImage");
+    assertThat(profileImage.getData()).hasSize(3);
+    assertThat(profileImage.getData()).containsExactlyInAnyOrder(1,2,3);
   }
 }

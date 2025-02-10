@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 
+import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
 @Service
@@ -143,7 +145,12 @@ public class BasicUserService implements UserService {
         () -> createStatusIfNotExists(id)
     );
 
-    return UserResponseDto.from(user, status);
+    BinaryContent profilePicture = null;
+    if(user.getBinaryContentId() != null) {
+       profilePicture = binaryContentRepository.findById(user.getBinaryContentId()).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+    }
+
+    return UserResponseDto.from(user, status, profilePicture);
   }
 
   private UserStatus createStatusIfNotExists(String id) {
@@ -163,7 +170,8 @@ public class BasicUserService implements UserService {
             userStatusRepository.findByUserId(user.getUUID())
                 .orElseGet(
                     () -> createStatusIfNotExists(user.getUUID())
-                )
+                ),
+            binaryContentRepository.findById(user.getUUID()).orElse(null)
         )).toList();
   }
 

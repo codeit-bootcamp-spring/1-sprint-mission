@@ -36,17 +36,11 @@ public class BinaryContentServiceImplIntegrationTest {
 
     File userFile = new File(USER_FILE);
     File binaryContentFile = new File(BINARY_CONTENT_FILE);
-//    File userStatusFile = new File(USER_STATUS_FILE);
-//    File channelFile = new File(CHANNEL_FILE);
-//    File messageFile = new File(MESSAGE_FILE);
-//    File binaryContentFile = new File(BINARY_CONTENT_FILE);
+
 
     if (userFile.exists()) userFile.delete();
     if (binaryContentFile.exists()) binaryContentFile.delete();
-//    if (userStatusFile.exists()) userStatusFile.delete();
-//    if(channelFile.exists()) channelFile.delete();
-//    if(messageFile.exists()) messageFile.delete();
-//    if(binaryContentFile.exists()) binaryContentFile.delete();
+
 
     user = userService.createUser(
         new CreateUserDto(

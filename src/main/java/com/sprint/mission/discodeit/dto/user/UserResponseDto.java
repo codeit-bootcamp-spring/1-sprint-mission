@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -13,9 +14,10 @@ public record UserResponseDto(
     String phoneNumber,
     Instant createdAt,
     Instant lastOnlineAt,
-    String userStatus
+    String userStatus,
+    BinaryContent profilePicture
 ) {
-  public static UserResponseDto from(User user, UserStatus userStatus){
+  public static UserResponseDto from(User user, UserStatus userStatus, BinaryContent profilePicture){
     return new UserResponseDto(
         user.getUUID(),
         user.getUsername(),
@@ -24,7 +26,8 @@ public record UserResponseDto(
         user.getPhoneNumber(),
         user.getCreatedAt(),
         userStatus.getLastOnlineAt(),
-        userStatus.getUserStatus().toString()
+        userStatus.getUserStatus().toString(),
+        profilePicture
     );
   }
 }
