@@ -50,8 +50,6 @@ public class BasicUserService implements UserService {
   @Override
   public User createUser(CreateUserDto userDto) {
 
-
-
     User user = new User.UserBuilder(
         userDto.username(),
         PasswordEncryptor.hashPassword(userDto.password()),

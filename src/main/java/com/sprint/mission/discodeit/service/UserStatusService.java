@@ -9,6 +9,7 @@ import java.util.List;
 public interface UserStatusService {
   UserStatus create(CreateUserStatusDto dto);
   UserStatus find(String id);
+  UserStatus findByUserId(String userId);
   List<UserStatus> findAll();
   UserStatus update(UpdateUserStatusDto dto);
   UserStatus updateByUserId(String userId, UpdateUserStatusDto dto);

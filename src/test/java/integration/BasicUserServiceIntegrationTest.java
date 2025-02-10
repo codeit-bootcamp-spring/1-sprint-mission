@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.service.UserService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
-public class UserServiceIntegrationTest {
+public class BasicUserServiceIntegrationTest {
 
   @Autowired
   private UserService userService;

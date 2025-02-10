@@ -43,6 +43,12 @@ public class UserStatusServiceImpl implements UserStatusService {
   }
 
   @Override
+  public UserStatus findByUserId(String userId) {
+    validator.findOrThrow(User.class, userId, new UserNotFoundException());
+    return userStatusRepository.findByUserId(userId).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+  }
+
+  @Override
   public List<UserStatus> findAll() {
     return userStatusRepository.findAll();
   }
