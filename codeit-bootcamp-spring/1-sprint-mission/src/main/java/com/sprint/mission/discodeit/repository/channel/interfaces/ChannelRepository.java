@@ -9,4 +9,6 @@ public interface ChannelRepository {
     Channel save(Channel channel);
 
     Optional<Channel> findOneById(UUID uuid);
+
+    void deleteById(UUID uuid);
 }

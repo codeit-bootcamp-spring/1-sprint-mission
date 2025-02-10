@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.domain.channel;
 
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNameInvalidException;
+import com.sprint.mission.discodeit.domain.channel.exception.ChannelSubjectOverLengthException;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -33,14 +34,18 @@ public class Channel {
 
     public void updateSubject(String subject) {
         if (subject.length() > SUBJECT_MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw new ChannelSubjectOverLengthException(ErrorCode.INVALID_SUBJECT_LENGTH, "입력 글자 수:".concat(String.valueOf(subject.length())));
         }
         this.subject = subject;
     }
 
+    public void updateName(String name) {
+        this.name = name.trim();
+    }
+
     private void validate(String name) {
         if (Objects.isNull(name) || name.isBlank()) {
-            throw new ChannelNameInvalidException(ErrorCode.INVALID_CHANNEL_NAME_LENGTH, name);
+            throw new ChannelNameInvalidException(ErrorCode.INVALID_CHANNEL_NAME_NOT_NULL, name);
         }
     }
 

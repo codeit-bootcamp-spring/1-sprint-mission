@@ -4,7 +4,7 @@ public enum ErrorCode {
 
     // common
     NOT_FOUND(404, "요청한 데이터를 찾을 수 없습니다."),
-
+    INVALID_SUBJECT_LENGTH(400, "채널 주제는 최대 1024자 이내여야 합니다."),
     // User
     INVALID_USERNAME_LENGTH(400, "유저 이름은 1~32자 이내여야 합니다."),
     INVALID_NICKNAME_LENGTH(400, "유저 이름은 2~32자 이내여야 합니다."),
@@ -28,7 +28,10 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
 
     // Channel
-    INVALID_CHANNEL_NAME_LENGTH(400, "채널 이름은 필수입니다."),
+    INVALID_CHANNEL_NAME_NOT_NULL(400, "채널 이름은 필수 입력값 입니다."),
+
+    // Message
+    INVALID_MESSAGE_CONTENT_NOT_NULL(400, "메시지 내용은 필수 입력값 입니다."),
     ;
 
     private final int status;

@@ -21,4 +21,9 @@ public class InMemoryChannelRepository implements ChannelRepository {
     public Optional<Channel> findOneById(UUID uuid) {
         return Optional.ofNullable(uuidChannels.get(uuid));
     }
+
+    @Override
+    public void deleteById(UUID uuid) {
+        uuidChannels.remove(uuid);
+    }
 }
