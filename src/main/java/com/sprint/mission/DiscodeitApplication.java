@@ -1,8 +1,11 @@
 
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -10,26 +13,57 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.sprint.mission.discodeit.*", "com.sprint.mission.discodeit.repository.jcf"})
 public class DiscodeitApplication {
 
+  private static AuthService authService;
+  private static ChannelService channelService;
+  private static MessageService messageService;
+  private static UserService userService;
+  private static BinaryContentService binaryContentService;
+  private static ReadStatusService readStatusService;
+  private static UserStatusService userStatusService;
+
   public static void main(String[] args) {
-    SpringApplication.run(DiscodeitApplication.class, args);
+    ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+    authService = context.getBean(AuthService.class);
+    channelService = context.getBean(ChannelService.class);
+    messageService = context.getBean(MessageService.class);
+    userService = context.getBean(UserService.class);
+    binaryContentService = context.getBean(BinaryContentService.class);
+    readStatusService = context.getBean(ReadStatusService.class);
+    userStatusService = context.getBean(UserStatusService.class);
+
+  }
+
+  static void userSimulation() {
+    System.out.println("=== 유저 생성 및 조회 ===");
+
+    CreateUserDto createUserDto1 = new CreateUserDto(
+        "username1",
+        "pwd1",
+        "email1@email.com",
+        "nickname1",
+        "01012341234",
+        new byte[]{1, 2, 3},
+        "user1ProfileImage",
+        "jpg",
+        "description1"
+    );
+
+    CreateUserDto createUserDto2 = new CreateUserDto(
+        "username2",
+        "pwd2",
+        "email2@email.com",
+        "nickname2",
+        "01012341233",
+        new byte[]{1, 2, 3},
+        "user2ProfileImage",
+        "jpg",
+        "description2"
+    );
+
+
   }
 }
 /*
-  private static void setup() {
-    File file = new File(MESSAGE_FILE);
-    File file2 = new File(USER_FILE);
-    File file3 = new File(CHANNEL_FILE);
-
-    if (file.exists()) {
-      file.delete();
-    }
-    if (file2.exists()) {
-      file2.delete();
-    }
-    if (file3.exists()) {
-      file3.delete();
-    }
-  }}
 
   static void userSimulation() {
 
