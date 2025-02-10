@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.channel.InMemoryChannelRepository
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ChannelFactory {
@@ -18,13 +19,13 @@ public class ChannelFactory {
     }
 
     public static ChannelRepository createChannelRepository() {
-        Properties props = new Properties();
-        try {
-            props.load(new FileInputStream("application.yaml"));
+        Properties properties = new Properties();
+        try (InputStream is = ChannelFactory.class.getClassLoader().getResourceAsStream("application.properties")) {
+            properties.load(is);
         } catch (IOException exception) {
             System.out.println("설정 파일 로드 실패, 기본값(memory) 사용");
         }
-        String repositoryType = props.getProperty("repository.type", "memory");
+        String repositoryType = properties.getProperty("repository.type", "memory");
 
         return switch (repositoryType) {
             default -> new InMemoryChannelRepository();
