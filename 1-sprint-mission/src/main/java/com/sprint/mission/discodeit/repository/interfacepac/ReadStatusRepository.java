@@ -17,7 +17,7 @@ public interface ReadStatusRepository {
     //
     List<ReadStatus> findAllByChannel(Channel channel);
     List<ReadStatus> findAllByUser(User user);
-    List<Channel>findChannelsByUser(User Owner);
+    List<Channel>findChannelsByUser(User owner);
     List<UUID>findUserIdsByChannel(Channel channel);
     Optional<ReadStatus> findById(UUID id);
     Optional<ReadStatus> findByUserAndChannel(User user, Channel channel);

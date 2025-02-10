@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.interfacepac.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -22,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -182,6 +184,6 @@ public class BasicChannelService implements ChannelService {
         //채널 삭제
         channelRepository.deleteByChannel(channel);
 
-        System.out.println("Channel deleted: " + channelId);
+        log.info("Deleted channel: {}", channelId);
     }
 }

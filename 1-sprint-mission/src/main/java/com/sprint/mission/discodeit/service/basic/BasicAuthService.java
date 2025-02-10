@@ -7,16 +7,16 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import com.sprint.mission.discodeit.service.interfacepac.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
+@RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
-    public BasicAuthService(UserRepository userRepository, UserStatusRepository userStatusRepository) {
-        this.userRepository = userRepository;
-        this.userStatusRepository = userStatusRepository;
-    }
 
     @Override
     public UserLoginResponseDTO login(UserLoginRequestDTO userLoginRequestDTO) {

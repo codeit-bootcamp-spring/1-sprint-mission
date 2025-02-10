@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-
+@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
     private static final String FILE_PATH = "tmp/user_status.ser";
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -77,13 +79,13 @@ public class FileUserStatusRepository implements UserStatusRepository {
     private Map<UUID, UserStatus> loadFromFile() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
         try {
             return objectMapper.readValue(file, new TypeReference<Map<UUID, UserStatus>>() {});
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
     }
 

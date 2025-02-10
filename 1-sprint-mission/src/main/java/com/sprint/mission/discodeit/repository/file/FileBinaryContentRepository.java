@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,13 +87,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     private Map<UUID, BinaryContent> loadFromFile() {
         File file = new File(FILE_PATH);
         if(!file.exists()){
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
         try {
             return objectMapper.readValue(file, new TypeReference<Map<UUID, BinaryContent>>() {});
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
     }
 
