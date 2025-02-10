@@ -13,12 +13,13 @@ public class Message implements Serializable {
 
     private static final Long serialVersionUID = 1L;
     private UUID id ;
-    private String content;
     private final Instant createdAt;
     private Instant updatedAt;
 
     private UUID senderId;
     private UUID channelId;
+    private String content;
+
 
     public Message(UUID userId, UUID channelId, String content){
         this.id = UUID.randomUUID();

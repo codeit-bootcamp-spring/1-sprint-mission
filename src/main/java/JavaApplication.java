@@ -23,59 +23,59 @@ public class JavaApplication {
 
     public static void main(String[] args) {
 
-        JCFChannelService jcfChannelService = new JCFChannelService();
-        JCFUserService jcfUserService = new JCFUserService();
-        JCFMessageService jcfMessageService = new JCFMessageService();
-
-
-
-        //file* Service 테스트
-
-        FileChannelService fileChannelService = new FileChannelService();
-        FileUserService fileUserService= new FileUserService();
-        FileMessageService fileMessageService = new FileMessageService();
-
-        Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
-        Channel channel3 = fileChannelService.createChannel("ch_fileIO_3");
-        Channel channel2=  fileChannelService.readChannel(channel1.getId());
-
-
-        System.out.println(channel1.getId());
-        System.out.println(channel2.getId());
-
-        System.out.println(channel2.getChannelName());
-
-        User user1 = fileUserService.createUser("user1");
-
-        Message message1 = fileMessageService.createMessage(user1.getId(), channel1.getId(),"message1");
-
-
-
-        FileChannelRepository fileChannelRepository = new FileChannelRepository();
-        fileChannelRepository.save(channel1);
-
-
-        
-        //Basic*Service 테스트
-        JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
-        BasicChannelService basicChannelService = new BasicChannelService(jcfChannelRepository);
-
-        //채널 추가
-        Channel newChannel = basicChannelService.createChannel("newChannel");
-        Channel newChannel2 = basicChannelService.createChannel("newChannel2");
-        System.out.println(basicChannelService.readChannel(newChannel.getId()).getChannelName());
-        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
-
-        //모두 로드
-        System.out.println(basicChannelService.readAllChannel());
-
-        //이름 변경
-        System.out.println(basicChannelService.modifyChannel(newChannel2.getId(), "newChannel3"));
-        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
-
-        //채널 삭제
-        basicChannelService.deleteChannel(newChannel2.getId());
-        System.out.println(basicChannelService.readAllChannel());
+//        JCFChannelService jcfChannelService = new JCFChannelService();
+//        JCFUserService jcfUserService = new JCFUserService();
+//        JCFMessageService jcfMessageService = new JCFMessageService();
+//
+//
+//
+//        //file* Service 테스트
+//
+//        FileChannelService fileChannelService = new FileChannelService();
+//        FileUserService fileUserService= new FileUserService();
+//        FileMessageService fileMessageService = new FileMessageService();
+//
+//        Channel channel1 = fileChannelService.createChannel("ch_fileIO_1");
+//        Channel channel3 = fileChannelService.createChannel("ch_fileIO_3");
+//        Channel channel2=  fileChannelService.readChannel(channel1.getId());
+//
+//
+//        System.out.println(channel1.getId());
+//        System.out.println(channel2.getId());
+//
+//        System.out.println(channel2.getChannelName());
+//
+//        User user1 = fileUserService.createUser("user1");
+//
+//        Message message1 = fileMessageService.createMessage(user1.getId(), channel1.getId(),"message1");
+//
+//
+//
+//        FileChannelRepository fileChannelRepository = new FileChannelRepository();
+//        fileChannelRepository.save(channel1);
+//
+//
+//
+//        //Basic*Service 테스트
+//        JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
+//        BasicChannelService basicChannelService = new BasicChannelService(jcfChannelRepository);
+//
+//        //채널 추가
+//        Channel newChannel = basicChannelService.createChannel("newChannel");
+//        Channel newChannel2 = basicChannelService.createChannel("newChannel2");
+//        System.out.println(basicChannelService.readChannel(newChannel.getId()).getChannelName());
+//        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
+//
+//        //모두 로드
+//        System.out.println(basicChannelService.readAllChannel());
+//
+//        //이름 변경
+//        System.out.println(basicChannelService.modifyChannel(newChannel2.getId(), "newChannel3"));
+//        System.out.println(basicChannelService.readChannel(newChannel2.getId()).getChannelName());
+//
+//        //채널 삭제
+//        basicChannelService.deleteChannel(newChannel2.getId());
+//        System.out.println(basicChannelService.readAllChannel());
 
 
 

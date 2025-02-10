@@ -34,7 +34,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message modifyMessage(UUID msgID, String content) {
+    public Message updateMessage(UUID msgID, String content) {
         Message message = messageRepository.findById(msgID);
         message.updateContent(content);
         return messageRepository.save(message);

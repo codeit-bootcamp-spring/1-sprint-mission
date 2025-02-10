@@ -15,9 +15,10 @@ public class Channel implements Serializable  {
 
     private static final Long serialVersionUID = 1L;
     private final UUID id ;
-    private String channelName;
     private final Instant createdAt;
     private Instant updatedAt;
+
+    private String channelName;
 
     public Channel(String channelName){
         this.id = UUID.randomUUID();

@@ -1,37 +1,92 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class User implements Serializable  {
+public class User implements Serializable {
 
     private static final Long serialVersionUID = 1L;
     private UUID id ;
-    private String userName;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public User(String userName){
+    private String userName;
+    private String password;
+    private String email;
+
+    //고유한 UserStatus, BinaryContent 생성
+    private UserStatus userStatus;
+    private BinaryContent binaryContent;
+
+//    public User(String userName){
+//        this.id = UUID.randomUUID();
+//        this.userName = userName;
+//        this.createdAt =  Instant.now();
+//        userStatus = new UserStatus(this.id);
+//    }
+
+
+    public User(UserCreateDTO userCreateDTO){
         this.id = UUID.randomUUID();
-        this.userName = userName;
-        this.createdAt =  Instant.now(); // 초 단위로 변환
+        this.userName = userCreateDTO.name();
+        this.createdAt =  Instant.now();
+        this.userStatus = new UserStatus(this.id);
+        updateBinaryContent(userCreateDTO.filePath());
     }
 
     //update
     public void updateUpdatedAt(){
         this.updatedAt=Instant.now(); //업데이트 시간
     }
-    public void updateUsername(String userName){
-        this.userName =userName;
+
+    public void updateUser(UserUpdateDTO userUpdateDTO) {
+        updateUserName(userUpdateDTO.newName());
+        updatePassword(userUpdateDTO.newPassword());
+        updateEmail(userUpdateDTO.newEmail());
+        updateBinaryContent(userUpdateDTO.newFilePAth());
+        updateUpdatedAt();
     }
+
+    private void updateUserName(String newName) {
+        this.userName = Objects.requireNonNullElse(newName, this.userName);
+    }
+
+    private void updatePassword(String newPassword) {
+        this.password = Objects.requireNonNullElse(newPassword, this.password);
+    }
+
+    private void updateEmail(String newEmail) {
+        this.email = Objects.requireNonNullElse(newEmail, this.email);
+    }
+
+    //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
+    private void updateBinaryContent(String newFilePath) {
+        if (newFilePath != null) {
+            this.binaryContent = new BinaryContent(this.id, newFilePath.toString());
+        }
+    }
+
+
+    //delete
+
+    public void deleteUserStatus(){
+        this.userStatus=null;
+    }
+    public void deleteBinaryContent(){
+        this.binaryContent=null;
+    }
+
+
 
 
 }

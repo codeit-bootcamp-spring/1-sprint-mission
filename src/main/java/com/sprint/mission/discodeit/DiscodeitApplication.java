@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -15,7 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DiscodeitApplication {
 
 	static User setupUser(UserService userService) {
-		User user = userService.createUser("홍길동");
+		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath"));
 		return user;
 	}
 

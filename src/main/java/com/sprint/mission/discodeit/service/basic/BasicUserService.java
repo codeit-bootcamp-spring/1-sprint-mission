@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -17,8 +20,8 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User createUser(String userName) {
-        User user = new User(userName);
+    public User createUser(UserCreateDTO userCreateDTO) {
+        User user = new User(userCreateDTO);
         userRepository.save(user);
         return user;
     }
@@ -35,14 +38,31 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User modifyUser(UUID userID, String newName) {
+    public User updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findbyId(userID);
-        user.updateUsername(newName);
+        user.updateUser(userUpdateDTO);
         return userRepository.save(user);
     }
 
     @Override
     public void deleteUser(UUID userID) {
+        User user = readUser(userID);
+        user.deleteUserStatus();
+        user.deleteBinaryContent();
         userRepository.delete(userID);
+    }
+
+    @Override
+    public Boolean isNameExist(String name) {
+        return userRepository.load().values()
+                .stream()
+                .anyMatch(user -> user.getUserName().equals(name));
+    }
+
+    @Override
+    public Boolean isEmailExist(String email) {
+        return userRepository.load().values()
+                .stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 }
