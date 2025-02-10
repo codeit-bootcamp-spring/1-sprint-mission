@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.domain.user;
 
 import com.sprint.mission.discodeit.domain.user.exception.BirthDateInvalidException;
-import com.sprint.mission.discodeit.domain.user.validation.BirthDateValidator;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.time.LocalDate;
 import java.util.Objects;

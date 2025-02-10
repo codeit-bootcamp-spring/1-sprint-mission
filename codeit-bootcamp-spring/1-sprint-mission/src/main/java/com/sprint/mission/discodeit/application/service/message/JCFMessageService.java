@@ -40,15 +40,19 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public void updateMessage(UpdateMessageContentRequestDto requestDto) {
+    public void updateMessage(UUID userId, UpdateMessageContentRequestDto requestDto) {
+        User foundUser = userService.findOneByIdOrThrow(userId);
         Message foundMessage = findOneByIdOrThrow(requestDto.messageId());
+        throwIsNotSender(foundUser, foundMessage);
         foundMessage.updateContent(requestDto.content());
         messageRepository.save(foundMessage);
     }
 
     @Override
-    public void deleteMessage(DeleteMessageRequestDto requestDto) {
+    public void deleteMessage(UUID userId, DeleteMessageRequestDto requestDto) {
+        User foundUser = userService.findOneByIdOrThrow(userId);
         Message foundMessage = findOneByIdOrThrow(requestDto.messageId());
+        throwIsNotSender(foundUser, foundMessage);
         messageRepository.deleteById(foundMessage.getId());
     }
 
@@ -56,5 +60,11 @@ public class JCFMessageService implements MessageService {
     public Message findOneByIdOrThrow(UUID messageId) {
         return messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
+    }
+
+    private void throwIsNotSender(User foundUser, Message foundMessage) {
+        if (!foundMessage.isSender(foundUser)) {
+            throw new IllegalArgumentException();
+        }
     }
 }

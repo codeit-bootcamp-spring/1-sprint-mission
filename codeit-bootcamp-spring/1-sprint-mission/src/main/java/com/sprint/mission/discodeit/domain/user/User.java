@@ -1,12 +1,17 @@
 package com.sprint.mission.discodeit.domain.user;
 
 import com.sprint.mission.discodeit.domain.user.enums.EmailSubscriptionStatus;
-import java.time.LocalDateTime;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Builder;
 
-public class User {
+public class User implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1284229838745272170L;
 
     private final UUID id;
     private final Nickname nickname;
@@ -14,8 +19,8 @@ public class User {
     private final Email email;
     private final Password password;
     private final BirthDate birthDate;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private final Instant createdAt;
+    private final Instant updatedAt;
     private final EmailSubscriptionStatus emailSubscriptionStatus;
 
     @Builder
@@ -28,8 +33,8 @@ public class User {
             EmailSubscriptionStatus emailSubscriptionStatus
     ) {
         this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.nickname = nickname;
         this.username = username;
         this.email = email;

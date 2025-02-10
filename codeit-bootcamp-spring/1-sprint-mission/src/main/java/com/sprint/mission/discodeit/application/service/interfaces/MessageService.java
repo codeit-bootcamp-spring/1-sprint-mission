@@ -11,9 +11,9 @@ public interface MessageService {
 
     MessageResponseDto createMessage(CreateMessageRequestDto requestDto);
 
-    void updateMessage(UpdateMessageContentRequestDto requestDto);
+    void updateMessage(UUID userId, UpdateMessageContentRequestDto requestDto);
 
-    void deleteMessage(DeleteMessageRequestDto requestDto);
+    void deleteMessage(UUID userId, DeleteMessageRequestDto requestDto);
 
     Message findOneByIdOrThrow(UUID uuid);
 }

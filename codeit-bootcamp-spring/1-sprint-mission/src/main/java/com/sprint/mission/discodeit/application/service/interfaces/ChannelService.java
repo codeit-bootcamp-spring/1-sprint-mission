@@ -10,13 +10,13 @@ import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelResponseDto create(CreateChannelRequestDto requestDto);
+    ChannelResponseDto create(UUID userId, CreateChannelRequestDto requestDto);
 
     Channel findOneByIdOrThrow(UUID uuid);
 
-    void changeSubject(ChangeChannelSubjectRequestDto requestDto);
+    void changeSubject(UUID userId, ChangeChannelSubjectRequestDto requestDto);
 
-    void changeChannelName(ChangeChannelNameRequestDto requestDto);
+    void changeChannelName(UUID userId, ChangeChannelNameRequestDto requestDto);
 
-    void deleteChannel(DeleteChannelRequestDto requestDto);
+    void deleteChannel(UUID userId, DeleteChannelRequestDto requestDto);
 }

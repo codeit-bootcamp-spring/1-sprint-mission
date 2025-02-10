@@ -3,33 +3,42 @@ package com.sprint.mission.discodeit.domain.channel;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNameInvalidException;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelSubjectOverLengthException;
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 6800939087441796647L;
     private final static int SUBJECT_MAX_LENGTH = 1024;
 
     private final UUID id;
     private String name;
     private String subject;
     private ChannelType type;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
+    private final User manager;
 
     public Channel(
             String name,
-            ChannelType type
+            ChannelType type,
+            User manager
     ) {
         validate(name);
         this.id = UUID.randomUUID();
         this.name = name;
         this.subject = "";
         this.type = type;
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+        this.manager = manager;
     }
 
     public void updateSubject(String subject) {
@@ -50,6 +59,10 @@ public class Channel {
         }
     }
 
+    public boolean isManager(User user) {
+        return this.manager.equals(user);
+    }
+
     public UUID getId() {
         return id;
     }
@@ -64,5 +77,22 @@ public class Channel {
 
     public String getType() {
         return type.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Channel channel = (Channel) o;
+        return Objects.equals(id, channel.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

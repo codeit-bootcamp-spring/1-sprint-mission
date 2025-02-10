@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.domain.user;
 
 import com.sprint.mission.discodeit.domain.user.exception.UserNameInvalidException;
-import com.sprint.mission.discodeit.domain.user.validation.UsernameValidator;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.util.Objects;
 import java.util.Set;

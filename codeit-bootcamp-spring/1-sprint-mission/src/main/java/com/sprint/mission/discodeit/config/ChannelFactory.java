@@ -12,7 +12,7 @@ import java.util.Properties;
 public class ChannelFactory {
 
     private static final ChannelRepository CHANNEL_REPOSITORY = createChannelRepository();
-    private static final ChannelService CHANNEL_SERVICE = new JCFChannelService(CHANNEL_REPOSITORY);
+    private static final ChannelService CHANNEL_SERVICE = new JCFChannelService(CHANNEL_REPOSITORY, UserFactory.getUserService());
 
     public static ChannelService getChannelService() {
         return CHANNEL_SERVICE;
