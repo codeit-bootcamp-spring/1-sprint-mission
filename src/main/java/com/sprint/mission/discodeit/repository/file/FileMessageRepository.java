@@ -95,7 +95,6 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-
     // 디렉토리 초기화
     private void init(Path directory) {
         if (!Files.exists(directory)) {

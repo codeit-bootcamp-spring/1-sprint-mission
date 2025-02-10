@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.userstatus.UserIdDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusIdDTO;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public interface UserStatusService {
 
     UserStatus find(UUID id);
 
-    Map<UUID, UserStatus> findAll();
+    List<UserStatus> findAll();
 
     void update(UserStatusIdDTO idData, CurrentTimeDTO timeData);
 

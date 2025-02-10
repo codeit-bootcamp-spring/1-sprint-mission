@@ -4,17 +4,19 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserStatusRepository {
 
-    void save(UserStatus userStatus);
+    UserStatus save(UserStatus userStatus);
 
-    UserStatus findById(UUID uuid);
+    Optional<UserStatus> findById(UUID uuid);
 
-    UserStatus findByUserId(UUID userId);
+    Optional<UserStatus> findByUserId(UUID userId);
 
-    HashMap<UUID, UserStatus> findAll();
+    List<UserStatus> findAll();
 
     void delete(UUID uuid);
 }

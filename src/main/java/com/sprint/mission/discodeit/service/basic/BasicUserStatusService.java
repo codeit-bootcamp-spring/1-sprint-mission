@@ -12,7 +12,9 @@ import com.sprint.mission.discodeit.validation.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -41,11 +43,12 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus find(UUID id) {
         userStatusValidator.CheckUserStatus(id);
-        return userStatusRepository.findById(id);
+        return userStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("UsetStatus with is " + id + "not found"));
     }
 
     @Override
-    public Map<UUID, UserStatus> findAll() {
+    public List<UserStatus> findAll() {
         return userStatusRepository.findAll();
     }
     @Override
@@ -59,12 +62,14 @@ public class BasicUserStatusService implements UserStatusService {
         try {
             userValidator.CheckUser(idData.userId());
             userStatusValidator.nullCheckUserHasUserStatus(idData.userId());
-            UserStatus userStatus = userStatusRepository.findByUserId(idData.userId());
+            UserStatus userStatus = userStatusRepository.findByUserId(idData.userId())
+                            .orElseThrow(() -> new NoSuchElementException("UsetStatus with is " + idData.userId()+ "not found"));
             userStatus.updateLastAccessed(timeData.currentTime());
         }catch (CustomException e){
             System.out.println("userStatus Update 실패 -> "+ e.getMessage());
         }
     }
+
     @Override
     public void delete(UUID id){
         userStatusValidator.CheckUserStatus(id);

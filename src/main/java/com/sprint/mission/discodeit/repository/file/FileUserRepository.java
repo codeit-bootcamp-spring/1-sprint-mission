@@ -20,7 +20,8 @@ public class FileUserRepository implements UserRepository {
 
 
     public FileUserRepository(){
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),
+                "file-data-map", User.class.getSimpleName());
         init(DIRECTORY);  // 파일 디렉토리 초기화
     }
     private Path resolvePath(UUID id) {

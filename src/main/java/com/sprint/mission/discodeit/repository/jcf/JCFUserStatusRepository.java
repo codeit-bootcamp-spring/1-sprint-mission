@@ -4,8 +4,7 @@ import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 
 public class JCFUserStatusRepository implements UserStatusRepository {
@@ -22,19 +21,19 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID id) {
-        return userStatusStore.get(id);
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(userStatusStore.get(id));
     }
 
     @Override
-    public UserStatus findByUserId(UUID userId){
+    public Optional<UserStatus> findByUserId(UUID userId){
         UUID id= userToStatusMap.get(userId);
-        return userStatusStore.get(id);
+        return Optional.ofNullable(userStatusStore.get(id));
     }
 
     @Override
-    public HashMap<UUID, UserStatus> findAll() {
-        return new HashMap<>(userStatusStore);
+    public List<UserStatus> findAll() {
+        return new ArrayList<>(userStatusStore.values());
     }
 
     @Override
