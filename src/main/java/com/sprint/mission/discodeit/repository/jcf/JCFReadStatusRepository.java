@@ -16,12 +16,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public UUID save(ReadStatus readStatus) {
-        return null;
+        data.put(readStatus.getId(), readStatus);
+        return readStatus.getId();
     }
 
     @Override
     public ReadStatus findOne(UUID id) {
-        return null;
+        return data.get(id);
     }
 
     @Override

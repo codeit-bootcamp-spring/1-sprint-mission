@@ -1,18 +1,19 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileUserRepository implements UserRepository {
+public class FileUserStatusRepository implements UserStatusRepository {
 
-    private static final String FILE_PATH = "userData.ser";
-    private Map<UUID, User> data;
+    private static final String FILE_PATH = "UserStatusData.ser";
+    private final Map<UUID, UserStatus> data;
 
-    public FileUserRepository() {
-        this.data = loadDataFromFile();
+    public FileUserStatusRepository() {
+        data = new HashMap<>();
     }
 
     // 데이터 파일 읽기
@@ -64,27 +65,38 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-
-    public UUID save(User user) {
-        data.put(user.getId(), user);
+    @Override
+    public UUID save(UserStatus userStatus) {
+        data.put(userStatus.getId(), userStatus);
         saveDataToFile();
-        return user.getId();
+        return userStatus.getUserId();
     }
 
-    public User findOne(UUID id) {
+    @Override
+    public UserStatus findOne(UUID id) {
         return data.get(id);
     }
 
-    public List<User> findAll() {
+    @Override
+    public List<UserStatus> findAll() {
         return new ArrayList<>(data.values());
     }
 
-    public UUID update(User user){
-        data.put(user.getId(), user);
-        saveDataToFile();
-        return user.getId();
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId){
+        return data.values().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
+    @Override
+    public UUID update(UserStatus userStatus) {
+        data.put(userStatus.getId(), userStatus);
+        saveDataToFile();
+        return userStatus.getId();
+    }
+
+    @Override
     public UUID delete(UUID id) {
         data.remove(id);
         saveDataToFile();

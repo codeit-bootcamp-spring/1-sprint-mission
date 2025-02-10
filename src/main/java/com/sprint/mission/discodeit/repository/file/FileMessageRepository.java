@@ -75,10 +75,14 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     public List<Message> findAll() {
-/*        if(data.isEmpty()){
-            return Collections.emptyList(); // 빈 리스트 반환
-        }*/
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> list = data.values().stream().filter(message -> message.getChannelId().equals(channelId))
+                .toList();
+        return new ArrayList<>(list);
     }
 
     public UUID update(Message message){

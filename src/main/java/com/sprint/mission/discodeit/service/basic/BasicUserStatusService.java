@@ -3,19 +3,20 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 

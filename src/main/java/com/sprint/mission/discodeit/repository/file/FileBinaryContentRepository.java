@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileUserRepository implements UserRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private static final String FILE_PATH = "userData.ser";
-    private Map<UUID, User> data;
+    private static final String FILE_PATH = "BinaryContent.ser";
+    private final Map<UUID, BinaryContent> data;
 
-    public FileUserRepository() {
-        this.data = loadDataFromFile();
+    public FileBinaryContentRepository() {
+        data = new HashMap<>();
     }
+
 
     // 데이터 파일 읽기
     @SuppressWarnings("unchecked")
@@ -65,26 +67,32 @@ public class FileUserRepository implements UserRepository {
     }
 
 
-    public UUID save(User user) {
-        data.put(user.getId(), user);
+    @Override
+    public UUID save(BinaryContent binaryContent) {
+        data.put(binaryContent.getId(), binaryContent);
         saveDataToFile();
-        return user.getId();
+        return binaryContent.getId();
     }
 
-    public User findOne(UUID id) {
+    @Override
+    public BinaryContent findOne(UUID id) {
         return data.get(id);
     }
 
-    public List<User> findAll() {
+    @Override
+    public List<BinaryContent> findAll() {
         return new ArrayList<>(data.values());
     }
 
-    public UUID update(User user){
-        data.put(user.getId(), user);
-        saveDataToFile();
-        return user.getId();
+    @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        return ids.stream()
+                .map(key -> data.get(key))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
+    @Override
     public UUID delete(UUID id) {
         data.remove(id);
         saveDataToFile();

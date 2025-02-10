@@ -1,1 +1,8 @@
-spring.application.name=discodeit
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: jcf
+    file-directory: .discodeit

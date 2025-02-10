@@ -14,10 +14,12 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 

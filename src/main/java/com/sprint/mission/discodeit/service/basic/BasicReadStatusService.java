@@ -4,19 +4,20 @@ import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 

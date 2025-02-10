@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
 import java.io.*;
 import java.util.*;
 
-public class FileUserRepository implements UserRepository {
+public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private static final String FILE_PATH = "userData.ser";
-    private Map<UUID, User> data;
+    private static final String FILE_PATH = "ReadStatusData.ser";
+    private final Map<UUID, ReadStatus> data;
 
-    public FileUserRepository() {
-        this.data = loadDataFromFile();
+    public FileReadStatusRepository() {
+        data = new HashMap<>();
     }
+
 
     // 데이터 파일 읽기
     @SuppressWarnings("unchecked")
@@ -64,30 +66,52 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-
-    public UUID save(User user) {
-        data.put(user.getId(), user);
+    @Override
+    public UUID save(ReadStatus readStatus) {
+        data.put(readStatus.getId(), readStatus);
         saveDataToFile();
-        return user.getId();
+        return readStatus.getId();
     }
 
-    public User findOne(UUID id) {
+    @Override
+    public ReadStatus findOne(UUID id) {
         return data.get(id);
     }
 
-    public List<User> findAll() {
+    @Override
+    public List<ReadStatus> findAll() {
         return new ArrayList<>(data.values());
     }
 
-    public UUID update(User user){
-        data.put(user.getId(), user);
-        saveDataToFile();
-        return user.getId();
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
     }
 
+
+    @Override
+    public Optional<ReadStatus> findByUserIdAndChannlId(UUID userId, UUID channelId) {
+        return data.values().stream()
+                .filter(
+                        readStatus -> readStatus.getUserId().equals(userId) &&
+                                readStatus.getChannelId().equals(channelId))
+                .findFirst();
+    }
+
+    @Override
+    public UUID update(ReadStatus readStatus) {
+        data.put(readStatus.getId(), readStatus);
+        saveDataToFile();
+        return readStatus.getId();
+    }
+
+    @Override
     public UUID delete(UUID id) {
         data.remove(id);
         saveDataToFile();
         return id;
     }
+
 }
