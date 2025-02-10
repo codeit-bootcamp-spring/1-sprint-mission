@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.entity.security;
 
+import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+@Service
 public class Encryptor {
     public static String getEncryptedPassword(String password) {
         String result = "";

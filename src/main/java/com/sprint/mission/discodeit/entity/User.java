@@ -1,49 +1,41 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.security.Encryptor;
+import lombok.Getter;
+import java.io.Serializable;
+import java.util.Optional;
 
-import static com.sprint.mission.discodeit.entity.security.Encryptor.getEncryptedPassword;
-
-public class User {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String password;
-    private String name;
-
-
-    public User(String password, String name) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = null;
-        this.password = getEncryptedPassword(password);
-        this.name = name;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void updatePassword(String password) {
-        this.password = getEncryptedPassword(password);
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public void updateName(String name) {
-        this.name = name;
-        this.updatedAt = System.currentTimeMillis();
-    }
-
+@Getter
+public class User extends BaseEntity implements Serializable {
+  private static final long serialVersionUID = 1L;
+  private final Encryptor encryptor;
+  private transient String password;
+  private String name;
+  private String email;
+  private Optional<BinaryContent> profileImage;
+  
+  public User(String password, String name, String email, Encryptor encryptor,
+              Optional<BinaryContent> profileImage) {
+    super();
+    this.password = encryptor.getEncryptedPassword(password);
+    this.name = name;
+    this.email = email;
+    this.encryptor = encryptor;
+    this.profileImage = profileImage;
+  }
+  
+  public void updatePassword(String password) {
+    this.password = encryptor.getEncryptedPassword(password);
+    super.update();
+  }
+  
+  public void updateName(String name) {
+    this.name = name;
+    super.update();
+  }
+  
+  public void updateProfileImage(Optional<BinaryContent> newImage) {
+    this.profileImage = newImage;
+  }
 }
+

@@ -1,54 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.constant.MessageType;
+import jakarta.annotation.Nullable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
-public class Message {
-    private final UUID id;
-    private final Long createdAt;
-    private final User sender;
-    private Long updatedAt;
-    private String content;
-    private MessageType type;
-
-    private Message(User sender, String content, MessageType type) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = null;
-        this.sender = sender;
-        this.content = content;
-        this.type = type;
-    }
-
-    public static Message ofCommon(User sender, String content) {
-        return new Message(sender, content, MessageType.COMMON);
-    }
-
-    public static Message ofReply(User sender, String content) {
-        return new Message(sender, content, MessageType.REPLY);
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void updateContent(String content) {
-        this.content = content;
-        this.updatedAt = System.currentTimeMillis();
-    }
+@Getter
+@AllArgsConstructor
+public class Message extends BaseEntity implements Serializable {
+  private static final long serialVersionUID = 1L;
+  private final UUID channelId;
+  private final UUID senderId;
+  private UUID replyToId;
+  private String content;
+  @Nullable
+  private List<BinaryContent> binaryContent;
+  private MessageType type;
+  
+  public static Message ofCommon(UUID channelId, UUID senderId, List<BinaryContent> binaryContent, String content) {
+    return new Message(channelId, senderId, null, content, binaryContent, MessageType.COMMON);
+  }
+  
+  public static Message ofReply(UUID channelId, UUID senderId, UUID replyToId, List<BinaryContent> binaryContent, String content) {
+    return new Message(channelId, senderId, replyToId, content, binaryContent, MessageType.REPLY);
+  }
+  
+  public void updateContent(String content) {
+    this.content = content;
+    super.update();
+  }
 }
