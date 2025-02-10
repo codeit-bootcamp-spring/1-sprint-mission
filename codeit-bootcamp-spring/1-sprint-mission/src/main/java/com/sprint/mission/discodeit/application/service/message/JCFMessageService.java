@@ -4,9 +4,9 @@ import com.sprint.mission.discodeit.application.dto.message.CreateMessageRequest
 import com.sprint.mission.discodeit.application.dto.message.DeleteMessageRequestDto;
 import com.sprint.mission.discodeit.application.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.application.dto.message.UpdateMessageContentRequestDto;
-import com.sprint.mission.discodeit.application.service.channel.JCFChannelService;
+import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.MessageService;
-import com.sprint.mission.discodeit.application.service.user.JCFUserService;
+import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundException;
@@ -18,13 +18,13 @@ import java.util.UUID;
 public class JCFMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final JCFChannelService channelService;
-    private final JCFUserService userService;
+    private final ChannelService channelService;
+    private final UserService userService;
 
     public JCFMessageService(
             MessageRepository messageRepository,
-            JCFChannelService channelService,
-            JCFUserService userService
+            ChannelService channelService,
+            UserService userService
     ) {
         this.messageRepository = messageRepository;
         this.channelService = channelService;
@@ -54,6 +54,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message findOneByIdOrThrow(UUID messageId) {
-        return messageRepository.findById(messageId).orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
     }
 }
