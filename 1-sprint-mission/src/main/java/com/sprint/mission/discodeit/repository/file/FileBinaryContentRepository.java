@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,125 +18,89 @@ import java.util.stream.Stream;
 
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private static final String STORAGE_DIR = "tmp/storage";
-
+    private static final String FILE_PATH = "tmp/binary_content.ser";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<UUID, BinaryContent>binaryContentData;
 
     public FileBinaryContentRepository() {
-        try {
-            Files.createDirectories(Paths.get(STORAGE_DIR));
-        }catch (IOException e){
-            throw new RuntimeException("Failed to create storage directory" , e);
-        }
+        this.binaryContentData = loadFromFile();
     }
+
 
     @Override
     public void save(BinaryContent binaryContent) {
-        Path filePath = getFilePath(binaryContent.getId());
-        try(ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            oos.writeObject(binaryContent);
-        }catch (IOException e){
-            throw new RuntimeException("Failed to save binary content" , e);
-        }
+        binaryContentData.put(binaryContent.getId(), binaryContent);
+        saveToFile();
     }
 
     @Override
     public List<BinaryContent> findAllByUserId(UUID userId) {
-        return findAll().stream()
+        return binaryContentData.values().stream()
                 .filter(content -> userId.equals(content.getUserId()))
                 .toList();
     }
 
     @Override
     public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return findAll().stream()
+        return binaryContentData.values().stream()
                 .filter(content -> messageId.equals(content.getMessageId()))
                 .toList();
     }
 
     @Override
     public Optional<BinaryContent> findById(UUID binaryContentId) {
-        Path filePath = getFilePath(binaryContentId);
-        if(!Files.exists(filePath)){
-            return Optional.empty();
-        }
-
-        try(ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
-            return Optional.of((BinaryContent)ois.readObject());
-        }catch (IOException | ClassNotFoundException e){
-            throw new RuntimeException("Failed to read binary content" , e);
-        }
+        return Optional.ofNullable(binaryContentData.get(binaryContentId));
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return findAll().stream()
+        return binaryContentData.values().stream()
                 .filter(content -> ids.contains(content.getId()))
                 .toList();
     }
 
     @Override
     public void delete(BinaryContent binaryContent) {
-        deleteFile(getFilePath(binaryContent.getId()));
+        binaryContentData.remove(binaryContent.getId());
+        saveToFile();
     }
 
     @Override
     public void deleteByMessageId(UUID messageId) {
-        List<Path> filesToDelete = findAll().stream()
-                .filter(content -> messageId.equals(content.getMessageId()))
-                .map(content -> getFilePath(content.getId()))
-                .toList();
-
-        filesToDelete.forEach(this::deleteFile);
+        binaryContentData.values().removeIf(content -> messageId.equals(content.getMessageId()));
+        saveToFile();
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        List<Path> filesToDelete = findAll().stream()
-                .filter(content -> userId.equals(content.getUserId()))
-                .map(content -> getFilePath(content.getId()))
-                .toList();
-
-        filesToDelete.forEach(this::deleteFile);
+        binaryContentData.values().removeIf(content -> userId.equals(content.getUserId()));
+        saveToFile();
     }
 
     @Override
     public boolean existsByUserId(UUID userId) {
-        return findAll().stream()
+        return binaryContentData.values().stream()
                 .anyMatch(content -> userId.equals(content.getUserId()));
     }
 
-    private Path getFilePath(UUID id) {
-        return Paths.get(STORAGE_DIR, id.toString() + ".bin");
-    }
-
-    //파일을 BinaryContent로 변환하는 메서드
-    private BinaryContent deserializeBinaryContent(Path filePath){
-        if(!Files.exists(filePath)){
-            return null;
+    private Map<UUID, BinaryContent> loadFromFile() {
+        File file = new File(FILE_PATH);
+        if(!file.exists()){
+            return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
-            return (BinaryContent) ois.readObject();
-        }catch (IOException | ClassNotFoundException e){
-            return null;
-        }
-    }
-
-    private List<BinaryContent> findAll(){
-        try(Stream<Path> files = Files.list(Paths.get(STORAGE_DIR))) {
-            return files.map(this::deserializeBinaryContent)
-                        .filter(Objects::nonNull)
-                        .toList();
-        }catch (IOException e){
-            throw new RuntimeException("Failed to find files" , e);
-        }
-    }
-
-    private void deleteFile(Path filePath){
         try {
-            Files.deleteIfExists(filePath);
-        }catch (IOException e){
-            throw new RuntimeException("Failed to delete file: " + filePath , e);
+            return objectMapper.readValue(file, new TypeReference<Map<UUID, BinaryContent>>() {});
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return new HashMap<>();
         }
     }
 
+    private void saveToFile() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+            oos.writeObject(binaryContentData);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save binary content data to file.", e);
+        }
+    }
 }

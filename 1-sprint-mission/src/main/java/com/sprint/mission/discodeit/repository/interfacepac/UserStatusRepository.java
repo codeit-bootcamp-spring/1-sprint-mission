@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface UserStatusRepository {
     void save(UserStatus userStatus); // 새로운 사용자 상태 저장
     //
-    Optional<UserStatus> findByUser(User user); //사용자 상태 조회
+    Optional<UserStatus> findByUserId(UUID userId); //사용자 상태 조회
     Optional<UserStatus> findById(UUID userStatusId); //사용자 상태 조회
 
     //

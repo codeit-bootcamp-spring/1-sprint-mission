@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -74,7 +73,7 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(userId)
                .orElseThrow(()-> new IllegalArgumentException("User not found"));
        // 온라인 상태 확인
-        boolean isOnline = userStatusRepository.findByUser(user)
+        boolean isOnline = userStatusRepository.findByUserId(user.getId())
                 .map(UserStatus::isOnline)
                 .orElse(false);
         //변환 반환
@@ -85,7 +84,7 @@ public class BasicUserService implements UserService {
     public List<UserDTO> findAll() {
         return userRepository.findAll().stream()
                 .map(user -> {
-                    boolean isOnline = userStatusRepository.findByUser(user)
+                    boolean isOnline = userStatusRepository.findByUserId(user.getId())
                             .map(UserStatus::isOnline)
                             .orElse(false);
                     return new UserDTO(
@@ -129,7 +128,7 @@ public class BasicUserService implements UserService {
                 );
                 binaryContentRepository.save(binaryContent);
             }
-            boolean isOnline = userStatusRepository.findByUser(user)
+            boolean isOnline = userStatusRepository.findByUserId(user.getId())
                     .map(UserStatus::isOnline)
                     .orElse(false);
             return new UserDTO(user.getId(),

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import org.springframework.stereotype.Repository;
@@ -9,7 +11,8 @@ import java.util.*;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "tmp/users.ser";
+    private static final String FILE_PATH = "tmp/entity/users.ser";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<UUID, User> userdata;
 
     public FileUserRepository() {
@@ -78,10 +81,9 @@ public class FileUserRepository implements UserRepository {
         if (!file.exists()) {
             return new HashMap<>();
         }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (Map<UUID, User>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        try {
+            return objectMapper.readValue(file, new TypeReference<Map<UUID, User>>() {});
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             return new HashMap<>();
         }

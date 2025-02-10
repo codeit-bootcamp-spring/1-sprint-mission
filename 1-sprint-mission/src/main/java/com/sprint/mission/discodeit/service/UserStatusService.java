@@ -47,7 +47,7 @@ public class UserStatusService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         //사용자 상태 조회(온라인 여부 확인)
-        UserStatus userStatus = userStatusRepository.findByUser(user)
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElse(new UserStatus(user, Instant.EPOCH));
         boolean isOnline = userStatus.isOnline();
         // 응답 DTO 변환 후 반란
@@ -71,7 +71,7 @@ public class UserStatusService {
         //사용자 상태 조회, 온라인 여부 포함
         return users.stream()
                 .map(user -> {
-                    UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
+                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
                     boolean isOnline = (userStatus != null) && userStatus.isOnline();
 
                     return new UserDTO(
@@ -107,7 +107,7 @@ public class UserStatusService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         //userStatus 조회 (없으면 새로 생성)
-        UserStatus userStatus = userStatusRepository.findByUser(user)
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     UserStatus newUserStatus = new UserStatus(user, Instant.EPOCH);
                     userStatusRepository.save(newUserStatus);

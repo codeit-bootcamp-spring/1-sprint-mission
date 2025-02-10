@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,7 +15,8 @@ import java.util.stream.Collectors;
 @Repository
 public class FileMessageRepository implements MessageRepository {
 
-    private static final String FILE_PATH = "tmp/message.ser";
+    private static final String FILE_PATH = "tmp/entity/message.ser";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<User, List<Message>> messageData;
 
 
@@ -99,10 +102,9 @@ public class FileMessageRepository implements MessageRepository {
         if (!file.exists()) {
             return new HashMap<>();
         }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (Map<User, List<Message>>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
+        try {
+            return objectMapper.readValue(file, new TypeReference<Map<User, List<Message>>>() {});
+        } catch (IOException e) {
             System.out.println(e.getMessage());
             return new HashMap<>();
         }

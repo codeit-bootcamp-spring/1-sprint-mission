@@ -28,7 +28,7 @@ public class BasicAuthService implements AuthService {
             throw new IllegalArgumentException("Invalid email or password");
         }
         //온라인 상태 확인
-        Boolean isOnline = userStatusRepository.findByUser(user)
+        Boolean isOnline = userStatusRepository.findByUserId(user.getId())
                 .map(UserStatus::isOnline)
                 .orElse(false);
         return new UserLoginResponseDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(),user.getUpdatedAt(), isOnline);
