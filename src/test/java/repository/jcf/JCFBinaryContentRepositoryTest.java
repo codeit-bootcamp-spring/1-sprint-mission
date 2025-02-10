@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFBinaryContentRepositoryTest {
 
-  @Autowired
+
   private JCFBinaryContentRepository repository;
   private BinaryContent binaryContent1;
   private BinaryContent binaryContent2;
@@ -25,6 +25,7 @@ public class JCFBinaryContentRepositoryTest {
 
   @BeforeEach
   void setUp(){
+    repository = new JCFBinaryContentRepository();
     repository.clear();
     binaryContent1 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
 

@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFUserStatusRepositoryTest {
 
-  @Autowired
+
   private JCFUserStatusRepository repository;
   private UserStatus userStatus1;
   private UserStatus userStatus2;
@@ -26,7 +26,7 @@ public class JCFUserStatusRepositoryTest {
 
   @BeforeEach
   void setUp(){
-    repository.clear();
+    repository = new JCFUserStatusRepository();
 
     userStatus1 = new UserStatus("user1" , Instant.now());
     userStatus2 = new UserStatus("user2", Instant.now());

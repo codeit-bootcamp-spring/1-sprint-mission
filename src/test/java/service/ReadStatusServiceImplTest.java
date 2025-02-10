@@ -121,5 +121,5 @@ public class ReadStatusServiceImplTest {
     verify(readStatusRepository, never()).save(any(ReadStatus.class));
   }
 
-  
+
 }

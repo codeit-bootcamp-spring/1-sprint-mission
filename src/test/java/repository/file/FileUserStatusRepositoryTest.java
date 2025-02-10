@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
@@ -39,15 +36,16 @@ public class FileUserStatusRepositoryTest {
   private List<UserStatus> mockUserStatusList;
   @BeforeAll
   static void beforeAll(){
-    fileUtilMock = mockStatic(FileUtil.class);
+
   }
   @AfterAll
   static void afterAll(){
-    fileUtilMock.close();
+//    fileUtilMock.close();
   }
 
   @BeforeEach
   void setUp(){
+    fileUtilMock = mockStatic(FileUtil.class);
     repository = new FileUserStatusRepository("fileDir/user_status.ser");
     userStatus1 = new UserStatus("user1", Instant.now());
     userStatus2 = new UserStatus("user2", Instant.now());
@@ -56,7 +54,10 @@ public class FileUserStatusRepositoryTest {
     mockUserStatusList.add(userStatus1);
     mockUserStatusList.add(userStatus2);
   }
-
+  @AfterEach
+  void afterEach(){
+    fileUtilMock.close();;
+  }
   @Test
   void testSave_New(){
     fileUtilMock.when(() -> FileUtil.loadAllFromFile(USER_STATUS_FILE, UserStatus.class)).thenReturn(mockUserStatusList);
@@ -95,6 +96,8 @@ public class FileUserStatusRepositoryTest {
 
     UserStatus status = optionalStatus.get();
     status.updateLastOnline();
+
+    repository.save(status);
 
     fileUtilMock.verify(() -> FileUtil.saveAllToFile(USER_STATUS_FILE, mockUserStatusList), times(1));
   }
@@ -141,7 +144,7 @@ public class FileUserStatusRepositoryTest {
     fileUtilMock.verify(() ->
           FileUtil.saveAllToFile(eq(USER_STATUS_FILE), argThat((List<UserStatus> list) ->
                 list.stream().noneMatch(status -> status.getUUID().equals(userStatus1.getUUID()))
-              )), times(4)
+              )), times(1)
         );
   }
 }

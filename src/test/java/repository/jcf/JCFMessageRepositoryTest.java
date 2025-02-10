@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFMessageRepositoryTest {
 
-  @Autowired
+
   private JCFMessageRepository repository;
   private Message message1;
   private Message message2;
@@ -25,7 +25,7 @@ public class JCFMessageRepositoryTest {
 
   @BeforeEach
   void setUp() throws InterruptedException {
-    repository.clear();
+    repository = new JCFMessageRepository();
     message1 = new Message.MessageBuilder("user1", "channel1", "Hello World!").build();
     TimeUnit.MILLISECONDS.sleep(5);
     message2 = new Message.MessageBuilder("user2", "channel1", "Second message").build();

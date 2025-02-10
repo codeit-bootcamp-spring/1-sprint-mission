@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFChannelRepositoryTest {
 
-  @Autowired
+
   private JCFChannelRepository repository;
   private Channel channel1;
   private Channel channel2;
@@ -25,7 +25,7 @@ public class JCFChannelRepositoryTest {
 
   @BeforeEach
   void setUp(){
-    repository.clear();
+    repository = new JCFChannelRepository();
 
     channel1 = new Channel.ChannelBuilder("channel1", Channel.ChannelType.CHAT)
         .serverUUID("server1")

@@ -68,7 +68,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
   @Override
   public void deleteById(String id) {
     List<UserStatus> statuses = loadAll(UserStatus.class);
-    statuses.removeIf(status->status.getUUID().equals(id));
+    statuses.removeIf(status -> status.getUUID().equals(id));
     saveAll(statuses);
   }
 

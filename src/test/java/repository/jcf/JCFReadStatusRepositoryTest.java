@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFReadStatusRepositoryTest {
 
-  @Autowired
   private JCFReadStatusRepository repository;
 
   private ReadStatus readStatus1;
@@ -31,7 +30,7 @@ public class JCFReadStatusRepositoryTest {
 
   @BeforeEach
   void setUp(){
-    repository.clear();
+    repository = new JCFReadStatusRepository();
 
     readStatus1 = new ReadStatus("channel1", "user1");
     readStatus2 = new ReadStatus("channel1", "user2");

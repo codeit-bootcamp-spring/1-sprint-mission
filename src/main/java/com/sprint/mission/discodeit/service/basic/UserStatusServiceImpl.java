@@ -54,6 +54,8 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     userStatus.updateLastOnline();
 
+    userStatusRepository.save(userStatus);
+
     return userStatus;
   }
 
@@ -62,9 +64,13 @@ public class UserStatusServiceImpl implements UserStatusService {
 
     validator.findOrThrow(User.class, userId, new UserNotFoundException());
 
-    UserStatus status = find(dto.uuid());
+    UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
+        () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+    );
 
     status.updateLastOnline();
+
+    userStatusRepository.save(status);
 
     return status;
   }

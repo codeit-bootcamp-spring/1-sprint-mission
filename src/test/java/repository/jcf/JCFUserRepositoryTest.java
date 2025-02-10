@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class JCFUserRepositoryTest {
 
-  @Autowired
+
   private JCFUserRepository repository;
 
   private User user1;
@@ -26,7 +26,7 @@ public class JCFUserRepositoryTest {
 
   @BeforeEach
   void setUp(){
-    repository.clear();
+    repository = new JCFUserRepository();
     user1 = new User.UserBuilder("username1" , "pwd1" , "email1@email.com", "01012345671")
         .nickname("nickname1")
         .build();
