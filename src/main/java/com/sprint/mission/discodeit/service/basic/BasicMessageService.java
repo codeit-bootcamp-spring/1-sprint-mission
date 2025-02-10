@@ -9,9 +9,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
+
 @Slf4j
 @Service
 @ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
@@ -31,6 +35,7 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final EntityValidator validator;
+  private final ChannelRepository channelRepository;
 
 
   @Override
@@ -40,7 +45,16 @@ public class BasicMessageService implements MessageService {
     validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
 
     // 채널 검증
-    validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
+
+
+    // 채널에 속하지 않은 유저 검증
+    if(channel.getIsPrivate()){
+      channel.getParticipatingUsers().stream().filter(id -> id.equals(messageDto.userId())).findAny().orElseThrow(
+          () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+      );
+    }
+
 
     Message message = new Message.MessageBuilder(messageDto.userId(), messageDto.channelId(), messageDto.content()).build();
 
@@ -66,9 +80,10 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Optional<Message> getMessageById(String messageId, Channel channel) {
-
-    return messageRepository.findById(messageId);
+  public MessageResponseDto getMessageById(String messageId) {
+    List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
+    Message message = messageRepository.findById(messageId).orElseThrow(MessageNotFoundException::new);
+    return MessageResponseDto.fromBinaryContent(message, contents);
   }
 
 
@@ -109,6 +124,10 @@ public class BasicMessageService implements MessageService {
     Message originalMessage = messageRepository.findById(messageDto.messageId()).orElseThrow(
         MessageNotFoundException::new
     );
+
+    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
+
+    if(!originalMessage.getUserUUID().equals(messageDto.userId())) throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
 
     List<BinaryContent> updatedContents = findAndUpdateBinaryContent(messageDto.messageId(), messageDto.userId(), messageDto.binaryContent());
 

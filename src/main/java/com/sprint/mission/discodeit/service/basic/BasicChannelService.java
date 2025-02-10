@@ -51,6 +51,7 @@ public class BasicChannelService implements ChannelService {
         .serverUUID(channelDto.serverId())
         .maxNumberOfPeople(channelDto.maxNumberOfPeople())
         .isPrivate(true)
+        .participatingUsers(channelDto.userIds())
         .build();
 
     // channel 저장
@@ -64,7 +65,7 @@ public class BasicChannelService implements ChannelService {
       );
     });
 
-    return new PrivateChannelResponseDto(channel.getUUID(), channel.getServerUUID(), channel.getChannelType(), channel.getCreatedAt());
+    return new PrivateChannelResponseDto(channel.getUUID(), channel.getServerUUID(), channel.getChannelType(), channel.getCreatedAt(), channel.getParticipatingUsers());
   }
 
   @Override

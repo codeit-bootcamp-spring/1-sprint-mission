@@ -12,19 +12,15 @@ import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.validator.EntityValidator;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
@@ -104,11 +100,9 @@ public class BasicMessageServiceTest {
   void testGetMessageById(){
     when(messageRepository.findById(message1.getUUID())).thenReturn(Optional.ofNullable(message1));
 
-    Optional<Message> optional = messageService.getMessageById(message1.getUUID(), channel1);
-    assertThat(optional).isPresent();
-    Message message = optional.get();
+    MessageResponseDto message = messageService.getMessageById(message1.getUUID());
 
-    assertThat(message.getUUID()).isEqualTo(message1.getUUID());
+    assertThat(message.messageId()).isEqualTo(message1.getUUID());
     verify(messageRepository, times(1)).findById(message1.getUUID());
   }
 

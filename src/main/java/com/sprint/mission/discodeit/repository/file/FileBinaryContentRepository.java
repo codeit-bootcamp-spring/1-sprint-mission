@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -79,15 +80,16 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
 
   @Override
   public List<BinaryContent> findByChannel(String channelId) {
-    return getFromFile().stream()
-        .filter(content -> content.getChannelId().equals(channelId))
+    return  Optional.ofNullable(getFromFile())
+        .orElse(Collections.emptyList()).stream()
+        .filter(content -> channelId.equals(content.getChannelId()))
         .toList();
   }
 
   @Override
   public List<BinaryContent> findByMessageId(String messageId) {
     return getFromFile().stream()
-        .filter(content -> content.getMessageId().equals(messageId))
+        .filter(content -> messageId.equals(content.getMessageId()))
         .toList();
   }
 
@@ -101,7 +103,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
   @Override
   public void deleteByMessageId(String messageId) {
     List<BinaryContent> contents = getFromFile();
-    contents.removeIf(content -> content.getMessageId().equals(messageId));
+    contents.removeIf(content -> messageId.equals(content.getMessageId()));
     writeToFile(contents);
   }
 

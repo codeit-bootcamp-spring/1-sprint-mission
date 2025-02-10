@@ -13,12 +13,9 @@ import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
@@ -294,5 +291,5 @@ public class BasicChannelServiceIntegrationTest {
     assertThat(channelsForUser1).extracting("channelId").contains(res.channelId());
     assertThat(channelsForUser2).extracting("channelId").doesNotContain(res.channelId());
   }
-  
+
 }
