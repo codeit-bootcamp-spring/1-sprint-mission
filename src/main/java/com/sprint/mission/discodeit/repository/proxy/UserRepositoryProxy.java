@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserRepositoryProxy implements UserRepository {
     private final RepositoryLogger logger;
     private final UserRepository   userRepository;

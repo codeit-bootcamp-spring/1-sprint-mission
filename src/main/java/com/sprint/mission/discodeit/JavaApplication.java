@@ -1,4 +1,4 @@
-package com.sprint.mission;
+package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -10,9 +10,6 @@ import com.sprint.mission.discodeit.factory.type.repository.UserRepositoryType;
 import com.sprint.mission.discodeit.factory.type.service.ChannelServiceType;
 import com.sprint.mission.discodeit.factory.type.service.MessageServiceType;
 import com.sprint.mission.discodeit.factory.type.service.UserServiceType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;

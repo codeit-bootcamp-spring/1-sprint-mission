@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
 public class ChannelRepositoryProxy implements ChannelRepository {
     private final RepositoryLogger  logger;

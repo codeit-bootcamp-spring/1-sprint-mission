@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MessageRepositoryProxy implements MessageRepository {
     private final RepositoryLogger  logger;
     private final MessageRepository messageRepository;

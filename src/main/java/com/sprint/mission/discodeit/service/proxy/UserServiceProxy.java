@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserServiceProxy implements UserService {
     private final ServiceLogger logger;
     private final UserService   userService;

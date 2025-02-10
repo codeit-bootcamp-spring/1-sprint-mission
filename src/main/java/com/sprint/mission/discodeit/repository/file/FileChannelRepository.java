@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import static com.sprint.mission.discodeit.constant.ExitStatus.DIR_CREATION_ERROR;
 
+
 public class FileChannelRepository implements ChannelRepository {
     private static final RepositoryLogger logger = RepositoryLogger.getInstance();
     private static final Path   FILE_DIR  = Paths.get(System.getProperty("user.dir"), "file", "channel");

@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ChannelServiceProxy implements ChannelService {
     private final ServiceLogger  logger;
     private final ChannelService channelService;
