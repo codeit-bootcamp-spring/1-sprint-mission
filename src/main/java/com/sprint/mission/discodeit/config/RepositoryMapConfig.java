@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 특정 엔티티 클래스와 해당 엔티티를 관리하는 Repository 간의 매핑을 제공하는 설정 클래스
+ * {@link com.sprint.mission.discodeit.validator.EntityValidator} 에서 주입받아 사용
+ */
 @Configuration
 @RequiredArgsConstructor
 public class RepositoryMapConfig {
@@ -20,6 +24,9 @@ public class RepositoryMapConfig {
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
 
+  /**
+   * @return 엔티티 클래스와 해당 엔티티의 레포지토리간의 매핑을 포함하는 Map
+   */
   @Bean
   public Map<Class<?>, BaseRepository<?, ?>> baseRepositoryMap() {
     Map<Class<?>, BaseRepository<?, ?>> map = new HashMap<>();

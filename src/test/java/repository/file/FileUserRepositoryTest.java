@@ -50,7 +50,7 @@ public class FileUserRepositoryTest {
 
   @BeforeEach
   void setUp(){
-    System.out.println("[repository] : " + repository.getClass());
+    repository = new FileUserRepository("fileDir/users.ser");
 
     user1 = new User.UserBuilder("user1","pwd1","email@email.com","01012345689")
         .nickname("user1Nickname1").build();

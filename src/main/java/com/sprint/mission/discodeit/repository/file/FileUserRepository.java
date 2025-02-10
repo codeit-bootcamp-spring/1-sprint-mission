@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -16,35 +18,42 @@ import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileUserRepository implements UserRepository{
+public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository{
+
+  public FileUserRepository(@Value("${app.file.user-file}") String filePath) {
+    super(filePath);
+  }
+
   @Override
   public User create(User user) {
-    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    List<User> users = loadAll(User.class);
+
     users.add(user);
-    FileUtil.saveAllToFile(USER_FILE, users);
+    saveAll(users);
+
     return user;
   }
 
   @Override
   public Optional<User> findById(String id) {
-    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    List<User> users = loadAll(User.class);
     return users.stream().filter(u -> u.getUUID().equals(id)).findAny();
   }
 
   @Override
   public Optional<User> findByUsername(String username) {
-    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    List<User> users = loadAll(User.class);
     return users.stream().filter(u -> u.getUsername().equals(username)).findAny();
   }
 
   @Override
   public List<User> findAll() {
-    return FileUtil.loadAllFromFile(USER_FILE, User.class);
+    return loadAll(User.class);
   }
 
   @Override
   public User update(User user) {
-    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    List<User> users = loadAll(User.class);
 
     User targetUser = users.stream()
         .filter(u -> u.getUUID().equals(user.getUUID()))
@@ -53,20 +62,20 @@ public class FileUserRepository implements UserRepository{
 
     users.remove(targetUser);
     users.add(user);
-    FileUtil.saveAllToFile(USER_FILE, users);
+    saveAll(users);
 
     return user;
   }
 
   @Override
   public void delete(String userId) {
-    List<User> users = FileUtil.loadAllFromFile(USER_FILE, User.class);
+    List<User> users = loadAll(User.class);
     User targetUser = users.stream()
         .filter(u -> u.getUUID().equals(userId))
         .findAny()
         .orElseThrow(() -> new UserNotFoundException());
     users.remove(targetUser);
-    FileUtil.saveAllToFile(USER_FILE, users);
+    saveAll(users);
   }
 
   @Override

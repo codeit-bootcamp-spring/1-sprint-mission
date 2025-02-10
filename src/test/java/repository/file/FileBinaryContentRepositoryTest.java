@@ -3,6 +3,7 @@ package repository.file;
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
 import com.sprint.mission.discodeit.util.FileType;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(classes = DiscodeitApplication.class)
 public class FileBinaryContentRepositoryTest {
 
-  private final BinaryContentRepository repository;
+  private BinaryContentRepository repository;
   private BinaryContent content1;
   private BinaryContent content2;
 
@@ -32,6 +33,8 @@ public class FileBinaryContentRepositoryTest {
 
   @BeforeEach
   void setUp(){
+
+    repository = new FileBinaryContentRepository("fileDir/binary_content.ser" );
 
     File file = new File(BINARY_CONTENT_FILE);
 

@@ -1,5 +1,13 @@
 app:
   repository:
-    type: "jcf"
+    type: "file"
   service:
     type: "basic"
+  file:
+    base-dir: "fileDir/"
+    user-file: "${app.file.base-dir}users.ser"
+    channel-file: "${app.file.base-dir}channel.ser"
+    message-file: "${app.file.base-dir}message.ser"
+    user-status-file: "${app.file.base-dir}user_status.ser"
+    read-status-file: "${app.file.base-dir}read_status.ser"
+    binary-content-file: "${app.file.base-dir}binary_content.ser"

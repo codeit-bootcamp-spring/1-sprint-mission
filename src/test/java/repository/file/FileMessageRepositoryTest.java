@@ -54,8 +54,8 @@ public class FileMessageRepositoryTest {
   @BeforeEach
   void setUp() throws InterruptedException {
 
+    repository = new FileMessageRepository("fileDir/message.ser");
     repository.clear();
-
     message1 = new Message.MessageBuilder(
         "userUUID",
         "channelUUID",
@@ -184,6 +184,7 @@ public class FileMessageRepositoryTest {
 
   @Test
   void testDeleteByChannel(){
+
     fileUtilMock.when(() -> FileUtil.loadAllFromFile(MESSAGE_FILE, Message.class))
         .thenReturn(mockMessageList);
 

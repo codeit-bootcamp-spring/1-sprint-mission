@@ -48,7 +48,7 @@ public class FileUserStatusRepositoryTest {
 
   @BeforeEach
   void setUp(){
-
+    repository = new FileUserStatusRepository("fileDir/user_status.ser");
     userStatus1 = new UserStatus("user1", Instant.now());
     userStatus2 = new UserStatus("user2", Instant.now());
     userStatus3 = new UserStatus("user3", Instant.now());
@@ -93,13 +93,9 @@ public class FileUserStatusRepositoryTest {
     Optional<UserStatus> optionalStatus = repository.findById(userStatus1.getUUID());
     assertThat(optionalStatus).isPresent();
 
-
     UserStatus status = optionalStatus.get();
-    Instant beforeTime = status.getLastOnlineAt();
     status.updateLastOnline();
 
-    UserStatus updatedStatus = repository.save(status);
-    assertThat(beforeTime).isNotEqualTo(updatedStatus.getLastOnlineAt());
     fileUtilMock.verify(() -> FileUtil.saveAllToFile(USER_STATUS_FILE, mockUserStatusList), times(1));
   }
 

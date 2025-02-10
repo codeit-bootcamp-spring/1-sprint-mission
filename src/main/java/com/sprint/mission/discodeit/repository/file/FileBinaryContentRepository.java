@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.util.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -16,14 +18,18 @@ import static com.sprint.mission.discodeit.constant.FileConstant.BINARY_CONTENT_
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileBinaryContentRepository implements BinaryContentRepository{
+public class FileBinaryContentRepository extends AbstractFileRepository<BinaryContent> implements BinaryContentRepository{
+
+  public FileBinaryContentRepository(@Value("${app.file.binary-content-file}") String filePath) {
+    super(filePath);
+  }
 
   private List<BinaryContent> getFromFile(){
-    return FileUtil.loadAllFromFile(BINARY_CONTENT_FILE, BinaryContent.class);
+    return loadAll(BinaryContent.class);
   }
 
   private void writeToFile(List<BinaryContent> contents){
-    FileUtil.saveAllToFile(BINARY_CONTENT_FILE, contents);
+    saveAll(contents);
   }
 
   @Override

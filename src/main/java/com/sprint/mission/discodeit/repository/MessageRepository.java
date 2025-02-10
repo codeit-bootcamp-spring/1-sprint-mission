@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface MessageRepository extends BaseRepository<Message,String> {
   Message create(Message message);
-  Optional<Message> findById(String id);
+
   List<Message> findByChannel(String channelId);
   List<Message> findAll();
   Message findLatestChannelMessage(String channelId);

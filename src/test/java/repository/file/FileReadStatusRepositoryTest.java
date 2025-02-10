@@ -48,6 +48,9 @@ public class FileReadStatusRepositoryTest {
 
   @BeforeEach
   void setUp(){
+
+    repository = new FileReadStatusRepository("fileDir/read_status.ser");
+
     status1 = new ReadStatus("channel1", "user1");
     status2 = new ReadStatus("channel1", "user2");
     status3 = new ReadStatus("channel2", "user1");

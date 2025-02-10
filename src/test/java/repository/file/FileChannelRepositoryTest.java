@@ -48,7 +48,7 @@ public class FileChannelRepositoryTest {
 
   @BeforeEach
   void setUp() {
-
+    repository = new FileChannelRepository("fileDir/channel.ser");
     channel1 = new Channel.ChannelBuilder("channel1", Channel.ChannelType.VOICE)
         .serverUUID("server1")
         .build();
