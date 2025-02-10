@@ -34,7 +34,8 @@ public class Channel {
 
     public void updateSubject(String subject) {
         if (subject.length() > SUBJECT_MAX_LENGTH) {
-            throw new ChannelSubjectOverLengthException(ErrorCode.INVALID_SUBJECT_LENGTH, "입력 글자 수:".concat(String.valueOf(subject.length())));
+            throw new ChannelSubjectOverLengthException(ErrorCode.INVALID_SUBJECT_LENGTH,
+                    "입력 글자 수:".concat(String.valueOf(subject.length())));
         }
         this.subject = subject;
     }
@@ -51,5 +52,17 @@ public class Channel {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getType() {
+        return type.toString();
     }
 }

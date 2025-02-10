@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-public record JoinUserReqeustDto(
+public record joinUserRequestDto(
     @NotBlank String nickname,
     @NotBlank String username,
     @Email String email,

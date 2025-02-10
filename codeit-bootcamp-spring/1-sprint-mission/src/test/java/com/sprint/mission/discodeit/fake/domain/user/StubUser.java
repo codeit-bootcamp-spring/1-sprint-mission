@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.fake.domain.user;
 
-import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.Nickname;
@@ -29,15 +29,15 @@ public class StubUser {
             .build();
     }
 
-    public static JoinUserReqeustDto generateJoinRequestDto() {
-        return new JoinUserReqeustDto(NICK_NAME, USER_NAME, EMAIL, PASSWORD, BIRTH_DATE);
+    public static joinUserRequestDto generateJoinRequestDto() {
+        return new joinUserRequestDto(NICK_NAME, USER_NAME, EMAIL, PASSWORD, BIRTH_DATE);
     }
 
-    public static JoinUserReqeustDto generateJoinRequestByUsername(String username) {
-        return new JoinUserReqeustDto(NICK_NAME, username, EMAIL, PASSWORD, BIRTH_DATE);
+    public static joinUserRequestDto generateJoinRequestByUsername(String username) {
+        return new joinUserRequestDto(NICK_NAME, username, EMAIL, PASSWORD, BIRTH_DATE);
     }
 
-    public static JoinUserReqeustDto generateJoinRequestByEmail(String email) {
-        return new JoinUserReqeustDto(NICK_NAME, USER_NAME, email, PASSWORD, BIRTH_DATE);
+    public static joinUserRequestDto generateJoinRequestByEmail(String email) {
+        return new joinUserRequestDto(NICK_NAME, USER_NAME, email, PASSWORD, BIRTH_DATE);
     }
 }

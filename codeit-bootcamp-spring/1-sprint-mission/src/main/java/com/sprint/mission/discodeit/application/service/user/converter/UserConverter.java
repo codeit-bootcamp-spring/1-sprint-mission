@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.application.service.user.converter;
 
-import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
+import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
 import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConverter {
 
-    public User toUser(JoinUserReqeustDto requestDto) {
+    public User toUser(joinUserRequestDto requestDto) {
         return User.builder()
             .username(new Username(requestDto.username()))
             .nickname(new Nickname(requestDto.nickname()))

@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit.application.service.user;
 
 import com.sprint.mission.discodeit.application.auth.PasswordEncoder;
 import com.sprint.mission.discodeit.application.dto.user.ChangePasswordRequestDto;
-import com.sprint.mission.discodeit.application.dto.user.JoinUserReqeustDto;
 import com.sprint.mission.discodeit.application.dto.user.LoginRequestDto;
 import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
+import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
@@ -23,13 +24,13 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class JCFUserService implements UserService {
 
     private final UserRepository userRepository;
     private final UserConverter userConverter;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(
+    public JCFUserService(
             UserRepository userRepository,
             UserConverter userConverter,
             PasswordEncoder passwordEncoder
@@ -39,7 +40,8 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public UserResponseDto join(JoinUserReqeustDto requestDto) {
+    @Override
+    public UserResponseDto join(joinUserRequestDto requestDto) {
         throwEmailAlreadyUsed(requestDto.email());
         throwUsernameAlreadyUsed(requestDto.username());
         PasswordValidator.validateOrThrow(requestDto.password());
@@ -47,6 +49,7 @@ public class UserService {
         return userConverter.toDto(savedUser);
     }
 
+    @Override
     public void login(LoginRequestDto requestDto) {
         userRepository.findOneByEmail(new Email(requestDto.email()))
                 .filter(user -> matchUserPassword(requestDto.password(), user.getPasswordValue()))
@@ -55,11 +58,13 @@ public class UserService {
         // etc. 스프링 시큐리티 적용 시 리팩터링 최대한 변경에 유연하게 코딩
     }
 
+    @Override
     public User findOneByIdOrThrow(UUID uuid) {
         return userRepository.findOneById(uuid)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND));
     }
 
+    @Override
     public void changePassword(UUID userId, ChangePasswordRequestDto requestDto) {
         PasswordValidator.validateOrThrow(requestDto.password());
         User foundUser = findOneByIdOrThrow(userId);
@@ -83,7 +88,7 @@ public class UserService {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
-    private User toUserWithPasswordEncode(JoinUserReqeustDto requestDto) {
+    private User toUserWithPasswordEncode(joinUserRequestDto requestDto) {
         return User.builder()
                 .username(new Username(requestDto.username()))
                 .nickname(new Nickname(requestDto.nickname()))
