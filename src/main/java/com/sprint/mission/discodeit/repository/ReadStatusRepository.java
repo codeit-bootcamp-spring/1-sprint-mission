@@ -11,6 +11,7 @@ public interface ReadStatusRepository {
 
     UUID save(ReadStatus readStatus);
     ReadStatus findOne(UUID id);
+    List<ReadStatus> findAll();
     List<ReadStatus> findAllByUserId(UUID userId);
     UUID update(ReadStatus readStatus);
     UUID delete(UUID id);

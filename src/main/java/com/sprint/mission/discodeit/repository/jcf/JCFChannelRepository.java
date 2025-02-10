@@ -23,9 +23,6 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     public List<Channel> findAll() {
-/*        if(data.isEmpty()){
-            return Collections.emptyList(); // 빈 리스트 반환
-        }*/
         return new ArrayList<>(data.values());
     }
 

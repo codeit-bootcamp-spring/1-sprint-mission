@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Message implements Serializable {
@@ -11,16 +13,18 @@ public class Message implements Serializable {
     private Instant updatedAt;
 
     private String content;
-    private UUID authorId;
+    private UUID userId;
     private UUID channelId;
+    private List<UUID> binaryContentIds;
 
-    public Message(String content, UUID authorId, UUID channelId) {
+    public Message(String content, UUID userId, UUID channelId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.content = content;
-        this.authorId = authorId;
+        this.userId = userId;
         this.channelId = channelId;
+        binaryContentIds = new ArrayList<>();
     }
 
     public UUID getId() {
@@ -39,8 +43,12 @@ public class Message implements Serializable {
         return content;
     }
 
-    public UUID getAuthorId() {
-        return authorId;
+    public List<UUID> getBinaryContentIds() {
+        return binaryContentIds;
+    }
+
+    public UUID getUserId() {
+        return userId;
     }
 
     public UUID getChannelId() {
@@ -67,6 +75,9 @@ public class Message implements Serializable {
         return true;
     }
 
+    public void addBinaryContent(UUID binaryContentId) {
+        binaryContentIds.add(binaryContentId);
+    }
 
     @Override
     public String toString() {
@@ -75,7 +86,7 @@ public class Message implements Serializable {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", content='" + content + '\'' +
-                ", authorId=" + authorId +
+                ", authorId=" + userId +
                 ", channelId=" + channelId +
                 '}';
     }

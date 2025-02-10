@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelServiceUpdateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
@@ -11,10 +13,11 @@ public interface ChannelService {
 
 
     //서비스 로직
-    UUID create(String name, String description, ChannelType type);
-    Channel read(UUID id);
-    List<Channel> readAll();
-    Channel updateChannel(UUID id, String name, String description, ChannelType type);
+    UUID createPublic(String name, String description);
+    UUID createPrivate(UUID userId);
+    ChannelServiceFindDTO find(UUID id);
+    List<ChannelServiceFindDTO> findAll();
+    Channel update(ChannelServiceUpdateDTO channelServiceUpdateDTO);
     UUID deleteChannel(UUID id);
 }
 

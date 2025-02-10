@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Channel implements Serializable {
@@ -13,15 +15,16 @@ public class Channel implements Serializable {
     private String name;
     private String description;
     private ChannelType type;
+    private List<UUID> userIds;
 
     public Channel(String name, String description, ChannelType type) {
-
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.name = name;
         this.description = description;
         this.type = type;
+        userIds = new ArrayList<>();
     }
 
     public static boolean validation(String name, String description){
@@ -58,11 +61,19 @@ public class Channel implements Serializable {
         return type;
     }
 
+    public List<UUID> getUserIds() {
+        return userIds;
+    }
+
+    public void addUsers(UUID userId) {
+        userIds.add(userId);
+    }
+
     public void setUpdatedAt() {
         this.updatedAt = Instant.now();
     }
 
-    public void setChannel(String name, String description, ChannelType type){
+    public void setChannel(String name, String description){
         if(name !=null && !name.equals(this.name)){
             this.name = name;
         }else{
@@ -74,11 +85,6 @@ public class Channel implements Serializable {
         } else{
             throw new IllegalArgumentException("입력한 설명: "+description+"이 기존 값과 같습니다.");
         }
-
-        if(type != null && !type.equals(this.type)){
-            this.type = type;
-        }
-
         setUpdatedAt();
     }
 

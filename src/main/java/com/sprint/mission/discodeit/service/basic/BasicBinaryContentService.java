@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +23,18 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final MessageService messageService;
 
     @Override
-    public UUID create(BinaryContentCreateDTO binaryContentCreateDTO) {
-        // userId와 channelId 중 하나만 값이 존재
-        UserServiceFindDTO userServiceFindDTO = Optional.ofNullable(binaryContentCreateDTO.getUserId()).map(userService::find).orElse(null);
-        Message findMessage = Optional.ofNullable(binaryContentCreateDTO.getMessageId()).map(messageService::read).orElse(null);
-        UUID userId = Optional.ofNullable(userServiceFindDTO).map(UserServiceFindDTO::getId).orElse(null);
-        UUID messageId = Optional.ofNullable(findMessage).map(Message::getId).orElse(null);
+    public UUID create(BinaryContentCreateDTO dto) {
+        if(dto.getUserId() != null){
+            userService.find(dto.getUserId());
+        }else{
+            messageService.find(dto.getMessageId());
+        }
 
+        byte[] file = getFileBytes(dto.getFile());
+        String contentType = dto.getFile().getContentType();
+        Long size = dto.getFile().getSize();
 
-        byte[] file = getFileBytes(binaryContentCreateDTO.getFile());
-        String contentType = binaryContentCreateDTO.getFile().getContentType();
-        Long size = binaryContentCreateDTO.getFile().getSize();
-
-        BinaryContent binaryContent = new BinaryContent(userId, messageId, file, contentType, size);
+        BinaryContent binaryContent = new BinaryContent(dto.getUserId(), dto.getMessageId(), file, contentType, size);
         return binaryContentRepository.save(binaryContent);
     }
 

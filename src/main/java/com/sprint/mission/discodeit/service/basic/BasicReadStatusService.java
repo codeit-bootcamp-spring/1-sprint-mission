@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -26,12 +26,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
 
     @Override
-    public UUID create(ReadStatusCreateDTO readStatusCreateDTO) {
-        UserServiceFindDTO userServiceFindDTO = userService.find(readStatusCreateDTO.getUserId());
-        Channel findChannel = channelService.read(readStatusCreateDTO.getChannelId());
-        checkDuplicateReadStatus(userServiceFindDTO.getId(), findChannel.getId());
+    public UUID create(ReadStatusCreateDTO dto) {
+        UserServiceFindDTO userServiceFindDTO = userService.find(dto.getUserId());
+        ChannelServiceFindDTO channelServiceFindDTO = channelService.find(dto.getChannelId());
+        checkDuplicateReadStatus(userServiceFindDTO.getId(), channelServiceFindDTO.getId());
 
-        ReadStatus readStatus = new ReadStatus(userServiceFindDTO.getId(), findChannel.getId());
+        ReadStatus readStatus = new ReadStatus(userServiceFindDTO.getId(), channelServiceFindDTO.getId());
         return readStatus.getId();
     }
 
@@ -41,6 +41,11 @@ public class BasicReadStatusService implements ReadStatusService {
         Optional.ofNullable(findReadStatus)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 findReadStatus 가 없습니다."));
         return findReadStatus;
+    }
+
+    @Override
+    public List<ReadStatus> findAll(){
+        return readStatusRepository.findAll();
     }
 
     @Override

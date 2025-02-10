@@ -10,6 +10,7 @@ public interface MessageRepository {
     UUID save(Message message);
     Message findOne(UUID id);
     List<Message> findAll();
+    List<Message> findAllByChannelId(UUID id);
     UUID update(Message message);
     UUID delete (UUID id);
 }

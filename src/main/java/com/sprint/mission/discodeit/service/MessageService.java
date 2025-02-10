@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.message.MessageServiceCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageServiceUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -11,9 +13,10 @@ public interface MessageService {
 
 
     //서비스 로직
-    UUID create(String content, UUID authorId, UUID channelId);
-    Message read(UUID id);
-    List<Message> readAll();
-    Message updateMessage(UUID id, String message, User user);
-    UUID deleteMessage(UUID id, User user);
+    UUID create(MessageServiceCreateDTO messageServiceCreateDTO);
+    Message find(UUID id);
+    List<Message> findAll();
+    List<Message> findAllByChannelId(UUID ChannelId);
+    Message update(MessageServiceUpdateDTO messageServiceUpdateDTO);
+    UUID delete(UUID id);
 }

@@ -105,17 +105,23 @@ public class BasicUserService implements UserService {
     public UUID delete(UUID id) {
         User findUser = userRepository.findOne(id);
 
+        //userStatus 삭제
         userStatusService.findAll().stream()
                 .filter(uS -> uS.getUserId().equals(findUser.getId()))
                 .findFirst()
                 .map(UserStatus::getId)
                 .ifPresent(userStatusService::delete);
 
+        //프로필 이미지 삭제
         binaryContentService.findAll().stream()
                 .filter(bC -> bC.getUserId().equals(findUser.getId()) && bC.getMessageId() == null)
                 .findFirst()
                 .map(BinaryContent::getId)
                 .ifPresent(binaryContentService::delete);
+
+        //PRIVATE 채널이 가지고 있는 채널 List 에서 삭제
+        //아직 가입이 없으니 걍 놔두자
+
 
         return userRepository.delete(findUser.getId());
     }
