@@ -27,6 +27,11 @@ public class Message {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public void updateContent(String content) {
+        validate(content);
+        this.content = content;
+    }
+
     private void validate(String content) {
         if (Objects.isNull(content) || content.isBlank()) {
             throw new InvalidMessageContentException(ErrorCode.INVALID_MESSAGE_CONTENT_NOT_NULL, content);
