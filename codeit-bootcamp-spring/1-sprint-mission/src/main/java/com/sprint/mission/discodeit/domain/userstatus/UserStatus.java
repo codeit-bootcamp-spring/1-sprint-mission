@@ -12,7 +12,6 @@ public class UserStatus {
     private final UUID id;
     private final User user;
     private final Instant createdAt;
-    private Instant updatedAt;
     private Instant lastAccessedAt;
 
     public UserStatus(User user) {
@@ -20,7 +19,6 @@ public class UserStatus {
         this.id = UUID.randomUUID();
         this.user = user;
         this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
         this.lastAccessedAt = Instant.now();
     }
 
