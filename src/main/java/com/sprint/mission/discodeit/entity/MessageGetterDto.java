@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record MessageGetterDto(
-        long createdAt,
-        long updatedAt,
+        Instant createdAt,
+        Instant updatedAt,
         UUID id,
         User fromUser,
         Channel channel,

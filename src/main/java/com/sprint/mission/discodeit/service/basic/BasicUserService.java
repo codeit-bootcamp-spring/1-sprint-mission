@@ -41,10 +41,10 @@ public class BasicUserService implements UserService {
         return userRepository.getUser(userId).getUserName();
     }
 
-    //유저 생성. 'UsersMap'에 uuid-유저객체 주소 넣어줌.
+    //유저 생성.
     @Override
     public UUID createUser(String userName, String email,String password) {
-        if (userName == null){
+        if (userName == null || email == null || password == null) {
             System.out.println("유저 생성 실패. 입력값을 확인해주세요.");
             return null;
         }
@@ -53,6 +53,20 @@ public class BasicUserService implements UserService {
         System.out.println(userName + " 유저 생성 성공!");
         return newUser.getId();
     }
+
+    //유저 생성.
+    /*@Override
+    public UUID createUser(String userName, String email,String password, String profilePicturePath) {
+        if (userName == null || email == null || password == null || profilePicturePath == null) {
+            System.out.println("유저 생성 실패. 입력값을 확인해주세요.");
+            return null;
+        }
+        File profilePicture =
+        User newUser = new User(userName, email, password, profilePicture);
+        userRepository.addUser(newUser);
+        System.out.println(userName + " 유저 생성 성공!");
+        return newUser.getId();
+    }*/
 
     //유저 존재여부 확인.
     @Override

@@ -2,10 +2,9 @@ package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -13,6 +12,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -32,8 +32,18 @@ public class DiscodeitApplication {
         System.out.println("메시지 생성: " + message1);
     }
 
+    static void RepositoryClear(){
+        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
+        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
+        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
+    }
+
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+
+
+        RepositoryClear();
+
 
         UserService userService = context.getBean(UserService.class);
         ChannelService channelService = context.getBean(ChannelService.class);

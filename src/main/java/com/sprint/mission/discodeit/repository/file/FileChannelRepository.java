@@ -15,7 +15,6 @@ public class FileChannelRepository implements ChannelRepository {
     String mainChannelRepository = "Channel\\mainOIChannelRepository";
 
 
-
     /* 외부에서 생성자 접근 불가
     private FileChannelRepository() {
         fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), mainChannelRepository);
@@ -83,12 +82,12 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean addChannelMember(UUID channelId, User member){
+    public boolean addChannelMember(UUID channelId, UUID memberId){
         HashMap<UUID, Channel> channelsMap = (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
-        if (channelId==null || member==null) {
+        if (channelId==null || memberId==null) {
             return false;
         }
-        channelsMap.get(channelId).getMembers().add(member);
+        channelsMap.get(channelId).getMembers().add(memberId);
         fileIOHandler.serializeHashMap(channelsMap, mainChannelRepository);
         return true;
     }

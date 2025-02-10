@@ -70,11 +70,11 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean addChannelMember(UUID channelId, User member){;
-        if (channelId==null || member==null) {
+    public boolean addChannelMember(UUID channelId, UUID memberId){;
+        if (channelId==null || memberId==null) {
             return false;
         }
-        channelsMap.get(channelId).getMembers().add(member);
+        channelsMap.get(channelId).getMembers().add(memberId);
         return true;
     }
 

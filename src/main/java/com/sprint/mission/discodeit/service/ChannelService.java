@@ -23,7 +23,7 @@ public interface ChannelService {
 
     boolean isChannelExist(UUID channelId);
 
-    ArrayList<User> getAllMembers(UUID channelId);
+    ArrayList<UUID> getAllMembers(UUID channelId);
 
     String getChannelNameById(UUID userId);
 

@@ -103,21 +103,18 @@ public class BasicMessageService implements MessageService {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss.SSS");
         Date date = new Date();
-        if (messageRepository.getMessage(messageId).getUpdatedAt() != 0){
-            date.setTime(messageRepository.getMessage(messageId).getUpdatedAt());
-        } else {
-            date.setTime(messageRepository.getMessage(messageId).getCreatedAt());
-        }
+
+        date.setTime(messageRepository.getMessage(messageId).getUpdatedAt().toEpochMilli());
 
         String authorName = messageRepository.getMessage(messageId).getAuthor().getUserName();
         String channelName = messageRepository.getMessage(messageId).getChannel().getChannelName();
         String messageContent = messageRepository.getMessage(messageId).getContent();
-        String messageLatestEditTime = simpleDateFormat.format(date);
+        String messageLatestEditedTime = simpleDateFormat.format(date);
 
         System.out.println("[보낸이] " + authorName);
         System.out.println("[채널] " + channelName);
         System.out.println("[내용] " + messageContent);
-        System.out.println("[최근 수정시간] " + messageLatestEditTime);
+        System.out.println("[최근 수정시간] " + messageLatestEditedTime);
         return true;
     }
 

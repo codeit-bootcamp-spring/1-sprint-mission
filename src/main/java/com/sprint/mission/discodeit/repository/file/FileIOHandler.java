@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Entity;
+import org.springframework.stereotype.Component;
 
+import java.awt.image.BufferedImage;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
@@ -10,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.UUID;
 
+//todo IO핸들러를 싱글톤객체로 호출하고있는데, Bean에 넣고 꺼내쓰는게 낫나?
+@Component
 public class FileIOHandler {
 
     //외부에서 생성자 접근 불가
@@ -56,5 +60,10 @@ public class FileIOHandler {
             return null;
         }
     }
+
+
+    //public BufferedImage loadImage(String imagePath) {
+
+    //}
 
 }

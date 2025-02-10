@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
 public interface UserService {
     UUID createUser(String userName, String email,String password);
+
+    //UUID createUser(String userName, String email,String password, String profilePicturePath);
 
     HashMap<UUID, User> getUsersMap();
 
@@ -21,5 +21,6 @@ public interface UserService {
     boolean changeUserName(UUID userId, String newName);
 
     boolean isUserExist(UUID userId);
+
 }
 

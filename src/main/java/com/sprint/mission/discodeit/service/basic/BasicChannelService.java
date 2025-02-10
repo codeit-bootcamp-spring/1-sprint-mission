@@ -95,7 +95,7 @@ public class BasicChannelService implements ChannelService {
             System.out.println("채널 멤버 추가 실패. 입력값을 확인해주세요.");
             return false;
         }
-        channelRepository.addChannelMember(channelId, userRepository.getUser(memberId));
+        channelRepository.addChannelMember(channelId, memberId);
         System.out.println(channelRepository.getChannel(channelId).getChannelName() + " 채널에 "+ userRepository.getUser(memberId).getUserName() +" 멤버 추가 성공!");
         return true;
     }
@@ -111,7 +111,7 @@ public class BasicChannelService implements ChannelService {
 
     //해당 채널에 소속되어있는 유저 객체들 ArrayList로 반환
     @Override
-    public ArrayList<User> getAllMembers(UUID channelId) {
+    public ArrayList<UUID> getAllMembers(UUID channelId) {
         if (channelId == null || channelRepository.isChannelExist(channelId) == false){
             System.out.println("채널 멤버 리스트 반환 실패. 입력값을 확인해주세요.");
             return null;
@@ -126,9 +126,10 @@ public class BasicChannelService implements ChannelService {
             return false;
         }
         Channel channel = channelRepository.getChannel(channelId);
-        System.out.println(channel.getChannelName()+" 채널에 소속된 멤버 : " + channel.getMembers().stream().map((member) -> member.getUserName()).collect(Collectors.joining(", ")));
+        System.out.println(channel.getChannelName()+" 채널에 소속된 멤버 : " + channel.getMembers().stream().map((memberId) -> userRepository.getUser(memberId).getUserName()).collect(Collectors.joining(", ")));
         return true;
     }
+
 
 
 }
