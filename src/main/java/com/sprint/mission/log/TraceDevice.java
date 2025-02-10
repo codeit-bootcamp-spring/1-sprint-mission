@@ -38,21 +38,21 @@ public class TraceDevice {
     private void synchronize() {
         TraceId traceId = traceHolder.get();
         if (traceId == null) {
-            log.info("======================================================");
+//            log.info("======================================================");
             traceHolder.set(new TraceId());
         }
         else traceHolder.set(traceId.createNextId());
     }
 
-    public void end(TraceStatus status){
-        complete(status, null);
+    public void end(TraceStatus status, Object returnValue){
+        complete(status, null, returnValue);
     }
 
-    public void exception(TraceStatus status, Throwable e){
-        complete(status, e);
+    public void exception(TraceStatus status, Throwable e, Object returnValue){
+        complete(status, e, null);
     }
 
-    private void complete(TraceStatus status, Throwable e) {
+    private void complete(TraceStatus status, Throwable e, Object returnValue) {
         TraceId traceId = traceHolder.get();
         ProceedingJoinPoint joinPoint = status.getJoinPoint();
         //Long resultTime = System.currentTimeMillis() - status.getStartTime();
@@ -60,9 +60,9 @@ public class TraceDevice {
         String simpleClassName = joinPoint.getTarget().getClass().getSimpleName();
 
         if (e == null){
-            log.info("[{}] {} {}(Method {}, Args {})", traceId.getId(), addSpace(COMPLET_PREFIX, traceId.getLevel()), simpleClassName, methodName);
+            log.info("[{}] {} {}(Method {}, Return {})", traceId.getId(), addSpace(COMPLET_PREFIX, traceId.getLevel()), simpleClassName,methodName, returnValue);
         } else {
-            log.info("[{}] {} {}(Method {}, Args {}) *예외 ={}", traceId.getId(), addSpace(EX_PREFIX, traceId.getLevel()), simpleClassName, methodName, joinPoint.getArgs(), e.getClass().getSimpleName());
+            log.info("[{}] {} {}(Method {}) *예외 ={}", traceId.getId(), addSpace(EX_PREFIX, traceId.getLevel()), simpleClassName, methodName, e.getClass().getSimpleName());
         }
         releaseHolder(status);
     }
@@ -72,7 +72,6 @@ public class TraceDevice {
         if (traceId.getLevel() == 0){
             Long resultTime = System.currentTimeMillis() - status.getStartTime();
             log.info("[{}] 걸린 시간 : {}ms", traceId.getId(), resultTime);
-            log.info("======================================================");
             traceHolder.remove();
         } else {
             traceHolder.set(traceId.createPrevId());

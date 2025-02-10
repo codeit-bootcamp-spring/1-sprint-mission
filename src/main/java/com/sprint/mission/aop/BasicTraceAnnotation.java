@@ -34,10 +34,10 @@ public class BasicTraceAnnotation {
         try {
             status = trace.begin(joinPoint);
             Object result = joinPoint.proceed();
-            trace.end(status);
+            trace.end(status, result);
             return result;
         } catch (Throwable e) {
-            trace.exception(status, e);
+            trace.exception(status, e, null);
             throw new RuntimeException(e);
         }
     }

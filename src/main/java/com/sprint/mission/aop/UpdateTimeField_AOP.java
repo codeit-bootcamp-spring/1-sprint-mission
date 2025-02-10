@@ -6,6 +6,7 @@ import com.sprint.mission.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -24,6 +25,7 @@ public class UpdateTimeField_AOP {
     @Pointcut("execution(* com.sprint.mission.repository..save(..))")
     public void save(){}
 
+    @Order(2)
     @AfterReturning("delete() || save()")
     public void setTimeLog(JoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();

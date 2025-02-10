@@ -26,7 +26,7 @@ public class BasicTrace {
     public void repositoryMethod(){}
 
     @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
-    public void jcfCreateMethod(){}
+    public void jcfCreateMethod(){} // 테스트 1회성
 
     @Around("serviceMethod() || repositoryMethod()")
     public Object doTrace(ProceedingJoinPoint joinPoint){
@@ -35,10 +35,10 @@ public class BasicTrace {
         try {
             status = trace.begin(joinPoint);
             Object result = joinPoint.proceed();
-            trace.end(status);
+            trace.end(status, result);
             return result;
         } catch (Throwable e) {
-            trace.exception(status, e);
+            trace.exception(status, e, null);
             throw new RuntimeException(e);
         }
     }
