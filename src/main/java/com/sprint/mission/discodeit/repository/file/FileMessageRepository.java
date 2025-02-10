@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
-import com.sprint.mission.discodeit.service.file.SerializableFileStorage;
+import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {

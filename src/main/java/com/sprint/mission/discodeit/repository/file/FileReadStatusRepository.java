@@ -17,7 +17,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 	}
 
 	@Override
-	public ReadStatus findById(Long id) {
+	public ReadStatus findById(UUID id) {
 		return null;
 	}
 

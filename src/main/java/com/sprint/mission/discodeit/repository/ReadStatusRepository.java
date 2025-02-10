@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 public interface ReadStatusRepository {
 	ReadStatus save(ReadStatus readStatus);
 
-	ReadStatus findById(Long id);
+	Optional<ReadStatus> findById(UUID id);
 
 	//사용자의 특정 채널 읽음 상태 조회(해당 채널에서 어디까지 읽음을 확인할때 사용)
 	Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
