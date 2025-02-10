@@ -38,11 +38,13 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UUID update(UserStatus userStatus) {
-        return null;
+        data.put(userStatus.getId(), userStatus);
+        return userStatus.getId();
     }
 
     @Override
     public UUID delete(UUID id) {
-        return null;
+        data.remove(id);
+        return id;
     }
 }

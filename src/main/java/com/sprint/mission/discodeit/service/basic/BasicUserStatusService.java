@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -24,12 +25,12 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UUID create(UserStatusCreateDTO userStatusCreateDTO) {
         //유저가 존재하는지 파악
-        User findUSer = userService.read(userStatusCreateDTO.getUserid());
+        UserServiceFindDTO userServiceFindDTO = userService.find(userStatusCreateDTO.getUserid());
 
         //Duplicate >> 서비스 계층에서 >>레포.findByUserId() 해서 있으면 중복
-        checkDuplicateUserStatus(findUSer.getId());
+        checkDuplicateUserStatus(userServiceFindDTO.getId());
 
-        UserStatus userStatus = new UserStatus(findUSer.getId());
+        UserStatus userStatus = new UserStatus(userServiceFindDTO.getId());
         return userStatusRepository.save(userStatus);
     }
 

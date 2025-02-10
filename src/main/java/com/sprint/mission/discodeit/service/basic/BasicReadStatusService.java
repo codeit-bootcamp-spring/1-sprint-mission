@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -11,7 +12,6 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -27,11 +27,11 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public UUID create(ReadStatusCreateDTO readStatusCreateDTO) {
-        User findUser = userService.read(readStatusCreateDTO.getUserId());
+        UserServiceFindDTO userServiceFindDTO = userService.find(readStatusCreateDTO.getUserId());
         Channel findChannel = channelService.read(readStatusCreateDTO.getChannelId());
-        checkDuplicateReadStatus(findUser.getId(), findChannel.getId());
+        checkDuplicateReadStatus(userServiceFindDTO.getId(), findChannel.getId());
 
-        ReadStatus readStatus = new ReadStatus(findUser.getId(), findChannel.getId());
+        ReadStatus readStatus = new ReadStatus(userServiceFindDTO.getId(), findChannel.getId());
         return readStatus.getId();
     }
 

@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -22,15 +25,34 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public UUID create(BinaryContentCreateDTO binaryContentCreateDTO) {
-        User findUser = userService.read(binaryContentCreateDTO.getUserId());
-        Message findMessage = messageService.read(binaryContentCreateDTO.getMessageId());
+        // userId와 channelId 중 하나만 값이 존재
+        UserServiceFindDTO userServiceFindDTO = Optional.ofNullable(binaryContentCreateDTO.getUserId()).map(userService::find).orElse(null);
+        Message findMessage = Optional.ofNullable(binaryContentCreateDTO.getMessageId()).map(messageService::read).orElse(null);
+        UUID userId = Optional.ofNullable(userServiceFindDTO).map(UserServiceFindDTO::getId).orElse(null);
+        UUID messageId = Optional.ofNullable(findMessage).map(Message::getId).orElse(null);
 
-        BinaryContent binaryContent = new BinaryContent(findUser.getId(), findMessage.getId(),
-                binaryContentCreateDTO.getData(),
-                binaryContentCreateDTO.getContentType(),
-                binaryContentCreateDTO.getSize());
 
+        byte[] file = getFileBytes(binaryContentCreateDTO.getFile());
+        String contentType = binaryContentCreateDTO.getFile().getContentType();
+        Long size = binaryContentCreateDTO.getFile().getSize();
+
+        BinaryContent binaryContent = new BinaryContent(userId, messageId, file, contentType, size);
         return binaryContentRepository.save(binaryContent);
+    }
+
+    public byte[] getFileBytes(MultipartFile multipartFile){
+        byte[] file = null;
+        try {
+            if (multipartFile != null && !multipartFile.isEmpty()) {
+                file =  multipartFile.getBytes();
+            } else {
+                System.out.println("파일이 존재하지 않거나 비어 있음.");
+            }
+        } catch (IOException e) {
+            System.err.println("파일 변환 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return file;
     }
 
     @Override
@@ -40,6 +62,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         Optional.ofNullable(findBinaryContent)
                 .orElseThrow(() -> new NoSuchElementException("해당 BinaryContent 가 없습니다."));
         return findBinaryContent;
+    }
+
+    @Override
+    public List<BinaryContent> findAll() {
+        return binaryContentRepository.findAll();
     }
 
     @Override
