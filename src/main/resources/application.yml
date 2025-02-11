@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: discodeit
+
+  profiles:
+    active: local
+
+  main:
+    allow-bean-definition-overriding: true # Bean 충돌 방지
+
+logging:
+  level:
+    org.springframework: INFO
