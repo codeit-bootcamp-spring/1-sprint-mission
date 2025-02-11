@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.io.*;
@@ -47,14 +46,5 @@ public class FileMessageRepository {
 
         return messages;
     }
-
-
-
-
-
-
-
-
-
 
 }

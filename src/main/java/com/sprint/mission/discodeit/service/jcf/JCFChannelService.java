@@ -49,7 +49,7 @@ public class JCFChannelService implements ChannelService {
     public void updateChannel(Channel channel, String newName, User admin) {
         try {
             if (channel.getAdmin().equals(admin)) {
-                channel.setChannelName(newName);
+                channel.updateChannelName(newName);
                 channelRepository.update(channel);
                 System.out.println("채널이름이 변경되었습니다.");
             } else {

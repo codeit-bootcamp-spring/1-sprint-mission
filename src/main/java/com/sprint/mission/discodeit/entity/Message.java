@@ -2,10 +2,10 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@Setter
 public class Message extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -13,6 +13,7 @@ public class Message extends BaseEntity implements Serializable {
     private final Channel channel;
     private String content;
 
+    @Builder
     public Message(Channel channel, User writer, String content) {
         super();
         this.channel = channel;
@@ -20,7 +21,7 @@ public class Message extends BaseEntity implements Serializable {
         this.content = content;
     }
 
-    public void setContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
         update();
     }

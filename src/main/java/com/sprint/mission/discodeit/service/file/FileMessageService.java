@@ -46,18 +46,18 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void updateMessage(Message message, String content, User writer) {
-        try {
-            List<Message> messages = messageRepository.load();
-            boolean hasMessage = messages.stream()
-                    .anyMatch(check -> check.equals(message));
-            boolean isWriter = message.getWriter().equals(writer);
+        List<Message> messages = messageRepository.load();
+        boolean hasMessage = messages.stream()
+                .anyMatch(check -> check.equals(message));
+        boolean isWriter = message.getWriter().equals(writer);
 
+        try {
             if (!hasMessage) {
                 throw new NoSuchElementException("메시지가 없습니다.");
             } else if (!isWriter) {
                 throw new IllegalArgumentException("작성자만 변경할 수 있습니다.");
             } else {
-                message.setContent(content);
+                message.updateContent(content);
                 messageRepository.save(messages);
                 System.out.println("메시지가 수정되었습니다.");
             }
@@ -116,17 +116,16 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Map<String, String>> getChannelMessage(Channel channel) {
+        List<Message> messages = messageRepository.load();
+        List<Map<String, String>> channelMessages = messages.stream()
+                .filter(channelCheck -> channelCheck.getChannel().equals(channel))
+                .map(message -> {
+                    Map<String, String> channelMessage = new HashMap<>();
+                    channelMessage.put("작성자", message.getWriter().getUserName());
+                    channelMessage.put("메시지 내용", message.getContent());
+                    return channelMessage;
+                }).collect(Collectors.toList());
         try {
-            List<Message> messages = messageRepository.load();
-            List<Map<String, String>> channelMessages = messages.stream()
-                    .filter(channelCheck -> channelCheck.getChannel().equals(channel))
-                    .map(message -> {
-                        Map<String, String> channelMessage = new HashMap<>();
-                        channelMessage.put("작성자", message.getWriter().getUserName());
-                        channelMessage.put("메시지 내용", message.getContent());
-                        return channelMessage;
-                    }).collect(Collectors.toList());
-
             if (channelMessages.isEmpty()) {
                 throw new NoSuchElementException("해당 채널이 존재하지 않거나 메시지가 없습니다.");
             }
@@ -139,17 +138,17 @@ public class FileMessageService implements MessageService {
 
     @Override
     public List<Map<String, String>> getWriterMessage(User user) {
-        try {
-            List<Message> messages = messageRepository.load();
-            List<Map<String, String>> writerMessages = messages.stream()
-                    .filter(writerCheck -> writerCheck.getWriter().equals(user))
-                    .map(message -> {
-                        Map<String, String> writerMessage = new HashMap<>();
-                        writerMessage.put("채널", message.getChannel().getChannelName());
-                        writerMessage.put("메시지 내용", message.getContent());
-                        return writerMessage;
-                    }).collect(Collectors.toList());
+        List<Message> messages = messageRepository.load();
+        List<Map<String, String>> writerMessages = messages.stream()
+                .filter(writerCheck -> writerCheck.getWriter().equals(user))
+                .map(message -> {
+                    Map<String, String> writerMessage = new HashMap<>();
+                    writerMessage.put("채널", message.getChannel().getChannelName());
+                    writerMessage.put("메시지 내용", message.getContent());
+                    return writerMessage;
+                }).collect(Collectors.toList());
 
+        try {
             if (writerMessages.isEmpty()) {
                 throw new NoSuchElementException("사용자가 없거나, 메시지가 없습니다.");
             }

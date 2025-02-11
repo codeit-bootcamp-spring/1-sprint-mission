@@ -65,7 +65,7 @@ public class FileChannelService implements ChannelService{
                     .filter(check -> check.equals(channel))
                     .anyMatch(check -> check.getAdmin().equals(admin));
             if (isAdmin) {
-                channel.setChannelName(newName);
+                channel.updateChannelName(newName);
                 channelRepository.save(channels);
                 System.out.println("채널이름이 변경되었습니다.");
             } else {

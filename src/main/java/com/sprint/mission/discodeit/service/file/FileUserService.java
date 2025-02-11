@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class FileUserService implements UserService {
-    private final FileUserRepository userRepository;
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    private final FileUserRepository userRepository;
 
     public FileUserService(){
         this.userRepository = new FileUserRepository();
@@ -39,7 +39,7 @@ public class FileUserService implements UserService {
         try {
             List<User> users = userRepository.load();
             User existingUser = getUserOrThrow(user, users);
-            existingUser.setUserName(newName);
+            existingUser.updateUserName(newName);
             userRepository.save(users);
             System.out.println("사용자 이름이 수정되었습니다.");
         } catch (NoSuchElementException e) {
@@ -55,7 +55,7 @@ public class FileUserService implements UserService {
                 throw new IllegalArgumentException("올바르지 않은 이메일 형식입니다.");
             } else {
                 User existingUser = getUserOrThrow(user, users);
-                existingUser.setEmail(newEmail);
+                existingUser.updateUserEmail(newEmail);
                 userRepository.save(users);
                 System.out.println("사용자 이메일이 수정되었습니다.");
             }
@@ -86,7 +86,7 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void getUserInfo(User user){
+    public void getUser(User user){
         try {
             List<User> users = userRepository.load();
             User existingUser = getUserOrThrow(user, users);

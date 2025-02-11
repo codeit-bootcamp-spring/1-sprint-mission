@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileChannelRepository {
+    private static final String FILE_PATH = "channels.ser";
     private static FileChannelRepository instance;
     private final Path directory;
     private final Path filePath;
@@ -17,11 +18,11 @@ public class FileChannelRepository {
 
     private FileChannelRepository() {
         this.directory = Paths.get(System.getProperty("user.dir"), "data");
-        this.filePath = directory.resolve("channels.ser");
+        this.filePath = directory.resolve(FILE_PATH);
         init();
     }
 
-    public static synchronized FileChannelRepository getInstance() {
+    public static FileChannelRepository getInstance() {
         if (instance == null) {
             instance = new FileChannelRepository();
         }
@@ -50,7 +51,7 @@ public class FileChannelRepository {
     @SuppressWarnings("unchecked")
     public List<Channel> load() {
         List<Channel> channels = new ArrayList<>();
-        Path filePath = directory.resolve("channels.ser");
+        Path filePath = directory.resolve(FILE_PATH);
 
         if (Files.exists(filePath)) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {

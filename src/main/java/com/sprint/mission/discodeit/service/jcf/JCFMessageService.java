@@ -45,7 +45,7 @@ public class JCFMessageService implements MessageService {
             } else if (!isWriter) {
                 throw new IllegalArgumentException("작성자만 변경할 수 있습니다.");
             } else {
-                message.setContent(content);
+                message.updateContent(content);
                 messageRepository.save(message);
                 System.out.println("메시지가 수정되었습니다.");
             }

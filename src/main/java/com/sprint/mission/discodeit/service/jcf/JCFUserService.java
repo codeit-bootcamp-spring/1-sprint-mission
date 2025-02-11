@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class JCFUserService implements UserService {
-    private final JCFUserRepository userRepository;
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+    private final JCFUserRepository userRepository;
 
     public JCFUserService() {
         this.userRepository = new JCFUserRepository();
@@ -35,7 +35,7 @@ public class JCFUserService implements UserService {
     public void updateUserName(User user, String newName) {
         try {
             User existingUser = getUserOrThrow(user);
-            existingUser.setUserName(newName);
+            existingUser.updateUserName(newName);
             System.out.println("사용자 이름이 수정되었습니다.");
         }catch (NoSuchElementException e){
             System.out.println(e.getMessage());
@@ -49,7 +49,7 @@ public class JCFUserService implements UserService {
                 System.out.println("올바르지 않은 이메일 형식입니다. 바꿔주세요");
             } else {
                 User existingUser = getUserOrThrow(user);
-                existingUser.setEmail(newEmail);
+                existingUser.updateUserEmail(newEmail);
                 System.out.println("사용자 이메일이 수정되었습니다.");
             }
         }catch (NoSuchElementException e){
@@ -77,7 +77,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void getUserInfo(User user) {
+    public void getUser(User user) {
         try {
             User existingUser = getUserOrThrow(user);
             existingUser.display();

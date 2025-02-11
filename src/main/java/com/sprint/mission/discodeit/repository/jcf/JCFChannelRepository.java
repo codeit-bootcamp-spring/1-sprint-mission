@@ -14,7 +14,7 @@ public class JCFChannelRepository {
         this.channels = new ArrayList<>();
     }
 
-    public static synchronized JCFChannelRepository getInstance() {
+    public static JCFChannelRepository getInstance() {
         if (instance == null) {
             instance = new JCFChannelRepository();
         }
