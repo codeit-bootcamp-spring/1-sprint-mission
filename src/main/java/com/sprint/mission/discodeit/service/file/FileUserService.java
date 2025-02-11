@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -13,7 +14,7 @@ public class FileUserService implements UserService {
 
     public FileUserService(){
         this.userRepository = new FileUserRepository();
-        userRepository.init();
+        userRepository();
     }
 
     @Override
@@ -26,7 +27,7 @@ public class FileUserService implements UserService {
                 throw new IllegalArgumentException("이미 등록된 사용자입니다.");
             } else {
                 users.add(user);
-                userRepository.save(users);
+                userRepository.saveUserToFile(users);
                 System.out.println("사용자가 등록되었습니다.");
             }
         } catch (IllegalArgumentException e) {
@@ -40,7 +41,7 @@ public class FileUserService implements UserService {
             List<User> users = userRepository.load();
             User existingUser = getUserOrThrow(user, users);
             existingUser.updateUserName(newName);
-            userRepository.save(users);
+            userRepository.saveUserToFile(users);
             System.out.println("사용자 이름이 수정되었습니다.");
         } catch (NoSuchElementException e) {
             System.out.println(e.getMessage());
@@ -56,7 +57,7 @@ public class FileUserService implements UserService {
             } else {
                 User existingUser = getUserOrThrow(user, users);
                 existingUser.updateUserEmail(newEmail);
-                userRepository.save(users);
+                userRepository.saveUserToFile(users);
                 System.out.println("사용자 이메일이 수정되었습니다.");
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
@@ -75,7 +76,7 @@ public class FileUserService implements UserService {
             User existingUser = getUserOrThrow(user, users);
             if (existingUser.getPassword().equals(password)) {
                 users.remove(existingUser);
-                userRepository.save(users);
+                userRepository.saveUserToFile(users);
                 System.out.println("사용자가 삭제되었습니다.");
             } else {
                 throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
@@ -117,3 +118,4 @@ public class FileUserService implements UserService {
                 .orElseThrow(() -> new NoSuchElementException("사용자가 없습니다."));
     }
 }
+*/

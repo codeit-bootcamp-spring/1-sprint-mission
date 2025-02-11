@@ -1,50 +1,101 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-public class FileUserRepository {
-    Path directory = Paths.get(System.getProperty("user.dir"), "data");
-    Path filePath = directory.resolve("users.ser");
+public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public void init() {
-        if (!Files.exists(directory)) {
+    public FileUserRepository(){
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", User.class.getSimpleName());
+        if (!Files.exists(DIRECTORY)) {
             try {
-                Files.createDirectories(directory);
+                Files.createDirectories(DIRECTORY);
                 System.out.println("디렉토리 생성 완료");
             } catch (IOException e) {
-                throw new RuntimeException("디렉토리 생성 실패: " + e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
-
     }
 
-    public void save(List<User> users) {
-
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
-                oos.writeObject(users);
-            } catch (IOException e) {
-                throw new RuntimeException("사용자 저장 실패: " + e.getMessage(), e);
-            }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
-    @SuppressWarnings("unchecked")
-    public List<User> load() {
-        List<User> users = new ArrayList<>();
-        Path filePath = directory.resolve("users.ser");
+    @Override
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return user;
+    }
 
-        if (Files.exists(filePath)) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath.toFile()))) {
-                users = (List<User>) ois.readObject();
+    @Override
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("사용자 로드 실패: " + e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
-
-        return users;
+        return Optional.ofNullable(userNullable);
     }
+
+    @Override
+    public List<User> findAll() {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths.filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e.getMessage(), e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean existsId(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
+
 }

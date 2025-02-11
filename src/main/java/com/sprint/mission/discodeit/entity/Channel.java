@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -14,14 +15,11 @@ public class Channel extends BaseEntity implements  Serializable {
     private final User admin;
     private String channelName;
     private ChannelType type;
-
-    private final List<Message> messagesList;
     private final List<User> memberList;
 
     @Builder
     public Channel(ChannelType type, String channelName, User admin) {
         super();
-        messagesList = new ArrayList<>();
         memberList = new ArrayList<>();
         this.channelName = channelName;
         this.admin = admin;
@@ -29,22 +27,23 @@ public class Channel extends BaseEntity implements  Serializable {
         memberList.add(admin);
     }
 
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-        update();
-    }
+    public void update(String newName) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.channelName)) {
+            this.channelName = newName;
+            anyValueUpdated = true;
+        }
 
+        if (anyValueUpdated) {
+            updated();
+        }
+    }
     public void addMember(User user) {
         memberList.add(user);
     }
 
-    public void deleteAllMember() {
-        memberList.clear();
+    public void deleteMember(User user) {
+        memberList.remove(user);
     }
-
-    public void deleteAllMessage() {
-        messagesList.clear();
-    }
-
 
 }

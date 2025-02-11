@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
@@ -134,3 +135,4 @@ public class JCFMessageService implements MessageService {
         return writerMessages;
     }
 }
+*/

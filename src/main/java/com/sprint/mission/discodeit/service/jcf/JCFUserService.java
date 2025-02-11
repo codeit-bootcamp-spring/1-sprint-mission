@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
@@ -101,3 +102,4 @@ public class JCFUserService implements UserService {
                     .orElseThrow(() -> new NoSuchElementException("사용자가 없습니다."));
     }
 }
+*/
