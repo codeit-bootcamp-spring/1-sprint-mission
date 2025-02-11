@@ -29,8 +29,8 @@ public class DiscodeitApplication {
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-		Message message = messageService.createMessage(author.getId(), channel.getId(), "안녕하세요");
-		System.out.println("메시지 생성: " + message.getId());
+//		Message message = messageService.createMessage(author.getId(), channel.getId(), "안녕하세요");
+//		System.out.println("메시지 생성: " + message.getId());
 	}
 
 

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -17,31 +19,40 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Message createMessage(UUID userId, UUID channelId, String content) {
-        Message message = new Message(userId, channelId, content);
+    public Message createMessage(MessageCreateDTO messageCreateDTO) {
+        Message message = new Message(messageCreateDTO);
         return  messageRepository.save(message);
     }
 
     @Override
-    public Message readMessage(UUID id) {
+    public Message find(UUID id) {
         return messageRepository.findById(id);
     }
 
     @Override
-    public List<Message> readAllMessage() {
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messageList = messageRepository.findByChannelId(channelId);
+        return messageList;
+    }
+
+    @Override
+    public List<Message> findAll() {
         List<Message> messageList= new ArrayList<>( messageRepository.load().values());
         return messageList;
     }
 
     @Override
-    public Message updateMessage(UUID msgID, String content) {
-        Message message = messageRepository.findById(msgID);
-        message.updateContent(content);
+    public Message update(MessageUpdateDTO messageUpdateDTO) {
+        Message message = messageRepository.findById(messageUpdateDTO.uuid());
+        message.updateContent(messageUpdateDTO);
         return messageRepository.save(message);
     }
 
     @Override
     public void deleteMessage(UUID msgID) {
+        //관련된 도메인 삭제 Binary
+        Message message = messageRepository.findById(msgID);
+        message.deleteBinaryContentList();;
         messageRepository.delete(msgID);
     }
 }
