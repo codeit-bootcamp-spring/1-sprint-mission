@@ -1,12 +1,13 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Repository
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data = new ConcurrentHashMap<>();
 
