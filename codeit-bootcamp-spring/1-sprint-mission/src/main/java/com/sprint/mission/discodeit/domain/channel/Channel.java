@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.domain.channel;
 
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
+import com.sprint.mission.discodeit.domain.channel.enums.ChannelVisibility;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNameInvalidException;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelSubjectOverLengthException;
 import com.sprint.mission.discodeit.domain.user.User;
@@ -25,20 +26,34 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
     private final User manager;
+    private final ChannelVisibility visibility;
+    private final ParticipatedUser participatedUser;
+
 
     public Channel(
             String name,
             ChannelType type,
-            User manager
+            User manager,
+            ChannelVisibility visibility
     ) {
         validate(name);
         this.id = UUID.randomUUID();
         this.name = name;
         this.subject = "";
         this.type = type;
+        this.visibility = visibility;
         createdAt = Instant.now();
         updatedAt = Instant.now();
         this.manager = manager;
+        participatedUser = new ParticipatedUser();
+    }
+
+    public static Channel ofPrivateChannel(User manager, ChannelType type) {
+        return new Channel("", type, manager, ChannelVisibility.PRIVATE);
+    }
+
+    public void join(User user) {
+        participatedUser.addUser(user);
     }
 
     public void updateSubject(String subject) {

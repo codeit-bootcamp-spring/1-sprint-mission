@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.Username;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +35,11 @@ public class FakeUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findAll() {
+        return uuidUsers.values().stream().toList();
+    }
+
+    @Override
     public boolean isExistByEmail(Email email) {
         return emailUsers.containsKey(email);
     }
@@ -41,5 +47,12 @@ public class FakeUserRepository implements UserRepository {
     @Override
     public boolean isExistByUsername(Username username) {
         return usernameUsers.containsKey(username);
+    }
+
+    @Override
+    public void deleteByUser(User user) {
+        uuidUsers.remove(user.getId());
+        emailUsers.remove(user.getEmail());
+        usernameUsers.remove(user.getUsername());
     }
 }

@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.domain.userstatus.enums.OnlineStatus;
 import com.sprint.mission.discodeit.repository.userstatus.interfaces.UserStatusRepository;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
@@ -20,6 +22,10 @@ public class UserStatusService {
         this.userService = userService;
     }
 
+    public UserStatus createAtFirstJoin(User user) {
+        return userStatusRepository.save(new UserStatus(user));
+    }
+
     public UserStatus findOneByUser(User user) {
         return userStatusRepository.findByUser(user).orElse(new UserStatus(user));
     }
@@ -31,9 +37,13 @@ public class UserStatusService {
         userStatusRepository.save(foundUserStatus);
     }
 
-    public OnlineStatus getUserStatus(UUID userId) {
+    public OnlineStatus getUserOlineStatus(UUID userId) {
         User foundUser = userService.findOneByIdOrThrow(userId);
         UserStatus foundUserStatus = findOneByUser(foundUser);
         return foundUserStatus.getOnlineStatus();
+    }
+
+    public void delete(User targetUser) {
+        userStatusRepository.deleteByUser(targetUser);
     }
 }

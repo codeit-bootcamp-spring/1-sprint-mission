@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
+import com.sprint.mission.discodeit.application.service.userstatus.UserStatusService;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.Nickname;
@@ -18,8 +19,10 @@ import com.sprint.mission.discodeit.domain.user.exception.AlreadyUserExistsExcep
 import com.sprint.mission.discodeit.domain.user.exception.InvalidLoginException;
 import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.validation.PasswordValidator;
+import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -29,15 +32,18 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository;
     private final UserConverter userConverter;
     private final PasswordEncoder passwordEncoder;
+    private final UserStatusService userStatusService;
 
     public JCFUserService(
             UserRepository userRepository,
             UserConverter userConverter,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            UserStatusService userStatusService
     ) {
         this.userRepository = userRepository;
         this.userConverter = userConverter;
         this.passwordEncoder = passwordEncoder;
+        this.userStatusService = userStatusService;
     }
 
     @Override
@@ -46,7 +52,8 @@ public class JCFUserService implements UserService {
         throwUsernameAlreadyUsed(requestDto.username());
         PasswordValidator.validateOrThrow(requestDto.password());
         User savedUser = userRepository.save(toUserWithPasswordEncode(requestDto));
-        return userConverter.toDto(savedUser);
+        UserStatus savedUserStatus = userStatusService.createAtFirstJoin(savedUser);
+        return userConverter.toDto(savedUser, savedUserStatus);
     }
 
     @Override
@@ -65,11 +72,29 @@ public class JCFUserService implements UserService {
     }
 
     @Override
+    public List<UserResponseDto> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> {
+                    UserStatus userStatus = userStatusService.findOneByUser(user);
+                    return userConverter.toDto(user, userStatus);
+                })
+                .toList();
+    }
+
+    @Override
     public void changePassword(UUID userId, ChangePasswordRequestDto requestDto) {
         PasswordValidator.validateOrThrow(requestDto.password());
         User foundUser = findOneByIdOrThrow(userId);
         foundUser.updatePassword(passwordEncoder.encode(requestDto.password()));
         userRepository.save(foundUser);
+    }
+
+    @Override
+    public void quitUser(UUID userId) {
+        User foundUser = findOneByIdOrThrow(userId);
+        userStatusService.delete(foundUser);
+        userRepository.deleteByUser(foundUser);
     }
 
     private void throwEmailAlreadyUsed(String email) {

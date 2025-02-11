@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.application.dto.user.LoginRequestDto;
 import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
 import com.sprint.mission.discodeit.domain.user.User;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -15,6 +16,9 @@ public interface UserService {
 
     User findOneByIdOrThrow(UUID userId);
 
+    List<UserResponseDto> findAll();
+
     void changePassword(UUID userId, ChangePasswordRequestDto requestDto);
 
+    void quitUser(UUID userId);
 }

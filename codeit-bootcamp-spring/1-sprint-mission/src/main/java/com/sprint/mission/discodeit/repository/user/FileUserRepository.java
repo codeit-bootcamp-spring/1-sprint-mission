@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.user.Username;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,11 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findAll() {
+        return List.of();
+    }
+
+    @Override
     public boolean isExistByEmail(Email email) {
         return false;
     }
@@ -32,5 +38,10 @@ public class FileUserRepository implements UserRepository {
     @Override
     public boolean isExistByUsername(Username username) {
         return false;
+    }
+
+    @Override
+    public void deleteByUser(User user) {
+
     }
 }

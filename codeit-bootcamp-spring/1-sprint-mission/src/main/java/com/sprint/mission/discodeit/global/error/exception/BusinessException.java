@@ -17,4 +17,8 @@ public class BusinessException extends RuntimeException {
         super(errorCode.getDescription().concat(" 입력값 = ").concat(message));
         this.errorCode = errorCode;
     }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
+    }
 }

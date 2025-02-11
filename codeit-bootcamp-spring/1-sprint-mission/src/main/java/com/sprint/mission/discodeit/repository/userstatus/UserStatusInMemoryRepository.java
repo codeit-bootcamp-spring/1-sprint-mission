@@ -6,7 +6,9 @@ import com.sprint.mission.discodeit.repository.userstatus.interfaces.UserStatusR
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserStatusInMemoryRepository implements UserStatusRepository {
 
     private final Map<User, UserStatus> userStatuses = new HashMap<>();
@@ -21,5 +23,10 @@ public class UserStatusInMemoryRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findByUser(User user) {
         return Optional.ofNullable(userStatuses.get(user));
+    }
+
+    @Override
+    public void deleteByUser(User user) {
+        userStatuses.remove(user);
     }
 }

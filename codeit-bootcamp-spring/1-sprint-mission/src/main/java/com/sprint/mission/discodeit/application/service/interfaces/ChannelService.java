@@ -5,12 +5,19 @@ import com.sprint.mission.discodeit.application.dto.channel.ChangeChannelSubject
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.dto.channel.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.channel.DeleteChannelRequestDto;
+import com.sprint.mission.discodeit.application.dto.channel.InviteChannelRequestDto;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import java.util.UUID;
 
 public interface ChannelService {
 
-    ChannelResponseDto create(UUID userId, CreateChannelRequestDto requestDto);
+    ChannelResponseDto createPublicChannel(UUID userId, CreateChannelRequestDto requestDto);
+
+    ChannelResponseDto createPrivateChannel(UUID userId);
+
+    void joinPublicChannel(UUID invitedUserId, InviteChannelRequestDto requestDto);
+
+    void joinPrivateChannel(UUID invitedUserId, InviteChannelRequestDto requestDto);
 
     Channel findOneByIdOrThrow(UUID uuid);
 

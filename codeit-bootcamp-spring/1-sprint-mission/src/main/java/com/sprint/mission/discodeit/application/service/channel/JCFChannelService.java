@@ -5,37 +5,72 @@ import com.sprint.mission.discodeit.application.dto.channel.ChangeChannelSubject
 import com.sprint.mission.discodeit.application.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.application.dto.channel.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.channel.DeleteChannelRequestDto;
+import com.sprint.mission.discodeit.application.dto.channel.InviteChannelRequestDto;
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
+import com.sprint.mission.discodeit.domain.channel.enums.ChannelVisibility;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.domain.readStatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
+import com.sprint.mission.discodeit.repository.readstatus.interfaces.ReadStatusRepository;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserService userService;
+    private final ReadStatusRepository readStatusRepository;
 
     public JCFChannelService(
             ChannelRepository channelRepository,
-            UserService userService
+            UserService userService,
+            ReadStatusRepository readStatusService
     ) {
         this.channelRepository = channelRepository;
         this.userService = userService;
+        this.readStatusRepository = readStatusService;
     }
 
     @Override
-    public ChannelResponseDto create(UUID userId, CreateChannelRequestDto requestDto) {
+    public ChannelResponseDto createPublicChannel(UUID userId, CreateChannelRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        // TODO 예외 발생할 수 있음 -> 이넘타입에 존재하지 않을 경우
-        ChannelType channelType = ChannelType.valueOf(requestDto.channelType());
-        Channel createChannel = new Channel(requestDto.name(), channelType, foundUser);
+        // TODO 예외 발생할 수 있음 -> Request에 이넘타입에 존재하지 않을 경우
+        ChannelType channelType = requestDto.channelType();
+        Channel createChannel = new Channel(requestDto.name(), channelType, foundUser, ChannelVisibility.PUBLIC);
         Channel savedChannel = channelRepository.save(createChannel);
         return ChannelResponseDto.from(savedChannel);
+    }
+
+    @Override
+    public ChannelResponseDto createPrivateChannel(UUID userId) {
+        User foundUser = userService.findOneByIdOrThrow(userId);
+        Channel createChannel = Channel.ofPrivateChannel(foundUser, ChannelType.TEXT);
+        Channel savedChannel = channelRepository.save(createChannel);
+        ReadStatus readStatus = new ReadStatus(foundUser, savedChannel);
+        readStatusRepository.save(readStatus);
+        return ChannelResponseDto.from(savedChannel);
+    }
+
+    @Override
+    public void joinPublicChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
+        User foundUser = userService.findOneByIdOrThrow(invitedUserId);
+        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        foundChannel.join(foundUser);
+        channelRepository.save(foundChannel);
+    }
+
+    @Override
+    public void joinPrivateChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
+        User foundUser = userService.findOneByIdOrThrow(invitedUserId);
+        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        foundChannel.join(foundUser);
+        ReadStatus readStatus = new ReadStatus(foundUser, foundChannel);
+        readStatusRepository.save(readStatus);
+        channelRepository.save(foundChannel);
     }
 
     @Override

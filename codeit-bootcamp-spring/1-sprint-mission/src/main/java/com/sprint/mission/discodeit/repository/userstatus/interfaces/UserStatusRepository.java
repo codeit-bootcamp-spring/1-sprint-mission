@@ -9,4 +9,6 @@ public interface UserStatusRepository {
     UserStatus save(UserStatus userStatus);
 
     Optional<UserStatus> findByUser(User user);
+
+    void deleteByUser(User user);
 }
