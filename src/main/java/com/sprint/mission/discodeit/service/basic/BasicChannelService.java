@@ -1,52 +1,52 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.entity.ChannelType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@RequiredArgsConstructor
+@Service
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
+    @Override
+    public Channel create(ChannelType type, String name, String description) {
+        Channel channel = new Channel(type, name, description);
+        return channelRepository.save(channel);
     }
 
     @Override
-    public void createChannel(Channel channel) {
-        channelRepository.createChannel(channel);
+    public Channel find(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     }
 
     @Override
-    public Channel createChannel(ChannelType type, String channelName, String description) {
-        Channel channel = new Channel(UUID.randomUUID(), System.currentTimeMillis(), System.currentTimeMillis(), channelName, description);
-        channelRepository.createChannel(channel);  // Repository에 저장
-        return channel;
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
     }
 
     @Override
-    public Channel getChannel(UUID id) {
-        return channelRepository.getChannel(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 채널을 찾을 수 없습니다: " + id));
+    public Channel update(UUID channelId, String newName, String newDescription) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+        channel.update(newName, newDescription);
+        return channelRepository.save(channel);
     }
 
     @Override
-    public List<Channel> getAllChannels() {
-        return channelRepository.getAllChannels();
-    }
-
-    @Override
-    public void updateChannel(UUID id, String channelName) {
-        Channel channel = getChannel(id);
-        channel.update(channelName);  // 비즈니스 로직
-        channelRepository.updateChannel(id, channelName);  // Repository에 반영
-    }
-
-    @Override
-    public void deleteChannel(UUID id) {
-        channelRepository.deleteChannel(id);
+    public void delete(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " not found");
+        }
+        channelRepository.deleteById(channelId);
     }
 }
