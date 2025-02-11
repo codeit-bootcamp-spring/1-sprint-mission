@@ -27,7 +27,6 @@ public class AuthServiceIntegrationTest {
 
   @Autowired
   private AuthService authService;
-
   @Autowired
   private UserService userService;
   @Autowired

@@ -68,7 +68,8 @@ public class BinaryContentServiceImplIntegrationTest {
         "fileName",
         FileType.JPG,
         3,
-        new byte[]{1,1,1}
+        new byte[]{1,1,1},
+        false
     );
 
     BinaryContent binaryContent = binaryContentService.create(dto);

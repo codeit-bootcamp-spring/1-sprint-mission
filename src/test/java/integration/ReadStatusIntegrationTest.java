@@ -161,6 +161,8 @@ public class ReadStatusIntegrationTest {
     List<ReadStatus> statuses = readStatusService.findAllByUserId(user.getUUID());
     ReadStatus status = statuses.get(0);
     Instant timeBefore = status.getLastReadAt();
+
+    Thread.sleep(10);
     CreateReadStatusDto dto = new CreateReadStatusDto(channel.channelId(), user.getUUID());
 
     ReadStatus updated = readStatusService.update(dto);

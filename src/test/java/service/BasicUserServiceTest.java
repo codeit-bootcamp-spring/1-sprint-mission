@@ -1,5 +1,6 @@
 package service;
 
+import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
@@ -61,9 +62,9 @@ public class BasicUserServiceTest {
   private User user2;
   private User user3;
   private CreateUserDto createUserDto;
-  @BeforeEach
-  void setUp(){
 
+  @BeforeEach
+  void setUp() {
 
 
     user1 = new User.UserBuilder("user1", PasswordEncryptor.hashPassword("pwd1"), "email1@gmail.com", "01012341232").nickname("nickname1").build();
@@ -75,7 +76,7 @@ public class BasicUserServiceTest {
         "newUser@gmail.com",
         "newNickname",
         "01098765432",
-        new byte[]{1,2,3,4,5},
+        new byte[]{1, 2, 3, 4, 5},
         "imageName",
         "jpg",
         "description"
@@ -85,8 +86,19 @@ public class BasicUserServiceTest {
 
 
   @Test
-  void testCreateUser_Success(){
-
+  void testCreateUser_Success() {
+    when(binaryContentService.create(any(CreateBinaryContentDto.class))).thenAnswer(
+        invocation -> {
+          CreateBinaryContentDto dto = invocation.getArgument(0);
+          return new BinaryContent.BinaryContentBuilder(
+              dto.userId(),
+              dto.fileName(),
+              dto.fileType(),
+              dto.fileSize(),
+              dto.data()
+          ).isProfilePicture().build();
+        }
+    );
     User user = userService.createUser(createUserDto);
 
     assertThat(createUserDto.password()).isNotEqualTo(user.getPassword());
@@ -94,30 +106,31 @@ public class BasicUserServiceTest {
     assertThat(createUserDto.email()).isEqualTo(user.getEmail());
 
     verify(userRepository, times(1)).create(user);
-    verify(userStatusRepository, times(1)).save(any(UserStatus.class));
-    verify(binaryContentRepository, times(1)).save(any(BinaryContent.class));
+    verify(userStatusService, times(1)).create(any(CreateUserStatusDto.class));
 
-    verify(binaryContentRepository).save(argThat(binaryContent ->
-              binaryContent.getFileName().equals(createUserDto.imageName()) &&
-              binaryContent.getData().length == createUserDto.profileImage().length
-        ));
+    verify(userRepository).create(argThat(savedUser ->
+        savedUser.getUsername().equals(createUserDto.username()) &&
+            savedUser.getEmail().equals(createUserDto.email()) &&
+            PasswordEncryptor.checkPassword(createUserDto.password(), savedUser.getPassword())
+    ));
 
-    verify(userStatusRepository).save(argThat(userStatus ->
-            userStatus.getUserId().equals(user.getUUID()) &&
-            userStatus.getCreatedAt() != null
-        ));
+
+    verify(userStatusService).create(argThat(userStatus ->
+        userStatus.userId().equals(user.getUUID()) &&
+            userStatus.lastOnlineAt() != null
+    ));
   }
 
 
   @Test
-  void testCreateUser_Fail_Invalid_Email(){
+  void testCreateUser_Fail_Invalid_Email() {
     createUserDto = new CreateUserDto(
         "newUser",
         "securePwd123",
         "",
         "newNickname",
         "01098765432",
-        new byte[]{1,2,3,4,5},
+        new byte[]{1, 2, 3, 4, 5},
         "imageName",
         "jpg",
         "description"
@@ -127,14 +140,14 @@ public class BasicUserServiceTest {
   }
 
   @Test
-  void testCreateUser_Fail_Duplicate_Email(){
+  void testCreateUser_Fail_Duplicate_Email() {
     createUserDto = new CreateUserDto(
         "newUser",
         "securePwd123",
         "email1@gmail.com",
         "newNickname",
         "01098765432",
-        new byte[]{1,2,3,4,5},
+        new byte[]{1, 2, 3, 4, 5},
         "imageName",
         "jpg",
         "description"
@@ -142,18 +155,18 @@ public class BasicUserServiceTest {
 
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
-    assertThatThrownBy(()->userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_EMAIL);
+    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_EMAIL);
   }
 
   @Test
-  void testCreateUser_Fail_Invalid_PhoneNumber(){
+  void testCreateUser_Fail_Invalid_PhoneNumber() {
     createUserDto = new CreateUserDto(
         "newUser",
         "securePwd123",
         "email1@gmail.com",
         "newNickname",
         "010987",
-        new byte[]{1,2,3,4,5},
+        new byte[]{1, 2, 3, 4, 5},
         "imageName",
         "jpg",
         "description"
@@ -182,7 +195,7 @@ public class BasicUserServiceTest {
 
 
   @Test
-  void testCreateUser_Fail_Invalid_Nickname(){
+  void testCreateUser_Fail_Invalid_Nickname() {
     createUserDto = new CreateUserDto(
         "newUser",
         "securePwd123",
@@ -200,11 +213,11 @@ public class BasicUserServiceTest {
   }
 
   @Test
-  void testFindUserById_Success(){
+  void testFindUserById_Success() {
     UserStatus mockStatus = new UserStatus(user1.getUUID(), Instant.now());
 
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
-    when(userStatusRepository.findByUserId(user1.getUUID())).thenReturn(Optional.of(mockStatus));
+    when(userStatusService.findByUserId(user1.getUUID())).thenReturn(new UserStatus(user1.getUUID(), Instant.now()));
 
     UserResponseDto responseDto = userService.findUserById(user1.getUUID());
 
@@ -213,12 +226,12 @@ public class BasicUserServiceTest {
     assertThat(responseDto.email()).isEqualTo(user1.getEmail());
 
     verify(validator, times(1)).findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class));
-    verify(userStatusRepository, times(1)).findByUserId(user1.getUUID());
+    verify(userStatusService, times(1)).findByUserId(user1.getUUID());
 
   }
 
   @Test
-  void testFindUserById_Fail_UserNotFound(){
+  void testFindUserById_Fail_UserNotFound() {
     when(validator.findOrThrow(eq(User.class), eq("invalid-id"), any(UserNotFoundException.class))).thenThrow(new UserNotFoundException());
 
     assertThatThrownBy(() -> userService.findUserById("invalid-id")).isInstanceOf(UserNotFoundException.class);
@@ -226,22 +239,21 @@ public class BasicUserServiceTest {
   }
 
   @Test
-  void testFindUserById_CreateStatusIfNotExists(){
+  void testFindUserById_CreateStatusIfNotExists() {
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
-    when(userStatusService.create(any(CreateUserStatusDto.class))).thenReturn(new UserStatus(user1.getUUID(), Instant.now()));
-    when(userStatusRepository.findByUserId(user1.getUUID())).thenReturn(Optional.empty());
+    when(userStatusService.findByUserId(user1.getUUID())).thenReturn(new UserStatus(user1.getUUID(), Instant.now()));
+
     UserResponseDto response = userService.findUserById(user1.getUUID());
 
     assertThat(response).isNotNull();
     assertThat(response.userId()).isEqualTo(user1.getUUID());
     assertThat(response.userStatus()).isNotNull();
 
-    verify(userStatusService, times(1)).create(any());
-    verify(userStatusRepository, times(1)).findByUserId(user1.getUUID());
+    verify(userStatusService, times(1)).findByUserId(any());
   }
 
   @Test
-  void testFindAllUsers(){
+  void testFindAllUsers() {
 
     UserStatus user1Status = new UserStatus(user1.getUUID(), Instant.now());
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
@@ -270,8 +282,20 @@ public class BasicUserServiceTest {
   }
 
   @Test
-  void testUpdateUser(){
+  void testUpdateUser() {
+
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
+
+    when(binaryContentService.create(any(CreateBinaryContentDto.class))).thenAnswer(invocation -> {
+      CreateBinaryContentDto dto = invocation.getArgument(0);
+      return new BinaryContent.BinaryContentBuilder(
+          dto.userId(),
+          dto.fileName(),
+          dto.fileType(),
+          dto.fileSize(),
+          dto.data()
+      ).isProfilePicture().build();
+    });
 
     UserUpdateDto updateDto = new UserUpdateDto(
         "updatedUser",
@@ -290,12 +314,12 @@ public class BasicUserServiceTest {
     assertThat("updatedUser").isEqualTo(user1.getUsername());
     assertThat(PasswordEncryptor.checkPassword("newPassword123", user1.getPassword())).isTrue();
 
-    verify(userRepository, times(1)).update(user1);
-    verify(binaryContentRepository, times(1)).save(any(BinaryContent.class));
+    verify(userRepository, times(2)).update(user1);
+    verify(binaryContentService, times(1)).create(any(CreateBinaryContentDto.class));
   }
 
   @Test
-  void testUpdateUser_Fail_WrongPassword(){
+  void testUpdateUser_Fail_WrongPassword() {
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
 
     UserUpdateDto updateDto = new UserUpdateDto(
@@ -314,17 +338,17 @@ public class BasicUserServiceTest {
   }
 
   @Test
-  void testDeleteUser_Success(){
+  void testDeleteUser_Success() {
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
     userService.deleteUser(user1.getUUID(), "pwd1");
 
     verify(userRepository, times(1)).delete(user1.getUUID());
-    verify(userStatusRepository, times(1)).deleteByUserId(user1.getUUID());
-    verify(binaryContentRepository, times(1)).deleteByUserId(user1.getUUID());
+    verify(userStatusService, times(1)).deleteByUserId(user1.getUUID());
+    verify(binaryContentService, times(1)).delete(user1.getBinaryContentId());
   }
 
   @Test
-  void testDeleteUser_Fail_WrongPassword(){
+  void testDeleteUser_Fail_WrongPassword() {
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
 
     assertThatThrownBy(() -> userService.deleteUser(user1.getUUID(), "wrong-password")).isInstanceOf(UserValidationException.class).hasMessageContaining(PASSWORD_MATCH_ERROR);

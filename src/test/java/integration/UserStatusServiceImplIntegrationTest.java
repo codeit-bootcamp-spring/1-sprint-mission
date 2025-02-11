@@ -123,10 +123,10 @@ public class UserStatusServiceImplIntegrationTest {
   }
 
   @Test
-  void UserStatus_업데이트_성공() {
+  void UserStatus_업데이트_성공() throws InterruptedException {
     UserStatus status = userStatusService.findByUserId(user.getUUID());
     Instant timeBefore = status.getLastOnlineAt();
-
+    Thread.sleep(10);
     UpdateUserStatusDto dto = new UpdateUserStatusDto(status.getUUID(), Instant.now());
     UserStatus updatedStatus = userStatusService.update(dto);
 

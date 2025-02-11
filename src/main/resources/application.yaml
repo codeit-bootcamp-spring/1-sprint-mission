@@ -1,6 +1,6 @@
 app:
   repository:
-    type: "jcf"
+    type: "file"
   service:
     type: "basic"
   file:

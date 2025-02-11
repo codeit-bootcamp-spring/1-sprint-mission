@@ -34,7 +34,7 @@ public class User implements Serializable {
     this.email = builder.email;
     this.nickname = builder.nickname;
     this.phoneNumber = builder.phoneNumber;
-    this.binaryContentId = builder.binaryContentId != null ? builder.binaryContentId : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
+    this.binaryContentId = builder.binaryContentId;
     this.description = builder.description;
     this.userStatusId = builder.userStatusId;
     this.createdAt = Instant.now();
@@ -86,10 +86,10 @@ public class User implements Serializable {
   @Override
   public String toString() {
     return
-        ", username='" + username + '\'' +
+        "USER: username='" + username + '\'' +
         ", email='" + email + '\'' +
         ", nickname='" + nickname + '\'' +
-        ", phoneNumber='" + phoneNumber + '\'' +
+        ", phoneNumber='" + phoneNumber + '\'' + ", binaryID: " + binaryContentId +
         '}';
   }
 

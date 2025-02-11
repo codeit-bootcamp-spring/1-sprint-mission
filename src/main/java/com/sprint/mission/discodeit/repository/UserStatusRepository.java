@@ -11,7 +11,6 @@ public interface UserStatusRepository extends BaseRepository<UserStatus, String>
   UserStatus save(UserStatus userStatus);
   Optional<UserStatus> findById(String id);
   Optional<UserStatus> findByUserId(String id);
-
   List<UserStatus> findByAllIdIn(Set<String> userIds);
   List<UserStatus> findAll();
   void deleteByUserId(String id);

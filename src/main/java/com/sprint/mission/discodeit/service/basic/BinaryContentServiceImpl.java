@@ -31,7 +31,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
 
-    BinaryContent binaryContent = new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).build();
+    BinaryContent binaryContent = dto.isProfile()
+        ? new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).isProfilePicture().build()
+        : new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).build();
 
     return binaryContentRepository.save(binaryContent);
   }
@@ -55,10 +57,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds) {
 
-    if(userIds == null || userIds.isEmpty()) return Collections.emptyMap();
+    if (userIds == null || userIds.isEmpty()) return Collections.emptyMap();
 
     List<BinaryContent> profiles = binaryContentRepository.findProfilesOf(userIds);
-    System.out.println(profiles.size());
 
     return profiles.stream()
         .collect(Collectors.toMap(BinaryContent::getUserId, content -> content));

@@ -18,4 +18,5 @@ public interface UserStatusService {
   UserStatus updateByUserId(String userId, UpdateUserStatusDto dto);
   Map<String, UserStatus> mapUserToUserStatus(Set<String> users);
   void delete(String id);
+  void deleteByUserId(String userId);
 }

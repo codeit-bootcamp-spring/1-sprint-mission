@@ -46,7 +46,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatus findByUserId(String userId) {
     validator.findOrThrow(User.class, userId, new UserNotFoundException());
-    return userStatusRepository.findByUserId(userId).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+    return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new CreateUserStatusDto(userId, Instant.now())));
   }
 
   @Override
@@ -97,5 +97,10 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public void delete(String id) {
     userStatusRepository.deleteById(id);
+  }
+
+  @Override
+  public void deleteByUserId(String userId){
+    userStatusRepository.deleteByUserId(userId);
   }
 }

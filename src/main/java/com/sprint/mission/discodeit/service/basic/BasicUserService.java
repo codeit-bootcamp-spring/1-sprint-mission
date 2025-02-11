@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserConstant;
+import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
@@ -11,9 +12,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -31,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.constant.ErrorConstant.IMAGE_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
 @Slf4j
@@ -42,8 +39,6 @@ import static com.sprint.mission.discodeit.constant.UserConstant.*;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusRepository userStatusRepository;
-  private final BinaryContentRepository binaryContentRepository;
 
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
@@ -62,6 +57,8 @@ public class BasicUserService implements UserService {
    *
    * <p>{@link UserStatus} : 사용자의 온라인 정보 생성</p>
    *
+   * <p>순서 : user validation -> user repository -> UserStatus 생성 -> userProfileImage 등록 (이때 user update )</p>
+   *
    * @param userDto 사용자의 정보를 포함하는 DTO
    * @return 생성된 사용자 객체
    * @throws UserValidationException  이메일, 닉네임, 전화번호 검증에 실패할 경우 발생
@@ -69,20 +66,21 @@ public class BasicUserService implements UserService {
    */
   @Override
   public User createUser(CreateUserDto userDto) {
+
     // User 객체 생성
     User user = createUserDtoToUser(userDto);
 
     // email, nickname, phone number 검증
-    validateUserInformation(user, user.getUUID());
+    validateUserInformationWhenCreate(user, user.getUUID());
+
+    // user 생성
+    userRepository.create(user);
+
+    // UserStatus 생성
+    userStatusService.create(new CreateUserStatusDto(user.getUUID(), Instant.now()));
 
     // 프로필 이미지가 같이 넘어왔다면 등록
     saveProfileImage(user, userDto.imageName(), userDto.fileType(), userDto.profileImage());
-
-    // UserStatus 생성
-    UserStatus status = new UserStatus(user.getUUID(), Instant.now());
-
-    userRepository.create(user);
-    userStatusRepository.save(status);
 
     return user;
   }
@@ -108,10 +106,11 @@ public class BasicUserService implements UserService {
   /**
    * 단순 검증 로직 한번 실행 함수
    */
-  private void validateUserInformation(User user, String userId) {
-    validEmail(user.getEmail(), userId);
-    validNickname(user.getNickname(), userId);
-    validPhone(user.getPhoneNumber(), userId);
+  private void validateUserInformationWhenCreate(User user, String userId) {
+    List<User> users = userRepository.findAll();
+    validEmail(user.getEmail(), userId, users);
+    validNickname(user.getNickname(), userId, users);
+    validPhone(user.getPhoneNumber(), userId, users);
   }
 
   /**
@@ -119,7 +118,8 @@ public class BasicUserService implements UserService {
    * file 이 비어있으면 동작하지 않음
    *
    * <p>file 이 존재한다면, BinaryContent를 생성해서, user의 binaryContentId (ProfilePicture) 에 할당, binaryContentRepository에 해당 이미지 저장</p>
-   * isProfilePicture() 를 통해 프로필 이미지임을 명시
+   * {@link CreateBinaryContentDto} 의 마지막 boolean 필드는 프로필 이미지 여부
+   * {@link BinaryContentServiceImpl} 의 create 에서 boolean 여부로
    *
    * @param user      사용자 객체
    * @param imageName 넘어온 이미지 이름
@@ -130,46 +130,47 @@ public class BasicUserService implements UserService {
     if (file != null && file.length != 0) {
       //TODO : 필드 예외 처리
 
-      if(user.getBinaryContentId() != null || !user.getBinaryContentId().isEmpty()){
+      if (user.getBinaryContentId() != null && !user.getBinaryContentId().isEmpty()) {
         binaryContentService.delete(user.getBinaryContentId());
       }
 
-      BinaryContent profileImage = new BinaryContent.BinaryContentBuilder(
+      CreateBinaryContentDto profileDto = new CreateBinaryContentDto(
           user.getUUID(),
+          null,
           imageName,
           FileTypeProcessor.process(fileType),
           file.length,
-          file
-      ).isProfilePicture().build();
+          file,
+          true
+      );
 
-      user.setBinaryContentId(profileImage.getUUID());
-      binaryContentRepository.save(profileImage);
+      BinaryContent binary = binaryContentService.create(profileDto);
+      user.setBinaryContentId(binary.getUUID());
+      userRepository.update(user);
+
     }
   }
 
 
-  private void validEmail(String email, String id) {
+  private void validEmail(String email, String id, List<User> users) {
     if (!email.matches(EMAIL_REGEX)) throw new UserValidationException(ERROR_INVALID_EMAIL);
-    List<User> users = userRepository.findAll();
     if (users.stream()
         .anyMatch(u -> u.getEmail().equals(email) && !u.getUUID().equals(id)))
       throw new UserValidationException(DUPLICATE_EMAIL);
   }
 
-  private void validPhone(String phoneNumber, String id) {
+  private void validPhone(String phoneNumber, String id, List<User> users) {
     if (!phoneNumber.matches(PHONE_REGEX)) throw new UserValidationException(ERROR_INVALID_PHONE);
-    List<User> users = userRepository.findAll();
     if (users.stream()
         .anyMatch(u -> u.getPhoneNumber().equals(phoneNumber) && !u.getUUID().equals(id)))
       throw new UserValidationException(DUPLICATE_PHONE);
   }
 
-  private void validNickname(String nickname, String id) {
+  private void validNickname(String nickname, String id, List<User> users) {
     if (nickname.length() <= UserConstant.USERNAME_MIN_LENGTH
         || nickname.length() > UserConstant.USERNAME_MAX_LENGTH) {
       throw new UserValidationException(UserConstant.ERROR_USERNAME_LENGTH);
     }
-    List<User> users = userRepository.findAll();
     if (users.stream()
         .anyMatch(u -> u.getNickname().equals(nickname) && !u.getUUID().equals(id)))
       throw new UserValidationException(DUPLICATE_NICKNAME);
@@ -196,7 +197,7 @@ public class BasicUserService implements UserService {
    * userStatus 를 가져오거나 없다면 생성
    */
   private UserStatus getUserStatusOrCreate(String userId) {
-    return userStatusRepository.findByUserId(userId).orElseGet(() -> createStatusIfNotExists(userId));
+    return userStatusService.findByUserId(userId);
   }
 
   /**
@@ -209,91 +210,184 @@ public class BasicUserService implements UserService {
       return null;
     }
 
-    return binaryContentRepository.findById(binaryContentId).orElseGet(() -> {
+    try {
+      return binaryContentService.find(binaryContentId);
+    } catch (InvalidOperationException e) {
       log.warn("Invalid binaryContentId: {}", binaryContentId);
       return null;
-    });
+    }
   }
 
   /**
-   * 사용자의 UserStatus 가 존재하지 않는다면 자동 생성 후 repo에 저장
+   * 모든 사용자 정보를 조회하여 UserResponseDto 리스트로 반환
    *
-   * @param id 사용자의 id
-   * @return 새로 생성한 UserStatus
+   * <p>내부 로직 :
+   *   <ul>
+   *     <li>모든 사용자 조회</li>
+   *     <li>사용자 UUID Set 추출</li>
+   *     <li>UserId에 대해 UserStatus 및 BinaryContent 매핑</li>
+   *     <li>각 사용자에 대해 UserStatus 가 없다면 생성</li>
+   *   </ul>
+   * </p>
+   *
+   * @return 전체 사용자의 대한 {@link  UserResponseDto} 리스트
    */
-  private UserStatus createStatusIfNotExists(String id) {
-    return userStatusService.create(new CreateUserStatusDto(id, Instant.now()));
-  }
-
-
   @Override
   public List<UserResponseDto> findAllUsers() {
 
     List<User> users = userRepository.findAll();
 
-    Set<String> userIdSet = users.stream().map(User::getUUID).collect(Collectors.toSet());
+    Set<String> userIdSet = mapToUserUuids(users);
 
     Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSet);
 
     Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSet);
 
+    return createMultipleUserResponses(users, userStatusMap, binaryContentMap);
+  }
+
+  /**
+   * 주어진 User 리스트에서 UUID 만 추출하여 Set 으로 변환
+   *
+   * @param users 유저 리스트
+   * @return 유저 ID Set
+   */
+  private Set<String> mapToUserUuids(List<User> users) {
+    return users.stream()
+        .map(User::getUUID)
+        .collect(Collectors.toSet());
+  }
+
+  /**
+   * 주어진 사용자 리스트를 순회하여 각 사용자의 UserStatus 와 BinaryContent 를 이용해
+   * {@link UserResponseDto}  생성
+   *
+   * <p>
+   *   UserStatus 가 존재하지 않을 경우 생성
+   * </p>
+   * @param users            사용자 리스트
+   * @param userStatusMap    사용자ID : 사용자 UserStatus
+   * @param binaryContentMap 사용자ID : 사용자 BinaryContent
+   * @return {@link UserResponseDto} 리스트
+   */
+  private List<UserResponseDto> createMultipleUserResponses(
+      List<User> users,
+      Map<String, UserStatus> userStatusMap,
+      Map<String, BinaryContent> binaryContentMap
+  ) {
     return users.stream()
         .map(user -> {
-
-          UserStatus userStatus = userStatusMap.containsKey(user.getUUID())
-              ? userStatusMap.get(user.getUUID())
-              : createStatusIfNotExists(user.getUUID());
-
+          UserStatus userStatus = getOrCreateUserStatus(userStatusMap, user.getUUID());
           BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
           return UserResponseDto.from(user, userStatus, profilePicture);
         }).toList();
   }
 
+  /**
+   * 사용자에게 할당된 UserStatus 가 없다면 생성
+   * @param userStatusMap UserStatus Map
+   * @param userId 사용자 id
+   * @return 기존에 존재하던 UserStatus 혹은 생성한 user status
+   */
+  private UserStatus getOrCreateUserStatus(Map<String, UserStatus> userStatusMap, String userId) {
+    return userStatusMap.containsKey(userId)
+        ? userStatusMap.get(userId)
+        : userStatusService.create(new CreateUserStatusDto(userId, Instant.now()));
+  }
 
+  /**
+   * 사용자 정보를 업데이트 한다
+   * <p>
+   *   <ul>
+   *     <li>id로 사용자를 찾는다. 없을 경우 {@link UserNotFoundException}</li>
+   *     <li>입력받은 비밀번호와 기존 비빌번호를 비교</li>
+   *     <li>사용자의 필드를 업데이트</li>
+   *     <li>프로필 이미지 업데이트 및 사용자 레포지토리 반영</li>
+   *   </ul>
+   * </p>
+   * @param id 업데이트 할 사용자 id
+   * @param updatedUser 업데이트 정보가 담긴 DTO
+   * @param plainPassword 사용자가 입력한 비밀번호
+   */
   @Override
-  public void updateUser(String id, UserUpdateDto updatedUser, String originalPassword) {
+  public void updateUser(String id, UserUpdateDto updatedUser, String plainPassword) {
+
     User originalUser = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
-    if (!PasswordEncryptor.checkPassword(originalPassword, originalUser.getPassword()))
-      throw new UserValidationException(PASSWORD_MATCH_ERROR);
+    checkPasswordIsCorrect(plainPassword, originalUser.getPassword());
 
     synchronized (originalUser) {
-      if (updatedUser.nickname() != null) {
-        validNickname(updatedUser.nickname(), id);
-        originalUser.setNickname(updatedUser.nickname());
-      }
-      if (updatedUser.email() != null) {
-        validEmail(updatedUser.email(), id);
-        originalUser.setEmail(updatedUser.email());
-      }
-      if (updatedUser.phoneNumber() != null) {
-        validPhone(updatedUser.phoneNumber(), id);
-        originalUser.setPhoneNumber(updatedUser.phoneNumber());
-      }
-      if (updatedUser.username() != null) {
-        originalUser.setUsername(updatedUser.username());
-      }
-      if (updatedUser.description() != null) {
-        originalUser.setDescription(updatedUser.description());
-      }
-      if (updatedUser.password() != null) {
-        originalUser.setPassword(PasswordEncryptor.hashPassword(updatedUser.password()));
-      }
+      updateFields(originalUser, updatedUser);
     }
 
     saveProfileImage(originalUser, updatedUser.imageName(), updatedUser.fileType(), updatedUser.profileImage());
     userRepository.update(originalUser);
   }
 
+  /**
+   * 비밀번호에 대한 검증
+   * 일치하지 않을 경우 {@link UserValidationException}
+   * @param plain 사용자가 입력한 비밀번호
+   * @param hashed 기존에 저장되어 있던 비밀번호
+   */
+  private void checkPasswordIsCorrect(String plain, String hashed){
+    if (!PasswordEncryptor.checkPassword(plain, hashed))
+      throw new UserValidationException(PASSWORD_MATCH_ERROR);
+  }
+
+  /**
+   * {@link UserUpdateDto} 기반으로 사용자 필드를 업데이트
+   * <p>
+   *   <ul>
+   *     <li>사용자 전체 목록 조회 후, nickname, email, phonenumber 중복 여부 검증</li>
+   *     <li>각 필드가 null 이 아닌 경우만 update</li>
+   *     <li>비밀번호는 해시화 하여 저장</li>
+   *   </ul>
+   * </p>
+   * @param originalUser 업데이트 대상 User
+   * @param updatedUser 업데이트 될 정보
+   */
+  private void updateFields(User originalUser, UserUpdateDto updatedUser){
+
+    List<User> users = userRepository.findAll();
+    if (updatedUser.nickname() != null) {
+      validNickname(updatedUser.nickname(), originalUser.getUUID(), users);
+      originalUser.setNickname(updatedUser.nickname());
+    }
+    if (updatedUser.email() != null) {
+      validEmail(updatedUser.email(), originalUser.getUUID(), users);
+      originalUser.setEmail(updatedUser.email());
+    }
+    if (updatedUser.phoneNumber() != null) {
+      validPhone(updatedUser.phoneNumber(), originalUser.getUUID(), users);
+      originalUser.setPhoneNumber(updatedUser.phoneNumber());
+    }
+    if (updatedUser.username() != null) {
+      originalUser.setUsername(updatedUser.username());
+    }
+    if (updatedUser.description() != null) {
+      originalUser.setDescription(updatedUser.description());
+    }
+    if (updatedUser.password() != null) {
+      originalUser.setPassword(PasswordEncryptor.hashPassword(updatedUser.password()));
+    }
+  }
+
+  /**
+   * 사용자를 조회하여 비밀번호 검증 후 삭제
+   * 관련된 {@link UserStatus} {@link BinaryContent} 도 같이 삭제
+   * @param id
+   * @param password
+   */
   @Override
   public void deleteUser(String id, String password) {
 
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
-    if (!PasswordEncryptor.checkPassword(password, user.getPassword()))
-      throw new UserValidationException(PASSWORD_MATCH_ERROR);
+    checkPasswordIsCorrect(password, user.getPassword());
+
     userRepository.delete(id);
-    userStatusRepository.deleteByUserId(id);
-    binaryContentRepository.deleteByUserId(id);
+    userStatusService.deleteByUserId(id);
+    binaryContentService.delete(user.getBinaryContentId());
   }
 }

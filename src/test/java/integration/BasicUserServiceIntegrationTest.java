@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -34,12 +35,15 @@ public class BasicUserServiceIntegrationTest {
 
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
   private CreateUserDto userDto1, userDto2;
 
   @BeforeEach
   void setUp(){
 
     userRepository.clear();
+    binaryContentRepository.clear();
 
     userDto1 = new CreateUserDto(
         "username1","pwd1","email1@email.com","nickname1","01012341234",new byte[]{1}, "image1", "jpg", "description1"
@@ -125,10 +129,15 @@ public class BasicUserServiceIntegrationTest {
     userService.createUser(userDto2);
 
     List<UserResponseDto> users = userService.findAllUsers();
-    UserResponseDto user = users.stream().filter(u -> "username1".equals(u.username())).findAny().orElseThrow();
-    assertThat(users).hasSize(2);
-    assertThat(user.profilePicture()).isNotNull();
 
+    UserResponseDto user = users.stream()
+        .filter(u -> "username1".equals(u.username()))
+        .findAny()
+        .orElseThrow();
+
+    assertThat(users).hasSize(2);
+
+    assertThat(user.profilePicture()).isNotNull();
     BinaryContent user1Profile = user.profilePicture();
     assertThat(user1Profile.getUserId()).isEqualTo(user.userId());
     assertThat(user1Profile.getFileName()).isEqualTo("image1");
@@ -139,6 +148,7 @@ public class BasicUserServiceIntegrationTest {
   void 유저_정보를_수정할수_있다(){
 
     User user = userService.createUser(userDto1);
+
     UserUpdateDto updateDto = new UserUpdateDto(
         "UpdatedUsername", "newPassword123", "updated@email.com",
         "UpdatedNickname", "01087654321", "Updated Description",
@@ -150,10 +160,15 @@ public class BasicUserServiceIntegrationTest {
 
 
     UserResponseDto response = userService.findUserById(user.getUUID());
+
     assertThat(userService.findAllUsers()).hasSize(1);
     assertThat(response).isNotNull();
     assertThat(response.userId()).isEqualTo(user.getUUID());
     assertThat(response.username()).isEqualTo("UpdatedUsername");
+
+    BinaryContent profilePicture = response.profilePicture();
+    assertThat(profilePicture).isNotNull();
+    assertThat(profilePicture.getData()).containsExactlyInAnyOrder(4,5,6);
   }
 
   @Test
@@ -219,6 +234,7 @@ public class BasicUserServiceIntegrationTest {
         )
     );
 
+    System.out.println(userService.findAllUsers().size());
     UserResponseDto responseDto = userService.findUserById(user.getUUID());
     BinaryContent profileImage = responseDto.profilePicture();
 
