@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.Interface.*;
+import lombok.SneakyThrows;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
+    @SneakyThrows
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
@@ -28,8 +30,9 @@ public class DiscodeitApplication {
         MessageService messageService = context.getBean(MessageService.class);
 
         // 사용자 등록
-        User user1 = userService.createUser(new UserCreateRequestDto("Alice", "alice@naver.com", "12345",null, "ONLINE"));;
+        User user1 = userService.createUser(new UserCreateRequestDto("Alice", "alice@naver.com", "12345",null, "ONLINE"));
         User user2 = userService.createUser(new UserCreateRequestDto("Bob", "bob@naver.com", "67890",null,"ONLINE"));
+
         List<UUID> members=new ArrayList<>();
         members.add(user2.getId());
         displayEntityDetails(user1);

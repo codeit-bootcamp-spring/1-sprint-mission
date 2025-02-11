@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-//@Repository
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final Path FILE_PATH;

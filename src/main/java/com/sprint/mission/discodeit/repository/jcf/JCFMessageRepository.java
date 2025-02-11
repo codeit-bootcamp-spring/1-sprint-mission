@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//@Repository
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID,Message> data;
 

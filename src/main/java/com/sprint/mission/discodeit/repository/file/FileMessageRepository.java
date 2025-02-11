@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//@Repository
+@Repository
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
     private final Path FILE_PATH;

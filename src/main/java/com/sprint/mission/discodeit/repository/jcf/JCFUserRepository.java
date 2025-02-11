@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-//@Repository
+@Repository
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID,User> data;
 
