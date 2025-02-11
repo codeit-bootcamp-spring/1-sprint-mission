@@ -24,13 +24,13 @@ public class UserStatusValidator {
     }
 
     public void nullCheckUserHasUserStatus(UUID userId){
-        if(userStatusRepository.findByUserId(userId) == null){
+        if(userStatusRepository.findUserStatusIdByUserId(userId) == null){
             throw new CustomException(ExceptionText.STATUS_NOT_FOUND);
         }
     }
 
     public void CheckUserHasUserStatus(UUID userId){
-        if(userStatusRepository.findByUserId(userId) !=null){
+        if(userStatusRepository.findUserStatusIdByUserId(userId) !=null){
             throw new CustomException(ExceptionText.STATUS_DUPLICATE);
         }
     }

@@ -62,7 +62,8 @@ public class BasicUserStatusService implements UserStatusService {
         try {
             userValidator.CheckUser(idData.userId());
             userStatusValidator.nullCheckUserHasUserStatus(idData.userId());
-            UserStatus userStatus = userStatusRepository.findByUserId(idData.userId())
+            UUID userStatusId = userStatusRepository.findUserStatusIdByUserId(idData.userId());
+            UserStatus userStatus = userStatusRepository.findById(userStatusId)
                             .orElseThrow(() -> new NoSuchElementException("UsetStatus with is " + idData.userId()+ "not found"));
             userStatus.updateLastAccessed(timeData.currentTime());
         }catch (CustomException e){

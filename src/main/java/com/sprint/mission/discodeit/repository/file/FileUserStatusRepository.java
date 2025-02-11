@@ -10,35 +10,41 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
 
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
+    private final Path MAP_DIRECTORY;
+    private final Path MAP_FILE;
+    //Map<userId, userStatusId>
+    private final Map<UUID, UUID> userStatusMap;
 
     public FileUserStatusRepository(){
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),
-                "file-data-map",
-                UserStatus.class.getSimpleName());
+        this.userStatusMap = new HashMap<>();
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", UserStatus.class.getSimpleName());
+        this.MAP_DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", "map");
+        this.MAP_FILE = MAP_DIRECTORY.resolve("userStatusMap.ser");
         init(DIRECTORY);
+        init(MAP_DIRECTORY);
     }
 
-    private Path resolvePach(UUID id){
+    private Path resolvePath(UUID id){
         return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        Path path = resolvePach(userStatus.getId());
+        Path path = resolvePath(userStatus.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(userStatus);
+            userStatusMap.put(userStatus.getUserId(), userStatus.getId());
+            saveUserStatusMap();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,7 +54,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findById(UUID id) {
         UserStatus userNullable = null;
-        Path path = resolvePach(id);
+        Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -63,9 +69,8 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-        
-        return null;
+    public UUID findUserStatusIdByUserId(UUID userId) {
+        return userStatusMap.get(userId);
     }
 
     @Override
@@ -90,8 +95,13 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UUID uuid) {
-
+    public void delete(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void init(Path DIRECTORY) {
@@ -101,6 +111,17 @@ public class FileUserStatusRepository implements UserStatusRepository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void saveUserStatusMap() {
+        try (
+                FileOutputStream fos = new FileOutputStream(MAP_FILE.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(userStatusMap);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save userStatusMap to file", e);
         }
     }
 }

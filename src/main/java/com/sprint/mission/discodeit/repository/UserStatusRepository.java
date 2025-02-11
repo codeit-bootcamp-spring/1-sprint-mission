@@ -14,7 +14,7 @@ public interface UserStatusRepository {
 
     Optional<UserStatus> findById(UUID uuid);
 
-    Optional<UserStatus> findByUserId(UUID userId);
+    UUID findUserStatusIdByUserId(UUID userId);
 
     List<UserStatus> findAll();
 
