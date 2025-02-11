@@ -17,20 +17,30 @@ public class JavaApplication {
         JCFUserRepository jcfUserRepository =new JCFUserRepository();
         BasicUserService basicUserService = new BasicUserService(jcfUserRepository);
 
-        //DTO User생성 및 업데이트
+        //DTO User생성
         User user = basicUserService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", ""));
+        User user2 = basicUserService.createUser(new UserCreateDTO("김이박", "1234", "dis2@code.it", ""));
         System.out.println(basicUserService.findUserDTO(user.getId()).getFilePath());
+
+        //User update
         basicUserService.updateUser(user.getId(),new UserUpdateDTO("홍감동", "1234", "dis@code.it", "filePath" ));
 
         System.out.println(basicUserService.findUserDTO(user.getId()).getName());
         System.out.println(basicUserService.findUserDTO(user.getId()).getFilePath());
+
+        System.out.println(basicUserService.isNameExist("홍감동"));
+        System.out.println(basicUserService.findAllUserDTO());
+
+        //delete
+        basicUserService.deleteUser(user2.getId());
+        System.out.println(basicUserService.findAllUserDTO());
 
 
 
 //        //Basic*Service 테스트
 //        JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
 //        BasicChannelService basicChannelService = new BasicChannelService(jcfChannelRepository);
-//
+
 //        //채널 추가
 //        Channel newChannel = basicChannelService.createChannel("newChannel");
 //        Channel newChannel2 = basicChannelService.createChannel("newChannel2");

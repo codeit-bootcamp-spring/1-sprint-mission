@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@Repository
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String fileName = "savedata/channel.ser";

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Repository
 public class FileMessageRepository implements MessageRepository {
     private static final String fileName = "savedata/message.ser";
     private final Map<UUID, Message> messageList;

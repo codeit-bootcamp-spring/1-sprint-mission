@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Repository
 public class FileUserRepository implements UserRepository {
 
     private static final String fileName = "savedata/user.ser";

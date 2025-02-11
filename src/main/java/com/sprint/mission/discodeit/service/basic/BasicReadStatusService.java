@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,14 +19,14 @@ import java.util.UUID;
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
-    private final ChannelService channelService;
     private final UserService userService;
 
     @Override
     public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO) {
         try {
-            //채널존재확인
-            channelService.readChannel(readStatusCreateDTO.channelId());
+            //TODO 순환의존성을 없애기 위해 
+            ////채널존재확인
+            //channelService.readChannel(readStatusCreateDTO.channelId());
             userService.findUserDTO(readStatusCreateDTO.userId());
         } catch (Exception exception) {
             throw new IllegalArgumentException("ReadStatus를 생성할 수 없습니다.");
