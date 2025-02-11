@@ -17,9 +17,9 @@ public class FileChannelRepository implements ChannelRepository {
 
     public FileChannelRepository() {
         // CHANNEL 클래스를 기준으로 디렉토리 생성
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName());
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),
+                "file-data-map", Channel.class.getSimpleName());
         init(DIRECTORY);
-
     }
     // 디렉토리가 없다면 생성
     private void init(Path DIRECTORY){
@@ -31,7 +31,6 @@ public class FileChannelRepository implements ChannelRepository {
             }
         }
     }
-
     // 파일 경로 생성
     private Path resolvePath(UUID id) {
         return DIRECTORY.resolve(id + EXTENSION);  // 채널의 UUID를 기준으로 파일 경로 생성

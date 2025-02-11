@@ -17,7 +17,8 @@ public class BinaryContent {
     private final ContentType contentType;
 
     public BinaryContent
-            (ContentType contentType,UUID targetId, String filename, String fileType, byte[] data){
+            (ContentType contentType,UUID targetId, String filename,
+             String fileType, byte[] data){
         this.contentType = contentType;
         this.targetUUID = targetId;
         this.id = UUID.randomUUID();

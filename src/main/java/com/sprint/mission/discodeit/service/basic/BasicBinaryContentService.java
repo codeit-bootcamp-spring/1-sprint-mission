@@ -5,14 +5,33 @@ import com.sprint.mission.discodeit.entity.data.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Component
 public class BasicBinaryContentService implements BinaryContentService {
 
     public BinaryContent created(ProfileImageDTO data){
-        BinaryContent image =
+        BinaryContent binaryContent =
                 new BinaryContent(data.contentType(),
                         data.targetUUID(), data.filename(),data.fileType(), data.data());
-        return image;
+        return binaryContent;
+    }
+
+    @Override
+    public Optional<BinaryContent> find(UUID id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<BinaryContent> findAllByIdIn() {
+        return List.of();
+    }
+
+    @Override
+    public void delete() {
+
     }
 
     //    find
