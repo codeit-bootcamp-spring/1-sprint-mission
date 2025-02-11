@@ -7,6 +7,7 @@ import com.sprint.mission.entity.main.User;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,5 +28,17 @@ public class FindPrivateChannelDto implements FindChannelDto {
                 .map(User::getId)
                 .collect(Collectors.toCollection(ArrayList::new));
         this.lastMessageTime = channel.getLastMessageTime();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        FindPrivateChannelDto that = (FindPrivateChannelDto) o;
+        return channelType == that.channelType && Objects.equals(description, that.description) && Objects.equals(name, that.name) && Objects.equals(userIdList, that.userIdList) && Objects.equals(lastMessageTime, that.lastMessageTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(channelType, description, name, userIdList, lastMessageTime);
     }
 }

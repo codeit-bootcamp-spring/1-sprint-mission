@@ -24,10 +24,10 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
-        User findUser = data.get(userId);
-        if (findUser == null) throw new NotFoundId("ID를 찾지 못했습니다.");
-        else return findUser;
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
+//        if (findUser == null) throw new NotFoundId("ID를 찾지 못했습니다.");
+//        else return findUser;
         // 여기서 null 처리 안하고 Optional쓰면 다른 곳에서 코드가 지저분해짐
     }
 

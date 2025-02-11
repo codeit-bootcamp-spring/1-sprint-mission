@@ -9,10 +9,10 @@ import java.time.Instant;
 @Getter
 public class FindUserDto {
 
-    private final String name;
-    private final String email;
-    private final Instant createAt;
-    private final Instant updateAt;
+    private String name;
+    private String email;
+    private Instant createAt;
+    private Instant updateAt;
 
     @Setter
     private boolean isOnline;
@@ -24,4 +24,6 @@ public class FindUserDto {
         this.updateAt = user.getUpdateAt();
         this.isOnline = isOnline;
     }
+
+    public FindUserDto() {}
 }

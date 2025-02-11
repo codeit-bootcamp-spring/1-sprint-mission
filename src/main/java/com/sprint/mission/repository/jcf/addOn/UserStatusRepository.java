@@ -14,10 +14,10 @@ public class UserStatusRepository {
         statusMap.put(userStatus.getUserId(), userStatus);
     }
 
-    public UserStatus findById(UUID userId){
-        UserStatus userStatus = statusMap.get(userId);
-        if (userStatus == null) throw new NoSuchElementException("Cannot Find status By UserId");
-        else return userStatus;
+    public Optional<UserStatus> findById(UUID userId){
+        return Optional.of(statusMap.get(userId));
+//        if (userStatus == null) throw new NoSuchElementException("Cannot Find status By UserId");
+//        else return userStatus;
     }
 
     public List<UserStatus> findAll(){

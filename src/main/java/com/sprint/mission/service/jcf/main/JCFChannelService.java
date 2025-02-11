@@ -6,6 +6,7 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
+import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.dto.request.ChannelDto;
 import com.sprint.mission.service.dto.response.FindChannelDto;
@@ -28,6 +29,7 @@ public class JCFChannelService implements ChannelService {
 
     private final JCFChannelRepository channelRepository;
     private final JCFUserService userService;
+    private final JCFUserRepository userRepository;
     private final UserStatusService userStatusService;
 
     //@Override
@@ -60,10 +62,29 @@ public class JCFChannelService implements ChannelService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
+    /**
+     * [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
+     * [ ] PUBLIC 채널 목록은 전체 조회합니다.
+     * [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
+     */
+    public List<FindChannelDto> findAllByUserId(UUID userId) {
+        ArrayList<FindChannelDto> findChannelListDto = channelRepository.findAll().stream()
+                        .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
+                        .map((channel) -> getFindChannelDto(channel))
+                        .collect(Collectors.toCollection(ArrayList::new));
+
+        userRepository.findById(userId).ifPresent((user) -> {
+            user.getChannels().stream()
+                    .filter((channel -> channel.getChannelType().equals(ChannelType.PRIVATE)))
+                    .forEach((joiningPrivateChannel) -> findChannelListDto.add(new FindPrivateChannelDto(joiningPrivateChannel)));
+        });
+        return findChannelListDto;
+    }
+
     private static FindChannelDto getFindChannelDto(Channel findChannel) {
-        if (findChannel.getChannelType().equals(ChannelType.PRIVATE)){
+        if (findChannel.getChannelType().equals(ChannelType.PRIVATE)) {
             return new FindPrivateChannelDto(findChannel);
-        } else  {
+        } else {
             return new FindPublicChannelDto(findChannel);
         }
     }
@@ -76,14 +97,14 @@ public class JCFChannelService implements ChannelService {
         channelRepository.delete(channel);
     }
 
-    public void addUser(User user, Channel channel){
+    public void addUser(User user, Channel channel) {
         channel.addUser(user);
     }
 
 
-    public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId){
+    public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId) {
         Channel findChannel = channelRepository.findById(channelId);
-        if (findChannel.getChannelType().equals(ChannelType.PUBLIC)){
+        if (findChannel.getChannelType().equals(ChannelType.PUBLIC)) {
             return new HashMap<>();
         }
 

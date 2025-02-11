@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface UserRepository {
     User save(User user) throws IOException;
-    User findById(UUID id) throws IOException, ClassNotFoundException;
+    Optional<User> findById(UUID id) throws IOException, ClassNotFoundException;
     List<User> findAll() throws IOException;
     void delete(UUID userId);
 

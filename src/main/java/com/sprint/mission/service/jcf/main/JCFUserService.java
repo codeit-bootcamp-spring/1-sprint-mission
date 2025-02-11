@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,27 +45,22 @@ public class JCFUserService {
 
     public void update(UUID userId, UserDtoForRequest dto) {
         isDuplicateNameEmail(dto);
-        if (!userRepository.existsById(userId)) {
-            log.info("Fail to update User : NoSuchUserId");
-            return;
-        }
-
-        User updatingUser = userRepository.findById(userId);
-        updatingUser.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
-
-        // 선택적으로 프로필 이미지를 대체할 수 있다
-        if (dto.getProfileImg() != null) profileService.create(new BinaryContentDto(userId, dto.getProfileImg()));
-        // User가 프로필을 안 갖고 있다
-
-        userRepository.save(updatingUser);
+        userRepository.findById(userId).ifPresentOrElse((user) -> {
+            user.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
+            if (dto.getProfileImg() != null) profileService.create(new BinaryContentDto(userId, dto.getProfileImg()));
+            userRepository.save(user);
+        }, () -> log.info("Fail to update User : NoSuchUserId"));
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
     public FindUserDto findById(UUID userId) {
-        User findUser = userRepository.findById(userId); // null 위험 없음
-        UserStatus status = userStatusService.findById(userId);
-        return new FindUserDto(findUser, status.isOnline());
+        return userRepository.findById(userId).map((user) -> {
+            Boolean isOnline = userStatusService.findById(userId)
+                    .map(UserStatus::isOnline)
+                    .orElse(false);
+            return new FindUserDto(user, isOnline);
+        }).orElse(new FindUserDto());
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
@@ -72,8 +68,9 @@ public class JCFUserService {
     public List<FindUserDto> findAll() {
         List<FindUserDto> findUsersDto = new ArrayList<>();
         for (User user : userRepository.findAll()) {
-            UserStatus userStatus = userStatusService.findById(user.getId());
-            findUsersDto.add(new FindUserDto(user, userStatus.isOnline()));
+            userStatusService.findById(user.getId()).ifPresent((userStatus) -> {
+                findUsersDto.add(new FindUserDto(user, userStatus.isOnline()));
+            });
         }
         return findUsersDto;
     }
@@ -90,8 +87,10 @@ public class JCFUserService {
     // 온라인 / 오프라인 메서드 나중에
 
     public void joinChannel(UUID userId, UUID channelId) {
-        User joiningUser = userRepository.findById(userId);
-        joiningUser.changeReadStatus(channelId);
+        userRepository.findById(userId).ifPresent((joiningUser) -> {
+            joiningUser.changeReadStatus(channelId);
+        });
+
         //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
     }
 

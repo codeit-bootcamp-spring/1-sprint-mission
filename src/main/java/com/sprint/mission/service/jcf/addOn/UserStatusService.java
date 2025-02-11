@@ -22,7 +22,7 @@ public class UserStatusService {
         }
     }
 
-    public UserStatus findById(UUID userId){
+    public Optional<UserStatus> findById(UUID userId){
         return userStatusRepository.findById(userId);
     }
 
