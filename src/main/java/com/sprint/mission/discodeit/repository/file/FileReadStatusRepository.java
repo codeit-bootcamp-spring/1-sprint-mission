@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 
 @Repository
-@Primary
 public class FileReadStatusRepository implements ReadStatusRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";

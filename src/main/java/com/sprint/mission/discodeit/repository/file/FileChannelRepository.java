@@ -15,7 +15,6 @@ import java.util.UUID;
 
 
 @Repository
-@Primary
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";

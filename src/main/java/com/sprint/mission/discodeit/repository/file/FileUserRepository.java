@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@Primary
 public class FileUserRepository implements UserRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";

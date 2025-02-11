@@ -12,3 +12,7 @@ spring:
     hibernate:
       ddl-auto: update  # 자동 테이블 생성 (create, update, validate, none 가능)
     show-sql: true  # SQL 쿼리 로그 출력 활성화
+
+discodeit:
+  repository:
+    type: jcf  # jcf | file (이 값을 변경하면 자동으로 Repository가 변경됨)

@@ -1,29 +1,57 @@
 package com.sprint.mission.discodeit.config;
 
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.file.*;
+import com.sprint.mission.discodeit.repository.jcf.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration  // ✅ 설정 클래스임을 명시
+@Configuration
 public class RepositoryConfig {
 
-    @Bean  // ✅ FileUserRepository를 Bean으로 등록
+    @Value("${discodeit.repository.type:jcf}") // 기본값은 jcf
+    private String repositoryType;
+
+    @Bean
     public UserRepository userRepository() {
-        return new FileUserRepository();
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileUserRepository()
+                : new JCFUserRepository();
     }
 
-    @Bean  // ✅ FileChannelRepository를 Bean으로 등록
+    @Bean
     public ChannelRepository channelRepository() {
-        return new FileChannelRepository();
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileChannelRepository()
+                : new JCFChannelRepository();
     }
 
-    @Bean  // ✅ FileMessageRepository를 Bean으로 등록
+    @Bean
     public MessageRepository messageRepository() {
-        return new FileMessageRepository();
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileMessageRepository()
+                : new JCFMessageRepository();
+    }
+
+    @Bean
+    public ReadStatusRepository readStatusRepository() {
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileReadStatusRepository()
+                : new JCFReadStatusRepository();
+    }
+
+    @Bean
+    public UserStatusRepository userStatusRepository() {
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileUserStatusRepository()
+                : new JCFUserStatusRepository();
+    }
+
+    @Bean
+    public BinaryContentRepository binaryContentRepository() {
+        return repositoryType.equalsIgnoreCase("file")
+                ? new FileBinaryContentRepository()
+                : new JCFBinaryContentRepository();
     }
 }
