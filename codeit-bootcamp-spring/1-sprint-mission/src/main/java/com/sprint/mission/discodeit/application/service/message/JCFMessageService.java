@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundExce
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.repository.message.interfaces.MessageRepository;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
@@ -60,6 +61,11 @@ public class JCFMessageService implements MessageService {
     public Message findOneByIdOrThrow(UUID messageId) {
         return messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
+    }
+
+    @Override
+    public LocalDateTime getLastMessageTime(UUID channelId) {
+        return null;
     }
 
     private void throwIsNotSender(User foundUser, Message foundMessage) {

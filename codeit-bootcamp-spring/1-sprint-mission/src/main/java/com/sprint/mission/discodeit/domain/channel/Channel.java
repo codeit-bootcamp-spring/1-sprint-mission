@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 public class Channel implements Serializable {
@@ -28,7 +28,6 @@ public class Channel implements Serializable {
     private final User manager;
     private final ChannelVisibility visibility;
     private final ParticipatedUser participatedUser;
-
 
     public Channel(
             String name,
@@ -78,6 +77,14 @@ public class Channel implements Serializable {
         return this.manager.equals(user);
     }
 
+    public boolean isPublic() {
+        return this.visibility == ChannelVisibility.PUBLIC;
+    }
+
+    public Set<UUID> getParticipantUserId() {
+        return this.participatedUser.getParticipatedUserId();
+    }
+
     public UUID getId() {
         return id;
     }
@@ -93,6 +100,7 @@ public class Channel implements Serializable {
     public String getType() {
         return type.toString();
     }
+
 
     @Override
     public boolean equals(Object o) {

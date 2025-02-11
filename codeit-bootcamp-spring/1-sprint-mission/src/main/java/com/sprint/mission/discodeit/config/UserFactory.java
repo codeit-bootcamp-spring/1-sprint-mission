@@ -4,9 +4,11 @@ import com.sprint.mission.discodeit.application.auth.PasswordEncoder;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.application.service.user.JCFUserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
+import com.sprint.mission.discodeit.application.service.userstatus.UserStatusService;
 import com.sprint.mission.discodeit.repository.user.InMemoryUserRepository;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
-import java.io.FileInputStream;
+import com.sprint.mission.discodeit.repository.userstatus.UserStatusInMemoryRepository;
+import com.sprint.mission.discodeit.repository.userstatus.interfaces.UserStatusRepository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -14,7 +16,13 @@ import java.util.Properties;
 public class UserFactory {
 
     private static final UserRepository USER_REPOSITORY = createUserRepository();
-    private static final UserService USER_SERVICE = new JCFUserService(USER_REPOSITORY, new UserConverter(), new PasswordEncoder());
+    private static final UserService USER_SERVICE =
+            new JCFUserService(
+                    USER_REPOSITORY,
+                    new UserConverter(),
+                    new PasswordEncoder(),
+                    new UserStatusService(new UserStatusInMemoryRepository())
+            );
 
     public static UserService getUserService() {
         return USER_SERVICE;
@@ -29,7 +37,7 @@ public class UserFactory {
         }
         String repositoryType = properties.getProperty("repository.type", "memory");
 
-        return switch(repositoryType) {
+        return switch (repositoryType) {
             default -> new InMemoryUserRepository();
         };
     }

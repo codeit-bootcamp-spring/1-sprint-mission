@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.application.dto.message.DeleteMessageRequest
 import com.sprint.mission.discodeit.application.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.application.dto.message.UpdateMessageContentRequestDto;
 import com.sprint.mission.discodeit.domain.message.Message;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface MessageService {
@@ -16,4 +17,6 @@ public interface MessageService {
     void deleteMessage(UUID userId, DeleteMessageRequestDto requestDto);
 
     Message findOneByIdOrThrow(UUID uuid);
+
+    LocalDateTime getLastMessageTime(UUID channelId);
 }

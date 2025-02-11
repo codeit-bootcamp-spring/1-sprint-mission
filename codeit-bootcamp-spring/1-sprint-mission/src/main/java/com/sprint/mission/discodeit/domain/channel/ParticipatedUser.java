@@ -1,15 +1,21 @@
 package com.sprint.mission.discodeit.domain.channel;
 
 import com.sprint.mission.discodeit.domain.user.User;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class ParticipatedUser {
 
-    private final List<User> users = new ArrayList<>();
+    private final Map<UUID, User> users = new HashMap<>();
 
     public void addUser(User user) {
-        users.add(user);
+        users.put(user.getId(), user);
     }
 
+    public Set<UUID> getParticipatedUserId() {
+        return Collections.unmodifiableSet(users.keySet());
+    }
 }
