@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.application.service.user.JCFUserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
 import com.sprint.mission.discodeit.application.service.userstatus.UserStatusService;
 import com.sprint.mission.discodeit.fake.repository.FakeUserRepository;
+import com.sprint.mission.discodeit.repository.channel.ChannelInMemoryRepository;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
 import com.sprint.mission.discodeit.repository.userstatus.UserStatusInMemoryRepository;
-import com.sprint.mission.discodeit.repository.userstatus.interfaces.UserStatusRepository;
 
 public class FakeFactory {
     private FakeFactory() {
@@ -22,6 +22,8 @@ public class FakeFactory {
                 getUserRepository(),
                 new UserConverter(),
                 new PasswordEncoder(),
-                new UserStatusService(new UserStatusInMemoryRepository()));
+                new UserStatusService(new UserStatusInMemoryRepository()),
+                new ChannelInMemoryRepository()
+        );
     }
 }
