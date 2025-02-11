@@ -6,6 +6,9 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.assertj.core.api.Assertions;
@@ -27,6 +30,12 @@ public class AuthServiceIntegrationTest {
 
   @Autowired
   private UserService userService;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private UserStatusRepository userStatusRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
   private CreateUserDto userDto;
 
   @Value("${app.file.user-file}")
@@ -34,8 +43,9 @@ public class AuthServiceIntegrationTest {
 
   @BeforeEach
   void setUp(){
-    File file = new File(userFilePath);
-    if(file.exists()) file.delete();
+    userRepository.clear();
+    userStatusRepository.clear();
+    binaryContentRepository.clear();
     userDto = new CreateUserDto(
         "testUser", "password123", "test@example.com",
         "testNickname", "01012345678", new byte[]{1},

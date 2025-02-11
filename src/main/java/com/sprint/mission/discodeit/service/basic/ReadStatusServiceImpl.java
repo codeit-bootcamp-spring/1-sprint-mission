@@ -69,8 +69,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public ReadStatus update(CreateReadStatusDto dto) {
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(dto.channelId(), dto.userId()).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+
     readStatus.updateLastReadAt();
     readStatusRepository.save(readStatus);
+
     return readStatus;
   }
 

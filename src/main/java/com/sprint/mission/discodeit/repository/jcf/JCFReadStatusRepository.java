@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
 public class JCFReadStatusRepository implements ReadStatusRepository{
 
   private final Map<String, ReadStatus> data = new ConcurrentHashMap<>();

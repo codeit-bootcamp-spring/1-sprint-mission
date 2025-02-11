@@ -16,6 +16,10 @@ import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -45,21 +49,24 @@ public class BasicMessageServiceIntegrationTest {
   @Autowired
   private ChannelService channelService;
 
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private ChannelRepository channelRepository;
+  @Autowired
+  private MessageRepository messageRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
   private User user;
   private PrivateChannelResponseDto channel, channel2;
 
   @BeforeEach
   void setUp(){
 
-    File userFile = new File(USER_FILE);
-    File channelFile = new File(CHANNEL_FILE);
-    File messageFile = new File(MESSAGE_FILE);
-    File binaryContentFile = new File(BINARY_CONTENT_FILE);
-
-    if(userFile.exists()) userFile.delete();
-    if(channelFile.exists()) channelFile.delete();
-    if(messageFile.exists()) messageFile.delete();
-    if(binaryContentFile.exists()) binaryContentFile.delete();
+    userRepository.clear();
+    channelRepository.clear();;
+    messageRepository.clear();
+    binaryContentRepository.clear();
 
     user = userService.createUser(
         new CreateUserDto(

@@ -80,9 +80,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
 
   @Override
   public void clear() {
-    File file = new File(USER_FILE);
-    if (file.exists()) {
-      file.delete();
-    }
+    File file = new File(getFilePath());
+    if(file.exists()) file.delete();
   }
 }

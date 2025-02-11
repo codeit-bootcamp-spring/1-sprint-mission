@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FileType;
@@ -29,17 +31,17 @@ public class BinaryContentServiceImplIntegrationTest {
 
   @Autowired
   private UserService userService;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private BinaryContentRepository binaryContentRepository;
   private User user;
 
   @BeforeEach
   void setUp() {
 
-    File userFile = new File(USER_FILE);
-    File binaryContentFile = new File(BINARY_CONTENT_FILE);
-
-
-    if (userFile.exists()) userFile.delete();
-    if (binaryContentFile.exists()) binaryContentFile.delete();
+    userRepository.clear();
+    binaryContentRepository.clear();
 
 
     user = userService.createUser(

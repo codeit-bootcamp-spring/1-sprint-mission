@@ -10,6 +10,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -29,24 +33,28 @@ public class BasicChannelServiceIntegrationTest {
 
   @Autowired
   private ChannelService channelService;
-
   @Autowired
   private UserService userService;
   @Autowired
   private ReadStatusService readStatusService;
-
+  @Autowired
+  private ChannelRepository channelRepository;
+  @Autowired
+  private MessageRepository messageRepository;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private ReadStatusRepository readStatusRepository;
   private CreateUserDto userDto, userDto2;
   private User user, user2;
 
   @BeforeEach
   void setUp(){
-    File userFile = new File(USER_FILE);
-    File channelFile = new File(CHANNEL_FILE);
-    File readStatusFile = new File(READ_STATUS_FILE);
+    channelRepository.clear();
+    messageRepository.clear();
+    userRepository.clear();
+    readStatusRepository.clear();
 
-    if(userFile.exists()) userFile.delete();
-    if(channelFile.exists()) channelFile.delete();
-    if(readStatusFile.exists()) readStatusFile.delete();
 
     userDto = new CreateUserDto(
         "testUser", "password123", "test@example.com",

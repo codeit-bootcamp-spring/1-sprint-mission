@@ -68,10 +68,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
 
   @Override
   public void clear() {
-
-    File file = new File(CHANNEL_FILE);
-    if (file.exists()) {
-      file.delete();
-    }
+    File file = new File(getFilePath());
+    if(file.exists()) file.delete();
   }
 }

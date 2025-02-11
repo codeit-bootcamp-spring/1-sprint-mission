@@ -14,7 +14,7 @@ import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAUL
 import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_UUID;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository{
 
   private final Map<String, BinaryContent> data = new ConcurrentHashMap<>();

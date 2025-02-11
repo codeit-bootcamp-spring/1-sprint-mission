@@ -266,7 +266,6 @@ public class BasicUserServiceTest {
 
     verify(userRepository, times(1)).findAll();
     verify(userStatusService, times(1)).mapUserToUserStatus(anySet());
-
     verify(binaryContentService, times(1)).mapUserToBinaryContent(anySet());
   }
 

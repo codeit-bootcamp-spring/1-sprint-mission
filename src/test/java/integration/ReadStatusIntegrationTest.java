@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.List;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.*;
@@ -37,24 +39,22 @@ public class ReadStatusIntegrationTest {
   @Autowired
   private ChannelService channelService;
 
+  @Autowired private UserRepository userRepository;
+  @Autowired private ChannelRepository channelRepository;
+  @Autowired private MessageRepository messageRepository;
+  @Autowired private BinaryContentRepository binaryContentRepository;
+  @Autowired private ReadStatusRepository readStatusRepository;
   private User user;
   private PrivateChannelResponseDto channel;
 
   @BeforeEach
   void setUp(){
 
-    File userFile = new File(USER_FILE);
-    File channelFile = new File(CHANNEL_FILE);
-    File messageFile = new File(MESSAGE_FILE);
-    File binaryContentFile = new File(BINARY_CONTENT_FILE);
-    File readStatusFile = new File(READ_STATUS_FILE);
-
-
-    if(userFile.exists()) userFile.delete();
-    if(channelFile.exists()) channelFile.delete();
-    if(messageFile.exists()) messageFile.delete();
-    if(binaryContentFile.exists()) binaryContentFile.delete();
-    if(readStatusFile.exists()) readStatusFile.delete();
+    userRepository.clear();
+    channelRepository.clear();
+    messageRepository.clear();
+    binaryContentRepository.clear();
+    readStatusRepository.clear();
 
     user = userService.createUser(
         new CreateUserDto(
@@ -157,15 +157,15 @@ public class ReadStatusIntegrationTest {
   }
 
   @Test
-  void ReadStatus_업데이트_성공(){
+  void ReadStatus_업데이트_성공() throws InterruptedException {
     List<ReadStatus> statuses = readStatusService.findAllByUserId(user.getUUID());
     ReadStatus status = statuses.get(0);
-
+    Instant timeBefore = status.getLastReadAt();
     CreateReadStatusDto dto = new CreateReadStatusDto(channel.channelId(), user.getUUID());
 
     ReadStatus updated = readStatusService.update(dto);
 
-    assertThat(updated.getLastReadAt()).isAfter(status.getLastReadAt());
+    assertThat(updated.getLastReadAt()).isAfter(timeBefore);
   }
 
   @Test

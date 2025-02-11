@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
 
 public class JCFUserRepository implements UserRepository{
 

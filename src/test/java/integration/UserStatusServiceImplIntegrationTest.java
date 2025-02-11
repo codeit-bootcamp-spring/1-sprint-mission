@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.UserStatusType;
@@ -33,22 +35,16 @@ public class UserStatusServiceImplIntegrationTest {
   @Autowired
   private UserService userService;
 
+  @Autowired private UserRepository userRepository;
+  @Autowired private UserStatusRepository userStatusRepository;
   private User user;
 
   @BeforeEach
   void setUp() {
 
-    File userFile = new File(USER_FILE);
-    File userStatusFile = new File(USER_STATUS_FILE);
-//    File channelFile = new File(CHANNEL_FILE);
-//    File messageFile = new File(MESSAGE_FILE);
-//    File binaryContentFile = new File(BINARY_CONTENT_FILE);
+  userRepository.clear();
+  userStatusRepository.clear();
 
-    if (userFile.exists()) userFile.delete();
-    if (userStatusFile.exists()) userStatusFile.delete();
-//    if(channelFile.exists()) channelFile.delete();
-//    if(messageFile.exists()) messageFile.delete();
-//    if(binaryContentFile.exists()) binaryContentFile.delete();
     user = userService.createUser(
         new CreateUserDto(
             "username",
@@ -129,21 +125,23 @@ public class UserStatusServiceImplIntegrationTest {
   @Test
   void UserStatus_업데이트_성공() {
     UserStatus status = userStatusService.findByUserId(user.getUUID());
+    Instant timeBefore = status.getLastOnlineAt();
 
     UpdateUserStatusDto dto = new UpdateUserStatusDto(status.getUUID(), Instant.now());
     UserStatus updatedStatus = userStatusService.update(dto);
 
-    assertThat(updatedStatus.getLastOnlineAt()).isAfter(status.getLastOnlineAt());
+    assertThat(updatedStatus.getLastOnlineAt()).isAfter(timeBefore);
   }
 
   @Test
   void UserStatus_UserId_로_업데이트_성공() {
     UserStatus status = userStatusService.findByUserId(user.getUUID());
+    Instant timeBefore = status.getLastOnlineAt();
 
     UpdateUserStatusDto dto = new UpdateUserStatusDto(status.getUUID(), Instant.now());
     UserStatus updatedStatus = userStatusService.updateByUserId(user.getUUID(), dto);
 
-    assertThat(updatedStatus.getLastOnlineAt()).isAfter(status.getLastOnlineAt());
+    assertThat(updatedStatus.getLastOnlineAt()).isAfter(timeBefore);
   }
 
   @Test

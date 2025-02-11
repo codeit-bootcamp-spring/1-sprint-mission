@@ -95,8 +95,6 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   @Override
   public void clear() {
     File file = new File(getFilePath());
-    if (file.exists()) {
-      file.delete();
-    }
+    if(file.exists()) file.delete();
   }
 }

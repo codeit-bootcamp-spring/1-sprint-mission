@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,13 +32,14 @@ public class BasicUserServiceIntegrationTest {
   @Value("${app.file.user-file}")
   private String filePath;
 
+  @Autowired
+  private UserRepository userRepository;
   private CreateUserDto userDto1, userDto2;
 
   @BeforeEach
   void setUp(){
 
-    File file = new File(filePath);
-    if(file.exists()) file.delete();
+    userRepository.clear();
 
     userDto1 = new CreateUserDto(
         "username1","pwd1","email1@email.com","nickname1","01012341234",new byte[]{1}, "image1", "jpg", "description1"
@@ -110,6 +113,7 @@ public class BasicUserServiceIntegrationTest {
 
     UserResponseDto foundUser = userService.findUserById(user1.getUUID());
 
+
     assertThat(foundUser).isNotNull();
     assertThat(foundUser.userId()).isEqualTo(user1.getUUID());
     assertThat(foundUser.email()).isEqualTo(user1.getEmail());
@@ -121,8 +125,14 @@ public class BasicUserServiceIntegrationTest {
     userService.createUser(userDto2);
 
     List<UserResponseDto> users = userService.findAllUsers();
-
+    UserResponseDto user = users.stream().filter(u -> "username1".equals(u.username())).findAny().orElseThrow();
     assertThat(users).hasSize(2);
+    assertThat(user.profilePicture()).isNotNull();
+
+    BinaryContent user1Profile = user.profilePicture();
+    assertThat(user1Profile.getUserId()).isEqualTo(user.userId());
+    assertThat(user1Profile.getFileName()).isEqualTo("image1");
+    assertThat(user1Profile.getData().length).isEqualTo(1);
   }
 
   @Test

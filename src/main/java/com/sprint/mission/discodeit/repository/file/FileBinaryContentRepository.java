@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -127,6 +128,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
 
   @Override
   public void clear() {
-
+    File file = new File(getFilePath());
+    if(file.exists()) file.delete();
   }
 }
