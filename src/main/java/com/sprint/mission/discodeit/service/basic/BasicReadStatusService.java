@@ -50,7 +50,6 @@ public class BasicReadStatusService {
     }
 
     public void delete(UUID readStatusId) {
-        validateReadStatus.validateReadStatus(readStatusId);
         readStatusRepository.delete(readStatusId);
     }
 

@@ -61,7 +61,7 @@ public class BasicUserService implements UserService {
         return users.stream()
                 .map(user -> changeToDto(user, userStatusRepository.findByUserId(user.getUserId())
                         .map(UserStatus::isOnline)
-                        .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."))))
+                        .orElseThrow(() -> new ResourceNotFoundException("User status not found."))))
                 .collect(Collectors.toList());
     }
 
@@ -87,8 +87,6 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        userRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
         binaryContentRepository.deleteByUserId(userId);
         userStatusRepository.deleteByUserId(userId);
         userRepository.delete(userId);

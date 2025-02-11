@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto findByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
         return changeToDto(userStatus);
     }
 
@@ -49,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto update(UserStatusUpdateRequest request) {
         UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("UserStatus not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
         userStatus.update(request.lastLoginTime());
         userStatusRepository.save(userStatus);
         return changeToDto(userStatus);

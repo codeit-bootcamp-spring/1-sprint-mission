@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.validation.ValidateBinaryContent;
@@ -134,18 +135,37 @@ class BasicMessageServiceTest {
     @Test
     void update_MessageNotFound(){
         // given
+        UUID userId = UUID.randomUUID();
+        UUID channelId = UUID.randomUUID();
+        List<byte[]> messages = new ArrayList<>(List.of(
+                new byte[]{1, 2, 3},
+                new byte[]{4, 5, 6}
+        ));
+        Message message = new Message("안녕하세요.", userId, channelId, messages);
+        MessageUpdateRequest request = new MessageUpdateRequest(message.getId(), userId, channelId, "수정 메시지", messages);
 
         // when
+        doNothing().when(validateMessage).validateMessage(request.message(), request.userId(),request.channelId());
+        when(messageRepository.findByMessageId(message.getId())).thenReturn(Optional.empty());
 
         // then
+        assertThrows(ResourceNotFoundException.class, () -> basicMessageService.update(request));
+
+        verify(binaryContentRepository, never()).deleteByMessageId(message.getId());
+        verify(binaryContentRepository, never()).save(any(BinaryContent.class));
+        verify(messageRepository, never()).save(any(Message.class));
     }
 
     @Test
     void delete_Success() {
         // given
+        UUID messageID = UUID.randomUUID();
 
         // when
+        basicMessageService.delete(messageID);
 
         // then
+        verify(binaryContentRepository, times(1)).deleteByMessageId(messageID);
+        verify(messageRepository, times(1)).deleteByMessageId(messageID);
     }
 }
