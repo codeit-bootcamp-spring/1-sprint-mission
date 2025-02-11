@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelVisibility;
 import com.sprint.mission.discodeit.domain.channel.exception.AlreadyJoinUserException;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.domain.channel.exception.NotChannelManagerException;
 import com.sprint.mission.discodeit.domain.readStatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
@@ -115,7 +116,7 @@ public class JCFChannelService implements ChannelService {
 
     private void throwIsNotManager(User foundUser, Channel foundChannel) {
         if (!foundChannel.isManager(foundUser)) {
-            throw new IllegalArgumentException();
+            throw new NotChannelManagerException(ErrorCode.CHANNEL_ADMIN_REQUIRED, foundUser.getUsernameValue());
         }
     }
 
@@ -141,9 +142,17 @@ public class JCFChannelService implements ChannelService {
 
     private Channel createChannelWithVisibility(UUID userId, CreateChannelRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel createChannel = requestDto.visibility() == ChannelVisibility.PUBLIC ?
-                Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser) :
-                Channel.ofPrivateChannel(foundUser, requestDto.channelType());
+        Channel createChannel = null;
+        if (requestDto.visibility() == ChannelVisibility.PUBLIC) {
+            createChannel = Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser);
+        } else if (requestDto.visibility() == ChannelVisibility.PRIVATE) {
+            createChannel = Channel.ofPrivateChannel(foundUser, requestDto.channelType());
+        }
+//        ====> 삼항 연산자와 if 문 분기처리 중 어떤 것을 더 선호해야할까요? 제가 생각하기에는 삼항 연산자가 보기 더 편한것 같습니다.
+//        다음 미션에서는 둘 중 하나 지워두겠습니다.
+//        createChannel = requestDto.visibility() == ChannelVisibility.PUBLIC ?
+//                Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser) :
+//                Channel.ofPrivateChannel(foundUser, requestDto.channelType());
         Channel savedChannel = channelRepository.save(createChannel);
         createAndSaveReadStatus(foundUser, savedChannel);
         return savedChannel;
