@@ -3,6 +3,7 @@ package service;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -11,6 +12,8 @@ import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.FileTypeProcessor;
@@ -28,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
@@ -43,6 +47,11 @@ public class BasicUserServiceTest {
   private UserStatusRepository userStatusRepository;
   @Mock
   private BinaryContentRepository binaryContentRepository;
+
+  @Mock
+  private UserStatusService userStatusService;
+  @Mock
+  private BinaryContentService binaryContentService;
   @Mock
   private EntityValidator validator;
   @InjectMocks
@@ -219,17 +228,16 @@ public class BasicUserServiceTest {
   @Test
   void testFindUserById_CreateStatusIfNotExists(){
     when(validator.findOrThrow(eq(User.class), eq(user1.getUUID()), any(UserNotFoundException.class))).thenReturn(user1);
+    when(userStatusService.create(any(CreateUserStatusDto.class))).thenReturn(new UserStatus(user1.getUUID(), Instant.now()));
     when(userStatusRepository.findByUserId(user1.getUUID())).thenReturn(Optional.empty());
-    when(userStatusRepository.save(any(UserStatus.class))).thenAnswer(status -> status.getArgument(0));
-
     UserResponseDto response = userService.findUserById(user1.getUUID());
 
     assertThat(response).isNotNull();
     assertThat(response.userId()).isEqualTo(user1.getUUID());
     assertThat(response.userStatus()).isNotNull();
 
+    verify(userStatusService, times(1)).create(any());
     verify(userStatusRepository, times(1)).findByUserId(user1.getUUID());
-    verify(userStatusRepository, times(1)).save(any(UserStatus.class));
   }
 
   @Test
@@ -237,8 +245,11 @@ public class BasicUserServiceTest {
 
     UserStatus user1Status = new UserStatus(user1.getUUID(), Instant.now());
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
-    when(userStatusRepository.findByUserId(user1.getUUID())).thenReturn(Optional.of(user1Status));
-    when(userStatusRepository.findByUserId(user2.getUUID())).thenReturn(Optional.empty());
+    when(userStatusService.mapUserToUserStatus(anySet())).thenReturn(Map.of(
+        user1.getUUID(), user1Status,
+        user2.getUUID(), new UserStatus(user2.getUUID(), Instant.now())
+    ));
+
 
     List<UserResponseDto> responseList = userService.findAllUsers();
 
@@ -254,9 +265,9 @@ public class BasicUserServiceTest {
     assertThat(res2.userId()).isEqualTo(user2.getUUID());
 
     verify(userRepository, times(1)).findAll();
-    verify(userStatusRepository, times(2)).findByUserId(anyString());
+    verify(userStatusService, times(1)).mapUserToUserStatus(anySet());
 
-    verify(userStatusRepository, times(1)).save(any(UserStatus.class));
+    verify(binaryContentService, times(1)).mapUserToBinaryContent(anySet());
   }
 
   @Test

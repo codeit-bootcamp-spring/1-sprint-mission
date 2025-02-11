@@ -21,6 +21,7 @@ public class BinaryContent implements Serializable {
   private final FileType fileType;
   private final long fileSize;
   private final byte[] data;
+  private final boolean isProfilePicture;
   private final Instant createdAt;
 
   private BinaryContent(BinaryContentBuilder builder){
@@ -32,6 +33,7 @@ public class BinaryContent implements Serializable {
     this.fileType = builder.fileType;
     this.fileSize = builder.fileSize;
     this.data = builder.data;
+    this.isProfilePicture = builder.isProfilePicture;
     this.createdAt = Instant.now();
   }
   public static class BinaryContentBuilder {
@@ -42,8 +44,10 @@ public class BinaryContent implements Serializable {
     private final FileType fileType;
     private final long fileSize;
     private final byte[] data;
+    private boolean isProfilePicture;
 
     public BinaryContentBuilder(String userId, String fileName, FileType fileType, long fileSize, byte[] data) {
+      this.isProfilePicture = false;
       this.userId = userId;
       this.fileName = fileName;
       this.fileType = fileType;
@@ -61,6 +65,10 @@ public class BinaryContent implements Serializable {
       return this;
     }
 
+    public BinaryContentBuilder isProfilePicture(){
+      this.isProfilePicture = true;
+      return this;
+    }
     public BinaryContent build() {
       return new BinaryContent(this);
     }

@@ -11,7 +11,10 @@ import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
@@ -47,6 +50,18 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     ).toList();
 
     return contents;
+  }
+
+  @Override
+  public Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds) {
+
+    if(userIds == null || userIds.isEmpty()) return Collections.emptyMap();
+
+    List<BinaryContent> profiles = binaryContentRepository.findProfilesOf(userIds);
+    System.out.println(profiles.size());
+
+    return profiles.stream()
+        .collect(Collectors.toMap(BinaryContent::getUserId, content -> content));
   }
 
   @Override

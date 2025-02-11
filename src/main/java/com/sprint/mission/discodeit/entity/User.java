@@ -23,6 +23,7 @@ public class User implements Serializable {
   private String phoneNumber;
   private String binaryContentId;
   private String description;
+  private String userStatusId;
   private Instant createdAt;
   private Instant updatedAt;
 
@@ -35,6 +36,7 @@ public class User implements Serializable {
     this.phoneNumber = builder.phoneNumber;
     this.binaryContentId = builder.binaryContentId != null ? builder.binaryContentId : UserConstant.DEFAULT_PROFILE_PICTURE_URL;
     this.description = builder.description;
+    this.userStatusId = builder.userStatusId;
     this.createdAt = Instant.now();
     this.updatedAt = Instant.now();
   }
@@ -43,6 +45,7 @@ public class User implements Serializable {
     private final String username;
     private final String password;
     private final String email;
+    private String userStatusId;
     private String nickname;
     private String phoneNumber;
     private String binaryContentId;
@@ -67,6 +70,11 @@ public class User implements Serializable {
 
     public UserBuilder description(String description) {
       this.description = description;
+      return this;
+    }
+
+    public UserBuilder userStatusId(String id){
+      this.userStatusId = id;
       return this;
     }
 

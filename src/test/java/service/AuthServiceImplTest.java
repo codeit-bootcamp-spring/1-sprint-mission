@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.basic.AuthServiceImpl;
@@ -36,6 +37,8 @@ public class AuthServiceImplTest {
   private UserRepository userRepository;
   @Mock
   private UserStatusRepository userStatusRepository;
+  @Mock
+  private BinaryContentRepository binaryContentRepository;
 
   @InjectMocks
   private AuthServiceImpl authService;

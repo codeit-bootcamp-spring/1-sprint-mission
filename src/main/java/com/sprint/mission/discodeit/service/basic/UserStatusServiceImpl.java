@@ -13,7 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -79,6 +80,18 @@ public class UserStatusServiceImpl implements UserStatusService {
     userStatusRepository.save(status);
 
     return status;
+  }
+
+  @Override
+  public Map<String, UserStatus> mapUserToUserStatus(Set<String> users) {
+
+    if(users == null || users.isEmpty()) return Collections.emptyMap();
+
+    List<UserStatus> statuses = userStatusRepository.findByAllIdIn(users);
+
+    return statuses.stream()
+        .collect(Collectors.toMap(UserStatus::getUserId, status -> status));
+
   }
 
   @Override

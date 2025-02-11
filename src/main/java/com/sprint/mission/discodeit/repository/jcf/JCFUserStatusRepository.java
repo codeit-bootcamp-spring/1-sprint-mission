@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -33,6 +34,11 @@ public class JCFUserStatusRepository implements UserStatusRepository{
     return data.values().stream()
         .filter(userStatus -> userStatus.getUserId().equals(id))
         .findFirst();
+  }
+
+  @Override
+  public List<UserStatus> findByAllIdIn(Set<String> userIds) {
+    return data.values().stream().filter(status -> userIds.contains(status.getUserId())).toList();
   }
 
   @Override

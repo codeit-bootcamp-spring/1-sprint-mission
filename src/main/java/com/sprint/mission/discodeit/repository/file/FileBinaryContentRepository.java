@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_NAME;
+import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_UUID;
 import static com.sprint.mission.discodeit.constant.FileConstant.BINARY_CONTENT_FILE;
 
 @Repository
@@ -90,6 +93,14 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
   public List<BinaryContent> findByMessageId(String messageId) {
     return getFromFile().stream()
         .filter(content -> messageId.equals(content.getMessageId()))
+        .toList();
+  }
+
+  @Override
+  public List<BinaryContent> findProfilesOf(Set<String> users) {
+    List<BinaryContent> contents = getFromFile();
+    return contents.stream()
+        .filter(content -> content.isProfilePicture() && users.contains(content.getUserId()))
         .toList();
   }
 

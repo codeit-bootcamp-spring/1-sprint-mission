@@ -17,6 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.File;
 import java.util.List;
 
+import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_NAME;
+import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_UUID;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
@@ -214,5 +216,24 @@ public class BasicUserServiceIntegrationTest {
     assertThat(profileImage.getFileName()).isEqualTo("profileImage");
     assertThat(profileImage.getData()).hasSize(3);
     assertThat(profileImage.getData()).containsExactlyInAnyOrder(1,2,3);
+  }
+
+  @Test
+  void 프로필_사진을_등록하지_않으면_null(){
+    User user = userService.createUser(
+        new CreateUserDto(
+            "newUser",
+            "newPwd",
+            "new@email.com",
+            "newNickname",
+            "01098765432",
+            null, null, null,"description"
+        )
+    );
+
+    UserResponseDto responseDto = userService.findUserById(user.getUUID());
+
+
+    assertThat(responseDto.profilePicture()).isNull();
   }
 }

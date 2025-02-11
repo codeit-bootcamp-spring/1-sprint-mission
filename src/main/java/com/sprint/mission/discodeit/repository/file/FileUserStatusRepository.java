@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.USER_STATUS_FILE;
 
@@ -51,6 +53,12 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     return statuses.stream()
         .filter(status -> status.getUserId().equals(id))
         .findFirst();
+  }
+
+  @Override
+  public List<UserStatus> findByAllIdIn(Set<String> userIds) {
+    List<UserStatus> statuses = loadAll(UserStatus.class);
+    return statuses.stream().filter(status -> userIds.contains(status.getUserId())).collect(Collectors.toList());
   }
 
   @Override

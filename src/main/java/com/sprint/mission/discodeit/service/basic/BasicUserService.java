@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.constant.UserConstant;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -13,20 +14,28 @@ import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.FileTypeProcessor;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.IMAGE_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
+@Slf4j
 @Service
 @ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
 @RequiredArgsConstructor
@@ -36,6 +45,9 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
 
+  private final UserStatusService userStatusService;
+  private final BinaryContentService binaryContentService;
+
   private final EntityValidator validator;
 
   /**
@@ -44,6 +56,12 @@ public class BasicUserService implements UserService {
    * <p>{@link CreateUserDto}를 기반으로 새로운 사용자를 생성하고,
    * 프로필 이미지를 저장한 후, 사용자 상태 정보를 초기화하여 저장.</p>
    *
+   * <p>username, email 이 다른 유저와 같다면 예외 발생</p>
+   *
+   * <p>saveProfileImage() 는 실제 profileImage 가 비어있다면 동작하지 않음.</p>
+   *
+   * <p>{@link UserStatus} : 사용자의 온라인 정보 생성</p>
+   *
    * @param userDto 사용자의 정보를 포함하는 DTO
    * @return 생성된 사용자 객체
    * @throws UserValidationException  이메일, 닉네임, 전화번호 검증에 실패할 경우 발생
@@ -51,23 +69,16 @@ public class BasicUserService implements UserService {
    */
   @Override
   public User createUser(CreateUserDto userDto) {
+    // User 객체 생성
+    User user = createUserDtoToUser(userDto);
 
-    User user = new User.UserBuilder(
-        userDto.username(),
-        PasswordEncryptor.hashPassword(userDto.password()),
-        userDto.email(),
-        userDto.phoneNumber()
-    )
-        .nickname(userDto.nickname())
-        .description(userDto.description())
-        .build();
+    // email, nickname, phone number 검증
+    validateUserInformation(user, user.getUUID());
 
-    validEmail(userDto.email(), user.getUUID());
-    validNickname(userDto.nickname(), user.getUUID());
-    validPhone(userDto.phoneNumber(), user.getUUID());
-
+    // 프로필 이미지가 같이 넘어왔다면 등록
     saveProfileImage(user, userDto.imageName(), userDto.fileType(), userDto.profileImage());
 
+    // UserStatus 생성
     UserStatus status = new UserStatus(user.getUUID(), Instant.now());
 
     userRepository.create(user);
@@ -77,8 +88,38 @@ public class BasicUserService implements UserService {
   }
 
   /**
+   * 단순히 UserDto 를 User 객체로 파싱하는 함수
+   *
+   * @param userDto
+   * @return User 객체
+   */
+  private User createUserDtoToUser(CreateUserDto userDto) {
+    return new User.UserBuilder(
+        userDto.username(),
+        PasswordEncryptor.hashPassword(userDto.password()),
+        userDto.email(),
+        userDto.phoneNumber()
+    )
+        .nickname(userDto.nickname())
+        .description(userDto.description())
+        .build();
+  }
+
+  /**
+   * 단순 검증 로직 한번 실행 함수
+   */
+  private void validateUserInformation(User user, String userId) {
+    validEmail(user.getEmail(), userId);
+    validNickname(user.getNickname(), userId);
+    validPhone(user.getPhoneNumber(), userId);
+  }
+
+  /**
    * 범용성이 높도록 Dto 를 인자로 받지 않음
    * file 이 비어있으면 동작하지 않음
+   *
+   * <p>file 이 존재한다면, BinaryContent를 생성해서, user의 binaryContentId (ProfilePicture) 에 할당, binaryContentRepository에 해당 이미지 저장</p>
+   * isProfilePicture() 를 통해 프로필 이미지임을 명시
    *
    * @param user      사용자 객체
    * @param imageName 넘어온 이미지 이름
@@ -88,13 +129,18 @@ public class BasicUserService implements UserService {
   private void saveProfileImage(User user, String imageName, String fileType, byte[] file) {
     if (file != null && file.length != 0) {
       //TODO : 필드 예외 처리
+
+      if(user.getBinaryContentId() != null || !user.getBinaryContentId().isEmpty()){
+        binaryContentService.delete(user.getBinaryContentId());
+      }
+
       BinaryContent profileImage = new BinaryContent.BinaryContentBuilder(
           user.getUUID(),
           imageName,
           FileTypeProcessor.process(fileType),
           file.length,
           file
-      ).build();
+      ).isProfilePicture().build();
 
       user.setBinaryContentId(profileImage.getUUID());
       binaryContentRepository.save(profileImage);
@@ -133,47 +179,76 @@ public class BasicUserService implements UserService {
    * 사용자를 찾아서 반환
    * id 에 해당하는 사용자가 없다면 UserNotFoundException
    * id 에 해당하는 status 가 없다면 새로운 status 생성
-   *
-   * @param id
    */
   @Override
   public UserResponseDto findUserById(String id) {
 
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
-    UserStatus status = userStatusRepository.findByUserId(id).orElseGet(
-        () -> createStatusIfNotExists(id)
-    );
+    UserStatus status = getUserStatusOrCreate(id);
 
-    BinaryContent profilePicture = null;
-    if(user.getBinaryContentId() != null) {
-       profilePicture = binaryContentRepository.findById(user.getBinaryContentId()).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
-    }
+    BinaryContent profilePicture = getProfilePicture(user.getBinaryContentId());
 
     return UserResponseDto.from(user, status, profilePicture);
   }
 
-  private UserStatus createStatusIfNotExists(String id) {
-    UserStatus newStatus = new UserStatus(id, Instant.now());
-    userStatusRepository.save(newStatus);
-    return newStatus;
+  /**
+   * userStatus 를 가져오거나 없다면 생성
+   */
+  private UserStatus getUserStatusOrCreate(String userId) {
+    return userStatusRepository.findByUserId(userId).orElseGet(() -> createStatusIfNotExists(userId));
   }
+
+  /**
+   * 프로필 사진이 없다면 null 반환
+   * 이떄 프로필 사진 id 는 user 객체에 저장되어 있다
+   * 기본 이미지는 프론트에서 처리한다 >> 서버는 null 을 반환
+   */
+  private BinaryContent getProfilePicture(String binaryContentId) {
+    if (binaryContentId == null || binaryContentId.isEmpty()) {
+      return null;
+    }
+
+    return binaryContentRepository.findById(binaryContentId).orElseGet(() -> {
+      log.warn("Invalid binaryContentId: {}", binaryContentId);
+      return null;
+    });
+  }
+
+  /**
+   * 사용자의 UserStatus 가 존재하지 않는다면 자동 생성 후 repo에 저장
+   *
+   * @param id 사용자의 id
+   * @return 새로 생성한 UserStatus
+   */
+  private UserStatus createStatusIfNotExists(String id) {
+    return userStatusService.create(new CreateUserStatusDto(id, Instant.now()));
+  }
+
 
   @Override
   public List<UserResponseDto> findAllUsers() {
 
     List<User> users = userRepository.findAll();
 
+    Set<String> userIdSet = users.stream().map(User::getUUID).collect(Collectors.toSet());
+
+    Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSet);
+
+    Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSet);
+
     return users.stream()
-        .map(user -> UserResponseDto.from(
-            user,
-            userStatusRepository.findByUserId(user.getUUID())
-                .orElseGet(
-                    () -> createStatusIfNotExists(user.getUUID())
-                ),
-            binaryContentRepository.findById(user.getUUID()).orElse(null)
-        )).toList();
+        .map(user -> {
+
+          UserStatus userStatus = userStatusMap.containsKey(user.getUUID())
+              ? userStatusMap.get(user.getUUID())
+              : createStatusIfNotExists(user.getUUID());
+
+          BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
+          return UserResponseDto.from(user, userStatus, profilePicture);
+        }).toList();
   }
+
 
   @Override
   public void updateUser(String id, UserUpdateDto updatedUser, String originalPassword) {
