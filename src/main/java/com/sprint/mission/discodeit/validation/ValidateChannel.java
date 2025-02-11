@@ -33,7 +33,7 @@ public class ValidateChannel {
     }
 
     public void validChannelType(ChannelType channelType) {
-        if (channelType == null || !Arrays.asList(ChannelType.values()).contains(channelType)) {
+        if (!Arrays.asList(ChannelType.values()).contains(channelType)) {
             throw new InvalidResourceException("Invalid channel type.");
         }
     }

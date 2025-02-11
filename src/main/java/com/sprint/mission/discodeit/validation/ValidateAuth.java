@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.exception.validation.InvalidResourceException;
 import com.sprint.mission.discodeit.repository.UserRepository;

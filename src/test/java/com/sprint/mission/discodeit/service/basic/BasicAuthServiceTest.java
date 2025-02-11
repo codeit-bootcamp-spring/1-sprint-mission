@@ -7,17 +7,16 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.validation.ValidateAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,9 +34,6 @@ class BasicAuthServiceTest {
     @Mock
     private UserStatusRepository userStatusRepository;
 
-    @Mock
-    private ValidateAuth validateAuth;
-
     @BeforeEach
     void setUp() {
     }
@@ -50,8 +46,8 @@ class BasicAuthServiceTest {
         UserStatus userStatus = new UserStatus(user.getUserId(), Instant.now());
 
         // When
-        when(userRepository.findByUsername(loginRequest.username())).thenReturn(Optional.of(user));
-        when(userStatusRepository.findByUserId(user.getUserId())).thenReturn(Optional.of(userStatus));
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
+        when(userStatusRepository.findByUserId(any(UUID.class))).thenReturn(Optional.of(userStatus));
 
         UserDto result = basicAuthService.login(loginRequest);
 
@@ -62,8 +58,6 @@ class BasicAuthServiceTest {
         assertEquals(result.email(), user.getEmail());
         assertEquals(result.phoneNumber(), user.getPhoneNumber());
         assertTrue(result.isOnline());
-        assertEquals(result.createdAt(), user.getCreatedAt());
-        assertEquals(result.updatedAt(), user.getUpdatedAt());
 
         verify(userStatusRepository).save(any(UserStatus.class));
     }

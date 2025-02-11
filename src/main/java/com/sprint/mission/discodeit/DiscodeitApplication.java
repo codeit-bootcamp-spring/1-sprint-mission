@@ -96,11 +96,11 @@ public class DiscodeitApplication {
 		// 채널 생성
 		ChannelDto createdPrivateChannel = channelService.createPrivateChannel(privatechannelCreateRequest);
 		ChannelDto createdPublicChannel = channelService.createPublicChannel(publicChannelCreateRequest);
-		System.out.println("채널 생성: " + createdPrivateChannel.ChannelId());
-		System.out.println("채널 생성: " + createdPublicChannel.ChannelId());
+		System.out.println("채널 생성: " + createdPrivateChannel.channelId());
+		System.out.println("채널 생성: " + createdPublicChannel.channelId());
 
 		// 채널 조회 (단건)
-		ChannelDto foundChannel = channelService.findById(createdPrivateChannel.ChannelId());
+		ChannelDto foundChannel = channelService.findById(createdPrivateChannel.channelId());
 		System.out.println("채널 조회(단건): " + foundChannel);
 
 		// 채널 조회 (다건)
@@ -109,7 +109,7 @@ public class DiscodeitApplication {
 
 		// 채널 수정 요청 DTO
 		ChannelUpdateRequest channelUpdateRequest = new ChannelUpdateRequest(
-				createdPublicChannel.ChannelId(),
+				createdPublicChannel.channelId(),
 				"스프링",
 				"modify 스프린트 미션 3",
 				ChannelType.PUBLIC,
@@ -121,8 +121,8 @@ public class DiscodeitApplication {
 		System.out.println("채널 수정: 이름: " + updatedChannel.name() + ", 설명: " + updatedChannel.description() + ", 타입: " + updatedChannel.channelType());
 
 		// 채널 삭제
-		channelService.delete(createdPrivateChannel.ChannelId());
-		channelService.delete(createdPublicChannel.ChannelId());
+		channelService.delete(createdPrivateChannel.channelId());
+		channelService.delete(createdPublicChannel.channelId());
 		// 유저 삭제
 		userService.delete(createdUser.userId());
 
@@ -157,7 +157,7 @@ public class DiscodeitApplication {
 		// 메시지 생성 요청 DTO
 		MessageCreateRequest messageCreateRequest = new MessageCreateRequest(
 				createdUser.userId(),
-				createdPublicChannel.ChannelId(),
+				createdPublicChannel.channelId(),
 				"안녕하세요.",
 				List.of(
 				new byte[]{1, 2, 3},
@@ -170,18 +170,18 @@ public class DiscodeitApplication {
 		System.out.println("메시지 생성: " + createdMessage.messageId());
 
 		// 메시지 조회 (단건)
-		List<MessageDto> foundMessage = messageService.findAllByChannelId(createdPublicChannel.ChannelId());
+		List<MessageDto> foundMessage = messageService.findAllByChannelId(createdPublicChannel.channelId());
 		System.out.println("메시지 조회(단건): " + foundMessage);
 
 		// 메시지 조회 (다건)
-		List<MessageDto> foundMessages = messageService.findAllByChannelId(createdPublicChannel.ChannelId());
+		List<MessageDto> foundMessages = messageService.findAllByChannelId(createdPublicChannel.channelId());
 		System.out.println("메시지 조회(다건): " + foundMessages.size());
 
 		// 메시지 수정 요청 DTO
 		MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(
 				createdMessage.messageId(),
 				createdUser.userId(),
-				createdPublicChannel.ChannelId(),
+				createdPublicChannel.channelId(),
 				"반갑습니다.",
 				List.of(
 						new byte[]{5, 5, 5},
@@ -199,7 +199,7 @@ public class DiscodeitApplication {
 		System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
 
 		// 채널 삭제
-		channelService.delete(createdPublicChannel.ChannelId());
+		channelService.delete(createdPublicChannel.channelId());
 
 		// 유저 삭제
 		userService.delete(createdUser.userId());
