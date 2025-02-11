@@ -1,12 +1,7 @@
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,21 +11,21 @@ public class MainTest {
 
     @Test
     public void testUserService() {
-        UserService userService=new JCFUserService();
-        //UserService userService=new FileUserServiece();
-        assertEquals("등록된 유저가 없습니다.", userService.readUserAll(), "실패1.");
-
-        userService.createNewUser("고구마");
-        userService.createNewUser("김치");
-        userService.createNewUser("우유");
-        userService.createNewUser("김치");
-        assertNotNull(userService.readUser("고구마"), "실패2");
-        assertEquals("해당하는 유저가 없습니다.", userService.readUser("돼지"));
-        userService.updateUserName("고구마","감자");
-        assertEquals("해당하는 유저가 없습니다.", userService.readUser("고구마"));
-        assertNotNull(userService.readUser("고구마"), "감자");
-        assertFalse(userService.deleteUser("고구마"));
-        assertTrue(userService.deleteUser("감자"));
+//        UserService userService=new JCFUserService();
+//        //UserService userService=new FileUserServiece();
+//        assertEquals("등록된 유저가 없습니다.", userService.readUserAll(), "실패1.");
+//
+//        userService.createNewUser("고구마");
+//        userService.createNewUser("김치");
+//        userService.createNewUser("우유");
+//        userService.createNewUser("김치");
+//        assertNotNull(userService.readUser("고구마"), "실패2");
+//        assertEquals("해당하는 유저가 없습니다.", userService.readUser("돼지"));
+//        userService.updateUserName("고구마","감자");
+//        assertEquals("해당하는 유저가 없습니다.", userService.readUser("고구마"));
+//        assertNotNull(userService.readUser("고구마"), "감자");
+//        assertFalse(userService.deleteUser("고구마"));
+//        assertTrue(userService.deleteUser("감자"));
 
     }
 

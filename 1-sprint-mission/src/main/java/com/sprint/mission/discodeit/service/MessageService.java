@@ -1,16 +1,25 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.DTO.MessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
     void createNewMessage(String title, String body);
 
-    <T> String readMessage(T key);
+    void createNewMessage(String title, String body, List<BinaryContent> binaryContents);
 
 
-    String readMessageAll();
+    void createNewMessagetoImg(String title, String body, List<char[]> imgs);
+
+    <T> List<Message> readMessage(T key);
+
+
+    List<Message> readMessageAll();
 
     boolean updateMessageTitle(UUID ID, String change);
 
@@ -24,5 +33,7 @@ public interface MessageService {
 
     boolean deleteMessage(String title);
     void addMessage(Message m);
+    boolean updateMessageTitle(MessageDto messageDto);
+    public boolean updateMessageBody(MessageDto messageDto);
     /// /////////////////////////////////////////////////////
 }

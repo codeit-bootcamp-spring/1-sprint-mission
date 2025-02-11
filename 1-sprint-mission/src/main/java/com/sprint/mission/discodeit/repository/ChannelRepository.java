@@ -6,6 +6,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    public Map<UUID, Channel> loadChannelTxt();
-    public void saveChannelTxt();
+    public Map<UUID, Channel> loadChannelText();
+    public void saveChannelText();
 }

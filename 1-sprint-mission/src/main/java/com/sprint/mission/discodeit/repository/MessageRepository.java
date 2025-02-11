@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface MessageRepository {
-    public Map<UUID, Message> loadMessageTxt();
-    public void saveMessageTxt();
+    public Map<UUID, Message> loadMessageText();
+    public void saveMessageText();
 
 }

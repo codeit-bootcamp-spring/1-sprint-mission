@@ -1,13 +1,23 @@
-package com.sprint.mission.discodeit.repository.jcf;
+package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.DTO.MessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service("JCFMessageService")
 public class JCFMessageService implements MessageService {
     protected Map<UUID, Message> messageList=new LinkedHashMap<>();
     protected static final Set<UUID> existMessageIdCheck=new HashSet<>();
+    @Autowired
+    @Qualifier("FileBinaryContentService")
+    private JCFBinaryContentService jcfBinaryContentService;
+
 
     @Override
     public void createNewMessage(String title, String body) {
@@ -21,9 +31,32 @@ public class JCFMessageService implements MessageService {
 
     }
 
+
+
     @Override
-    public <T>String readMessage(T key) {
-        StringBuilder list= new StringBuilder();
+    public void createNewMessage(String title, String body, List<BinaryContent> binaryContents) {
+        Message newMessage;
+        do{
+            newMessage=Message.createDefaultMessage(title,body,binaryContents);
+        }while(existMessageIdCheck.contains(newMessage.getId()));
+        messageList.put(newMessage.getId(),newMessage);
+        existMessageIdCheck.add(newMessage.getId());
+
+
+    }
+
+    @Override
+    public void createNewMessagetoImg(String title, String body, List<char[]> imgs) {
+        List<BinaryContent> contents=new ArrayList<>();
+        for(char[] img:imgs){
+            contents.add(jcfBinaryContentService.create(img));
+        }
+        createNewMessage(title,body,contents);
+    }
+
+    @Override
+    public <T>List<Message> readMessage(T key) {
+        List<Message> list= new ArrayList<>();
 
         LinkedHashMap<UUID,Message> foundMessage=new LinkedHashMap<>();
 
@@ -34,26 +67,23 @@ public class JCFMessageService implements MessageService {
         }
 
         for (Message val : foundMessage.values()) {
-            list.append(val.toString());
+            list.add(val);
         }
 
-        if(!list.toString().isEmpty())
-            return list.toString();
-        else
-            return "해당하는 메세지가 없습니다.";
+        return list;
     }
 
 
     @Override
-    public String readMessageAll() {
-        StringBuilder list= new StringBuilder();
+    public List<Message> readMessageAll() {
+        List<Message> list= new ArrayList<>();
         for (Message val : messageList.values()) {
-            list.append(val.toString());
+            list.add(val);
         }
         if(!list.toString().isEmpty())
-            return list.toString();
+            return list;
         else
-            return "등록된 메세지가 없습니다.";
+            return null;
     }
 
     @Override
@@ -91,22 +121,20 @@ public class JCFMessageService implements MessageService {
         return deleteMessageInfo(instance);
     }
 
-
-    protected boolean deleteMessageInfo(LinkedHashMap<UUID, Message> instance) {
-        if (instance.isEmpty()) {
-            System.out.println( "해당하는 메세지가가 없습니다.");
-            return false;
-        } else if (instance.size() == 1) {
-            Message find = instance.entrySet().iterator().next().getValue();
-            existMessageIdCheck.remove(find.getId());
-            messageList.remove(find.getId());
-            System.out.println("성공적으로 삭제했습니다.");
-            return true;
-        } else {
-            System.out.println("중복된 메세지가 있습니다.");
-            return false;
-        }
+    @Override
+    public boolean updateMessageTitle(MessageDto messageDto) {
+        LinkedHashMap<UUID, Message> instance = findMessage(messageDto.id());
+        return changeMessageTitle(instance, messageDto.title());
     }
+
+    @Override
+    public boolean updateMessageBody(MessageDto  messageDto) {
+        LinkedHashMap<UUID, Message> instance = findMessage(messageDto.id());
+        return changeMessageBody(instance, messageDto.messageBody());
+    }
+
+
+
 
     protected LinkedHashMap<UUID,Message> findMessage(UUID id) {
         LinkedHashMap<UUID, Message> findMessage = new LinkedHashMap<>();
@@ -125,7 +153,21 @@ public class JCFMessageService implements MessageService {
         return findMessage;
     }
 
-
+    protected boolean deleteMessageInfo(LinkedHashMap<UUID, Message> instance) {
+        if (instance.isEmpty()) {
+            System.out.println( "해당하는 메세지가가 없습니다.");
+            return false;
+        } else if (instance.size() == 1) {
+            Message find = instance.entrySet().iterator().next().getValue();
+            existMessageIdCheck.remove(find.getId());
+            messageList.remove(find.getId());
+            System.out.println("성공적으로 삭제했습니다.");
+            return true;
+        } else {
+            System.out.println("중복된 메세지가 있습니다.");
+            return false;
+        }
+    }
 
     protected boolean changeMessageTitle(LinkedHashMap<UUID, Message> instance, String changetitle) {
         if (instance==null||instance.isEmpty()) {

@@ -1,23 +1,33 @@
 package com.sprint.mission.discodeit.entity;
-import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Getter
 public class Message {
     final private UUID id;
-    final private Long createdAt;
-    private Long updatedAt;
+    final private Instant createdAt;
+    private Instant updatedAt;
+    @Setter
     private String title;
+    @Setter
     private String messageBody;
-    //private static final Set<UUID> existMessageIdCheck=new HashSet<>();
+    private final List<BinaryContent> binaryContents;
 
     private String senderName;
     private String receiverName;
     private UUID senderId;
     private UUID receiverId;
 
-    private Message(String title,String messageBody){
+    private Message(String title,String messageBody,List<BinaryContent> binaryContents){
 
         this.id = UUID.randomUUID();
-        this.createdAt= System.currentTimeMillis();
+        this.createdAt= Instant.now();
         this.updatedAt=null;
         this.title=title;
         this.messageBody=messageBody;
@@ -25,12 +35,14 @@ public class Message {
         this.receiverName ="";
         this.senderId=null;
         this.receiverId =null;
+        this.binaryContents=binaryContents;
 
     };
-    private Message(UUID ID,Long createdAt,Long updatedAt,String title,String messageBody,
-                   String senderName,String receiverName, UUID senderId, UUID receiverId ){
+    private Message(UUID id, Instant createdAt, Instant updatedAt, String title, String messageBody, List<BinaryContent> binaryContents,
+                    String senderName, String receiverName, UUID senderId, UUID receiverId ){
 
-        this.id=ID;
+        this.id=id;
+        this.binaryContents = binaryContents;
 
         this.createdAt= createdAt;
         this.updatedAt=updatedAt;
@@ -44,63 +56,22 @@ public class Message {
     };
 
     public static Message createDefaultMessage(String title,String messageBody){
-        return new Message(title,messageBody);
+         ArrayList<BinaryContent> newBinary=new ArrayList<>();
+        return new Message(title,messageBody,newBinary);
     }
-    public static Message createChannelAll(UUID ID,Long createdAt,Long updatedAt,String title,String messageBody,
-                                           String senderName,String receiverName, UUID senderId, UUID receiverId){
-        return new Message(ID,createdAt,updatedAt,title,messageBody,senderName,receiverName,senderId,receiverId);
+    public static Message createDefaultMessage(String title,String messageBody,List<BinaryContent> binaryContents){
+        return new Message(title,messageBody,binaryContents);
     }
-
-
-    public UUID getId() {
-        return id;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
+    public static Message createChannelAll(UUID Id, Instant createdAt, Instant updatedAt, String title, String messageBody, ArrayList<BinaryContent> binaryContents,
+                                           String senderName, String receiverName, UUID senderId, UUID receiverId){
+        return new Message(Id,createdAt,updatedAt,title,messageBody,binaryContents,senderName,receiverName,senderId,receiverId);
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-    public String getMessageBody(){
-        return messageBody;
-    }
 
     public void setUpdatedAt() {
-        this.updatedAt= System.currentTimeMillis();
-    }
-    public void setMessageBody(String messageBody){
-        this.messageBody= messageBody;
+        this.updatedAt= Instant.now();
     }
 
-    public String getSenderName() {
-        return senderName;
-    }
-    public String getReceiverName() {
-        return senderName;
-    }
-
-
-
-    public UUID getSenderID() {
-        return senderId;
-    }
-    public UUID getReceiverID() {
-        return receiverId;
-    }
-    public void updateReceiverID(UUID receiverId) {
-        this.receiverId = receiverId;
-    }
-    public void updateSenderID(UUID senderId) {
-        this.senderId = senderId;
-    }
-    public void updateReceiverName(String receiverName) {
-        this.receiverName = receiverName;
-    }
-    public void updateSenderName(String senderName) {
-        this.senderName = senderName;
-    }
 
     public void updateSender(UUID senderId, String senderName){
         this.senderName=senderName;
@@ -109,6 +80,12 @@ public class Message {
     public void updateReceiver(UUID receiverId, String receiverName){
         this.receiverName = receiverName;
         this.receiverId = receiverId;
+    }
+
+    public List<UUID> getBinaryConetentIdList(){
+        return binaryContents.stream()
+                .map(BinaryContent::getId)
+                .collect(Collectors.toList());
     }
     @Override
     public String toString(){
@@ -126,12 +103,4 @@ public class Message {
         return display.toString();
     }
 
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }

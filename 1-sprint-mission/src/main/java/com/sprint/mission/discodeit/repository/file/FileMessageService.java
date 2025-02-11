@@ -1,42 +1,77 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.MessageService;
+import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.*;
 
+@Repository
+@Service("FileMessageService")
 public class FileMessageService extends JCFMessageService implements MessageService, MessageRepository {
 
-    private static final String fileName = ".\\1-sprint-mission\\1-sprint-mission\\src\\main\\repo\\message.txt";
+    private static final String fileName = Paths.get("src", "main", "repo", "message.txt").toString();
+    @Autowired
+    @Qualifier("JCFBinaryContentService")
+    private final BinaryContentService JCFBinaryContentService;
 
-    public FileMessageService(){
-        messageList=loadMessageTxt();
+    public FileMessageService(@Qualifier("FileBinaryContentService") BinaryContentService jcfBinaryContentService){
+        JCFBinaryContentService = jcfBinaryContentService;
+        messageList= loadMessageText();
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        saveMessageText();
     }
 
     @Override
     public void createNewMessage(String title, String body) {
         super.createNewMessage(title,body);
-        saveMessageTxt();
+        saveMessageText();
+    }
+    @Override
+    public void createNewMessage(String title, String body, List<BinaryContent> binaryContents) {
+        super.createNewMessage(title,body,binaryContents);
+        saveMessageText();
+    }
+
+    @Override
+    public void createNewMessagetoImg(String title, String body, List<char[]> imgs){
+        super.createNewMessagetoImg(title,body,imgs);
+        saveMessageText();
+
     }
 
 
     @Override
     public void addMessage(Message m) {
         super.addMessage(m);
-        saveMessageTxt();
+        saveMessageText();
     }
 
     @Override
     protected boolean deleteMessageInfo(LinkedHashMap<UUID, Message> instance) {
         if(super.deleteMessageInfo(instance)){
-            saveMessageTxt();
+            saveMessageText();
             return true;
         }else{
             return false;
@@ -45,7 +80,7 @@ public class FileMessageService extends JCFMessageService implements MessageServ
     @Override
     protected boolean changeMessageTitle(LinkedHashMap<UUID, Message> instance, String changetitle) {
         if(super.changeMessageTitle(instance,changetitle)){
-            saveMessageTxt();
+            saveMessageText();
             return true;
         }else{
             return false;
@@ -54,14 +89,16 @@ public class FileMessageService extends JCFMessageService implements MessageServ
     @Override
     protected boolean changeMessageBody(LinkedHashMap<UUID, Message> instance, String changeBody) {
         if(super.changeMessageBody(instance,changeBody)){
-            saveMessageTxt();
+            saveMessageText();
             return true;
         }else {
             return false;
         }
     }
+
+
     @Override
-    public Map<UUID,Message> loadMessageTxt(){
+    public Map<UUID,Message> loadMessageText(){
         Map<UUID,Message> loadTxt=new TreeMap<>();
         File file = new File(fileName);
         if (!file.exists()) {
@@ -99,12 +136,15 @@ public class FileMessageService extends JCFMessageService implements MessageServ
 
                 UUID id = UUID.fromString(key);
 
-                long createdAt = messageData.get("createdAt").asLong();
-                long updatedAt = messageData.has("updatedAt") ? messageData.get("updatedAt").asLong() : 0;
+                Instant createdAt = Instant.ofEpochMilli(messageData.get("createdAt").asLong());
+                Instant updatedAt = messageData.has("updatedAt")
+                        ? Instant.ofEpochMilli(messageData.get("updatedAt").asLong())
+                        : null;
                 String title = messageData.get("title").asText();
                 String messageBody = messageData.get("messageBody").asText();
                 String senderName = messageData.get("senderName").asText();
                 String receiverName = messageData.get("receiverName").asText();
+
                 UUID senderId = null;
                 if (messageData.has("senderId") && !messageData.get("senderId").isNull()) {
                     senderId = UUID.fromString(messageData.get("senderId").asText());
@@ -115,8 +155,14 @@ public class FileMessageService extends JCFMessageService implements MessageServ
                     receiverId = UUID.fromString(messageData.get("receiverId").asText());
                 }
 
-                Message message = Message.createChannelAll(id, createdAt, updatedAt, title,
-                        messageBody,senderName,receiverName,senderId,receiverId);
+
+                JsonNode binaryContentsNode = (JsonNode) messageData.get("binaryContents");
+                List<UUID> binaryContentIds = objectMapper.convertValue(binaryContentsNode, new TypeReference<List<UUID>>() {});
+
+                ArrayList<BinaryContent> binaryContents = new ArrayList<>(JCFBinaryContentService.findAllByIdIn(binaryContentIds));
+
+                Message message = Message.createChannelAll(id, createdAt, updatedAt, title, messageBody,
+                        binaryContents, senderName, receiverName, senderId, receiverId);
                 existMessageIdCheck.add(message.getId());
 
 
@@ -124,13 +170,21 @@ public class FileMessageService extends JCFMessageService implements MessageServ
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("파일을 불러올수 수 없습니다: " + e.getMessage());
         }
         return loadTxt;
     }
     @Override
-    public void saveMessageTxt() {
+    public void saveMessageText() {
+
+
+
+
+
+
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8))) {
 
@@ -149,19 +203,22 @@ public class FileMessageService extends JCFMessageService implements MessageServ
                 messageData.put("messageBody", message.getMessageBody());
                 messageData.put("senderName", message.getSenderName());
                 messageData.put("receiverName", message.getReceiverName());
-                messageData.put("senderId", message.getSenderID() != null ? message.getSenderID() : null);
-                messageData.put("receiverId", message.getReceiverID() != null ? message.getReceiverID() : null);
+                messageData.put("senderId", message.getSenderId() != null ? message.getSenderId() : null);
+                messageData.put("receiverId", message.getReceiverId() != null ? message.getReceiverId() : null);
 
+                messageData.put("binaryContents", message.getBinaryConetentIdList());
 
-                saveData.put(entry.getKey(), messageData);
+                saveData.put(entry.getKey(),messageData);
             }
+
+
 
             ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
             String jsonString = writer.writeValueAsString(saveData);
             bw.write(jsonString);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("파일을 불러올수 수 없습니다: " + e.getMessage());
         }
     }
 
