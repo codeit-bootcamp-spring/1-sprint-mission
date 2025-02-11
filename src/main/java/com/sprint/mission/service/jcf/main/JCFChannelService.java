@@ -1,20 +1,21 @@
 package com.sprint.mission.service.jcf.main;
 
 
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.file.FileUserRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.dto.request.ChannelDto;
+import com.sprint.mission.service.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.service.dto.response.FindChannelDto;
 import com.sprint.mission.service.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.service.dto.response.FindPublicChannelDto;
 import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.exception.DuplicateName;
 import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.service.file.FileUserService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,9 +35,11 @@ public class JCFChannelService implements ChannelService {
     private final JCFUserService userService;
     private final JCFUserRepository userRepository;
     private final UserStatusService userStatusService;
+    private final FileUserRepository fileUserRepository;
+    private final FileUserService fileUserService;
 
-    //@Override
-    public Channel create(ChannelDto dto) {
+    @Override
+    public Channel create(ChannelDtoForRequest dto) {
         // PRIVATE 채널을 생성할 때:
         // [] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
         // ????? 채널을 생성했는데 어떻게 바로 User가 있지???
@@ -44,8 +47,8 @@ public class JCFChannelService implements ChannelService {
         return channelRepository.save(channel);
     }
 
-    //@Override
-    public void update(ChannelDto dto) {
+    @Override
+    public void update(ChannelDtoForRequest dto) {
         channelRepository.findById(dto.getChannelId())
                 .map((updatingChannel) -> {
                     updatingChannel.setName(dto.getName());
@@ -57,14 +60,14 @@ public class JCFChannelService implements ChannelService {
                 .orElseThrow(NotFoundId::new);
     }
 
-    //@Override
+    @Override
     public FindChannelDto findById(UUID id) {
         return channelRepository.findById(id)
                 .map((findChannel) -> getFindChannelDto(findChannel))
                 .orElse(new FindPublicChannelDto());
     }
 
-    //@Override
+    @Override
     public List<FindChannelDto> findAll() {
         return channelRepository.findAll().stream()
                 .map((channel) -> getFindChannelDto(channel))
@@ -77,6 +80,7 @@ public class JCFChannelService implements ChannelService {
      * [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
      */
     public List<FindChannelDto> findAllByUserId(UUID userId) {
+
         ArrayList<FindChannelDto> findChannelListDto = channelRepository.findAll().stream()
                 .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
                 .map((channel) -> getFindChannelDto(channel))
@@ -97,11 +101,19 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-    //@Override
-    public void delete(Channel channel) {
+    @Override
+    public void delete(UUID channelId) {
         //channel.getUsersImmutable().stream().forEach(user -> user.removeChannel(channel));
         //deletingChannel.removeAllUser();
-        channelRepository.delete(channel);
+        Channel deletingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+
+        deletingChannel.getUserList().forEach(user -> {
+                    user.getChannels().remove(deletingChannel);
+                    userRepository.save(user);
+                    // JPA 쓰고 싶다....
+                });
+
+        channelRepository.delete(channelId);
     }
 
     public void addUser(User user, Channel channel) {

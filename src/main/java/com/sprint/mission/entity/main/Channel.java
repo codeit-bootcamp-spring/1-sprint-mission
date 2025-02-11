@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.main;
 
+import com.sprint.mission.service.dto.request.ChannelDtoForRequest;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,26 +34,29 @@ public class Channel implements Serializable {
         this.updatedAt = Instant.now();
     }
 
+    public static Channel createChannelByRequestDto(ChannelDtoForRequest dto) {
+        return new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
+    }
+
     // 양방향은 channel에서만
-    public void addUser(User user){
-        if (!userList.contains(user)){
-            userList.add(user);
-            user.getChannels().add(this);
-            user.changeReadStatus(id); // 흠 등록과 동시에 넣는게 흠
-        }
+    public void addUser(User user) {
+        //if (!userList.contains(user))
+        userList.add(user);
+        user.getChannels().add(this);
+        user.changeReadStatus(id); // 흠 등록과 동시에 넣는게 흠
     }
 
-    public void dropUser(User user){
-        if (userList.contains(user)){
-
-        }
+    public void removeUser(User user) {
+        //if (userList.contains(user))
+        userList.remove(user);
+        user.getChannels().remove(this);
     }
 
-    public int countUser(){
+    public int countUser() {
         return userList.size();
     }
 
-    public void updateLastMessageTime(){
+    public void updateLastMessageTime() {
         lastMessageTime = Instant.now();
     }
 }

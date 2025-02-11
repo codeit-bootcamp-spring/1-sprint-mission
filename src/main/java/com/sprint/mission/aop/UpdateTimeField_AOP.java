@@ -30,7 +30,6 @@ public class UpdateTimeField_AOP {
     public void setTimeLog(JoinPoint joinPoint){
         Object[] args = joinPoint.getArgs();
 
-
         for (Object target : args) {
             switch (target){
 

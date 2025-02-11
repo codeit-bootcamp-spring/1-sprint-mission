@@ -14,7 +14,7 @@ public interface ChannelRepository {
     List<Channel> findAll() throws IOException;
     //Channel updateChannelName(Channel updatingChannel);
 
-    void delete(Channel deletingChannel);
+    void delete(UUID channelId);
 
     boolean existsById(UUID id);
 }

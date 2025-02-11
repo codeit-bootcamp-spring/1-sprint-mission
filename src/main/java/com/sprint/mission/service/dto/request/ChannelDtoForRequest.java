@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-public class ChannelDto {
+public class ChannelDtoForRequest {
 
     private UUID channelId;
     private ChannelType channelType;

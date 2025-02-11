@@ -8,17 +8,18 @@ import lombok.Setter;
 @Setter
 public class UserDtoForRequest {
 
-    private final String username;
-    private final String password;
-    private final String email;
+    private String username;
+    private String password;
+    private String email;
     // 프로필 이미지
     private BinaryProfileContent profileImg;
+//
+//    public UserDtoForRequest(String username, String password, String email) {
+//        this.username = username;
+//        this.password = password;
+//        this.email = email;
+//    }
 
-    public UserDtoForRequest(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
 
     @Override
     public String toString() {

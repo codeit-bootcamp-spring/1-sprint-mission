@@ -45,7 +45,6 @@ public class User implements Serializable {
         return new User(dto.getUsername(), dto.getPassword(), dto.getEmail());
     }
 
-
     public void setAll(String name, String password, String email) {
         this.password = password;
         this.name = name;
