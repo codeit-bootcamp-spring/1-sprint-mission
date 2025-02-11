@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.global.error.exception;
 
 import com.sprint.mission.discodeit.global.error.ErrorCode;
-import lombok.Getter;
 
-@Getter
 public class BusinessException extends RuntimeException {
 
     protected final ErrorCode errorCode;

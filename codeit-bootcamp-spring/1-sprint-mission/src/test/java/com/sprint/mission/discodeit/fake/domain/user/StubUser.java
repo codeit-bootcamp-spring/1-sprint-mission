@@ -19,14 +19,14 @@ public class StubUser {
     private static final LocalDate BIRTH_DATE = LocalDate.of(2000, 1, 1);
 
     public static User generateUser() {
-        return User.builder()
-            .username(new Username(USER_NAME))
-            .nickname(new Nickname(NICK_NAME))
-            .email(new Email(EMAIL))
-            .password(new Password(PASSWORD))
-            .birthDate(new BirthDate(BIRTH_DATE))
-            .emailSubscriptionStatus(EmailSubscriptionStatus.SUBSCRIBED)
-            .build();
+        return new User(
+                new Nickname(USER_NAME),
+                new Username(USER_NAME),
+                new Email(EMAIL),
+                new Password(PASSWORD),
+                new BirthDate(BIRTH_DATE),
+                EmailSubscriptionStatus.UNSUBSCRIBED
+        );
     }
 
     public static joinUserRequestDto generateJoinRequestDto() {

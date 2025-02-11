@@ -122,13 +122,13 @@ public class JCFUserService implements UserService {
     }
 
     private User toUserWithPasswordEncode(joinUserRequestDto requestDto) {
-        return User.builder()
-                .username(new Username(requestDto.username()))
-                .nickname(new Nickname(requestDto.nickname()))
-                .email(new Email(requestDto.email()))
-                .password(new Password(passwordEncoder.encode(requestDto.password())))
-                .birthDate(new BirthDate(requestDto.birthDate()))
-                .emailSubscriptionStatus(EmailSubscriptionStatus.UNSUBSCRIBED)
-                .build();
+        return new User(
+                new Nickname(requestDto.nickname()),
+                new Username(requestDto.username()),
+                new Email(requestDto.email()),
+                new Password(passwordEncoder.encode(requestDto.password())),
+                new BirthDate(requestDto.birthDate()),
+                EmailSubscriptionStatus.UNSUBSCRIBED
+        );
     }
 }

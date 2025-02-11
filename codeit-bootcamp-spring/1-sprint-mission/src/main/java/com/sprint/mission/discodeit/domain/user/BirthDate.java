@@ -4,9 +4,7 @@ import com.sprint.mission.discodeit.domain.user.exception.BirthDateInvalidExcept
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.time.LocalDate;
 import java.util.Objects;
-import lombok.Getter;
 
-@Getter
 public class BirthDate {
     private static final int MIN_AGE_RESTRICT = 13;
 
@@ -31,4 +29,7 @@ public class BirthDate {
         }
     }
 
+    public LocalDate getValue() {
+        return value;
+    }
 }

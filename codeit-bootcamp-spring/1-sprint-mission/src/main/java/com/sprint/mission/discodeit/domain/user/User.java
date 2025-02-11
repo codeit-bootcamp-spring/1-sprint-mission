@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
-import lombok.Builder;
 
 public class User implements Serializable {
 
@@ -23,7 +22,6 @@ public class User implements Serializable {
     private final Instant updatedAt;
     private final EmailSubscriptionStatus emailSubscriptionStatus;
 
-    @Builder
     public User(
             Nickname nickname,
             Username username,
