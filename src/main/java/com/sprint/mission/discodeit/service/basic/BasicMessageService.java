@@ -1,46 +1,50 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.dto.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@Service("basicMessageService")
+@Primary
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final MessageRepository messageRepository;
 
-    public BasicMessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
+    private final Map<UUID, MessageDTO> messages = new HashMap<>();
+
+    @Override
+    public void create(MessageDTO messageDTO) {
+        messages.put(messageDTO.getId(), messageDTO);
     }
 
     @Override
-    public void create(Message message) {
-        messageRepository.save(message);
+    public void create(MessageCreateDTO messageCreateDTO) {
+        MessageDTO messageDTO = new MessageDTO(
+                UUID.randomUUID(),
+                messageCreateDTO.getContent(),
+                messageCreateDTO.getSenderId(),
+                messageCreateDTO.getChannelId(),
+                null
+        );
+        create(messageDTO);
     }
 
     @Override
-    public Optional<Message> read(UUID id) {
-        return messageRepository.findById(id);
+    public List<MessageDTO> readAll() {
+        return new ArrayList<>(messages.values());
     }
 
     @Override
-    public List<Message> readAll() {
-        return messageRepository.findAll();
+    public Optional<MessageDTO> read(UUID messageId) {
+        return Optional.ofNullable(messages.get(messageId));
     }
 
     @Override
-    public void update(UUID id, Message message) {
-        if (messageRepository.findById(id).isPresent()) {
-            messageRepository.save(message);
-        } else {
-            throw new IllegalArgumentException("Message not found for ID: " + id);
-        }
-    }
-
-    @Override
-    public void delete(UUID id) {
-        messageRepository.delete(id);
+    public void delete(UUID messageId) {
+        messages.remove(messageId);
     }
 }

@@ -2,68 +2,46 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.*;
 import java.util.*;
 
+@Repository("fileMessageRepository")
 public class FileMessageRepository implements MessageRepository {
-    private final String filePath = "messages.dat";
-    private Map<UUID, Message> data = new HashMap<>();
 
-    public FileMessageRepository() {
-        loadFromFile();
-    }
+    private final Map<UUID, Message> messages = new HashMap<>();
 
     @Override
     public void save(Message message) {
-        data.put(message.getId(), message);
-        saveToFile();
+        messages.put(message.getId(), message);
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        loadFromFile();
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override
     public List<Message> findAll() {
-        loadFromFile();
-        return new ArrayList<>(data.values());
+        return new ArrayList<>(messages.values());
     }
 
     @Override
-    public void update(UUID id, Message message) {
-        if (data.containsKey(id)) {
-            data.put(id, message);
-            saveToFile();
-        } else {
-            throw new IllegalArgumentException("Message not found: " + id);
-        }
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
-        saveToFile();
+    public Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(data);
-        } catch (IOException e) {
-            throw new RuntimeException("Error saving data to file: " + e.getMessage());
-        }
-    }
-
-    private void loadFromFile() {
-        File file = new File(filePath);
-        if (file.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                data = (Map<UUID, Message>) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Error loading data from file, starting fresh: " + e.getMessage());
-            }
-        }
+    @Override
+    public void deleteById(UUID id) {
+        messages.remove(id);
     }
 }

@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: discodeit
+  web:
+    locale: ko_KR
+  mvc:
+    log-request-details: true
+
+  # ✅ H2 Database 설정 제거
+  # datasource:
+  #   url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  #   driver-class-name: org.h2.Driver
+  #   username: sa
+  #   password:
+  # jpa:
+  #   database-platform: org.hibernate.dialect.H2Dialect
+  #   hibernate:
+  #     ddl-auto: update
+  #   properties:
+  #     hibernate:
+  #       dialect: org.hibernate.dialect.H2Dialect
+  #       hbm2ddl:
+  #         auto: update
+  #       show_sql: true
+
+server:
+  port: 8080

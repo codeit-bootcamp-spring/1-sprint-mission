@@ -1,22 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public abstract class BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
-    private final UUID id; // UUID로 고유 식별자
-    private final Long createdAt; // 생성시간
-    private long updateAT; // 수정시간
+    private static final long serialVersionUID = 1L;
 
-    public BaseEntity() {
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    public BaseEntity
+            () {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updateAT = this.createdAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
     }
 
-    public UUID getId() { return id; }
-    public Long getCreatedAt() { return createdAt; }
-    public long getUpdateAT() { return updateAT; }
-    public void setUpdateAT(long updateAT) { this.updateAT = updateAT; }
+    public BaseEntity(UUID id) {
+        this.id = id;
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "BaseEntity{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

@@ -1,21 +1,49 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.springframework.boot' version '3.2.1'  // 최신 Spring Boot 버전
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.sprint.mission'
 version = '1.0-SNAPSHOT'
 
 application {
-    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+    mainClass = 'com.sprint.mission.discodeit.DiscodeitApplication'
 }
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // ✅ Spring Boot Core Dependencies
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'  // Spring Data JPA
+    implementation 'org.springframework.boot:spring-boot-starter-validation'  // Validation starter
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+
+    // ✅ Lombok (컴파일 및 애너테이션 프로세서 설정)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // H2 Database (Optional, used for testing)
+    runtimeOnly 'com.h2database:h2'
+
+    // ✅ Spring Boot Test (JUnit 5 지원)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+java {
+    // ✅ JDK 17 또는 JDK 21을 지원하도록 설정
+    sourceCompatibility = JavaVersion.VERSION_17 // JDK 17 버전 사용
+    targetCompatibility = JavaVersion.VERSION_17 // JDK 17 버전 사용
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs '-Dfile.encoding=UTF-8'
 }
 
 test {

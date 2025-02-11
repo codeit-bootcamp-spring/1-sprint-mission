@@ -1,59 +1,76 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import java.util.*;
 
+@Service("jcfChannelService")
+@RequiredArgsConstructor
 public class JCFChannelService implements ChannelService {
 
-    private static JCFChannelService instance; // 싱글톤 인스턴스
-    private final Map<UUID, Channel> data = new HashMap<>();
+    private final ChannelRepository channelRepository;
 
-    private JCFChannelService() {} // private 생성자
-
-    public static JCFChannelService getInstance() {
-        if (instance == null) {
-            synchronized (JCFChannelService.class) {
-                if (instance == null) {
-                    instance = new JCFChannelService();
-                }
-            }
-        }
-        return instance;
+    @Override
+    public void createPublicChannel(ChannelCreateDTO channelCreateDTO) {
+        Channel channel = new Channel(
+                UUID.randomUUID(),
+                channelCreateDTO.getName(),
+                channelCreateDTO.getDescription(),
+                channelCreateDTO.getCreatorId(),
+                false
+        );
+        channelRepository.save(channel);
     }
 
     @Override
-    public void create(Channel channel) {
-        if (data.containsKey(channel.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 채널입니다: " + channel.getName());
-        }
-        data.put(channel.getId(), channel);
+    public void createPrivateChannel(UUID creatorId, List<UUID> members) {
+        Channel channel = new Channel(
+                UUID.randomUUID(),
+                "Private Channel",
+                "Private Channel for users",
+                creatorId,
+                true
+        );
+        channel.setMembers(members);
+        channelRepository.save(channel);
     }
 
     @Override
-    public Optional<Channel> read(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    public List<ChannelDTO> readAll() {
+        return channelRepository.findAll().stream()
+                .map(channel -> new ChannelDTO(
+                        channel.getId(),
+                        channel.getName(),
+                        channel.getDescription(),
+                        channel.getCreatorId(),
+                        channel.isPublic(),
+                        channel.getCreatedAt(),
+                        channel.getMembers()
+                ))
+                .toList();
     }
 
     @Override
-    public List<Channel> readAll() {
-        return new ArrayList<>(data.values());
+    public Optional<ChannelDTO> read(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .map(channel -> new ChannelDTO(
+                        channel.getId(),
+                        channel.getName(),
+                        channel.getDescription(),
+                        channel.getCreatorId(),
+                        channel.isPublic(),
+                        channel.getCreatedAt(),
+                        channel.getMembers()
+                ));
     }
 
     @Override
-    public void update(UUID id, Channel channel) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("해당 ID의 채널을 찾을 수 없습니다: " + id);
-        }
-        data.put(id, channel);
-    }
-
-    @Override
-    public void delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 채널이 존재하지 않습니다: " + id);
-        }
-        data.remove(id);
+    public void delete(UUID channelId) {
+        channelRepository.deleteById(channelId);
     }
 }

@@ -2,43 +2,59 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Repository("jcfUserRepository")
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data = new HashMap<>();
 
-    // 사용자 저장
+    private final Map<UUID, User> data = new ConcurrentHashMap<>();
+
     @Override
     public void save(User user) {
         data.put(user.getId(), user);
     }
 
-    // 특정 사용자 조회
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
     }
 
-    // 모든 사용자 조회
     @Override
     public List<User> findAll() {
         return new ArrayList<>(data.values());
     }
 
-    // 사용자 수정
     @Override
-    public void update(UUID id, User user) {
-        if (data.containsKey(id)) {
-            data.put(id, user);
-        } else {
-            throw new IllegalArgumentException("User not found: " + id);
-        }
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 
-    // 사용자 삭제
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return data.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return data.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return data.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 }

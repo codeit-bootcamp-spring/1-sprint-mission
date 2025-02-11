@@ -1,40 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.io.Serializable;
+import java.util.UUID;
 
-public class User extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
+@Getter
+@Setter
+@NoArgsConstructor
 
-    private String username;  // 사용자 이름
-    private String email;     // 사용자 이메일
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    public User(String username, String email) {
-        super();
+    private UUID id;
+    private String username;
+    private String email;
+    private UUID profileImageId;
+    private String password;
+
+    // ✅ 기존 생성자
+    public User(UUID id, String username, String email, UUID profileImageId, String password) {
+        this.id = id;
         this.username = username;
         this.email = email;
+        this.profileImageId = profileImageId;
+        this.password = password;
     }
 
-    public String getUsername() { return username; }
-    public String getEmail() { return email; }
+    public User(String username, String email, UUID profileImageId, String password) {
+        this(UUID.randomUUID(), username, email, profileImageId, password);
+    }
 
-    public void updateUsername(String username) {
+    // ✅ 새로운 생성자 추가 (email과 profileImageId 없이 사용자 등록 가능)
+    public User(UUID id, String username, String password) {
+        this.id = id;
         this.username = username;
-        setUpdateAT(System.currentTimeMillis());
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
-        setUpdateAT(System.currentTimeMillis());
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + getId() +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdateAT() +
-                '}';
+        this.password = password;
+        this.email = ""; // 기본값 설정 (필요시 변경 가능)
+        this.profileImageId = null; // 프로필 이미지 기본값
     }
 }
