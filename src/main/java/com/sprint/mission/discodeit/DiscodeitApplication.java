@@ -17,10 +17,9 @@ public class DiscodeitApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-        // ✅ 실행 결과를 보기 위해 직접 메서드를 호출해서 출력
         runTest(context);
 
-        System.out.println("✅ Spring Boot Application 실행 완료");
+        System.out.println("Spring Boot Application 실행 완료");
     }
 
     private static void runTest(ApplicationContext context) {

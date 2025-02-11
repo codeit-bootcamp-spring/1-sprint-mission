@@ -29,9 +29,9 @@ public class Channel implements Serializable {
     }
 
     public void update(String name, String description, ChannelType channelType) {
-        this.name = name != null ? name : this.name;
-        this.description = description != null ? description : this.description;
+        this.name = name;
+        this.description = description;
         this.updatedAt = Instant.now();
-        this.type = channelType != null ? channelType : this.type;
+        this.type = channelType;
     }
 }

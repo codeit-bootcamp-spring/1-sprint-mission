@@ -31,8 +31,8 @@ public class User implements Serializable {
     }
 
     public void update(String name, String email) {
-        this.name = name != null ? name : this.name;
-        this.email = email != null ? email : this.email;
+        this.name = name;
+        this.email = email;
         this.updatedAt = Instant.now();
     }
 }

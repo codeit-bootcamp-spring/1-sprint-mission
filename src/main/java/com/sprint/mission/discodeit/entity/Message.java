@@ -27,7 +27,7 @@ public class Message implements Serializable {
     }
 
     public void update(String content) {
-        this.content = content != null ? content : this.content;
+        this.content = content;
         this.updatedAt = Instant.now();
     }
 }
