@@ -1,23 +1,70 @@
 package com.sprint.mission.discodeit.entity;
 
-// 채팅 사용자 엔티티
-public class User extends BaseEntity {
-    private String name; // 사용자 이름
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-    // 사용자 이름을 초기화하는 생성자
-    public User(String name) {
-        super();
-        this.name = name;
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
+
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    // 사용자 이름을 반환
-    public String getName() {
-        return name;
+    public UUID getId() {
+        return id;
     }
 
-    // 사용자 이름을 설정하고 수정 시간을 업데이트
-    public void setName(String name) {
-        this.name = name;
-        updateTimestamp();
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
