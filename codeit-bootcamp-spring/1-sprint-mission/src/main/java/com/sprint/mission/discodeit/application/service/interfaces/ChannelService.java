@@ -14,15 +14,13 @@ public interface ChannelService {
 
     ChannelCreateResponseDto createPublicChannel(UUID userId, CreateChannelRequestDto requestDto);
 
-    ChannelCreateResponseDto createPrivateChannel(UUID userId);
+    ChannelCreateResponseDto createPrivateChannel(UUID userId, CreateChannelRequestDto requestDto);
 
-    void joinPublicChannel(UUID invitedUserId, InviteChannelRequestDto requestDto);
-
-    void joinPrivateChannel(UUID invitedUserId, InviteChannelRequestDto requestDto);
+    void joinChannel(UUID invitedUserId, InviteChannelRequestDto requestDto);
 
     FoundChannelResponseDto findOneByChannelId(UUID channelId);
 
-    Channel findOneByIdOrThrow(UUID uuid);
+    Channel findOneByChannelIdOrThrow(UUID uuid);
 
     void changeSubject(UUID userId, ChangeChannelSubjectRequestDto requestDto);
 

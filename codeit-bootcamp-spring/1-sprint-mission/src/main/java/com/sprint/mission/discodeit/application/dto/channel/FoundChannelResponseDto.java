@@ -11,6 +11,7 @@ public record FoundChannelResponseDto(
         LocalDateTime lastMessageTime,
         Set<UUID> participatedUserId
 ) {
+    
     public static FoundChannelResponseDto ofPublicChannel(Channel channel, LocalDateTime lastMessageTime) {
         return new FoundChannelResponseDto(channel.getId(), channel.getName(), lastMessageTime, Set.of());
     }

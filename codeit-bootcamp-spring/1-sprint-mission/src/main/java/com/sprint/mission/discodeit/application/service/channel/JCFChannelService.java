@@ -10,7 +10,6 @@ import com.sprint.mission.discodeit.application.dto.channel.InviteChannelRequest
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
-import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelVisibility;
 import com.sprint.mission.discodeit.domain.channel.exception.AlreadyJoinUserException;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
@@ -47,45 +46,30 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public ChannelCreateResponseDto createPublicChannel(UUID userId, CreateChannelRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
-        ChannelType channelType = requestDto.channelType();
-        Channel createChannel = new Channel(requestDto.name(), channelType, foundUser, ChannelVisibility.PUBLIC);
-        Channel savedChannel = channelRepository.save(createChannel);
+        Channel savedChannel = createChannelWithVisibility(userId, requestDto);
+        return ChannelCreateResponseDto.from(savedChannel);
+    }
+
+    // 같은 기능의 중복 메서드 => 요구사항에 두 개로 나누어 두라고 했지만, 로직이 매우 비슷.
+    @Override
+    public ChannelCreateResponseDto createPrivateChannel(UUID userId, CreateChannelRequestDto requestDto) {
+        Channel savedChannel = createChannelWithVisibility(userId, requestDto);
         return ChannelCreateResponseDto.from(savedChannel);
     }
 
     @Override
-    public ChannelCreateResponseDto createPrivateChannel(UUID userId) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel createChannel = Channel.ofPrivateChannel(foundUser, ChannelType.TEXT);
-        Channel savedChannel = channelRepository.save(createChannel);
-        ReadStatus readStatus = new ReadStatus(foundUser, savedChannel);
-        readStatusRepository.save(readStatus);
-        return ChannelCreateResponseDto.from(savedChannel);
-    }
-
-    @Override
-    public void joinPublicChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
+    public void joinChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(invitedUserId);
-        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
-        foundChannel.join(foundUser);
-        channelRepository.save(foundChannel);
-    }
-
-    @Override
-    public void joinPrivateChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(invitedUserId);
-        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsAlreadyJoinUser(foundUser, foundChannel);
         foundChannel.join(foundUser);
-        ReadStatus readStatus = new ReadStatus(foundUser, foundChannel);
-        readStatusRepository.save(readStatus);
+        createAndSaveReadStatus(foundUser, foundChannel);
         channelRepository.save(foundChannel);
     }
 
     @Override
     public FoundChannelResponseDto findOneByChannelId(UUID channelId) {
-        Channel foundChannel = findOneByIdOrThrow(channelId);
+        Channel foundChannel = findOneByChannelIdOrThrow(channelId);
         return toFoundChannelResponseDto(foundChannel);
     }
 
@@ -96,7 +80,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel findOneByIdOrThrow(UUID id) {
+    public Channel findOneByChannelIdOrThrow(UUID id) {
         return channelRepository.findOneById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.NOT_FOUND));
     }
@@ -104,7 +88,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void changeSubject(UUID userId, ChangeChannelSubjectRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         foundChannel.updateSubject(requestDto.subject());
         channelRepository.save(foundChannel);
@@ -113,7 +97,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void changeChannelName(UUID userId, ChangeChannelNameRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         foundChannel.updateName(requestDto.channelName());
         channelRepository.save(foundChannel);
@@ -122,7 +106,7 @@ public class JCFChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID userId, DeleteChannelRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         readStatusRepository.deleteByChannel(foundChannel);
         messageRepository.deleteByChannel(foundChannel);
@@ -148,5 +132,20 @@ public class JCFChannelService implements ChannelService {
         if (channelRepository.isExistUser(targetUser, targetChannel)) {
             throw new AlreadyJoinUserException(ErrorCode.ALREADY_CHANNEL_JOIN_USER, targetUser.getNicknameValue());
         }
+    }
+
+    private void createAndSaveReadStatus(User foundUser, Channel savedChannel) {
+        ReadStatus readStatus = new ReadStatus(foundUser, savedChannel);
+        readStatusRepository.save(readStatus);
+    }
+
+    private Channel createChannelWithVisibility(UUID userId, CreateChannelRequestDto requestDto) {
+        User foundUser = userService.findOneByIdOrThrow(userId);
+        Channel createChannel = requestDto.visibility() == ChannelVisibility.PUBLIC ?
+                Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser) :
+                Channel.ofPrivateChannel(foundUser, requestDto.channelType());
+        Channel savedChannel = channelRepository.save(createChannel);
+        createAndSaveReadStatus(foundUser, savedChannel);
+        return savedChannel;
     }
 }

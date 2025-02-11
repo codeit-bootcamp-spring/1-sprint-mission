@@ -29,7 +29,7 @@ public class Channel implements Serializable {
     private final ChannelVisibility visibility;
     private final ParticipatedUser participatedUser;
 
-    public Channel(
+    private Channel(
             String name,
             ChannelType type,
             User manager,
@@ -45,6 +45,10 @@ public class Channel implements Serializable {
         updatedAt = Instant.now();
         this.manager = manager;
         participatedUser = new ParticipatedUser();
+    }
+
+    public static Channel ofPublicChannel(String name, ChannelType type, User user) {
+        return new Channel(name, type, user, ChannelVisibility.PUBLIC);
     }
 
     public static Channel ofPrivateChannel(User manager, ChannelType type) {
@@ -84,7 +88,7 @@ public class Channel implements Serializable {
     }
 
     private void validate(String name) {
-        if (Objects.isNull(name) || name.isBlank()) {
+        if (Objects.isNull(name)) {
             throw new ChannelNameInvalidException(ErrorCode.INVALID_CHANNEL_NAME_NOT_NULL, name);
         }
     }

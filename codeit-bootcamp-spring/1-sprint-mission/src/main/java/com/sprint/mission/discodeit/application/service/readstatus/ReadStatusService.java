@@ -29,7 +29,7 @@ public class ReadStatusService {
 
     public void updateLastReadTime(UUID userId, ReadStatusUpdateRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel foundChannel = channelService.findOneByIdOrThrow(requestDto.channelId());
+        Channel foundChannel = channelService.findOneByChannelIdOrThrow(requestDto.channelId());
         ReadStatus readStatus = findOneByUserIdAndChannelId(foundUser, foundChannel).orElseGet(() -> new ReadStatus(foundUser, foundChannel));
         readStatus.updateLastReadAt(Instant.now());
         readStatusRepository.save(readStatus);

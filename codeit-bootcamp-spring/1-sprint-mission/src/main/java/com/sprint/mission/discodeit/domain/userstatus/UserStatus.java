@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.domain.userstatus;
 
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.enums.OnlineStatus;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -33,7 +34,7 @@ public class UserStatus {
     }
 
     public OnlineStatus getOnlineStatus() {
-        if (lastAccessedAt.isAfter(Instant.now().minus(5, ChronoUnit.MINUTES))) {
+        if (Duration.between(createdAt, Instant.now()).toMinutes() <= 5L) {
             return OnlineStatus.ONLINE;
         }
         return OnlineStatus.OFFLINE;
