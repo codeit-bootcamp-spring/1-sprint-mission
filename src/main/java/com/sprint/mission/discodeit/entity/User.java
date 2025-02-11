@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import lombok.Getter;
@@ -68,7 +69,7 @@ public class User implements Serializable {
     //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
     private void updateBinaryContent(String newFilePath) {
         if (newFilePath != null) {
-            this.binaryContent = new BinaryContent(this.id, newFilePath.toString());
+            this.binaryContent = new BinaryContent(new BinaryContentCreateDTO(id, newFilePath));
         }
     }
 

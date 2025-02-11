@@ -8,6 +8,10 @@ import java.util.UUID;
 public interface UserRepository {
     User save(User user);
     User findbyId(UUID uuid);
+
+    Boolean existByUserId(UUID userId);
+    boolean existsByUsername(String username);
+
     Map<UUID, User> load();
     void delete(UUID id);
 }

@@ -9,6 +9,9 @@ public interface UserStatusRepository {
 
     UserStatus save(UserStatus userStatus);
     UserStatus findById(UUID id);
+    UserStatus findByUserId(UUID userId);
     Map<UUID, UserStatus> load();
+
+    Boolean existsByUserId(UUID userId);
     void delete(UUID id);
 }

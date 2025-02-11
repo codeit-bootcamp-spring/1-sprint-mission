@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +26,17 @@ public class UserStatus {
         this.userId=userId;
         this.createdAt = Instant.now();
         this.lastAccessedAt=Instant.now();
-        isOnline();
+        this.onlineStatus=isOnline();
+    }
+
+    public UserStatus(UserStatusCreateDTO userStatusCreateDTO) {
+        this.id=UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt=this.createdAt;
+
+        this.userId=userStatusCreateDTO.userId();
+        this.lastAccessedAt=userStatusCreateDTO.lastAccessedAt();
+        this.onlineStatus=isOnline();
     }
 
     //유저 온라인 상태 반환. 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 판별하는 메서드.
@@ -37,5 +49,11 @@ public class UserStatus {
             else onlineStatus=false;
         }
         return onlineStatus;
+    }
+
+    public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
+
+
+
     }
 }

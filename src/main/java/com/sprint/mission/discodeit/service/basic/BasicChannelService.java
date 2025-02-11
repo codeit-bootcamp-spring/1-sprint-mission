@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -23,14 +25,26 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
         Channel channel = new Channel(channelCreateDTO, ChannelType.PRIVATE);
-        //ReadStatus서비스 가져와서 크리에이트?
+
+        createReadStatus(channel, channelCreateDTO);
+
         return channelRepository.save(channel);
     }
 
     @Override
     public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
         Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
+
+        createReadStatus(channel, channelCreateDTO);
         return channelRepository.save(channel);
+    }
+
+    //ReadStatus서비스에서 ReadStatus를 크리에이트
+    private void createReadStatus(Channel channel, ChannelCreateDTO channelCreateDTO) {
+        List<User> userList = channelCreateDTO.userList();
+        for(User user :userList){
+            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), user.getId() ));
+        }
     }
 
     @Override

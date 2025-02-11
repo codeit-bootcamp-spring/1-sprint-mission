@@ -41,6 +41,19 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public Boolean existByUserId(UUID userId) {
+        return load().values().stream()
+                .anyMatch(user-> user.getId().equals(userId));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return load().values().stream()
+                .anyMatch(user -> user.getUserName().equals(username));
+    }
+
+
+    @Override
     public Map<UUID, User> load() {
         File file = new File(fileName);
 
