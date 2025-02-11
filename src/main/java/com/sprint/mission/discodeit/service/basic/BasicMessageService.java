@@ -5,17 +5,17 @@ import com.sprint.mission.discodeit.repository.BaseRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.file.FileService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService{
     private final MessageRepository repository;
-
-    public BasicMessageService(MessageRepository repository) {
-        this.repository = repository;
-    }
 
     @Override
     public Message create(Message message) {

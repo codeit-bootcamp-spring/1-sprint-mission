@@ -4,12 +4,16 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
-import org.checkerframework.checker.units.qual.A;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
 
 import java.io.*;
 import java.sql.Array;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name="repository.type", havingValue = "file", matchIfMissing = true)
 public class FileMessageRepository implements MessageRepository, FileService<Message> {
     private static final String MESSAGE_SAVE_FILE = "config/message.ser";
 

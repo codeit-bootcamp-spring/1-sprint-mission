@@ -3,10 +3,14 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name = "repository.type", havingValue = "file", matchIfMissing = true)
 public class FileUserRepository implements UserRepository, FileService<User> {
     private static final String USER_SAVE_FILE = "config/user.ser";
 
@@ -100,6 +104,7 @@ public class FileUserRepository implements UserRepository, FileService<User> {
             User existingUser = users.get(id);
             // 기존 사용자 정보를 수정
             existingUser.setUsername(modifiedUser.getUsername());
+            existingUser.setPassword(modifiedUser.getPassword());
             existingUser.setEmail(modifiedUser.getEmail());
             existingUser.setPhoneNumber(modifiedUser.getPhoneNumber());
             existingUser.setAddr(modifiedUser.getAddr());

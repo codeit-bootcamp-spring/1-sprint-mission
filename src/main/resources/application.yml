@@ -1,0 +1,6 @@
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+repository:
+  type : jcf  # jcf or file

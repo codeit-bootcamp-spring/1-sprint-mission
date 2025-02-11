@@ -5,10 +5,14 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 import org.checkerframework.checker.units.qual.C;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name="repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository, FileService<Channel> {
     private static final String CHANNEL_SAVE_FILE = "config/channel.ser";
 
