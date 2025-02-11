@@ -2,12 +2,15 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryMessageRepository;
-import com.sprint.mission.service.dto.request.BinaryContentDto;
+import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
+import com.sprint.mission.service.exception.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,21 +26,23 @@ public class BinaryMessageService {
 
     private final BinaryMessageRepository repository;
 
-    public void findById(UUID messageId){
-        BinaryMessageContent findContent = repository.findById(messageId);
-        // return할 땐 dto로
+    public BinaryMessageContentDto findById(UUID messageId){
+        return repository.findById(messageId)
+                .map((bmc) -> new BinaryMessageContentDto(bmc))
+                .orElseThrow(NotFoundId::new);
     }
 
-    public void findAll(){
-        List<BinaryMessageContent> findAllContent = repository.findAllByIdIn();
+    public List<BinaryMessageContentDto> findAll(){
+         return repository.findAll().stream()
+                 .map((bmc) -> new BinaryMessageContentDto(bmc))
+                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void delete(UUID messageId){
         repository.delete(messageId);
     }
 
-    public void create(BinaryContentDto dto){
-        repository.save(new BinaryMessageContent(dto.getId(), dto.getBinaryContent().getBytes()));
+    public void create(BinaryMessageContentDto dto){
+        repository.save(new BinaryMessageContent(dto));
     }
-
 }

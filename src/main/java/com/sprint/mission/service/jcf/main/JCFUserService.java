@@ -1,14 +1,15 @@
 package com.sprint.mission.service.jcf.main;
 
 
-import com.sprint.mission.aop.annotation.TraceAnnotation;
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
-import com.sprint.mission.service.dto.request.BinaryContentDto;
+import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
+import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.service.dto.request.UserDtoForRequest;
 import com.sprint.mission.service.dto.response.FindUserDto;
+import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -34,8 +34,8 @@ public class JCFUserService {
         User user = User.createUserByRequestDto(userDto);
 
         // 선택적 프로필 생성
-        BinaryContent profileImg = userDto.getProfileImg();
-        if (!(profileImg == null)) profileService.create(new BinaryContentDto(user.getId(), profileImg));
+        BinaryProfileContent profileImg = userDto.getProfileImg();
+        if (!(profileImg == null)) profileService.create(new BinaryProfileContentDto(profileImg));
 
         // UserStatus 생성
         userStatusService.create(user.getId());
@@ -45,11 +45,17 @@ public class JCFUserService {
 
     public void update(UUID userId, UserDtoForRequest dto) {
         isDuplicateNameEmail(dto);
-        userRepository.findById(userId).ifPresentOrElse((user) -> {
-            user.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
-            if (dto.getProfileImg() != null) profileService.create(new BinaryContentDto(userId, dto.getProfileImg()));
-            userRepository.save(user);
-        }, () -> log.info("Fail to update User : NoSuchUserId"));
+
+        userRepository.findById(userId)
+                .map((user) -> {
+
+                    user.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
+                    if (dto.getProfileImg() != null) {
+                        profileService.create(new BinaryProfileContentDto(dto.getProfileImg()));
+                    }
+                    return userRepository.save(user);
+                })
+                .orElseThrow(NotFoundId::new);
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기

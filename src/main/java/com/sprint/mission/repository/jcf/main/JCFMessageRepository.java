@@ -4,11 +4,13 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.service.exception.NotFoundId;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Repository
 public class JCFMessageRepository implements MessageRepository{
 
@@ -21,10 +23,10 @@ public class JCFMessageRepository implements MessageRepository{
     }
 
     @Override
-    public Message findById(UUID id){
-        Message message = data.get(id);
-        if (message == null) throw new NotFoundId("Cannot find Message : incorrect MessageId");
-        return message;
+    public Optional<Message> findById(UUID id){
+        return Optional.ofNullable(data.get(id));
+//        if (message == null) throw new NotFoundId("Cannot find Message : incorrect MessageId");
+//        return message;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class JCFMessageRepository implements MessageRepository{
     }
 
 
-    public List<Message> findAllByChannelId(Channel channel){
+    public List<Message> findAllByChannel(Channel channel){
         return data.values().stream()
                 .filter(message -> message.getWrittenPlace().equals(channel))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -41,7 +43,8 @@ public class JCFMessageRepository implements MessageRepository{
 
     @Override
     public void delete(UUID messageId) {
-        data.remove(messageId);
+        Message remove = data.remove(messageId);
+        log.info("[Remove Message]  content : {}", remove.getContent());
     }
 
     @Override

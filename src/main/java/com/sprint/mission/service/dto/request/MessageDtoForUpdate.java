@@ -3,11 +3,13 @@ package com.sprint.mission.service.dto.request;
 import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 public class MessageDtoForUpdate {
     private UUID messageId;
     private String changeContent;
-    private BinaryMessageContent binaryMessageContent;
+    private List<BinaryMessageContent> binaryMessageContent;
+
 }

@@ -14,8 +14,10 @@ import com.sprint.mission.service.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.service.dto.response.FindPublicChannelDto;
 import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.exception.DuplicateName;
+import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
@@ -23,6 +25,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JCFChannelService implements ChannelService {
@@ -42,23 +45,29 @@ public class JCFChannelService implements ChannelService {
     }
 
     //@Override
-    public Channel update(ChannelDto dto) {
-        Channel updatingChannel = channelRepository.findById(dto.getChannelId());
-        updatingChannel.setName(dto.getName());
-        updatingChannel.setChannelType(dto.getChannelType());
-        updatingChannel.setDescription(dto.getDescription());
-        return channelRepository.save(updatingChannel);
+    public void update(ChannelDto dto) {
+        channelRepository.findById(dto.getChannelId())
+                .map((updatingChannel) -> {
+                    updatingChannel.setName(dto.getName());
+                    updatingChannel.setChannelType(dto.getChannelType());
+                    updatingChannel.setDescription(dto.getDescription());
+                    log.info("{} 수정", updatingChannel);
+                    return channelRepository.save(updatingChannel);
+                })
+                .orElseThrow(NotFoundId::new);
     }
 
     //@Override
     public FindChannelDto findById(UUID id) {
-        Channel findChannel = channelRepository.findById(id);
-        return getFindChannelDto(findChannel);
+        return channelRepository.findById(id)
+                .map((findChannel) -> getFindChannelDto(findChannel))
+                .orElse(new FindPublicChannelDto());
     }
 
     //@Override
     public List<FindChannelDto> findAll() {
-        return channelRepository.findAll().stream().map(JCFChannelService::getFindChannelDto)
+        return channelRepository.findAll().stream()
+                .map((channel) -> getFindChannelDto(channel))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -69,9 +78,9 @@ public class JCFChannelService implements ChannelService {
      */
     public List<FindChannelDto> findAllByUserId(UUID userId) {
         ArrayList<FindChannelDto> findChannelListDto = channelRepository.findAll().stream()
-                        .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
-                        .map((channel) -> getFindChannelDto(channel))
-                        .collect(Collectors.toCollection(ArrayList::new));
+                .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
+                .map((channel) -> getFindChannelDto(channel))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         userRepository.findById(userId).ifPresent((user) -> {
             user.getChannels().stream()
@@ -81,12 +90,10 @@ public class JCFChannelService implements ChannelService {
         return findChannelListDto;
     }
 
-    private static FindChannelDto getFindChannelDto(Channel findChannel) {
-        if (findChannel.getChannelType().equals(ChannelType.PRIVATE)) {
-            return new FindPrivateChannelDto(findChannel);
-        } else {
-            return new FindPublicChannelDto(findChannel);
-        }
+    private FindChannelDto getFindChannelDto(Channel findChannel) {
+        return (findChannel.getChannelType().equals(ChannelType.PRIVATE)
+                ? new FindPrivateChannelDto(findChannel)
+                : new FindPublicChannelDto(findChannel));
     }
 
 
@@ -103,16 +110,17 @@ public class JCFChannelService implements ChannelService {
 
 
     public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId) {
-        Channel findChannel = channelRepository.findById(channelId);
-        if (findChannel.getChannelType().equals(ChannelType.PUBLIC)) {
-            return new HashMap<>();
-        }
+        List<User> userList = channelRepository.findById(channelId)
+                .filter((findChannel) -> !findChannel.getChannelType().equals(ChannelType.PUBLIC))
+                .map(Channel::getUserList)
+                .orElse(new ArrayList<>());
 
         // 유저별 이 채널 마지막 readTime
         Map<FindUserDto, Instant> readTimeMap = new HashMap<>();
-        for (User user : findChannel.getUserList()) {
-            UserStatus userStatus = userStatusService.findById(user.getId());
-            readTimeMap.put(new FindUserDto(user, userStatus.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
+        for (User user : userList) {
+            userStatusService.findById(user.getId()).ifPresentOrElse((userStatus) -> {
+                readTimeMap.put(new FindUserDto(user, userStatus.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
+            }, () -> readTimeMap.put(new FindUserDto(user, false), null));
         }
         return readTimeMap;
     }

@@ -19,15 +19,16 @@ public class BinaryMessageRepository {
 
     private final Map<UUID, BinaryMessageContent> data = new HashMap<>();
 
-    public void save(BinaryMessageContent binaryContent){
+    public BinaryMessageContent save(BinaryMessageContent binaryContent){
         data.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
     }
 
-    public BinaryMessageContent findById(UUID id){
-        return data.get(id);
+    public Optional<BinaryMessageContent> findById(UUID id){
+        return Optional.ofNullable(data.get(id));
     }
 
-    public List<BinaryMessageContent> findAllByIdIn(){
+    public List<BinaryMessageContent> findAll(){
         return new ArrayList<>(data.values());
     }
 

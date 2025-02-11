@@ -16,8 +16,6 @@ public class UserStatusRepository {
 
     public Optional<UserStatus> findById(UUID userId){
         return Optional.of(statusMap.get(userId));
-//        if (userStatus == null) throw new NoSuchElementException("Cannot Find status By UserId");
-//        else return userStatus;
     }
 
     public List<UserStatus> findAll(){

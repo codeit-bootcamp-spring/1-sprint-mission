@@ -6,7 +6,7 @@ public class NotFoundId extends NullPointerException {
     }
 
     public NotFoundId() {
-        super("id를 잘못 입력했습니다.");
+        super("Fail to find : wrong id");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
+import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -7,7 +8,7 @@ import java.util.UUID;
 
 
 @Getter
-public class BinaryMessageContent implements BinaryContent {
+public class BinaryMessageContent{
 
     // 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델
     // 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용
@@ -24,6 +25,13 @@ public class BinaryMessageContent implements BinaryContent {
         this.messageId = messageId;
         this.createdAt = Instant.now();
         this.bytes = bytes;
+    }
+
+    public BinaryMessageContent(BinaryMessageContentDto dto) {
+        this.id = UUID.randomUUID();
+        this.messageId = dto.getMessageId();
+        this.createdAt = Instant.now();
+        this.bytes = dto.getBytes();
     }
 
 }

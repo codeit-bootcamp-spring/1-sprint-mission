@@ -1,10 +1,12 @@
 package com.sprint.mission.repository.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Slf4j
 @Repository
 public class BinaryProfileRepository {
 
@@ -19,20 +21,21 @@ public class BinaryProfileRepository {
 
     private final Map<UUID, BinaryProfileContent> data = new HashMap<>();
 
-
-    public void save(BinaryProfileContent binaryContent){
+    public BinaryProfileContent save(BinaryProfileContent binaryContent){
         data.put(binaryContent.getId(), binaryContent);
+        return binaryContent;
     }
 
-    public BinaryProfileContent findById(UUID id){
-        return data.get(id);
+    public Optional<BinaryProfileContent> findById(UUID id){
+        return Optional.ofNullable(data.get(id));
     }
 
-    public List<BinaryProfileContent> findAllByIdIn(){
+    public List<BinaryProfileContent> findAll(){
         return new ArrayList<>(data.values());
     }
 
     public void delete(UUID id){
         data.remove(id);
+        log.info("[Remove BinaryProfile]");
     }
 }

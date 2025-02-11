@@ -2,15 +2,17 @@ package com.sprint.mission.service.dto.response;
 
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
+import lombok.Getter;
 
 import java.time.Instant;
 
+@Getter
 public class FindPublicChannelDto implements FindChannelDto {
 
-    private final ChannelType channelType;
-    private final String description;
-    private final String name;
-    private final Instant lastMessageTime;
+    private ChannelType channelType;
+    private String description;
+    private String name;
+    private Instant lastMessageTime;
 
     public FindPublicChannelDto(Channel channel) {
         this.channelType = channel.getChannelType();
@@ -18,4 +20,8 @@ public class FindPublicChannelDto implements FindChannelDto {
         this.name = channel.getName();
         this.lastMessageTime = channel.getLastMessageTime();
     }
+
+    public FindPublicChannelDto() {}
+
+
 }

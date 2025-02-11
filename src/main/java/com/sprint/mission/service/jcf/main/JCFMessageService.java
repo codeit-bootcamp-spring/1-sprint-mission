@@ -7,15 +7,18 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
-import com.sprint.mission.service.dto.request.BinaryContentDto;
+import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.service.dto.request.MessageDtoForCreate;
 import com.sprint.mission.service.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JCFMessageService {
@@ -29,39 +32,53 @@ public class JCFMessageService {
     public void create(MessageDtoForCreate responseDto) {
         // FindChannelDto byId = channelService.findById(dto.getChannelId());
         // 아직 컨트롤러가 없어서 Sevice 이용하면 DTO 반환...
-        Channel writtenChannel = channelRepository.findById(responseDto.getChannelId());
-        User writer = userRepository.findById(responseDto.getUserId());
+        // [ ] 선택적으로 여러 개의 첨부파일을 같이 등록할 수 있습니다.
+        // [ ] DTO를 활용해 파라미터를 그룹화합니다.
+        Channel writtenChannel = channelRepository.findById(responseDto.getChannelId())
+                .orElseThrow(() -> new NotFoundId("wrong channelId"));
+        User writer = userRepository.findById(responseDto.getUserId())
+                .orElseThrow(() -> new NotFoundId("wrong userId"));
 
-        Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent());
-        if (responseDto.getBinaryMessageContent() != null){
-            createdMessage.setBinaryContent(responseDto.getBinaryMessageContent());
-            binaryMessageService.create(new BinaryContentDto(createdMessage.getId(), createdMessage.getBinaryContent()));
+        Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent()); // 첨부파일 미포함 메시지
+
+        // 첨부파일 적용
+        List<BinaryMessageContent> bmc = responseDto.getBinaryMessageContent();
+        if (!bmc.isEmpty()) {
+            createdMessage.setBinaryContent(bmc);
+            bmc.forEach((binaryMessageContent)
+                    -> binaryMessageService.create(new BinaryMessageContentDto(binaryMessageContent)));
         }
         messageRepository.save(createdMessage);
     }
 
-    public void update(MessageDtoForUpdate updateDto){
-        Message updatingMessage = messageRepository.findById(updateDto.getMessageId());
+    public void update(MessageDtoForUpdate updateDto) {
+        Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
+                .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
 
-        BinaryMessageContent bmc = updateDto.getBinaryMessageContent();
-        if (bmc != null){
+        List<BinaryMessageContent> bmc = updateDto.getBinaryMessageContent();
+        if (!bmc.isEmpty()) {
+            // message에 첨부파일들 등록
             updatingMessage.setBinaryContent(bmc);
-            binaryMessageService.create(new BinaryContentDto(updatingMessage.getId(), bmc));
+            // binaryMessage 저장소에 저장
+            bmc.forEach((binaryMessageContent) -> {
+                binaryMessageService.create(new BinaryMessageContentDto(binaryMessageContent));
+            });
         }
 
         updatingMessage.setContent(updateDto.getChangeContent());
+
         messageRepository.save(updatingMessage);
     }
 
     //@Override
-    public Message findById(UUID messageId){
+    public Optional<Message> findById(UUID messageId) {
         return messageRepository.findById(messageId);
     }
 
     //@Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        Channel findChannel = channelRepository.findById(channelId);
-        return messageRepository.findAllByChannelId(findChannel);
+        return channelRepository.findById(channelId).map(messageRepository::findAllByChannel)
+                .orElseGet(ArrayList::new);
     }
 
     //@Override

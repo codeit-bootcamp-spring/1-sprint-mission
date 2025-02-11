@@ -2,12 +2,16 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryProfileRepository;
-import com.sprint.mission.service.dto.request.BinaryContentDto;
+import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
+import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
+import com.sprint.mission.service.exception.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +27,24 @@ public class BinaryProfileService {
 
     private final BinaryProfileRepository repository;
 
-    public void create(BinaryContentDto dto){
-        repository.save(new BinaryProfileContent(dto.getId(), dto.getBinaryContent().getBytes()));
+    public void create(BinaryProfileContentDto dto) {
+        repository.save(new BinaryProfileContent(dto));
     }
 
-    public void findById(UUID messageId){
-        BinaryProfileContent findContent = repository.findById(messageId);
-        // return할 땐 dto로
+    public BinaryProfileContentDto findById(UUID userId) {
+        return repository.findById(userId)
+                .map(profileContent
+                        -> new BinaryProfileContentDto(profileContent))
+                .orElseThrow(() -> new NotFoundId("Fail to find : wrong id"));
     }
 
-    public void findAll(){
-        List<BinaryProfileContent> findAllContent = repository.findAllByIdIn();
+    public List<BinaryProfileContentDto> findAll() {
+        return repository.findAll().stream()
+                .map(bpc -> new BinaryProfileContentDto(bpc))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public void delete(UUID messageId){
+    public void delete(UUID messageId) {
         repository.delete(messageId);
     }
 

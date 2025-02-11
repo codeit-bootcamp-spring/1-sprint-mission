@@ -1,19 +1,26 @@
 package com.sprint.mission.service.dto.request;
 
-import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.BinaryMessageContent;
+import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import lombok.Getter;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class BinaryContentDto {
+public class BinaryProfileContentDto {
 
-    private UUID id;
-    private BinaryContent binaryContent;
 
-    public BinaryContentDto(UUID id, BinaryContent binaryContent) {
-        this.id = id;
-        this.binaryContent = binaryContent;
+    private final UUID userId;
+    private final Instant createdAt;
+    private final byte[] bytes;
+
+    public BinaryProfileContentDto(BinaryProfileContent profileContent) {
+        this.userId = profileContent.getUserId();
+        this.createdAt = profileContent.getCreatedAt();
+        this.bytes = profileContent.getBytes();
     }
 
     //

@@ -17,6 +17,7 @@ public class FindUserDto {
     @Setter
     private boolean isOnline;
 
+    // 나중에 USER가 ONLINE 상태 가지도록하면 수정
     public FindUserDto(User user, Boolean isOnline){
         this.name = user.getName();
         this.email = user.getEmail();

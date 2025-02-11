@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,7 +21,7 @@ public class Message implements Serializable, Comparable<Message> {
     private final Instant createAt;
     private Instant updateAt;
 
-    private BinaryMessageContent BinaryContent;
+    private List<BinaryMessageContent> BinaryContent;
     private String content;
 
     // 무조건 메시지는 CREATE로 생성하도록

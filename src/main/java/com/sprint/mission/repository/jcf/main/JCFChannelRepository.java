@@ -3,38 +3,37 @@ package com.sprint.mission.repository.jcf.main;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.service.exception.NotFoundId;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Slf4j
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> data = new HashMap<>();
 
-    @Override
+    @Override // 나중에 void로
     public Channel save(Channel channel) {
         // optional no
-        return data.put(channel.getId(), channel);
+        data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
-        // null 예외처리 여기서 확실히 잡기 : 다른 메서드가 findById 활용을 많이 함
-        Channel findChannel = data.get(id);
-        if (findChannel == null) throw new NotFoundId();
-        else return findChannel;
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
-    public Set<Channel> findAll() {
-        return new HashSet<>(data.values());
+    public List<Channel> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     @Override
     public void delete(Channel deletingChannel) {
-
-        System.out.printf("채널명 %s는 사라집니다.", deletingChannel.getName());
+        log.info("채널명 {}(은)는 사라집니다.", deletingChannel.getName());
         data.remove(deletingChannel.getId());
     }
 
