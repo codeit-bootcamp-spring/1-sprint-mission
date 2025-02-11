@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,7 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    boolean updateUserProfile(UUID id, String name, String email, String password, UserStatus status);
+    boolean updateUserProfile(UUID id, String name, String email, String password);
 
     boolean deleteUser(UUID id);
 }

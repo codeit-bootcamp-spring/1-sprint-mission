@@ -43,16 +43,16 @@ public class DiscodeitApplication {
 		System.out.println("10명의 기본 사용자 등록\n");
 
 		List<User> testUsers = Arrays.asList(
-				new User("김철수", "kim@test.com", "1234", UserStatus.ONLINE),
-				new User("이영희", "lee@test.com", "1234", UserStatus.IDLE),
-				new User("박지성", "park@test.com", "1234", UserStatus.OFFLINE),
-				new User("정민수", "jung@test.com", "1234", UserStatus.ONLINE),
-				new User("강다혜", "kang@test.com", "1234", UserStatus.IDLE),
-				new User("조성민", "cho@test.com", "1234", UserStatus.ONLINE),
-				new User("윤서연", "yoon@test.com", "1234", UserStatus.OFFLINE),
-				new User("장미란", "jang@test.com", "1234", UserStatus.ONLINE),
-				new User("임준호", "lim@test.com", "1234", UserStatus.IDLE),
-				new User("한지민", "han@test.com", "1234", UserStatus.ONLINE)
+				new User("김철수", "kim@test.com", "1234"),
+				new User("이영희", "lee@test.com", "1234"),
+				new User("박지성", "park@test.com", "1234"),
+				new User("정민수", "jung@test.com", "1234"),
+				new User("강다혜", "kang@test.com", "1234"),
+				new User("조성민", "cho@test.com", "1234"),
+				new User("윤서연", "yoon@test.com", "1234"),
+				new User("장미란", "jang@test.com", "1234"),
+				new User("임준호", "lim@test.com", "1234"),
+				new User("한지민", "han@test.com", "1234")
 		);
 
 		testUsers.forEach(user -> {
@@ -67,7 +67,7 @@ public class DiscodeitApplication {
 		System.out.println("\n전체 등록된 사용자 수: " + userService.getAllUsers().size());
 		// 1. 유저 등록
 		System.out.println("\n새 유저 등록 ");
-		User user = new User("홍길동", "gildong@google.com","1234", UserStatus.ONLINE);
+		User user = new User("홍길동", "gildong@google.com","1234");
 		UUID userId = user.getId();
 		User gildongUser = userService.register(user);
 		System.out.printf("사용자 등록 완료 - 이름: %s, 이메일: %s, 상태: %s%n",
@@ -91,7 +91,7 @@ public class DiscodeitApplication {
 
 		// 4. 유저 정보 수정
 		System.out.println("\n유저 정보 수정 ");
-		boolean updateSuccess = userService.updateUserProfile(gildongUser.getId(), "홍길동", "gildong@naver.com", "1234",UserStatus.IDLE);
+		boolean updateSuccess = userService.updateUserProfile(gildongUser.getId(), "홍길동", "gildong@naver.com", "1234");
 		System.out.println("수정 결과 : " + (updateSuccess ? "성공" : "실패"));
 
 		// 5. 수정된 유저 데이터 조회
@@ -158,7 +158,7 @@ public class DiscodeitApplication {
 
 	private void testMessageService() {
 		// 유저 및 채널 등록
-		User author = userService.register(new User("유저1", "user1@google.com", "1234", UserStatus.ONLINE));
+		User author = userService.register(new User("유저1", "user1@google.com", "1234"));
 		Channel channel = channelService.createChannel("채널1", "학습 공간입니다", ChannelType.PUBLIC_THREAD);
 		List<User> allUsers = userService.getAllUsers();
 
@@ -194,10 +194,10 @@ public class DiscodeitApplication {
 
 
 		System.out.println("\n=== 멘션 동작 테스트 ===");
-		User userA = new User("유저A", "userA@example.com", "1234", UserStatus.ONLINE);
+		User userA = new User("유저A", "userA@example.com", "1234");
 		userService.register(userA);
 		System.out.println(userA.getName() + " 등록 완료");
-		User userB = new User("유저B", "userB@example.com", "1234", UserStatus.IDLE);
+		User userB = new User("유저B", "userB@example.com", "1234");
 		userService.register(userB);
 		System.out.println(userB.getName() + " 등록 완료");
 
@@ -216,8 +216,8 @@ public class DiscodeitApplication {
 		messageService.sendMessage(messageAtoB);
 		System.out.println("\n=== 심화 요구 사항 테스트 : MessageService에 채널, 유저 검증 로직 추가 ===");
 		try {
-			User testSender = new User("김진수", "jinsu@gmail.com", "1234", UserStatus.ONLINE);
-			User testReceiver = new User("강동원", "dongwon@hanmail.net", "1234", UserStatus.IDLE);
+			User testSender = new User("김진수", "jinsu@gmail.com", "1234");
+			User testReceiver = new User("강동원", "dongwon@hanmail.net", "1234");
 			userService.register(testSender);
 			userService.register(testReceiver);
 

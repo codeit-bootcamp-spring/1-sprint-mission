@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
@@ -48,9 +47,9 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public boolean updateUserProfile(UUID id, String name, String email, String password, UserStatus status) {
+    public boolean updateUserProfile(UUID id, String name, String email, String password) {
         boolean updated = data.computeIfPresent(id, (key, user) -> {
-            user.update(name, email, password, status);
+            user.update(name, email, password);
             return user;
         }) != null;
         if (updated) saveData();

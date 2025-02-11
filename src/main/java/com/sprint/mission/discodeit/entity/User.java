@@ -11,21 +11,18 @@ public class User extends BaseEntity {
     private String name;
     private String email;
     private String password;
-    private UserStatus status;
 
-    public User(String name, String email, String password, UserStatus status) {
+    public User(String name, String email, String password) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.status = status;
     }
 
-    public void update(String name, String email, String password, UserStatus status) {
+    public void update(String name, String email, String password) {
         if (name != null) this.name = name;
         if (email != null) this.email = email;
         if (password != null) this.password = password;
-        if (status != null) this.status = status;
         updateTimeStamp();
     }
 }

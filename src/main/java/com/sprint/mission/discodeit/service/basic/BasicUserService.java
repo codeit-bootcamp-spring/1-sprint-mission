@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +33,11 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public boolean updateUserProfile(UUID id, String name, String email, String password, UserStatus status) {
+    public boolean updateUserProfile(UUID id, String name, String email, String password) {
         Optional<User> byId = userRepository.findById(id);
         if(byId.isPresent()){
             User user = byId.get();
-            user.update(name, email, password, status);
+            user.update(name, email, password);
             userRepository.save(user);
             return true;
         }
