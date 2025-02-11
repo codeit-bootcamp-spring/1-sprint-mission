@@ -44,20 +44,19 @@ public class BasicUserService implements UserService {
     public User createUser(CreatedUserDataDTO data, ProfileImageDTO proFile) {
         try {
             userValidator.validateUser(data.name(), data.email(), data.password());
+            User user = new User(data.name(), data.email(), data.id(), data.password());
+            userRepository.save(user);
+
+            if(proFile != null){
+                binaryContentService.created(proFile);
+            }
+            UserIdDTO statusDTO = new UserIdDTO(user.getId());
+            userStatusService.created(statusDTO);
+            return user;
         }catch (CustomException e){
             System.out.println("유저생성 실패 -> " + e.getMessage());
+            return null;
         }
-        User user = new User(data.name(), data.email(), data.id(), data.password());
-        userRepository.save(user);
-
-        if(proFile != null){
-            binaryContentService.created(proFile);
-        }
-        // 유저생성하고 UserStatus를 같이 생성합니다.
-        UserIdDTO statusDTO = new UserIdDTO(user.getId());
-        userStatusService.created(statusDTO);
-        return user;
-
     }
 
 

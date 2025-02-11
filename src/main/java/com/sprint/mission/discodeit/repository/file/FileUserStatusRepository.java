@@ -17,7 +17,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private final Path MAP_DIRECTORY;
     private final Path MAP_FILE;
     //Map<userId, userStatusId>
     private final Map<UUID, UUID> userStatusMap;
@@ -25,7 +24,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     public FileUserStatusRepository(){
         this.userStatusMap = new HashMap<>();
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", UserStatus.class.getSimpleName());
-        this.MAP_DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", "map");
+        Path MAP_DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", "map");
         this.MAP_FILE = MAP_DIRECTORY.resolve("userStatusMap.ser");
         init(DIRECTORY);
         init(MAP_DIRECTORY);

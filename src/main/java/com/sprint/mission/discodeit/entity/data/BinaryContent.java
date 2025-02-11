@@ -14,17 +14,16 @@ public class BinaryContent {
     private final UUID targetUUID;
     private final String fileName;
     private final String fileType;
+    private final ContentType contentType;
 
-    // 레포지토리에 저장시 음 User 프로필인지,Message 첨부파일지 구분해서 저장하게..?
-
-    public BinaryContent(String filename,String fileType, UUID targetUUID, byte[] data){
-        this.targetUUID = targetUUID;
+    public BinaryContent
+            (ContentType contentType,UUID targetId, String filename, String fileType, byte[] data){
+        this.contentType = contentType;
+        this.targetUUID = targetId;
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.fileType =fileType;
         this.fileName = filename;
         this.data = data;
     }
-
-
 }

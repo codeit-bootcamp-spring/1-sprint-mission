@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 public class BasicBinaryContentService implements BinaryContentService {
 
     public BinaryContent created(ProfileImageDTO data){
-        BinaryContent image = new BinaryContent(data.filename(),data.fileType(),data.targetUUID(), data.data());
+        BinaryContent image =
+                new BinaryContent(data.contentType(),
+                        data.targetUUID(), data.filename(),data.fileType(), data.data());
         return image;
     }
 
