@@ -6,8 +6,11 @@ import com.sprint.mission.discodeit.repository.message.interfaces.MessageReposit
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
-public class InMemoryMessageRepository implements MessageRepository {
+@Repository
+public class MessageInMemoryRepository implements MessageRepository {
+
     @Override
     public Message save(Message message) {
         return null;

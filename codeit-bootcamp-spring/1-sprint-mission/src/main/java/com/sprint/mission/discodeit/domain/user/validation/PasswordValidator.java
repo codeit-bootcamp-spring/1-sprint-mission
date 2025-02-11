@@ -22,4 +22,5 @@ public class PasswordValidator {
             throw new PassWordInvalidException(ErrorCode.WEAK_PASSWORD, password);
         }
     }
+
 }

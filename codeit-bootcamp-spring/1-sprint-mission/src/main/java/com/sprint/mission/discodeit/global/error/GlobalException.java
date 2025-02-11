@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.global.error;
 
 import com.sprint.mission.discodeit.global.error.exception.EntityNotFoundException;
 import com.sprint.mission.discodeit.global.error.exception.InvalidException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +29,7 @@ public class GlobalException {
     protected ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
         ErrorResponse errorResponse = new ErrorResponse(exception.getErrorCode().getDescription(),
                 exception.getErrorCode().getStatus());
-        return ResponseEntity.status(404).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

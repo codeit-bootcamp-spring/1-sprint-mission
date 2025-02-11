@@ -5,13 +5,7 @@ import com.sprint.mission.discodeit.global.error.ErrorCode;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
-@Getter
-@EqualsAndHashCode(of = {"value"})
-@ToString(of = {"value"})
 public class Nickname {
 
     private static final int MAX_LENGTH = 32;
@@ -62,5 +56,33 @@ public class Nickname {
                 throw new NickNameInvalidException(ErrorCode.INVALID_NICKNAME_FORMAT, value);
             }
         }
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Nickname nickname = (Nickname) o;
+        return Objects.equals(value, nickname.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value);
+    }
+
+    @Override
+    public String toString() {
+        return "Nickname{" +
+                "value='" + value + '\'' +
+                '}';
     }
 }

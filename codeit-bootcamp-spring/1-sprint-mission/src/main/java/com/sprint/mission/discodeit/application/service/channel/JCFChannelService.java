@@ -23,7 +23,9 @@ import com.sprint.mission.discodeit.repository.readstatus.interfaces.ReadStatusR
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class JCFChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
@@ -87,7 +89,7 @@ public class JCFChannelService implements ChannelService {
         return toFoundChannelResponseDto(foundChannel);
     }
 
-    public List<FoundChannelResponseDto> findAllByChannelId(UUID userId) {
+    public List<FoundChannelResponseDto> findAllByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAllByUserId(userId);
         // 채널 한 개당 메세지를 조회해오는 N + 1
         return channels.stream().map(this::toFoundChannelResponseDto).toList();

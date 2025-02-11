@@ -10,7 +10,7 @@ public interface ChannelRepository {
 
     Channel save(Channel channel);
 
-    Optional<Channel> findOneById(UUID uuid);
+    Optional<Channel> findOneById(UUID channelId);
 
     List<Channel> findAllByUserId(UUID userId);
 

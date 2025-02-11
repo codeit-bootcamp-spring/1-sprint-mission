@@ -5,9 +5,11 @@ import com.sprint.mission.discodeit.application.dto.user.ChangePasswordRequestDt
 import com.sprint.mission.discodeit.application.dto.user.LoginRequestDto;
 import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
+import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
 import com.sprint.mission.discodeit.application.service.userstatus.UserStatusService;
+import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.user.BirthDate;
 import com.sprint.mission.discodeit.domain.user.Email;
 import com.sprint.mission.discodeit.domain.user.Nickname;
@@ -21,6 +23,7 @@ import com.sprint.mission.discodeit.domain.user.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.domain.user.validation.PasswordValidator;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
+import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
 import com.sprint.mission.discodeit.repository.user.interfaces.UserRepository;
 import java.util.List;
 import java.util.UUID;
@@ -33,17 +36,20 @@ public class JCFUserService implements UserService {
     private final UserConverter userConverter;
     private final PasswordEncoder passwordEncoder;
     private final UserStatusService userStatusService;
+    private final ChannelRepository channelRepository;
 
     public JCFUserService(
             UserRepository userRepository,
             UserConverter userConverter,
             PasswordEncoder passwordEncoder,
-            UserStatusService userStatusService
+            UserStatusService userStatusService,
+            ChannelRepository channelRepository
     ) {
         this.userRepository = userRepository;
         this.userConverter = userConverter;
         this.passwordEncoder = passwordEncoder;
         this.userStatusService = userStatusService;
+        this.channelRepository = channelRepository;
     }
 
     @Override
@@ -93,6 +99,8 @@ public class JCFUserService implements UserService {
     @Override
     public void quitUser(UUID userId) {
         User foundUser = findOneByIdOrThrow(userId);
+        List<Channel> channels = channelRepository.findAllByUserId(userId);
+        channels.forEach(channel -> channel.quitChannel(foundUser));
         userStatusService.delete(foundUser);
         userRepository.deleteByUser(foundUser);
     }

@@ -67,10 +67,8 @@ public class Channel implements Serializable {
         this.name = name.trim();
     }
 
-    private void validate(String name) {
-        if (Objects.isNull(name) || name.isBlank()) {
-            throw new ChannelNameInvalidException(ErrorCode.INVALID_CHANNEL_NAME_NOT_NULL, name);
-        }
+    public void quitChannel(User user) {
+        participatedUser.removeUser(user);
     }
 
     public boolean isManager(User user) {
@@ -83,6 +81,12 @@ public class Channel implements Serializable {
 
     public Set<UUID> getParticipantUserId() {
         return this.participatedUser.getParticipatedUserId();
+    }
+
+    private void validate(String name) {
+        if (Objects.isNull(name) || name.isBlank()) {
+            throw new ChannelNameInvalidException(ErrorCode.INVALID_CHANNEL_NAME_NOT_NULL, name);
+        }
     }
 
     public UUID getId() {

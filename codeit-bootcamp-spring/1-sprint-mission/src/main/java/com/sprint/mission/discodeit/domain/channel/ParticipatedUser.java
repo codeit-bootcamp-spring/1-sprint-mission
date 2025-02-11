@@ -15,6 +15,10 @@ public class ParticipatedUser {
         users.put(user.getId(), user);
     }
 
+    public void removeUser(User user) {
+        users.remove(user.getId());
+    }
+
     public Set<UUID> getParticipatedUserId() {
         return Collections.unmodifiableSet(users.keySet());
     }

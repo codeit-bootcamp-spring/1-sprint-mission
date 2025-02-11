@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class ReadStatusInMemoryRepository implements ReadStatusRepository {
 
     private final Map<ReadStatusKey, ReadStatus> readStatusStore = new HashMap<>();

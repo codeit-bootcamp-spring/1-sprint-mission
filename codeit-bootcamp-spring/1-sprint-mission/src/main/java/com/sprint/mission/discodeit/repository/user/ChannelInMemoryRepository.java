@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class InMemoryUserRepository implements UserRepository {
+public class ChannelInMemoryRepository implements UserRepository {
 
     Map<UUID, User> uuidUsers = new HashMap<>();
     Map<Email, User> emailUsers = new HashMap<>();

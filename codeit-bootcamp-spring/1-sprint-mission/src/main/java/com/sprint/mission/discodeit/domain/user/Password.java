@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.domain.user;
 
-import lombok.ToString;
-
-@ToString(of = "value")
 public class Password {
 
     private String value;
@@ -21,5 +18,12 @@ public class Password {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return "Password{" +
+                "value='" + value + '\'' +
+                '}';
     }
 }

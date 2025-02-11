@@ -9,8 +9,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.stereotype.Repository;
 
-public class InMemoryChannelRepository implements ChannelRepository {
+@Repository
+public class ChannelInMemoryRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> channelUUIDStore = new HashMap<>();
 
@@ -21,8 +23,8 @@ public class InMemoryChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findOneById(UUID uuid) {
-        return Optional.ofNullable(channelUUIDStore.get(uuid));
+    public Optional<Channel> findOneById(UUID channelId) {
+        return Optional.ofNullable(channelUUIDStore.get(channelId));
     }
 
     @Override

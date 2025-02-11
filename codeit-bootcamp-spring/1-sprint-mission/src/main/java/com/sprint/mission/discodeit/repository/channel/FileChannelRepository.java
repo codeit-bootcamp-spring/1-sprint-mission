@@ -8,13 +8,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
+
     @Override
     public Channel save(Channel channel) {
         return null;
     }
 
     @Override
-    public Optional<Channel> findOneById(UUID uuid) {
+    public Optional<Channel> findOneById(UUID channelId) {
         return Optional.empty();
     }
 
