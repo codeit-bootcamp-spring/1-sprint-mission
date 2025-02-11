@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.channel;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +21,11 @@ public class InMemoryChannelRepository implements ChannelRepository {
     @Override
     public Optional<Channel> findOneById(UUID uuid) {
         return Optional.ofNullable(uuidChannels.get(uuid));
+    }
+
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return List.of();
     }
 
     @Override

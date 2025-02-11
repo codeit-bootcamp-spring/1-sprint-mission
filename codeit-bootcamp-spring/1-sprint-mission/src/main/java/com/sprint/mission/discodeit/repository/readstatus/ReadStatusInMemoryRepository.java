@@ -16,24 +16,35 @@ public class ReadStatusInMemoryRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        ReadStatusKey readStatusKey = new ReadStatusKey(readStatus.getUser(), readStatus.getChannel());
+        ReadStatusKey readStatusKey = ReadStatusKey.of(readStatus.getUser(), readStatus.getChannel());
         readStatusMap.put(readStatusKey, readStatus);
         return readStatus;
     }
 
     @Override
     public Optional<ReadStatus> findOneByUserIdAndChannelId(User user, Channel channel) {
-        ReadStatusKey readStatusKey = new ReadStatusKey(user, channel);
+        ReadStatusKey readStatusKey = ReadStatusKey.of(user, channel);
         return Optional.ofNullable(readStatusMap.get(readStatusKey));
+    }
+
+    @Override
+    public void deleteByChannel(Channel channel) {
+        channel.getParticipantUserId().stream()
+                .map(userId -> new ReadStatusKey(userId, channel.getId()))
+                .forEach(readStatusMap::remove);
     }
 
     private static class ReadStatusKey {
         private final UUID userId;
         private final UUID channelId;
 
-        public ReadStatusKey(User user, Channel channel) {
-            this.userId = user.getId();
-            this.channelId = channel.getId();
+        public ReadStatusKey(UUID userId, UUID channelId) {
+            this.userId = userId;
+            this.channelId = channelId;
+        }
+
+        public static ReadStatusKey of(User user, Channel channel) {
+            return new ReadStatusKey(user.getId(), channel.getId());
         }
 
         @Override

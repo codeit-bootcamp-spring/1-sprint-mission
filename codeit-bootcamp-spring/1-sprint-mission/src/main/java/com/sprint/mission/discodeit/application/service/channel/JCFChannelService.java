@@ -5,10 +5,9 @@ import com.sprint.mission.discodeit.application.dto.channel.ChangeChannelSubject
 import com.sprint.mission.discodeit.application.dto.channel.ChannelCreateResponseDto;
 import com.sprint.mission.discodeit.application.dto.channel.CreateChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.channel.DeleteChannelRequestDto;
-import com.sprint.mission.discodeit.application.dto.channel.InviteChannelRequestDto;
 import com.sprint.mission.discodeit.application.dto.channel.FoundChannelResponseDto;
+import com.sprint.mission.discodeit.application.dto.channel.InviteChannelRequestDto;
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
-import com.sprint.mission.discodeit.application.service.interfaces.MessageService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
@@ -18,8 +17,10 @@ import com.sprint.mission.discodeit.domain.readStatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
+import com.sprint.mission.discodeit.repository.message.interfaces.MessageRepository;
 import com.sprint.mission.discodeit.repository.readstatus.interfaces.ReadStatusRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -27,18 +28,18 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserService userService;
     private final ReadStatusRepository readStatusRepository;
-    private final MessageService messageService;
+    private final MessageRepository messageRepository;
 
     public JCFChannelService(
             ChannelRepository channelRepository,
             UserService userService,
             ReadStatusRepository readStatusService,
-            MessageService messageService
+            MessageRepository messageRepository
     ) {
         this.channelRepository = channelRepository;
         this.userService = userService;
         this.readStatusRepository = readStatusService;
-        this.messageService = messageService;
+        this.messageRepository = messageRepository;
     }
 
     @Override
@@ -81,13 +82,13 @@ public class JCFChannelService implements ChannelService {
     @Override
     public FoundChannelResponseDto findOneByChannelId(UUID channelId) {
         Channel foundChannel = findOneByIdOrThrow(channelId);
-        LocalDateTime lastMessageTime = messageService.getLastMessageTime(foundChannel.getId());
-        if (foundChannel.isPublic()) {
-            return FoundChannelResponseDto.ofPublicChannel(foundChannel, lastMessageTime);
-        }
-        else {
-            return FoundChannelResponseDto.ofPrivateChannel(foundChannel, lastMessageTime);
-        }
+        return toFoundChannelResponseDto(foundChannel);
+    }
+
+    public List<FoundChannelResponseDto> findAllByChannelId(UUID userId) {
+        List<Channel> channels = channelRepository.findAllByUserId(userId);
+        // 채널 한 개당 메세지를 조회해오는 N + 1
+        return channels.stream().map(this::toFoundChannelResponseDto).toList();
     }
 
     @Override
@@ -119,12 +120,23 @@ public class JCFChannelService implements ChannelService {
         User foundUser = userService.findOneByIdOrThrow(userId);
         Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
+        readStatusRepository.deleteByChannel(foundChannel);
+        messageRepository.deleteByChannel(foundChannel);
         channelRepository.deleteById(foundChannel.getId());
     }
 
     private void throwIsNotManager(User foundUser, Channel foundChannel) {
         if (!foundChannel.isManager(foundUser)) {
             throw new IllegalArgumentException();
+        }
+    }
+
+    private FoundChannelResponseDto toFoundChannelResponseDto(Channel foundChannel) {
+        LocalDateTime lastMessageTime = messageRepository.getLastMessageTimeByChannelId(foundChannel.getId());
+        if (foundChannel.isPublic()) {
+            return FoundChannelResponseDto.ofPublicChannel(foundChannel, lastMessageTime);
+        } else {
+            return FoundChannelResponseDto.ofPrivateChannel(foundChannel, lastMessageTime);
         }
     }
 }

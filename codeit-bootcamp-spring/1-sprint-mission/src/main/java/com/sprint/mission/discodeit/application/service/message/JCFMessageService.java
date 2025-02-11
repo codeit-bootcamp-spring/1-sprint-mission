@@ -63,11 +63,6 @@ public class JCFMessageService implements MessageService {
                 .orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
     }
 
-    @Override
-    public LocalDateTime getLastMessageTime(UUID channelId) {
-        return null;
-    }
-
     private void throwIsNotSender(User foundUser, Message foundMessage) {
         if (!foundMessage.isSender(foundUser)) {
             throw new IllegalArgumentException();

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.application.service.channel.JCFChannelServic
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.repository.channel.InMemoryChannelRepository;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
+import com.sprint.mission.discodeit.repository.message.InMemoryMessageRepository;
 import com.sprint.mission.discodeit.repository.readstatus.ReadStatusInMemoryRepository;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,7 @@ public class ChannelFactory {
                     CHANNEL_REPOSITORY,
                     UserFactory.getUserService(),
                     new ReadStatusInMemoryRepository(),
-                    MessageFactory.getMessageService()
+                    new InMemoryMessageRepository()
             );
 
     public static ChannelService getChannelService() {
