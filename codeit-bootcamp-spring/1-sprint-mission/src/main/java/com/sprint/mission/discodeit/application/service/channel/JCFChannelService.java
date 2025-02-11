@@ -60,7 +60,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void joinChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(invitedUserId);
+        User foundUser = userService.findOneByUserIdOrThrow(invitedUserId);
         Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsAlreadyJoinUser(foundUser, foundChannel);
         foundChannel.join(foundUser);
@@ -88,7 +88,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void changeSubject(UUID userId, ChangeChannelSubjectRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
         Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         foundChannel.updateSubject(requestDto.subject());
@@ -97,7 +97,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void changeChannelName(UUID userId, ChangeChannelNameRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
         Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         foundChannel.updateName(requestDto.channelName());
@@ -106,7 +106,7 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID userId, DeleteChannelRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
         Channel foundChannel = findOneByChannelIdOrThrow(requestDto.channelId());
         throwIsNotManager(foundUser, foundChannel);
         readStatusRepository.deleteByChannel(foundChannel);
@@ -141,7 +141,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     private Channel createChannelWithVisibility(UUID userId, CreateChannelRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
         Channel createChannel = null;
         if (requestDto.visibility() == ChannelVisibility.PUBLIC) {
             createChannel = Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser);
@@ -150,9 +150,9 @@ public class JCFChannelService implements ChannelService {
         }
 //        ====> 삼항 연산자와 if 문 분기처리 중 어떤 것을 더 선호해야할까요? 제가 생각하기에는 삼항 연산자가 보기 더 편한것 같습니다.
 //        다음 미션에서는 둘 중 하나 지워두겠습니다.
-//        createChannel = requestDto.visibility() == ChannelVisibility.PUBLIC ?
-//                Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser) :
-//                Channel.ofPrivateChannel(foundUser, requestDto.channelType());
+//        createChannel = requestDto.visibility() == ChannelVisibility.PUBLIC
+//                ? Channel.ofPublicChannel(requestDto.name(), requestDto.channelType(), foundUser)
+//                : Channel.ofPrivateChannel(foundUser, requestDto.channelType());
         Channel savedChannel = channelRepository.save(createChannel);
         createAndSaveReadStatus(foundUser, savedChannel);
         return savedChannel;

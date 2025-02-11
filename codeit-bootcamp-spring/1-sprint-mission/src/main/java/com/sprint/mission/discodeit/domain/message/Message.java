@@ -63,6 +63,10 @@ public class Message implements Serializable {
         return destinationChannel.getId();
     }
 
+    public Channel getDestinationChannel() {
+        return destinationChannel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

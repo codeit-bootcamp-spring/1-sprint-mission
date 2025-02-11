@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.application.dto.user.ChangePasswordRequestDt
 import com.sprint.mission.discodeit.application.dto.user.LoginRequestDto;
 import com.sprint.mission.discodeit.application.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.application.dto.user.joinUserRequestDto;
-import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.application.service.user.converter.UserConverter;
 import com.sprint.mission.discodeit.application.service.userstatus.UserStatusService;
@@ -72,7 +71,7 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findOneByIdOrThrow(UUID uuid) {
+    public User findOneByUserIdOrThrow(UUID uuid) {
         return userRepository.findOneById(uuid)
                 .orElseThrow(() -> new UserNotFoundException(ErrorCode.NOT_FOUND));
     }
@@ -91,14 +90,14 @@ public class JCFUserService implements UserService {
     @Override
     public void changePassword(UUID userId, ChangePasswordRequestDto requestDto) {
         PasswordValidator.validateOrThrow(requestDto.password());
-        User foundUser = findOneByIdOrThrow(userId);
+        User foundUser = findOneByUserIdOrThrow(userId);
         foundUser.updatePassword(passwordEncoder.encode(requestDto.password()));
         userRepository.save(foundUser);
     }
 
     @Override
     public void quitUser(UUID userId) {
-        User foundUser = findOneByIdOrThrow(userId);
+        User foundUser = findOneByUserIdOrThrow(userId);
         List<Channel> channels = channelRepository.findAllByUserId(userId);
         channels.forEach(channel -> channel.quitChannel(foundUser));
         userStatusService.delete(foundUser);

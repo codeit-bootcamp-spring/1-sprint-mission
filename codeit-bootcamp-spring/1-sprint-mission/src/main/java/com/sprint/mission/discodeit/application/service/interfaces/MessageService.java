@@ -15,6 +15,6 @@ public interface MessageService {
 
     void deleteMessage(UUID userId, DeleteMessageRequestDto requestDto);
 
-    Message findOneByIdOrThrow(UUID uuid);
+    Message findOneByMessageIdOrThrow(UUID uuid);
 
 }

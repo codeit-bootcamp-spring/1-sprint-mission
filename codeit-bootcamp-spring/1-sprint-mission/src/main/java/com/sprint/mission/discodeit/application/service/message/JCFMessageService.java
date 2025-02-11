@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.application.dto.message.UpdateMessageContent
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.MessageService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
+import com.sprint.mission.discodeit.application.service.readstatus.ReadStatusService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.message.Message;
 import com.sprint.mission.discodeit.domain.message.exception.MessageNotFoundException;
@@ -20,20 +21,23 @@ public class JCFMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
     private final UserService userService;
+    private final ReadStatusService readStatusService;
 
     public JCFMessageService(
             MessageRepository messageRepository,
             ChannelService channelService,
-            UserService userService
+            UserService userService,
+            ReadStatusService readStatusService
     ) {
         this.messageRepository = messageRepository;
         this.channelService = channelService;
         this.userService = userService;
+        this.readStatusService = readStatusService;
     }
 
     @Override
     public MessageResponseDto createMessage(CreateMessageRequestDto requestDto) {
-        User sender = userService.findOneByIdOrThrow(requestDto.userId());
+        User sender = userService.findOneByUserIdOrThrow(requestDto.userId());
         Channel destinationChannel = channelService.findOneByChannelIdOrThrow(requestDto.destinationChannelId());
         Message createMessage = messageRepository.save(new Message(sender, destinationChannel, requestDto.content()));
         return MessageResponseDto.from(createMessage);
@@ -41,23 +45,24 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID userId, UpdateMessageContentRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
-        Message foundMessage = findOneByIdOrThrow(requestDto.messageId());
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
+        Message foundMessage = findOneByMessageIdOrThrow(requestDto.messageId());
         throwIsNotSender(foundUser, foundMessage);
         foundMessage.updateContent(requestDto.content());
+        readStatusService.updateLastReadTime(foundUser, foundMessage.getDestinationChannel());
         messageRepository.save(foundMessage);
     }
 
     @Override
     public void deleteMessage(UUID userId, DeleteMessageRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
-        Message foundMessage = findOneByIdOrThrow(requestDto.messageId());
+        User foundUser = userService.findOneByUserIdOrThrow(userId);
+        Message foundMessage = findOneByMessageIdOrThrow(requestDto.messageId());
         throwIsNotSender(foundUser, foundMessage);
         messageRepository.deleteById(foundMessage.getId());
     }
 
     @Override
-    public Message findOneByIdOrThrow(UUID messageId) {
+    public Message findOneByMessageIdOrThrow(UUID messageId) {
         return messageRepository.findById(messageId)
                 .orElseThrow(() -> new MessageNotFoundException(ErrorCode.NOT_FOUND));
     }

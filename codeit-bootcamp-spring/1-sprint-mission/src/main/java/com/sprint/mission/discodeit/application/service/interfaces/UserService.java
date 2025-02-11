@@ -14,7 +14,7 @@ public interface UserService {
 
     void login(LoginRequestDto requestDto);
 
-    User findOneByIdOrThrow(UUID userId);
+    User findOneByUserIdOrThrow(UUID userId);
 
     List<UserResponseDto> findAll();
 

@@ -1,15 +1,14 @@
 package com.sprint.mission.discodeit.application.service.readstatus;
 
-import com.sprint.mission.discodeit.application.dto.readstatus.ReadStatusUpdateRequestDto;
 import com.sprint.mission.discodeit.application.service.interfaces.ChannelService;
 import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.readStatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
+import com.sprint.mission.discodeit.global.error.ErrorCode;
+import com.sprint.mission.discodeit.global.error.exception.EntityNotFoundException;
 import com.sprint.mission.discodeit.repository.readstatus.interfaces.ReadStatusRepository;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 
 public class ReadStatusService {
 
@@ -27,15 +26,10 @@ public class ReadStatusService {
         this.channelService = channelService;
     }
 
-    public void updateLastReadTime(UUID userId, ReadStatusUpdateRequestDto requestDto) {
-        User foundUser = userService.findOneByIdOrThrow(userId);
-        Channel foundChannel = channelService.findOneByChannelIdOrThrow(requestDto.channelId());
-        ReadStatus readStatus = findOneByUserIdAndChannelId(foundUser, foundChannel).orElseGet(() -> new ReadStatus(foundUser, foundChannel));
+    public void updateLastReadTime(User user, Channel channel) {
+        ReadStatus readStatus = readStatusRepository.findOneByUserIdAndChannelId(user, channel)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND));
         readStatus.updateLastReadAt(Instant.now());
         readStatusRepository.save(readStatus);
-    }
-
-    public Optional<ReadStatus> findOneByUserIdAndChannelId(User foundUser, Channel foundChannel) {
-        return readStatusRepository.findOneByUserIdAndChannelId(foundUser, foundChannel);
     }
 }
