@@ -10,11 +10,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(UserCreateRequestDto request);
+    User createUser(UserCreateRequestDto request) throws Exception;
     Optional<UserResponseDto> getUserById(UUID id);
     List<UserResponseDto> getAllUsers();
     List<User> findAllUsers();
-    User updateUser(UserUpdateRequestDto request);
+    User updateUser(UserUpdateRequestDto request) throws Exception;
     void deleteUser(UUID id);
 }
 

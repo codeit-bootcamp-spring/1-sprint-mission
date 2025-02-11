@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -26,23 +27,22 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Autowired
     private MessageRepository messageRepository;
 
-    //UUID userId, byte[] data
     @Override
-    public void createProfile(BinaryContentCreateRequestDto request) {
+    public void createProfile(BinaryContentCreateRequestDto request) throws IOException {
         if (!userRepository.existsById(request.getUserId())) {
             throw new NoSuchElementException("User not found");
         }
-        BinaryContent binaryContent = new BinaryContent(request.getUserId(), null, request.getData());
+        BinaryContent binaryContent = new BinaryContent(request.getUserId(), null, request.getMultipartFile().getBytes());
         binaryContentRepository.save(binaryContent);
     }
 
     @Override
-    public void createMessage(BinaryContentCreateRequestDto request) {
+    public void createMessage(BinaryContentCreateRequestDto request) throws IOException {
         if (!messageRepository.existsById(request.getMessageId())) {
             throw new NoSuchElementException("Message not found");
         }
 
-        BinaryContent binaryContent = new BinaryContent(null, request.getMessageId(), request.getData());
+        BinaryContent binaryContent = new BinaryContent(null, request.getMessageId(), request.getMultipartFile().getBytes());
         binaryContentRepository.save(binaryContent);
     }
 

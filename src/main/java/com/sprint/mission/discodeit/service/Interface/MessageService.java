@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(CreateMessageRequestDto request);
+    Message createMessage(CreateMessageRequestDto request) throws Exception;
     Optional<Message> getMessageById(UUID id);
     List<Message> getAllMessages();
     List<Message> findAllByChannelId(UUID channelID);

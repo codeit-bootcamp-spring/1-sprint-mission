@@ -7,8 +7,12 @@ import lombok.Getter;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 public class UserStatusRequest {
     private UUID userId;
     private String status;
+
+    public UserStatusRequest(UUID userId, String status) {
+        this.userId = userId;
+        this.status = status;
+    }
 }

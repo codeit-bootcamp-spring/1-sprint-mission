@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.dto.binary;
 
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
 @Getter
 public class BinaryContentCreateRequestDto {
     private UUID userId;
-    private byte[] data;
     private UUID messageId;
+    private MultipartFile multipartFile;
 
-    public BinaryContentCreateRequestDto(UUID authorId, byte[] data) {
-        this.userId = authorId;
-        this.data = data;
+    public BinaryContentCreateRequestDto(UUID userId, UUID messageId, MultipartFile multipartFile) throws  Exception {
+        this.userId = userId;
+        this.messageId = messageId;
+        this.multipartFile = multipartFile;
     }
 }

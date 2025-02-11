@@ -33,7 +33,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User createUser(UserCreateRequestDto request) {
+    public User createUser(UserCreateRequestDto request) throws Exception {
         if(userRepository.existsByEmail(request.getEmail())){
             throw new IllegalArgumentException("Email already in use");
         }
@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
         userStatusService.create(userStatusRequest);
 
         if(request.getProfileImage() != null) {
-            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), request.getProfileImage());
+            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(),null, request.getProfileImage());
             binaryContentService.createProfile(binaryRequest);
         }
         return user;
@@ -88,7 +88,7 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User updateUser(UserUpdateRequestDto request) {
+    public User updateUser(UserUpdateRequestDto request) throws Exception {
         User user=userRepository.getUserById(request.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User not fount"));
         user.update(request.getNewName(), request.getNewEmail(), request.getNewPassword());
@@ -96,7 +96,7 @@ public class BasicUserService implements UserService {
 
         if (request.getNewProfileImage() != null){
             binaryContentService.deleteByUserId(user.getId());
-            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), request.getNewProfileImage());
+            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), null,request.getNewProfileImage());
             binaryContentService.createProfile(binaryRequest);
         }
 

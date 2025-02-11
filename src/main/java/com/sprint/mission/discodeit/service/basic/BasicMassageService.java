@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.Interface.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.*;
@@ -26,13 +27,15 @@ public class BasicMassageService implements MessageService {
 
 
     @Override
-    public Message createMessage(CreateMessageRequestDto request) {
+    public Message createMessage(CreateMessageRequestDto request) throws Exception {
         Message message=new Message(request.getContent(),request.getChannelId(),request.getAuthorId());
         Message savedMessage=messageRepository.save(message);
         if(request.getAttachments()!=null){
-            for (byte[] fileData : request.getAttachments()) {
-                BinaryContentCreateRequestDto binaryContentCreateRequestDto =new BinaryContentCreateRequestDto(request.getAuthorId(),fileData);
-                binaryContentService.createProfile(binaryContentCreateRequestDto);
+            for (MultipartFile fileData : request.getAttachments()) {
+                if (!fileData.isEmpty()) {
+                    BinaryContentCreateRequestDto binaryContentCreateRequestDto =new BinaryContentCreateRequestDto(null,request.getAuthorId(),fileData);
+                    binaryContentService.createProfile(binaryContentCreateRequestDto);
+                }
             }
         }
         return savedMessage;
