@@ -1,5 +1,6 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.main;
 
+import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import lombok.Getter;
 import lombok.Setter;
 

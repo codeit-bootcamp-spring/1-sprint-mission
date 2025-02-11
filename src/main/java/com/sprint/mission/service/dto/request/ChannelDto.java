@@ -1,6 +1,6 @@
 package com.sprint.mission.service.dto.request;
 
-import com.sprint.mission.entity.ChannelType;
+import com.sprint.mission.entity.main.ChannelType;
 import lombok.Getter;
 
 import java.util.UUID;

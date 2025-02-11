@@ -1,4 +1,4 @@
-package com.sprint.mission.log;
+package com.sprint.mission.aop.log;
 
 import lombok.Getter;
 

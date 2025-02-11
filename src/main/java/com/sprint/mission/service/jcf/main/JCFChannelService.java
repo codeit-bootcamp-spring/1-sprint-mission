@@ -1,16 +1,19 @@
 package com.sprint.mission.service.jcf.main;
 
 
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.ChannelType;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.entity.addOn.UserStatus;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.dto.request.ChannelDto;
 import com.sprint.mission.service.dto.response.FindChannelDto;
 import com.sprint.mission.service.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.service.dto.response.FindPublicChannelDto;
+import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.exception.DuplicateName;
+import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +28,12 @@ public class JCFChannelService implements ChannelService {
 
     private final JCFChannelRepository channelRepository;
     private final JCFUserService userService;
+    private final UserStatusService userStatusService;
 
     //@Override
     public Channel create(ChannelDto dto) {
         // PRIVATE 채널을 생성할 때:
-        //[ ] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+        // [] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
         // ????? 채널을 생성했는데 어떻게 바로 User가 있지???
         Channel channel = new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
         return channelRepository.save(channel);
@@ -77,18 +81,17 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-
-
-    public Map<User, Instant> lastReadTimeListInChannel(UUID channelId){
+    public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId){
         Channel findChannel = channelRepository.findById(channelId);
         if (findChannel.getChannelType().equals(ChannelType.PUBLIC)){
             return new HashMap<>();
         }
 
-        Map<User, Instant> readTimeMap = new HashMap<>();
+        // 유저별 이 채널 마지막 readTime
+        Map<FindUserDto, Instant> readTimeMap = new HashMap<>();
         for (User user : findChannel.getUserList()) {
-            Instant lastRead = user.getReadStatus().findLastReadByChannel(channelId);
-            readTimeMap.put(user, lastRead);
+            UserStatus userStatus = userStatusService.findById(user.getId());
+            readTimeMap.put(new FindUserDto(user, userStatus.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
         }
         return readTimeMap;
     }

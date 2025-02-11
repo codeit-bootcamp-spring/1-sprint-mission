@@ -1,7 +1,7 @@
 package com.sprint.mission.service.dto.response;
 
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.ChannelType;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.ChannelType;
 
 import java.time.Instant;
 

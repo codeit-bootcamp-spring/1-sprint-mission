@@ -1,11 +1,9 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.addOn;
 
 import lombok.Getter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter

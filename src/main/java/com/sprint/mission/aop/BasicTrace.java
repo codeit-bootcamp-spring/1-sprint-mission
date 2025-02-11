@@ -1,8 +1,8 @@
 package com.sprint.mission.aop;
 
 
-import com.sprint.mission.log.TraceDevice;
-import com.sprint.mission.log.TraceStatus;
+import com.sprint.mission.aop.log.TraceDevice;
+import com.sprint.mission.aop.log.TraceStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

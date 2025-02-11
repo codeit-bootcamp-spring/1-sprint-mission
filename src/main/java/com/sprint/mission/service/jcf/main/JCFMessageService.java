@@ -1,9 +1,9 @@
 package com.sprint.mission.service.jcf.main;
 
-import com.sprint.mission.entity.BinaryMessageContent;
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.Message;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.entity.addOn.BinaryMessageContent;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;

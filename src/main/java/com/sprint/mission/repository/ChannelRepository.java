@@ -1,6 +1,6 @@
 package com.sprint.mission.repository;
 
-import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.main.Channel;
 
 import java.io.IOException;
 import java.util.Set;

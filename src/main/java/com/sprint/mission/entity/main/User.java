@@ -1,6 +1,7 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.main;
 
 
+import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.service.dto.request.UserDtoForRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,7 +41,7 @@ public class User implements Serializable {
         this.updateAt = Instant.now();
     }
 
-    public static User createUserByDto(UserDtoForRequest dto){
+    public static User createUserByRequestDto(UserDtoForRequest dto){
         return new User(dto.getUsername(), dto.getPassword(), dto.getEmail());
     }
 

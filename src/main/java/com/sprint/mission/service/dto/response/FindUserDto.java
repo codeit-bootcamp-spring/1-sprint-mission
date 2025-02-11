@@ -1,6 +1,6 @@
 package com.sprint.mission.service.dto.response;
 
-import com.sprint.mission.entity.User;
+import com.sprint.mission.entity.main.User;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,29 +1,26 @@
 package com.sprint.mission.aop;
 
 
-import com.sprint.mission.aop.annotation.TraceAnnotation;
-import com.sprint.mission.aop.annotation.ValidTraceAnnotation;
-import com.sprint.mission.log.TraceDevice;
-import com.sprint.mission.log.TraceStatus;
+import com.sprint.mission.aop.log.TraceDevice;
+import com.sprint.mission.aop.log.TraceStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-//@Component
 @Aspect
 @RequiredArgsConstructor
+//@Component <<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// 쓰고 싶을 때 컴포넌트 설정
 public class BasicTraceAnnotation {
 
     private final TraceDevice trace;
 
     @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
     public void classWithin(){}
-
     @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
     public void methodWith(){}
 

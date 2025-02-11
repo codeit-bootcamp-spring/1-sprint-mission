@@ -1,8 +1,8 @@
 package com.sprint.mission.service.dto.response;
 
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.ChannelType;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.entity.main.User;
 
 import java.time.Instant;
 import java.util.ArrayList;

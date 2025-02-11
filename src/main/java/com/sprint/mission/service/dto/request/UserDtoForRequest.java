@@ -1,6 +1,6 @@
 package com.sprint.mission.service.dto.request;
 
-import com.sprint.mission.entity.BinaryProfileContent;
+import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import lombok.Getter;
 import lombok.Setter;
 

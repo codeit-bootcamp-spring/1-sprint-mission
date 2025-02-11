@@ -1,6 +1,6 @@
 package com.sprint.mission.repository.jcf.addOn;
 
-import com.sprint.mission.entity.UserStatus;
+import com.sprint.mission.entity.addOn.UserStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

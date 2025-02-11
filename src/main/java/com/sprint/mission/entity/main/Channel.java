@@ -1,4 +1,4 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.main;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -47,7 +47,6 @@ public class Channel implements Serializable {
 
         }
     }
-
 
     public int countUser(){
         return userList.size();

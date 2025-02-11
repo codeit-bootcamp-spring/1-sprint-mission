@@ -1,9 +1,8 @@
-package com.sprint.mission.log;
+package com.sprint.mission.aop.log;
 
 
 import lombok.Getter;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.weaver.tools.Trace;
 
 @Getter
 public class TraceStatus {

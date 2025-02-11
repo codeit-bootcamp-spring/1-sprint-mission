@@ -6,9 +6,9 @@
 //import com.sprint.mission.controller.file.FileChannelController;
 //import com.sprint.mission.controller.file.FileMessageController;
 //import com.sprint.mission.controller.file.FileUserController;
-//import com.sprint.mission.entity.Channel;
-//import com.sprint.mission.entity.Message;
-//import com.sprint.mission.entity.User;
+//import com.sprint.mission.entity.main.Channel;
+//import com.sprint.mission.entity.main.Message;
+//import com.sprint.mission.entity.main.User;
 //
 //import java.io.IOException;
 //import java.util.ArrayList;

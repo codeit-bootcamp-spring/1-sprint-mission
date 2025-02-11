@@ -1,17 +1,11 @@
 package com.sprint.mission;
 
-import com.sprint.mission.entity.User;
-import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.UserService;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.dto.request.UserDtoForRequest;
-import com.sprint.mission.service.dto.response.FindUserDto;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {

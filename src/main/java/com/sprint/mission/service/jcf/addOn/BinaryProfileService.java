@@ -1,6 +1,6 @@
 package com.sprint.mission.service.jcf.addOn;
 
-import com.sprint.mission.entity.BinaryProfileContent;
+import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryProfileRepository;
 import com.sprint.mission.service.dto.request.BinaryContentDto;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ public class BinaryProfileService {
     //[ ] id로 삭제합니다.
 
     private final BinaryProfileRepository repository;
-
 
     public void create(BinaryContentDto dto){
         repository.save(new BinaryProfileContent(dto.getId(), dto.getBinaryContent().getBytes()));

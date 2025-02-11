@@ -1,4 +1,4 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.main;
 
 public enum ChannelType {
     PRIVATE, PUBLIC;

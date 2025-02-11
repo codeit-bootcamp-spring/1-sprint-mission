@@ -1,6 +1,6 @@
 package com.sprint.mission.service.dto.request;
 
-import com.sprint.mission.entity.BinaryMessageContent;
+import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import lombok.Getter;
 
 import java.util.UUID;

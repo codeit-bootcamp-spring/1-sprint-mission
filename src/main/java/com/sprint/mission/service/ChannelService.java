@@ -1,13 +1,6 @@
 package com.sprint.mission.service;
 
 
-import com.sprint.mission.entity.Channel;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 public interface ChannelService {
 
 //    Channel create(Channel channel) throws IOException;

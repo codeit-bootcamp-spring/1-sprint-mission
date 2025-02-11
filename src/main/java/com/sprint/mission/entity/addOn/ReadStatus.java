@@ -1,4 +1,4 @@
-package com.sprint.mission.entity;
+package com.sprint.mission.entity.addOn;
 
 import java.time.Instant;
 import java.util.HashMap;

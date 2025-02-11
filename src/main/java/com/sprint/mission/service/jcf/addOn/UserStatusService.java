@@ -1,6 +1,6 @@
 package com.sprint.mission.service.jcf.addOn;
 
-import com.sprint.mission.entity.UserStatus;
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

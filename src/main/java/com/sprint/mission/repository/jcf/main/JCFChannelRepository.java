@@ -1,6 +1,6 @@
 package com.sprint.mission.repository.jcf.main;
 
-import com.sprint.mission.entity.Channel;
+import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.service.exception.NotFoundId;
 import org.springframework.stereotype.Repository;
