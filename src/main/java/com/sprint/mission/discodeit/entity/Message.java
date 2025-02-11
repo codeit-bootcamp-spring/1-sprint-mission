@@ -34,6 +34,7 @@ public class Message implements Serializable {
 
     public Message() {
         this.id = null;
+        this.content = "삭제된 메시지 입니다";
         this.createdAt = Instant.ofEpochSecond(0L);
     }
 

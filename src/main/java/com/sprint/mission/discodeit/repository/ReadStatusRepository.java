@@ -18,7 +18,7 @@ public interface ReadStatusRepository {
     void delete(UUID id);
     void deleteByUserId(UUID userId); //유저 아이디를 통한 채널 정보 통합 삭제
     void deleteByChannelId(UUID id);
-    void update(ReadStatusDto readStatusDto); //유저가 채널에 방문했을 떄 방문한 시각 업데이트
+    void update(ReadStatusDto before, ReadStatusDto after); //유저가 채널에 방문했을 떄 방문한 시각 업데이트
 
 
 }

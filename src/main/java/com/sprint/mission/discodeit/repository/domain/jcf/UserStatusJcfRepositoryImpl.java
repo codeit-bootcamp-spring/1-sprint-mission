@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 public class UserStatusJcfRepositoryImpl implements UserStatusRepository {
-    private Map<UUID, UserStatus> userStatusMap = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatusMap = new HashMap<>();
 
 
     @Override
@@ -39,6 +39,10 @@ public class UserStatusJcfRepositoryImpl implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
+        for (UserStatus userStatus : userStatusMap.values()) {
+            userStatus.checkStatus();
+            System.out.println("userStatus = " + userStatus);
+        }
         return new ArrayList<>(userStatusMap.values());
     }
 
@@ -48,9 +52,10 @@ public class UserStatusJcfRepositoryImpl implements UserStatusRepository {
     }
 
     @Override
-    public void update(UserStatusDto userStatusDto) { //유저 상태 필드 변경
-        UserStatus updated = findById(userStatusDto.id()).updateFields(userStatusDto);
+    public void update(UserStatusDto before, UserStatusDto after) { //유저 상태 필드 변경
+        UserStatus updated = findById(before.id()).updateFields(after);
         userStatusMap.replace(updated.getId(), updated);
     }
+
 
 }

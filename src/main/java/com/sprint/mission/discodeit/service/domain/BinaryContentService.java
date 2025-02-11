@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,39 +20,63 @@ public class BinaryContentService {
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
 
-    public BinaryContent save(BinaryContentDto binaryContentDto) {
+    public BinaryContentDto save(BinaryContentDto binaryContentDto) {
         if (binaryContentDto.domainId() == null || binaryContentDto.file() == null) {
             throw new IllegalStateException("도메인 아이디 혹은 파일이 잘못되었습니다.");
         }
-        return binaryContentRepository.save(binaryContentDto);
+        return new BinaryContentDto(binaryContentRepository.save(binaryContentDto));
     }
 
-    public BinaryContent findById(UUID id) {
-        return binaryContentRepository.findById(id);
+    public BinaryContentDto findById(UUID id) {
+        return new BinaryContentDto(binaryContentRepository.findById(id));
     }
 
-    public List<BinaryContent> findByDomainId(UUID domainId) {
-        if (userRepository.findUserById(domainId) != null) {
+    public List<BinaryContentDto> findByDomainId(UUID domainId) {
+        if(userRepository.findUserById(domainId) != null || messageRepository.findMessagesById(domainId) != null){
+            List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
+            List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
+            for (BinaryContent binaryContent : binaryContents) {
+                binaryContentDtos.add(new BinaryContentDto(binaryContent));
+            }
+            return binaryContentDtos;
+        }
+        /*if (userRepository.findUserById(domainId) != null) {
             //Domain -> User
-            return binaryContentRepository.findByDomainId(domainId);
+            List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
+            List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
+            for (BinaryContent binaryContent : binaryContents) {
+                binaryContentDtos.add(new BinaryContentDto(binaryContent));
+            }
+            return binaryContentDtos;
         }
-        if (messageRepository.findMessagesById(domainId) == null) {
+        if (messageRepository.findMessagesById(domainId) != null) {
             //Domain -> Message
-            return binaryContentRepository.findByDomainId(domainId);
-        }
+            List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
+            List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
+            for (BinaryContent binaryContent : binaryContents) {
+                binaryContentDtos.add(new BinaryContentDto(binaryContent));
+            }
+            return binaryContentDtos;
+        }*/
         throw new IllegalStateException("도메인을 찾을 수 없습니다.");
     }
 
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll();
+    public List<BinaryContentDto> findAll() {
+        List<BinaryContent> binaryContents = binaryContentRepository.findAll();
+        List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
+        for (BinaryContent binaryContent : binaryContents) {
+            binaryContentDtos.add(new BinaryContentDto(binaryContent));
+        }
+        return binaryContentDtos;
     }
 
 
     public void delete(UUID id) {
-        if (binaryContentRepository.findById(id) != null) {
+        if (findById(id) != null) {
             binaryContentRepository.delete(id);
+        }else {
+            throw new IllegalStateException("아이디를 찾을 수 없습니다.");
         }
-        throw new IllegalStateException("아이디를 찾을 수 없습니다.");
     }
 
     public void deleteByDomainId(UUID domainId) {

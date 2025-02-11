@@ -29,8 +29,8 @@ public class BasicUserService implements UserService {
         if (userDto != null) return userDto;
         User savedUser = repository.save(paramUserDto.userName(), paramUserDto.password(), paramUserDto.email());
         UserStatus savedUserStatus = userStatusRepository.save(new UserStatusDto(savedUser.getId()));
-        if( paramUserDto.binaryContent() != null ) { //User 당 하나의 프로필 가짐
-            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContentDto(savedUser.getId(), paramUserDto.binaryContent().getFile()));
+        if( paramUserDto.binaryContentDto() != null ) { //User 당 하나의 프로필 가짐
+            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContentDto(savedUser.getId(), paramUserDto.binaryContentDto().file()));
         }
         return new UserDto(savedUser);
     }
@@ -63,9 +63,9 @@ public class BasicUserService implements UserService {
     @Override
     public void updateUser(UserDto userDto) {
         repository.update(userDto.id(), userDto.userName(), userDto.email());
-        if (userDto.binaryContent() != null) {
+        if (userDto.binaryContentDto() != null) {
             System.out.println("profile 수정");
-            binaryContentRepository.update(userDto.id(), userDto.binaryContent());
+            binaryContentRepository.update(userDto.id(), userDto.binaryContentDto());
         }
     }
 

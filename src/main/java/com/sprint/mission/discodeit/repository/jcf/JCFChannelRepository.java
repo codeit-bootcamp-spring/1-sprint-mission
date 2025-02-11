@@ -12,31 +12,28 @@ import java.util.*;
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> map; //채널 리스트
     private final Map<UUID, List<UUID>> messages = new HashMap<>();
-    //private JcfMessageService jcfMessageService;
-    //private static volatile JcfChannelService instance;
 
-    //public JCFChannelRepository(Map<UUID, Channel> map) {this.map = map;}
     public JCFChannelRepository() {
         this.map = new HashMap<>();
     }
 
-    public List<UUID> messages(UUID uuid) {
-        Channel channel = findById(uuid);
-        if (channel == null) {
-            System.out.println("채널을 찾을 수 없습니다.");
-            return null;
-        }
-        List<UUID> messageUuidList = messages.get(channel.getId());
+    public List<UUID> findMessagesByChannelId(UUID uuid) {
+        List<UUID> messageUuidList = messages.get(uuid); //채널이 가진 메시지 리스트 반환
         return new ArrayList<>(messageUuidList);
     }
 
-    public void addMessage(UUID uuid, UUID messageId) {
-        Channel channel = findById(uuid);
+    @Override
+    public void deleteMessageInChannel(UUID channelId, UUID messageId) {
+        messages.get(channelId).remove(messageId);
+    }
+
+    public void addMessage(UUID channelId, UUID messageId) {
+        Channel channel = findById(channelId);
         if (channel == null) {
             System.out.println("채널을 찾을 수 없습니다.");
             return;
         }
-        messages.get(uuid).add(messageId);
+        messages.get(channelId).add(messageId);
         System.out.println("성공적으로 메시시 추가되었습니다.");
     }
 

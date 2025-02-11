@@ -42,13 +42,12 @@ public class UserStatusService {
         userStatusRepository.delete(id);
     }
 
-    public void update(UserStatusDto userStatusDto) { //활동 시간 업데이트 -> 상태 업데이트
-        userStatusRepository.update(userStatusDto);
+    public void update(UserStatusDto before, UserStatusDto after) { //활동 시간 업데이트 -> 상태 업데이트
+        userStatusRepository.update(before, after);
     }
 
-    public void updateByUserId(UUID userId) {
+    public void updateByUserId(UUID userId, UserStatusDto after) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
-        userStatusRepository.update(new UserStatusDto(userStatus));
-
+        userStatusRepository.update(new UserStatusDto(userStatus), after);
     }
 }

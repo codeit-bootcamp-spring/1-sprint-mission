@@ -7,20 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-@RequiredArgsConstructor
 @Profile("Jcf")
+@RequiredArgsConstructor
 public class BinaryContentJcfRepositoryImpl implements BinaryContentRepository {
-    private Map<UUID, BinaryContent> binaryContentMap;
+    private final Map<UUID, BinaryContent> binaryContentMap;
 
-    public BinaryContentJcfRepositoryImpl(Map<UUID, BinaryContent> binaryContentMap) {
-        this.binaryContentMap = binaryContentMap;
+    public BinaryContentJcfRepositoryImpl() {
+        this.binaryContentMap =  new HashMap<>();
     }
 
     @Override
@@ -59,11 +56,11 @@ public class BinaryContentJcfRepositoryImpl implements BinaryContentRepository {
     }
 
     @Override
-    public void update(UUID id, BinaryContent binaryContent) {
+    public void update(UUID id, BinaryContentDto binaryContentDto) {
         //프로필 업데이트에 사용됨
         BinaryContent existBinaryContent = binaryContentMap.get(id);
         if (existBinaryContent.getFile() != null) {
-            existBinaryContent = existBinaryContent.update(binaryContent.getFile());
+            existBinaryContent = existBinaryContent.update(binaryContentDto.file());
         }
         binaryContentMap.replace(id, existBinaryContent);
     }

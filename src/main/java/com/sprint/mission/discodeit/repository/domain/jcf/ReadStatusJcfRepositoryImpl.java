@@ -7,21 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 //사용자가 언제 마지막으로 채널에 접속했는 지 기록
 @Repository
-@RequiredArgsConstructor
 @Profile("Jcf")
 public class ReadStatusJcfRepositoryImpl implements ReadStatusRepository {
-    private Map<UUID, ReadStatus> readStatusMap;
+    private final Map<UUID, ReadStatus> readStatusMap; //채널마다 각 유저의 ReadStatus 정보 가짐
 
-    public ReadStatusJcfRepositoryImpl(Map<UUID, ReadStatus> readStatusMap) {
-        this.readStatusMap = readStatusMap;
+    public ReadStatusJcfRepositoryImpl() {
+        this.readStatusMap = new HashMap<>();
     }
 
     @Override
@@ -48,6 +44,10 @@ public class ReadStatusJcfRepositoryImpl implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> collect = readStatusMap.values().stream().filter(r -> r.getChannelId().equals(channelId)).collect(Collectors.toList());
+        if(collect.isEmpty()) {
+            return null;
+        }
         return readStatusMap.values().stream().filter(r -> r.getChannelId().equals(channelId)).collect(Collectors.toList());
     }
 
@@ -73,9 +73,11 @@ public class ReadStatusJcfRepositoryImpl implements ReadStatusRepository {
     }
 
     @Override
-    public void update(ReadStatusDto readStatusDto) {
-        ReadStatus readStatus = findById(readStatusDto.id());
-        readStatus = readStatus.update(readStatusDto);
+    public void update(ReadStatusDto before, ReadStatusDto after) {
+        ReadStatus readStatus = findById(before.id());
+        System.out.println("before = " + readStatus);
+        readStatus = readStatus.update(after);
+        System.out.println("after = " + readStatus);
         readStatusMap.replace(readStatus.getId(), readStatus);
     }
 }

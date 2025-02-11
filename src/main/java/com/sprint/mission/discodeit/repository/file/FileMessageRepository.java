@@ -96,15 +96,16 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findMessagesById(UUID id) {
+        return findAll().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
         //Map<UUID, Message> messageMap = loadFromSer(FILE_NAME);
-        Map<UUID, Message> messageMap = FileSerializationUtil.loadFromSer(FILE_NAME);
+        /*Map<UUID, Message> messageMap = FileSerializationUtil.loadFromSer(FILE_NAME);
         if(!messageMap.containsKey(id)){
             System.out.println("메시지를 찾을 수 없습니다.");
             return null;
         }
         List<Message> collect = findAll().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
         System.out.println("collect = " + collect.size());
-        return collect;
+        return collect;*/
     }
 
     @Override

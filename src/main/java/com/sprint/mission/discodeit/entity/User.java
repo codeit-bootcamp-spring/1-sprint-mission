@@ -21,7 +21,8 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     @JsonProperty("userId")
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final UUID id;
     @Setter
     @JsonProperty("userName")
@@ -51,6 +52,7 @@ public class User implements Serializable {
         this.updatedAt = Instant.now();
         this.email = email;
     }
+
     public User() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
@@ -62,6 +64,10 @@ public class User implements Serializable {
         updatedAt = Instant.now();
     }
 
+    @Override
+    public String toString() {
+        return "User{" + "id=" + id + ", userName='" + userName + '\'' + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", email='" + email + '\'' + ", password='" + password + '\'' + ", hashedPassword=" + hashedPassword + '}';
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -69,8 +75,9 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) return false; // null이거나 클래스가 다르면 false
         User user = (User) o;
         //수정했는데 확인해봐야할 듯
-        return  Objects.equals(userName, user.userName) || user.email.equals(email); // 모든 필드를 비교
+        return Objects.equals(userName, user.userName) || user.email.equals(email); // 모든 필드를 비교
     }
+
     @Override
     public int hashCode() {
         return Objects.hash(id, userName, email, createdAt, updatedAt); // 비교 대상 필드 기반 hashCode 생성

@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.ReadStatus;
-import com.sprint.mission.discodeit.dto.ChannelDto;
-import com.sprint.mission.discodeit.dto.ChannelFindAllDto;
-import com.sprint.mission.discodeit.dto.ChannelFindDto;
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -39,17 +36,23 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto create(ChannelDto dto) {
         //public 신청 검토
         Channel savedChannel = channelRepository.save(dto.name(), dto.type());
+        //readStatus 업데이트 필요
+
         return new ChannelDto(savedChannel);
     }
 
     @Override
     public ChannelFindDto find(UUID id) {
         Channel channel = channelRepository.findById(id);
+        if(channel == null){
+            throw new IllegalStateException("채널을 찾을 수 없습니다.");
+        }
         List<Message> messagesById = messageRepository.findMessagesById(id);
+        if(messagesById.isEmpty()) {return new ChannelFindDto(channel, null);}
         Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();//가장 최근의 메시지 시간 정보
 
         if (channel.getType() == ChannelType.PRIVATE) {
-            //참여한 User의 ID 정보 포함
+            //Private 채널에 참여한 User의 ID 정보 포함
             List<ReadStatus> privateChannelUsers = readStatusRepository.findAllByChannelId(id);
             List<UUID> userList = privateChannelUsers.stream().map(ReadStatus::getUserId).toList();
             return new ChannelFindDto(channel, updatedAt, userList);
@@ -61,22 +64,26 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelFindAllDto findAll() {
         List<Channel> channels = channelRepository.findAll();
-        Map<UUID, Instant> latestMessagesInstant = new HashMap<>();
+        Map<UUID, Instant> latestMessages = new HashMap<>();
         List<UUID> list = channels.stream().map(Channel::getId).toList(); //채널 ID
         for (UUID uuid : list) {
-            List<Message> messagesById = messageRepository.findMessagesById(uuid);
+            List<Message> messagesById = messageRepository.findAll().stream().filter(s -> s.getChannelId().equals(uuid)).toList();
+            //효율성? 고려해야될 듯
+            if(messagesById.isEmpty()) {
+                continue;
+            }
             Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();
-            latestMessagesInstant.put(uuid, updatedAt);
+            latestMessages.put(uuid, updatedAt); //채널 별 가장 최근의 메시지
         }
         List<List<UUID>> userList = new ArrayList<>();
         for (Channel channel : channels) {
             if (channel.getType() == ChannelType.PRIVATE) {
-                //참여한 User의 ID 정보 포함
+                //Private 채널에 참여한 User의 ID 정보 포함
                 List<ReadStatus> privateChannelUsers = readStatusRepository.findAllByChannelId(channel.getId());
                 userList.add(privateChannelUsers.stream().map(ReadStatus::getUserId).toList());
             }
         }
-        return new ChannelFindAllDto(channels, latestMessagesInstant, userList);
+        return new ChannelFindAllDto(channels, latestMessages, userList);
         //채널, 채널마다 시간 정보, 유저 리스트
     }
 
@@ -101,13 +108,45 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID id) {
         //채널과 관련된 메시지 삭제 (Message.ser 속 객체 )
-        List<UUID> messages = channelRepository.messages(id);
-        for (UUID message : messages) {
-            messageRepository.delete(message);
+        List<UUID> messages = channelRepository.findMessagesByChannelId(id);
+        if(!messages.isEmpty()) {
+            int count = 0;
+            for (UUID message : messages) {
+                boolean delete = messageRepository.delete(message);
+                System.out.println("delete = " + delete+" message = " + message);
+                if (delete == true ) count++;
+            }
+            System.out.println("채널과 연관된 메시지 삭제 성공 - " + count+"개");
         }
         //채널 삭제 ( 내부 Map )
         channelRepository.delete(id);
         //채널과 관련된 ReadStatus 삭제
+        if(readStatusRepository.findAllByChannelId(id)==null) {
+            System.out.println("채널 속 유저 상태 정보가 없습니다."); return;
+        }
         readStatusRepository.deleteByChannelId(id);
+    }
+
+    @Override
+    public UUID addMessageInChannel(MessageDto messageDto) {
+        //채널에 메시지 추가하기
+        UUID senderId = messageDto.senderId();
+        UUID channelId = messageDto.channelId();
+        if(senderId == null || channelId == null) {
+            throw new IllegalStateException("아이디와 채널 아이디를 추가해주세요.");
+        }
+        UUID savedMessageId = messageRepository.save(senderId, channelId, messageDto.content());
+        channelRepository.addMessage(channelId, savedMessageId);
+        return savedMessageId;
+    }
+
+    @Override
+    public List<UUID> findAllMessagesByChannelId(UUID channelId) {
+        Channel channel = channelRepository.findById(channelId);
+        if (channel == null) {
+            throw new IllegalStateException("채널을 찾을 수 없습니다.");
+        }
+        List<UUID> messagesByChannelId = channelRepository.findMessagesByChannelId(channelId);
+        return new ArrayList<>(messagesByChannelId);
     }
 }

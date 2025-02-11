@@ -7,16 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    UserRepository repository;
+    private final UserRepository repository;
 
     public UserDto login(String username, String password) {
         List<User> users = repository.findAll();
         for (User user : users) {
-            if(user.getUserName().equals(username) && user.getPassword().equals(password)) {
+            if(user.getUserName().equals(username) && user.getHashedPassword()== Objects.hashCode(password)) {
                 return new UserDto(user);
             }
         }

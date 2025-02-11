@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.ChannelFindAllDto;
 import com.sprint.mission.discodeit.dto.ChannelFindDto;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
@@ -25,4 +26,8 @@ public interface ChannelService {
     void updateChannel(ChannelDto dto);
 
     void deleteChannel(UUID id);
+
+    UUID addMessageInChannel(MessageDto dto);
+
+    List<UUID> findAllMessagesByChannelId(UUID channelId);
 }

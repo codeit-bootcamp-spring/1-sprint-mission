@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -17,7 +19,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @RequiredArgsConstructor
-public class ReadStatus {
+public class ReadStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue
     private UUID id;
@@ -51,6 +55,7 @@ public class ReadStatus {
         if(newStatus.channelId() != null) { this.channelId = newStatus.channelId();}
         if(newStatus.userId() != null) { this.userId = newStatus.userId();}
         if(newStatus.lastReadAt() != null) { this.lastReadAt = newStatus.lastReadAt();}
+        //일단 다 바꾸어 줄 수 있도록 했습니다.
         return this;
     }
 

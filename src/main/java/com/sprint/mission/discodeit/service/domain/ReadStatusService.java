@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,30 +35,36 @@ public class ReadStatusService{
         }
     }
 
-    public ReadStatus findById(UUID id) {
+    public ReadStatusDto findById(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id);
         if (readStatus == null) {
             System.out.println("아이디를 찾을 수 없습니다.");
             return null;
         }
-        return readStatus;
+        return new ReadStatusDto(readStatus);
     }
 
-    public List<ReadStatus> findAll() {
-        return readStatusRepository.findAll();
+    public List<ReadStatusDto> findAll() {
+        List<ReadStatusDto> readStatusDtos = new ArrayList<>();
+        readStatusRepository.findAll().forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        return readStatusDtos;
     }
 
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+        List<ReadStatusDto> readStatusDtos = new ArrayList<>();
+        readStatusRepository.findAllByUserId(userId).forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        return readStatusDtos;
     }
 
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    public List<ReadStatusDto> findAllByChannelId(UUID channelId) {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             System.out.println("채널을 찾을 수 없습니다.");
             return null;
         }
-        return readStatusRepository.findAllByChannelId(channelId);
+        List<ReadStatusDto> readStatusDtos = new ArrayList<>();
+        readStatusRepository.findAllByChannelId(channelId).forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        return readStatusDtos;
     }
 
     public void delete(UUID id) {
@@ -83,9 +90,9 @@ public class ReadStatusService{
         readStatusRepository.deleteByChannelId(channelId);
     }
 
-    public void update(ReadStatusDto readStatusDto) {
-        if(readStatusRepository.findById(readStatusDto.id())!=null) {
-            readStatusRepository.update(readStatusDto);
+    public void update(ReadStatusDto before, ReadStatusDto after) {
+        if(readStatusRepository.findById(before.id())!=null) {
+            readStatusRepository.update(before, after);
             System.out.println("업데이트 성공");
         }else System.out.println("상태 정보를 찾을 수 없습니다.");
     }

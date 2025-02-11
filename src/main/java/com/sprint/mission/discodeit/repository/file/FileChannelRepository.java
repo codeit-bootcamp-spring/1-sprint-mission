@@ -68,8 +68,10 @@ public class FileChannelRepository implements ChannelRepository {
 
         return map;
     }
+
     @Override
     public void addMessage(UUID uuid, UUID messageId) {
+        messages = loadMessagesFromSer(CHANNEL_MESSAGES);
         Channel channel = findById(uuid);
         if (channel == null) {
             System.out.println("채널을 찾을 수 없습니다.");
@@ -81,7 +83,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     }
     @Override
-    public List<UUID> messages(UUID channelId) {
+    public List<UUID> findMessagesByChannelId(UUID channelId) {
         Channel channel = findById(channelId);
         if (channel == null) {
             System.out.println("채널을 찾을 수 없습니다.");
@@ -93,35 +95,45 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public void deleteMessageInChannel(UUID channelId, UUID messageId) {
+        //파일 속 메시지 연관성 삭제
+    }
+
+    @Override
     public Channel save(String channelName, ChannelType type) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        if (channelMap.values().stream().anyMatch(channel -> channel.getName().equals(channelName))) {
+        /*if (channelMap.values().stream().anyMatch(channel -> channel.getName().equals(channelName))) {
             System.out.println("이미 존재하는 채널입니다.");
             return channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getName().equals(channelName)).findFirst().get()); //존재하는 채널 UUID 반환
         }
-        System.out.println("채널 생성 중");
-        Channel channel = new Channel(channelName, type);
-        channelMap.put(channel.getId(), channel);
+        System.out.println("채널 생성 중");*/
+        Channel newChannel = new Channel(channelName, type);
+        channelMap.put(newChannel.getId(), newChannel);
+        messages.put(newChannel.getId(), new ArrayList<>());
         saveToSer(FILE_NAME, channelMap);
+        saveMessageToSer(CHANNEL_MESSAGES, messages);
 
-        return channel;
+        return newChannel;
     }//public
 
     @Override
     public Channel save(ChannelType type) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
         System.out.println("채널 생성 중");
-        Channel channel = new Channel(type);
-        channelMap.put(channel.getId(), channel);
+        Channel newChannel = new Channel(type);
+        channelMap.put(newChannel.getId(), newChannel);
+        messages.put(newChannel.getId(), new ArrayList<>());
         saveToSer(FILE_NAME, channelMap);
-        return channel;
+        saveMessageToSer(CHANNEL_MESSAGES, messages);
+
+        return newChannel;
     }//private
 
     @Override
     public Channel findById(UUID id) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
         if (!channelMap.containsKey(id)) {
-            return null;
+            throw new IllegalStateException("Channel을 찾을 수 없습니다");
         }
         return channelMap.get(id);
     }

@@ -16,6 +16,7 @@ public interface ChannelRepository {
     List<Channel> findAll();
     boolean delete(UUID channelId);
     void update(UUID id, String name);
-    void addMessage(UUID uuid, UUID messageId);
-    List<UUID> messages(UUID channelId);
+    void addMessage(UUID channelId, UUID messageId);
+    List<UUID> findMessagesByChannelId(UUID channelId);
+    void deleteMessageInChannel(UUID channelId, UUID messageId);
 }

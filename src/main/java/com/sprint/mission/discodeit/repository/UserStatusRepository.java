@@ -15,7 +15,7 @@ public interface UserStatusRepository {
     UserStatus findByUserId(UUID userId); // 유저 아이디로 찾기
     List<UserStatus> findAll(); //모든 유저 상태
     void delete(UUID id);
-    void update(UserStatusDto userStatusDto); //유저 상태 업데이트
+    void update(UserStatusDto before, UserStatusDto after); //유저 상태 업데이트
 
 
 }

@@ -6,5 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageDto(UUID id, UUID senderId, UUID channelId,Instant createdAt, Instant updatedAt, String content, List<File> fileList) {
-
+    public MessageDto (UUID senderId, UUID channelId, String content){
+        this(null, senderId, channelId, null, null,content, null);
+    }
 }

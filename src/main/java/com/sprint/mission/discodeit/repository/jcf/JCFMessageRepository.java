@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -11,12 +13,12 @@ import java.util.stream.Collectors;
 //implements MessageRepository
 @Repository
 @Profile("Jcf")
+@RequiredArgsConstructor
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messageMap;
+    private final ChannelRepository channelRepository;
+    private Map<UUID, Message> messageMap = new HashMap<>();
 
-    public JCFMessageRepository() {
-        this.messageMap = new HashMap<>();
-    }
+/*
 
     public UUID createMessage(UUID sender, UUID channelId, String content) {
         Message message = new Message(sender, channelId, content);
@@ -58,6 +60,7 @@ public class JCFMessageRepository implements MessageRepository {
             System.out.println("메시지를 찾을 수 없습니다.");
         }
     }
+*/
 
     @Override
     public UUID save(UUID sender,UUID channelId, String content) {
@@ -73,7 +76,7 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findMessagesById(UUID id) {
-        return getMessages().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
+        return findAll().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
     }
 
     @Override
@@ -87,11 +90,14 @@ public class JCFMessageRepository implements MessageRepository {
         if (messageMap.containsKey(messageId)) {
             //Message message = messageMap.get(messageId);
             //initializeMessage(message);
+            Message message = messageMap.get(messageId);
             messageMap.replace(messageId, new Message());
             messageMap.remove(messageId);
+            //채널에서 해당 메시지 기록이 살아있음
+            channelRepository.deleteMessageInChannel(message.getChannelId(), messageId);
             return true;
         } else {
-            System.out.println("메시지를 찾을 수 없습니다.");
+            System.out.println("messageId = " + messageId + " -> 메시지를 찾을 수 없습니다.");
             return false;
         }
     }
