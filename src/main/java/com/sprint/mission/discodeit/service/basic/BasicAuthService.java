@@ -39,13 +39,7 @@ public class BasicAuthService implements AuthService {
 	}
 
 	private UserResponse createLoginResponse(User user, UserStatus userStatus) {
-		return new UserResponse(
-			user.getUserid(),
-			user.getUsername(),
-			user.getEmail(),
-			userStatus.isOnline(),
-			user.getCreatedAt(),
-			user.getUpdatedAt()
-		);
+		return new UserResponse(user.getUserid(), user.getUsername(), user.getEmail(), userStatus.isOnline(),
+			user.getCreatedAt(), user.getUpdatedAt());
 	}
 }

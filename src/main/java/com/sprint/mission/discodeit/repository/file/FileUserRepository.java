@@ -15,7 +15,7 @@ import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
+	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
 	private static final String USER_FILE = "user.ser";
 	private final FileStorage<User> fileStorage;
 
@@ -34,35 +34,51 @@ public class FileUserRepository implements UserRepository {
 
 	@Override
 	public Optional<User> findById(UUID id) {
-		return findAll().stream()
-			.filter(u -> u.getId().equals(id))
-			.findFirst();
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getId().equals(id)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
 	public Optional<User> findByUserid(String userid) {
-		return findAll().stream()
-			.filter(u -> u.getUserid().equals(userid))
-			.findFirst();
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getUserid().equals(userid)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
 	public Optional<User> findByEmail(String email) {
-		return findAll().stream()
-			.filter(u -> u.getEmail().equals(email))
-			.findFirst();
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getEmail().equals(email)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
 	public Optional<User> findByUsername(String username) {
-		return findAll().stream()
-			.filter(u -> u.getUserid().equals(username))
-			.findFirst();
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getUserid().equals(username)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override
 	public List<User> findAll() {
-		return fileStorage.load(ROOT_DIR);
+		return fileStorage.load(ROOT_DIR.resolve(USER_FILE));
 	}
 
 	@Override

@@ -9,13 +9,13 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 
 public interface UserService {
-	UserResponse createUser(CreateUserRequest requestDto);
+	UserResponse createUser(CreateUserRequest request);
 
 	UserResponse findUser(UUID existUserId);
 
 	List<UserResponse> findAllUsers();
 
-	User updateUser(UUID existUserId, UpdateUserRequest requestDto);
+	User updateUser(UUID existUserId, UpdateUserRequest request);
 
 	void deleteUser(UUID userId);
 }

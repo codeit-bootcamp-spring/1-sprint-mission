@@ -1,135 +1,158 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusRequest;
+import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicUserService implements UserService {
 	private final UserRepository userRepository;
-	//1. 이 둘은 나중에 repository가 아닌 service로 불러와야되지 않을까..?
-	//2. constructor가 아닌 setter주입으로 혹시 모를 순환참조를 막는게 좋지 않을까...?
-	private final UserStatusRepository userStatusRepository;
-	private final BinaryContentRepository binaryContentRepository;
+	private final UserStatusService userStatusService;
+	private final BinaryContentService binaryContentService;
 
+	public BasicUserService(UserRepository userRepository, UserStatusService userStatusService,
+		BinaryContentService binaryContentService) {
+		this.userRepository = userRepository;
+		this.userStatusService = userStatusService;
+		this.binaryContentService = binaryContentService;
+	}
+
+	/**
+	 * 새로운 사용자를 생성합니다.
+	 * @param request 사용자 생성 요청 정보 (ID, 사용자명, 이메일, 비밀번호, 프로필 이미지)
+	 * @return 생성된 사용자 정보
+	 */
 	@Override
-	public UserResponse createUser(CreateUserRequest requestDto) {
+	public UserResponse createUser(CreateUserRequest request) {
 		// 중복 체크
-		if (userRepository.findByUsername(requestDto.username()).isPresent()) {
-			throw new IllegalArgumentException("Username already exists: " + requestDto.username());
+		if (userRepository.findByUsername(request.username()).isPresent()) {
+			throw new IllegalArgumentException("Username already exists: " + request.username());
 		}
-		if (userRepository.findByEmail(requestDto.email()).isPresent()) {
-			throw new IllegalArgumentException("Email already exists: " + requestDto.email());
+		if (userRepository.findByEmail(request.email()).isPresent()) {
+			throw new IllegalArgumentException("Email already exists: " + request.email());
 		}
-		//user 생성
-		User user = new User(requestDto.userid(), requestDto.username(), requestDto.email(), requestDto.password());
+
+		// user 생성
+		User user = new User(request.userid(), request.username(), request.email(), request.password());
 		user = userRepository.save(user);
 
-		//userstatus 생성
-		UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
-		userStatusRepository.save(userStatus);
+		// userstatus 생성
+		UserStatus userStatus = userStatusService.create(new CreateUserStatusRequest(user.getId(), Instant.now()));
 
-		//프로필 이미지가 있다면 저장
-		if (requestDto.profileImage() != null) {
-			BinaryContent profileImage = new BinaryContent(
-				UUID.randomUUID(),
-				Instant.now(),
-				user.getId(),
-				null,
-				requestDto.profileImage(),
-				requestDto.contentType(),
-				requestDto.fileName(),
-				requestDto.profileImage().length
-			);
-			binaryContentRepository.save(profileImage);
+		// 프로필 이미지가 있다면 저장
+		if (request.profileImage() != null) {
+			try {
+				CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(user.getId(), null,
+					request.profileImage(), BinaryContentType.PROFILE_IMAGE);
+				binaryContentService.create(binaryRequest);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to process profile image", e);
+			}
 		}
 
 		return createUserResponse(user, userStatus);
 	}
 
+	/**
+	 * 사용자 ID를 기반으로 사용자를 조회합니다.
+	 * @param existUserId 조회할 사용자 ID
+	 * @return 조회된 사용자 정보
+	 */
+	//비밀번호 변경시에는 userresponse에서는 password를 반환하지 않는데 새로운 메서드를 하나 만들어야될까?
 	@Override
 	public UserResponse findUser(UUID existUserId) {
 		User user = userRepository.findById(existUserId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found: " + existUserId));
-		UserStatus userStatus = userStatusRepository.findById(existUserId)
-			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found: " + existUserId));
+		UserStatus userStatus = userStatusService.find(existUserId);
 
 		return createUserResponse(user, userStatus);
 	}
 
+	/**
+	 * 모든 사용자를 조회합니다.
+	 * @return 전체 사용자 목록
+	 */
 	@Override
 	public List<UserResponse> findAllUsers() {
-		return userRepository.findAll().stream()
-			.map(user -> {
-				UserStatus status = userStatusRepository.findByUserId(user.getId())
-					.orElseThrow();
-				return createUserResponse(user, status);
-			})
-			.collect(Collectors.toList());
+		List<User> users = userRepository.findAll();
+		List<UserResponse> responses = new ArrayList<>();
+
+		for (User user : users) {
+			UserStatus status = userStatusService.find(user.getId());
+			responses.add(createUserResponse(user, status));
+		}
+
+		return responses;
 	}
 
+	/**
+	 * 사용자 정보를 업데이트합니다.
+	 * @param existUserId 업데이트할 사용자 ID
+	 * @param request 변경할 사용자 정보 (사용자명, 이메일, 프로필 이미지)
+	 * @return 업데이트된 사용자 객체
+	 */
 	@Override
-	public User updateUser(UUID existUserId, UpdateUserRequest requestDto) {
-		//isPresent를 통해 orElseThrow를 만들려고 했는데 잘 됐는지 잘 모르겠다.
+	public User updateUser(UUID existUserId, UpdateUserRequest request) {
 		User user = userRepository.findById(existUserId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
 		// 프로필 이미지 업데이트
-		if (requestDto.profileImage() != null) {
-			binaryContentRepository.findByAuthorId(existUserId)
-				.forEach(content -> binaryContentRepository.deleteById(content.getId()));
+		if (request.profileImage() != null) {
+			try {
+				// 기존 프로필 이미지 삭제
+				binaryContentService.deleteProfileImageByAuthorId(existUserId);
 
-			BinaryContent newProfile = new BinaryContent(
-				UUID.randomUUID(),
-				Instant.now(),
-				existUserId,
-				null,
-				requestDto.profileImage(),
-				requestDto.contentType(),
-				requestDto.fileName(),
-				requestDto.profileImage().length
-			);
-			binaryContentRepository.save(newProfile);
+				// 새로운 프로필 이미지 저장
+				CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(user.getId(),
+					null, request.profileImage(), BinaryContentType.PROFILE_IMAGE);
+				binaryContentService.create(binaryRequest);
+			} catch (Exception e) {
+				throw new RuntimeException("Failed to process profile image", e);
+			}
 		}
 
-		user.updateUserid(requestDto.userid());
-		user.updateUsername(requestDto.username());
-		user.updateUserEmail(requestDto.email());
+		user.updateUserid(request.userid());
+		user.updateUsername(request.username());
+		user.updateUserEmail(request.email());
 
 		return userRepository.save(user);
 	}
 
+	/**
+	 * 사용자를 삭제합니다.
+	 * @param userId 삭제할 사용자 ID
+	 */
 	@Override
 	public void deleteUser(UUID userId) {
 		User existUser = userRepository.findById(userId)
 			.orElseThrow(() -> new IllegalArgumentException("User ID does not exist: " + userId));
 
 		// 관련 도메인 삭제
-		userStatusRepository.deleteByUserId(existUser.getId());
-		binaryContentRepository.findByAuthorId(existUser.getId())
-			.forEach(content -> binaryContentRepository.deleteById(content.getId()));
+		userStatusService.deleteByUserId(userId);
+		binaryContentService.delete(userId);
 
 		userRepository.delete(existUser.getId());
 	}
 
-	//메서드로 만들어 return
+	/**
+	 * 사용자와 사용자 상태를 기반으로 사용자 응답 객체를 생성합니다.
+	 * @param user 사용자 객체
+	 * @param userStatus 사용자 상태 객체
+	 * @return 사용자 응답 객체
+	 */
 	private UserResponse createUserResponse(User user, UserStatus userStatus) {
 		return new UserResponse(
 			user.getUserid(),

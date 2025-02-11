@@ -16,7 +16,7 @@ public class UserStatus extends BaseEntity {
 	}
 
 	// 마지막 활동 시간을 업데이트하는 메서드
-	public void updateLastActiveTime() {
+	public void updateLastActiveTime(Instant lastActiveAt) {
 		this.lastActiveAt = Instant.now();
 	}
 

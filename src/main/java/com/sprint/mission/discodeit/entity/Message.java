@@ -1,18 +1,20 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.UUID;
+
 import lombok.Getter;
 
 @Getter
 public class Message extends BaseEntity {
 	private String content;
-	private User author;   // 메시지를 작성한 사용자 ID
-	private Channel channel; // 메시지가 속한 채널 ID
+	private UUID authorId;   // User 객체 대신 ID 참조
+	private UUID channelId;  // Channel 객체 대신 ID 참조
 
-	public Message(String content, User author, Channel channel) {
+	public Message(String content, UUID authorId, UUID channelId) {
 		super();
 		this.content = content;
-		this.author = author;
-		this.channel = channel;
+		this.authorId = authorId;
+		this.channelId = channelId;
 	}
 
 	public void updateContent(String content) {
@@ -20,26 +22,23 @@ public class Message extends BaseEntity {
 		updateTime();
 	}
 
-	public void updateAuthor(User author) {
-		this.author = author;
+	public void updateAuthor(UUID userId) {
+		this.authorId = userId;
 		updateTime();
 	}
 
-	public void updateChannel(Channel channel) {
-		this.channel = channel;
+	public void updateChannel(UUID channelId) {
+		this.channelId = channelId;
 		updateTime();
 	}
 
 	@Override
 	public String toString() {
-		String authorName = (author != null) ? author.getUsername() : "Unknown";
-		String channelName = (channel != null) ? channel.getName() : "Unknown";
-
 		return "Message{" +
 			"id='" + getId() + '\'' +
 			"content='" + content + '\'' +
-			", author='" + authorName + '\'' +
-			", channel='" + channelName + '\'' +
+			", author='" + authorId + '\'' +
+			", channel='" + channelId + '\'' +
 			'}';
 	}
 }
