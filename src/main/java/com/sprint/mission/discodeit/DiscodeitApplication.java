@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.basic.BasicUserStatusService;
 import com.sprint.mission.discodeit.dto.*;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,13 +40,16 @@ public class DiscodeitApplication {
         UserStatusDTO userStatus = userStatusService.create(new UserStatusDTO(createdUser.getId(), Instant.now()));
         System.out.println("[유저 상태] 온라인 상태 업데이트 완료: " + userStatus.getUserId());
 
+        UserStatusType currentStatus = userStatusService.getUserOnlineStatus(createdUser.getId());
+        System.out.println("[유저 온라인 상태]: " + userDTO.getName() +  " 현재 상태: " + currentStatus);
+
         ChannelDTO channelDTO = new ChannelDTO("PUBLIC CHANNEL", "오픈 채널입니다.", "PUBLIC");
         Channel createdChannel = channelService.create(channelDTO);
         System.out.println("[채널 생성] 채널명: " + createdChannel.getName() + " | 타입: " + createdChannel.getType());
 
         MessageDTO messageDTO = new MessageDTO("안녕하세요! 채팅 시작합니다.", createdChannel.getId(), createdUser.getId());
         Message createdMessage = messageService.create(messageDTO);
-        System.out.println("[메시지 전송]: " + "채널명 : "+ createdChannel.getName() + " 보낸 유저: " + createdUser.getName() + " | 내용: " + createdMessage.getContent());
+        System.out.println("[메시지 전송]: " + "채널명: "+ createdChannel.getName() + " 보낸 유저: " + createdUser.getName() + " | 내용: " + createdMessage.getContent());
 
         ReadStatusDTO readStatus = readStatusService.create(new ReadStatusDTO(createdUser.getId(), createdChannel.getId(), Instant.now()));
         System.out.println("[읽음 상태] 유저가 마지막으로 읽은 시간 업데이트: " + readStatus.getLastReadTime());
