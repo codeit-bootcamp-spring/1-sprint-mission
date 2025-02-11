@@ -67,6 +67,7 @@ public class Channel implements Serializable {
         this.subject = subject;
     }
 
+
     public void updateName(String name) {
         this.name = name.trim();
     }

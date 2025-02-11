@@ -20,6 +20,6 @@ public class ParticipatedUser {
     }
 
     public Set<UUID> getParticipatedUserId() {
-        return Collections.unmodifiableSet(users.keySet());
+        return Set.copyOf(users.keySet());
     }
 }

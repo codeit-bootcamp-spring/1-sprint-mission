@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class BirthDate {
+
     private static final int MIN_AGE_RESTRICT = 13;
 
     private final LocalDate value;
