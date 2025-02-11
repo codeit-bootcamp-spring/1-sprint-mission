@@ -32,14 +32,14 @@ public class DiscodeitApplication {
 
         UserService userService = context.getBean(UserService.class);
 
-        setupUser(ㅈ);
+        setupUser(userService);
 
         System.out.println("==== User Read All ====");
-        List<User> users = userService.readAll();
+        List<UserResponse> users = userService.readAll();
         users.forEach(user -> {
-            System.out.println("userName : " + user.getUsername()
-                    + " | Email : " + user.getEmail()
-                    + " | phoneNumber : " + user.getPhoneNumber()
+            System.out.println("userName : " + user.username()
+                    + " | Email : " + user.email()
+                    + " | phoneNumber : " + user.phoneNumber()
             );
         });
 

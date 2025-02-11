@@ -51,37 +51,45 @@ public class BasicUserService implements UserService {
 
         userStatusRepository.save(new UserStatus(user.getId()));
 
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), false);
+        return UserResponse.fromEntity(user);
     }
 
     @Override
     public UserResponse readOne(UUID id) {
         User user = userRepository.findById(id);
         // TODO user readOne -> isOnline
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.geti)
+        userStatusRepository.findByUserId(user.getId());
+
+        return UserResponse.fromEntity(user);
     }
 
     @Override
-    public List<User> readAll() {
-        return repository.readAll();
+    public List<UserResponse> readAll() {
+        List<User> users = userRepository.readAll();
+        List<UserResponse> responses = (List<UserResponse>) users.stream().map(user -> UserResponse.fromEntity(user));
+
+        return responses;
     }
 
     @Override
-    public User update(UUID id, User updatedUser) {
+    public UserResponse update(UUID id, UserRequest updatedUserReq) {
         try {
-            if(!validator.isValidEmail(updatedUser.getEmail())){
-                System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println(new ValidationException("Invalid email format : " + updatedUser.getEmail()));
+            if(!validator.isValidEmail(updatedUserReq.email())){
+                System.out.println(updatedUserReq.username() + "님의 사용자 수정이 완료되지 않았습니다.");
+                System.out.println(new ValidationException("Invalid email format : " + updatedUserReq.email()));
                 return null;
             }
 
-            if(!validator.isValidPhoneNumber(updatedUser.getPhoneNumber())){
-                System.out.println(updatedUser.getUsername() + "님의 사용자 수정이 완료되지 않았습니다.");
-                System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + updatedUser.getPhoneNumber()));
+            if(!validator.isValidPhoneNumber(updatedUserReq.phoneNumber())){
+                System.out.println(updatedUserReq.username() + "님의 사용자 수정이 완료되지 않았습니다.");
+                System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + updatedUserReq.phoneNumber()));
                 return null;
             }
 
-            return repository.modify(id, updatedUser);
+            User user = userRepository.modify(id, new User(updatedUserReq.username(), updatedUserReq.password(), updatedUserReq.email(), updatedUserReq.phoneNumber()));
+
+            return UserResponse.fromEntity(user);
+
         } catch (DataNotFoundException e){
             throw new DataNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);
         }
@@ -89,6 +97,6 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean delete(UUID id) {
-        return repository.deleteById(id);
+        return userRepository.deleteById(id);
     }
 }

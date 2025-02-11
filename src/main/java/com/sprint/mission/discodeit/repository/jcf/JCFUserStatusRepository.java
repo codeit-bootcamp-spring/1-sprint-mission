@@ -17,8 +17,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public JCFUserStatusRepository() { this.data = new HashMap<>(); }
 
     @Override
-    public UserStatus findByUserId(String userid) {
-        return null;
+    public UserStatus findByUserId(UUID userid) {
+        return data.get(userid);
     }
 
     @Override

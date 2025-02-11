@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelRequest;
+import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BaseRepository;
@@ -14,46 +16,52 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    private final ChannelRepository repository;
+    private final ChannelRepository channelRepository;
 
     @Override
-    public Channel create(Channel channel) {
-        repository.save(channel);
-        return channel;
+    public ChannelResponse create(ChannelRequest request) {
+        Channel channel = new Channel(
+                request.name(),
+                request.description(),
+                request.member().stream()
+                        .map(user -> new ChannelRequest(user.username(), user.)),
+                request.owner());
+        channelRepository.save(request);
+        return ChannelResponse.fromEntity(request);
     }
 
     @Override
-    public Channel readOne(UUID id) {
-        return repository.findById(id);
+    public ChannelResponse readOne(UUID id) {
+        return channelRepository.findById(id);
     }
 
     @Override
-    public List<Channel> readAll() {
-        return repository.readAll();
+    public List<ChannelResponse> readAll() {
+        return channelRepository.readAll();
     }
 
     @Override
-    public Channel update(UUID id, Channel updateChannel) {
-        return repository.modify(id, updateChannel);
+    public ChannelResponse update(UUID id, ChannelRequest updateChannel) {
+        return channelRepository.modify(id, updateChannel);
     }
 
     @Override
     public boolean delete(UUID id) {
-        return repository.deleteById(id);
+        return channelRepository.deleteById(id);
     }
 
     @Override
     public Channel channelOwnerChange(UUID id, User owner) {
-        return repository.ownerChange(id, owner);
+        return channelRepository.ownerChange(id, owner);
     }
 
     @Override
     public boolean channelMemberJoin(UUID id, User user) {
-        return repository.memberJoin(id, user);
+        return channelRepository.memberJoin(id, user);
     }
 
     @Override
     public boolean channelMemberWithdrawal(UUID id, User user) {
-        return repository.memberWithdrawal(id, user);
+        return channelRepository.memberWithdrawal(id, user);
     }
 }
