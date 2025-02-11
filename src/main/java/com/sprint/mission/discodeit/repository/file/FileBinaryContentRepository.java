@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.data.BinaryContent;
+import com.sprint.mission.discodeit.entity.data.ContentType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,9 +35,22 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         init(MESSAGE_IMAGE);
     }
 
+    private Path resolvePath(UUID id, ContentType contentType){
+        return DIRECTORY.resolve(contentType.name()).resolve(id + EXTENSION);
+    }
+
     @Override
-    public BinaryContent save(BinaryContent binaryContent) {
-        return null;
+    public BinaryContent save(BinaryContent binaryContent, ContentType contentType) {
+        Path path = resolvePath(binaryContent.getId(), contentType);
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(binaryContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return binaryContent;
     }
 
     @Override

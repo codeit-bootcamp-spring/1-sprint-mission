@@ -1,21 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ProfileImageDTO;
+import com.sprint.mission.discodeit.dto.user.BinaryContentDTO;
 import com.sprint.mission.discodeit.entity.data.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
+@Service
+@RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
+    private final BinaryContentRepository binaryContentRepository;
 
-    public BinaryContent created(ProfileImageDTO data){
+    public BinaryContent created(BinaryContentDTO data){
         BinaryContent binaryContent =
                 new BinaryContent(data.contentType(),
                         data.targetUUID(), data.filename(),data.fileType(), data.data());
+        binaryContentRepository.save(binaryContent, data.contentType());
         return binaryContent;
     }
 

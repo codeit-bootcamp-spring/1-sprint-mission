@@ -1,4 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
+import com.sprint.mission.discodeit.dto.user.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.user.CreatedUserDataDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.service.UserService;
@@ -13,18 +15,17 @@ public class JCFUserService implements UserService {
     private final UserValidator userValidator;
 
     public JCFUserService(UserValidator userValidator){
-
         this.userValidator = userValidator;
     }
 
     @Override
-    public User createUser(String name, String email,String iD ,String password) {
+    public User createUser(CreatedUserDataDTO userData, BinaryContentDTO binaryCData) {
         try{
-            userValidator.validateUser(name, email, password);
+            userValidator.validateUser(userData.name(), userData.email(), userData.password());
         }catch (CustomException e){
             System.out.println("유저생성 실패 ->" + e.getMessage());
         }
-        User user = new User(name, email, iD, password);
+        User user = new User(userData.name(), userData.email(), userData.id(), userData.password());
         data.put(user.getId(), user);
         return user;
 

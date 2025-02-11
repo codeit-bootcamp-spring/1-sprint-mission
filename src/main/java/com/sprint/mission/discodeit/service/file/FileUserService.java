@@ -1,4 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
+import com.sprint.mission.discodeit.dto.user.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.user.CreatedUserDataDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
@@ -30,11 +32,11 @@ public class FileUserService implements UserService {
 
 
     @Override
-    public User createUser(String name, String email,String iD ,String password) {
+    public User createUser(CreatedUserDataDTO userData, BinaryContentDTO proFile) {
         try{
-            userValidator.validateUser(name, email, password);
-            User user = new User(name, email, iD, password);
-            data.put(user.getId(), user);
+            userValidator.validateUser(userData.name(), userData.email(), userData.password());
+            User user = new User(userData.name(), userData.email(), userData.id(), userData.password());
+            dat.put(user.getId(), user);
             saveDataToFile();
             return user;
         }catch (CustomException e){
