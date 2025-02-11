@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
@@ -26,7 +27,16 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID id) {
-        return messageList.get(id);
+        if (id == null) {
+            throw new IllegalArgumentException("ID가 null입니다.");
+        }
+
+        Message message = messageList.get(id);
+        if (message == null) {
+            throw new NoSuchElementException("해당 객체가 존재하지 않습니다: " + id);
+        }
+
+        return message;
     }
 
     @Override
@@ -39,6 +49,9 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Map<UUID, Message> load() {
+        if (messageList.isEmpty()) {
+            throw new IllegalStateException("메시지 목록이 초기화되지 않았습니다.");
+        }
         return messageList;
     }
 

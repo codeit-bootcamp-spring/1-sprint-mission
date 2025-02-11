@@ -23,13 +23,21 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID id) {
-        return channelList.get(id);
+        Channel channel = channelList.get(id);
+        if (channel == null) {
+            throw new IllegalArgumentException("해당 객체가 존재하지 않습니다.");
+        }
+        return channel;
     }
 
     @Override
     public Map<UUID, Channel> load() {
+        if (channelList.isEmpty()) {
+            throw new IllegalStateException("Channel 목록이 초기화되지 않았습니다.");
+        }
         return channelList;
     }
+
 
     @Override
     public void delete(UUID id) {

@@ -1,41 +1,85 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 
+import javax.management.InstanceNotFoundException;
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
-    @Override
-    public ReadStatus save(ReadStatus readStatus) {
-        return null;
+    private final Map<UUID, ReadStatus> readStatusMap;
+    JCFReadStatusRepository(){
+        readStatusMap=new HashMap<>();
     }
 
     @Override
+    public ReadStatus save(ReadStatus readStatus) {
+        readStatusMap.put(readStatus.getId(), readStatus);
+        return readStatus;
+    }
+    @Override
     public ReadStatus findById(UUID id) {
-        return null;
+        ReadStatus readStatus = readStatusMap.get(id);
+        if (readStatus == null) {
+            throw new IllegalArgumentException("해당 객체가 존재하지 않습니다.");
+        }
+        return readStatus;
     }
 
     @Override
     public Map<UUID, ReadStatus> load() {
-        return Map.of();
+        if (readStatusMap.isEmpty()) {
+            throw new IllegalStateException("ReadStatus 맵이 초기화되지 않았습니다.");
+        }
+        return readStatusMap;
     }
 
-    @Override
-    public void delete(UUID id) {
-
-    }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return List.of();
+        List<ReadStatus> readStatusListByUserId = readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getUserId().equals(userId))
+                .toList();
+        if (readStatusListByUserId.isEmpty()) {
+            throw new IllegalArgumentException("해당 유저에 대한 객체가 존재하지 않습니다.");
+        }
+        return readStatusListByUserId;
     }
+
 
     @Override
     public Instant findLatestTimeByChannelId(UUID channeId) {
-        return null;
+            return
+                    readStatusMap.values().stream()
+                    .filter(readStatus -> readStatus.getChannelId().equals(channeId))
+                    .map(ReadStatus::getChannelLastReadTimes)
+                    .max(Comparator.naturalOrder()) //가장 최신 시간
+                    .orElseThrow(()-> new IllegalArgumentException("해당 객체를 찾을 수 없습니다."));
+
     }
+
+    //delete
+    @Override
+    public void delete(UUID id) {
+        if (!readStatusMap.containsKey(id)) {
+            throw new IllegalArgumentException("해당 객체가 존재하지 않아서 삭제할 수 없습니다.");
+        }
+        readStatusMap.remove(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        boolean removed = readStatusMap.values().removeIf(readStatus -> readStatus.getChannelId().equals(channelId));
+        if (!removed) {
+            throw new IllegalArgumentException("해당 채널 ID에 해당하는 객체를 삭제할 수 없습니다.");
+        }
+    }
+
 }

@@ -25,7 +25,11 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User findbyId(UUID id) {
-        return userList.get(id);
+        User user = userList.get(id);
+        if (user == null) {
+            throw new IllegalArgumentException("해당 객체가 존재하지 않습니다.");
+        }
+        return user;
     }
 
     @Override

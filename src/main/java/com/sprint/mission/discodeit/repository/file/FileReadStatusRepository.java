@@ -38,4 +38,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public Instant findLatestTimeByChannelId(UUID channeId) {
         return null;
     }
+
+    @Override
+    public void deleteByChannelId(UUID id) {
+
+    }
 }

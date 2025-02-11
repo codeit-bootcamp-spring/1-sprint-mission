@@ -17,4 +17,6 @@ public interface ReadStatusRepository {
     List<ReadStatus> findAllByUserId(UUID userId); //한 id의 모든 readStatus반환
 
     Instant findLatestTimeByChannelId(UUID channeId);
+
+    void deleteByChannelId(UUID id);
 }

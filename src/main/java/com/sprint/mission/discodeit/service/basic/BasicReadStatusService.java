@@ -67,4 +67,10 @@ public class BasicReadStatusService implements ReadStatusService {
     public void delete(UUID uuid) {
         readStatusRepository.delete(uuid);
     }
+
+    @Override
+    public void deleteByChannelId(UUID id) {
+        readStatusRepository.deleteByChannelId( id);
+    }
+
 }
