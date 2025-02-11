@@ -195,6 +195,7 @@ public class BasicMessageServiceIntegrationTest {
     MessageResponseDto created = messageService.createMessage(messageDto);
 
     assertThat(created.data()).extracting("fileName").contains("image1", "image2");
+    assertThat(created.data()).extracting("data").contains(new byte[]{1,2,3}, new byte[]{1,2,3,4});
   }
 
   @Test

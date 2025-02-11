@@ -34,32 +34,6 @@ public class DiscodeitApplication {
   }
 
   static void userSimulation() {
-    System.out.println("=== 유저 생성 및 조회 ===");
-
-    CreateUserDto createUserDto1 = new CreateUserDto(
-        "username1",
-        "pwd1",
-        "email1@email.com",
-        "nickname1",
-        "01012341234",
-        new byte[]{1, 2, 3},
-        "user1ProfileImage",
-        "jpg",
-        "description1"
-    );
-
-    CreateUserDto createUserDto2 = new CreateUserDto(
-        "username2",
-        "pwd2",
-        "email2@email.com",
-        "nickname2",
-        "01012341233",
-        new byte[]{1, 2, 3},
-        "user2ProfileImage",
-        "jpg",
-        "description2"
-    );
-
 
   }
 }

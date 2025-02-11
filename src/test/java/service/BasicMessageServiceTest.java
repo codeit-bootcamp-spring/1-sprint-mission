@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -39,6 +41,8 @@ public class BasicMessageServiceTest {
   private BinaryContentRepository binaryContentRepository;
   @Mock
   private EntityValidator validator;
+  @Mock
+  private BinaryContentService binaryContentService;
 
   @InjectMocks
   private BasicMessageService messageService;
@@ -65,7 +69,7 @@ public class BasicMessageServiceTest {
     when(validator.findOrThrow(eq(Channel.class), eq(messageDto.channelId()), any(ChannelNotFoundException.class))).thenReturn(channel1);
 
     when(messageRepository.create(any(Message.class))).thenReturn(message1);
-
+    when(binaryContentService.saveBinaryContentsForMessage(any(CreateMessageDto.class), anyString())).thenReturn(Collections.emptyList());
     MessageResponseDto response = messageService.createMessage(messageDto);
 
     assertThat(response).isNotNull();
@@ -106,6 +110,7 @@ public class BasicMessageServiceTest {
     verify(messageRepository, times(1)).findById(message1.getUUID());
   }
 
+  // TODO : 다시작성
   @Test
   void testGetMessagesByChannel(){
 
@@ -115,8 +120,8 @@ public class BasicMessageServiceTest {
         .build();
 
     when(messageRepository.findByChannel(channel1.getUUID())).thenReturn(List.of(message1, message2));
-    when(binaryContentRepository.findByChannel(channel1.getUUID())).thenReturn(List.of(binary1));
-
+//    when(binaryContentRepository.findByChannel(channel1.getUUID())).thenReturn(List.of(binary1));
+    when(binaryContentService.getBinaryContentsFilteredByChannelAndGroupedByMessage(channel1.getUUID())).thenReturn(Map.of(message1.getUUID(),List.of(binary1)));
     List<MessageResponseDto> responseList = messageService.getMessagesByChannel(channel1.getUUID());
 
     assertThat(responseList).isNotNull();
@@ -131,6 +136,7 @@ public class BasicMessageServiceTest {
     assertThat(response2.data()).isEmpty();
   }
 
+  //TODO : 다시 작성
   @Test
   void testUpdateMessage_Success(){
 
@@ -139,8 +145,8 @@ public class BasicMessageServiceTest {
 
     MessageUpdateDto updateDto = new MessageUpdateDto(message1.getUUID(), user1.getUUID(), "new content", List.of(binaryDto));
 
-    when(messageRepository.findById(message1.getUUID())).thenReturn(Optional.ofNullable(message1));
-    when(binaryContentRepository.saveMultipleBinaryContent(any(List.class))).thenReturn(List.of(newBinaryContent));
+    when(validator.findOrThrow(eq(Message.class), eq(message1.getUUID()), any(MessageNotFoundException.class))).thenReturn(message1);
+    when(binaryContentService.updateBinaryContentForMessage(eq(message1), eq(updateDto.userId()), any(List.class))).thenReturn(List.of(newBinaryContent));
 
     MessageResponseDto messageResponse = messageService.updateMessage(updateDto);
 
@@ -151,10 +157,7 @@ public class BasicMessageServiceTest {
     assertThat(messageResponse.data().get(0).fileName()).isEqualTo("file1");
     assertThat(messageResponse.data().get(0).data()).hasSize(3);
 
-    verify(messageRepository, times(2)).findById(message1.getUUID());
     verify(messageRepository, times(1)).update(message1);
-    verify(binaryContentRepository, times(1)).saveMultipleBinaryContent(any(List.class));
-    verify(binaryContentRepository, times(1)).findByMessageId(message1.getUUID());
   }
 
   @Test
@@ -163,7 +166,7 @@ public class BasicMessageServiceTest {
 
     MessageUpdateDto updateDto = new MessageUpdateDto(message1.getUUID(), user1.getUUID(), "new content", List.of(binaryDto));
 
-    when(messageRepository.findById(message1.getUUID())).thenThrow(MessageNotFoundException.class);
+    when(validator.findOrThrow(eq(Message.class), eq(message1.getUUID()), any(MessageNotFoundException.class))).thenThrow(new MessageNotFoundException());
 
     assertThatThrownBy(() -> messageService.updateMessage(updateDto)).isInstanceOf(MessageNotFoundException.class);
   }

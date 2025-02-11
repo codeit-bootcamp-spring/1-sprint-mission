@@ -13,7 +13,7 @@ import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.*;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -35,53 +34,67 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final EntityValidator validator;
-  private final ChannelRepository channelRepository;
+
+  private final BinaryContentService binaryContentService;
 
 
+  /**
+   * 메시지를 생성하고 첨부 파일을 저장한다
+   * <p>
+   * 1) 사용자 / 채널 검증
+   * 2) Message 생성 + 저장
+   * 3) 첨부파일 저장
+   * 4) MessageResponseDto 생성 및 반환
+   * </p>
+   *
+   * @param messageDto
+   * @return {@link MessageResponseDto} 기본적인 메시지 정보 & 같이 첨부된 파일 데이터
+   */
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto) {
 
-    // 사용자 검증
-    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
-
-    // 채널 검증
-    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
-
-
-    // 채널에 속하지 않은 유저 검증
-    if(channel.getIsPrivate()){
-      channel.getParticipatingUsers().stream().filter(id -> id.equals(messageDto.userId())).findAny().orElseThrow(
-          () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
-      );
-    }
-
+    validateCreateMessageRequest(messageDto);
 
     Message message = new Message.MessageBuilder(messageDto.userId(), messageDto.channelId(), messageDto.content()).build();
 
-    List<BinaryContentDto> binaryContentDtos = messageDto.binaryContent();
-
-    //TODO : 한번에 save 하도록
-    for (BinaryContentDto binary : binaryContentDtos) {
-      BinaryContent content = new BinaryContent.BinaryContentBuilder(
-          messageDto.userId(),
-          binary.fileName(),
-          binary.fileType(),
-          binary.fileSize(),
-          binary.data()
-      ).messageId(message.getUUID())
-          .channelId(messageDto.channelId()).build();
-
-      binaryContentRepository.save(content);
-    }
-
     messageRepository.create(message);
+
+    List<BinaryContentDto> binaryContentDtos = binaryContentService.saveBinaryContentsForMessage(messageDto, message.getUUID());
 
     return MessageResponseDto.fromBinaryContentDto(message, binaryContentDtos);
   }
 
+  /**
+   * 사용자, 채널의 존재 여부 검증
+   * 사용자가 해당 채널에 속해 있는지 검증
+   *
+   * @param messageDto 메시지 생성 정보
+   * @return 존재하는 검증 완료된 Channel 엔티티
+   */
+  private Channel validateCreateMessageRequest(CreateMessageDto messageDto) {
+    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
+    checkIfUserBelongsToPrivateChannel(channel, messageDto);
+    return channel;
+  }
+
+  /**
+   * Private 채널에 속하지 않은 User 가 해당 채널에 메시지를 작성하려는 경우 예외
+   *
+   * @param channel    대상 채널
+   * @param messageDto 메시지 생성 정보
+   */
+  private void checkIfUserBelongsToPrivateChannel(Channel channel, CreateMessageDto messageDto) {
+    if (channel.getIsPrivate()) {
+      channel.getParticipatingUsers().stream().filter(id -> id.equals(messageDto.userId())).findAny().orElseThrow(
+          () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+      );
+    }
+  }
+
   @Override
   public MessageResponseDto getMessageById(String messageId) {
-    List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
+    List<BinaryContent> contents = binaryContentService.findByMessageId(messageId);
     Message message = messageRepository.findById(messageId).orElseThrow(MessageNotFoundException::new);
     return MessageResponseDto.fromBinaryContent(message, contents);
   }
@@ -102,73 +115,98 @@ public class BasicMessageService implements MessageService {
     List<Message> channelMessages = messageRepository.findByChannel(channelId);
 
     // 메시지 id : binaryContents
-    Map<String, List<BinaryContent>> messageIdToBinaryContentMap =
-        binaryContentRepository.findByChannel(channelId).stream()
-            .collect(Collectors.groupingBy(
-                BinaryContent::getMessageId,
-                Collectors.toList()
-            ));
+    Map<String, List<BinaryContent>> messageIdToBinaryContentMap = binaryContentService.getBinaryContentsFilteredByChannelAndGroupedByMessage(channelId);
+
+    return buildMessageResponseDtos(channelMessages, messageIdToBinaryContentMap);
+  }
 
 
-    return channelMessages.stream()
+  /**
+   * 메시지 목록과 (messageId: BinaryContent 목록) 맵을 이용해
+   * 각 메시지 마다 {@link MessageResponseDto} 를 생성
+   *
+   * @param messages                    메시지 리스트
+   * @param messageIdToBinaryContentMap (messageId : BinaryContent 목록)
+   * @return MessageResponseDto 목록
+   */
+  private List<MessageResponseDto> buildMessageResponseDtos(
+      List<Message> messages,
+      Map<String, List<BinaryContent>> messageIdToBinaryContentMap
+  ) {
+
+    return messages.stream()
         .map(
             message -> MessageResponseDto
                 .fromBinaryContent(message, messageIdToBinaryContentMap.getOrDefault(message.getUUID(), Collections.emptyList())))
         .toList();
   }
 
+  /**
+   * {@link MessageUpdateDto} 를 받아 메시지를 업데이트 한다
+   * <p>
+   *   1) 메시지, 사용자 검증 후 기존 메시지를 찾는다
+   *   2) 메시지의 BinaryContent를 업데이트 한다
+   *   3) 메시지의 내용을 업데이트 한다
+   *   4) 업데이트 된 메시지와 BinaryContent 로 {@link MessageResponseDto}
+   * </p>
+   * @param messageDto 메시지 업데이트 정보
+   * @return 업데이트 된 메시지 & BinaryContent
+   */
   @Override
   public MessageResponseDto updateMessage(MessageUpdateDto messageDto) {
 
+    Message originalMessage = validateMessageUpdateRequest(messageDto);
 
-    Message originalMessage = messageRepository.findById(messageDto.messageId()).orElseThrow(
-        MessageNotFoundException::new
+    List<BinaryContent> updatedContents = binaryContentService.updateBinaryContentForMessage(
+        originalMessage,
+        messageDto.userId(),
+        messageDto.binaryContent()
     );
 
-    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
+    updateMessageContent(originalMessage, messageDto.content());
 
-    if(!originalMessage.getUserUUID().equals(messageDto.userId())) throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
-
-    List<BinaryContent> updatedContents = findAndUpdateBinaryContent(messageDto.messageId(), messageDto.userId(), messageDto.binaryContent());
-
-    synchronized (originalMessage) {
-      originalMessage.setContent(messageDto.content());
-    }
-
-    messageRepository.update(originalMessage);
     return MessageResponseDto.fromBinaryContent(originalMessage, updatedContents);
   }
 
-  // TODO : messageId 가 아닌 Message 자체를 넘기도록 (지금 중복임)
-  private List<BinaryContent> findAndUpdateBinaryContent(String messageId, String userId, List<BinaryContentDto> binaryDtos) {
+  /**
+   * 메시지 요청의 유효성을 검증한다
+   * <p>
+   *   1) 메시지 존재 여부
+   *   2) 사용자 존재 여부
+   *   3) 사용자가 메시지 작성자인지 확인
+   * </p>
+   * @param messageDto 메시지 업데이트 정보
+   * @return 검증된 Message
+   */
+  private Message validateMessageUpdateRequest(MessageUpdateDto messageDto) {
+    Message message = validator.findOrThrow(Message.class, messageDto.messageId(), new MessageNotFoundException());
+    validator.findOrThrow(User.class, messageDto.userId(), new UserNotFoundException());
 
-    List<BinaryContent> originalBinaryContent = binaryContentRepository.findByMessageId(messageId);
-
-    Message message = messageRepository.findById(messageId).orElseThrow(
-        () -> new MessageNotFoundException()
-    );
-
-    for (BinaryContentDto dto : binaryDtos) {
-      BinaryContent existingContent = originalBinaryContent.stream()
-          .filter(content -> content.getFileName().equals(dto.fileName()))
-          .findFirst()
-          .orElse(null);
-
-      if (existingContent == null) {
-        BinaryContent newBinaryContent = new BinaryContent.BinaryContentBuilder(userId, dto.fileName(), dto.fileType(), dto.fileSize(), dto.data())
-            .messageId(messageId)
-            .channelId(message.getChannelUUID()).build();
-        originalBinaryContent.add(newBinaryContent);
-      }
+    if (!message.getUserUUID().equals(messageDto.userId())) {
+      log.warn("해당 사용자의 메시가 아닙니다. user={} message{}", messageDto.userId(), messageDto.messageId());
+      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
 
-    return binaryContentRepository.saveMultipleBinaryContent(originalBinaryContent);
+    return message;
   }
 
+  /**
+   * 메시지의 내용을 업데이트 한다
+   * @param message 검증된 Message
+   * @param newContent 수정 될 내용
+   */
+  private void updateMessageContent(Message message, String newContent) {
+
+    synchronized (message) {
+      message.setContent(newContent);
+    }
+
+    messageRepository.update(message);
+  }
 
   @Override
   public void deleteMessage(String messageId) {
-    binaryContentRepository.deleteByMessageId(messageId);
+    binaryContentService.deleteByMessageId(messageId);
     messageRepository.delete(messageId);
   }
 }
