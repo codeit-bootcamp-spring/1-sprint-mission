@@ -19,8 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +30,9 @@ class BasicBinaryContentServiceTest {
 
     @Mock
     BinaryContentRepository binaryContentRepository;
+
+    @Mock
+    ValidateBinaryContent validateBinaryContent;
 
     @BeforeEach
     void setUp(){
@@ -46,6 +48,7 @@ class BasicBinaryContentServiceTest {
         BinaryContent binaryContent = new BinaryContent(request.userId(), request.messageId(), request.content());
 
         // when
+        doNothing().when(validateBinaryContent).validateBinaryContent(any(UUID.class), any(UUID.class));
         when(binaryContentRepository.save(any(BinaryContent.class))).thenReturn(binaryContent);
 
         BinaryContentDto result = basicBinaryContentService.create(request);
@@ -65,7 +68,7 @@ class BasicBinaryContentServiceTest {
         BinaryContent binaryContent = new BinaryContent(UUID.randomUUID(), UUID.randomUUID(), new byte[]{1, 2, 3});
 
         // when
-        when(binaryContentRepository.findByContentId(any(UUID.class))).thenReturn(Optional.of(binaryContent));
+        when(binaryContentRepository.findByContentId(binaryContent.getId())).thenReturn(Optional.of(binaryContent));
 
         BinaryContentDto result = basicBinaryContentService.findByContentId(binaryContent.getId());
 
@@ -74,7 +77,8 @@ class BasicBinaryContentServiceTest {
         assertEquals(binaryContent.getUserId(), result.userId());
         assertEquals(binaryContent.getMessageId(), result.messageId());
         assertEquals(binaryContent.getContent(), result.content());
-        verify(binaryContentRepository, times(1)).findByContentId(any(UUID.class));
+
+        verify(binaryContentRepository, times(1)).findByContentId(binaryContent.getId());
     }
 
     @Test
@@ -83,7 +87,7 @@ class BasicBinaryContentServiceTest {
         UUID contentId = UUID.randomUUID();
 
         // when
-        when(binaryContentRepository.findByContentId(any(UUID.class))).thenReturn(Optional.empty());
+        when(binaryContentRepository.findByContentId(contentId)).thenReturn(Optional.empty());
 
         // then
         assertThrows(ResourceNotFoundException.class, () -> basicBinaryContentService.findByContentId(contentId));
@@ -92,23 +96,24 @@ class BasicBinaryContentServiceTest {
     @Test
     public void findAllByUserId_Success(){
         // given
-        UUID userID = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
         List<BinaryContent> binaryContents = List.of(
-                new BinaryContent(userID, UUID.randomUUID(), new byte[]{1, 2, 3}),
-                new BinaryContent(userID, UUID.randomUUID(), new byte[]{4, 5, 6})
+                new BinaryContent(userId, UUID.randomUUID(), new byte[]{1, 2, 3}),
+                new BinaryContent(userId, UUID.randomUUID(), new byte[]{4, 5, 6})
         );
 
         // when
-        when(binaryContentRepository.findAllByUserId(any(UUID.class))).thenReturn(binaryContents);
+        when(binaryContentRepository.findAllByUserId(userId)).thenReturn(binaryContents);
 
-        List<BinaryContentDto> results = basicBinaryContentService.findAllByUserId(userID);
+        List<BinaryContentDto> results = basicBinaryContentService.findAllByUserId(userId);
 
         // then
         assertNotNull(results);
         assertEquals(2, results.size());
         assertEquals(results.get(0).contentId(), binaryContents.get(0).getId());
         assertEquals(results.get(1).contentId(), binaryContents.get(1).getId());
-        verify(binaryContentRepository, times(1)).findAllByUserId(any(UUID.class));
+
+        verify(binaryContentRepository, times(1)).findAllByUserId(userId);
     }
 
     @Test
@@ -122,7 +127,7 @@ class BasicBinaryContentServiceTest {
         );
 
         // when
-        when(binaryContentRepository.findByAllMessageId(any(UUID.class))).thenReturn(binaryContents);
+        when(binaryContentRepository.findByAllMessageId(messageId)).thenReturn(binaryContents);
 
         List<BinaryContentDto> results = basicBinaryContentService.findByAllMessageId(messageId);
 
@@ -131,7 +136,8 @@ class BasicBinaryContentServiceTest {
         assertEquals(2, results.size());
         assertEquals(binaryContents.get(0).getId(), results.get(0).contentId());
         assertEquals(binaryContents.get(1).getId(), results.get(1).contentId());
-        verify(binaryContentRepository, times(1)).findByAllMessageId(any(UUID.class));
+
+        verify(binaryContentRepository, times(1)).findByAllMessageId(messageId);
     }
 
     @Test

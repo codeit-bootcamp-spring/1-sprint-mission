@@ -42,19 +42,19 @@ public class ValidateUser {
         }
     }
 
-    public static void validateEmail(String email) {
+    public void validateEmail(String email) {
         if (email == null || !email.matches(EMAIL_REGEX)) {
             throw new InvalidResourceException("Invalid email.");
         }
     }
 
-    public static void validatePhoneNumber(String phoneNumber) {
+    public void validatePhoneNumber(String phoneNumber) {
         if (phoneNumber == null || !phoneNumber.matches(PHONE_NUMBER_REGEX)) {
             throw new InvalidResourceException("Invalid phone number.");
         }
     }
 
-    public static void validatePassword(String password) {
+    public void validatePassword(String password) {
         if (password == null || !password.matches(PASSWORD_REGEX)) {
             throw new InvalidResourceException("Invalid password.");
         }

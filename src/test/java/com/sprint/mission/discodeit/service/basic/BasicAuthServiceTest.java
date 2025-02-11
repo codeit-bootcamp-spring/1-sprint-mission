@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.validation.ValidateAuth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,9 @@ class BasicAuthServiceTest {
     @Mock
     private UserStatusRepository userStatusRepository;
 
+    @Mock
+    private ValidateAuth validateAuth;
+
     @BeforeEach
     void setUp() {
     }
@@ -46,6 +50,7 @@ class BasicAuthServiceTest {
         UserStatus userStatus = new UserStatus(user.getUserId(), Instant.now());
 
         // When
+        doNothing().when(validateAuth).validateLogin(anyString(), anyString());
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
         when(userStatusRepository.findByUserId(any(UUID.class))).thenReturn(Optional.of(userStatus));
 
@@ -59,7 +64,9 @@ class BasicAuthServiceTest {
         assertEquals(result.phoneNumber(), user.getPhoneNumber());
         assertTrue(result.isOnline());
 
-        verify(userStatusRepository).save(any(UserStatus.class));
+        verify(userRepository, times(1)).findByUsername(loginRequest.username());
+        verify(userStatusRepository, times(1)).findByUserId(user.getUserId());
+        verify(userStatusRepository, times(1)).save(any(UserStatus.class));
     }
 
     @Test
@@ -68,10 +75,14 @@ class BasicAuthServiceTest {
         AuthLoginRequest loginRequest = new AuthLoginRequest("testUsername", "qwer123!");
 
         // when
+        doNothing().when(validateAuth).validateLogin(anyString(), anyString());
         when(userRepository.findByUsername(loginRequest.username())).thenReturn(Optional.empty());
 
         // then
         assertThrows(ResourceNotFoundException.class, () -> basicAuthService.login(loginRequest));
+
+        verify(userStatusRepository, never()).findByUserId(any(UUID.class));
+        verify(userStatusRepository, never()).save(any(UserStatus.class));
     }
 
     @Test
@@ -81,10 +92,13 @@ class BasicAuthServiceTest {
         User user = new User(loginRequest.username(), "test@gmail.com", "01012345678", loginRequest.password());
 
         // when
+        doNothing().when(validateAuth).validateLogin(anyString(), anyString());
         when(userRepository.findByUsername(loginRequest.username())).thenReturn(Optional.of(user));
         when(userStatusRepository.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
         // then
         assertThrows(ResourceNotFoundException.class, () -> basicAuthService.login(loginRequest));
+
+        verify(userStatusRepository, never()).save(any(UserStatus.class));
     }
 }

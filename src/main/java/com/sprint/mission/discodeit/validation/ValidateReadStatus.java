@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.validation;
 
+import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -35,8 +36,8 @@ public class ValidateReadStatus {
     }
 
     public void validateDuplicateReadStatus(UUID channelId, UUID userId){
-        if (!readStatusRepository.existsByUserIdAndChannelId(userId, channelId)){
-            throw new ResourceNotFoundException("ReadStatus already exists.");
+        if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)){
+            throw new DuplicateResourceException("ReadStatus already exists.");
         }
     }
 

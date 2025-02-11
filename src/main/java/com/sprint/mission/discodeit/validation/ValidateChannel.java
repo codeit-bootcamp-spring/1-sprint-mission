@@ -14,10 +14,9 @@ public class ValidateChannel {
     private static final String CHANNEL_NAME = "^(?!\\s*$).{1,100}$";
     private static final String DESCRIPTION = "^(?!\\s*$).{1,100}$";
 
-    public void validatePublicChannel(String name, String description, ChannelType channelType){
+    public void validatePublicChannel(String name, String description){
         validChannelName(name);
         validDescription(description);
-        validChannelType(channelType);
     }
 
     public void validChannelName(String name) {
@@ -29,12 +28,6 @@ public class ValidateChannel {
     public void validDescription(String description) {
         if (description == null || !description.matches(DESCRIPTION)) {
             throw new InvalidResourceException("Invalid channel description.");
-        }
-    }
-
-    public void validChannelType(ChannelType channelType) {
-        if (!Arrays.asList(ChannelType.values()).contains(channelType)) {
-            throw new InvalidResourceException("Invalid channel type.");
         }
     }
 

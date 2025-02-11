@@ -49,9 +49,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageDto update(MessageUpdateRequest request) {
+        validateMessage.validateMessage(request.message(), request.userId(), request.channelId());
         Message message = messageRepository.findByMessageId(request.messageId())
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found."));
-        validateMessage.validateMessage(request.message(), request.userId(), request.channelId());
 
         // BinaryContent update
         binaryContentRepository.deleteByMessageId(request.messageId());

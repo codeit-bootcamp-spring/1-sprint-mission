@@ -20,8 +20,4 @@ public class ValidateAuth {
             throw new InvalidResourceException("Invalid password.");
         }
     }
-
-    public void validateUsername(String username){
-
-    }
 }

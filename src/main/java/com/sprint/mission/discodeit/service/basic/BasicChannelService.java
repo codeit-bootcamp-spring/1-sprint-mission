@@ -29,8 +29,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto createPrivateChannel(PrivateChannelCreateRequest request) {
-        validateChannel.validChannelType(request.channelType());
-
         Channel channel = new Channel(null, null, ChannelType.PRIVATE);
         channelRepository.save(channel);
         for (UUID userId : request.participants()) {
@@ -42,7 +40,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto createPublicChannel(PublicChannelCreateRequest request) {
-        validateChannel.validatePublicChannel(request.name(), request.description(), request.channelType());
+        validateChannel.validatePublicChannel(request.name(), request.description());
 
         Channel channel = new Channel(request.name(), request.description(), ChannelType.PUBLIC);
         channelRepository.save(channel); // 모든 사용자 조회
@@ -72,7 +70,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto update(ChannelUpdateRequest request) {
         validateChannel.validatePublicChannelType(request.channelType());
-        validateChannel.validatePublicChannel(request.name(), request.description(), request.channelType());
+        validateChannel.validatePublicChannel(request.name(), request.description());
 
         Channel channel = channelRepository.findById(request.ChannelId())
                 .orElseThrow(() -> new ResourceNotFoundException("Channel not found."));
