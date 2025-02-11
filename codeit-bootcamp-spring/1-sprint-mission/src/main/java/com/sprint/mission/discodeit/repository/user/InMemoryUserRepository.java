@@ -38,7 +38,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return uuidUsers.values().stream().toList();
+        return List.copyOf(uuidUsers.values());
     }
 
     @Override

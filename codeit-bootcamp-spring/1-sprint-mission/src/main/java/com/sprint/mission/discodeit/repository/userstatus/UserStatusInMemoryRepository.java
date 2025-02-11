@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
 import com.sprint.mission.discodeit.repository.userstatus.interfaces.UserStatusRepository;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,17 @@ public class UserStatusInMemoryRepository implements UserStatusRepository {
     }
 
     @Override
+    public List<UserStatus> findAll() {
+        return List.copyOf(userStatuses.values());
+    }
+
+    @Override
     public void deleteByUser(User user) {
         userStatuses.remove(user);
+    }
+
+    @Override
+    public boolean isExistUser(User user) {
+        return userStatuses.containsKey(user);
     }
 }

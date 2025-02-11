@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.channel;
 
 import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
 import java.util.List;
 import java.util.Optional;
@@ -25,5 +26,10 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteById(UUID uuid) {
 
+    }
+
+    @Override
+    public boolean isExistUser(User user, Channel channel) {
+        return false;
     }
 }

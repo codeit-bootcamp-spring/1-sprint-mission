@@ -18,6 +18,9 @@ public class UserStatusService {
     }
 
     public UserStatus createAtFirstJoin(User user) {
+        if (userStatusRepository.isExistUser(user)) {
+            throw new IllegalArgumentException("userStatus already exist");
+        }
         return userStatusRepository.save(new UserStatus(user));
     }
 

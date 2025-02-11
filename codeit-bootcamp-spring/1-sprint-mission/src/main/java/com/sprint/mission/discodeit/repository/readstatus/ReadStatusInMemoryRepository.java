@@ -12,26 +12,26 @@ import java.util.UUID;
 
 public class ReadStatusInMemoryRepository implements ReadStatusRepository {
 
-    private final Map<ReadStatusKey, ReadStatus> readStatusMap = new HashMap<>();
+    private final Map<ReadStatusKey, ReadStatus> readStatusStore = new HashMap<>();
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
         ReadStatusKey readStatusKey = ReadStatusKey.of(readStatus.getUser(), readStatus.getChannel());
-        readStatusMap.put(readStatusKey, readStatus);
+        readStatusStore.put(readStatusKey, readStatus);
         return readStatus;
     }
 
     @Override
     public Optional<ReadStatus> findOneByUserIdAndChannelId(User user, Channel channel) {
         ReadStatusKey readStatusKey = ReadStatusKey.of(user, channel);
-        return Optional.ofNullable(readStatusMap.get(readStatusKey));
+        return Optional.ofNullable(readStatusStore.get(readStatusKey));
     }
 
     @Override
     public void deleteByChannel(Channel channel) {
         channel.getParticipantUserId().stream()
                 .map(userId -> new ReadStatusKey(userId, channel.getId()))
-                .forEach(readStatusMap::remove);
+                .forEach(readStatusStore::remove);
     }
 
     private static class ReadStatusKey {

@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.application.service.interfaces.UserService;
 import com.sprint.mission.discodeit.domain.channel.Channel;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelType;
 import com.sprint.mission.discodeit.domain.channel.enums.ChannelVisibility;
+import com.sprint.mission.discodeit.domain.channel.exception.AlreadyJoinUserException;
 import com.sprint.mission.discodeit.domain.channel.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.domain.readStatus.ReadStatus;
 import com.sprint.mission.discodeit.domain.user.User;
@@ -73,6 +74,7 @@ public class JCFChannelService implements ChannelService {
     public void joinPrivateChannel(UUID invitedUserId, InviteChannelRequestDto requestDto) {
         User foundUser = userService.findOneByIdOrThrow(invitedUserId);
         Channel foundChannel = findOneByIdOrThrow(requestDto.channelId());
+        throwIsAlreadyJoinUser(foundUser, foundChannel);
         foundChannel.join(foundUser);
         ReadStatus readStatus = new ReadStatus(foundUser, foundChannel);
         readStatusRepository.save(readStatus);
@@ -137,6 +139,12 @@ public class JCFChannelService implements ChannelService {
             return FoundChannelResponseDto.ofPublicChannel(foundChannel, lastMessageTime);
         } else {
             return FoundChannelResponseDto.ofPrivateChannel(foundChannel, lastMessageTime);
+        }
+    }
+
+    private void throwIsAlreadyJoinUser(User targetUser, Channel targetChannel) {
+        if (channelRepository.isExistUser(targetUser, targetChannel)) {
+            throw new AlreadyJoinUserException(ErrorCode.ALREADY_CHANNEL_JOIN_USER, targetUser.getNicknameValue());
         }
     }
 }

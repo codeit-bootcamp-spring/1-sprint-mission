@@ -1,26 +1,28 @@
 package com.sprint.mission.discodeit.repository.channel;
 
 import com.sprint.mission.discodeit.domain.channel.Channel;
+import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.repository.channel.interfaces.ChannelRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class InMemoryChannelRepository implements ChannelRepository {
 
-    private final Map<UUID, Channel> uuidChannels = new HashMap<>();
+    private final Map<UUID, Channel> channelUUIDStore = new HashMap<>();
 
     @Override
     public Channel save(Channel channel) {
-        Channel savedChannel = uuidChannels.put(channel.getId(), channel);
+        Channel savedChannel = channelUUIDStore.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
     public Optional<Channel> findOneById(UUID uuid) {
-        return Optional.ofNullable(uuidChannels.get(uuid));
+        return Optional.ofNullable(channelUUIDStore.get(uuid));
     }
 
     @Override
@@ -30,6 +32,12 @@ public class InMemoryChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteById(UUID uuid) {
-        uuidChannels.remove(uuid);
+        channelUUIDStore.remove(uuid);
+    }
+
+    @Override
+    public boolean isExistUser(User user, Channel channel) {
+        Set<UUID> participantUserId = channelUUIDStore.get(channel.getId()).getParticipantUserId();
+        return participantUserId.contains(user.getId());
     }
 }

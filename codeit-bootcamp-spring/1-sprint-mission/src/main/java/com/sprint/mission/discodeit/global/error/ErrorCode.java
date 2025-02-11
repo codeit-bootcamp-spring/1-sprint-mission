@@ -29,7 +29,7 @@ public enum ErrorCode {
 
     // Channel
     INVALID_CHANNEL_NAME_NOT_NULL(400, "채널 이름은 필수 입력값 입니다."),
-
+    ALREADY_CHANNEL_JOIN_USER(400, "이미 참여한 채널입니다."),
     // Message
     INVALID_MESSAGE_CONTENT_NOT_NULL(400, "메시지 내용은 필수 입력값 입니다."),
     ;

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.userstatus.interfaces;
 
 import com.sprint.mission.discodeit.domain.user.User;
 import com.sprint.mission.discodeit.domain.userstatus.UserStatus;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserStatusRepository {
@@ -10,5 +11,9 @@ public interface UserStatusRepository {
 
     Optional<UserStatus> findByUser(User user);
 
+    List<UserStatus> findAll();
+
     void deleteByUser(User user);
+
+    boolean isExistUser(User user);
 }
