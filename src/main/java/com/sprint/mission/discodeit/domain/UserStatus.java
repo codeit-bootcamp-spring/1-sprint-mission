@@ -45,6 +45,7 @@ public class UserStatus {
     public UserStatus checkStatus() { //Status 상태 계산 후 반환
         if (this.updatedAt != null) {
             Instant fiveMinutesAgo = Instant.now().minusSeconds(1); //300 에서 test 확인을 위해 1으로 변경
+            //Instant fiveMinutesAgo = Instant.now().minusSeconds(300);
             this.status = this.updatedAt.isBefore(fiveMinutesAgo) ? Status.OFFLINE : Status.ONLINE;
         }
         return this;
