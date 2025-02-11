@@ -16,6 +16,7 @@ public class JCFChannelService implements ChannelService {
 
     protected Map<UUID,Channel> channelList=new LinkedHashMap<>();
     protected static final Set<UUID> existChannelIdCheck = new HashSet<>();
+    protected static final Set<String> existNameCheck = new HashSet<>();
 
     @Autowired
     @Qualifier("FileMessageService")
@@ -31,6 +32,10 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void createNewChannel(String name) {
+        if(!existNameCheck.contains(name)){
+            System.err.println("이미 존재하는 채널 이름");
+        }
+
         Channel newChannel;
         do{
             newChannel=Channel.createDefaultChannel(name);
@@ -38,6 +43,7 @@ public class JCFChannelService implements ChannelService {
 
         channelList.put(newChannel.getId(),newChannel);
         existChannelIdCheck.add(newChannel.getId());
+        existNameCheck.add(name);
 
     }
 
@@ -294,8 +300,10 @@ public class JCFChannelService implements ChannelService {
             return false;
         } else if (instance.size() == 1) {
             Channel firstChannel = instance.entrySet().iterator().next().getValue();
+            existNameCheck.remove(firstChannel.getChannelName());
             firstChannel.updateChannelName(changeName);
             firstChannel.updateUpdatedAt();
+            existNameCheck.add(changeName);
             System.out.println("성공적으로 바꿨습니다.");
             return true;
         }else{

@@ -33,7 +33,7 @@ public record MessageDto(
                 message.getSenderName(),
                 message.getReceiverName(),
                 message.getSenderId(),
-                message.getReceiverID()
+                message.getReceiverId()
         );
     }
 }

@@ -72,13 +72,22 @@ public class FileReadStatusService extends JCFReadStatusService implements ReadS
             File file = new File(fileName);
 
 
+            File parentDir = file.getParentFile();
+            if (!parentDir.exists()) {
+                boolean dirsCreated = parentDir.mkdirs();
+                if (!dirsCreated) {
+                    System.err.println("디렉터리를 생성할 수 없습니다.");
+                    return loadTxt;
+                }
+            }
+
             if (!file.exists()) {
                 try {
                     file.createNewFile();
                 } catch (IOException e) {
                     System.err.println("파일을 생성할 수 없습니다: " + e.getMessage());
+                    return loadTxt;
                 }
-                return loadTxt;
             }
 
             if (file.length() == 0) {

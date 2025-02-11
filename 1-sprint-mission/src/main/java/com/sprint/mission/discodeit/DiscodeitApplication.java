@@ -28,7 +28,7 @@ public class DiscodeitApplication {
 		MessageService messageService=context.getBean("BasicMessageService",MessageService.class);
 		ChannelService channelService=context.getBean("BasicChannelService",ChannelService.class);
 
-		System.out.println(userService.sendMessageToUser("감자전","고구마","감자튀김"));
+		//System.out.println(userService.sendMessageToUser("감자전","고구마","감자튀김"));
 		//messageService.createNewMessage("ff","afdas");
 
 		char[] a={'c','g','d'};
@@ -37,9 +37,9 @@ public class DiscodeitApplication {
 		List<char[]> ab=new ArrayList<>();
 		ab.add(a);
 		ab.add(b);
-//		userService.updateUserSelfImg("감자전",a);
-//		userService.createNewUser("감자전","지짐그","이메일");
-//		userService.createNewUser("고구마","전","이메일");
+		userService.updateUserSelfImg("감자전",a);
+		//userService.createNewUser("감자전","지짐그","이메일");
+		//userService.createNewUser("고구마","전","이메일");
 		//System.out.println(userService.readUserAll());
 		//System.out.println(userService.readUser("감자전"));
 		//userService.deleteUser("감자전","지짐그그");
@@ -49,10 +49,9 @@ public class DiscodeitApplication {
 		//UUID id = UUID.fromString(rawUuid.replaceAll("\"", ""));  // 공백 제거 후 변환
 
 		//channelService.createPrivateChannel();
-		//channelService.addUserToChannel(id,"감자전");
-		//channelService.deleteUserToChannel("탄수화물 패밀리","고구마");
-//		channelService.createNewChannel("탄수화물 패밀리");
-//		channelService.addUserToChannel("탄수화물 패밀리","감자전");
+		channelService.deleteUserToChannel("탄수화물 패밀리","고구마");
+		//channelService.createNewChannel("탄수화물 패밀리");
+		//channelService.addUserToChannel("탄수화물 패밀리","감자전");
 //		channelService.addUserToChannel("탄수화물 패밀리","고구마");
 //		System.out.println(channelService.readChannelInUser("탄수화물 패밀리"));
 //		System.out.println(channelService.readChannel("탄수화물 패밀리"));
@@ -62,8 +61,9 @@ public class DiscodeitApplication {
 
 
 
-//		messageService.createNewMessagetoImg("감자튀김","마요네즈 맛있음 아마",ab);
-//		System.out.println(messageService.readMessage("감자튀김"));
+		messageService.createNewMessagetoImg("감자튀김","마요네즈 맛있음 아마",ab);
+		System.out.println(userService.sendMessageToUser("감자전","고구마","감자튀김"));
+		//System.out.println(messageService.readMessage("감자튀김"));
 //		System.out.println(messageService.readMessageAll());
 //		messageService.deleteMessage("감자튀김");
 //		System.out.println(messageService.readMessage("감자튀김"));

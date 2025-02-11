@@ -136,6 +136,8 @@ public class JCFUserService implements UserService {
         }
 
         List<Message> messagesList = new ArrayList<>(jfMessageService.readMessage(message));
+        if(reciverUser==null||senderUser==null||messagesList==null)
+            return false;
         if(reciverUser.isEmpty() || senderUser.isEmpty() || messagesList.isEmpty())
             return false;
         Message messageGet=messagesList.get(0);

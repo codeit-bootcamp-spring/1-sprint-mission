@@ -60,13 +60,24 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
     public Map<UUID, Channel> loadChannelText(){
         Map<UUID, Channel> loadTxt=new TreeMap<>();
         File file = new File(fileName);
+
+
+        File parentDir = file.getParentFile();
+        if (!parentDir.exists()) {
+            boolean dirsCreated = parentDir.mkdirs();
+            if (!dirsCreated) {
+                System.err.println("디렉터리를 생성할 수 없습니다.");
+                return loadTxt;
+            }
+        }
+
         if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (IOException e) {
                 System.err.println("파일을 생성할 수 없습니다: " + e.getMessage());
+                return loadTxt;
             }
-            return loadTxt;
         }
 
         if (file.length() == 0) {
@@ -146,6 +157,7 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
                 Channel channel=Channel.createChannelAll(id,createdAt,updatedAt,channelName,channelType
                 ,userList,readStatusList,messageList);
                 existChannelIdCheck.add(id);
+                existNameCheck.add(channelName);
                 loadTxt.put(id, channel);
 
             }
