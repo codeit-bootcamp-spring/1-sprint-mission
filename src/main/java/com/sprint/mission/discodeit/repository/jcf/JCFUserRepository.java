@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +33,10 @@ public class JCFUserRepository implements UserRepository {
         return userList;
     }
 
+    @Override
+    public List<UUID> findAllUserIdByChannelId(UUID uuid) {
+        return List.of();
+    }
 
     @Override
     public Boolean existByUserId(UUID userId) {

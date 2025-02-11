@@ -20,4 +20,5 @@ public interface ReadStatusService {
 
     void delete(UUID uuid);
 
+    void deleteByChannelId(UUID id);
 }

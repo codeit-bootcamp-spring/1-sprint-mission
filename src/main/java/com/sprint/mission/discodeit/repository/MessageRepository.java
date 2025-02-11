@@ -13,4 +13,5 @@ public interface MessageRepository {
     Map<UUID, Message> load();
     void delete(UUID id);
 
+    void deleteByChannelId(UUID id);
 }

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -52,6 +53,10 @@ public class FileUserRepository implements UserRepository {
                 .anyMatch(user -> user.getUserName().equals(username));
     }
 
+    @Override
+    public List<UUID> findAllUserIdByChannelId(UUID uuid) {
+        return List.of();
+    }
 
     @Override
     public Map<UUID, User> load() {

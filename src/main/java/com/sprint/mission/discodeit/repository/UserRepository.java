@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,4 +15,6 @@ public interface UserRepository {
 
     Map<UUID, User> load();
     void delete(UUID id);
+
+    List<UUID> findAllUserIdByChannelId(UUID uuid); //채널에 참여하는 유저 id 리스트 반환
 }

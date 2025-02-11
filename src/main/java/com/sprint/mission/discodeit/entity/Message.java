@@ -21,6 +21,8 @@ public class Message implements Serializable {
     private String content;
 
 
+
+
     public Message(UUID userId, UUID channelId, String content){
         this.id = UUID.randomUUID();
         this.content = content;

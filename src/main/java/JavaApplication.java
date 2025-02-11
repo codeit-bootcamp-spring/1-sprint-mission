@@ -47,7 +47,7 @@ public class JavaApplication {
 //        //채널 삭제
 //        basicChannelService.deleteChannel(newChannel2.getId());
 //        System.out.println(basicChannelService.readAllChannel());
-
+//
 
 
 
