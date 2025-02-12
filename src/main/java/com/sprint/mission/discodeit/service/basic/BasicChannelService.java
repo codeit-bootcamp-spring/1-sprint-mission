@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -35,54 +34,69 @@ public class BasicChannelService implements ChannelService {
 
   private final ReadStatusService readStatusService;
 
-  private final EntityValidator entityValidator;
+  private final EntityValidator validator;
 
   private final ChannelRepository channelRepository;
   private final MessageRepository messageRepository;
 
+  /**
+   * {@link CreatePrivateChannelDto} 다음 작업 후 {@link PrivateChannelResponseDto} 를 반환한다
+   * 1) user 의 존재 여부 검증
+   * 2) Channel 객체 생성 및 저장
+   * 3) 속한 user 별 {@link ReadStatus} 생성 및 저장
+   * @param channelDto 속할 userId list 를 포함하는 비공개 채널 생성 dto
+   * @return 비공개 채널 반환
+   */
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
 
     // User 존재 여부 검증
-    channelDto.userIds().forEach(id -> entityValidator.findOrThrow(User.class, id, new UserNotFoundException()));
+    channelDto.userIds().forEach(id -> validator.findOrThrow(User.class, id, new UserNotFoundException()));
 
     // Channel 객체 생성
-    Channel channel = new Channel.ChannelBuilder(null, channelDto.channelType())
-        .serverUUID(channelDto.serverId())
-        .maxNumberOfPeople(channelDto.maxNumberOfPeople())
-        .isPrivate(true)
-        .participatingUsers(channelDto.userIds())
-        .build();
+    Channel channel = buildPrivateChannelFromDto(channelDto);
 
     // channel 저장
     channelRepository.save(channel);
 
     // user 별 read status 생성
-    // TODO : repository 에 saveAll()
-    channelDto.userIds().stream().forEach(id -> {
-      readStatusService.create(
-          new CreateReadStatusDto(channel.getUUID(), id), true
-      );
-    });
+    readStatusService.createMultipleReadStatus(channelDto.userIds(), channel.getUUID());
 
     return new PrivateChannelResponseDto(channel.getUUID(), channel.getServerUUID(), channel.getChannelType(), channel.getCreatedAt(), channel.getParticipatingUsers());
   }
 
+
   @Override
   public PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
-
     //TODO: exception tuning, other validations
-    Channel channel = new Channel.ChannelBuilder(channelDto.channelName(), channelDto.channelType())
-        .serverUUID(channelDto.serverId())
-        .isPrivate(false)
-        .maxNumberOfPeople(channelDto.maxNumberOfPeople())
-        .build();
+    Channel channel = buildPublicChannelFromDto(channelDto);
 
     channelRepository.save(channel);
 
     return new PublicChannelResponseDto(channel.getUUID(), channel.getServerUUID(), channel.getChannelType(), channel.getChannelName(), channel.getCreatedAt(), false);
   }
 
+  /**
+   * CreatePrivateChannelDto 를 사용해 Channel 을 만들어 반환
+   */
+  private Channel buildPrivateChannelFromDto(CreatePrivateChannelDto dto){
+    return new Channel.ChannelBuilder(null, dto.channelType())
+        .serverUUID(dto.serverId())
+        .maxNumberOfPeople(dto.maxNumberOfPeople())
+        .isPrivate(true)
+        .participatingUsers(dto.userIds())
+        .build();
+  }
+  /**
+   * CreateChannelDto 를 사용해 Channel 을 만들어 반환
+   */
+  private Channel buildPublicChannelFromDto(CreateChannelDto dto){
+    return new Channel.ChannelBuilder(dto.channelName(), dto.channelType())
+        .serverUUID(dto.serverId())
+        .isPrivate(false)
+        .maxNumberOfPeople(dto.maxNumberOfPeople())
+        .build();
+  }
 
   /**
    * ChannelId 로 Channel을 찾음
@@ -96,7 +110,7 @@ public class BasicChannelService implements ChannelService {
    */
   @Override
   public FindChannelResponseDto getChannelById(String channelId) {
-    Channel channel = entityValidator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
 
     List<String> userIds = getParticipatingUsersByChannel(channelId);
 

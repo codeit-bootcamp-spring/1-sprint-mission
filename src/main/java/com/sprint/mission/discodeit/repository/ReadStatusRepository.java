@@ -13,7 +13,6 @@ public interface ReadStatusRepository extends BaseRepository<ReadStatus,String>{
   List<ReadStatus> findByChannelId(String id);
   Optional<ReadStatus> findByChannelIdAndUserId(String channelId, String userId);
   List<ReadStatus> findAll();
-
   void deleteByUserId(String id);
   void deleteByChannelId(String channelId);
   void clear();

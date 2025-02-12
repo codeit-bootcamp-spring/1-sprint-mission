@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ReadStatusService {
   ReadStatus create(CreateReadStatusDto dto, boolean skipValidation);
+  List<ReadStatus> createMultipleReadStatus(List<String> userIds, String channelId);
   ReadStatus find(String id);
   List<ReadStatus> findAllByUserId(String userId);
   List<ReadStatus> findAllByChannelId(String channelId);

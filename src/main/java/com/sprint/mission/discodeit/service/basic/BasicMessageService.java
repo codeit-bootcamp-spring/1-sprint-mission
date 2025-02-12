@@ -56,7 +56,6 @@ public class BasicMessageService implements MessageService {
     validateCreateMessageRequest(messageDto);
 
     Message message = new Message.MessageBuilder(messageDto.userId(), messageDto.channelId(), messageDto.content()).build();
-
     messageRepository.create(message);
 
     List<BinaryContentDto> binaryContentDtos = binaryContentService.saveBinaryContentsForMessage(messageDto, message.getUUID());

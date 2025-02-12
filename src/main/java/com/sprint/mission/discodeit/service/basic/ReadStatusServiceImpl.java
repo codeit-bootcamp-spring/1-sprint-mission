@@ -41,6 +41,17 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     return readStatusRepository.save(new ReadStatus(dto.channelId(), dto.userId()));
   }
 
+  // TODO : repository 에 saveAll(), 필요시 validation 추가
+  @Override
+  public List<ReadStatus> createMultipleReadStatus(List<String> userIds, String channelId) {
+    return userIds.stream()
+        .map(userId -> {
+          ReadStatus status = new ReadStatus(channelId, userId);
+          readStatusRepository.save(status);
+          return status;
+        }).toList();
+  }
+
   private void validateDuplicateUserChannelStatus(String userId, String channelId) {
     boolean exists = readStatusRepository.findByUserId(userId).stream()
         .anyMatch(status -> status.getChannelId().equals(channelId));
@@ -50,6 +61,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
   }
+
+
 
   @Override
   public ReadStatus find(String id) {
