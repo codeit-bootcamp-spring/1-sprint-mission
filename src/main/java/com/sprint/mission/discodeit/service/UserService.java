@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserService {
     // 새로운 유저 생성
-    User createUser(String name, String email);
+    User createUser(String name, String email, String password);
 
     // 유저 정보 수정 - name 과 email 만 수정 가능
     void updateUserName(UUID userId, String name);

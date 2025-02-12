@@ -24,4 +24,5 @@ public interface ChannelService {
     void deleteChannel(UUID channelId);
 
 
+    void createChannel(Channel channel);
 }

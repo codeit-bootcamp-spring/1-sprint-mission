@@ -1,5 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
 public class Channel extends BaseEntity{
             private String channelName;
 
@@ -7,22 +14,7 @@ public class Channel extends BaseEntity{
                 super();
                 this.channelName = channelName;
             }
-
-            public String getChannelName() {
-                return channelName;
-            }
-
-            public void setChannelName(String channelName) {
-                this.channelName = channelName;
-            }
-
-            @Override
-            public String toString() {
-                return "Channel{" +
-                        "channelId=" + getId() +
-                        ", channelName='" + channelName + '\'' +
-                        ", createdAt=" + getCreatedAt() +
-                        ", updatedAt=" + getUpdatedAt() +
-                        '}';
+            public Channel (Channel channel) {
+                super();
             }
         }

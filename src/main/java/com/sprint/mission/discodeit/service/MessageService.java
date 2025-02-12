@@ -10,9 +10,7 @@ import java.util.UUID;
 public interface MessageService {
 
     //새로운 메시지 생성
-
-    Message createMessage(UUID channelId, UUID authorId, String content);
-
+    void createMessage(Message message);
     // 메세지 모두 조회
     List<Message> getAllMessageList();
 

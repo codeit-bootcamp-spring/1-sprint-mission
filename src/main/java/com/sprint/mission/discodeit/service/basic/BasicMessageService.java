@@ -1,37 +1,45 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 public class BasicMessageService implements MessageService {
     private MessageRepository messageRepository;
     private UserService userService;
     private ChannelService channelService;
 
+    @Autowired
     public BasicMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
+
+
     public void setService(UserService userService, ChannelService channelService) {
         this.userService = userService;
         this.channelService = channelService;
     }
+
     @Override
-    public Message createMessage(UUID channelId, UUID authorId, String content) {
-        if(isContent(content)) {
-            Message newMessage = new Message(content, channelId, authorId);
-            messageRepository.save(newMessage);
-            System.out.println("새로운 메세지가 작성되었습니다.");
-            return newMessage;
+    public void createMessage(Message message) {
+        if (!isContent(message.getContent())) {
+            return;
         }
-        return null;
+        Message newMessage = new Message(message);
+        messageRepository.save(newMessage);
+        System.out.println("새로운 메시지가 작성되었습니다.");
     }
 
     @Override
@@ -62,6 +70,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID messageId, String newContent) {
+        if(!isContent(newContent)) {
+            return;
+        }
         try {
             Message message = searchById(messageId);
             message.setContent(newContent);
@@ -74,7 +85,7 @@ public class BasicMessageService implements MessageService {
     }
 
     private boolean isContent(String content) {
-        if (content.isBlank()) {
+        if (content == null || content.isBlank()) {
             System.out.println("내용을 입력해주세요!!!");
             return false;
         }

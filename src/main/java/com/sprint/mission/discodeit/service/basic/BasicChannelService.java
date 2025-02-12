@@ -6,17 +6,21 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class BasicChannelService implements ChannelService {
+@Service
+public class BasicChannelService implements ChannelService { //서비스 계층에서 꼭 모든 오류를 잡지 않아도 됨 -> 윗 계층에서 오류를 해결하자!
     private ChannelRepository channelRepository;
     private UserService userService;
     private MessageService messageService;
 
+    @Autowired
     public BasicChannelService(ChannelRepository channelRepository) {
         this.channelRepository = channelRepository;
     }
@@ -24,15 +28,21 @@ public class BasicChannelService implements ChannelService {
         this.userService = userService;
         this.messageService = messageService;
     }
+
+    @Override
+    public void createChannel(Channel channel) {
+        Channel newChannel = new Channel(channel);
+        channelRepository.save(channel);
+    }
     @Override
     public Channel createChannel(String title, User owner) {
-       if(correctTitle(title)) {
-           Channel newChannel = new Channel(title, owner);
-           channelRepository.save(newChannel);
-           System.out.println(owner.getUserName() + "님께서 새로운 채널을 생성했습니다.");
-           return newChannel;
-       }
-        return null;
+        if(! iscorrectTitle(title)){
+            return  null;
+        }
+        Channel newChannel = new Channel(title, owner);
+        channelRepository.save(newChannel);
+        System.out.println(owner.getUserName() + "님께서 새로운 채널을 생성했습니다.");
+        return newChannel;
     }
 
     @Override
@@ -76,7 +86,7 @@ public class BasicChannelService implements ChannelService {
 
     }
 
-    private boolean correctTitle(String channelName) {
+    private boolean iscorrectTitle(String channelName) {
         if (channelName.isBlank()) {
             System.out.println("제목을 입력해주세요");
             return false;
