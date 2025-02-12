@@ -2,27 +2,30 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
-//import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-//import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.MessageService;
 //import com.sprint.mission.discodeit.service.file.FileUserService;
 //import com.sprint.mission.discodeit.service.file.FileChannelService;
 //import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-//import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-//import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-//import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 //import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 //import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 //import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
@@ -37,6 +40,9 @@ public class JavaApplication {
 
     UserRepository userRepository = new JCFUserRepository();
     UserService userService = new JCFUserService(userRepository);
+
+    MessageRepository messageRepository = new JCFMessageRepository();
+    MessageService messageService = new JCFMessageService(messageRepository);
 
     // ===== 회원 =====
     System.out.println("\n===== 회원 서비스 CRUD =====");
@@ -82,39 +88,30 @@ public class JavaApplication {
     channelService.deleteChannel(ch1.getId());
 
 
-//    // ===== 메세지 =====
-//    System.out.println("\n===== 메세지 서비스 CRUD =====");
-//
-//    // 메세지를 보낼 회원 등록
-//    User messageUser = new User("MessageSender", 25,MALE);
-//    userService.createUser(messageUser);
-//
-//    // 등록
-//    Message message = new Message("안녕하세요", messageUser.getId());
-//    if (messageService.createMessage(message)) {
-//      System.out.println("등록된 메세지: " + message);
-//    } else {
-//      System.out.println("메세지 등록 실패");
-//    }
-//
-//    // 조회 - 단건
-//    messageService.readMessage(message.getId())
-//        .ifPresent(m -> System.out.println("특정 메세지 조회: " + m));
-//
-//    // 조회 - 다건
-//    System.out.println("모든 메세지 조회: " + messageService.readAllMessages());
-//
-//    // 수정
-//    messageService.updateMessage(message.getId(), "수정 문구: Hello", messageUser.getId());
-//
-//    // 수정된 데이터 조회
-//    messageService.readMessage(message.getId())
-//        .ifPresent(m -> System.out.println("수정된 메세지 조회: " + m));
-//
-//    // 삭제
-//    messageService.deleteMessage(message.getId());
-//
-//    // 조회를 통해 삭제되었는지 확인
-//    System.out.println("삭제 후 메세지 목록: " + messageService.readAllMessages());
+    // ===== 메세지 =====
+    System.out.println("\n===== 메세지 서비스 CRUD =====");
+
+    // 메세지를 보낼 회원 등록
+    User messageUser = new User("MessageSender", 25, Gender.MALE);
+    userService.createUser(messageUser);
+
+    // 등록
+    Message msg1 = new Message("안녕하세요", messageUser.getId());
+    messageService.createMessage(msg1);
+
+    Message msg2 = new Message("Hi", messageUser.getId());
+    messageService.createMessage(msg2);
+
+    // 조회 - 단건
+    messageService.readMessage(msg1.getId());
+
+    // 조회 - 다건
+    messageService.readAllMessages();
+
+    // 수정 & 조회
+    messageService.updateMessage(msg1.getId(), "Hello~!!", messageUser.getId());
+
+    // 삭제 & 조회
+    messageService.deleteMessage(msg1.getId());
   }
 }
