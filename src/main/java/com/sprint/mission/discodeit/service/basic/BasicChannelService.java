@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
 import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.UpdateChannelRequest;
@@ -27,16 +25,22 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 	private final ChannelRepository channelRepository;
 	private final UserService userService;
 	private final ReadStatusService readStatusService;
 	private final MessageRepository messageRepository;
 	private final ReadStatusRepository readStatusRepository;
+
+	public BasicChannelService(ChannelRepository channelRepository, UserService userService,
+		ReadStatusService readStatusService, MessageRepository messageRepository,
+		ReadStatusRepository readStatusRepository) {
+		this.channelRepository = channelRepository;
+		this.userService = userService;
+		this.readStatusService = readStatusService;
+		this.messageRepository = messageRepository;
+		this.readStatusRepository = readStatusRepository;
+	}
 
 	/**
 	 * 1:1 개인 채널을 생성합니다.

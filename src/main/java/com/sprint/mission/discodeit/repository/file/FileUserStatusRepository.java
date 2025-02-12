@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -7,30 +9,44 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FileUserStatusRepository implements UserStatusRepository {
 
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
+	private final Path rootDir;
 	private static final String USERSTATUS_FILE = "userstatus.ser";
 	private final FileStorage<UserStatus> fileStorage;
 
-	public FileUserStatusRepository() {
+	public FileUserStatusRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(UserStatus.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	/**
 	 * 내부적으로 파일에서 전체 UserStatus 목록을 가져옴.
 	 */
 	private List<UserStatus> findAll() {
-		return fileStorage.load(ROOT_DIR.resolve(USERSTATUS_FILE));
+		Path filePath = rootDir.resolve(USERSTATUS_FILE);
+
+		// 파일이 디렉토리인지 체크 후 삭제
+		if (Files.exists(filePath) && Files.isDirectory(filePath)) {
+			log.error("🚨 오류: userstatus.ser가 디렉토리로 생성됨. 삭제 후 재생성합니다.");
+			try {
+				Files.delete(filePath);
+			} catch (IOException e) {
+				throw new RuntimeException("디렉토리 삭제 실패: " + filePath, e);
+			}
+		}
+
+		List<UserStatus> userStatuses = fileStorage.load(filePath);
+		return userStatuses;
 	}
 
 	/**
@@ -41,7 +57,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 		List<UserStatus> statuses = findAll();
 		statuses.removeIf(status -> status.getId().equals(userStatus.getId()));
 		statuses.add(userStatus);
-		fileStorage.save(ROOT_DIR.resolve(USERSTATUS_FILE), statuses);
+		fileStorage.save(rootDir.resolve(USERSTATUS_FILE), statuses);
 		return userStatus;
 	}
 
@@ -86,6 +102,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
 	public void deleteByUserId(UUID userId) {
 		List<UserStatus> statuses = findAll();
 		statuses.removeIf(status -> status.getUserId().equals(userId));
-		fileStorage.save(ROOT_DIR.resolve(USERSTATUS_FILE), statuses);
+		fileStorage.save(rootDir.resolve(USERSTATUS_FILE), statuses);
 	}
 }

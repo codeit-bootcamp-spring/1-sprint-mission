@@ -1,8 +1,9 @@
-server:
-  port: 8080
 spring:
-  application:
-    name: discodeit
+  datasource:
+    url: jdbc:mysql://prod-db:3306/codeitdb
+    username: root
+    password: 1234
+
 logging:
   level:
     root: info

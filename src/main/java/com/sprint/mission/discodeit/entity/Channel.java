@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,7 +11,8 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import lombok.Getter;
 
 @Getter
-public class Channel extends BaseEntity {
+public class Channel extends BaseEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String description;
 	private Map<UUID, UserResponse> participants;

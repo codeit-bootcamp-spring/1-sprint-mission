@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -16,14 +14,17 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 	private final BinaryContentRepository binaryContentRepository;
 	private final UserRepository userRepository;
 	private final MessageRepository messageRepository;
+
+	public BasicBinaryContentService(BinaryContentRepository binaryContentRepository, UserRepository userRepository,
+		MessageRepository messageRepository) {
+		this.binaryContentRepository = binaryContentRepository;
+		this.userRepository = userRepository;
+		this.messageRepository = messageRepository;
+	}
 
 	/**
 	 * 새로운 바이너리 컨텐츠를 생성합니다.

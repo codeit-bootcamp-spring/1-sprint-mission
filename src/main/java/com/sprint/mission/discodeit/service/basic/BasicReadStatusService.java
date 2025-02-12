@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
 import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -13,14 +11,17 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 	private final ReadStatusRepository readStatusRepository;
 	private final UserRepository userRepository;
 	private final ChannelRepository channelRepository;
+
+	public BasicReadStatusService(ReadStatusRepository readStatusRepository, UserRepository userRepository,
+		ChannelRepository channelRepository) {
+		this.readStatusRepository = readStatusRepository;
+		this.userRepository = userRepository;
+		this.channelRepository = channelRepository;
+	}
 
 	/**
 	 * 새로운 읽음 상태를 생성합니다.

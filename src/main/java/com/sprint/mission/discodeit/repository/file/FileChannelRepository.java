@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -8,8 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -17,15 +17,15 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
 public class FileChannelRepository implements ChannelRepository {
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
+	private final Path rootDir;
 	private static final String CHANNEL_FILE = "channel.ser";
 	private final FileStorage<Channel> fileStorage;
 
-	public FileChannelRepository() {
+	public FileChannelRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(Channel.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class FileChannelRepository implements ChannelRepository {
 			channels.add(channel);
 		}
 
-		fileStorage.save(ROOT_DIR.resolve(CHANNEL_FILE), channels);
+		fileStorage.save(rootDir.resolve(CHANNEL_FILE), channels);
 		return channel;
 	}
 
@@ -63,14 +63,25 @@ public class FileChannelRepository implements ChannelRepository {
 
 	@Override
 	public List<Channel> findAll() {
-		return fileStorage.load(ROOT_DIR);
+		Path filePath = rootDir.resolve(CHANNEL_FILE);
+		if (Files.exists(filePath) && Files.isDirectory(filePath)) {
+			System.err.println("🚨 오류: channel.ser가 디렉토리로 생성됨. 삭제 후 재생성합니다.");
+			try {
+				Files.delete(filePath);
+			} catch (IOException e) {
+				throw new RuntimeException("디렉토리 삭제 실패: " + filePath, e);
+			}
+		}
+		List<Channel> channels = fileStorage.load(filePath);
+		return channels;
+
 	}
 
 	@Override
 	public void delete(UUID id) {
 		List<Channel> channels = findAll();
 		channels.removeIf(channel -> channel.getId().equals(id));
-		fileStorage.save(ROOT_DIR.resolve(CHANNEL_FILE), channels);
+		fileStorage.save(rootDir.resolve(CHANNEL_FILE), channels);
 	}
 
 	@Override

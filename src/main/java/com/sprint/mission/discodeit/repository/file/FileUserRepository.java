@@ -6,29 +6,33 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FileUserRepository implements UserRepository {
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
+	private final Path rootDir;
 	private static final String USER_FILE = "user.ser";
 	private final FileStorage<User> fileStorage;
 
-	public FileUserRepository() {
+	public FileUserRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(User.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	@Override
 	public User save(User user) {
 		List<User> users = findAll();
 		users.add(user);
-		fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
+		fileStorage.save(rootDir.resolve(USER_FILE), users);
+		// 강제로 다시 로드해보기
+		List<User> reloadedUsers = fileStorage.load(rootDir.resolve(USER_FILE));
+		log.info("Loaded {} users", reloadedUsers);
 		return user;
 	}
 
@@ -78,13 +82,15 @@ public class FileUserRepository implements UserRepository {
 
 	@Override
 	public List<User> findAll() {
-		return fileStorage.load(ROOT_DIR.resolve(USER_FILE));
+		List<User> users = fileStorage.load(rootDir.resolve(USER_FILE));
+		log.info("Loaded users: " + users);
+		return users;
 	}
 
 	@Override
 	public void delete(UUID id) {
 		List<User> users = findAll();
 		users.removeIf(u -> u.getId().equals(id));
-		fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
+		fileStorage.save(rootDir.resolve(USER_FILE), users);
 	}
 }

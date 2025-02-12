@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import org.springframework.stereotype.Service;
-
 import com.sprint.mission.discodeit.dto.user.request.LoginUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,13 +8,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 	private final UserRepository userRepository;
 	private final UserStatusRepository userStatusRepository;
+
+	public BasicAuthService(UserRepository userRepository, UserStatusRepository userStatusRepository) {
+		this.userRepository = userRepository;
+		this.userStatusRepository = userStatusRepository;
+	}
 
 	@Override
 	public UserResponse login(LoginUserRequest request) {
@@ -39,7 +38,8 @@ public class BasicAuthService implements AuthService {
 	}
 
 	private UserResponse createLoginResponse(User user, UserStatus userStatus) {
-		return new UserResponse(user.getUserid(), user.getUsername(), user.getEmail(), userStatus.isOnline(),
+		return new UserResponse(user.getId(), user.getUserid(), user.getUsername(), user.getEmail(),
+			userStatus.isOnline(),
 			user.getCreatedAt(), user.getUpdatedAt());
 	}
 }

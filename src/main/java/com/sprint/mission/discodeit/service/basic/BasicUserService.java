@@ -82,6 +82,17 @@ public class BasicUserService implements UserService {
 	}
 
 	/**
+	 * 사용자 ID를 기반으로 User 도메인 객체를 반환합니다.
+	 * @param existUserId 조회할 사용자 ID
+	 * @return 조회된 사용자 객체
+	 */
+	@Override
+	public User findUserEntity(UUID existUserId) {
+		return userRepository.findById(existUserId)
+			.orElseThrow(() -> new IllegalArgumentException("User not found: " + existUserId));
+	}
+
+	/**
 	 * 모든 사용자를 조회합니다.
 	 * @return 전체 사용자 목록
 	 */
@@ -155,6 +166,7 @@ public class BasicUserService implements UserService {
 	 */
 	private UserResponse createUserResponse(User user, UserStatus userStatus) {
 		return new UserResponse(
+			user.getId(),
 			user.getUserid(),
 			user.getUsername(),
 			user.getEmail(),

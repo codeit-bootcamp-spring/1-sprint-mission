@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 import lombok.Getter;
 
 @Getter
-public class UserStatus extends BaseEntity {
+public class UserStatus extends BaseEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private final UUID userId;
 	private Instant lastActiveAt;
 

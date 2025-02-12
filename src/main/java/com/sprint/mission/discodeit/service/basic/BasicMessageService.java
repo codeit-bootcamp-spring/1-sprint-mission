@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentRequest;
@@ -22,15 +21,20 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 	private final MessageRepository messageRepository;
 	private final UserService userService;
 	private final ChannelService channelService;
 	private final BinaryContentService binaryContentService;
+
+	public BasicMessageService(MessageRepository messageRepository, UserService userService,
+		ChannelService channelService,
+		BinaryContentService binaryContentService) {
+		this.messageRepository = messageRepository;
+		this.userService = userService;
+		this.channelService = channelService;
+		this.binaryContentService = binaryContentService;
+	}
 
 	/**
 	 * 새로운 메시지를 생성합니다.

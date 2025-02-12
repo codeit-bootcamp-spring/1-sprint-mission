@@ -13,6 +13,8 @@ public interface UserService {
 
 	UserResponse findUser(UUID existUserId);
 
+	User findUserEntity(UUID existUserId);
+	
 	List<UserResponse> findAllUsers();
 
 	User updateUser(UUID existUserId, UpdateUserRequest request);

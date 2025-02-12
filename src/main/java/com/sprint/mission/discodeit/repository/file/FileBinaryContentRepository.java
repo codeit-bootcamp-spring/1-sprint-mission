@@ -7,26 +7,24 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
+	private final Path rootDir;
 	private static final String BINARYCONTENT_FILE = "binarycontent.ser";
 	private final FileStorage<BinaryContent> fileStorage;
 
-	public FileBinaryContentRepository() {
+	public FileBinaryContentRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(BinaryContent.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	private List<BinaryContent> findAll() {
-		return fileStorage.load(ROOT_DIR.resolve(BINARYCONTENT_FILE));
+		return fileStorage.load(rootDir.resolve(BINARYCONTENT_FILE));
 	}
 
 	@Override
@@ -43,7 +41,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 		if (!updated) {
 			contents.add(binaryContent);
 		}
-		fileStorage.save(ROOT_DIR.resolve(BINARYCONTENT_FILE), contents);
+		fileStorage.save(rootDir.resolve(BINARYCONTENT_FILE), contents);
 		return binaryContent;
 	}
 
@@ -90,7 +88,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 	public void deleteById(UUID id) {
 		List<BinaryContent> contents = findAll();
 		contents.removeIf(binaryContent -> binaryContent.getId().equals(id));
-		fileStorage.save(ROOT_DIR.resolve(BINARYCONTENT_FILE), contents);
+		fileStorage.save(rootDir.resolve(BINARYCONTENT_FILE), contents);
 	}
 
 	/**
@@ -100,6 +98,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 	public void deleteAllByMessageId(UUID messageId) {
 		List<BinaryContent> contents = findAll();
 		contents.removeIf(binaryContent -> binaryContent.getMessageId().equals(messageId));
-		fileStorage.save(ROOT_DIR.resolve(BINARYCONTENT_FILE), contents);
+		fileStorage.save(rootDir.resolve(BINARYCONTENT_FILE), contents);
 	}
 }

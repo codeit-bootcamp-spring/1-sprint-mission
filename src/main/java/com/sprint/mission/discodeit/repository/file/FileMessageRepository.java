@@ -7,23 +7,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
 public class FileMessageRepository implements MessageRepository {
 
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "ser");
+	private final Path rootDir;
 	private static final String MESSAGE_FILE = "message.ser";
 	private final FileStorage<Message> fileStorage;
 
-	public FileMessageRepository() {
+	public FileMessageRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(Message.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class FileMessageRepository implements MessageRepository {
 		if (!updated) {
 			messages.add(message);
 		}
-		fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
+		fileStorage.save(rootDir.resolve(MESSAGE_FILE), messages);
 		return message;
 	}
 
@@ -59,7 +57,7 @@ public class FileMessageRepository implements MessageRepository {
 
 	@Override
 	public List<Message> findAll() {
-		return fileStorage.load(ROOT_DIR.resolve(MESSAGE_FILE));
+		return fileStorage.load(rootDir.resolve(MESSAGE_FILE));
 	}
 
 	@Override
@@ -78,7 +76,7 @@ public class FileMessageRepository implements MessageRepository {
 	public void delete(UUID id) {
 		List<Message> messages = findAll();
 		messages.removeIf(m -> m.getId().equals(id));
-		fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
+		fileStorage.save(rootDir.resolve(MESSAGE_FILE), messages);
 	}
 
 	/**
@@ -88,7 +86,7 @@ public class FileMessageRepository implements MessageRepository {
 	public void deleteAllByChannelId(UUID channelId) {
 		List<Message> messages = findAll();
 		messages.removeIf(m -> m.getChannelId().equals(channelId));
-		fileStorage.save(ROOT_DIR.resolve(MESSAGE_FILE), messages);
+		fileStorage.save(rootDir.resolve(MESSAGE_FILE), messages);
 	}
 
 	/**

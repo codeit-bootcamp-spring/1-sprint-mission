@@ -7,29 +7,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Repository;
-
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.FileStorage;
 import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
 
-@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
 	// 루트 디렉터리 및 파일 경로 정의
-	private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
 	private static final String READSTATUS_FILE = "readstatus.ser";
-
-	// 제네릭 FileStorage 인스턴스 생성
+	private final Path rootDir;
 	private final FileStorage<ReadStatus> fileStorage;
 
-	public FileReadStatusRepository() {
+	public FileReadStatusRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
 		this.fileStorage = new SerializableFileStorage<>(ReadStatus.class);
-		fileStorage.init(ROOT_DIR);
+		fileStorage.init(rootDir);
 	}
 
 	private List<ReadStatus> findAll() {
-		return fileStorage.load(ROOT_DIR.resolve(READSTATUS_FILE));
+		return fileStorage.load(rootDir.resolve(READSTATUS_FILE));
 	}
 
 	/**
@@ -50,7 +46,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 		if (!updated) {
 			statuses.add(readStatus);
 		}
-		fileStorage.save(ROOT_DIR.resolve(READSTATUS_FILE), statuses);
+		fileStorage.save(rootDir.resolve(READSTATUS_FILE), statuses);
 		return readStatus;
 	}
 
@@ -116,7 +112,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 	public void deleteByUserIdAndChannelId(UUID userId, UUID channelId) {
 		List<ReadStatus> statuses = findAll();
 		statuses.removeIf(s -> s.getUserId().equals(userId) && s.getChannelId().equals(channelId));
-		fileStorage.save(ROOT_DIR.resolve(READSTATUS_FILE), statuses);
+		fileStorage.save(rootDir.resolve(READSTATUS_FILE), statuses);
 	}
 
 	/**
@@ -126,6 +122,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 	public void deleteAllByChannelId(UUID channelId) {
 		List<ReadStatus> statuses = findAll();
 		statuses.removeIf(s -> s.getChannelId().equals(channelId));
-		fileStorage.save(ROOT_DIR.resolve(READSTATUS_FILE), statuses);
+		fileStorage.save(rootDir.resolve(READSTATUS_FILE), statuses);
 	}
 }

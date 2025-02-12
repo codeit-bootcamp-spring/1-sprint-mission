@@ -3,6 +3,14 @@ server:
 spring:
   application:
     name: discodeit
+  datasource:
+    url: jdbc:h2:mem:commonDB
+    username: common
+    password: 1234
 logging:
   level:
     root: info
+discodeit:
+  repository:
+    type: file     # jcf | file
+    file-directory: .discodeit

@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
 import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.userStatus.response.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -12,13 +10,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 
-import lombok.RequiredArgsConstructor;
-
-@Service
-@RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 	private final UserStatusRepository userStatusRepository;
 	private final UserRepository userRepository;
+
+	public BasicUserStatusService(UserStatusRepository userStatusRepository, UserRepository userRepository) {
+		this.userStatusRepository = userStatusRepository;
+		this.userRepository = userRepository;
+	}
 
 	/**
 	 * 새로운 사용자 상태를 생성합니다.
@@ -48,7 +47,7 @@ public class BasicUserStatusService implements UserStatusService {
 	 */
 	@Override
 	public UserStatus find(UUID id) {
-		return userStatusRepository.findById(id)
+		return userStatusRepository.findByUserId(id)
 			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 	}
 
