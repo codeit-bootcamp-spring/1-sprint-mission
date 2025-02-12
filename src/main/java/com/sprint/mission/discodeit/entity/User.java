@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 
 import lombok.Builder;
 import lombok.Getter;

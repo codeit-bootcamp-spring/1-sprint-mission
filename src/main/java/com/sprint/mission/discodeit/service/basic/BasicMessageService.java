@@ -31,7 +31,7 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("유저가 존재하지 않습니다.");
         }
 
-        Message message = new Message(content, channelId, writerId);
+        Message message = new Message(channelId, content ,writerId);
         return messageRepository.save(message);
     }
 
@@ -61,7 +61,7 @@ public class BasicMessageService implements MessageService {
     public Message update(UUID messageId, String newContent) {
         Message message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new NoSuchElementException("메시지가 존재하지 않습니다."));
-        message.updated(newContent);
+        message.update(newContent);
         return messageRepository.save(message);
     }
 

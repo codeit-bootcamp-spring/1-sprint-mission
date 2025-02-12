@@ -14,7 +14,6 @@ public abstract class BaseEntity implements Serializable {
     private long createdAt;
     private long updatedAt;
 
-    @Builder
     public BaseEntity() {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();

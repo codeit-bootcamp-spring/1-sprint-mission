@@ -11,12 +11,12 @@ import lombok.Getter;
 public class Message extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private UUID channelId;
-    private UUID writerId;
+    private final UUID channelId;
+    private final UUID writerId;
     private String content;
 
     @Builder
-    public Message(UUID channelId, UUID writerId, String content) {
+    public Message(UUID channelId, String content, UUID writerId) {
         super();
         this.channelId = channelId;
         this.writerId = writerId;

@@ -1,35 +1,42 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFMessageRepository {
-    private final List<Message> messages;
+public class JCFMessageRepository implements MessageRepository {
+    private final Map<UUID, Message> messages;
 
     public JCFMessageRepository(){
-        this.messages = new ArrayList<>();
+        this.messages = new HashMap<>();
     }
 
-    public void save(Message message){
-        messages.add(message);
+    @Override
+    public Message save(Message message){
+        this.messages.put(message.getId(), message);
+        return message;
     }
 
-    public void delete(Message message){
-        messages.remove(message);
+    @Override
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.messages.get(id));
     }
 
-    public List<Message> load(){
-        return messages;
+    @Override
+    public List<Message> findAll() {
+        return this.messages.values().stream()
+                .toList();
     }
 
-    public Optional<Message> findById(UUID messageId) {
-        return messages.stream()
-                .filter(user-> user.getId().equals(messageId))
-                .findFirst();
+    @Override
+    public boolean existsId(UUID id) {
+        return this.messages.containsKey(id);
+    }
+
+    @Override
+    public void delete(UUID id){
+        this.messages.remove(id);
     }
 
 }
