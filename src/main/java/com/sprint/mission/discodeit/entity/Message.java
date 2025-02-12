@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private UUID id;
   private Long createdAt;
   private Long updatedAt;
@@ -37,9 +40,8 @@ public class Message {
     return authorId;
   }
 
-  public void update(String content, UUID authorId) {
+  public void update(String content) {
     this.content = content;
-    this.authorId = authorId;
     this.updatedAt = System.currentTimeMillis();
   }
 

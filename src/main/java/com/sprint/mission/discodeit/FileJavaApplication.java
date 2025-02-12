@@ -38,8 +38,9 @@ public class FileJavaApplication {
 
     SerializationUtil<User> util = new SerializationUtil<>();
 
-    FileUserRepository fileUserRepository = new FileUserRepository(util, "user.ser");
+    FileUserRepository fileUserRepository = new FileUserRepository(util, "record.ser");
     FileUserService fileUserService = new FileUserService(fileUserRepository);
+
 
     // ===== 회원 직렬화 =====
     System.out.println("\n===== 회원 서비스 CRUD =====");

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 
 public class SerializationUtil<T> {
-  private static final String FILE_PATH = "user.ser";
+  private static final String FILE_PATH = "record.ser";
   // Java에서는 기본 생성자를 명시적으로 작성해주지 않아도 자동으로 제공함
 
   // 파일에 객체 직렬화하기

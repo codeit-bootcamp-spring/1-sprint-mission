@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Gender;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.repository.UserRepository;
-
-
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
