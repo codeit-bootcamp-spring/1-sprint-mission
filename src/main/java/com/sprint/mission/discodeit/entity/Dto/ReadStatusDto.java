@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.Dto;
+
+import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.time.Instant;
 import java.util.UUID;

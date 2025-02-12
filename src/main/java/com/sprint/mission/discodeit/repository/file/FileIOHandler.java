@@ -3,11 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Entity;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -30,9 +28,9 @@ public class FileIOHandler {
     }
 
     //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
-    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName) {
+    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName) throws IOException {
         if (entityMap == null || fileName == null) {
-            return false;
+            throw new NullPointerException("IO 핸들러에 전달된 엔티티맵 혹은 파일이름이 null인 상태입니다.");
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileOutputStream fos = new FileOutputStream(filePath);
@@ -40,30 +38,51 @@ public class FileIOHandler {
         {
             oos.writeObject(entityMap);
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        } catch (IOException e) {
+            throw new IOException("엔티티맵 직렬화에 실패했습니다. 실패한 파일 경로", e);
         }
     }
 
     //역직렬화 성공여부에 따라 해쉬맵 or null 반환
-    public HashMap<UUID, ? extends Entity> deserializeHashMap(String fileName) {
+    public HashMap<UUID, ? extends Entity> deserializeHashMap(String fileName) throws IOException {
         if (fileName == null) {
-            return null;
+            throw new NullPointerException("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (HashMap<UUID, ? extends Entity>) ois.readObject();
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
+        } catch (IOException | ClassNotFoundException e){
+            throw new IOException("엔티티맵 역직렬화 실패", e);
         }
     }
 
+    //이미지 불러오기.
+    public BufferedImage loadImage(String imagePath) throws IOException {
+        if (imagePath == null) {
+            throw new NullPointerException("IO 핸들러에 전달된 이미지경로가 null인 상태입니다.");
+        }
 
-    //public BufferedImage loadImage(String imagePath) {
+        try {
+            File image = new File(imagePath);
+            return ImageIO.read(image);
+        } catch (IOException e) {
+            throw new IOException("이미지 불러오기 중 오류가 발생했습니다", e);
+        }
+    }
 
-    //}
+    //이미지 저장하기
+    public boolean saveImage(BufferedImage image, String imagePath) throws IOException{
+        if (image == null || imagePath == null) {
+            return false;
+        }
+        try {
+            File outputImage = new File(imagePath);
+            ImageIO.write(image, "jpg",outputImage);
+            return true;
+        } catch (IOException e) {
+            throw new IOException("이미지 불러오기 중 오류가 발생했습니다", e);
+        }
 
+    }
 }

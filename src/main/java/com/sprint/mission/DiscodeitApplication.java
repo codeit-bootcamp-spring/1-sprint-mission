@@ -1,7 +1,9 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileIOHandler;
@@ -17,12 +19,12 @@ import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-    static User setupUser(UserService userService) {
+    static UserDto setupUser(UserService userService) {
         UUID user1 = userService.createUser("woody", "woody@codeit.com", "woody1234");
         return userService.getUserById(user1);
     }
 
-    static Channel setupChannel(ChannelService channelService) {
+    /*static ChannelDto setupChannel(ChannelService channelService) {
         UUID channel1 = channelService.createChannel(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
         return channelService.getChannelById(channel1);
     }
@@ -31,11 +33,15 @@ public class DiscodeitApplication {
         UUID message1 = messageService.createMessage(author.getId(), channel.getId(),"안녕하세요.");
         System.out.println("메시지 생성: " + message1);
     }
-
+*/
     static void RepositoryClear(){
-        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
-        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
-        FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
+        try{//FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
+            FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
+            //FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
+        }catch (Exception e){
+            e.printStackTrace();
+            e.getMessage();
+        }
     }
 
     public static void main(String[] args) {
@@ -46,15 +52,15 @@ public class DiscodeitApplication {
 
 
         UserService userService = context.getBean(UserService.class);
-        ChannelService channelService = context.getBean(ChannelService.class);
-        MessageService messageService = context.getBean(MessageService.class);
+        //ChannelService channelService = context.getBean(ChannelService.class);
+        //MessageService messageService = context.getBean(MessageService.class);
 
 
         // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        UserDto user = setupUser(userService);
+        //ChannelDto channel = setupChannel(channelService);
         // 테스트
-        messageCreateTest(messageService, channel, user);
+        //messageCreateTest(messageService, channel, user);
 
 
     }

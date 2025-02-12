@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -32,27 +35,24 @@ public class FileUserRepository implements UserRepository {
 
     // I/O로 생성된 모든 유저 객체가 담기는 해쉬맵 반환
     @Override
-    public HashMap<UUID, User> getUsersMap() {
-
-        return (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
+    public HashMap<UUID, User> getUsersMap() throws Exception{
+        HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
+        return usersMap;
     }
 
     // 특정 유저객체 여부에 따라 객체 혹은 null 반환.
     @Override
-    public User getUser(UUID userId) {
-        HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
-        if (usersMap.containsKey(userId) == false) {
-            return null;
-        }
-        return usersMap.get(userId);
+    public User getUser(UUID userId) throws Exception{
+        HashMap<UUID, User> usersMap = getUsersMap();
+        return Optional.ofNullable(usersMap.get(userId)).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
 
     // 특정 유저객체 존재여부 확인 후 삭제
     @Override
-    public boolean deleteUser(UUID userId) {
-        HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
+    public boolean deleteUser(UUID userId) throws Exception {
+        HashMap<UUID, User> usersMap = getUsersMap();
         if (usersMap.containsKey(userId) == false) {
-            return false;
+            throw new NoSuchElementException("User is not found");
         }
         usersMap.remove(userId);
         fileIOHandler.serializeHashMap(usersMap, mainUserRepository);
@@ -61,10 +61,10 @@ public class FileUserRepository implements UserRepository {
 
     // 전달받은 유저객체 null 여부 확인 후 유저 해쉬맵에 추가.
     @Override
-    public boolean addUser(User user) {
+    public boolean saveUser(User user) throws Exception {
         HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
         if (user == null) {
-            return false;
+            throw new NullPointerException("Given User Object is null.");
         }
         usersMap.put(user.getId(), user);
         fileIOHandler.serializeHashMap(usersMap, mainUserRepository);
@@ -72,7 +72,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean isUserExist(UUID userId) {
+    public boolean isUserExistByUUID(UUID userId) throws Exception{
         HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
         if (usersMap.containsKey(userId) == false) {
             return false;
@@ -80,5 +80,18 @@ public class FileUserRepository implements UserRepository {
         return true;
     }
 
+    @Override
+    public boolean isUserExistByUserName(String userName) throws Exception{
+        HashMap<UUID, User> usersMap = getUsersMap();
+        boolean isMatch = usersMap.values().stream().anyMatch(user -> user.getUserName().equals(userName));
+        return isMatch;
+    }
+
+    @Override
+    public boolean isUserExistByEmail(String email) throws Exception{
+        HashMap<UUID, User> usersMap = getUsersMap();
+        boolean isMatch = usersMap.values().stream().anyMatch(user -> user.getEmail().equals(email));
+        return isMatch;
+    }
 
 }

@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Service
@@ -19,13 +18,6 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
-
-
-    //모든 메세지 관리 맵 'MessagesMap' 반환
-    @Override
-    public HashMap<UUID, Message> getMessagesMap() {
-        return messageRepository.getMessagesMap();
-    }
 
     //해당 메세지 객체 리턴
     @Override
@@ -40,7 +32,7 @@ public class BasicMessageService implements MessageService {
     //메세지 생성. 'MessagesMap'에 uuid-메세지객체 주소 넣어줌.
     @Override
     public UUID createMessage(UUID author, UUID channel, String content) {
-        if (author == null || channel == null || content == null || userRepository.isUserExist(author) == false || channelRepository.isChannelExist(channel)==false) {
+        if (author == null || channel == null || content == null || userRepository.isUserExistByUUID(author) == false || channelRepository.isChannelExist(channel)==false) {
             System.out.println("메세지 생성 실패. 입력값을 확인해주세요.");
             return null;
         }

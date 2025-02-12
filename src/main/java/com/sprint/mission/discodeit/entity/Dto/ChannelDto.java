@@ -1,10 +1,13 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.Dto;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public record ChannelGetterDto(
+public record ChannelDto(
         UUID id,
         String channelName,
         ArrayList<UUID>members,
@@ -13,8 +16,8 @@ public record ChannelGetterDto(
         ChannelType type,
         String description
 ) {
-    public static ChannelGetterDto from(Channel channel) {
-        return new ChannelGetterDto(channel.getId(), channel.getChannelName(), channel.getMembers(), channel.getCreatedAt(), channel.getUpdatedAt(), channel.getType(), channel.getDescription());
+    public static ChannelDto from(Channel channel) {
+        return new ChannelDto(channel.getId(), channel.getChannelName(), channel.getMembers(), channel.getCreatedAt(), channel.getUpdatedAt(), channel.getType(), channel.getDescription());
     }
 
     //todo 겟 멤버스 메서드를 반환하면 채널에 속해있는 유저들의 객체가 그대로 반환된다. 보안 ㄱㅊ?

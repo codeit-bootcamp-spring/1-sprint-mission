@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.entity;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import lombok.Getter;
 import lombok.Setter;
 

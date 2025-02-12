@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -21,14 +19,6 @@ public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-
-
-
-    //모든 채널 관리 맵 'channelsMap' 반환
-    @Override
-    public HashMap<UUID, Channel> getChannelsMap() {
-        return channelRepository.getChannelsMap();
-    }
 
     //해당 채널 리턴
     @Override
@@ -91,7 +81,7 @@ public class BasicChannelService implements ChannelService {
     //멤버 한명 추가.
     @Override
     public boolean addChannelMember(UUID channelId, UUID memberId){
-        if (channelId == null || channelRepository.isChannelExist(channelId)==false || memberId==null || userRepository.isUserExist(memberId) == false) {
+        if (channelId == null || channelRepository.isChannelExist(channelId)==false || memberId==null || userRepository.isUserExistByUUID(memberId) == false) {
             System.out.println("채널 멤버 추가 실패. 입력값을 확인해주세요.");
             return false;
         }

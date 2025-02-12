@@ -1,7 +1,8 @@
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -19,11 +20,15 @@ import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import java.util.UUID;
 
 public class JavaApplication {
-    static User setupUser(UserService userService) {
+
+    //todo 전체적으로해야할것 1 : 검증코드 try catch로 변경
+    //todo 전체적으로해야할것 2 : 레포지토리 업데이트 코드 보완
+
+    static UserDto setupUser(UserService userService) {
         UUID user1 = userService.createUser("woody", "woody@codeit.com", "woody1234");
         return userService.getUserById(user1);
     }
-
+/*
     static Channel setupChannel(ChannelService channelService) {
         UUID channel1 = channelService.createChannel(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
         return channelService.getChannelById(channel1);
@@ -33,25 +38,25 @@ public class JavaApplication {
         UUID message1 = messageService.createMessage(author.getId(), channel.getId(),"안녕하세요.");
         System.out.println("메시지 생성: " + message1);
     }
-
+*/
     public static void main(String[] args) {
 
         UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+        //ChannelRepository channelRepository = new FileChannelRepository();
+        //MessageRepository messageRepository = new FileMessageRepository();
 
         UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository,userRepository);
-        MessageService messageService = new BasicMessageService(messageRepository,userRepository,channelRepository);
+        //ChannelService channelService = new BasicChannelService(channelRepository,userRepository);
+        //MessageService messageService = new BasicMessageService(messageRepository,userRepository,channelRepository);
 
 
 
 
         //셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+        UserDto user = setupUser(userService);
+        //Channel channel = setupChannel(channelService);
         // 테스트
-        messageCreateTest(messageService, channel, user);
+        //messageCreateTest(messageService, channel, user);
 
 
     }

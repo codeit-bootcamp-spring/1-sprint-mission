@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +9,6 @@ import java.util.UUID;
 
 public interface ChannelService {
     UUID createChannel(ChannelType type, String channelName, String description);
-
-    HashMap<UUID, Channel> getChannelsMap();
 
     Channel getChannelById(UUID channelId);
 

@@ -12,11 +12,11 @@ public class UserStatus implements Serializable, Entity{
 
     private UUID id;
     private Instant createdAt;
-    @Setter private Instant updatedAt;
+    private Instant updatedAt;
 
 
     // 생성자
-    private UserStatus() {
+    public UserStatus() {
         id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();

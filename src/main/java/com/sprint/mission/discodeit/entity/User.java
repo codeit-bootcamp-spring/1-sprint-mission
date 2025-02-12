@@ -1,4 +1,5 @@
 package com.sprint.mission.discodeit.entity;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,59 +11,43 @@ import java.util.UUID;
 public class User implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
+    //패스워드 제외한 모든 항목
     private final Instant createdAt;
-    @Setter private Instant updatedAt;
+    private Instant updatedAt;
     private UUID id;
-    @Setter private String email;
-    @Setter private String userName;
-    @Setter private String password;
-    @Setter private String profilePicture;
+    private String email;
+    private String userName;
+    private UUID profilePictureId;
+    private String password;
+    private UUID userStatusId;
 
-    public User(String userName, String email, String password) {
+    public User(String userName, String email, String password, UUID userStatusId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.userName = userName;
         this.email = email;
-        this.password = password;
         this.updatedAt = Instant.now();
-    }
-
-    public User(String userName, String email, String password, String profilePicture) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userName = userName;
-        this.email = email;
         this.password = password;
-        this.updatedAt = Instant.now();
-        this.profilePicture = profilePicture;
+        this.userStatusId = userStatusId;
     }
-
 
     //업데이트시간 수정
     public void setUpdatedAt(){this.updatedAt = Instant.now();}
+
     //유저이름 변경
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUserName(String newUserName){
+        this.userName = newUserName;
         this.setUpdatedAt();
     }
     //유저 이메일 변경
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String newEmail) {
+        this.email = newEmail;
         this.setUpdatedAt();
     }
-    //유저 비밀번호 변경
-    public void setPassword(String password) {
-        this.password = password;
-        this.setUpdatedAt();
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
+    //프로필사진 변경
+    public void setProfilePicture(UUID profilePictureId) {
+        this.profilePictureId = profilePictureId;
         this.setUpdatedAt();
     }
 
-    public void deleteProfilePicture() {
-        this.profilePicture = null;
-        this.setUpdatedAt();
-    }
 }

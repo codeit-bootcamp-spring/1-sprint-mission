@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.Type;
 
 public enum BinaryContentType {
     Profile_Picture,
