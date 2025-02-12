@@ -28,6 +28,7 @@ public class ReadStatus {
 
         this.userId=userId;
         this.channelId=channelId;
+        this.channelLastReadTimes=createdAt;
     }
 
     public void update() {

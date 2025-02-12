@@ -55,9 +55,10 @@ public class BasicChannelService implements ChannelService {
 
     //ReadStatus서비스에서 ReadStatus를 만드는 함수
     private void createReadStatus(Channel channel, ChannelCreateDTO channelCreateDTO) {
-        List<User> userList = channelCreateDTO.userList();
-        for(User user :userList){
-            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), user.getId() ), isChannelExist(channel.getId()));
+        List<UUID> userIDList = channelCreateDTO.userList();
+        for(UUID uuid :userIDList){
+            System.out.println("ReadStatus created");
+            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid ), isChannelExist(channel.getId()));
         }
     }
 

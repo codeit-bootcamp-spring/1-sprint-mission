@@ -27,8 +27,8 @@ public class Channel implements Serializable  {
         this.createdAt =  Instant.now();
         this.updatedAt=createdAt;
 
-        this.channelName = channelName;
-        this.type = ChannelType.valueOf("PRivate");
+        this.channelName = channelCreateDTO.name();
+        this.type = type;
     }
 
 
