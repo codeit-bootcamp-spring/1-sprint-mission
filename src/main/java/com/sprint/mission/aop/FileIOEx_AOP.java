@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
-@Component
+//@Component
 @Slf4j
-@Aspect
+//@Aspect
 public class FileIOEx_AOP {
 
     @Pointcut("execution(* com.sprint.mission.repository.file.*(..))")

@@ -5,6 +5,7 @@ import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
+import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.service.dto.request.UserDtoForRequest;
@@ -21,16 +22,16 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JCFUserService {
+public class JCFUserService implements UserService {
 
     private final JCFUserRepository userRepository;
     private final BinaryProfileService profileService;
     private final UserStatusService userStatusService;
 
     // 테스트에서 create 후 userId 필요해서 임시적 USER 반환 (할거면 나중에 컨트롤러에서)
+    @Override
     public User create(UserDtoForRequest userDto) {
-        isDuplicateNameEmail(userDto);
-
+        isDuplicateNameEmail(userDto.getUsername(), userDto.getEmail());
         User user = User.createUserByRequestDto(userDto);
 
         // 선택적 프로필 생성
@@ -43,15 +44,16 @@ public class JCFUserService {
         return userRepository.save(user);
     }
 
-    public void update(UUID userId, UserDtoForRequest dto) {
-        isDuplicateNameEmail(dto);
+    @Override
+    public void update(UUID userId, UserDtoForRequest updateDto) {
+        isDuplicateNameEmail(updateDto.getUsername(), updateDto.getEmail());
 
         userRepository.findById(userId)
                 .map((user) -> {
 
-                    user.setAll(dto.getUsername(), dto.getPassword(), dto.getEmail());
-                    if (dto.getProfileImg() != null) {
-                        profileService.create(new BinaryProfileContentDto(dto.getProfileImg()));
+                    user.setAll(updateDto.getUsername(), updateDto.getPassword(), updateDto.getEmail());
+                    if (updateDto.getProfileImg() != null) {
+                        profileService.create(new BinaryProfileContentDto(updateDto.getProfileImg()));
                     }
                     return userRepository.save(user);
                 })
@@ -60,6 +62,8 @@ public class JCFUserService {
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
+
+    @Override
     public FindUserDto findById(UUID userId) {
         return userRepository.findById(userId).map((user) -> {
             Boolean isOnline = userStatusService.findById(userId)
@@ -71,6 +75,8 @@ public class JCFUserService {
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
+
+    @Override
     public List<FindUserDto> findAll() {
         List<FindUserDto> findUsersDto = new ArrayList<>();
         for (User user : userRepository.findAll()) {
@@ -82,6 +88,7 @@ public class JCFUserService {
     }
 
     //관련된 도메인도 같이 삭제 -> BinaryContent(프로필), Userstatus
+    @Override
     public void delete(UUID userID) {
         if (!userRepository.existsById(userID)) return;
 
@@ -91,6 +98,7 @@ public class JCFUserService {
     }
 
     // 온라인 / 오프라인 메서드 나중에
+
 
     public void joinChannel(UUID userId, UUID channelId) {
         userRepository.findById(userId).ifPresent((joiningUser) -> {
@@ -103,14 +111,15 @@ public class JCFUserService {
     public void outChannel(UUID userId, UUID channelId) {
     }
 
-    protected void isDuplicateNameEmail(UserDtoForRequest userDto) {
+    @Override
+    public void isDuplicateNameEmail(String name, String email) {
         List<User> allUser = userRepository.findAll();
-        boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(userDto.getUsername()));
+        boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(name));
         if (isDuplicateName)
-            throw new IllegalStateException(String.format("Duplicate Name: %s", userDto.getUsername()));
+            throw new IllegalStateException(String.format("Duplicate Name: %s", name));
 
-        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()));
+        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> user.getEmail().equals(email));
         if (isDuplicateEmail)
-            throw new IllegalStateException(String.format("Duplicate Email: %s", userDto.getUsername()));
+            throw new IllegalStateException(String.format("Duplicate Email: %s", name));
     }
 }

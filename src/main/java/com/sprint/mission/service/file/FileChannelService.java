@@ -40,9 +40,9 @@ public class FileChannelService implements ChannelService {
 
     @SneakyThrows
     @Override
-    public void update(ChannelDtoForRequest dto) {
+    public void update(UUID channelId, ChannelDtoForRequest dto) {
         //validateDuplicateName(newName);
-        Channel updatingChannel = fileChannelRepository.findById(dto.getChannelId()).orElseThrow();
+        Channel updatingChannel = fileChannelRepository.findById(channelId).orElseThrow(NotFoundId::new);
         updatingChannel.setName(dto.getName());
         updatingChannel.setDescription(dto.getDescription());
         updatingChannel.setChannelType(dto.getChannelType());
@@ -63,8 +63,8 @@ public class FileChannelService implements ChannelService {
 
     @SneakyThrows
     @Override
-    public FindChannelDto findById(UUID id) {
-        Channel findChannel = fileChannelRepository.findById(id).orElseThrow(NotFoundId::new);
+    public FindChannelDto findById(UUID channelId) {
+        Channel findChannel = fileChannelRepository.findById(channelId).orElseThrow(NotFoundId::new);
         return findChannel.getChannelType().equals(ChannelType.PUBLIC)
                 ? new FindPublicChannelDto(findChannel)
                 : new FindPrivateChannelDto(findChannel);

@@ -8,7 +8,7 @@ import java.util.UUID;
 @Getter
 public class ChannelDtoForRequest {
 
-    private UUID channelId;
+    //private UUID channelId;
     private ChannelType channelType;
     private String description;
     private String name;

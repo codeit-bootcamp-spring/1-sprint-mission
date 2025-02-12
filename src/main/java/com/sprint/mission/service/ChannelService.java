@@ -13,7 +13,7 @@ public interface ChannelService {
     Channel create(ChannelDtoForRequest dto);
     List<FindChannelDto> findAll();
     FindChannelDto findById(UUID id);
-    void update(ChannelDtoForRequest dto);
+    void update(UUID channelId, ChannelDtoForRequest dto);
     void delete(UUID channelId);
 //    void validateDuplicateName(String name);
 }
