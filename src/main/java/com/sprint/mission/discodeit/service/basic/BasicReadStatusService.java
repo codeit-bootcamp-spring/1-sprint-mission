@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.readstatus.ReadStatusFindDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,17 +20,12 @@ import java.util.UUID;
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO) {
-        try {
-            //TODO 순환의존성을 없애기 위해 
-            ////채널존재확인
-            //channelService.readChannel(readStatusCreateDTO.channelId());
-            userService.findUserDTO(readStatusCreateDTO.userId());
-        } catch (Exception exception) {
-            throw new IllegalArgumentException("ReadStatus를 생성할 수 없습니다.");
+    public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO, boolean isChannelExist) {
+        if(!isChannelExist &&  !userRepository.existByUserId(readStatusCreateDTO.userId())){
+           throw new IllegalArgumentException("ReadStatus를 생성할 수 없습니다.");
         }
 
         ReadStatus readStatus = new ReadStatus(readStatusCreateDTO.channelId(), readStatusCreateDTO.userId());

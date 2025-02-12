@@ -13,5 +13,6 @@ public interface ChannelRepository {
     Channel findById(UUID id);
     Map<UUID, Channel> load();
     void delete(UUID id);
+    boolean isChannelExsit(UUID uuid);
 
 }

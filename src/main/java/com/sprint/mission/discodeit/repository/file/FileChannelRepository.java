@@ -24,6 +24,14 @@ public class FileChannelRepository implements ChannelRepository {
         this.channelList = load();
     }
 
+    @Override
+    public boolean isChannelExsit(UUID uuid) {
+        Channel channel = channelList.get(uuid);
+        if (channel == null) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public Channel save(Channel channel) {

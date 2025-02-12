@@ -57,8 +57,13 @@ public class BasicChannelService implements ChannelService {
     private void createReadStatus(Channel channel, ChannelCreateDTO channelCreateDTO) {
         List<User> userList = channelCreateDTO.userList();
         for(User user :userList){
-            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), user.getId() ));
+            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), user.getId() ), isChannelExist(channel.getId()));
         }
+    }
+
+    //채널이 레포에 존재하는지 검증
+    private boolean isChannelExist(UUID uuid) {
+        return channelRepository.isChannelExsit(uuid);
     }
 
 

@@ -25,6 +25,15 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public boolean isChannelExsit(UUID uuid) {
+        Channel channel = channelList.get(uuid);
+        if (channel == null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public Channel findById(UUID id) {
         Channel channel = channelList.get(id);
         if (channel == null) {

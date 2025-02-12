@@ -17,4 +17,5 @@ public interface UserRepository {
     void delete(UUID id);
 
     List<UUID> findAllUserIdByChannelId(UUID uuid); //채널에 참여하는 유저 id 리스트 반환
+
 }
