@@ -9,63 +9,60 @@ import java.util.*;
 import java.io.*;
 
 public class FileUserService implements UserService {
-  private static final String FILE_PATH = "user.ser";
   private final UserRepository userRepository;
-  private final List<User> data;
-
   public FileUserService(UserRepository userRepository){
     this.userRepository = userRepository;
-    this.data = loadData();
   }
 
   @Override
-  public void createUser(User user) {
-    userRepository.save(user);
-    data.add(user);
-    saveData();
+  public boolean createUser(User user) {
+    boolean created = userRepository.save(user);
+    if(created){
+      System.out.println("생성된 회원: " + user);
+      return true;
+    } else{
+      return false;
+    }
   }
 
   @Override
   public Optional<User> readUser(UUID id) {
-    return userRepository.findById(id);
+    Optional<User> usr = userRepository.findById(id);
+    usr.ifPresent(u -> System.out.println("조회된 회원: " + u));
+    return usr;
   }
 
   @Override
   public List<User> readAllUsers() {
-    return userRepository.findAll();
+    List<User> users = userRepository.findAll();
+    if(users != null && !users.isEmpty()){
+      System.out.println("전체 회원 목록: " + users);
+      return users;
+    } else {
+      System.out.println("회원 목록이 비어 있습니다.");
+      return Collections.emptyList(); // 비어 있을 경우 빈 리스트 반환
+    }
   }
 
   @Override
-  public void updateUser(User user, String name, int age, Gender gender) {
-    userRepository.updateOne(user, name, age, gender);
-    saveData();
+  public void updateUser(UUID id, String name, int age, Gender gender) {
+    boolean updated = userRepository.updateOne(id, name, age, gender);
+    if (updated) {
+      Optional<User> usr = userRepository.findById(id);
+      usr.ifPresent(u -> System.out.println("수정된 회원: " + u));
+      List<User> allUsers = userRepository.findAll();
+      System.out.println("수정 후 전체 회원 목록: " + allUsers);
+    }
   }
 
   @Override
   public void deleteUser(UUID id) {
-    userRepository.deleteOne(id);
-    saveData();
-  }
-
-  // 파일에 객체 직렬화하기
-  public void saveData(){
-    try (FileOutputStream fos = new FileOutputStream(FILE_PATH);
-         ObjectOutputStream oos = new ObjectOutputStream(fos);
-    ) {
-      oos.writeObject(data);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  // 파일에 객체 역직렬화하기
-  public List<User> loadData(){
-    try (FileInputStream fis = new FileInputStream(FILE_PATH);
-         ObjectInputStream ois = new ObjectInputStream(fis)) {
-      return (List<User>) ois.readObject();
-    } catch (IOException | ClassNotFoundException e) {
-      e.printStackTrace();
-      return new ArrayList<>();
+    boolean deleted = userRepository.deleteOne(id);
+    if (deleted){
+      Optional<User> usr = userRepository.findById(id);
+      System.out.println("삭제된 회원: " + usr); // 존재안하면 안하는데로 Optional.isEmpty 가 뜨는지 확인
+      List<User> allUsers = userRepository.findAll();
+      System.out.println("삭제 후 전체 회원 목록: " + allUsers);
     }
   }
 }
