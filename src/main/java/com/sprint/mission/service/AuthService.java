@@ -32,5 +32,4 @@ public class AuthService {
                 .map(user -> new FindUserDto(user, false))
                 .orElseThrow(NoSuchElementException::new);
     }
-
 }

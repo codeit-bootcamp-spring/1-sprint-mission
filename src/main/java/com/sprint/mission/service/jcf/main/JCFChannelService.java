@@ -35,8 +35,7 @@ public class JCFChannelService implements ChannelService {
     private final JCFUserService userService;
     private final JCFUserRepository userRepository;
     private final UserStatusService userStatusService;
-    private final FileUserRepository fileUserRepository;
-    private final FileUserService fileUserService;
+
 
     @Override
     public Channel create(ChannelDtoForRequest dto) {
@@ -48,8 +47,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(ChannelDtoForRequest dto) {
-        channelRepository.findById(dto.getChannelId())
+    public void update(UUID channelId, ChannelDtoForRequest dto) {
+        channelRepository.findById(channelId)
                 .map((updatingChannel) -> {
                     updatingChannel.setName(dto.getName());
                     updatingChannel.setChannelType(dto.getChannelType());
