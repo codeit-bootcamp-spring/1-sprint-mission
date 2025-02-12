@@ -2,68 +2,63 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-  private final List<Channel> data;
-  // Channel 형의 리스트 data를 생성하는 순간, Channel의 객체인 channel이 생성된 것임! 리스트 data는 channel들의 집합.
-  public JCFChannelService() {
-    this.data = new ArrayList<>();
-  }
+  private final ChannelRepository channelRepository;
+  public JCFChannelService(ChannelRepository channelRepository){this.channelRepository = channelRepository;}
 
   @Override
   public boolean createChannel(Channel channel) {
-    try {
-      if (channel == null) {
-        throw new IllegalArgumentException("채널이 null일 수 없습니다.");
-      }
-      return data.add(channel); // 성공하면 true 반환
-    } catch(IllegalArgumentException e) {
-        System.out.println("채널 생성 실패: " + e.getMessage());
-    } catch(Exception e) {
-        System.out.println("알 수 없는 오류가 발생했습니다."); // 일반적인 예외 처리
+    boolean created = channelRepository.save(channel);
+    if(created){
+      System.out.println("생성된 채널: " + channel);
+      return true;
+    } else{
+      return false;
     }
-    return false; // 실패시 false 반환
-}
+  }
 
   @Override
   public Optional<Channel> readChannel(UUID id) {
-    return data.stream()
-        .filter(channel -> channel.getId().equals(id)) // Channel 객체의 리스트인 data의 각 요소(Channel 객체)를 channel이라 두겠어. = channel 변수가 Channel 객체를 참조. 그 다음 ~~.
-        .findFirst();
+    Optional<Channel> ch = channelRepository.findById(id);
+    ch.ifPresent(c -> System.out.println("조회된 채널: " + c));
+    return ch;
   }
 
   @Override
   public List<Channel> readAllChannels() {
-    return new ArrayList<>(data);
+    List<Channel> channels = channelRepository.findAll();
+    if(channels != null && !channels.isEmpty()){
+      System.out.println("전체 채널 목록: " + channels);
+      return channels;
+    } else {
+      System.out.println("채널 목록이 비어 있습니다.");
+      return Collections.emptyList(); // 비어 있을 경우 빈 리스트 반환
+    }
   }
 
   @Override
-  // isPresent()는 boolean, ifPresent()는 void 타입
   public void updateChannel(UUID id, String name, String topic) {
-    Optional<Channel> optionalChannel = readChannel(id); // readChannel(id).isPresent; 이렇게 바로 불가능.
-
-    if (optionalChannel.isPresent()){ // readChannel(id)의 반환값이 Optional<Channel>이기 때문에 null 값일 수도 있음. 이걸 대비하는 조건문.
-      Channel channel = optionalChannel.get();
-      channel.update(name, topic);
-    }else {
-      System.out.println("채널 수정 실패");
+    boolean updated = channelRepository.updateOne(id, name, topic);
+    if (updated) {
+      Optional<Channel> ch = channelRepository.findById(id);
+      ch.ifPresent(c -> System.out.println("수정된 채널: " + c));
+      List<Channel> allChannels = channelRepository.findAll();
+      System.out.println("수정 후 전체 채널 목록: " + allChannels);
     }
   }
-  // readChannel(id).ifPresent(channel -> channel.update(name, topic);
-
 
   @Override
   public void deleteChannel(UUID id) {
-    Optional<Channel> optionalChannel = readChannel(id);
-
-    if (optionalChannel.isPresent()){
-      Channel channel = optionalChannel.get();
-      channel.delete(id); // delete 구현 해줘야 함
-    }else {
-      System.out.println("채널 삭제 실패");
+    boolean deleted = channelRepository.deleteOne(id);
+    if (deleted){
+      Optional<Channel> ch = channelRepository.findById(id);
+      System.out.println("삭제된 채널: " + ch); // 존재안하면 안하는데로 Optional.isEmpty 가 뜨는지 확인
+      List<Channel> allChannels = channelRepository.findAll();
+      System.out.println("삭제 후 전체 채널 목록: " + allChannels);
     }
   }
-  // data.removeIf(channel -> channel.getId().equals(id));
 }

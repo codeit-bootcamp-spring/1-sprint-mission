@@ -1,25 +1,25 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.User;
+//import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Gender;
-import com.sprint.mission.discodeit.service.UserService;
+//import com.sprint.mission.discodeit.entity.Message;
+//import com.sprint.mission.discodeit.entity.Gender;
+//import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+//import com.sprint.mission.discodeit.service.MessageService;
+//import com.sprint.mission.discodeit.service.file.FileUserService;
+//import com.sprint.mission.discodeit.service.file.FileChannelService;
+//import com.sprint.mission.discodeit.service.file.FileMessageService;
+//import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.repository.UserRepository;
-//import com.sprint.mission.discodeit.repository.ChannelRepository;
+//import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+//import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 //import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-//import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+//import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 //import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+//import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 //import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 //import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 
@@ -27,109 +27,99 @@ import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 
 public class JavaApplication {
   public static void main(String[] args) {
-    // 서비스 초기화
-    UserRepository userRepository = new FileUserRepository();  // UserRepository 생성
-    UserService userService = new FileUserService(userRepository);  // FileUserService 생성
-//   ChannelService channelService = new FileChannelService();
-//   MessageService messageService = new FileMessageService();
+    // 서비스 초기화 변수/타입 인터페이스로 하는 건지 구현체로 하는 건지 헷갈
+    ChannelRepository channelRepository = new JCFChannelRepository();
+    ChannelService channelService = new JCFChannelService(channelRepository);
 
-    // ===== 회원 =====
-    System.out.println("===== 회원 서비스 CRUD =====");
-    // 등록
-    User user = new User("정연경", 24, Gender.FEMALE);
-    if (userService.createUser(user)) {
-      System.out.println("등록된 회원: " + user2);
-    }else{
-      System.out.println("회원 등록 실패");
-    }
-
-    // 조회 - 단건
-    userService.readUser(user.getId())
-        .ifPresent(u -> System.out.println("특정 회원 조회: " + u));
-
-    // 조회 - 다건
-    System.out.println("모든 회원 조회: " + userService.readAllUsers());
-
-    // 수정
-    userService.updateUser(user, "정연경", 23, Gender.FEMALE);
-    userService.updateUser(user2, "신서연", 22, Gender.FEMALE);
-
-    // 수정된 데이터 조회
-    userService.readUser(user.getId())
-        .ifPresent(u -> System.out.println("수정된 회원 조회: " + u));
-    userService.readUser(user2.getId())
-        .ifPresent(u -> System.out.println("수정된 회원 조회: " + u));
-
-    // 삭제
-    userService.deleteUser(user.getId());
-
-    // 조회를 통해 삭제되었는지 확인
-    System.out.println("삭제 후 회원 목록: " + userService.readAllUsers());
+//    // ===== 회원 =====
+//    System.out.println("===== 회원 서비스 CRUD =====");
+//    // 등록
+//    User user = new User("정연경", 24, Gender.FEMALE);
+//    if (userService.createUser(user)) {
+//      System.out.println("등록된 회원: " + user2);
+//    }else{
+//      System.out.println("회원 등록 실패");
+//    }
+//
+//    // 조회 - 단건
+//    userService.readUser(user.getId())
+//        .ifPresent(u -> System.out.println("특정 회원 조회: " + u));
+//
+//    // 조회 - 다건
+//    System.out.println("모든 회원 조회: " + userService.readAllUsers());
+//
+//    // 수정
+//    userService.updateUser(user, "정연경", 23, Gender.FEMALE);
+//    userService.updateUser(user2, "신서연", 22, Gender.FEMALE);
+//
+//    // 수정된 데이터 조회
+//    userService.readUser(user.getId())
+//        .ifPresent(u -> System.out.println("수정된 회원 조회: " + u));
+//    userService.readUser(user2.getId())
+//        .ifPresent(u -> System.out.println("수정된 회원 조회: " + u));
+//
+//    // 삭제
+//    userService.deleteUser(user.getId());
+//
+//    // 조회를 통해 삭제되었는지 확인
+//    System.out.println("삭제 후 회원 목록: " + userService.readAllUsers());
 
 
     // ===== 채널 =====
     System.out.println("\n===== 채널 서비스 CRUD =====");
     // 등록
-    Channel channel = new Channel("general", "General discussion");
-    if (channelService.createChannel(channel)) {
-      System.out.println("등록된 채널: " + channel);
-    } else {
-      System.out.println("채널 등록 실패");
-    }
-    // 조회 - 단건
-    channelService.readChannel(channel.getId())
-        .ifPresent(c -> System.out.println("특정 채널 조회: " + c));
+    Channel ch1 = new Channel("general", "General discussion");
+    channelService.createChannel(ch1);
 
-    // 조회 - 다건
-    System.out.println("모든 채널 조회: " + channelService.readAllChannels());
-
-    // 수정
-    channelService.updateChannel(channel.getId(), "수정된 채널", "Updated general discussion");
-
-    // 수정된 데이터 조회
-    channelService.readChannel(channel.getId())
-        .ifPresent(c -> System.out.println("수정된 채널 조회: " + c));
-
-    // 삭제
-    channelService.deleteChannel(channel.getId());
-
-    // 조회를 통해 삭제되었는지 확인
-    System.out.println("삭제 후 채널 목록: " + channelService.readAllChannels());
-
-
-    // ===== 메세지 =====
-    System.out.println("\n===== 메세지 서비스 CRUD =====");
-
-    // 메세지를 보낼 회원 등록
-    User messageUser = new User("MessageSender", 25,MALE);
-    userService.createUser(messageUser);
-
-    // 등록
-    Message message = new Message("안녕하세요", messageUser.getId());
-    if (messageService.createMessage(message)) {
-      System.out.println("등록된 메세지: " + message);
-    } else {
-      System.out.println("메세지 등록 실패");
-    }
+    Channel ch2 = new Channel("extra", "Extra discussion");
+    channelService.createChannel(ch2);
 
     // 조회 - 단건
-    messageService.readMessage(message.getId())
-        .ifPresent(m -> System.out.println("특정 메세지 조회: " + m));
+    channelService.readChannel(ch1.getId());
 
     // 조회 - 다건
-    System.out.println("모든 메세지 조회: " + messageService.readAllMessages());
+    channelService.readAllChannels();
 
-    // 수정
-    messageService.updateMessage(message.getId(), "수정 문구: Hello", messageUser.getId());
+    // 수정 & 조회
+    channelService.updateChannel(ch1.getId(), "수정된 채널", "General discussion"); // 이름이랑 내용 중 하나만 수정하려면 매개변수 어떡하지 ?
 
-    // 수정된 데이터 조회
-    messageService.readMessage(message.getId())
-        .ifPresent(m -> System.out.println("수정된 메세지 조회: " + m));
+    // 삭제 & 조회
+    channelService.deleteChannel(ch1.getId());
 
-    // 삭제
-    messageService.deleteMessage(message.getId());
 
-    // 조회를 통해 삭제되었는지 확인
-    System.out.println("삭제 후 메세지 목록: " + messageService.readAllMessages());
+//    // ===== 메세지 =====
+//    System.out.println("\n===== 메세지 서비스 CRUD =====");
+//
+//    // 메세지를 보낼 회원 등록
+//    User messageUser = new User("MessageSender", 25,MALE);
+//    userService.createUser(messageUser);
+//
+//    // 등록
+//    Message message = new Message("안녕하세요", messageUser.getId());
+//    if (messageService.createMessage(message)) {
+//      System.out.println("등록된 메세지: " + message);
+//    } else {
+//      System.out.println("메세지 등록 실패");
+//    }
+//
+//    // 조회 - 단건
+//    messageService.readMessage(message.getId())
+//        .ifPresent(m -> System.out.println("특정 메세지 조회: " + m));
+//
+//    // 조회 - 다건
+//    System.out.println("모든 메세지 조회: " + messageService.readAllMessages());
+//
+//    // 수정
+//    messageService.updateMessage(message.getId(), "수정 문구: Hello", messageUser.getId());
+//
+//    // 수정된 데이터 조회
+//    messageService.readMessage(message.getId())
+//        .ifPresent(m -> System.out.println("수정된 메세지 조회: " + m));
+//
+//    // 삭제
+//    messageService.deleteMessage(message.getId());
+//
+//    // 조회를 통해 삭제되었는지 확인
+//    System.out.println("삭제 후 메세지 목록: " + messageService.readAllMessages());
   }
 }
