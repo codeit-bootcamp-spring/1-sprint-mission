@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -16,107 +19,87 @@ public class FileUserRepository implements UserRepository {
     **/
     
     // 폴더 주소
-    private final String USERS_PATH = Paths.get("users").toString();
+    private final Path USERS_PATH;
+    private final String EXETENSION = ".ser";
 
     public FileUserRepository(){
-        // 초기화 시 파일의 존재 유무 확인
-        File dir = new File(USERS_PATH);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        // 서치해보니 File.separator 도 좋지만, Path.get도 가독성이 좋다고 하여 채택하여 사용했습니다!
+        this.USERS_PATH = Paths.get(System.getProperty("user.dir"), "file-data-map", "crs", User.class.getSimpleName());
+        if(Files.notExists(USERS_PATH)){
+            try{
+                Files.createDirectories(USERS_PATH);
+            }catch (IOException e){
+                throw new RuntimeException(e);
+            }
         }
+    }
+
+    public User saveFile(Path path, User user){
+        try(
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+
+    public User loadFile(Path path){
+        User userNullable = null;
+        if(Files.exists(path)){
+            try(FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
+                userNullable = (User) ois.readObject();
+            }catch (IOException | ClassNotFoundException e){
+                throw new RuntimeException(e);
+            }
+        }
+        return userNullable;
+    }
+
+    private Path resolvePath(UUID id) {
+        return USERS_PATH.resolve(id + EXETENSION);
     }
 
     // FileIO를 통해서 save
     @Override
-    public void saveUser(User user){
-        //System.out.println("3             " + user.getId());
-        String filePath = USERS_PATH + user.getId() + ".ser";
-        //System.out.println("4             " + user.getId());
-        //System.out.println("Saving user to: " + filePath); // 파일 경로 로그 추가
-        try {
-            try (FileOutputStream fos = new FileOutputStream(filePath, false); // false는 덮어쓰기 모드
-                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-                oos.writeObject(user); // 사용자 객체 직렬화
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // IOException 처리
-        }
+    public User saveUser(User user){
+        Path path = resolvePath(user.getId());
+        return saveFile(path, user);
     }
-
-    // !!! 이쯤에서 질문있습니다 !!!
-    // 길어서 pull-request-template 쪽에 작성했으니 확인해주세요!
-    // save 기능과 load 기능을 Message, Channel에서는 분리했는데
-    // 이쪽은 제가 겪었던 오류가 있어서, 확인받고 싶어 우선은 수정하지 않고 제출합니다.
 
     // FileIO를 통해서 load
     @Override
     public Optional<User> findUserById(UUID id){
-        String filePath = USERS_PATH + id + ".ser";
-        //System.out.println("Loading user from: " + filePath); // 로드 경로 로그 추가
-
-        if(!Files.exists(Paths.get(filePath))){
-            //System.out.println("User file not found: " + filePath);
-            return null;
-        }else{
-            //System.out.println(filePath);
-        }
-        try(FileInputStream fis = new FileInputStream(filePath); // FileInputStream을 사용하여 파일을 읽고
-            ObjectInputStream ois = new ObjectInputStream(fis)){ // ObjectInputStream을 사용하여 직렬화된 객체를 역직렬화
-            // 여기서 무슨 일이 벌어지는 거 같은데?
-            // 역직렬화 후 객체의 상태를 출력하여 확인
-            User user = (User) ois.readObject();
-            //System.out.println("Deserialized User ID: " + user.getId());
-            //System.out.println("Deserialized User Nickname: " + user.getNickname());
-            //System.out.println( "findUserById   역직렬화 이후  user.getId()   : " + user.getId());
-            return Optional.ofNullable(user); // 역직렬화된 객체는 User 타입으로 반환
-        } catch (IOException | ClassNotFoundException e){ // 만약 예외가 발생하면 null을 반환하고, 예외를 처리합니다.
-            e.printStackTrace();
-            return null;
-        }
+        Path path = resolvePath(id);
+        return Optional.ofNullable(loadFile(path));
     }
 
     @Override
     public Collection<User> getAllUsers(){
-        // Map<UUID, User> userMap = new HashMap<>();
-        List<User> userList = new ArrayList<>();
-        // USERS_PATH 아래 모든 파일 들고오기
-        // findUserById 로 User을 들고와야 한다.
-        File userDir = new File("users");
-
-        if(userDir.exists() && userDir.isDirectory()){
-            File[] files = userDir.listFiles(); // 모든 파일의 주소 반환
-            if(files != null){
-                for(File file : files){
-                    // 파일이 파일이고, file의 이름 마지막이 ".ser"로 끝난다면
-                    if(file.isFile() && file.getName().endsWith(".ser")){
-                        // fromString 문자열 -> UUID
-                        UUID id = UUID.fromString(file.getName().replace(".ser", ""));
-                        //userMap.put(id, findUserById(id).orElse(null));
-                        userList.add(findUserById(id).orElse(null));
-                    }
-                }
-            }
+        // USERS_PATH 는 생성자에서 "없으면 생성하라" 라고 하고 있어서
+        // 검증 로직은 빼기로 했습니다!
+        // 혹시 그럼에도 불구하고 필요할까요?
+        try{
+            return Files.list(USERS_PATH) // PATH 가 디렉토리가 아닐 경우 자동으로 NotDirectoryEX을 던진다.
+                    .filter(path -> path.toString().endsWith(EXETENSION)) // 디렉토리에 해당 조건을 만족하는 파일이 없다면 빈 리스트가 반환된다
+                    .map(this::loadFile)
+                    .toList();
+        }catch (IOException e){
+            throw new RuntimeException(e);
         }
-        return userList.isEmpty() ? null : userList;
-    }
-
-    // 삭제
-    @Override
-    public void deleteAllUsers(){
-        File file = new File("users/");
-        File[] fileList = file.listFiles();
-        for(File fileName : fileList){
-            fileName.delete();
-        }
-        System.out.println("deleteAllUsers 삭제 완료");
     }
 
     @Override
     public void deleteUserById(UUID id){
-        String fileName = "users/" + id + ".ser";
-        File userFile = new File(fileName);
-        if(userFile.delete()){
-            System.out.println("deleteUserById 삭제 완료");
+        Path path =resolvePath(id);
+        try{
+            Files.deleteIfExists(path);
+        }catch (IOException e){
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,12 +1,8 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: validate
 logging:
   level:
     root: INFO
+spring:
+  datasource:
+    url: jdbc:mysql://prod-db:3306/mydb
+    username: prodUser
+    password: prodSecret

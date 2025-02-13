@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
+@Getter
 public class Channel extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -10,24 +14,23 @@ public class Channel extends BaseEntity implements Serializable {
         // 채널의 속성 : private, public
         // private 의 경우 owner의 초대로만 참가할 수 있다.
         // public 의 경우 1. 1.1서버의 주소/1.2서버 서칭 탭에서 서칭을 통한 접근을 통해 스스로 참가 가능하다. 2. owner의 초대로 참가
-    private User owner;
+    private ChannelType type; //추가
+    private UUID ownerId;
     private String channelName;
+    private String description;
 
-    public Channel(User owner, String channelName){
-        if(owner == null){
-            throw new IllegalArgumentException("User 은 null 일 수 없습니다.");
-        }
+    public Channel(ChannelType type, UUID ownerId, String channelName, String description){
         if(channelName == null || channelName.trim().isEmpty()){
             throw new IllegalArgumentException("channelName 은 null 이거나 공백일 수 없습니다.");
         }
-        this.owner = owner;
+        this.type = type;
+        this.ownerId = ownerId;
         this.channelName = channelName;
+        this.description = description;
     }
 
-    public String getChannelName(){
-        return channelName;
-    }
-
+    // update
+    // TODO : setter 이름 변경하기
     public void setChannelName(String channelName){
         if(channelName == null || channelName.trim().isEmpty()){
             throw new IllegalArgumentException("channelName 은 null 이거나 공백일 수 없습니다.");
@@ -35,12 +38,19 @@ public class Channel extends BaseEntity implements Serializable {
        this.channelName = channelName;
     }
 
-    public User getUser(){return owner;}
+    public void setDescription(String description){
+        // description 은 공백일 수 있다고 가정
+        if(description == null){
+            throw new IllegalArgumentException("channelName 은 null일 수 없습니다.");
+        }
+        this.description = description;
+    }
+
 
     @Override
     public String toString(){
         return "\n"
-                + "User : "  + owner.getNickname()
+                + "Owner Id : "  + getOwnerId()
                 + "\n"
                 + "Channel : " + getChannelName()
                 + "\n"
