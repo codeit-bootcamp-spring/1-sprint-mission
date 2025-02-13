@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
@@ -31,9 +32,7 @@ public class BasicMessageService implements MessageService {
         }
 
         try {
-            User userByUUID = userService.findById(userId);
-            Channel channelByUUID = channelService.findById(channelId);
-            if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
+            //수정해야함
             User userByUUID = userService.findById(createMessageDto.userId());
             ChannelResponseDto channelDto = channelService.findById(createMessageDto.channelId());
             if (!channelService.isUserInChannel(channelDto.id(), userByUUID.getId())) {
