@@ -44,20 +44,9 @@ public class BinaryContentService {
         Path path = fileManager.getPath().resolve(fileName);
         fileManager.createFile(fileName, data);
 
-        BinaryContent content = BinaryContent
-                .of(id, dto.getType(), dto.getBelongTo(), fileName, path.toString());
+        BinaryContent content = BinaryContent.of(id, dto.getType(),
+                dto.getBelongTo(), fileName, path.toString());
         return binaryContentRepository.save(content);
-    }
-
-    public void update(UUID id, BinaryContentDto dto) {
-        BinaryContent content = binaryContentRepository.findById(id);
-        fileManager.deleteFile(content.getName());
-
-        String fileName = generateFileName(id, dto.getName());
-        fileManager.createFile(fileName, dto.getData());
-        content.setName(fileName);
-        content.setPath(fileManager.getPath().resolve(fileName).toString());
-        binaryContentRepository.save(content);
     }
 
     private String generateFileName(UUID id, String originalName) {
@@ -68,7 +57,8 @@ public class BinaryContentService {
     public BinaryContentDto find(UUID id) {
         BinaryContent content = binaryContentRepository.findById(id);
         byte[] data = fileManager.readFile(content.getName());
-        return BinaryContentDto.of(content.getName(), content.getType(), content.getId(), data);
+        return BinaryContentDto.of(content.getName(), content.getType(),
+                content.getId(), data);
     }
 
     public BinaryContentDto findByUserId(UUID userId) {
@@ -76,7 +66,8 @@ public class BinaryContentService {
         BinaryContent content = binaryContent.orElseThrow(
                 () -> new NotFoundException("존재하지 않는 user에 대한 BinaryContent 요청"));
         byte[] data = fileManager.readFile(content.getName());
-        return BinaryContentDto.of(content.getName(), content.getType(), content.getBelongTo(), data);
+        return BinaryContentDto.of(content.getName(), content.getType(),
+                content.getBelongTo(), data);
     }
 
     public List<BinaryContentDto> findByMessageId(UUID messageId) {
@@ -84,7 +75,8 @@ public class BinaryContentService {
         List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
         for (BinaryContent content : contents) {
             byte[] data = fileManager.readFile(content.getName());
-            BinaryContentDto dto = BinaryContentDto.of(content.getName(), content.getType(), content.getBelongTo(), data);
+            BinaryContentDto dto = BinaryContentDto.of(content.getName(),
+                    content.getType(), content.getBelongTo(), data);
             dtos.add(dto);
         }
         return dtos;
