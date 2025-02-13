@@ -21,16 +21,9 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final UserService userService;
-    private final MessageService messageService;
 
     @Override
     public UUID create(BinaryContentCreateDTO dto) {
-        if(dto.getUserId() != null){
-            userService.find(dto.getUserId());
-        }else{
-            messageService.find(dto.getMessageId());
-        }
 
         byte[] file = getFileBytes(dto.getFile());
         String contentType = dto.getFile().getContentType();

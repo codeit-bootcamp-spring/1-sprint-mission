@@ -2,40 +2,70 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import jdk.jfr.Registered;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
-    private static final String FILE_PATH = "messageData.ser";
-    private Map<UUID, Message> data;
+    private final Path DIRECTORY;
+    private final Path FILE_PATH;
+    private final Map<UUID, Message> data;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(@Value("${discodeit.repository.file.path}") String path ) {
+
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), path, "Message");
+        this.FILE_PATH = DIRECTORY.resolve("message.ser"); //두 경로 조합
+
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create directory: " + DIRECTORY, e);
+            }
+        }
+
         this.data = loadDataFromFile();
     }
 
     // 데이터 파일 읽기
     @SuppressWarnings("unchecked")
     private Map<UUID, Message> loadDataFromFile() {
-        File file = new File(FILE_PATH);
+        File file = FILE_PATH.toFile();
+
         if (!file.exists()) {
             return new HashMap<>();
         }
-        try (FileInputStream fis = new FileInputStream(file);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (Map<UUID, Message>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return new HashMap<>();
+            throw new RuntimeException("Failed to load data"+e.getMessage());
         }
     }
 
-    // 데이터 파일 쓰기
+    // 데이터 파일에 쓰기
     private void saveDataToFile() {
-        try (FileOutputStream fos = new FileOutputStream(FILE_PATH);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH.toFile()))) {
             oos.writeObject(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 파일을 빈 파일로 만드는 메서드
+    public void clearFile() {
+        File file = FILE_PATH.toFile();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            // 파일을 비우는 방법
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,7 +73,7 @@ public class FileMessageRepository implements MessageRepository {
 
     //파일 삭제
     public void deleteFile() {
-        File file = new File(FILE_PATH);
+        File file = FILE_PATH.toFile();
         if (file.exists()) {
             boolean deleted = file.delete();
             if (!deleted) {
@@ -52,16 +82,6 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    // 파일을 빈 파일로 만드는 메서드
-    public void clearFile() {
-        File file = new File(FILE_PATH);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            // 파일을 비우는 방법
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
 
     public UUID save(Message message) {

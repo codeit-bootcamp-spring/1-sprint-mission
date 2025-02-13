@@ -26,7 +26,6 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
 
-    private final ChannelService channelService;
     private final BinaryContentService binaryContentService;
 
     @Override
@@ -59,8 +58,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        ChannelServiceFindDTO channelDTO = channelService.find(channelId);
-        return messageRepository.findAllByChannelId(channelDTO.getId());
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override

@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public interface UserStatusRepository {
 
-
     UUID save(UserStatus userStatus);
     UserStatus findOne(UUID id);
     List<UserStatus> findAll();

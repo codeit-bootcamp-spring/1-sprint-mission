@@ -5,4 +5,5 @@ spring:
 discodeit:
   repository:
     type: jcf
-    file-directory: .discodeit
+    file:
+      path: "file-data-map/"

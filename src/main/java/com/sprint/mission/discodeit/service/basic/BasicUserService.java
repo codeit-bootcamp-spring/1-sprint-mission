@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
 

@@ -21,17 +21,14 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
-    private final UserService userService;
 
     @Override
-    public UUID create(UserStatusCreateDTO userStatusCreateDTO) {
-        //유저가 존재하는지 파악
-        UserServiceFindDTO userServiceFindDTO = userService.find(userStatusCreateDTO.getUserid());
+    public UUID create(UserStatusCreateDTO dto) {
 
         //Duplicate >> 서비스 계층에서 >>레포.findByUserId() 해서 있으면 중복
-        checkDuplicateUserStatus(userServiceFindDTO.getId());
+        checkDuplicateUserStatus(dto.getUserid());
 
-        UserStatus userStatus = new UserStatus(userServiceFindDTO.getId());
+        UserStatus userStatus = new UserStatus(dto.getUserid());
         return userStatusRepository.save(userStatus);
     }
 
@@ -77,22 +74,6 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatusRepository.findByUserId(userId).isPresent()) {
             throw new IllegalArgumentException("중복된 UserStatus 가 존재합니다. Userid: " + userId);
         }
-
-        //방법1 findByUserId 정의해서 넘어온 값이 null이면 중복 x
-        //List로 넘어오는 경우이다.
-/*        List<UserStatus> findUserStatus = userStatusRepository.findByUserId(userId);
-
-        if (!findUserStatus.isEmpty()) {
-            throw new IllegalArgumentException("중복된 UserStatus 가 존재합니다. Userid: " + userId);
-        }*/
-
-
-        //중복 검사 Optional1
-/*        Optional.ofNullable(userStatusRepository.findByUserId(userId))
-                .filter(list -> !list.isEmpty()) // 리스트가 비어있지 않으면 예외 발생
-                .ifPresent(list -> {
-                    throw new DuplicateUserStatusException("UserStatus already exists for userId: " + userId);
-                });*/
 
     }
 }
