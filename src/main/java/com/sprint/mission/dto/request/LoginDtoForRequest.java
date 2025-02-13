@@ -1,4 +1,4 @@
-package com.sprint.mission.service.dto.request;
+package com.sprint.mission.dto.request;
 
 import lombok.Getter;
 

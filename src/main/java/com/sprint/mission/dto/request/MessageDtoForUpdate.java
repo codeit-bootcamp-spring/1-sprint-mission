@@ -1,4 +1,4 @@
-package com.sprint.mission.service.dto.request;
+package com.sprint.mission.dto.request;
 
 import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import lombok.Getter;

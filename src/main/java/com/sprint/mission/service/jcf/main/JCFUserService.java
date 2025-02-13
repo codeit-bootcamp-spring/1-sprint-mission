@@ -6,10 +6,9 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
-import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
-import com.sprint.mission.service.dto.request.UserDtoForRequest;
-import com.sprint.mission.service.dto.response.FindUserDto;
+import com.sprint.mission.dto.request.BinaryProfileContentDto;
+import com.sprint.mission.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.response.FindUserDto;
 import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
@@ -64,27 +63,15 @@ public class JCFUserService implements UserService {
     // 패스워드 정보 제외
 
     @Override
-    public FindUserDto findById(UUID userId) {
-        return userRepository.findById(userId).map((user) -> {
-            Boolean isOnline = userStatusService.findById(userId)
-                    .map(UserStatus::isOnline)
-                    .orElse(false);
-            return new FindUserDto(user, isOnline);
-        }).orElse(new FindUserDto());
+    public User findById(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(NotFoundId::new);
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
-
     @Override
-    public List<FindUserDto> findAll() {
-        List<FindUserDto> findUsersDto = new ArrayList<>();
-        for (User user : userRepository.findAll()) {
-            userStatusService.findById(user.getId()).ifPresent((userStatus) -> {
-                findUsersDto.add(new FindUserDto(user, userStatus.isOnline()));
-            });
-        }
-        return findUsersDto;
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 
     //관련된 도메인도 같이 삭제 -> BinaryContent(프로필), Userstatus

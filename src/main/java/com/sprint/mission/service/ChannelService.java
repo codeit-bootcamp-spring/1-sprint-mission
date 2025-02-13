@@ -2,8 +2,8 @@ package com.sprint.mission.service;
 
 
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.service.dto.request.ChannelDtoForRequest;
-import com.sprint.mission.service.dto.response.FindChannelDto;
+import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.response.FindChannelDto;
 
 import java.util.List;
 import java.util.UUID;

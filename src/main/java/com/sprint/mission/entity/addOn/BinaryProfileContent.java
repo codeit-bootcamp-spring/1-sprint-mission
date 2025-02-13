@@ -1,6 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
-import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
+import com.sprint.mission.dto.request.BinaryProfileContentDto;
 import lombok.Getter;
 
 import java.time.Instant;

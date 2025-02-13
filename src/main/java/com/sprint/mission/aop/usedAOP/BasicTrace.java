@@ -1,4 +1,4 @@
-package com.sprint.mission.aop.notUseAOP;
+package com.sprint.mission.aop.usedAOP;
 
 
 import com.sprint.mission.aop.log.TraceDevice;
@@ -9,22 +9,26 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
 @Aspect
 @RequiredArgsConstructor
-//@Component <<<<<<<<<<<<<<<<<<<<<<<<<<<<
-// 쓰고 싶을 때 컴포넌트 설정
-public class BasicTraceAnnotation {
+public class BasicTrace {
 
     private final TraceDevice trace;
 
-    @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
-    public void classWithin(){}
-    @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
-    public void methodWith(){}
+    @Pointcut("execution(* com.sprint.mission.service.jcf..*(..))")
+    public void serviceMethod(){}
 
-    @Around("classWithin()")
+    @Pointcut("execution(* com.sprint.mission.repository.jcf..*(..))")
+    public void repositoryMethod(){}
+
+    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
+    public void jcfCreateMethod(){} // 테스트 1회성
+
+    @Around("serviceMethod() || repositoryMethod()")
     public Object doTrace(ProceedingJoinPoint joinPoint){
 
         TraceStatus status = null;

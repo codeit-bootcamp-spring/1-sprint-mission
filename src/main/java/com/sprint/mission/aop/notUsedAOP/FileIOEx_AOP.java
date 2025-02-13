@@ -1,4 +1,4 @@
-package com.sprint.mission.aop.notUseAOP;
+package com.sprint.mission.aop.notUsedAOP;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

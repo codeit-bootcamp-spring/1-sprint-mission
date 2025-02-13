@@ -1,6 +1,6 @@
 package com.sprint.mission.entity.main;
 
-import com.sprint.mission.service.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import lombok.Getter;
 import lombok.Setter;
 

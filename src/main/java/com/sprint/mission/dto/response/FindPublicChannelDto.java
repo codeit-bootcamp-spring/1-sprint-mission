@@ -1,4 +1,4 @@
-package com.sprint.mission.service.dto.response;
+package com.sprint.mission.dto.response;
 
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;

@@ -2,8 +2,7 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryProfileRepository;
-import com.sprint.mission.service.dto.request.BinaryMessageContentDto;
-import com.sprint.mission.service.dto.request.BinaryProfileContentDto;
+import com.sprint.mission.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.service.exception.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

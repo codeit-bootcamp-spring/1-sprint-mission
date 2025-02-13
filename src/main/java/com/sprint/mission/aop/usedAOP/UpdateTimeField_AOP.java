@@ -1,4 +1,4 @@
-package com.sprint.mission.aop.useAOP;
+package com.sprint.mission.aop.usedAOP;
 
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;

@@ -1,6 +1,7 @@
 package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.UserStatus;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,10 @@ public class UserStatusService {
 
     public List<UserStatus> findAll(){
         return userStatusRepository.findAll();
+    }
+
+    public Map<User, UserStatus> findStatusMapByUserList(List<User> userList){
+        return userStatusRepository.findStatusMapByUser(userList);
     }
 
     // 이건 DTO가 필요없는거 같은데

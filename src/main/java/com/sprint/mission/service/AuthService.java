@@ -2,8 +2,8 @@ package com.sprint.mission.service;
 
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
-import com.sprint.mission.service.dto.request.LoginDtoForRequest;
-import com.sprint.mission.service.dto.response.FindUserDto;
+import com.sprint.mission.dto.request.LoginDtoForRequest;
+import com.sprint.mission.dto.response.FindUserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

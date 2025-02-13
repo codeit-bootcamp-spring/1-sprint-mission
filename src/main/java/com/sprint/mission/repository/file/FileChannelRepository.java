@@ -83,18 +83,15 @@ public class FileChannelRepository {
     public void createChannelDirectory() {
 
         if (Files.exists(CHANNEL_DIRECT_PATH)) {
-            try {
-                Files.list(CHANNEL_DIRECT_PATH).forEach(
-                        file -> {
-                            try {
-                                Files.delete(file);
-                            } catch (IOException e) {
-                                throw new RuntimeException("삭제할 수 없는 Channel 파일이 있습니다" + e.getMessage());
-                            }
-                        });
-            } catch (IOException e) {
-                System.out.println("디렉토리 초기화 실패");
-            } // Files.delete(CHANNEL_DIRECT_PATH); 굳이 디렉토리까지 삭제할 필요가 없다
+            Files.list(CHANNEL_DIRECT_PATH)
+                    .forEach(file -> {
+                        try {
+                            Files.delete(file);
+                        } catch (IOException e) {
+                            throw new RuntimeException("삭제할 수 없는 Channel 파일이 있습니다");
+                        }
+                    });
+            // Files.delete(CHANNEL_DIRECT_PATH); 굳이 디렉토리까지 삭제할 필요가 없다
         } else {
             Files.createDirectory(CHANNEL_DIRECT_PATH);
         }

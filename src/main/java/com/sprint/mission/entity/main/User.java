@@ -2,7 +2,7 @@ package com.sprint.mission.entity.main;
 
 
 import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.service.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.request.UserDtoForRequest;
 import lombok.Getter;
 import lombok.Setter;
 

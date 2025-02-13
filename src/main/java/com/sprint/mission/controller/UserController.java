@@ -1,49 +1,64 @@
 package com.sprint.mission.controller;
 
-import com.sprint.mission.service.exception.DuplicateName;
-import com.sprint.mission.service.exception.NotFoundId;
-import jakarta.servlet.http.PushBuilder;
+import com.sprint.mission.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.response.FindUserDto;
+import com.sprint.mission.entity.addOn.UserStatus;
+import com.sprint.mission.entity.main.User;
+import com.sprint.mission.service.jcf.addOn.UserStatusService;
+import com.sprint.mission.service.jcf.main.JCFUserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
+@RequestMapping("/api")
 public class UserController {
 
-    // 나중에 인터페이스 완료하면 ㄱ
+    private final JCFUserService userService;
+    private final UserStatusService userStatusService;
 
-    @GetMapping("/api/create")
-    public void create() {
-        if (3 > 0){
-            throw new DuplicateName();
+    @PostMapping("/create")
+    public ResponseEntity<String> create(@RequestBody UserDtoForRequest requestDTO) {
+        userService.create(requestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("User created successfully");
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<FindUserDto> findById(@RequestParam UUID userId){
+        User findUser = userService.findById(userId);
+        Boolean isOnline = userStatusService.findById(userId)
+                .map(UserStatus::isOnline)
+                .orElse(false);
+        return ResponseEntity.status(HttpStatus.OK).body(new FindUserDto(findUser, isOnline));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<FindUserDto>> findAll(){
+        Map<User, UserStatus> statusMapByUser = userStatusService.findStatusMapByUserList(userService.findAll());
+        List<FindUserDto> userListDTO = new ArrayList<>();
+        for (User user : statusMapByUser.keySet()) {
+            userListDTO.add(new FindUserDto(user, statusMapByUser.get(user).isOnline()));
         }
+
+        return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
     }
 
-    @GetMapping
-    public void findById(){
-
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> delete(@RequestParam UUID userId){
+        return ResponseEntity.ok("gd");
     }
 
-//    @ExceptionHandler(value = NotFoundId.class)
-//    public ResponseEntity<Map<String, String>> exceptionHandler(NotFoundId e){
-//
-//        log.info("++++++++++++++++++++++++++++++++++++++++ㅅㅂ 왜 안돼");
-//        HttpStatus status = HttpStatus.NOT_FOUND;
-//
-//        Map<String, String> map = new HashMap<>();
-//        map.put("code", "404");
-//        map.put("error type",status.getReasonPhrase());
-//        map.put("message", "찾을 수 없는 리소스입니다");
-//
-//        return new ResponseEntity<>(map, status);
-//    }
+
+
 
 }
