@@ -14,4 +14,10 @@ public interface ReadStatusRepository {
 
     boolean delete(String id);
 
+    ReadStatus findByChannelIdWithUserId(String channelId, String userId);
+
+    List<ReadStatus> findAllByUserId(String userId);
+
+    List<ReadStatus> findAllByChannelId(String channelId);
+
 }
