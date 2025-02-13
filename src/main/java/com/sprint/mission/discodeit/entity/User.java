@@ -13,15 +13,19 @@ public class User implements Serializable {
 
     private final UUID id;
     private final Instant createdAt;
+
     private Instant updatedAt;
+    private UUID binaryContentId;
 
     private String name;
     private String email;
     private transient String password;
 
-    public User(String name, String email, String password) {
+    public User(UUID binaryContentId, String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+
+        this.binaryContentId = binaryContentId;
 
         this.name = name;
         this.email = email;
@@ -30,6 +34,10 @@ public class User implements Serializable {
 
     public void updateUpdatedAt() {
         this.updatedAt = Instant.now();
+    }
+
+    public void updateBinaryContentId(UUID binaryContentId) {
+        this.binaryContentId = binaryContentId;
     }
 
     public void update(String name, String email) {

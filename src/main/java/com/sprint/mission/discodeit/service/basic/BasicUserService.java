@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.UserRequestDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +20,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final BinaryContentService binaryContentService;
     private final UserValidator validator;
 
     @Override
-    public User create(String name, String email, String password) {
-        validator.validate(name, email);
-        isDuplicateEmail(email);
-        return userRepository.save(name, email, password);
+    public User create(UserRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+        validator.validate(userRequestDto.name(), userRequestDto.email());
+        isDuplicateEmail(userRequestDto.email());
+
+        BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
+        User user = new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password());
+        return userRepository.save(user);
     }
 
     @Override

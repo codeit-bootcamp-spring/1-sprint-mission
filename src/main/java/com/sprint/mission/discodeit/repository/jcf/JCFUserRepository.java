@@ -16,8 +16,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(String name, String email, String password) {
-        User user = new User(name, email, password);
+    public User save(User user) {
         users.put(user.getId() ,user);
         return user;
     }

@@ -20,8 +20,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(String name, String email, String password) {
-        User user = new User(name, email, password);
+    public User save(User user) {
         Path filePath = directory.resolve(user.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
