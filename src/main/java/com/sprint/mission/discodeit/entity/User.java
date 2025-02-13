@@ -12,6 +12,8 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     //객체 식별용 id
     private final String id;
+    //로그인 아이디
+    private String username;
     //닉네임
     private String nickname;
     //이메일 - 로그인용 계정 아이디
@@ -31,16 +33,18 @@ public class User implements Serializable {
     //사용자 프로필 사진
     private String profileImageId;
 
-    public User(String nickname, String email, String password, String userStatusId, String statusMessage, AccountStatus accountStatus) {
+    public User(String username, String nickname, String email, String password, String userStatusId, String statusMessage, AccountStatus accountStatus, String profileImageId) {
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
+        this.username = username;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.userStatusId = userStatusId;
         this.statusMessage = statusMessage;
         this.accountStatus = accountStatus;
+        this.profileImageId = profileImageId;
     }
 
     public void setNickname(String nickname) {
@@ -71,6 +75,10 @@ public class User implements Serializable {
 
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
+    }
+
+    public void setProfileImageId(String profileImageId) {
+        this.profileImageId = profileImageId;
     }
 
     public String toFullString() {

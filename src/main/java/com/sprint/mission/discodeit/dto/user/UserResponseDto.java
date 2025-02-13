@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.entity.User;
 public record UserResponseDto(
         //객체 식별용 id
         String id,
+        //아이디
+        String username,
         //닉네임
         String nickname,
         //이메일 - 로그인용 계정 아이디
@@ -22,6 +24,7 @@ public record UserResponseDto(
     public static UserResponseDto from(User user, boolean isActive) {
         return new UserResponseDto(
                 user.getId(),
+                user.getUsername(),
                 user.getNickname(),
                 user.getEmail(),
                 isActive,
