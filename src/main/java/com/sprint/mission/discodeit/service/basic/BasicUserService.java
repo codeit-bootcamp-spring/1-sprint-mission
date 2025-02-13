@@ -95,8 +95,24 @@ public class BasicUserService implements UserService {
             user.setUpdatedAt(updateUserDto.updatedAt());
         }
 
-        return user;
+        return userRepository.save(user);
     }
+
+    // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
+    public User updateUser(String userId, UpdateUserDto updateUserDto, BinaryContent profileImg) throws CustomException {
+        User user = updateUser(userId, updateUserDto);
+
+        if(user.getProfileImageId() == null || user.getProfileImageId().isEmpty()) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
+        }
+
+        binaryContentService.deleteById(user.getProfileImageId());
+
+        user.setProfileImageId(binaryContentService.create(profileImg).getId()); //todo - CreateBinaryContentDto로 변경되면 이것도 바꿔야 할 듯
+
+        return userRepository.save(user);
+    }
+
 
     @Override
     public boolean deleteUser(String userId) throws CustomException {
