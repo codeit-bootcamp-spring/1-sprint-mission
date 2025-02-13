@@ -11,7 +11,7 @@ public interface BinaryContentRepository {
 
     BinaryContent save(BinaryContent binaryContent, ContentType contentType);
 
-    Optional<BinaryContent> findById();
+    Optional<BinaryContent> findById(UUID id);
 
     List<BinaryContent> findAll();
 

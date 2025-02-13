@@ -95,9 +95,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void delete(UUID id) {
+        Optional<UserStatus> userStatus= findById(id);
         Path path = resolvePath(id);
         try {
             Files.delete(path);
+            userStatus.ifPresent(status -> userStatusMap.remove(status.getUserId()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

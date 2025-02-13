@@ -26,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public Optional<BinaryContent> find(UUID id) {
+        //
         return Optional.empty();
     }
 

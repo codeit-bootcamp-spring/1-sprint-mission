@@ -2,12 +2,11 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.data.BinaryContent;
 import com.sprint.mission.discodeit.entity.data.ContentType;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,11 +51,36 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         }
         return binaryContent;
     }
-
     @Override
-    public Optional<BinaryContent> findById() {
+    public Optional<BinaryContent> findById(UUID id) {
+        Path[] directories = {PROFILE_IMAGE, MESSAGE_IMAGE};
+
+        for (Path dir : directories) {
+            Optional<BinaryContent> content = findInDirectory(dir, id);
+            if (content.isPresent()) {
+                return content;
+            }
+        }
         return Optional.empty();
     }
+
+    private Optional<BinaryContent> findInDirectory(Path directory, UUID id) {
+        Path path = directory.resolve(id + EXTENSION);
+
+        if (!Files.exists(path)) {
+            return Optional.empty();
+        }
+
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            return Optional.ofNullable((BinaryContent) ois.readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("파일 읽기 오류 발생: " + path, e);
+        }
+    }
+
 
     @Override
     public List<BinaryContent> findAll() {
