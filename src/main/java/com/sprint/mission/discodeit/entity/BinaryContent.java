@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BinaryContent extends BaseEntity implements Serializable {
+public class BinaryContent implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private UUID id;
@@ -25,7 +25,6 @@ public class BinaryContent extends BaseEntity implements Serializable {
                 "id=" + id +
                 ", ownerId=" + ownerId +
                 ", fileType='" + fileType + '\'' +
-                ", createdAt=" + getCreatedAt() +
                 '}';
     }
 }

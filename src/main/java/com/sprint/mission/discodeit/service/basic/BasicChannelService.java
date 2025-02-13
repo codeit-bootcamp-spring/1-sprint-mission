@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.*;
 
 @Service("basicChannelService")
+@Primary
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
