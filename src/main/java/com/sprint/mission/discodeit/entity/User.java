@@ -19,24 +19,24 @@ public class User implements Serializable {
     private Instant updatedAt;
 
     private String name;
-    private String loginId;
+    private String email;
     private String password;
 
-    private User(String name, String loginId, String password) {
+    private User(String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
-        this.loginId = loginId;
+        this.email = email;
         this.password = password;
         this.name = name;
     }
 
-    public static User of(String name, String loginId, String password) {
-        return new User(name, loginId, password);
+    public static User of(String name, String email, String password) {
+        return new User(name, email, password);
     }
 
-    public void updateLoginId(String loginId) {
-        this.loginId = loginId;
+    public void updateEmail(String email) {
+        this.email = email;
         updatedAt = Instant.now();
     }
 

@@ -10,21 +10,19 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 @RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
 
-    private static final Path filePath;
+    private final String directory = "users";
     private final String FILE_EXTENSION = ".ser";
 
-    static {
-        filePath = Paths.get(System.getProperty("user.dir"), "users");
-        FileManager.createDirectory(filePath);
-    }
+    private final FileManager fileManager = new FileManager(directory);
+    private final Path filePath = fileManager.getPath();
 
     @Override
     public User save(User user) {
