@@ -1,3 +1,4 @@
+/*
 package com.sprint.misson;
 
 import com.sprint.misson.discodeit.dto.channel.ChannelDTO;
@@ -368,3 +369,4 @@ public class JavaApplication {
     //이미 있는 경우? -> 이미 있다고 에러 메세지 반환?? 굳이?
 }
 
+*/
