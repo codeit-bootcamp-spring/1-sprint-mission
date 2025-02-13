@@ -1,68 +1,63 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.UserReadDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class FileUserService implements UserService {
-    private final Map<UUID, User> data = new HashMap<>();
-    private final String filePath = "users.dat";
+@Service("fileUserService")
+@RequiredArgsConstructor
+public class FileUserService {
 
-    public FileUserService() {
-        loadFromFile();
-    }
+    private final Map<UUID, User> userData = new HashMap<>();
+    private final Map<UUID, UserStatus> userStatusData = new HashMap<>();
 
-    @Override
-    public void create(User user) {
-        data.put(user.getId(), user);
-        saveToFile();
-    }
-
-    @Override
-    public Optional<User> read(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
-
-    @Override
-    public List<User> readAll() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void update(UUID id, User user) {
-        if (data.containsKey(id)) {
-            data.put(id, user);
-            saveToFile();
-        } else {
-            throw new IllegalArgumentException("User not found: " + id);
+    public void create(UserCreateDTO userDTO) {
+        if (existsByUsername(userDTO.getUsername()) || existsByEmail(userDTO.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 username 또는 email입니다.");
         }
+
+        UUID userId = UUID.randomUUID();
+        User user = new User(userId, userDTO.getUsername(), userDTO.getEmail(), userDTO.getProfileImageId(), userDTO.getPassword());
+        userData.put(userId, user);
+
+        userStatusData.put(userId, new UserStatus(userId, Instant.now()));
     }
 
-    @Override
+    public Optional<UserReadDTO> read(UUID id) {
+        return Optional.ofNullable(userData.get(id)).map(user -> {
+            UserStatus status = userStatusData.get(id);
+            boolean isOnline = status != null && status.isOnline();
+            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+        });
+    }
+
+    public List<UserReadDTO> readAll() {
+        return userData.values().stream()
+                .map(user -> {
+                    UserStatus status = userStatusData.get(user.getId());
+                    boolean isOnline = status != null && status.isOnline();
+                    return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+                })
+                .collect(Collectors.toList());
+    }
+
     public void delete(UUID id) {
-        data.remove(id);
-        saveToFile();
+        userData.remove(id);
+        userStatusData.remove(id);
     }
 
-    // 데이터를 파일에 저장
-    private void saveToFile() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            out.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public boolean existsByUsername(String username) {
+        return userData.values().stream().anyMatch(user -> user.getUsername().equals(username));
     }
 
-    // 파일에서 데이터를 로드
-    private void loadFromFile() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
-            data.putAll((Map<UUID, User>) in.readObject());
-        } catch (FileNotFoundException e) {
-            System.out.println("User data file not found, creating a new one.");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    public boolean existsByEmail(String email) {
+        return userData.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }

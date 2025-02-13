@@ -2,38 +2,47 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Repository("jcfMessageRepository")
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> data = new HashMap<>();
+
+    private final Map<UUID, Message> messages = new ConcurrentHashMap<>();
 
     @Override
     public void save(Message message) {
-        data.put(message.getId(), message);
+        messages.put(message.getId(), message);
     }
 
     @Override
     public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(data.values());
+        return new ArrayList<>(messages.values());
     }
 
     @Override
-    public void update(UUID id, Message message) {
-        if (data.containsKey(id)) {
-            data.put(id, message);
-        } else {
-            throw new IllegalArgumentException("Message not found: " + id);
-        }
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
-    public void delete(UUID id) {
-        data.remove(id);
+    public Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID channelId) {
+        return messages.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        messages.remove(id);
     }
 }

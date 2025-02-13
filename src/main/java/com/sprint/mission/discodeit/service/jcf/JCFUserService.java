@@ -1,61 +1,64 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.dto.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.UserReadDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
-public class JCFUserService implements UserService {
+@Service("jcfUserService")
+@RequiredArgsConstructor
+public class JCFUserService {
 
-    private static JCFUserService instance; // 싱글톤 인스턴스
-    private final Map<UUID, User> data = new HashMap<>(); // 사용자 데이터를 저장할 Map
+    private final Map<UUID, User> userData = new ConcurrentHashMap<>();
+    private final Map<UUID, UserStatus> userStatusData = new ConcurrentHashMap<>();
 
-    // private 생성자: 외부에서 객체 생성 불가
-    private JCFUserService() {}
-
-    // 싱글톤 인스턴스를 반환하는 메서드
-    public static JCFUserService getInstance() {
-        if (instance == null) {
-            synchronized (JCFUserService.class) {
-                if (instance == null) {
-                    instance = new JCFUserService();
-                }
-            }
+    public void create(UserCreateDTO userDTO) {
+        if (existsByUsername(userDTO.getUsername()) || existsByEmail(userDTO.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 username 또는 email입니다.");
         }
-        return instance;
+
+        UUID userId = UUID.randomUUID();
+        User user = new User(userId, userDTO.getUsername(), userDTO.getEmail(), userDTO.getProfileImageId(), userDTO.getPassword());
+        userData.put(userId, user);
+
+        userStatusData.put(userId, new UserStatus(userId, Instant.now()));
     }
 
-    @Override
-    public void create(User user) {
-        if (data.containsKey(user.getId())) {
-            throw new IllegalArgumentException("이미 존재하는 사용자입니다: " + user.getUsername());
-        }
-        data.put(user.getId(), user); // 사용자 데이터를 저장
+    public Optional<UserReadDTO> read(UUID id) {
+        return Optional.ofNullable(userData.get(id)).map(user -> {
+            UserStatus status = userStatusData.get(id);
+            boolean isOnline = status != null && status.isOnline();
+            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+        });
     }
 
-    @Override
-    public Optional<User> read(UUID id) {
-        return Optional.ofNullable(data.get(id)); // 사용자 ID로 데이터 조회
+    public List<UserReadDTO> readAll() {
+        return userData.values().stream()
+                .map(user -> {
+                    UserStatus status = userStatusData.get(user.getId());
+                    boolean isOnline = status != null && status.isOnline();
+                    return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+                })
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<User> readAll() {
-        return new ArrayList<>(data.values()); // 저장된 모든 사용자 반환
-    }
-
-    @Override
-    public void update(UUID id, User user) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다: " + id);
-        }
-        data.put(id, user); // 사용자 정보 업데이트
-    }
-
-    @Override
     public void delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("삭제할 사용자가 존재하지 않습니다: " + id);
-        }
-        data.remove(id); // 사용자 데이터 삭제
+        userData.remove(id);
+        userStatusData.remove(id);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userData.values().stream().anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    public boolean existsByEmail(String email) {
+        return userData.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }

@@ -1,60 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Channel extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
+    private static final long serialVersionUID = 1L;
 
-    private String name;        // 채널 이름
-    private String description; // 채널 설명
-    private User creator;       // 채널 생성자 (추가된 필드)
+    private String name;
+    private String description;
+    private UUID creatorId;
+    private boolean isPrivate;
+    private Instant createdAt;
+    private List<UUID> members;
 
-    // 기존 생성자
-    public Channel(String name, String description) {
-        super();
+    public Channel(UUID id, String name, String description, UUID creatorId, boolean isPrivate) {
+        super(id);
         this.name = name;
         this.description = description;
+        this.creatorId = creatorId;
+        this.isPrivate = isPrivate;
+        this.createdAt = Instant.now();
+        this.members = new ArrayList<>();
     }
 
-    // 새로운 생성자 (채널 생성자를 포함)
-    public Channel(String name, String description, User creator) {
-        super();
+    public boolean isPublic() {
+        return !isPrivate;
+    }
+
+    public void updateChannel(String name, String description) {
+        if (isPrivate) {
+            throw new IllegalArgumentException("Private channels cannot be updated.");
+        }
         this.name = name;
         this.description = description;
-        this.creator = creator;
-    }
-
-    // Getter for name
-    public String getName() {
-        return name;
-    }
-
-    // Setter for name
-    public void updateName(String name) {
-        this.name = name;
-        setUpdateAT(System.currentTimeMillis());
-    }
-
-    // Getter for description
-    public String getDescription() {
-        return description;
-    }
-
-    // Setter for description
-    public void updateDescription(String description) {
-        this.description = description;
-        setUpdateAT(System.currentTimeMillis());
-    }
-
-    // Getter for creator
-    public User getCreator() {
-        return creator;
-    }
-
-    // Setter for creator
-    public void updateCreator(User creator) {
-        this.creator = creator;
-        setUpdateAT(System.currentTimeMillis());
+        setUpdatedAt(Instant.now());
     }
 
     @Override
@@ -63,9 +54,10 @@ public class Channel extends BaseEntity implements Serializable {
                 "id=" + getId() +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", creator=" + (creator != null ? creator.getUsername() : "Unknown") +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdateAT() +
+                ", creatorId=" + creatorId +
+                ", isPrivate=" + isPrivate +
+                ", createdAt=" + createdAt +
+                ", members=" + members +
                 '}';
     }
 }

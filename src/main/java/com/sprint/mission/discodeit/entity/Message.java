@@ -1,40 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
+import java.util.List;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Message extends BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L; // 직렬화 버전 ID
+    private static final long serialVersionUID = 1L;
 
+    private UUID id;
     private String content;
     private UUID senderId;
     private UUID channelId;
+    private List<UUID> attachmentIds;
+    private Instant createdAt;
 
     public Message(String content, UUID senderId, UUID channelId) {
-        super();
+        this.id = UUID.randomUUID();
         this.content = content;
         this.senderId = senderId;
         this.channelId = channelId;
+        this.createdAt = Instant.now();
     }
 
-    public String getContent() { return content; }
-    public void updateContent(String content) {
-        this.content = content;
-        setUpdateAT(System.currentTimeMillis());
+    public void addAttachment(UUID attachmentId) {
+        this.attachmentIds.add(attachmentId);
+        setUpdatedAt(Instant.now());
     }
-
-    public UUID getSenderId() { return senderId; }
-    public UUID getChannelId() { return channelId; }
 
     @Override
     public String toString() {
         return "Message{" +
-                "id=" + getId() +
+                "id=" + id +
                 ", content='" + content + '\'' +
                 ", senderId=" + senderId +
                 ", channelId=" + channelId +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdateAT() +
+                ", attachmentIds=" + attachmentIds +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + getUpdatedAt() +
                 '}';
     }
 }
