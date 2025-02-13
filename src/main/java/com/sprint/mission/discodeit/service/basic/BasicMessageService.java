@@ -1,80 +1,86 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.io.InputHandler;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
-
+//
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+//
 import java.util.Collection;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    /**
-     * [x ] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
-     * => JCF랑 동일하게 작성했습니다
-     * [x ] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
-     * [x ] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
-     **/
-
-
-    MessageRepository messageRepository;
-    private InputHandler inputHandler;
-
-
-    public BasicMessageService(MessageRepository messageRepository){
-        this.messageRepository = messageRepository;
-    }
+    private final MessageRepository messageRepository;
+    private final BinaryContentService binaryContentService;
+    private final InputHandler inputHandler;
 
     @Override
-    public UUID createMessage(Channel channel, String messageText) {
-        Message message = new Message(channel, messageText);
+    public UUID createMessage(MessageCreateRequest messageCreateRequest) {
+        Message message = new Message(messageCreateRequest.channelId(), messageCreateRequest.authorId(), messageCreateRequest.messageText());
+
+        
+        // 첨부파일 업로드 단계 (사용자)   | (개발)
+        // (1) 첨부파일 아이콘 클릭         |
+        // (2) UI 창에서 선택하기          |
+        // (3) 한 개, 또는 여러 개 선택     |
+        // (4) 업로드 아이콘 클릭 또는 엔터  |  첨부파일과 첨부파일 개수 확인( 컨트롤러 쪽에서 첨부된 파일의 개수를 int binaryContentNum 으로 전달하면 되지 앟ㄴ으려나? )
+        //                               |  첨부파일 개수만큼 binaryContent 도메인 객체 생성 * 이때 Message content가 없어도 Message가 생성된다.
+
+        // binaryContent 도메인 객체 생성
+        // sprint3 기준 : 개수 제한은 두지 않음
+        if(messageCreateRequest.binaryContentNum() != 0){
+            for(int i = 0; i < messageCreateRequest.binaryContentNum(); i++) {
+                BinaryContent binaryContent = new BinaryContent();
+                binaryContent.saveUserProfileImage(message.getId());
+            }
+        }
+
         messageRepository.saveMessage(message);
         return message.getId();
     }
 
     @Override
-    public Collection<Message> showAllMessages() {
-        if (messageRepository.findAllMessages().isEmpty()) {
-            System.out.println("No Message exists.\n");
-            return null;
-        }else{
-            System.out.println(messageRepository.findAllMessages().toString());
-            return messageRepository.findAllMessages();
-        }
+    public Collection<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllMessages().stream()
+                .filter( message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
     public Message getMessageById(UUID id) {
         return messageRepository.findMessageById(id)
-                .orElseGet( () -> {
-                    System.out.println(" No  + " + id.toString() + " Message exists.\n");
-                    return null;
-                });
+                .orElseThrow(()-> new NoSuchElementException("해당 메세지가 없습니다."));
     }
 
     @Override
-    public void updateMessageText(UUID id) {
-        String messageText = inputHandler.getNewInput();
-        messageRepository.findMessageById(id).ifPresent( message -> message.setMessageText(messageText));
-        messageRepository.findMessageById(id).ifPresent(BaseEntity::refreshUpdateAt);
-    }
+    public void updateMessageText(MessageUpdateRequest messageUpdateRequest) {
+        // String messageText = inputHandler.getNewInput();
+        Optional<Message> messageOptional = messageRepository.findMessageById(messageUpdateRequest.messageId());
 
-    @Override
-    public void deleteAllMessages() {
-        String keyword = inputHandler.getYesNOInput().toLowerCase();
-        if(keyword.equals("y")){
-            messageRepository.deleteAllMessages();
-        }
+        Message message = messageOptional.orElseThrow( () -> new NoSuchElementException("메세지가 존재하지 않습니다."));
+
+        message.setMessageText(messageUpdateRequest.newMessage());
+
+        messageRepository.saveMessage(message);
     }
 
     @Override
     public void deleteMessageById(UUID id) {
-        String keyword = inputHandler.getYesNOInput().toLowerCase();
-        if(keyword.equals("y")){
+        String keyword = inputHandler.getYesNOInput();
+        if(keyword.equalsIgnoreCase("y")){
             messageRepository.deleteMessageById(id);
+            binaryContentService.deleteBinaryContentByMessageId(id);
         }
     }
 }

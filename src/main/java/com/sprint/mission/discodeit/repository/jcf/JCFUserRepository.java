@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
+
     Map<UUID, User> users;
 
     public JCFUserRepository(){
@@ -13,8 +14,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void saveUser(User user){
+    public User saveUser(User user){
         users.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -25,11 +27,6 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public Collection<User> getAllUsers() {
         return users.values();
-    }
-
-    @Override
-    public void deleteAllUsers(){
-        users.clear();
     }
 
     @Override
