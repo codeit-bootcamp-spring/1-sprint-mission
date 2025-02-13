@@ -18,7 +18,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     private final String channelJsonFile;
     private final ObjectMapper mapper;
-    private Map<UUID, Channel> channelMap;
+    private Map<UUID, Channel> store;
 
     @Autowired
     public FileChannelRepository(FileConfig fileConfig) {
@@ -27,33 +27,37 @@ public class FileChannelRepository implements ChannelRepository {
         this.channelJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        channelMap = new HashMap<>();
+        // 처름에 로드
+        store = loadChannelFromJson();
     }
 
     @Override
     public Channel save(Channel channel) {
-        channelMap = loadChannelFromJson();
-        channelMap.put(channel.getId(), channel);
-        saveChannelToJson(channelMap);
+        store.put(channel.getId(), channel);
+        // 저장
+        saveChannelToJson(store);
         return channel;
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
-        return Optional.ofNullable(loadChannelFromJson().get(channelId));
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(loadChannelFromJson().values());
+        return new ArrayList<>(store.values());
     }
 
     @Override
-    public void deleteByChannelId(UUID channelId) {
-        channelMap = loadChannelFromJson();
-        if (channelMap.containsKey(channelId)) {
-            channelMap.remove(channelId);
-            saveChannelToJson(channelMap);
+    public boolean existsById(UUID id) {
+        return store.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        if (store.remove(id) != null){
+            saveChannelToJson(store);
         }
     }
 
@@ -72,9 +76,9 @@ public class FileChannelRepository implements ChannelRepository {
         return map;
     }
 
-    private void saveChannelToJson(Map<UUID, Channel> channelMap) {
+    private void saveChannelToJson(Map<UUID, Channel> store) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(channelJsonFile), channelMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(channelJsonFile), store);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }

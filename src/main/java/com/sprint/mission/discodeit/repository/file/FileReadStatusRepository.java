@@ -21,7 +21,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     private final String readStatusJsonFile;
     private final ObjectMapper mapper;
-    private Map<UUID, ReadStatus> readStatusMap;
+    private Map<UUID, ReadStatus> store;
 
     @Autowired
     public FileReadStatusRepository(FileConfig fileConfig) {
@@ -30,65 +30,50 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         this.readStatusJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        readStatusMap = loadReadStatusesFromJson();
+        store = loadReadStatusesFromJson();
     }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        readStatusMap.put(readStatus.getId(), readStatus);
-        saveReadStatusesToJson(readStatusMap);
+        store.put(readStatus.getId(), readStatus);
+        saveReadStatusesToJson(store);
         return readStatus;
     }
 
     @Override
-    public Optional<ReadStatus> findByUserId(UUID userId) {
-        return readStatusMap.values().stream()
-                .filter(rs -> rs.getUserId().equals(userId))
-                .findFirst();
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
-    public Optional<ReadStatus> findByChannelId(UUID channelId) {
-        return readStatusMap.values().stream()
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return store.values().stream()
                 .filter(rs -> rs.getChannelId().equals(channelId))
-                .findFirst();
-    }
-
-    @Override
-    public Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return readStatusMap.values().stream()
-                .filter(rs -> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId))
-                .findFirst();
+                .toList();
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusMap.values().stream()
+        return store.values().stream()
                 .filter(rs -> rs.getUserId().equals(userId))
-                .collect(Collectors.toList());
+                .toList();
+    }
+    @Override
+    public boolean existsById(UUID id) {
+        return store.containsKey(id);
     }
 
     @Override
-    public Optional<ReadStatus> findById(UUID id) {
-        return Optional.ofNullable(readStatusMap.get(id));
+    public void deleteById(UUID id) {
+        if (store.remove(id) != null){
+            saveReadStatusesToJson(store);
+        }
     }
 
     @Override
-    public void delete(UUID readStatusId) {
-        readStatusMap.remove(readStatusId);
-        saveReadStatusesToJson(readStatusMap);
-    }
-
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        readStatusMap.values().removeIf(rs -> rs.getChannelId().equals(channelId));
-        saveReadStatusesToJson(readStatusMap);
-    }
-
-    @Override
-    public boolean existsByUserIdAndChannelId(UUID userId, UUID channelId) {
-        return readStatusMap.values().stream()
-                .anyMatch(rs -> rs.getUserId().equals(userId) && rs.getChannelId().equals(channelId));
+    public void deleteAllByChannelId(UUID channelId) {
+        store.values().removeIf(rs -> rs.getChannelId().equals(channelId));
+        saveReadStatusesToJson(store);
     }
 
     private Map<UUID, ReadStatus> loadReadStatusesFromJson() {
@@ -105,9 +90,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return map;
     }
 
-    private void saveReadStatusesToJson(Map<UUID, ReadStatus> readStatusMap) {
+    private void saveReadStatusesToJson(Map<UUID, ReadStatus> store) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(readStatusJsonFile), readStatusMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(readStatusJsonFile), store);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }

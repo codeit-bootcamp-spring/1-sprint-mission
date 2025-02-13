@@ -6,12 +6,19 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelDto (
-    UUID channelId,
-    String name,
-    String description,
-    ChannelType channelType,
-    Instant createdAt,
-    Instant updatedAt,
-    List<UUID> participantIds
-) {}
+public record ChannelDto(
+        // 채널 id
+        UUID channelId,
+        // 채널 명 (public channel)
+        String name,
+        // 설명 (public channel)
+        String description,
+        // 타입
+        ChannelType channelType,
+        // 참여자 id (private channel)
+        List<UUID> participantIds,
+        Instant lastMessageAt,
+        Instant createdAt,
+        Instant updatedAt
+) {
+}

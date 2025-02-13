@@ -17,7 +17,6 @@ public class Channel implements Serializable {
     private String name;
     private String description;
     private ChannelType channelType;
-    private List<UUID> participants = new LinkedList<>();
 
     public Channel() {
         this.id = UUID.randomUUID();
@@ -33,18 +32,19 @@ public class Channel implements Serializable {
         this.channelType = channelType;
     }
 
-    public void update(String name, String description, ChannelType channelType, List<UUID> participants) {
-        this.name = name;
-        this.description = description;
-        this.channelType = channelType;
-        updatedAt = Instant.now();
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    public void addParticipant(UUID userId){
-        participants.add(userId);
-    }
-
-    public void removeParticipant(UUID userId){
-        participants.remove(userId);
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

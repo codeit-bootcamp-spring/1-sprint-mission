@@ -8,45 +8,55 @@ import java.util.*;
 
 @Repository
 public class JCFUserReposiroty implements UserRepository {
-    private final Map<UUID, User> userMap = new HashMap<>();
+    
+    private final Map<UUID, User> store;
 
+    public JCFUserReposiroty() {
+        store = new HashMap<>();
+    }
+    
     @Override
     public User save(User user) {
-        userMap.put(user.getUserId(), user);
+        store.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public Optional<User> findByUserId(UUID userId) {
-        return Optional.ofNullable(userMap.get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userMap.values().stream()
+        return store.values().stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(userMap.values());
+        return new ArrayList<>(store.values());
     }
 
     @Override
-    public void delete(UUID userId) {
-        userMap.remove(userId);
+    public boolean existsById(UUID id) {
+        return store.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        store.remove(id);
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return userMap.values().stream()
+        return store.values().stream()
                 .anyMatch(user -> user.getUsername().equals(username));
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return userMap.values().stream()
+        return store.values().stream()
                 .anyMatch(user -> user.getEmail().equals(email));
     }
 }

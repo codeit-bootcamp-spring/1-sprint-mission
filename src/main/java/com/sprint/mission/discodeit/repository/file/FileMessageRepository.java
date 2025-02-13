@@ -19,7 +19,7 @@ import java.util.*;
 public class FileMessageRepository implements MessageRepository {
     private final String messageJsonFile;
     private final ObjectMapper mapper;
-    private Map<UUID, Message> messageMap;
+    private Map<UUID, Message> store;
 
     @Autowired
     public FileMessageRepository(FileConfig fileConfig) {
@@ -28,43 +28,39 @@ public class FileMessageRepository implements MessageRepository {
         this.messageJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        messageMap = new HashMap<>();
+        store = loadMessageFromJson();
     }
 
     @Override
     public Message save(Message message) {
-        messageMap = loadMessageFromJson();
-        messageMap.put(message.getId(), message);
-        saveMessageToJson(messageMap);
+        store.put(message.getId(), message);
+        saveMessageToJson(store);
         return message;
     }
 
     @Override
-    public Optional<Message> findByMessageId(UUID messageId) {
-        return Optional.ofNullable(loadMessageFromJson().get(messageId));
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
-        return new ArrayList<>(loadMessageFromJson().values().stream()
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return new ArrayList<>(store.values().stream()
                 .filter(message -> message.getChannelId().equals(channelId))
                 .toList());
     }
 
     @Override
-    public void deleteByMessageId(UUID messageId) {
-        messageMap = loadMessageFromJson();
-        if (messageMap.containsKey(messageId)) {
-            messageMap.remove(messageId);
-            saveMessageToJson(messageMap);
+    public void deleteById(UUID id) {
+        if (store.remove(id) != null) {
+            saveMessageToJson(store);
         }
     }
 
     @Override
-    public void deleteByChannelId(UUID channelId) {
-        Map<UUID, Message> messageMap = loadMessageFromJson();
-        messageMap.values().removeIf(message -> message.getChannelId().equals(channelId));
-        saveMessageToJson(messageMap);
+    public void deleteAllByChannelId(UUID channelId) {
+        store.values().removeIf(message -> message.getChannelId().equals(channelId));
+        saveMessageToJson(store);
     }
 
     private Map<UUID, Message> loadMessageFromJson() {
@@ -82,9 +78,9 @@ public class FileMessageRepository implements MessageRepository {
         return map;
     }
 
-    private void saveMessageToJson(Map<UUID, Message> messageMap) {
+    private void saveMessageToJson(Map<UUID, Message> store) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(messageJsonFile), messageMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(messageJsonFile), store);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }

@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 public record PublicChannelCreateRequest(
+        // 채널 명
         String name,
-        String description,
-        ChannelType channelType,
-        List<UUID> participants
+        // 채널 설명
+        String description
 ) {
 }

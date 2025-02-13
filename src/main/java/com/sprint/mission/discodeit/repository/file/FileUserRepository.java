@@ -20,7 +20,7 @@ public class FileUserRepository implements UserRepository {
 
     private final String userJsonFile;
     private final ObjectMapper mapper;
-    private Map<UUID, User> userMap;
+    private Map<UUID, User> store;
 
     @Autowired
     public FileUserRepository(FileConfig fileConfig) {
@@ -29,52 +29,54 @@ public class FileUserRepository implements UserRepository {
         this.userJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        userMap = new HashMap<>();
+        store = loadUserFromJson();
     }
 
     @Override
     public User save(User user) {
-        userMap = loadUserFromJson();
-        userMap.put(user.getUserId(), user);
-        saveUsersToJson(userMap);
+        store.put(user.getId(), user);
+        saveUsersToJson(store);
         return user;
     }
 
     @Override
-    public Optional<User> findByUserId(UUID userId) {
-        return Optional.ofNullable(loadUserFromJson().get(userId));
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return loadUserFromJson().values().stream()
+        return store.values().stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(loadUserFromJson().values());
+        return new ArrayList<>(store.values());
     }
 
     @Override
-    public void delete(UUID userId) {
-        userMap = loadUserFromJson();
-        if (userMap.containsKey(userId)) {
-            userMap.remove(userId);
-            saveUsersToJson(userMap);
+    public boolean existsById(UUID id) {
+        return store.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        if (store.remove(id) != null) {
+            saveUsersToJson(store);
         }
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return loadUserFromJson().values().stream()
+        return store.values().stream()
                 .anyMatch(user -> user.getUsername().equals(username));
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return loadUserFromJson().values().stream()
+        return store.values().stream()
                 .anyMatch(user -> user.getEmail().equals(email));
     }
 
@@ -94,10 +96,10 @@ public class FileUserRepository implements UserRepository {
         return map;
     }
 
-    private void saveUsersToJson(Map<UUID, User> userMap) {
+    private void saveUsersToJson(Map<UUID, User> store) {
         try {
             // json 데이터를 보기좋게(pretty print) 정렬하여 저장
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(userJsonFile), userMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(userJsonFile), store);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }

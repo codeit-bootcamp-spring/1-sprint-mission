@@ -17,27 +17,36 @@ public class UserStatus implements Serializable {
     private Instant updatedAt;
 
     private UUID userId;
-    private Instant lastLoginTime;
+    private Instant lastActiveAt;
 
     public UserStatus() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
 
-    public UserStatus(UUID userId, Instant lastLoginTime) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
+        //
         this.userId = userId;
-        this.lastLoginTime = lastLoginTime;
+        this.lastActiveAt = lastActiveAt;
     }
 
-    public void update(Instant lastLoginTime){
-        this.lastLoginTime = lastLoginTime;
-        this.updatedAt = Instant.now();
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public boolean isOnline(){
-        Instant now = Instant.now();
-        return lastLoginTime != null && Duration.between(lastLoginTime, now).toMinutes() <= 5;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }

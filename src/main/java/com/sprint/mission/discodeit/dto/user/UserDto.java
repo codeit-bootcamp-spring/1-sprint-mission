@@ -8,7 +8,10 @@ public record UserDto(
         String username,
         String email,
         String phoneNumber,
+
+        UUID profileId,
         boolean isOnline,
+
         Instant createdAt,
         Instant updatedAt
 ) {

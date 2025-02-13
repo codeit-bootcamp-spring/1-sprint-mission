@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,52 +22,42 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContentDto create(BinaryContentCreateRequest request) {
-        validateBinaryContent.validateBinaryContent(request.userId(), request.messageId());
-
-        BinaryContent binaryContent = new BinaryContent(request.userId(), request.messageId(), request.content());
-        binaryContentRepository.save(binaryContent);
-        return changeToDto(binaryContent);
+//        validateBinaryContent.validateBinaryContent(request.userId(), request.messageId());
+        String fileName = request.fileName();
+        String contentType = request.contentType();
+        byte[] bytes = request.bytes();
+        BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, request.bytes());
+        BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+        return changeToDto(createdBinaryContent);
     }
 
     @Override
-    public BinaryContentDto findByContentId(UUID contentId) {
-        BinaryContent binaryContent = binaryContentRepository.findByContentId(contentId)
+    public BinaryContentDto findById(UUID contentId) {
+        BinaryContent binaryContent = binaryContentRepository.findById(contentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Binary content not found."));
         return changeToDto(binaryContent);
     }
 
     @Override
-    public List<BinaryContentDto> findAllByUserId(UUID userId) {
-        List<BinaryContent> binaryContents = binaryContentRepository.findAllByUserId(userId);
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+        List<BinaryContent> binaryContents = binaryContentRepository.findAllByIdIn(binaryContentIds);
         return binaryContents.stream()
                 .map(BasicBinaryContentService::changeToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BinaryContentDto> findByAllMessageId(UUID messageId) {
-        List<BinaryContent> binaryContents = binaryContentRepository.findByAllMessageId(messageId);
-        return binaryContents.stream()
-                .map(BasicBinaryContentService::changeToDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteByContentId(UUID id) {
-        binaryContentRepository.deleteByContentId(id);
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        binaryContentRepository.deleteByUserId(userId);
-    }
-
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        binaryContentRepository.deleteByMessageId(messageId);
+    public void delete(UUID id) {
+        binaryContentRepository.deleteById(id);
     }
 
     private static BinaryContentDto changeToDto(BinaryContent binaryContent) {
-        return new BinaryContentDto(binaryContent.getId(), binaryContent.getUserId(), binaryContent.getMessageId(), binaryContent.getCreatedAt(), binaryContent.getContent());
+        return new BinaryContentDto(
+                binaryContent.getId(),
+                binaryContent.getFileName(),
+                binaryContent.getSize(),
+                binaryContent.getContentType(),
+                binaryContent.getBytes(),
+                binaryContent.getCreatedAt());
     }
 }

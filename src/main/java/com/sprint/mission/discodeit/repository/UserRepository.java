@@ -9,10 +9,19 @@ import java.util.UUID;
 
 public interface UserRepository {
     User save(User user);
-    Optional<User> findByUserId(UUID userId);
+    Optional<User> findById(UUID id);
     Optional<User> findByUsername(String username);
     List<User> findAll();
-    void delete(UUID userId);
-    boolean existsByUsername(String username);
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
     boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
+
+//    User save(User user);
+//    Optional<User> findByUserId(UUID userId);
+//    Optional<User> findByUsername(String username);
+//    List<User> findAll();
+//    void delete(UUID userId);
+//    boolean existsByUsername(String username);
+//    boolean existsByEmail(String email);
 }

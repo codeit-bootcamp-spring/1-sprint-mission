@@ -35,63 +35,35 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
+        store = loadBinaryContentsFromJson();
         store.put(binaryContent.getId(), binaryContent);
         saveBinaryContentsToJson(store);
         return binaryContent;
     }
-
     @Override
-    public Optional<BinaryContent> findProfileByUserId(UUID userId) {
-        return loadBinaryContentsFromJson().values().stream()
-                .filter(content -> content.getUserId().equals(userId) && content.getMessageId() == null)
-                .findFirst();
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(loadBinaryContentsFromJson().get(id));
     }
 
     @Override
-    public Optional<BinaryContent> findByContentId(UUID contentId) {
-        return loadBinaryContentsFromJson().values().stream()
-                .filter(content -> content.getId().equals(contentId))
-                .findFirst();
-    }
-
-    @Override
-    public List<BinaryContent> findAllByUserId(UUID userId) {
-        return new ArrayList<>(loadBinaryContentsFromJson().values().stream()
-                .filter(content -> content.getUserId().equals(userId))
-                .toList()
-        );
-    }
-
-    @Override
-    public List<BinaryContent> findByAllMessageId(UUID messageId) {
-        return new ArrayList<>(loadBinaryContentsFromJson().values().stream()
-                .filter(content -> content.getMessageId().equals(messageId))
-                .toList()
-        );
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        store = loadBinaryContentsFromJson();
-        store.values().removeIf(binaryContent -> binaryContent.getUserId().equals(userId));
-        saveBinaryContentsToJson(store);
-    }
-
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        store = loadBinaryContentsFromJson();
-        store.values()
-                .removeIf(binaryContent -> binaryContent.getMessageId().equals(messageId));
-        saveBinaryContentsToJson(store);
-    }
-
-    @Override
-    public void deleteByContentId(UUID contentId) {
-        store = loadBinaryContentsFromJson();
-        while (store.containsKey(contentId)){
-            store.remove(contentId);
-            saveBinaryContentsToJson(store);
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        List<BinaryContent> binaryContents= new ArrayList<>();
+        for (UUID id : ids){
+            binaryContents.add(loadBinaryContentsFromJson().get(id));
         }
+        return binaryContents;
+    }
+
+    @Override
+    public boolean existsById(UUID id){
+        return loadBinaryContentsFromJson().containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        store = loadBinaryContentsFromJson();
+        store.remove(id);
+        saveBinaryContentsToJson(store);
     }
 
     private Map<UUID, BinaryContent> loadBinaryContentsFromJson() {

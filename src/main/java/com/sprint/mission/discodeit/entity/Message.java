@@ -16,28 +16,34 @@ public class Message implements Serializable {
     private Instant updatedAt;
 
     private String message;
-    private UUID authorId;
     private UUID channelId;
-    private List<byte[]> content;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
     public Message() {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
 
-    public Message(String message, UUID authorId, UUID channelId, List<byte[]> content) {
+    public Message(String message, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-
+        //
         this.message = message;
-        this.authorId = authorId;
         this.channelId = channelId;
-        this.content = content;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public void update(String message, List<byte[]> content) {
-        this.message = message;
-        this.updatedAt = Instant.now();
-        this.content = content;
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.message)) {
+            this.message = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

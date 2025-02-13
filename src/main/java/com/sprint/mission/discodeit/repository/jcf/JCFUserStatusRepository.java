@@ -8,17 +8,28 @@ import java.util.*;
 
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
-    private final Map<UUID, UserStatus> store = new HashMap<>();
+    private final Map<UUID, UserStatus> store;
+
+    public JCFUserStatusRepository() {
+        store = new HashMap<>();
+    }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        store.put(userStatus.getUserId(), userStatus);
+        store.put(userStatus.getId(), userStatus);
         return userStatus;
     }
 
     @Override
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(store.get(id));
+    }
+
+    @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return Optional.ofNullable(store.get(userId));
+        return store.values().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
@@ -27,12 +38,17 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
-        store.remove(userId);
+    public boolean existsById(UUID id) {
+        return store.containsKey(id);
+    }
+    @Override
+    public void deleteById(UUID id) {
+        store.remove(id);
     }
 
     @Override
-    public boolean existsByUserId(UUID userId) {
-        return store.containsKey(userId);
+    public void deleteByUserId(UUID userId) {
+        store.values().removeIf(userStatus -> userStatus.getUserId().equals(userId));
     }
+
 }

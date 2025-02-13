@@ -6,7 +6,8 @@ import java.util.UUID;
 public record UserStatusDto(
         UUID userStatusId,
         UUID userId,
-        Instant lastReadTime,
+        Instant lastActiveTime,
+
         Instant createdAt,
         Instant updatedAt
 ) {
