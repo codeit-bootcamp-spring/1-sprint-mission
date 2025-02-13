@@ -88,7 +88,7 @@ public class FileChannelRepository implements ChannelRepository {
 	public List<Channel> findAllPublicChannels() {
 		List<Channel> allChannels = findAll();
 		List<Channel> publicChannels = new ArrayList<>();
-		// 모든 채널 목록을 순회하면서 PUBLIC 채널인 경우 추가합니다.
+		// 모든 채널 목록을 순회하면서 PUBLIC 채널인 경우 추가.
 		for (Channel channel : allChannels) {
 			if (channel.getChannelType() == ChannelType.PUBLIC) {
 				publicChannels.add(channel);
@@ -101,7 +101,7 @@ public class FileChannelRepository implements ChannelRepository {
 	public List<Channel> findPrivateChannelsByUserId(UUID userId) {
 		List<Channel> allChannels = findAll();
 		List<Channel> privateChannels = new ArrayList<>();
-		// 모든 채널 목록을 순회하면서 채널 타입이 PRIVATE이고, 참여자 목록에 userId가 포함된 경우 추가합니다.
+		// 모든 채널 목록을 순회하면서 채널 타입이 PRIVATE이고, 참여자 목록에 userId가 포함된 경우 추가.
 		for (Channel channel : allChannels) {
 			if (channel.getChannelType() == ChannelType.PRIVATE) {
 				Map<UUID, UserResponse> participants = channel.getParticipants();
