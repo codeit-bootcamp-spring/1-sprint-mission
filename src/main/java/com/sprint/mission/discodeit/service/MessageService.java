@@ -29,11 +29,11 @@ public interface MessageService {
     List<Message> findAllByCreatedAt(Instant createdAt);
 
     //다건 조회 - 특정 채널
-    List<Message> findAllByChannelId(Channel channel);
+    List<Message> findAllByChannelId(String channelId);
 
     //수정
     Message updateMessage(String messageId, UpdateMessageDto updateMessageDto);
 
     //삭제
-    boolean deleteMessage(Message message);
+    boolean delete(String messageId);
 }
