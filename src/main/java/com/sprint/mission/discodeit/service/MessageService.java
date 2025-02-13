@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
@@ -10,7 +11,7 @@ public interface MessageService {
 
 
     //생성
-    Message create(String content, String channelId, String userId);
+    Message create(CreateMessageDto createMessageDto);
 
     //모두 읽기
     List<Message> findAll();
@@ -31,7 +32,7 @@ public interface MessageService {
     List<Message> findAllByChannelId(Channel channel);
 
     //수정
-    Message updateMessage(String messageId, String newContent, Instant updatedAt);
+    Message updateMessage(String messageId, UpdateMessageDto updateMessageDto);
 
     //삭제
     boolean deleteMessage(Message message);

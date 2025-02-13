@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
@@ -22,9 +24,9 @@ public class BasicMessageService implements MessageService {
     private final ChannelService channelService;
 
     @Override
-    public Message create(String content, String channelId, String userId) throws CustomException {
-        if (content == null || content.isEmpty()) {
-            System.out.println("Message content is empty for User: " + userId + " Channel: " + channelId);
+    public Message create(CreateMessageDto createMessageDto) throws CustomException {
+        if (createMessageDto.content() == null || createMessageDto.content().isEmpty()) {
+            System.out.println("Message content is empty for User: " + createMessageDto.userId() + " Channel: " + createMessageDto.channelId());
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
@@ -32,13 +34,16 @@ public class BasicMessageService implements MessageService {
             User userByUUID = userService.findById(userId);
             Channel channelByUUID = channelService.findById(channelId);
             if (!channelService.isUserInChannel(channelByUUID, userByUUID)) {
+            User userByUUID = userService.findById(createMessageDto.userId());
+            ChannelResponseDto channelDto = channelService.findById(createMessageDto.channelId());
+            if (!channelService.isUserInChannel(channelDto.id(), userByUUID.getId())) {
                 System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
             }
-            Message message = new Message(userByUUID, content, channelByUUID);
+            Message message = new Message(userByUUID, createMessageDto.content(), channelDto.id());
             return messageRepository.save(message);
         } catch (CustomException e) {
-            System.out.println("Failed to create message. User: " + userId + " Channel: " + channelId + " Content: " + content);
+            System.out.println("Failed to create message. User: " + createMessageDto.userId() + " Channel: " + createMessageDto.channelId() + " Content: " + createMessageDto.content());
             if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
                 throw e;
             } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {

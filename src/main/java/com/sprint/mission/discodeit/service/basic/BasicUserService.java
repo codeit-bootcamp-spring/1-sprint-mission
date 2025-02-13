@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -20,19 +21,22 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(String nickname, String email, String password) {
-        boolean userExists = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+    public User create(CreateUserDto createUserDto) {
+        boolean userExists = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(createUserDto.email()));
         if (userExists) {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
         UserStatus userStatus = new UserStatus();
-        User newUser = new User(nickname, email, password, userStatus.getId(), null, AccountStatus.UNVERIFIED);
+        User newUser = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(), userStatus.getId(), null, AccountStatus.UNVERIFIED, null);
+
         return userRepository.save(newUser);
     }
 
-    public User create(String nickname, String email, String password, BinaryContent profileImage) {
-        User user = create(nickname, email, password);
+    public User create(CreateUserDto createUserDto, String profileImageId) {
+        User user = create(createUserDto);
+        user.setProfileImageId(profileImageId);
+
         UserStatus userStatus = new UserStatus();
         user.setUserStatus(userStatus.getId());
         return user;

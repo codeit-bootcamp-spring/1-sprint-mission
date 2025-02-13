@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,7 +10,7 @@ import java.util.List;
 public interface UserService {
 
     //생성
-    User create(String nickname, String email, String password);
+    User create(CreateUserDto createUserDto);
 
     //모두 읽기
     List<User> findAll();
