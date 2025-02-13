@@ -49,7 +49,7 @@ public class FileChannelRepository {
         return Files.exists(CHANNEL_DIRECT_PATH)
                 ? Files.list(CHANNEL_DIRECT_PATH)
                 .filter(path -> path.toString().endsWith(".ser"))
-                .map(this::readChannelFromFile)
+                .map((path) -> readChannelFromFile(path))
                 .collect(Collectors.toCollection(ArrayList::new))
                 : new ArrayList<>();
     }
@@ -67,9 +67,12 @@ public class FileChannelRepository {
         return CHANNEL_DIRECT_PATH.resolve(id.toString() + ".ser");
     }
 
-    public Channel readChannelFromFile(Path channelPath) throws IOException, ClassNotFoundException {
+
+    public Channel readChannelFromFile(Path channelPath) {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(channelPath))) {
             return (Channel) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,4 +1,4 @@
-package com.sprint.mission.aop;
+package com.sprint.mission.aop.useAOP;
 
 
 import com.sprint.mission.aop.log.TraceDevice;

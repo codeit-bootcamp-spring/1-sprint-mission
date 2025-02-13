@@ -14,6 +14,7 @@ public class DiscodeitApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
 		JCFUserService userService = context.getBean(JCFUserService.class);
+
 		UserDtoForRequest userDtoForRequest = new UserDtoForRequest("userA", "1234", "id");
 		User userA = userService.create(userDtoForRequest);
 
