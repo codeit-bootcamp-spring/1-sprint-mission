@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserServiceCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceUpdateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -13,6 +14,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +29,11 @@ public class BasicUserService implements UserService {
 
     private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
-
+    private final UserValidator userValidator;
 
     @Override
     public UUID create(UserServiceCreateDTO dto) {
-        checkDuplicateUser(dto.getUsername(), dto.getEmail());
+        userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.password);
 
         User user = new User(
                 dto.getUsername(),
@@ -85,8 +87,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public User update(UserServiceUpdateDTO dto) {
-        checkDuplicateUser(dto.getName(), dto.getEmail());
+        userValidator.validateUpdateUser(dto.getId(), dto.getName(), dto.getEmail());
+
         User findUser = userRepository.findOne(dto.getId());
+
         findUser.setUser(dto.getName(), dto.getEmail());
         userRepository.update(findUser);
 
@@ -103,6 +107,18 @@ public class BasicUserService implements UserService {
         }
         return findUser;
     }
+
+    //userId로 유저 상태 업데이트
+    @Override
+    public UUID updateUserOnline(UUID userId, UserStatusType type){
+        User findUser = userRepository.findOne(userId);
+        Optional.ofNullable(findUser)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
+        UserStatus userStatus = userStatusService.updateByUserId(userId, type);
+        return userId;
+    }
+
+    //유저Id로 유저가
 
     @Override
     public UUID delete(UUID id) {
@@ -129,11 +145,4 @@ public class BasicUserService implements UserService {
         return userRepository.delete(findUser.getId());
     }
 
-    public void checkDuplicateUser(String username, String email) {
-        boolean present = userRepository.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username) || user.getEmail().equals(email));
-        if (present) {
-            throw new IllegalArgumentException("이름 혹은 이메일이 중복입니다.");
-        }
-    }
 }

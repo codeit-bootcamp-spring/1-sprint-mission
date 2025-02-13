@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.validator.ReadStatusValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +19,11 @@ import java.util.UUID;
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
+    private final ReadStatusValidator readStatusValidator;
 
     @Override
     public UUID create(ReadStatusCreateDTO dto) {
-        checkDuplicateReadStatus(dto.getUserId(), dto.getChannelId());
-
+        readStatusValidator.validateReadStatus(dto.getUserId(), dto.getChannelId());
         ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId());
         return readStatus.getId();
     }
@@ -58,10 +59,4 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.delete(id);
     }
 
-    private void checkDuplicateReadStatus(UUID userId, UUID channelId) {
-        if (readStatusRepository.findByUserIdAndChannlId(userId, channelId).isPresent()) {
-            throw new IllegalArgumentException("중복된 ReadStatus 가 존재합니다. userid: " + userId+" channelId :"+channelId);
-        }
-
-    }
 }

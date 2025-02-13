@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validator.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +29,12 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
     private final UserService userService;
     private final MessageService messageService;
+    private final ChannelValidator channelValidator;
 
     //서비스 로직
     @Override
     public UUID createPublic(String name, String description) {
+        channelValidator.validateChannel(name, description);
         Channel channel = new Channel(name, description, ChannelType.PUBLIC);
         return channelRepository.save(channel);
     }
@@ -94,6 +97,7 @@ public class BasicChannelService implements ChannelService {
         return list;
     }
 
+    @Override
     public List<ChannelServiceFindAllByUserIdDTO> findAllByUserId(UUID userId){
         return channelRepository.findAll().stream()
                 .filter(channel -> channel.getType() != ChannelType.PRIVATE

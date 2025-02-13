@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,11 +26,12 @@ import java.util.UUID;
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-
     private final BinaryContentService binaryContentService;
+    private final MessageValidator messageValidator;
 
     @Override
     public UUID create(MessageServiceCreateDTO dto) {
+        messageValidator.validateMessage(dto.getContent(), dto.getUserId(), dto.getChannelId());
         Message message = new Message(dto.getContent(), dto.getUserId(), dto.getChannelId());
 
         if(dto.getFiles() != null && !dto.getFiles().isEmpty()){
