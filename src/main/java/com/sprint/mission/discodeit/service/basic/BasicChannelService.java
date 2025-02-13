@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
         channel.addUsers(userId);
 
         UserServiceFindDTO findUserDTO = userService.find(userId);
-        readStatusService.create(new ReadStatusCreateDTO(channel.getId(), findUserDTO.getId()));
+        readStatusService.create(new ReadStatusCreateDTO(findUserDTO.getId(), channel.getId()));
         return channel.getId();
     }
 

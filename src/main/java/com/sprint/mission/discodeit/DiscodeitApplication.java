@@ -92,7 +92,6 @@ public class DiscodeitApplication {
         for(Message message : messageService.findAllByChannelId(publicChannelId1)) System.out.println(message);
         System.out.println();
 
-
     }
 }
 
