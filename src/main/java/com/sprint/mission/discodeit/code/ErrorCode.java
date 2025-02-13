@@ -10,6 +10,7 @@ public enum ErrorCode {
 
     //채널 관련 에러
     CHANNEL_NOT_FOUND(2001, "채널을 찾을 수 없습니다."),
+    CHANNEL_PRIVATE_NOT_UPDATABLE(2002, "PRIVATE 채널은 수정할 수 없습니다."),
 
     //메세지 관련 에러
     MESSAGE_NOT_FOUND(3001, "메세지를 찾을 수 없습니다."),
@@ -17,7 +18,12 @@ public enum ErrorCode {
     MESSAGE_CHANNEL_NOT_MATCH(3003, "해당 메세지가 작성된 채널이 아닙니다."),
 
     //데이터 관련 에러
-    EMPTY_DATA(4001, "DTO가 비어있습니다.");
+    EMPTY_DATA(4001, "DTO가 비어있습니다."),
+
+    //ReadStatus 에러
+    READ_STATUS_NOT_FOUND(5001, "해당 read status를 찾을 수 없습니다."),
+    READ_STATUS_ALREADY_EXIST(5002, "해당 유저와 채널의 ReadStatus가 이미 존재합니다.");
+
 
     private final int code;
     private final String message;
