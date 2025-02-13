@@ -1,7 +1,11 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.*;
@@ -18,7 +22,7 @@ import java.util.UUID;
 public class DiscodeitApplication {
 
     static User setupUser(UserService userService) {
-        User user = userService.create("woody", "woody@codeit.com", "woody1234");
+        User user = userService.create(new CreateUserDto("woody", "우디","woody@codeit.com", "woody1234", ""));
         return user;
     }
 
@@ -28,7 +32,7 @@ public class DiscodeitApplication {
     }
 
     static void messageCreateTest(MessageService messageService, Channel channel, String authorId) {
-        Message message = messageService.create("안녕하세요.", channel.getId(), authorId);
+        Message message = messageService.create(new CreateMessageDto( "안녕하세요.", channel.getId(), authorId));
         System.out.println("메시지 생성: " + message.getId());
     }
 
@@ -54,9 +58,9 @@ public class DiscodeitApplication {
         System.out.println("\n=== 1. 등록 테스트 ===");
 
         System.out.println("\n--- User 등록---");
-        User user1 = userService.create("코드잇", "codeit@codeit.co.kr", "codeit123");
-        User user2 = userService.create("박유진", "yudility@gmail.com", "yujinpark123");
-        User user3 = userService.create("홍길동", "gildong@naver.com", "gdhong123123");
+        User user1 = userService.create(new CreateUserDto("codeit", "코드잇", "codeit@codeit.co.kr", "codeit123", null));
+        User user2 = userService.create(new CreateUserDto("yujin", "박유진", "yudility@gmail.com", "yujinpark123", "나는 박유진"));
+        User user3 = userService.create(new CreateUserDto("gd0000", "홍길동", "gildong@naver.com", "gdhong123123", "반갑습니다."));
 
         System.out.println("> 유저 생성 결과 및 전체 유저 목록: ");
         userService.findAll().forEach(u -> System.out.println(u.toString()));
@@ -67,7 +71,7 @@ public class DiscodeitApplication {
         System.out.println("> 실행 결과: ");
 
         try {
-            User user4 = userService.create("중복", "codeit@codeit.co.kr", "pwd1341241");
+            User user4 = userService.create(new CreateUserDto("중복", "나중복","codeit@codeit.co.kr", "pwd1341241", "저는 중복된 사용자 입니다."));
             UserResponseDto.from(user4, userStatusService.findById(user4.getUserStatusId()).isActive()).displayInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -80,7 +84,7 @@ public class DiscodeitApplication {
         Channel channel4 = channelService.create(new CreateChannelDto("회의실", ChannelType.PUBLIC, ChannelCategory.VOICE, "회의실 채널"));
 
         System.out.println("> 채널 생성 결과 및 전체 채널 목록:");
-        channelService.findAll().forEach(Channel::displayFullInfo);
+        channelService.findAllByUserId(user1.getId()).forEach(c -> System.out.println(c.toString()));
 
         System.out.println("\n* 채널에 유저 추가 및 삭제: ");
 
@@ -108,11 +112,11 @@ public class DiscodeitApplication {
 
         System.out.println("\n\n--- Massage 등록---");
 
-        Message msg1 = messageService.create("일반1 채널입니다!", channel1.getId(), user1.getId());
-        Message msg2 = messageService.create("반갑습니다!", channel1.getId(), user3.getId());
-        Message msg3 = messageService.create("일반2 채널입니다.", channel2.getId(), user1.getId());
-        Message msg4 = messageService.create("공지사항 채널입니다! 반갑습니다.", channel3.getId(), user2.getId());
-        Message msg5 = messageService.create("회의실 채널입니다.", channel4.getId(), user1.getId());
+        Message msg1 = messageService.create(new CreateMessageDto( "일반1 채널입니다!", channel1.getId(), user1.getId()));
+        Message msg2 = messageService.create(new CreateMessageDto("반갑습니다!", channel1.getId(), user3.getId()));
+        Message msg3 = messageService.create(new CreateMessageDto("일반2 채널입니다.", channel2.getId(), user1.getId()));
+        Message msg4 = messageService.create(new CreateMessageDto("공지사항 채널입니다! 반갑습니다.", channel3.getId(), user2.getId()));
+        Message msg5 = messageService.create(new CreateMessageDto("회의실 채널입니다.", channel4.getId(), user1.getId()));
 
         System.out.println("> 메시지 생성 결과 및 전체 목록:");
         messageService.findAll().forEach(Message::displayFullInfo);
@@ -120,12 +124,12 @@ public class DiscodeitApplication {
         System.out.println("\n* 심화 - 메세지 예외 처리");
 
         System.out.println("\n1) DB에 존재하지 않는 User로 메세지 생성 ");
-        User notExistUser = new User("없는유저", "noOne@test.com", "hello", "123454356", "없는 유저 상태", AccountStatus.UNVERIFIED);
+        User notExistUser = new User("none", "없는유저", "noOne@test.com", "hello", "123454356", "없는 유저 상태", AccountStatus.UNVERIFIED, null);
         System.out.println("- 테스트 유저");
         notExistUser.displayFullInfo();
         System.out.println("> 결과: ");
         try {
-            messageService.create("test message", channel1.getId(), notExistUser.getId()).displayFullInfo();
+            messageService.create(new CreateMessageDto("test message", channel1.getId(), notExistUser.getId())).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -136,7 +140,7 @@ public class DiscodeitApplication {
         notExistChannel.displayFullInfo();
         System.out.println("> 결과: ");
         try {
-            messageService.create("test message", notExistChannel.getId(), user1.getId()).displayFullInfo();
+            messageService.create(new CreateMessageDto("test message", notExistChannel.getId(), user1.getId())).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -145,7 +149,7 @@ public class DiscodeitApplication {
         System.out.println("- 테스트 채널 및 유저(위 테스트 케이스 사용)");
         System.out.println("> 결과: ");
         try {
-            messageService.create("test message", notExistChannel.getId(), notExistUser.getId()).displayFullInfo();
+            messageService.create(new CreateMessageDto("test message", notExistChannel.getId(), notExistUser.getId())).displayFullInfo();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -211,23 +215,23 @@ public class DiscodeitApplication {
 
         System.out.println("\n\n--- Channel 조회 ---");
         System.out.println("\n1) 전체 목록 조회");
-        List<Channel> tempChannels = channelService.findAll();
-        tempChannels.forEach(Channel::displayShortInfo);
+        List<ChannelResponseDto> tempChannels = channelService.findAllByUserId(user1.getId());
+        tempChannels.forEach(c -> System.out.println(c.toString()));
 
         System.out.println("\n2) UUID로 조회(단건)");
-        String uuidStringForChannelTest = tempChannels.get(0).getId();
+        String uuidStringForChannelTest = tempChannels.get(0).id();
 
         System.out.println("- 조회할 UUID를 가진 채널이 있는 경우: ");
         System.out.println("> 조회할 UUID: " + uuidStringForChannelTest);
         System.out.println("> 조회 결과: ");
-        channelService.findById(uuidStringForChannelTest).displayFullInfo();
+        System.out.println(channelService.findById(uuidStringForChannelTest).toString());
 
         System.out.println("\n- 조회할 UUID를 가진 채널이 없는 경우: ");
         UUID testUUID2 = UUID.randomUUID();
         System.out.println("> 조회할 UUID: " + testUUID2);
         System.out.println("> 조회 결과:");
         try {
-            channelService.findById(testUUID2.toString()).displayFullInfo();
+            System.out.println(channelService.findById(testUUID2.toString()).toString());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -284,7 +288,7 @@ public class DiscodeitApplication {
 
         System.out.println("\n5)특정 채널에 속하는 메세지 조회(다건)");
         System.out.println("> \"일반1\" 채널의 전체 메세지 목록:");
-        messageService.findAllByChannelId(channel1).forEach(Message::displayFullInfo);
+        messageService.findAllByChannelId(channel1.getId()).forEach(Message::displayFullInfo);
 
         // 3. 수정 테스트
         System.out.println("\n\n=== 3. 수정 테스트 ===");
@@ -305,13 +309,13 @@ public class DiscodeitApplication {
 
         System.out.println("\n\n--- Channel 수정 ---");
         System.out.println("\n> channel1의 이름을 '일반1'에서 '수다방'으로 수정: ");
-        Channel channelById = channelService.findById(channel1.getId());
-        channelById.displayFullInfo();
+        ChannelResponseDto channelById = channelService.findById(channel1.getId());
+        System.out.println(channelById.toString());
 
-        UpdateChannelDto updateChannelDto = new UpdateChannelDto("수다방", channelById.getChannelType(), channelById.getDescription(), Instant.now());
+        UpdateChannelDto updateChannelDto = new UpdateChannelDto("수다방", channelById.channelType(), channelById.description(), Instant.now());
 
         System.out.println("\n> 수정 결과:");
-        System.out.println(channelService.updateChannel(channelById.getId(), updateChannelDto).toFullString());
+        System.out.println(channelService.updateChannel(channelById.id(), updateChannelDto).toFullString());
 
         System.out.println("\n\n--- Message 수정 ---");
         System.out.println("\n> msg1 내용을 '일반1 채널입니다!'에서 '수다방 채널입니다!'로 수정 ");
@@ -319,7 +323,8 @@ public class DiscodeitApplication {
         messageByUUID.displayFullInfo();
 
         System.out.println("\n> 수정 결과:");
-        messageService.updateMessage(messageByUUID.getId(), "수다방 채널입니다!", Instant.now()).displayFullInfo();
+        UpdateMessageDto updateMessageDto = new UpdateMessageDto("수다방 채널입니다!", Instant.now());
+        messageService.updateMessage(messageByUUID.getId(), updateMessageDto).displayFullInfo();
 
         // 4. 삭제 테스트
         System.out.println("\n\n=== 4. 삭제 테스트 ===");
@@ -333,7 +338,7 @@ public class DiscodeitApplication {
 
         User senderMsg = userService.findAllContainsNickname("홍길동").get(0);
         Message msgToDelete = messageService.findAllBySenderId(senderMsg.getId()).get(0);
-        System.out.println("\n-> Message 삭제 결과: " + messageService.deleteMessage(msgToDelete));
+        System.out.println("\n-> Message 삭제 결과: " + messageService.delete(msgToDelete.getId()));
 
         System.out.println("\n> 삭제 후 메세지 목록: ");
         messageService.findAll().forEach(Message::displayFullInfo);
@@ -344,13 +349,13 @@ public class DiscodeitApplication {
         System.out.println("\n -> 채널 이름에 \"일반\"이 들어간 채널 삭제");
 
         System.out.println("\n> 전체 채널 목록:");
-        channelService.findAll().forEach(Channel::displayFullInfo);
+        channelService.findAllByUserId(user1.getId()).forEach(c -> System.out.println(c.toString()));
 
         List<Channel> normalChannels = channelService.findAllByChannelName("일반");
-        normalChannels.forEach(c -> System.out.println("\n-> 채널 \"" + c.getChannelName() + "\" 삭제 결과: " + channelService.deleteChannel(c)));
+        normalChannels.forEach(c -> System.out.println("\n-> 채널 \"" + c.getChannelName() + "\" 삭제 결과: " + channelService.delete(c.getId())));
 
         System.out.println("\n삭제 후 채널 목록: ");
-        channelService.findAll().forEach(Channel::displayFullInfo);
+        channelService.findAllByUserId(user1.getId()).forEach(c -> System.out.println(c.toString()));
 
         System.out.println("\n--- User 삭제 ---");
         System.out.println("\n -> email이 \"gildong@naver.com\"인 User 삭제");
