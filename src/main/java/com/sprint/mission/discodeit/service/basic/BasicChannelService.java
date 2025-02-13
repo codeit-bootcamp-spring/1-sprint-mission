@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(String channelId,UpdateChannelDto updateChannelDto) throws CustomException {
+    public Channel updateChannel(String channelId, UpdateChannelDto updateChannelDto) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);

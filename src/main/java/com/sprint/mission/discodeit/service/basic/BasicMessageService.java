@@ -85,17 +85,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(String messageId, String newContent, Instant updatedAt) throws CustomException {
+    public Message updateMessage(String messageId, UpdateMessageDto updateMessageDto) throws CustomException {
         Message message = messageRepository.findById(messageId);
         if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
-        } else if (newContent.isEmpty()) {
+        } else if (updateMessageDto.newContent().isEmpty()) {
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
 
-        if (!message.getContent().equals(newContent)) {
-            message.setContent(newContent);
-            message.setUpdatedAt(updatedAt);
+        if (!message.getContent().equals(updateMessageDto.newContent())) {
+            message.setContent(updateMessageDto.newContent());
+            message.setUpdatedAt(updateMessageDto.updatedAt());
         }
         return messageRepository.save(message);
     }
