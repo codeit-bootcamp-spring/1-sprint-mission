@@ -8,4 +8,5 @@ import java.time.Instant;
 public class BinaryContent {
     private String id;
     private Instant createdAt;
+    private Byte[] binaryImage;
 }
