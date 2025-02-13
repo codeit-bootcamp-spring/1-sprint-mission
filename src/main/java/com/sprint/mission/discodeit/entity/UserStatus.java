@@ -31,7 +31,9 @@ public class UserStatus extends BaseEntity implements Serializable {
 
 	// 현재 온라인 여부를 판단하는 메서드
 	public boolean isOnline() {
-		return lastActiveAt.isAfter(Instant.now().minusSeconds(300))
-			&& statusType == UserStatusType.ONLINE;
+		if (statusType == UserStatusType.OFFLINE) {
+			return false;
+		}
+		return lastActiveAt.isAfter(Instant.now().minusSeconds(300));
 	}
 }
