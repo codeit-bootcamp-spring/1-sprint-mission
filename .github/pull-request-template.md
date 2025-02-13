@@ -36,8 +36,6 @@
   - [x] Basic*Service의 생성자를 @RequiredArgsConstructor로 대체해보세요.
 
 
-
-
 ### 추가 기능 요구사항
 ### 시간 타입 변경하기
 - [X] 시간을 다루는 필드의 타입은 Instant로 통일합니다.
