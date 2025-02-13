@@ -25,13 +25,13 @@ public class Message implements Serializable {
     //첨부 이미지 목록
     private final Set<String> attachmentImageIds = new HashSet<>();
 
-    public Message(User sender, String content, Channel channel) {
+    public Message(User sender, String content, String channelId) {
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.senderId = sender.getId();
         this.content = content;
-        this.channelId = channel.getId();
+        this.channelId = channelId;
     }
 
     public void setContent(String content) {
@@ -45,6 +45,10 @@ public class Message implements Serializable {
     }
 
     //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
+
+    public void addImages(String imageId) {
+        this.attachmentImageIds.add(imageId);
+    }
 
     //추후에 추가할 것
     //멘션, 답장(reply)
