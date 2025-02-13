@@ -184,6 +184,6 @@ public class BasicChannelService implements ChannelService {
         //채널 삭제
         channelRepository.deleteByChannel(channel);
 
-        log.info("Deleted channel: {}", channelId);
+        log.error("Deleted channel: {}", channelId);
     }
 }

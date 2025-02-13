@@ -195,7 +195,7 @@ public class BasicMessageService implements MessageService {
         //메시지 삭제
         messageRepository.deleteById(messageId);
 
-       log.info("Message deleted: {}", messageId);
+       log.error("Message deleted: {}", messageId);
 
     }
 }

@@ -1,1 +1,16 @@
 spring.application.name=discodeit
+
+spring:
+  application:
+    name: discodeit
+  repository:
+    type: file  #jcf | file
+    file-directory: /Users/kbh/1-sprint-mission/1-sprint-mission/tmp
+  web:
+    locale: ko_KR
+  mvc:
+    log-request-details: true
+
+logging:
+  level:
+    org.springframework: INFO

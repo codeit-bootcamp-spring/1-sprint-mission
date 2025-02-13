@@ -68,6 +68,6 @@ public class BinaryContentService {
         binaryContentRepository.delete(binaryContent);
 
         System.out.println("BinaryContent deleted: " + binaryContentId);
-        log.info("BinaryContent deleted: {}", binaryContentId);
+        log.error("BinaryContent deleted: {}", binaryContentId);
     }
 }

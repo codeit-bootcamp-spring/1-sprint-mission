@@ -156,7 +156,7 @@ public class BasicUserService implements UserService {
 
             //user 삭제
             userRepository.deleteById(userId);
-            log.info("User: {} deleted", userId);
+            log.error("User: {} deleted", userId);
         }
 
 

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
@@ -100,6 +102,6 @@ public class ReadStatusService {
         // 삭제
         readStatusRepository.deleteById(readStatusId);
 
-        System.out.println("ReadStatus deleted : " + readStatusId);
+        log.error("ReadStatus deleted: {}", readStatus);
     }
 }
