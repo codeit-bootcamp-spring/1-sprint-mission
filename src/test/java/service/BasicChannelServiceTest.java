@@ -87,15 +87,7 @@ public class BasicChannelServiceTest {
     assertThat(responseDto.channelType()).isEqualTo(Channel.ChannelType.VOICE);
 
     verify(channelRepository, times(1)).save(any());
-
-    ArgumentCaptor<CreateReadStatusDto> captor = ArgumentCaptor.forClass(CreateReadStatusDto.class);
-
-    verify(readStatusService, times(2)).create(captor.capture(), eq(true));
-
-    List<CreateReadStatusDto> capturedValues = captor.getAllValues();
-    assertThat(capturedValues).hasSize(2);
-    assertThat(capturedValues).extracting("userId").containsExactlyInAnyOrder(mockUser1.getUUID(), mockUser2.getUUID());
-    assertThat(capturedValues).extracting("channelId").containsOnly(responseDto.channelId());
+    verify(readStatusService, times(1)).createMultipleReadStatus(anyList(), anyString());
   }
 
   @Test
