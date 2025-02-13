@@ -36,6 +36,12 @@ public class BasicChannelService implements ChannelService {
         }
         return channelRepository.save(channel);
     }
+
+//    @Override
+//    public List<Channel> findAll() {
+//        return channelRepository.findAll();
+//    }
+
     @Override
     public List<Channel> findAll() {
         return channelRepository.findAll();

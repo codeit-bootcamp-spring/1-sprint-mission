@@ -19,7 +19,7 @@ public class Channel implements Serializable {
     //수정 시간
     private Instant updatedAt;
 
-    //채널 종류 - 음성, 텍스트 todo - 필드명 변경
+    //채널 종류 - 음성, 텍스트
     private final ChannelCategory channelCategory;
 
     //채널 공개 여부
@@ -28,14 +28,12 @@ public class Channel implements Serializable {
     private String description;
 
     //채널에 속한 유저 목록
-    private final HashMap<String, User> userList;
+    private final Set<String> userSet;
 
-    //추가로 구현해볼만한 것
-    //채널 그룹
-    //채널 주제
-    //접근 권한
+    //채널에 속한 메세지 목록
+    private final Set<String> messageSet;
 
-    public Channel(String channelName, ChannelType channelType, ChannelCategory channelCategory,String description) {
+    public Channel(String channelName, ChannelType channelType, ChannelCategory channelCategory, String description) {
         //id, createdAt, updateAt은 생성자에서 초기화
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
@@ -44,7 +42,8 @@ public class Channel implements Serializable {
         this.channelCategory = channelCategory;
         this.channelType = channelType;
         this.description = description;
-        this.userList = new HashMap<>();
+        this.userSet = new HashSet<>();
+        this.messageSet = new HashSet<>();
     }
 
     public void setChannelName(String channelName) {
@@ -57,10 +56,6 @@ public class Channel implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    //채널 생성된 이후, 채널 종류를 변경할 수 없으므로 update 미구현
-    //TODO - 고민
-    //상속시켜서 음성채널, 보이스채널로 따로 구현해야?
-
     public void setChannelType(ChannelType channelType) {
         this.channelType = channelType;
     }
@@ -70,7 +65,7 @@ public class Channel implements Serializable {
     }
 
     public String toShortString() {
-        return "[Channel] id: " + id + " / channelName: " + channelName + " / channelType: " + channelType + " / total users: " + userList.size();
+        return "[Channel] id: " + id + " / channelName: " + channelName + " / channelType: " + channelType + " / total users: " + userSet.size();
     }
 
     public String toFullString() {
