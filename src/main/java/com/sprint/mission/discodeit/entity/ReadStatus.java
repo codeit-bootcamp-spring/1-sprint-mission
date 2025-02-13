@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 
-public class ReadStatus {
+public class ReadStatus implements Serializable {
 
     private final UUID id;
     private final Instant createdAt;

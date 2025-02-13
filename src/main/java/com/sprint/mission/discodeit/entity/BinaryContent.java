@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public class BinaryContent {
+public class BinaryContent implements Serializable {
 
     private final UUID id;
     private final Instant createdAt;
