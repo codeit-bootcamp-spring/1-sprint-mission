@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 
 import java.util.List;
@@ -10,9 +12,9 @@ public interface UserStatusService {
 
     List<UserStatus> findAll();
 
-    UserStatus create(UserStatus userStatus);
+    UserStatus create(CreateUserStatusDto createUserStatusDto);
 
-    boolean updateByUserId(String userStatusId, UserStatus userStatus);
+    UserStatus updateByUserId(String userStatusId, UpdateUserStatusDto updateUserStatusDto);
 
     boolean delete(String userStatusId);
 }

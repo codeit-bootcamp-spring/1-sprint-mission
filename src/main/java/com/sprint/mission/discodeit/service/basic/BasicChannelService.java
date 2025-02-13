@@ -25,6 +25,17 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
     }
 
+    //private 인 경우, userId 리스트 매개변수 필요
+    private Channel create(CreateChannelDto createChannelDto, List<String> userIds) {
+        Channel channel = new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null);
+
+        for (String userId : userIds) {
+            User user = userRepository.findById(userId);
+            readStatusService.create(new CreateReadStatusDto(channel.getId(), userId));
+            channel.getUserSet().add(user.getId());
+        }
+        return channelRepository.save(channel);
+    }
     @Override
     public List<Channel> findAll() {
         return channelRepository.findAll();

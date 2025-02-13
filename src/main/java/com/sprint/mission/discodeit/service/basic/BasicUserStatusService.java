@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +16,7 @@ import java.util.List;
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserStatus findById(String userStatusId) {
@@ -23,17 +29,38 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus create(UserStatus userStatus) {
+    public UserStatus create(CreateUserStatusDto createUserStatusDto) throws CustomException {
+        if (userRepository.findById(createUserStatusDto.userId()) == null){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        if (userStatusRepository.findByUserId(createUserStatusDto.userId()) != null) {
+            throw new IllegalArgumentException("userStatus already exists");
+        }
+        UserStatus userStatus = new UserStatus();
+
         return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public boolean updateByUserId(String userStatusId, UserStatus userStatus) {
-        return false;
+    public UserStatus updateByUserId(String userStatusId, UpdateUserStatusDto updateUserStatusDto) {
+        
+        if (userRepository.findById(updateUserStatusDto.userId()) == null){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        UserStatus userStatus = userStatusRepository.findById(userStatusId);
+        if (userStatus == null) {
+            throw new IllegalArgumentException("userStatus not found");
+        }
+
+        if (userStatus.isUpdated(updateUserStatusDto)) {
+            return userStatusRepository.save(userStatus);
+        }
+
+        return userStatus;
     }
 
     @Override
     public boolean delete(String userStatusId) {
-        return false;
+        return userStatusRepository.delete(userStatusId);
     }
 }
