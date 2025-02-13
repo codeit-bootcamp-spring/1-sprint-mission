@@ -6,9 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +46,20 @@ public class ControllerAdvice {
         return new ResponseEntity<>(map, status);
     }
 
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, MethodArgumentNotValidException.class})
+    public ResponseEntity<Map<String, String>> argsMissMatchHandler(MethodArgumentTypeMismatchException e){
 
-    @ExceptionHandler(value = Exception.class)
+        HashMap<String, String> map = new HashMap<>();
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        map.put("code", "400");
+        map.put("error type", status.getReasonPhrase());
+        if (e.getMessage().isBlank()) map.put("message", "Invalid type or value");
+        else map.put("message", e.getMessage());
+        return new ResponseEntity<>(map, status);
+    }
+
+
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> exceptionHandler(Exception e){
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 

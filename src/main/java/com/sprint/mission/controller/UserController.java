@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<FindUserDto> findById(@RequestParam UUID userId){
+    public ResponseEntity<FindUserDto> findById(@PathVariable UUID userId){
         User findUser = userService.findById(userId);
         Boolean isOnline = userStatusService.findById(userId)
                 .map(UserStatus::isOnline)
@@ -49,13 +49,13 @@ public class UserController {
         for (User user : statusMapByUser.keySet()) {
             userListDTO.add(new FindUserDto(user, statusMapByUser.get(user).isOnline()));
         }
-
         return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@RequestParam UUID userId){
-        return ResponseEntity.ok("gd");
+    public ResponseEntity<String> delete(@PathVariable UUID userId){
+        userService.delete(userId);
+        return ResponseEntity.ok("Successfully deleted");
     }
 
 
