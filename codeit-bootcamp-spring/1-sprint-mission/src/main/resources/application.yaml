@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: discodeit
+  mvc:
+    view:
+      suffix: .html
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit
+
+
+
