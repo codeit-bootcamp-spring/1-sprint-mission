@@ -11,11 +11,20 @@ public class UserStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private final UUID id;
+    private final UUID userId;
     private final Instant createdAt;
+
     private Instant updatedAt;
 
-    public UserStatus() {
+    public UserStatus(UUID userId) {
         this.id = UUID.randomUUID();
+        this.userId = userId;
         this.createdAt = Instant.now();
+
+        this.updatedAt = Instant.now();
+    }
+
+    public void updateUpdatedAt() {
+        this.updatedAt = Instant.now();
     }
 }

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final BinaryContentService binaryContentService;
     private final UserValidator validator;
+
+    private final BinaryContentService binaryContentService;
+    private final UserStatusService userStatusService;
 
     @Override
     public User create(UserRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
@@ -29,8 +32,10 @@ public class BasicUserService implements UserService {
         isDuplicateEmail(userRequestDto.email());
 
         BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
-        User user = new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password());
-        return userRepository.save(user);
+        User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
+        userStatusService.create(user.getId());
+
+        return user;
     }
 
     @Override
