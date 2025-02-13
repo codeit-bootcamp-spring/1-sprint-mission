@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ import java.util.List;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final BinaryContentService binaryContentService;
 
     @Override
     public User create(CreateUserDto createUserDto) {
@@ -39,7 +41,8 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = new UserStatus();
         user.setUserStatus(userStatus.getId());
-        return user;
+
+        return userRepository.save(user);
     }
 
     @Override
