@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -23,6 +24,7 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final ChannelService channelService;
+    private final BinaryContentService binaryContentService;
 
     @Override
     public Message create(CreateMessageDto createMessageDto) throws CustomException {
@@ -53,6 +55,19 @@ public class BasicMessageService implements MessageService {
 
     }
 
+    public Message create(CreateMessageDto createMessageDto, List<BinaryContent> binaryContents) throws CustomException {
+        Message message = create(createMessageDto);
+
+        if(binaryContents == null || binaryContents.isEmpty()) {
+            throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
+        }
+        for(BinaryContent binaryContent : binaryContents) {
+            binaryContentService.create(binaryContent);
+            message.addImages(binaryContent.getId());
+        }
+        return messageRepository.save(message);
+    }
+
     @Override
     public List<Message> findAll() {
         return messageRepository.findAll();
@@ -80,8 +95,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAllByChannelId(Channel channel) {
-        return messageRepository.findAll().stream().filter(m -> m.getChannelId().equals(channel.getId())).toList();
+    public List<Message> findAllByChannelId(String channelId) {
+        return messageRepository.findAll().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
     }
 
     @Override
@@ -101,11 +116,16 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean deleteMessage(Message message) throws CustomException {
-        Message messageByUUID = messageRepository.findById(message.getId().toString());
-        if (messageByUUID == null) {
+    public boolean delete(String messageId) throws CustomException {
+        Message message = messageRepository.findById(messageId);
+        if (message == null) {
             throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
         }
+
+        for(String imageId : message.getAttachmentImageIds()){
+            binaryContentService.deleteById(imageId);
+        }
+
         return messageRepository.delete(message);
     }
 }
