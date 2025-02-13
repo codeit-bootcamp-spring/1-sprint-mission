@@ -40,3 +40,6 @@ users/
 channels/
 messages/
 files/
+binary_contents/
+user_statuses/
+read_statuses/

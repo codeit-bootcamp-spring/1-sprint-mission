@@ -1,10 +1,10 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.user;
 
 import lombok.Value;
 
 @Value(staticConstructor = "of")
-public class UserDto {
-    String loginId;
+public class UserCreateDto {
+    String email;
     String password;
     String name;
 }
