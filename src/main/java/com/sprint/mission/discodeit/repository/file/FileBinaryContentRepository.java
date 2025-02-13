@@ -10,9 +10,11 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
@@ -84,7 +86,32 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public List<BinaryContent> findAll() {
-        return List.of();
+            List<BinaryContent> allContents = new ArrayList<>();
+            allContents.addAll(findFilesInDirectory(PROFILE_IMAGE));
+            allContents.addAll(findFilesInDirectory(MESSAGE_IMAGE));
+            return allContents;
+    }
+
+    private List<BinaryContent> findFilesInDirectory(Path directory) {
+        List<BinaryContent> contents = new ArrayList<>();
+        try {
+            Files.list(directory)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .forEach(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            BinaryContent content = (BinaryContent) ois.readObject();
+                            contents.add(content);
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException("파일 읽기 오류 발생: " + path, e);
+                        }
+                    });
+        } catch (IOException e) {
+            throw new RuntimeException("디렉토리 순회 오류 발생", e);
+        }
+        return contents;
     }
 
     @Override
