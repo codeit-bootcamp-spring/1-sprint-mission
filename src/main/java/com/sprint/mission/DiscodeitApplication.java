@@ -1,14 +1,8 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
-import com.sprint.mission.discodeit.entity.Type.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileIOHandler;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,7 +15,7 @@ import java.util.UUID;
 public class DiscodeitApplication {
     static UserDto setupUser(UserService userService) {
         UUID user1 = userService.createUser("woody", "woody@codeit.com", "woody1234");
-        return userService.getUserById(user1);
+        return userService.findUserById(user1);
     }
 
     /*static ChannelDto setupChannel(ChannelService channelService) {

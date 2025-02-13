@@ -2,10 +2,13 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserDto getUserById(UUID id);
+    UserDto findUserById(UUID id);
+
+    List<UserDto> findAllUsers();
 
     UUID createUser(String userName, String email,String password);
 

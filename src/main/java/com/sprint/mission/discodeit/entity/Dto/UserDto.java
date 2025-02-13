@@ -28,6 +28,9 @@ public record UserDto(
 
     public record GetProfilePictureRequest(UUID userId) {}
 
+    public record LoginUserRequest(User user, String password) {}
+
+
 
     //리스폰스 dto 시험삼아 만들어봄
     public record ShowUserNameResponse(String userName) {

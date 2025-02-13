@@ -40,7 +40,7 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.getChannel(channelId).getChannelName();
     }
 
-    //채널 생성 후 채널맵에 객체 넣어줌.
+    //채널 생성
     @Override
     public UUID createChannel(ChannelType type, String channelName, String description) {
         if (channelName == null){
@@ -86,7 +86,7 @@ public class BasicChannelService implements ChannelService {
             return false;
         }
         channelRepository.addChannelMember(channelId, memberId);
-        System.out.println(channelRepository.getChannel(channelId).getChannelName() + " 채널에 "+ userRepository.getUser(memberId).getUserName() +" 멤버 추가 성공!");
+        System.out.println(channelRepository.getChannel(channelId).getChannelName() + " 채널에 "+ userRepository.getUserById(memberId).getUserName() +" 멤버 추가 성공!");
         return true;
     }
 
@@ -116,7 +116,7 @@ public class BasicChannelService implements ChannelService {
             return false;
         }
         Channel channel = channelRepository.getChannel(channelId);
-        System.out.println(channel.getChannelName()+" 채널에 소속된 멤버 : " + channel.getMembers().stream().map((memberId) -> userRepository.getUser(memberId).getUserName()).collect(Collectors.joining(", ")));
+        System.out.println(channel.getChannelName()+" 채널에 소속된 멤버 : " + channel.getMembers().stream().map((memberId) -> userRepository.getUserById(memberId).getUserName()).collect(Collectors.joining(", ")));
         return true;
     }
 

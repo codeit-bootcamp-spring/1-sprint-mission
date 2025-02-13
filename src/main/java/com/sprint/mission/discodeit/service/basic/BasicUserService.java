@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
-import com.sprint.mission.discodeit.entity.Dto.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -10,7 +9,9 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,16 +20,29 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
+    //todo find, findAll 메서드가 이런 용도인게 맞나?..
     //유저 리턴
     @Override
-    public UserDto getUserById(UUID userId) {
+    public UserDto findUserById(UUID userId) {
         if (userId == null) {
             System.err.println("userId is null");
             return null;
         }
         try {
-            UserDto userDto = UserDto.from(userRepository.getUser(userId));
+            UserDto userDto = UserDto.from(userRepository.getUserById(userId));
             return userDto;
+        } catch (Exception e){
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //모든 유저 Dto 리스트로 만들어 리턴
+    @Override
+    public List<UserDto> findAllUsers() {
+        try {
+            return userRepository.getUsersMap().values().stream().map(user -> UserDto.from(user)).collect(Collectors.toList());
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -44,7 +58,7 @@ public class BasicUserService implements UserService {
             return null;
         }
         try {
-            return UserDto.ShowUserNameResponse.from(userRepository.getUser(userId)).userName();
+            return UserDto.ShowUserNameResponse.from(userRepository.getUserById(userId)).userName();
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
@@ -122,6 +136,10 @@ public class BasicUserService implements UserService {
             return false;
         }
         try {
+            User user = userRepository.getUserById(userId);
+            //todo 아직 바이너리콘텐트/유저스테이터스 레포지토리 구현안돼있어서 주석처리.
+            //binaryRepository.delete(user.getProfilePictureId());
+            //UserStatusRepository.delete(user.getUserStatusId());
             userRepository.deleteUser(userId);
             System.out.println("유저 삭제 성공!");
             return true;
@@ -141,7 +159,7 @@ public class BasicUserService implements UserService {
             return false;
         }
         try {
-            User user = userRepository.getUser(userId);
+            User user = userRepository.getUserById(userId);
             user.setUserName(newName);
             userRepository.saveUser(user);
             System.out.println("유저 이름 변경 성공!");
@@ -153,7 +171,9 @@ public class BasicUserService implements UserService {
         }
     }
 
-    //todo 아직 바이너리콘텐트레포지토리 구현안돼있어서 주석처리. (미션3에서 지금 구현하지 않기를 요구)
+
+
+    //todo 아직 바이너리콘텐트레포지토리 구현안돼있어서 주석처리. (미션3에서 지금 구현하지 않기를 요구). userDto에 updateDto 작성해놓음.
     /*
     //프로필사진 변경
     @Override
@@ -169,11 +189,12 @@ public class BasicUserService implements UserService {
             //프로필사진 바이너리객체를 바이너리레포지토리에 저장.
             BinaryContentRepository.saveBinaryContent(BinaryContentType.Profile_Picture, uploadedProfilePicture);
             //유저객체에 프로필사진 등록
-            userRepository.getUser(userId).setProfilePicture(uploadedProfilePicture.getId());
-            System.out.println(getUserById(userId).getUserName() + " 프로필사진 변경 성공!");
+            User user = userRepository.getUser(userId)
+            user.setProfilePicture(uploadedProfilePicture.getId());
+            userRepository.saveUser(user)
+            System.out.println(user.getUserName() + " 프로필사진 변경 성공!");
             return true;
         }
-
      */
 
     //프로필사진 삭제
@@ -183,7 +204,7 @@ public class BasicUserService implements UserService {
             return false;
         }
         try {
-            User user = userRepository.getUser(userId);
+            User user = userRepository.getUserById(userId);
             user.setProfilePicture(null);
             userRepository.saveUser(user);
             System.out.println(user.getUserName() + " 프로필사진 삭제 성공!");
@@ -194,6 +215,29 @@ public class BasicUserService implements UserService {
             return false;
         }
     }
+
+    //todo AuthService 클래스 위치 여기에 둬도 되나?
+    public class AuthService{
+        public boolean login(String username, String password) {
+            if (username.isBlank()||password.isBlank()){
+                return false;
+            }
+            try{
+                //false일 요인이 있다면 어차피 앞에서 예외를 던질것이기때문에 validateUserToLogin의 반환값이 true인지 검증하지 않았음.
+                userRepository.validateUserToLogin(username, password);
+                System.out.println("로그인 성공!");
+                //todo 반환값으로 유저객체나 뭔가 로그인정보를 반환해야될것같은데 지금으로서는 뭘 반환해야할지 확신이안가서 그냥 불린 리턴
+                return true;
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+                e.printStackTrace();
+                return false;
+            }
+        }
+    }
+
+
+
 }
 
 

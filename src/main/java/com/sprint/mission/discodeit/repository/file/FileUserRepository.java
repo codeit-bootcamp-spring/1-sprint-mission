@@ -42,7 +42,7 @@ public class FileUserRepository implements UserRepository {
 
     // 특정 유저객체 여부에 따라 객체 혹은 null 반환.
     @Override
-    public User getUser(UUID userId) throws Exception{
+    public User getUserById(UUID userId) throws Exception{
         HashMap<UUID, User> usersMap = getUsersMap();
         return Optional.ofNullable(usersMap.get(userId)).orElseThrow(() -> new NoSuchElementException("User not found"));
     }
@@ -64,13 +64,14 @@ public class FileUserRepository implements UserRepository {
     public boolean saveUser(User user) throws Exception {
         HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
         if (user == null) {
-            throw new NullPointerException("Given User Object is null.");
+            throw new NullPointerException("유저가 null인 상태로, 유저를 저장하지 못했습니다.");
         }
         usersMap.put(user.getId(), user);
         fileIOHandler.serializeHashMap(usersMap, mainUserRepository);
         return true;
     }
 
+    //해당 UUID를 가진 유저 존재여부 확인해서 반환
     @Override
     public boolean isUserExistByUUID(UUID userId) throws Exception{
         HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
@@ -80,6 +81,7 @@ public class FileUserRepository implements UserRepository {
         return true;
     }
 
+    //해당 이름을 가진 유저 존재여부 확인해서 반환
     @Override
     public boolean isUserExistByUserName(String userName) throws Exception{
         HashMap<UUID, User> usersMap = getUsersMap();
@@ -87,11 +89,25 @@ public class FileUserRepository implements UserRepository {
         return isMatch;
     }
 
+    //해당 이메일을 가진 유저 존재여부 확인해서 반환
     @Override
     public boolean isUserExistByEmail(String email) throws Exception{
         HashMap<UUID, User> usersMap = getUsersMap();
         boolean isMatch = usersMap.values().stream().anyMatch(user -> user.getEmail().equals(email));
         return isMatch;
+    }
+
+    //유저 로그인 시도시 유저이름과 비밀번호가 동일한 유저객체에 포함되어있는지 여부를 확인해서 반환.
+    //todo 예외를 너무 남용하고있는게아닌가? 로그인이 중지된 이유를 전달하고싶어서 우선 false를 반환하는 대신 예외를 던지는 식으로 처리했지만 뭐가 좋은 방법인지는 확인 필요.
+    @Override
+    public boolean validateUserToLogin(String userName, String password) throws Exception{
+        HashMap<UUID, User> usersMap = getUsersMap();
+        User user = usersMap.values().stream().filter(_user ->_user.getUserName().equals(userName)).findFirst().orElseThrow(() -> new NoSuchElementException("해당 이름을 가진 유저가 존재하지 않습니다. "));
+        if (user.getPassword().equals(password)) {
+            return true;
+        }else{
+            throw new Exception("비밀번호가 일치하지 않습니다. ");
+        }
     }
 
 }

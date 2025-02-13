@@ -36,7 +36,7 @@ public class BasicMessageService implements MessageService {
             System.out.println("메세지 생성 실패. 입력값을 확인해주세요.");
             return null;
         }
-        Message newMessage = new Message(userRepository.getUser(author), channelRepository.getChannel(channel), content);
+        Message newMessage = new Message(userRepository.getUserById(author), channelRepository.getChannel(channel), content);
         messageRepository.addMessage(newMessage);
         System.out.println("메세지 생성 성공!");
         return newMessage.getId();
