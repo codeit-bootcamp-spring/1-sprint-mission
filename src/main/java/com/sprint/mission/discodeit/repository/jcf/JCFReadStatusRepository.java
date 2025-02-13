@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {

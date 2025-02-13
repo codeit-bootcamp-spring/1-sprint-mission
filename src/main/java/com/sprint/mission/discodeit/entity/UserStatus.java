@@ -5,7 +5,6 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 @Getter

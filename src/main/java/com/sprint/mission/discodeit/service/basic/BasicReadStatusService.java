@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validation.ValidateReadStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BasicReadStatusService {
+public class BasicReadStatusService implements ReadStatusService
+{
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final ValidateReadStatus validateReadStatus;
 
+    @Override
     public ReadStatusDto create(ReadStatusCreateRequest request) {
         //validateReadStatus.validateReadStatus(request.channelId(), request.userId());
 
@@ -49,18 +51,21 @@ public class BasicReadStatusService {
         return changeToDto(createdReadStatus);
     }
 
+    @Override
     public ReadStatusDto findById(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
                 .map(this::changeToDto)
                 .orElseThrow(() -> new ResourceNotFoundException("ReadStatus not found."));
     }
 
+    @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId).stream()
                 .map(this::changeToDto)
                 .toList();
     }
 
+    @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
         Instant newLastReadTime = request.newLastReadTime();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -70,6 +75,7 @@ public class BasicReadStatusService {
         return changeToDto(updatedReadStatus);
     }
 
+    @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)){
             throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
