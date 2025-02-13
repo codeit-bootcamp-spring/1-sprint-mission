@@ -7,8 +7,6 @@ import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -68,8 +66,4 @@ public class AppConfig {
         return new FileChannelService(userService());
     }
 
-    @Bean
-    public MessageService messageService() {
-        return new FileMessageService(userService(), channelService());
-    }
 }
