@@ -34,4 +34,27 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public boolean delete(String id) {
         return data.remove(id) != null;
     }
+
+    @Override
+    public ReadStatus findByChannelIdWithUserId(String channelId, String userId) {
+        return data.values().stream()
+                .filter(rs -> rs.getChannelId().equals(channelId) && rs.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(String userId) {
+        return data.values().stream()
+                .filter(rs -> rs.getUserId().equals(userId))
+                .toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(String channelId) {
+        return data.values().stream()
+                .filter(rs -> rs.getChannelId().equals(channelId))
+                .toList();
+    }
+
 }
