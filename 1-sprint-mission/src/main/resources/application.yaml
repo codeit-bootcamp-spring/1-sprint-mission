@@ -6,9 +6,9 @@ spring:
 discodeit:
   repository:
     type: file  #jcf | file
-    file-directory: .discodeit
+    file-directory: /Users/kbh/1-sprint-mission/1-sprint-mission/tmp
 
 
 logging:
   level:
-    org.springframework: error
+    org.springframework: info

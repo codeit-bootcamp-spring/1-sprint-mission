@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<User, List<Channel>> channelData;
 
-    public JCFChannelRepository(Map<User, List<Channel>> channelData) {
-        this.channelData = channelData;
+    public JCFChannelRepository() {
+        this.channelData = new HashMap<>();
     }
 
 

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class JCFMessageRepository implements MessageRepository {
     private final Map<User, List<Message>> messageData;;
 
-    public JCFMessageRepository(Map<User, List<Message>> messageData) {
-        this.messageData = messageData;
+    public JCFMessageRepository() {
+        this.messageData = new HashMap<>();
     }
 
     @Override

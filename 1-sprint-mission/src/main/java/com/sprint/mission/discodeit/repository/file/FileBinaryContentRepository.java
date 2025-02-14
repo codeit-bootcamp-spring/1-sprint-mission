@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-@Repository
+
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private static final String FILE_PATH = "tmp/binary_content.ser";
     private static final ObjectMapper objectMapper = new ObjectMapper();

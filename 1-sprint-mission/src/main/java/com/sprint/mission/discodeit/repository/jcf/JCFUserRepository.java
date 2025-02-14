@@ -5,11 +5,12 @@ import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 
 import java.util.*;
 
+
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userData;
 
-    public JCFUserRepository(Map<UUID, User> userData) {
-        this.userData = userData;
+    public JCFUserRepository() {
+        this.userData = new HashMap<>();
     }
 
     @Override

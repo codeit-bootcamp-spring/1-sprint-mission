@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
+
 public class FileUserStatusRepository implements UserStatusRepository {
     private static final String FILE_PATH = "tmp/user_status.ser";
     private static final ObjectMapper objectMapper = new ObjectMapper();

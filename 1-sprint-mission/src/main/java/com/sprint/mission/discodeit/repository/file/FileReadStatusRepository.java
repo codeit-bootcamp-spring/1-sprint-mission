@@ -16,7 +16,6 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
     private static final String FILE_PATH = "tmp/read_status.ser";
     private static final ObjectMapper objectMapper = new ObjectMapper();

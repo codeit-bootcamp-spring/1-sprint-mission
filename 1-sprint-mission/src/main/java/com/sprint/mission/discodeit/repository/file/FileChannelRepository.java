@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String FILE_PATH = "tmp/entity/channel.ser";

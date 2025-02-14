@@ -13,7 +13,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-@Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> readStatusStorage = new ConcurrentHashMap<>();
 
