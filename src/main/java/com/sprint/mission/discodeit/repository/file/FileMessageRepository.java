@@ -32,7 +32,12 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(String id) {
-        return findAll().stream().filter(m -> m.getId().equals(id)).findFirst().orElse(null);
+        Path messagePath = messageDirectory.resolve(id.concat(".ser"));
+        List<Message> load = FileService.load(messagePath);
+        if (load == null || load.isEmpty()) {
+            return null;
+        }
+        return load.get(0);
     }
 
     @Override
