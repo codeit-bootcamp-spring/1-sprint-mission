@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
 
@@ -32,8 +33,10 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(data.values());
+    public List<Message> findByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(m -> m.getChannel().getId().equals(channelId))
+                .collect(Collectors.toList());
     }
 
     @Override

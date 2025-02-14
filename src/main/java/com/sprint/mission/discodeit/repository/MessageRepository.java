@@ -11,7 +11,7 @@ public interface MessageRepository {
 
     Message findById(UUID messageId);
 
-    List<Message> findAll();
+    List<Message> findByChannelId(UUID channelId);
 
     void updateMessage(Message message);
 

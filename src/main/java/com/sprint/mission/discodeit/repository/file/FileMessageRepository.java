@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,16 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 @RequiredArgsConstructor
 public class FileMessageRepository implements MessageRepository {
 
-    private static final Path filePath;
+    private final String directory = "messages";
     private final String FILE_EXTENSION = ".ser";
 
-    static {
-        filePath = Path.of(System.getProperty("user.dir"), "messages");
-        FileManager.createDirectory(filePath);
-    }
+    private final FileManager fileManager = new FileManager(directory);
+    private final Path filePath = fileManager.getPath();
 
     @Override
     public Message save(Message message) {
@@ -48,14 +48,16 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findByChannelId(UUID channelId) {
         File[] files = filePath.toFile().listFiles();
         List<Message> messages = new ArrayList<>(100);
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Message message = (Message) ois.readObject();
-                messages.add(message);
+                if (message.getChannel().getId().equals(channelId)) {
+                    messages.add(message);
+                }
             } catch (IOException | ClassNotFoundException e) {
                 throw new FileIOException("messages 읽기 실패");
             }
