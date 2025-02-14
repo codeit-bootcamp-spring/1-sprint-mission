@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 
@@ -16,7 +17,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent save(BinaryContent binaryContent) {
+    public BinaryContent save(CreateBinaryContentDto createBinaryContentDto) {
+        BinaryContent binaryContent = new BinaryContent(createBinaryContentDto.binaryImage(), createBinaryContentDto.createdAt());
         data.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
