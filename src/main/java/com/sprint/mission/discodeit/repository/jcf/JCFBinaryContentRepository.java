@@ -48,9 +48,6 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public Map<UUID, BinaryContent> load() {
-        if (binaryContentMap.isEmpty()) {
-            throw new IllegalArgumentException("Cannot find Object");
-        }
         return binaryContentMap;
     }
 

@@ -48,9 +48,6 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Map<UUID, UserStatus> load() {
-        if (userStatusMap.isEmpty()) {
-            throw new NullPointerException("UserStatusMap is empty");
-        }
         return userStatusMap;
     }
 

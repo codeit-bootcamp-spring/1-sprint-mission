@@ -44,9 +44,6 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Map<UUID, Channel> load() {
-        if (channelList.isEmpty()) {
-            throw new IllegalStateException("Channel 목록이 초기화되지 않았습니다.");
-        }
         return channelList;
     }
 

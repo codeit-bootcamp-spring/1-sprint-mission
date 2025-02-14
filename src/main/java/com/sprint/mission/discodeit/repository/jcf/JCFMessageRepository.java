@@ -51,9 +51,6 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Map<UUID, Message> load() {
-        if (messageList.isEmpty()) {
-            throw new IllegalStateException("메시지 목록이 초기화되지 않았습니다.");
-        }
         return messageList;
     }
 

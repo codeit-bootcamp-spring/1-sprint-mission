@@ -78,9 +78,12 @@ public class DiscodeitApplication {
 
 		//Channel channel = setupChannel(channelService);
 		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널",userList), ChannelType.PUBLIC);
-		System.out.println(channelService.readChannel(channel.getId()));
+		System.out.println(channelService.readChannel(channel.getId()) + " " + channel.getChannelName());
 
-		System.out.println(channelService.findDTO(channel.getId()));
+		System.out.println(channelService.findDTO(channel.getId()) + " " + channel.getChannelName());
+
+		channelService.deleteChannel(channel.getId());
+		System.out.println(channelService.readAllChannel());
 
 
 	}

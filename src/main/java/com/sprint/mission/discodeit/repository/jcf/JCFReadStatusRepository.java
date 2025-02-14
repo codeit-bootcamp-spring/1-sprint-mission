@@ -37,9 +37,6 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public Map<UUID, ReadStatus> load() {
-        if (readStatusMap.isEmpty()) {
-            throw new IllegalStateException("ReadStatus 맵이 초기화되지 않았습니다.");
-        }
         return readStatusMap;
     }
 
