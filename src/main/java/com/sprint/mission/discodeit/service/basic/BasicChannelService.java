@@ -11,9 +11,9 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     //메세지의 경우 다른 곳에서 Service 를 이용해 message
-    private final MessageService messageService;
+    private final MessageRepository messageRepository;
 
     private final ReadStatusService readStatusService;
 
@@ -69,7 +69,7 @@ public class BasicChannelService implements ChannelService {
                 continue;
             }
 
-            Optional<Instant> lastMessageTimestamp = messageService.findAllByChannelId(channel.getId()).stream()
+            Optional<Instant> lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
                     .map(Message::getCreatedAt)
                     .max(Instant::compareTo);
 
@@ -98,7 +98,7 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
-        Optional<Instant> lastMessageTimestamp = messageService.findAllByChannelId(channel.getId()).stream()
+        Optional<Instant> lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo);
 
@@ -151,7 +151,7 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
-        messageService.findAllByChannelId(channelId).forEach(m-> messageService.delete(m.getId()));
+        messageRepository.findAllByChannelId(channelId).forEach(m-> messageRepository.delete(m.getId()));
         readStatusService.findAllByChannelId(channelId).forEach(rs -> readStatusService.delete(rs.getId()));
 
         return channelRepository.delete(channel);
