@@ -29,7 +29,8 @@ public class BasicUserService implements UserService {
     @Override
     public User create(UserRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userRequestDto.name(), userRequestDto.email());
-        isDuplicateEmail(userRequestDto.email());
+        validateDuplicateName(userRequestDto.name());
+        validateDuplicateEmail(userRequestDto.email());
 
         BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
         User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
@@ -75,7 +76,12 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void isDuplicateEmail(String email) {
-        userRepository.findAll().forEach(user -> user.isDuplicateEmail(email));
+    public void validateDuplicateName(String name) {
+        userRepository.findAll().forEach(user -> user.validateDuplicateName(name));
+    }
+
+    @Override
+    public void validateDuplicateEmail(String email) {
+        userRepository.findAll().forEach(user -> user.validateDuplicateEmail(email));
     }
 }

@@ -15,5 +15,6 @@ public interface UserService {
     void update(UUID userId, String name, String email);
     void updatePassword(UUID userId, String originalPassword, String newPassword);
     void delete(UUID userId);
-    void isDuplicateEmail(String email);
+    void validateDuplicateName(String name);
+    void validateDuplicateEmail(String email);
 }

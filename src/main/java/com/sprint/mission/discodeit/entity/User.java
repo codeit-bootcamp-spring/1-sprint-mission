@@ -70,7 +70,13 @@ public class User implements Serializable {
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
     }
 
-    public void isDuplicateEmail(String email) {
+    public void validateDuplicateName(String name) {
+        if (this.name.equals(name)) {
+            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
+        }
+    }
+
+    public void validateDuplicateEmail(String email) {
         if (this.email.equals(email)) {
             throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일입니다.");
         }
