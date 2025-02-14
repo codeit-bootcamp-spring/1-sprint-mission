@@ -115,8 +115,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
-
+    public void deleteById(UUID id, ContentType contentType) {
+        Path path = resolvePath(id, contentType);
+        try {
+            Files.delete(path);
+        }catch (IOException e){
+            throw new RuntimeException(e);
+        }
     }
 
     private void init(Path DIRECTORY) {
