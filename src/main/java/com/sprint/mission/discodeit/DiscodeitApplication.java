@@ -1,28 +1,34 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.MessageDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BinaryContentService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-		UserService userService = (UserService) context.getBean("userService");
-		ChannelService channelService = (ChannelService) context.getBean("channelService");
-		MessageService messageService = (MessageService) context.getBean("messageService");
+		UserService userService = (UserService) context.getBean("basicUserService");
+		ChannelService channelService = (ChannelService) context.getBean("basicChannelService");
+		MessageService messageService = (MessageService) context.getBean("basicMessageService");
+		BinaryContentService binaryContentService = (BinaryContentService) context.getBean("binaryContentService");
 
 		System.out.println("===== userServiceTest ====");
 		System.out.println();
@@ -42,7 +48,7 @@ public class DiscodeitApplication {
 
 		System.out.println("===== user1의 loginId와 password를 변경 =====");
 		userService.updateUser(user1.getId(), UserDto.of("asdf", "qwer", "허원재"));
-		user1 = userService.readUser(user1.getId());
+		UserInfoDto userInfoDto = userService.readUser(user1.getId());
 		System.out.println(user1);
 		System.out.println();
 
@@ -58,11 +64,11 @@ public class DiscodeitApplication {
 		System.out.println("===== channelServiceTest =====\n");
 
 		System.out.println("===== channel 생성 =====");
-		Channel codeit = channelService.createChannel(ChannelDto.of("codeit", "codeit channel"));
-		Channel spring = channelService.createChannel(ChannelDto.of("spring", "spring channel"));
+		Channel codeit = channelService.createPublicChannel(ChannelDto.of("codeit", "codeit channel"));
+		Channel spring = channelService.createPrivateChannel(user1.getId());
 
 		System.out.println("===== 등록된 channel =====");
-		channelService.readAll().stream().forEach(System.out::println);
+		channelService.readAllByUserId(user1.getId()).stream().forEach(System.out::println);
 		System.out.println();
 
 		System.out.println("===== codeit channel 이름 변경 =====");
@@ -84,7 +90,7 @@ public class DiscodeitApplication {
 		System.out.println("===== codeit channel 삭제 =====");
 		channelService.deleteChannel(codeit.getId());
 		System.out.println("===== 등록된 channel 리스트 =====");
-		channelService.readAll().stream().forEach(System.out::println);
+		channelService.readAllByUserId(user1.getId()).stream().forEach(System.out::println);
 		System.out.println();
 
 
@@ -95,7 +101,7 @@ public class DiscodeitApplication {
 		Message message1 = messageService.createMessage(MessageDto.of(user1, "hi", spring));
 		Message message2 = messageService.createMessage(MessageDto.of(user1, "world", spring));
 		System.out.println("===== 등록된 message =====");
-		messageService.readAll().stream().forEach(System.out::println);
+		messageService.readAllByChannelId(spring.getId()).stream().forEach(System.out::println);
 		System.out.println();
 
 		System.out.println("===== 등록되지 않은 user거나 보내는 channel에 등록되지 않은 유저면 exception 발생 =====");
@@ -113,11 +119,18 @@ public class DiscodeitApplication {
 		System.out.println();
 
 		System.out.println("===== 메세지 삭제 =====");
-		messageService.deleteMessage(message1.getId());
+		messageService.deleteMessage(message2.getId());
 		System.out.println("===== 등록된 message =====");
-		messageService.readAll().stream().forEach(System.out::println);
+		messageService.readAllByChannelId(spring.getId()).stream().forEach(System.out::println);
 		System.out.println();
+
+		String fileName = "test.jpg";
+		Path path = Path.of(System.getProperty("user.dir"), fileName);
+
+		byte[] data = Files.readAllBytes(path);
+		BinaryContent content = binaryContentService.create(BinaryContentDto.of(fileName, BelongType.MESSAGE, message1.getId(), data));
+
+		BinaryContentDto contentDto = binaryContentService.find(content.getId());
+		messageService.deleteMessage(message1.getId());
 	}
-
-
 }
