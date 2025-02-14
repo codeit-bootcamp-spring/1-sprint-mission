@@ -3,11 +3,14 @@ package com.sprint.mission.discodeit.controller.user;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,7 +26,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    // 생성
     @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(
             @RequestBody UserCreateRequest userCreateRequest,
@@ -38,7 +40,21 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    // 업데이트
+    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    public ResponseEntity<Void> updateUser(
+            @PathVariable(name = "id") UUID userId,
+            @RequestBody UserUpdateRequest userUpdateRequest,
+            @RequestBody(required = false) BinaryContentCreateRequest binaryContentCreateRequest
+    ) {
+        userService.update(userId, userUpdateRequest, Optional.ofNullable(binaryContentCreateRequest));
+        return ResponseEntity.noContent().build();
+    }
 
-    // 삭제
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable(name = "id") UUID userId
+    ) {
+        userService.delete(userId);
+        return ResponseEntity.ok().build();
+    }
 }
