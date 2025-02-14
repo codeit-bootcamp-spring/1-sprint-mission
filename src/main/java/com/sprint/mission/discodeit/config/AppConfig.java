@@ -62,12 +62,12 @@ public class AppConfig {
     //todo 순환참조 해결하기 - message <-> channel
     @Bean
     public MessageService messageService(){
-        return new BasicMessageService(messageRepository(), userService(), channelService(), binaryContentService())
+        return new BasicMessageService(messageRepository(), userService(), channelService(), binaryContentService());
     }
 
     @Bean
     public ChannelService channelService() {
-        return new BasicChannelService(channelRepository(), userRepository(), messageService(), );
+        return new BasicChannelService(channelRepository(), userRepository(), messageRepository(), readStatusService());
     }
 
 }

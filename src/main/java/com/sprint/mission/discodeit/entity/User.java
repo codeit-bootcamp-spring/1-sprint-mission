@@ -24,8 +24,6 @@ public class User implements Serializable {
     private final Instant createdAt;
     //수정 시간
     private Instant updatedAt;
-    //접속 상태
-    private String userStatusId;
     //사용자 설정 상태 메세지
     private String statusMessage;
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
@@ -33,7 +31,7 @@ public class User implements Serializable {
     //사용자 프로필 사진
     private String profileImageId;
 
-    public User(String username, String nickname, String email, String password, String userStatusId, String statusMessage, AccountStatus accountStatus, String profileImageId) {
+    public User(String username, String nickname, String email, String password, String statusMessage, AccountStatus accountStatus, String profileImageId) {
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
@@ -41,7 +39,6 @@ public class User implements Serializable {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
-        this.userStatusId = userStatusId;
         this.statusMessage = statusMessage;
         this.accountStatus = accountStatus;
         this.profileImageId = profileImageId;
@@ -65,10 +62,6 @@ public class User implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public void setUserStatus(String userStatusId) {
-        this.userStatusId = userStatusId;
-    }
-
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
@@ -86,7 +79,7 @@ public class User implements Serializable {
     }
 
     public String toShortString() {
-        return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email + " / userStatusId: " + userStatusId + " / createdAt: " + createdAt;
+        return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email + " / createdAt: " + createdAt;
     }
 
     public void displayShortInfo() {

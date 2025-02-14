@@ -36,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatusRepository.findByUserId(createUserStatusDto.userId()) != null) {
             throw new IllegalArgumentException("userStatus already exists");
         }
-        UserStatus userStatus = new UserStatus();
+        UserStatus userStatus = new UserStatus(createUserStatusDto.userId());
 
         return userStatusRepository.save(userStatus);
     }

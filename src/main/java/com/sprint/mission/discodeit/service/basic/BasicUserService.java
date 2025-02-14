@@ -29,18 +29,15 @@ public class BasicUserService implements UserService {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
         }
 
-        UserStatus userStatus = new UserStatus();
-        User newUser = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(), userStatus.getId(), null, AccountStatus.UNVERIFIED, null);
+        User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(),null, AccountStatus.UNVERIFIED, null);
+        UserStatus userStatus = new UserStatus(user.getId());
 
-        return userRepository.save(newUser);
+        return userRepository.save(user);
     }
 
     public User create(CreateUserDto createUserDto, String profileImageId) {
         User user = create(createUserDto);
         user.setProfileImageId(profileImageId);
-
-        UserStatus userStatus = new UserStatus();
-        user.setUserStatus(userStatus.getId());
 
         return userRepository.save(user);
     }
