@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.data;
 
+import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,4 +13,5 @@ public record UserDto(
         UUID profileId,
         Boolean online
 ) {
+
 }
