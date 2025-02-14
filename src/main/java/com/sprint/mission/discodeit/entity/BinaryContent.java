@@ -1,12 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-// BinaryContent: 이미지 및 파일 저장 (수정 불가)
-public class BinaryContent {
+@Getter
+public class BinaryContent implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private Instant createdAt;
-    private UUID ownerId; // User or Message owner
-    private byte[] content;
+    //
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
+
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
+    }
 }
