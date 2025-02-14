@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final FileManager fileManager;
 
     @Override
     public Message createMessage(MessageDto messageDto) {
@@ -52,10 +54,9 @@ public class BasicMessageService implements MessageService {
     @Override
     public void deleteMessage(UUID messageId) {
         List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
-        FileManager fileManager = new FileManager("messages");
         for (BinaryContent content : contents) {
             binaryContentRepository.delete(content.getId());
-            fileManager.deleteFile(content.getName());
+            fileManager.deleteFile(Path.of(content.getPath()));
         }
         messageRepository.deleteMessage(messageId);
     }

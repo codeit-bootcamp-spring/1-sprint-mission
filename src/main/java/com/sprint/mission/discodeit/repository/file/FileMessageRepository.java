@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,15 +19,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileMessageRepository implements MessageRepository {
 
-    private final String directory = "messages";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "messages");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public Message save(Message message) {
-        Path path = filePath.resolve(message.getId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(message.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(message);
@@ -38,7 +43,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message findById(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (Message) ois.readObject();
@@ -49,8 +54,12 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findByChannelId(UUID channelId) {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<Message> messages = new ArrayList<>(100);
+
+        if (files == null) {
+            return messages;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -72,7 +81,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

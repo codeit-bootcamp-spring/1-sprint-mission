@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -16,17 +18,22 @@ import java.util.UUID;
 
 @Primary
 @Repository
+@RequiredArgsConstructor
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private final String directory = "read_statuses";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "read_statuses");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        Path path = filePath.resolve(readStatus.getId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(readStatus.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(readStatus);
@@ -38,7 +45,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus findById(UUID id) {
-        Path path = filePath.resolve(id.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (ReadStatus) ois.readObject();
@@ -49,8 +56,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findByUserId(UUID userId) {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<ReadStatus> readStatuses = new ArrayList<>(100);
+
+        if (files == null) {
+            return readStatuses;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -68,7 +79,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void delete(UUID id) {
-        Path path = filePath.resolve(id.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

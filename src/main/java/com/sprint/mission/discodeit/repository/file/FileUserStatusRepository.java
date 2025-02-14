@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -16,17 +18,22 @@ import java.util.UUID;
 
 @Primary
 @Repository
+@RequiredArgsConstructor
 public class FileUserStatusRepository implements UserStatusRepository {
 
-    private final String directory = "user_statuses";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "user_statuses");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public UserStatus save(UserStatus userStatus) {
-        Path path = filePath.resolve(userStatus.getUserId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(userStatus.getUserId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(userStatus);
@@ -38,7 +45,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public UserStatus findById(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (UserStatus)ois.readObject();
@@ -49,8 +56,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAll() {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<UserStatus> userStatuses = new ArrayList<>(100);
+
+        if (files == null) {
+            return userStatuses;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -65,7 +76,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void delete(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

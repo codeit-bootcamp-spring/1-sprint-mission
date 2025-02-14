@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileManager;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +25,14 @@ public class BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
+    private final FileManager fileManager;
 
-    private final String directory = "files";
-    private final FileManager fileManager = new FileManager(directory);
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "files");
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     public BinaryContent create(BinaryContentDto dto) {
 
@@ -41,8 +47,8 @@ public class BinaryContentService {
         UUID id = UUID.randomUUID();
         byte[] data = dto.getData();
         String fileName = generateFileName(id, dto.getName());
-        Path path = fileManager.getPath().resolve(fileName);
-        fileManager.createFile(fileName, data);
+        Path path = directoryPath.resolve(fileName);
+        fileManager.createFile(path, data);
 
         BinaryContent content = BinaryContent.of(id, dto.getType(),
                 dto.getBelongTo(), fileName, path.toString());
@@ -56,7 +62,7 @@ public class BinaryContentService {
 
     public BinaryContentDto find(UUID id) {
         BinaryContent content = binaryContentRepository.findById(id);
-        byte[] data = fileManager.readFile(content.getName());
+        byte[] data = fileManager.readFile(Path.of(content.getPath()));
         return BinaryContentDto.of(content.getName(), content.getType(),
                 content.getId(), data);
     }
@@ -65,7 +71,7 @@ public class BinaryContentService {
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByUserId(userId);
         BinaryContent content = binaryContent.orElseThrow(
                 () -> new NotFoundException("존재하지 않는 user에 대한 BinaryContent 요청"));
-        byte[] data = fileManager.readFile(content.getName());
+        byte[] data = fileManager.readFile(Path.of(content.getPath()));
         return BinaryContentDto.of(content.getName(), content.getType(),
                 content.getBelongTo(), data);
     }
@@ -74,7 +80,7 @@ public class BinaryContentService {
         ArrayList<BinaryContentDto> dtos = new ArrayList<>(100);
         List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
         for (BinaryContent content : contents) {
-            byte[] data = fileManager.readFile(content.getName());
+            byte[] data = fileManager.readFile(Path.of(content.getPath()));
             BinaryContentDto dto = BinaryContentDto.of(content.getName(),
                     content.getType(), content.getBelongTo(), data);
             dtos.add(dto);
@@ -84,7 +90,7 @@ public class BinaryContentService {
 
     public void delete(UUID id) {
         BinaryContent content = binaryContentRepository.findById(id);
-        fileManager.deleteFile(content.getName());
+        fileManager.deleteFile(Path.of(content.getPath()));
         binaryContentRepository.delete(id);
     }
 }

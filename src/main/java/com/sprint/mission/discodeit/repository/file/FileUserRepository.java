@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -18,15 +19,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileUserRepository implements UserRepository {
 
-    private final String directory = "users";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "users");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public User save(User user) {
-        Path path = filePath.resolve(user.getId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(user.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(user);
@@ -38,7 +43,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User findById(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (User)ois.readObject();
@@ -49,8 +54,12 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<User> users = new ArrayList<>(100);
+
+        if (files == null) {
+            return users;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -70,7 +79,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

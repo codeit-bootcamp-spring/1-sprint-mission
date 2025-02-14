@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -19,15 +20,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
-    private final String directory = "channels";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "channels");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    public void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public Channel save(Channel channel) {
-        Path path = filePath.resolve(channel.getId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(channel.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(channel);
@@ -39,7 +44,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel findById(UUID channelId) {
-        Path path = filePath.resolve(channelId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (Channel) ois.readObject();
@@ -50,7 +55,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAllByUserId(UUID userId) {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<Channel> channels = new ArrayList<>(100);
 
         if (files == null) {
@@ -77,7 +82,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteChannel(UUID channelId) {
-        Path path = filePath.resolve(channelId.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

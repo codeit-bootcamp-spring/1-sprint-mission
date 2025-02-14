@@ -2,22 +2,17 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.exception.FileIOException;
 import lombok.Getter;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Getter
+@Component
 public class FileManager {
 
-    private final Path path;
-
-    public FileManager(String directoryName) {
-        path = Path.of(System.getProperty("user.dir"), directoryName);
-        this.createDirectory();
-    }
-
-    private void createDirectory() {
+    public void createDirectory(Path path) {
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
@@ -27,8 +22,8 @@ public class FileManager {
         }
     }
 
-    public void createFile(String fileName, byte[] data) {
-        Path filePath = path.resolve(fileName);
+    public void createFile(Path path, byte[] data) {
+        Path filePath = path.resolve(path);
         try {
             Files.write(filePath, data);
         } catch (IOException e) {
@@ -36,8 +31,8 @@ public class FileManager {
         }
     }
 
-    public byte[] readFile(String fileName) {
-        Path filePath = path.resolve(fileName);
+    public byte[] readFile(Path path) {
+        Path filePath = path.resolve(path);
         try {
             return Files.readAllBytes(filePath);
         } catch (IOException e) {
@@ -45,8 +40,8 @@ public class FileManager {
         }
     }
 
-    public void deleteFile(String fileName) {
-        Path filePath = path.resolve(fileName);
+    public void deleteFile(Path path) {
+        Path filePath = path.resolve(path);
         try {
             Files.delete(filePath);
         } catch (IOException e) {

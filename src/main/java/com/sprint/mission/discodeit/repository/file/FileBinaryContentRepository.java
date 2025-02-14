@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -18,17 +20,22 @@ import java.util.UUID;
 
 @Primary
 @Repository
+@RequiredArgsConstructor
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private final String directory = "binary_contents";
+    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "binary_contents");
     private final String FILE_EXTENSION = ".ser";
 
-    private final FileManager fileManager = new FileManager(directory);
-    private final Path filePath = fileManager.getPath();
+    private final FileManager fileManager;
+
+    @PostConstruct
+    private void init() {
+        fileManager.createDirectory(directoryPath);
+    }
 
     @Override
     public BinaryContent save(BinaryContent content) {
-        Path path = filePath.resolve(content.getId().toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(content.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(content);
@@ -40,7 +47,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent findById(UUID id) {
-        Path path = filePath.resolve(id.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (BinaryContent) ois.readObject();
@@ -51,8 +58,12 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public Optional<BinaryContent> findByUserId(UUID userId) {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         BinaryContent content = null;
+
+        if (files == null) {
+            return Optional.empty();
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -71,8 +82,12 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public List<BinaryContent> findByMessageId(UUID messageId) {
-        File[] files = filePath.toFile().listFiles();
+        File[] files = directoryPath.toFile().listFiles();
         List<BinaryContent> contents = new ArrayList<>(100);
+
+        if (files == null) {
+            return contents;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
@@ -85,16 +100,12 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                 throw new FileIOException("BinaryContent 읽기 실패");
             }
         }
-
-        if (contents.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 message에 대한 BinaryContent 요청.");
-        }
         return contents;
     }
 
     @Override
     public void delete(UUID id) {
-        Path path = filePath.resolve(id.toString().concat(FILE_EXTENSION));
+        Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

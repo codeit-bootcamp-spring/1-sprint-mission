@@ -53,9 +53,6 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
             }
         }
 
-        if (contents.isEmpty()) {
-            throw new NotFoundException("존재하지 않는 message에 대한 BinaryContent 요청.");
-        }
         return contents;
     }
 

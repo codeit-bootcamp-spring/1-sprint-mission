@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final FileManager fileManager;
+
 
     @Override
     public User createUser(UserDto userDto) {
@@ -80,8 +83,7 @@ public class BasicUserService implements UserService {
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByUserId(userId);
         if (binaryContent.isPresent()) {
             BinaryContent content = binaryContent.get();
-            FileManager fileManager = new FileManager("files");
-            fileManager.deleteFile(content.getName());
+            fileManager.deleteFile(Path.of(content.getPath()));
         }
         userStatusRepository.delete(userId);
         userRepository.deleteUser(userId);
