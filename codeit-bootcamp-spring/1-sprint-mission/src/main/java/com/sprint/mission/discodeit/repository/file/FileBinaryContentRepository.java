@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.serialization.Serialization;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
+    private static final Serialization<BinaryContent> SERIALIZATION = new Serialization<>();
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
@@ -44,14 +46,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
         Path path = resolvePath(binaryContent.getId());
-        try (
-                FileOutputStream fos = new FileOutputStream(path.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(binaryContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        SERIALIZATION.serialize(DIRECTORY, binaryContent);
         return binaryContent;
     }
 
@@ -60,14 +55,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         BinaryContent binaryContentNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            try (
-                    FileInputStream fis = new FileInputStream(path.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                binaryContentNullable = (BinaryContent) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            binaryContentNullable = SERIALIZATION.deserialize(path);
         }
         return Optional.ofNullable(binaryContentNullable);
     }
@@ -77,16 +65,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         try (Stream<Path> paths = Files.list(DIRECTORY)) {
             return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            return (BinaryContent) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
+                    .map(SERIALIZATION::deserialize)
                     .filter(content -> ids.contains(content.getId()))
                     .toList();
         } catch (IOException e) {
