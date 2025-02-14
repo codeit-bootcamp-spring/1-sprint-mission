@@ -1,19 +1,18 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.MessageUpdateDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 
 public interface MessageService {
-  MessageResponseDto createMessage(CreateMessageDto messageDto);
+  Message createMessage(Message message);
+  Message updateMessage(Message message, String content);
 
-  MessageResponseDto getMessageById(String messageId);
+  Message getMessageById(String messageId);
 
-  List<MessageResponseDto> getMessagesByChannel(String channelId);
+  List<Message> getMessagesByChannel(String channelId);
 
-  MessageResponseDto updateMessage(MessageUpdateDto messageDto);
+
 
   void deleteMessage(String messageId);
 

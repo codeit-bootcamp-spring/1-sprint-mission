@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -53,7 +54,7 @@ public class BasicUserFacade implements UserFacade {
 
     user.setStatus(userStatus);
 
-    userService.update(user);
+    user = userService.update(user);
 
     return userMapper.from(user, userStatus, profileImage);
   }
@@ -99,6 +100,17 @@ public class BasicUserFacade implements UserFacade {
     Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSet);
 
     return createMultipleUserResponses(users, userStatusMap, binaryContentMap);
+  }
+
+  @Override
+  public void deleteUser(String id, String password) {
+    User user = userService.findUserById(id);
+
+    userService.deleteUser(id, password);
+    userStatusService.deleteByUserId(id);
+    if(user.getProfileImage()!=null){
+      binaryContentService.delete(user.getProfileImage().getUUID());
+    }
   }
 
   private Set<String> mapToUserUuids(List<User> users) {

@@ -14,5 +14,4 @@ public class BinaryContentMapper {
         .build();
   }
 
-
 }

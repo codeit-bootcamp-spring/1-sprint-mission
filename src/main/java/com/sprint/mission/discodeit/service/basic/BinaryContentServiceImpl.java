@@ -13,7 +13,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -85,57 +87,50 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   }
 
   @Override
-  public List<BinaryContentDto> saveBinaryContentsForMessage(CreateMessageDto messageDto, String messageId) {
-    validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
+  public List<BinaryContent> saveBinaryContentsForMessage(Message message) {
+    validator.findOrThrow(Message.class, message.getUUID(), new MessageNotFoundException());
 
-    if (messageDto.binaryContent() == null || messageDto.binaryContent().isEmpty()) {
+    if (message.getBinaryContents() == null || message.getBinaryContents().isEmpty()) {
       return Collections.emptyList();
     }
 
-    List<BinaryContentDto> binaryContentDtos = messageDto.binaryContent();
-    List<BinaryContent> binaryContents = new ArrayList<>();
-    for (BinaryContentDto binary : binaryContentDtos) {
-      BinaryContent content = new BinaryContent.BinaryContentBuilder(
-          messageDto.userId(),
-          binary.fileName(),
-          binary.fileType(),
-          binary.fileSize(),
-          binary.data()
-      )
-          .messageId(messageId)
-          .channelId(messageDto.channelId())
-          .build();
-
-      binaryContents.add(content);
-    }
-
-    binaryContentRepository.saveMultipleBinaryContent(binaryContents);
-    return binaryContentDtos;
+    return binaryContentRepository.saveMultipleBinaryContent(message.getBinaryContents());
   }
 
   @Override
-  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContentDto> binaryContentDtos) {
-    List<BinaryContent> originalBinaryContent = binaryContentRepository.findByMessageId(message.getUUID());
+  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<MultipartFile> newFiles) {
 
-    // 기존 파일이 있는지 확인
-    for (BinaryContentDto dto : binaryContentDtos) {
-      BinaryContent existingContent = originalBinaryContent.stream()
-          .filter(content -> content.getFileName().equals(dto.fileName()))
-          .findFirst()
-          .orElse(null);
+    List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getUUID());
 
-      // 없다면 새 파일 추가
-      if (existingContent == null) {
-        BinaryContent newBinaryContent = new BinaryContent.BinaryContentBuilder(userId, dto.fileName(), dto.fileType(), dto.fileSize(), dto.data())
-            .messageId(message.getUUID())
-            .channelId(message.getChannelUUID())
-            .build();
+    Set<String> newFileNames = newFiles.stream()
+        .map(MultipartFile::getOriginalFilename)
+        .collect(Collectors.toSet());
 
-        originalBinaryContent.add(newBinaryContent);
-      }
-    }
+    List<BinaryContent> filesToDelete = originalFiles.stream()
+        .filter(file -> !newFileNames.contains(file.getFileName()))
+        .toList();
 
-    return binaryContentRepository.saveMultipleBinaryContent(originalBinaryContent);
+    // 기존 파일 삭제
+    filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getUUID()));
+
+    // 새로운 파일 저장
+    List<BinaryContent> savedFiles = newFiles.stream()
+        .map(file -> {
+          try {
+            return new BinaryContent.BinaryContentBuilder(
+                userId,
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getSize(),
+                file.getBytes()
+            ).messageId(message.getUUID()).build();
+          } catch (IOException e) {
+            throw new InvalidOperationException("파일 저장 실패");
+          }
+        }).toList();
+
+
+    return binaryContentRepository.saveMultipleBinaryContent(savedFiles);
   }
 
   /**

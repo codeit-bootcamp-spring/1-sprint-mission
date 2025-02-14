@@ -11,6 +11,6 @@ public interface UserFacade {
   UserResponseDto createUser(CreateUserRequest request);
   UserResponseDto updateUser(String userId, UserUpdateDto updateDto, String plainPassword);
   UserResponseDto findUserById(String id);
-
   List<UserResponseDto> findAllUsers();
+  void deleteUser(String id, String password);
 }

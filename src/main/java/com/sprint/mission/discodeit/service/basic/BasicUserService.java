@@ -38,9 +38,6 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
 
-  private final UserStatusService userStatusService;
-  private final BinaryContentService binaryContentService;
-
   private final EntityValidator validator;
 
   @Override
@@ -59,9 +56,6 @@ public class BasicUserService implements UserService {
     return userRepository.update(user);
   }
 
-  /**
-   * 단순 검증 로직 한번 실행 함수
-   */
   private void validateUserInformationWhenCreate(User user, String userId) {
     List<User> users = userRepository.findAll();
     validEmail(user.getEmail(), userId, users);
@@ -199,15 +193,10 @@ public class BasicUserService implements UserService {
    */
   @Override
   public void deleteUser(String id, String password) {
-
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
     checkPasswordIsCorrect(password, user.getPassword());
 
     userRepository.delete(id);
-    userStatusService.deleteByUserId(id);
-    if (user.getProfileImage() != null) {
-      binaryContentService.delete(user.getProfileImage().getUUID());
-    }
   }
 }

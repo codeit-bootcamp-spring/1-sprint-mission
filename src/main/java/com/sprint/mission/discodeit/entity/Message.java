@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,7 +37,7 @@ public class Message implements Serializable {
   private Boolean isEdited;
   private final Instant createdAt;
   private Instant updatedAt;
-  private String binaryContentId; // TODO: 삭제
+  private List<BinaryContent> binaryContents;
   private String threadUUID;
 
   private Message(MessageBuilder builder) {
@@ -43,7 +45,7 @@ public class Message implements Serializable {
     this.userUUID = builder.userUUID;
     this.channelUUID = builder.channelUUID;
     this.content = builder.content;
-    this.binaryContentId = builder.binaryContentId;
+    this.binaryContents = builder.binaryContents;
     this.threadUUID = builder.threadUUID;
     this.isEdited = builder.isEdited;
     this.createdAt = builder.createdAt;
@@ -56,7 +58,7 @@ public class Message implements Serializable {
     private final String channelUUID;
     private final String content;
     private Boolean isEdited = false;
-    private String binaryContentId = "";
+    private List<BinaryContent> binaryContents = new ArrayList<>();
     private String threadUUID = "";
     private final Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
@@ -71,8 +73,8 @@ public class Message implements Serializable {
       this.content = content;
     }
 
-    public MessageBuilder binaryContentId(String binaryContentId) {
-      this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
+    public MessageBuilder binaryContents(List<BinaryContent> binaryContents) {
+      this.binaryContents = binaryContents;
       return this;
     }
 
@@ -92,8 +94,14 @@ public class Message implements Serializable {
     this.updatedAt = Instant.now();
   }
 
-  public void setContentImage(String binaryContentId) {
-    this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
+  public void addBinaryContent(BinaryContent binaryContent) {
+    this.binaryContents.add(binaryContent);
+    updatedAt = Instant.now();
+  }
+
+  public void removeBinaryContent(BinaryContent binaryContent) {
+    this.binaryContents.remove(binaryContent);
+    updatedAt = Instant.now();
   }
 
   public void setIsEdited() {
@@ -107,7 +115,6 @@ public class Message implements Serializable {
         ", userUUID='" + userUUID + '\'' +
         ", channelUUID='" + channelUUID + '\'' +
         ", content='" + content + '\'' +
-        ", contentImage='" + binaryContentId + '\'' +
         '}';
   }
 }

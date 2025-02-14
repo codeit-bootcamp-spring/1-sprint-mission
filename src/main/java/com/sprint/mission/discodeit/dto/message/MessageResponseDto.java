@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
+import java.util.Base64;
 import java.util.List;
 
 public record MessageResponseDto(
@@ -13,18 +14,22 @@ public record MessageResponseDto(
     String channelId,
     String content,
     Instant createdAt,
-    List<BinaryContentDto> data
+    List<String> base64Data
 ) {
-  public static MessageResponseDto fromBinaryContentDto(Message message, List<BinaryContentDto> contents) {
-    return new MessageResponseDto(message.getUUID(), message.getUserUUID(), message.getChannelUUID(), message.getContent(), message.getCreatedAt(), contents);
-  }
 
-  public static MessageResponseDto fromBinaryContent(Message message, List<BinaryContent> contents){
+  public static MessageResponseDto from(Message message){
 
-    List<BinaryContentDto> returnContents = contents.stream().map(content -> {
-      return new BinaryContentDto(content.getFileName(), content.getFileType(), content.getFileSize(), content.getData());
+    List<String> base64Encoded = message.getBinaryContents().stream().map(content -> {
+      return Base64.getEncoder().encodeToString(content.getData());
     }).toList();
 
-    return new MessageResponseDto(message.getUUID(), message.getUserUUID(), message.getChannelUUID(), message.getContent(), message.getCreatedAt(), returnContents);
+    return new MessageResponseDto(
+        message.getUUID(),
+        message.getUserUUID(),
+        message.getChannelUUID(),
+        message.getContent(),
+        message.getCreatedAt(),
+        base64Encoded
+    );
   }
 }
