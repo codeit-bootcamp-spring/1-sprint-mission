@@ -13,14 +13,15 @@ public class BinaryMessageContentDto {
 
 
     //private final UUID id;
-    private final UUID messageId;
-    private final Instant createdAt;
+    //private final Instant createdAt;
+
     private final byte[] bytes;
+    private final UUID messageId;
 
     public BinaryMessageContentDto(BinaryMessageContent contents) {
         //this.id = contents.getId();
+        //this.createdAt = contents.getCreatedAt();
         this.messageId = contents.getMessageId();
-        this.createdAt = contents.getCreatedAt();
         this.bytes = contents.getBytes();
     }
 

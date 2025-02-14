@@ -45,10 +45,10 @@ public class User implements Serializable {
         return new User(dto.getUsername(), dto.getPassword(), dto.getEmail());
     }
 
-    public void setAll(String name, String password, String email) {
-        this.password = password;
-        this.name = name;
-        this.email = email;
+    public void updateByRequestDTO(UserDtoForRequest requestDTO){
+        this.name = requestDTO.getUsername();
+        this.password = requestDTO.getPassword();
+        this.email = requestDTO.getEmail();
     }
 
     public void changeReadStatus(UUID channelId){

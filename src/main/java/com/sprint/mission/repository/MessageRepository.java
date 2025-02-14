@@ -8,11 +8,11 @@ import java.util.UUID;
 
 public interface MessageRepository {
 
-    Message save(Message message);
+    void save(Message message);
 
     Optional<Message> findById(UUID id);
     List<Message> findAll();
     void delete(UUID messageId);
 
-//    boolean existsById(UUID id);
+    boolean existsById(UUID messageId);
 }

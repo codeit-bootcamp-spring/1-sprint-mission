@@ -8,6 +8,7 @@ import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,9 @@ public class UserController {
     private final JCFUserService userService;
     private final UserStatusService userStatusService;
 
+
+    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
+    // 패스워드 정보 제외
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody UserDtoForRequest requestDTO) {
         userService.create(requestDTO);
@@ -52,13 +56,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
     }
 
+    @PatchMapping("/{userId}")
+    public ResponseEntity<String> update(@PathVariable UUID userId, @RequestBody UserDtoForRequest requestDTO){
+        userService.update(userId, requestDTO);
+        return ResponseEntity.ok("Successfully updated");
+    }
+
+
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> delete(@PathVariable UUID userId){
         userService.delete(userId);
         return ResponseEntity.ok("Successfully deleted");
     }
-
-
-
 
 }

@@ -7,22 +7,12 @@ import com.sprint.mission.service.exception.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BinaryProfileService {
-    //create
-    //[ ] DTO를 활용해 파라미터를 그룹화합니다.
-    //find
-    //[ ] id로 조회합니다.
-    //findAllByIdIn
-    //[ ] id 목록으로 조회합니다.
-    //delete
-    //[ ] id로 삭제합니다.
 
     private final BinaryProfileRepository repository;
 
@@ -34,7 +24,7 @@ public class BinaryProfileService {
         return repository.findById(userId)
                 .map(profileContent
                         -> new BinaryProfileContentDto(profileContent))
-                .orElseThrow(() -> new NotFoundId("Fail to find : wrong id"));
+                .orElseThrow(NotFoundId::new);
     }
 
     public List<BinaryProfileContentDto> findAll() {
@@ -44,8 +34,7 @@ public class BinaryProfileService {
     }
 
     public void delete(UUID messageId) {
-        repository.delete(messageId);
+        if (repository.isExistById(messageId)) throw new NotFoundId();
+        else repository.delete(messageId);
     }
-
-
 }

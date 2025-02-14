@@ -8,10 +8,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository {
-    User save(User user) throws IOException;
-    Optional<User> findById(UUID id) throws IOException, ClassNotFoundException;
-    List<User> findAll() throws IOException;
+    void save(User user);
+    Optional<User> findById(UUID id);
+    List<User> findAll();
     void delete(UUID userId);
-
-    //User updateUserNamePW(User user) throws IOException;
+    boolean existsById(UUID userId);
+    //User updateUserNamePW(User user)
 }

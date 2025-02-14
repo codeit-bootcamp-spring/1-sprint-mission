@@ -29,7 +29,7 @@ public class JCFUserService implements UserService {
 
     // 테스트에서 create 후 userId 필요해서 임시적 USER 반환 (할거면 나중에 컨트롤러에서)
     @Override
-    public User create(UserDtoForRequest userDto) {
+    public void create(UserDtoForRequest userDto) {
         isDuplicateNameEmail(userDto.getUsername(), userDto.getEmail());
         User user = User.createUserByRequestDto(userDto);
 
@@ -40,35 +40,32 @@ public class JCFUserService implements UserService {
         // UserStatus 생성
         userStatusService.create(user.getId());
 
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
+
+    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
+    // 패스워드 정보 제외
     @Override
     public void update(UUID userId, UserDtoForRequest updateDto) {
         isDuplicateNameEmail(updateDto.getUsername(), updateDto.getEmail());
 
-        userRepository.findById(userId)
-                .map((user) -> {
+        User updatingUser = userRepository.findById(userId).orElseThrow(NotFoundId::new);
+        updatingUser.updateByRequestDTO(updateDto);
 
-                    user.setAll(updateDto.getUsername(), updateDto.getPassword(), updateDto.getEmail());
-                    if (updateDto.getProfileImg() != null) {
-                        profileService.create(new BinaryProfileContentDto(updateDto.getProfileImg()));
-                    }
-                    return userRepository.save(user);
-                })
-                .orElseThrow(NotFoundId::new);
+        if (updateDto.getProfileImg() != null) {
+            profileService.create(new BinaryProfileContentDto(updateDto.getProfileImg()));
+        }
+
+        userRepository.save(updatingUser);
+
     }
-
-    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
-    // 패스워드 정보 제외
 
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId).orElseThrow(NotFoundId::new);
     }
 
-    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
-    // 패스워드 정보 제외
     @Override
     public List<User> findAll() {
         return userRepository.findAll();

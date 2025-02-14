@@ -17,16 +17,13 @@ public class JCFMessageRepository implements MessageRepository{
     private final Map<UUID, Message> data = new TreeMap<>();
 
     @Override
-    public Message save(Message message){
+    public void save(Message message){
         data.put(message.getId(), message);
-        return message;
     }
 
     @Override
     public Optional<Message> findById(UUID id){
         return Optional.ofNullable(data.get(id));
-//        if (message == null) throw new NotFoundId("Cannot find Message : incorrect MessageId");
-//        return message;
     }
 
     @Override
@@ -43,11 +40,10 @@ public class JCFMessageRepository implements MessageRepository{
 
     @Override
     public void delete(UUID messageId) {
-        Message remove = data.remove(messageId);
-        log.info("[Remove Message]  content : {}", remove.getContent());
+        data.remove(messageId);
     }
 
-
+    @Override
     public boolean existsById(UUID id) {
         return data.containsKey(id);
     }

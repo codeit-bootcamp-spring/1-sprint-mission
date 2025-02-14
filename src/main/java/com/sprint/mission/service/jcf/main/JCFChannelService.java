@@ -34,34 +34,28 @@ public class JCFChannelService implements ChannelService {
     private final JCFUserRepository userRepository;
     private final UserStatusService userStatusService;
 
-
     @Override
-    public Channel create(ChannelDtoForRequest dto) {
-        // PRIVATE 채널을 생성할 때:
-        // [] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
-        // ????? 채널을 생성했는데 어떻게 바로 User가 있지???
-        Channel channel = new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
-        return channelRepository.save(channel);
+    public void create(ChannelDtoForRequest requestDTO) {
+        /**
+         * 요구사항 : PRIVATE 채널을 생성할 때, 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+         * 의문점 : ????? 채널을 생성했는데 어떻게 바로 User가 있지???
+         * 이런 부분 떔에 PUBLIC-PRIVATE 분리해야 될 이유를 찾지 못했다.
+         */
+        Channel createdChannel = Channel.createChannelByRequestDto(requestDTO);
+        channelRepository.save(createdChannel);
     }
 
     @Override
     public void update(UUID channelId, ChannelDtoForRequest dto) {
-        channelRepository.findById(channelId)
-                .map((updatingChannel) -> {
-                    updatingChannel.setName(dto.getName());
-                    updatingChannel.setChannelType(dto.getChannelType());
-                    updatingChannel.setDescription(dto.getDescription());
-                    log.info("{} 수정", updatingChannel);
-                    return channelRepository.save(updatingChannel);
-                })
-                .orElseThrow(NotFoundId::new);
+        Channel updatingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        updatingChannel.updateByDTO(dto);
+        channelRepository.save(updatingChannel);
     }
 
     @Override
-    public FindChannelDto findById(UUID id) {
-        return channelRepository.findById(id)
-                .map((findChannel) -> getFindChannelDto(findChannel))
-                .orElse(new FindPublicChannelDto());
+    public Channel findById(UUID channelId) {
+        return channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+
     }
 
     @Override
@@ -78,11 +72,13 @@ public class JCFChannelService implements ChannelService {
      */
     public List<FindChannelDto> findAllByUserId(UUID userId) {
 
+        // 1. Public 채널
         ArrayList<FindChannelDto> findChannelListDto = channelRepository.findAll().stream()
                 .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
-                .map((channel) -> getFindChannelDto(channel))
+                .map(this::getFindChannelDto)
                 .collect(Collectors.toCollection(ArrayList::new));
 
+        // 2. USER가 참여한 PRIVATE 채널을 1번에 더하기
         userRepository.findById(userId).ifPresent((user) -> {
             user.getChannels().stream()
                     .filter((channel -> channel.getChannelType().equals(ChannelType.PRIVATE)))
@@ -91,19 +87,9 @@ public class JCFChannelService implements ChannelService {
         return findChannelListDto;
     }
 
-    private FindChannelDto getFindChannelDto(Channel findChannel) {
-        return (findChannel.getChannelType().equals(ChannelType.PRIVATE)
-                ? new FindPrivateChannelDto(findChannel)
-                : new FindPublicChannelDto(findChannel));
-    }
-
-
     @Override
     public void delete(UUID channelId) {
-        //channel.getUsersImmutable().stream().forEach(user -> user.removeChannel(channel));
-        //deletingChannel.removeAllUser();
         Channel deletingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
-
         deletingChannel.getUserList().forEach(user -> {
                     user.getChannels().remove(deletingChannel);
                     userRepository.save(user);
@@ -145,5 +131,15 @@ public class JCFChannelService implements ChannelService {
                     String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
         }
     }
+
+    /**
+     * 응답 DTO (타입별)
+     */
+    private FindChannelDto getFindChannelDto(Channel findedChannel) {
+        return (findedChannel.getChannelType().equals(ChannelType.PRIVATE)
+                ? new FindPrivateChannelDto(findedChannel)
+                : new FindPublicChannelDto(findedChannel));
+    }
+
 }
 

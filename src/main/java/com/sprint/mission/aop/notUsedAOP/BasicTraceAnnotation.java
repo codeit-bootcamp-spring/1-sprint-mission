@@ -19,9 +19,9 @@ public class BasicTraceAnnotation {
 
     private final TraceDevice trace;
 
-    @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
+    @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
     public void classWithin(){}
-    @Pointcut("@within(com.sprint.mission.aop.annotation.TraceAnnotation)")
+    @Pointcut("@within(com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation)")
     public void methodWith(){}
 
     @Around("classWithin()")

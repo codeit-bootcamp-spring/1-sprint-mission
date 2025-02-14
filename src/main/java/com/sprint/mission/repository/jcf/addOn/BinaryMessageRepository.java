@@ -19,9 +19,8 @@ public class BinaryMessageRepository {
 
     private final Map<UUID, BinaryMessageContent> data = new HashMap<>();
 
-    public BinaryMessageContent save(BinaryMessageContent binaryContent){
+    public void save(BinaryMessageContent binaryContent){
         data.put(binaryContent.getId(), binaryContent);
-        return binaryContent;
     }
 
     public Optional<BinaryMessageContent> findById(UUID id){
@@ -32,7 +31,11 @@ public class BinaryMessageRepository {
         return new ArrayList<>(data.values());
     }
 
-    public void delete(UUID id){
-        data.remove(id);
+    public void delete(UUID messageId){
+        data.remove(messageId);
+    }
+
+    public Boolean isExistById(UUID userId){
+        return data.get(userId) != null;
     }
 }

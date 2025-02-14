@@ -12,8 +12,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@Aspect
+@Component @Aspect
 @RequiredArgsConstructor
 public class BasicTrace {
 

@@ -29,7 +29,7 @@ public class UserDtoForRequest {
         return "UserDtoForRequest{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
+               ", email='" + email + '\'' +
                 ", profileImg=" + profileImg +
                 '}';
     }

@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    Channel save(Channel channel) throws IOException;
-    Optional<Channel> findById(UUID id) throws IOException, ClassNotFoundException;
-    List<Channel> findAll() throws IOException;
+    void save(Channel channel);
+    Optional<Channel> findById(UUID id) ;
+    List<Channel> findAll();
     //Channel updateChannelName(Channel updatingChannel);
 
     void delete(UUID channelId);

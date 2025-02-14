@@ -38,6 +38,12 @@ public class Channel implements Serializable {
         return new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
     }
 
+    public void updateByDTO(ChannelDtoForRequest dto){
+        this.channelType = dto.getChannelType();
+        this.description = dto.getDescription();
+        this.name = dto.getName();
+    }
+
     // 양방향은 channel에서만
     public void addUser(User user) {
         //if (!userList.contains(user))

@@ -24,7 +24,7 @@ public class UserStatusRepository {
     }
 
     public Boolean isExistById(UUID userId) {
-        return statusMap.containsKey(userId);
+        return statusMap.get(userId) != null;
     }
 
     public void delete(UUID userId) {
@@ -32,9 +32,9 @@ public class UserStatusRepository {
     }
 
     public Map<User, UserStatus> findStatusMapByUser(List<User> userList) {
-        Map<User, UserStatus> statusMap = new HashMap<>();
+        Map<User, UserStatus> userStatusMap = new HashMap<>();
         userList.forEach(user ->
-                statusMap.put(user, statusMap.getOrDefault(user.getId(), null)));
-        return statusMap;
+                userStatusMap.put(user, statusMap.getOrDefault(user.getId(), null)));
+        return userStatusMap;
     }
 }

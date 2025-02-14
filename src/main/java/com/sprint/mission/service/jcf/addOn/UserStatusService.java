@@ -3,6 +3,7 @@ package com.sprint.mission.service.jcf.addOn;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
+import com.sprint.mission.service.exception.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +37,17 @@ public class UserStatusService {
     }
 
     // 이건 DTO가 필요없는거 같은데
+    //[ ] userId 로 특정 User의 객체를 업데이트합니다.
+    // ??? 오타인걸로 생각 userstatus 업데이트
     public void update(UUID userId){
-        userStatusRepository.findById(userId).ifPresent((updatingUserStatus) -> {
+        userStatusRepository.findById(userId).ifPresentOrElse((updatingUserStatus) -> {
             updatingUserStatus.join();
             userStatusRepository.save(updatingUserStatus);
-        });
+        }, NotFoundId::new);
     }
 
     public void delete(UUID userId){
-        userStatusRepository.delete(userId);
+        if (userStatusRepository.isExistById(userId)) throw new NotFoundId();
+        else userStatusRepository.delete(userId);
     }
 }
