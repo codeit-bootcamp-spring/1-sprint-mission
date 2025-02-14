@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.UserRequestDto;
+import com.sprint.mission.discodeit.dto.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -40,39 +42,54 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User find(UUID userId) {
-        return Optional.ofNullable(userRepository.find(userId))
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+    public UserResponseDto find(UUID userId) {
+        User user = userRepository.find(userId);
+        validateUserExists(user);
+        BinaryContent binaryContent = binaryContentService.findByUserId(userId);
+        OnlineStatus onlineStatus = userStatusService.getOnlineStatus(userId);
+
+        return UserResponseDto.from(user, binaryContent, onlineStatus);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
+    public List<UserResponseDto> findAll() {
+        List<User> users = userRepository.findAll();
 
-    @Override
-    public String getInfo(UUID userId) {
-        return find(userId).toString();
+        return users.stream()
+                .map(user -> UserResponseDto.from(user,
+                        binaryContentService.findByUserId(user.getId()),
+                        userStatusService.getOnlineStatus(user.getId())))
+                .toList();
     }
 
     @Override
     public void update(UUID userId, String name, String email) {
         validator.validate(name, email);
-        User user = find(userId);
+        User user = userRepository.find(userId);
+        validateUserExists(user);
         userRepository.update(user, name, email);
     }
 
     @Override
     public void updatePassword(UUID userId, String originalPassword, String newPassword) {
-        User user = find(userId);
+        User user = userRepository.find(userId);
+        validateUserExists(user);
         userRepository.updatePassword(user, originalPassword, newPassword);
         user.updateUpdatedAt();
     }
 
     @Override
     public void delete(UUID userId) {
-        User user = find(userId);
+        User user = userRepository.find(userId);
+        validateUserExists(user);
         userRepository.delete(user);
+    }
+
+    @Override
+    public void validateUserExists(User user) {
+        if (user == null) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
     }
 
     @Override

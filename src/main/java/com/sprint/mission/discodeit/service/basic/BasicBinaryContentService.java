@@ -6,11 +6,18 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent create(BinaryContentRequestDto binaryContentRequestDto) {
         return new BinaryContent(binaryContentRequestDto.data());
+    }
+
+    @Override
+    public BinaryContent findByUserId(UUID userId) {
+        return null;
     }
 }

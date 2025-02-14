@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -16,5 +17,16 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus create(UUID userId) {
         return new UserStatus(userId);
+    }
+
+    @Override
+    public UserStatus findByUserId(UUID userId) {
+        return null;
+    }
+
+    @Override
+    public OnlineStatus getOnlineStatus(UUID userId) {
+        UserStatus userStatus = findByUserId(userId);
+        return userStatus.calculateOnlineStatus();
     }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -26,5 +27,12 @@ public class UserStatus implements Serializable {
 
     public void updateUpdatedAt() {
         this.updatedAt = Instant.now();
+    }
+
+    public OnlineStatus calculateOnlineStatus() {
+        if (Duration.between(updatedAt, Instant.now()).toMinutes() >= 5) {
+            return OnlineStatus.OFFLINE;
+        }
+        return OnlineStatus.ONLINE;
     }
 }
