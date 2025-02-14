@@ -5,10 +5,9 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/message")
@@ -36,15 +36,28 @@ public class MessageController {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(
+            method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
     public ResponseEntity<Void> createMessage(
             @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
-            @RequestPart(required = false, name = "binaryContentCreateRequest") List<BinaryContentCreateRequest> binaryContentCreateRequest
+            @RequestPart(required = false, name = "binaryContentCreateRequest") List<MultipartFile> binaryContentCreateRequest
     ) {
-        if (Objects.isNull(binaryContentCreateRequest)) {
-            binaryContentCreateRequest = new ArrayList<>();
-        }
-        messageService.create(messageCreateRequest, binaryContentCreateRequest);
+        List<BinaryContentCreateRequest> binaryContents = binaryContentCreateRequest.stream()
+                .map(file -> {
+                    try {
+                        return new BinaryContentCreateRequest(
+                                file.getOriginalFilename(),
+                                file.getContentType(),
+                                file.getBytes()
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+        messageService.create(messageCreateRequest, binaryContents);
         return ResponseEntity.created(URI.create("/")).build();
     }
 

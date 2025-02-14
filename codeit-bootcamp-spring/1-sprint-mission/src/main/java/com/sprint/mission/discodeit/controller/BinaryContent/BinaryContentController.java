@@ -28,8 +28,8 @@ public class BinaryContentController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<List<BinaryContent>> findAll(
-            @RequestBody List<UUID> uuids
+            @RequestBody List<UUID> binaryIds
     ) {
-        return ResponseEntity.ok(binaryContentService.findAllByIdIn(uuids));
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryIds));
     }
 }
