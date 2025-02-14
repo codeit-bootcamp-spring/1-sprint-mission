@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
+import com.sprint.mission.discodeit.dto.ChannelJoinDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
@@ -11,6 +14,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Primary
@@ -18,6 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Channel create(ChannelDTO channelDTO) {
@@ -27,6 +32,21 @@ public class BasicChannelService implements ChannelService {
                 ChannelType.valueOf(channelDTO.getType().toUpperCase())
         );
         return channelRepository.save(channel);
+    }
+
+    @Override
+    public Map<User, Channel> join(ChannelJoinDTO joinDTO) {
+
+        Channel channel = channelRepository.findById(joinDTO.getChannelName())
+                .orElseThrow(() -> new IllegalArgumentException("Channel Not Found"));
+
+        User user = userRepository.findById(joinDTO.getUserId())
+                .orElseThrow(()-> new IllegalArgumentException("User Not Found"));
+
+        channel.addMember(user);
+        channelRepository.save(channel);
+
+        return Map.of(user, channel);
     }
 
     @Override

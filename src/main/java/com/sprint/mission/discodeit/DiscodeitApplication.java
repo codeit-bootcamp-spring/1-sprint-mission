@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.time.Instant;
+import java.util.Map;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -30,29 +31,44 @@ public class DiscodeitApplication {
         ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
 
         UserDTO userDTO = new UserDTO("TestUser", "test@email.com", "password1234");
+        UserDTO userDTO2 = new UserDTO("TestUser2", "test2@email.com", "password1234");
         User createdUser = userService.create(userDTO, null);
+        User createdUser2 = userService.create(userDTO2, null);
         System.out.println("[회원가입] 유저 생성: " + createdUser.getName() + " | " + createdUser.getEmail());
+        System.out.println("[회원가입] 유저 생성: " + createdUser2.getName() + " | " + createdUser2.getEmail());
 
         AuthDTO authDTO = new AuthDTO("TestUser", "password1234");
+        AuthDTO authDTO2 = new AuthDTO("TestUser2", "password1234");
         UserDTO loggedInUser = authService.login(authDTO);
-        System.out.println("[로그인] 유저 로그인 성공: " + loggedInUser.getName());
+        UserDTO loggedInUser2 = authService.login(authDTO2);
+        System.out.println("[로그인] 유저 로그인 성공: " + loggedInUser.getName() + ", " + loggedInUser2.getName());
 
         UserStatusDTO userStatus = userStatusService.create(new UserStatusDTO(createdUser.getId(), Instant.now()));
-        System.out.println("[유저 상태] 온라인 상태 업데이트 완료: " + userStatus.getUserId());
+        UserStatusDTO userStatus2 = userStatusService.create(new UserStatusDTO(createdUser2.getId(), Instant.now()));
+        System.out.println("[유저 상태] 온라인 상태 업데이트 완료: " + userStatus.getUserId() + ", " + userStatus2.getUserId());
 
         UserStatusType currentStatus = userStatusService.getUserOnlineStatus(createdUser.getId());
-        System.out.println("[유저 온라인 상태]: " + userDTO.getName() +  " 현재 상태: " + currentStatus);
+        UserStatusType currentStatus2 = userStatusService.getUserOnlineStatus(createdUser2.getId());
+        System.out.println("[유저 온라인 상태]: " + userDTO.getName() + ", " + userDTO2.getName() + " 현재 상태: " + currentStatus);
 
         ChannelDTO channelDTO = new ChannelDTO("PUBLIC CHANNEL", "오픈 채널입니다.", "PUBLIC");
         Channel createdChannel = channelService.create(channelDTO);
         System.out.println("[채널 생성] 채널명: " + createdChannel.getName() + " | 타입: " + createdChannel.getType());
+
+        System.out.println(createdChannel);
+
+        ChannelJoinDTO joinDTO = new ChannelJoinDTO(createdUser.getId(), createdChannel.getId());
+        ChannelJoinDTO joinDTO2 = new ChannelJoinDTO(createdUser2.getId(), createdChannel.getId());
+        Map<User, Channel> result = channelService.join(joinDTO);
+        Map<User, Channel> result2 = channelService.join(joinDTO2);
+        System.out.println("[채널 가입] 채널 명 : " + createdChannel.getName() + " | 멤버 : " +result  + ", " + result2);
 
         MessageDTO messageDTO = new MessageDTO("안녕하세요! 채팅 시작합니다.", createdChannel.getId(), createdUser.getId());
         Message createdMessage = messageService.create(messageDTO);
         System.out.println("[메시지 전송]: " + "채널명: "+ createdChannel.getName() + " 보낸 유저: " + createdUser.getName() + " | 내용: " + createdMessage.getContent());
 
         ReadStatusDTO readStatus = readStatusService.create(new ReadStatusDTO(createdUser.getId(), createdChannel.getId(), Instant.now()));
-        System.out.println("[읽음 상태] 유저가 마지막으로 읽은 시간 업데이트: " + readStatus.getLastReadTime());
+        System.out.println("[읽음 상태] 유저가 마지막으로 읽은 시간 업데이트: " + readStatus.getLastReadTime() + ", 읽었는지 안읽었는지 : " + readStatusService.readOnOff(createdUser.getId()));
 
         UserStatusDTO foundUserStatus = userStatusService.find(createdUser.getId());
         System.out.println("[유저 상태 조회] 마지막 접속 시간: " + foundUserStatus.getLastSeen());

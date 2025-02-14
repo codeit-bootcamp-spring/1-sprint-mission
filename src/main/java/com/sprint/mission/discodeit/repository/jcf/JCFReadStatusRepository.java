@@ -30,4 +30,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     public void deleteByUserIdAndChannelId(String userId, String channelId) {
         readStatusStore.remove(userId + "-" + channelId);
     }
+
+    @Override
+    public Optional<ReadStatus> findByUserId(String userId) {
+        return Optional.empty();
+    }
 }

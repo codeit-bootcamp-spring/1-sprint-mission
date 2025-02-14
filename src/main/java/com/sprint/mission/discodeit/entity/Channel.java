@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -33,5 +35,11 @@ public class Channel implements Serializable {
         this.description = description;
         this.updatedAt = Instant.now();
         this.type = channelType;
+    }
+
+    private Set<User> members = new HashSet<>();
+
+    public void addMember(User user) {
+        this.members.add(user);
     }
 }

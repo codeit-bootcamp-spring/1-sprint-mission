@@ -49,4 +49,9 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public Optional<ReadStatus> findByUserId(String userId) {
+        return Optional.empty();
+    }
 }
