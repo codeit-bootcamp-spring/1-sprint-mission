@@ -25,8 +25,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean delete(Message message) {
-        Path messagePath = messageDirectory.resolve(message.getId().concat(".ser"));
+    public boolean delete(String messageId) {
+        Path messagePath = messageDirectory.resolve(messageId.concat(".ser"));
         return FileService.delete(messagePath);
     }
 
@@ -38,5 +38,10 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return FileService.load(messageDirectory);
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(String channelId) {
+        return findAll().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
     }
 }

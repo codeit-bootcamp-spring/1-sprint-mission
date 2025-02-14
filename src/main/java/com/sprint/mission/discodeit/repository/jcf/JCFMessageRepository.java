@@ -20,8 +20,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean delete(Message message) {
-        return data.remove(message.getId())!= null;
+    public boolean delete(String messageId) {
+        return data.remove(messageId)!= null;
     }
 
     @Override
@@ -32,5 +32,10 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return data.values().stream().toList();
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(String channelId) {
+        return data.values().stream().filter(m -> m.getChannelId().equals(channelId)).toList();
     }
 }

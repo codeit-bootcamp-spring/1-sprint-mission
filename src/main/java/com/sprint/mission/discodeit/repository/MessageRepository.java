@@ -8,9 +8,11 @@ public interface MessageRepository {
 
     Message save(Message message);
 
-    boolean delete(Message message);
+    boolean delete(String message);
 
     Message findById(String id);
 
     List<Message> findAll();
+
+    List<Message> findAllByChannelId(String channelId);
 }
