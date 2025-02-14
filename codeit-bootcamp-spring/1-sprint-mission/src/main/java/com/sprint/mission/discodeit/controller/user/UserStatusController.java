@@ -25,7 +25,7 @@ public class UserStatusController {
             @PathVariable(name = "userId") UUID userId,
             @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
     ) {
-        userStatusService.update(userId, userStatusUpdateRequest);
+        userStatusService.updateByUserId(userId, userStatusUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 }
