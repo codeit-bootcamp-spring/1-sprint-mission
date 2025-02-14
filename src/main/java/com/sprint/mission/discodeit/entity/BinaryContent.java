@@ -18,7 +18,7 @@ public class BinaryContent implements Serializable {
   private final String userId;
   private final String messageId;
   private final String fileName;
-  private final FileType fileType;
+  private final String fileType;
   private final long fileSize;
   private final byte[] data;
   private final boolean isProfilePicture;
@@ -41,12 +41,12 @@ public class BinaryContent implements Serializable {
     private String messageId;
     private String channelId;
     private final String fileName;
-    private final FileType fileType;
+    private final String fileType;
     private final long fileSize;
     private final byte[] data;
     private boolean isProfilePicture;
 
-    public BinaryContentBuilder(String userId, String fileName, FileType fileType, long fileSize, byte[] data) {
+    public BinaryContentBuilder(String userId, String fileName, String fileType, long fileSize, byte[] data) {
       this.isProfilePicture = false;
       this.userId = userId;
       this.fileName = fileName;

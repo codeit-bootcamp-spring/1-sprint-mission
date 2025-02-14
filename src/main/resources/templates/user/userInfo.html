@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 600px; margin: auto; padding: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>User Information</h2>
+    <p><strong>userId:</strong> <span th:text="${user.userId}"></span></p>
+    <p><strong>Username:</strong> <span th:text="${user.username}"></span></p>
+    <p><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+    <p><strong>Nickname:</strong> <span th:text="${user.nickname}"></span></p>
+    <p><strong>Phone Number:</strong> <span th:text="${user.phoneNumber}"></span></p>
+    <p><strong>Status:</strong> <span th:text="${user.userStatus ?: 'Unknown'}"></span></p>
+
+    <div th:if="${user.profilePictureBase64 != null}">
+        <img th:src="'data:image/png;base64,' + ${user.profilePictureBase64}"
+             alt="Profile Picture" width="100"/>
+    </div>
+    <p th:if="${user.profilePictureBase64 == null}">No Profile Picture</p>
+</div>
+</body>
+</html>

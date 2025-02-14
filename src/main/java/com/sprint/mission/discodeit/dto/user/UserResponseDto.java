@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.time.Instant;
+import java.util.Base64;
 
 public record UserResponseDto(
     String userId,
@@ -15,9 +16,9 @@ public record UserResponseDto(
     Instant createdAt,
     Instant lastOnlineAt,
     String userStatus,
-    BinaryContent profilePicture
+    String profilePictureBase64
 ) {
-  public static UserResponseDto from(User user, UserStatus userStatus, BinaryContent profilePicture){
+  public static UserResponseDto from(User user, UserStatus userStatus, BinaryContent profilePicture) {
     return new UserResponseDto(
         user.getUUID(),
         user.getUsername(),
@@ -27,7 +28,9 @@ public record UserResponseDto(
         user.getCreatedAt(),
         userStatus.getLastOnlineAt(),
         userStatus.getUserStatus().toString(),
-        profilePicture
+        profilePicture != null && profilePicture.getData() != null
+            ? Base64.getEncoder().encodeToString(profilePicture.getData())
+            : null
     );
   }
 }

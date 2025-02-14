@@ -3,10 +3,10 @@ package integration;
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
@@ -21,11 +21,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.FileConstant.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
@@ -45,8 +44,8 @@ public class BasicChannelServiceIntegrationTest {
   private UserRepository userRepository;
   @Autowired
   private ReadStatusRepository readStatusRepository;
-  private CreateUserDto userDto, userDto2;
-  private User user, user2;
+  private CreateUserRequest userDto, userDto2;
+  private UserResponseDto user, user2;
 
   @BeforeEach
   void setUp(){
@@ -54,18 +53,19 @@ public class BasicChannelServiceIntegrationTest {
     messageRepository.clear();
     userRepository.clear();
     readStatusRepository.clear();
+    MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
 
-    userDto = new CreateUserDto(
+    userDto = new CreateUserRequest(
         "testUser", "password123", "test@example.com",
-        "testNickname", "01012345678", new byte[]{1},
-        "profileImage", "jpg", "Test Description"
+        "testNickname", "01012345678", mockFile,
+        "Test Description"
     );
 
-    userDto2 = new CreateUserDto(
+    userDto2 = new CreateUserRequest(
         "testUser1", "password2", "test2@example.com",
-        "testNickname2", "01012345672", new byte[]{1},
-        "profileImage", "jpg", "Test Description"
+        "testNickname2", "01012345672", mockFile,
+        "Test Description"
     );
 
     user = userService.createUser(userDto);
@@ -78,7 +78,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         25,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -109,7 +109,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         25,
-        List.of(user.getUUID(), "randomUUID")
+        List.of(user.userId(), "randomUUID")
     );
 
     assertThatThrownBy(() -> channelService.createPrivateChannel(dto)).isInstanceOf(UserNotFoundException.class);
@@ -121,7 +121,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         25,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -129,7 +129,7 @@ public class BasicChannelServiceIntegrationTest {
     List<ReadStatus> statuses = readStatusService.findAllByChannelId(res.channelId());
     assertThat(statuses).isNotNull();
     assertThat(statuses).hasSize(1);
-    assertThat(statuses.get(0).getUserId()).isEqualTo(user.getUUID());
+    assertThat(statuses.get(0).getUserId()).isEqualTo(user.userId());
   }
 
 
@@ -144,7 +144,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         25,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -158,7 +158,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         44,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
 
@@ -181,7 +181,7 @@ public class BasicChannelServiceIntegrationTest {
     channelService.createPrivateChannel(dto3);
 
 
-    List<FindChannelResponseDto> res = channelService.findAllChannelsByUserId(user.getUUID());
+    List<FindChannelResponseDto> res = channelService.findAllChannelsByUserId(user.userId());
 
     assertThat(res).isNotNull();
     assertThat(res).hasSize(2);
@@ -221,7 +221,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         44,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -237,7 +237,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         44,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -253,7 +253,7 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         44,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
 
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
@@ -273,8 +273,8 @@ public class BasicChannelServiceIntegrationTest {
     );
     PublicChannelResponseDto res = channelService.createPublicChannel(dto);
 
-    List<FindChannelResponseDto> user1Channels = channelService.findAllChannelsByUserId(user.getUUID());
-    List<FindChannelResponseDto> user2Channels = channelService.findAllChannelsByUserId(user2.getUUID());
+    List<FindChannelResponseDto> user1Channels = channelService.findAllChannelsByUserId(user.userId());
+    List<FindChannelResponseDto> user2Channels = channelService.findAllChannelsByUserId(user2.userId());
 
     assertThat(user1Channels).extracting("channelName").contains("channelName");
     assertThat(user2Channels).extracting("channelName").contains("channelName");
@@ -287,13 +287,13 @@ public class BasicChannelServiceIntegrationTest {
         Channel.ChannelType.VOICE,
         "serverId",
         25,
-        List.of(user.getUUID())
+        List.of(user.userId())
     );
     PrivateChannelResponseDto res = channelService.createPrivateChannel(dto);
 
 
-    List<FindChannelResponseDto> channelsForUser1 = channelService.findAllChannelsByUserId(user.getUUID());
-    List<FindChannelResponseDto> channelsForUser2 = channelService.findAllChannelsByUserId(user2.getUUID());
+    List<FindChannelResponseDto> channelsForUser1 = channelService.findAllChannelsByUserId(user.userId());
+    List<FindChannelResponseDto> channelsForUser2 = channelService.findAllChannelsByUserId(user2.userId());
 
 
     assertThat(channelsForUser1).extracting("channelId").contains(res.channelId());

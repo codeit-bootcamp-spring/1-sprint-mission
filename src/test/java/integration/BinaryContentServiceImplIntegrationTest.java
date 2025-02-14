@@ -2,9 +2,9 @@ package integration;
 
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -12,16 +12,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FileType;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.FileConstant.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
@@ -35,25 +33,24 @@ public class BinaryContentServiceImplIntegrationTest {
   private UserRepository userRepository;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
-  private User user;
+  private UserResponseDto user;
 
   @BeforeEach
   void setUp() {
 
     userRepository.clear();
     binaryContentRepository.clear();
+    MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
 
     user = userService.createUser(
-        new CreateUserDto(
+        new CreateUserRequest(
             "username",
             "pwd",
             "test@example.com",
             "testNickname",
             "01012341234",
-            new byte[]{1},
-            "profileImage",
-            "jpg",
+            mockFile,
             "description"
         )
     );
@@ -63,10 +60,10 @@ public class BinaryContentServiceImplIntegrationTest {
   @Test
   void BinaryContent_생성_성공(){
     CreateBinaryContentDto dto = new CreateBinaryContentDto(
-        user.getUUID(),
+        user.userId(),
         null,
         "fileName",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1},
         false
@@ -77,7 +74,7 @@ public class BinaryContentServiceImplIntegrationTest {
     assertThat(binaryContent).isNotNull();
     assertThat(binaryContent.getData()).hasSize(3);
     assertThat(binaryContent.getMessageId()).isNull();
-    assertThat(binaryContent.getUserId()).isEqualTo(user.getUUID());
+    assertThat(binaryContent.getUserId()).isEqualTo(user.userId());
   }
 
   @Test
@@ -86,7 +83,7 @@ public class BinaryContentServiceImplIntegrationTest {
         "invalid-id",
         null,
         "fileName",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1}
     );
@@ -97,10 +94,10 @@ public class BinaryContentServiceImplIntegrationTest {
   @Test
   void BinaryContent_조회_성공(){
     CreateBinaryContentDto dto = new CreateBinaryContentDto(
-        user.getUUID(),
+        user.userId(),
         null,
         "fileName1",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1}
     );
@@ -117,18 +114,18 @@ public class BinaryContentServiceImplIntegrationTest {
   @Test
   void 여러_BinaryContent_ID로_조회_성공(){
     CreateBinaryContentDto dto = new CreateBinaryContentDto(
-        user.getUUID(),
+        user.userId(),
         null,
         "fileName",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1}
     );
     CreateBinaryContentDto dto2 = new CreateBinaryContentDto(
-        user.getUUID(),
+        user.userId(),
         null,
         "fileName2",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1}
     );
@@ -140,17 +137,17 @@ public class BinaryContentServiceImplIntegrationTest {
 
     assertThat(contents).isNotEmpty();
     assertThat(contents).hasSize(2);
-    assertThat(contents).extracting("userId").containsOnly(user.getUUID());
+    assertThat(contents).extracting("userId").containsOnly(user.userId());
     assertThat(contents).extracting("fileName").contains("fileName", "fileName2");
   }
 
   @Test
   void 삭제_성공(){
     CreateBinaryContentDto dto = new CreateBinaryContentDto(
-        user.getUUID(),
+        user.userId(),
         null,
         "fileName",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,1,1}
     );

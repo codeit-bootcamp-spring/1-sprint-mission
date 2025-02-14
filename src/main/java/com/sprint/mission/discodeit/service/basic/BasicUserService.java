@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserConstant;
 import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
@@ -24,12 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
 @Slf4j
@@ -48,7 +50,7 @@ public class BasicUserService implements UserService {
   /**
    * 사용자를 생성하는 메서드.
    *
-   * <p>{@link CreateUserDto}를 기반으로 새로운 사용자를 생성하고,
+   * <p>{@link CreateUserRequest}를 기반으로 새로운 사용자를 생성하고,
    * 프로필 이미지를 저장한 후, 사용자 상태 정보를 초기화하여 저장.</p>
    *
    * <p>username, email 이 다른 유저와 같다면 예외 발생</p>
@@ -65,7 +67,7 @@ public class BasicUserService implements UserService {
    * @throws IllegalArgumentException 필수 필드가 누락된 경우 발생
    */
   @Override
-  public User createUser(CreateUserDto userDto) {
+  public UserResponseDto createUser(CreateUserRequest userDto) {
 
     // User 객체 생성
     User user = createUserDtoToUser(userDto);
@@ -77,12 +79,23 @@ public class BasicUserService implements UserService {
     userRepository.create(user);
 
     // UserStatus 생성
-    userStatusService.create(new CreateUserStatusDto(user.getUUID(), Instant.now()));
+    UserStatus status = userStatusService.create(new CreateUserStatusDto(user.getUUID(), Instant.now()));
+    BinaryContent userProfileImage = null;
 
-    // 프로필 이미지가 같이 넘어왔다면 등록
-    saveProfileImage(user, userDto.imageName(), userDto.fileType(), userDto.profileImage());
+    try {
+      // 프로필 이미지가 같이 넘어왔다면 등록
+      if (userDto.profileImage() != null) {
+        userProfileImage = saveProfileImage(user, userDto.profileImage().getName(), userDto.profileImage().getContentType(), userDto.profileImage().getBytes());
+      }
+    } catch (IOException e) {
+      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
+    }
 
-    return user;
+    return UserResponseDto.from(
+        user,
+        status,
+        userProfileImage
+    );
   }
 
   /**
@@ -91,7 +104,7 @@ public class BasicUserService implements UserService {
    * @param userDto
    * @return User 객체
    */
-  private User createUserDtoToUser(CreateUserDto userDto) {
+  private User createUserDtoToUser(CreateUserRequest userDto) {
     return new User.UserBuilder(
         userDto.username(),
         PasswordEncryptor.hashPassword(userDto.password()),
@@ -126,29 +139,32 @@ public class BasicUserService implements UserService {
    * @param fileType  파일의 종류 (FileTypeProcessor 로 Enum 으로 변환)
    * @param file      실제 파일
    */
-  private void saveProfileImage(User user, String imageName, String fileType, byte[] file) {
+  private BinaryContent saveProfileImage(User user, String imageName, String fileType, byte[] file) {
     if (file != null && file.length != 0) {
       //TODO : 필드 예외 처리
 
-      if (user.getBinaryContentId() != null && !user.getBinaryContentId().isEmpty()) {
-        binaryContentService.delete(user.getBinaryContentId());
+      if (user.getProfileImage() != null) {
+        binaryContentService.delete(user.getProfileImage().getUUID());
       }
 
       CreateBinaryContentDto profileDto = new CreateBinaryContentDto(
           user.getUUID(),
           null,
           imageName,
-          FileTypeProcessor.process(fileType),
+          fileType,
           file.length,
           file,
           true
       );
 
       BinaryContent binary = binaryContentService.create(profileDto);
-      user.setBinaryContentId(binary.getUUID());
+      user.setProfileImage(binary);
       userRepository.update(user);
 
+      return binary;
     }
+
+    return null;
   }
 
 
@@ -188,7 +204,7 @@ public class BasicUserService implements UserService {
 
     UserStatus status = getUserStatusOrCreate(id);
 
-    BinaryContent profilePicture = getProfilePicture(user.getBinaryContentId());
+    BinaryContent profilePicture = user.getProfileImage();
 
     return UserResponseDto.from(user, status, profilePicture);
   }
@@ -263,8 +279,9 @@ public class BasicUserService implements UserService {
    * {@link UserResponseDto}  생성
    *
    * <p>
-   *   UserStatus 가 존재하지 않을 경우 생성
+   * UserStatus 가 존재하지 않을 경우 생성
    * </p>
+   *
    * @param users            사용자 리스트
    * @param userStatusMap    사용자ID : 사용자 UserStatus
    * @param binaryContentMap 사용자ID : 사용자 BinaryContent
@@ -285,8 +302,9 @@ public class BasicUserService implements UserService {
 
   /**
    * 사용자에게 할당된 UserStatus 가 없다면 생성
+   *
    * @param userStatusMap UserStatus Map
-   * @param userId 사용자 id
+   * @param userId        사용자 id
    * @return 기존에 존재하던 UserStatus 혹은 생성한 user status
    */
   private UserStatus getOrCreateUserStatus(Map<String, UserStatus> userStatusMap, String userId) {
@@ -305,8 +323,9 @@ public class BasicUserService implements UserService {
    *     <li>프로필 이미지 업데이트 및 사용자 레포지토리 반영</li>
    *   </ul>
    * </p>
-   * @param id 업데이트 할 사용자 id
-   * @param updatedUser 업데이트 정보가 담긴 DTO
+   *
+   * @param id            업데이트 할 사용자 id
+   * @param updatedUser   업데이트 정보가 담긴 DTO
    * @param plainPassword 사용자가 입력한 비밀번호
    */
   @Override
@@ -327,10 +346,11 @@ public class BasicUserService implements UserService {
   /**
    * 비밀번호에 대한 검증
    * 일치하지 않을 경우 {@link UserValidationException}
-   * @param plain 사용자가 입력한 비밀번호
+   *
+   * @param plain  사용자가 입력한 비밀번호
    * @param hashed 기존에 저장되어 있던 비밀번호
    */
-  private void checkPasswordIsCorrect(String plain, String hashed){
+  private void checkPasswordIsCorrect(String plain, String hashed) {
     if (!PasswordEncryptor.checkPassword(plain, hashed))
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
   }
@@ -344,10 +364,11 @@ public class BasicUserService implements UserService {
    *     <li>비밀번호는 해시화 하여 저장</li>
    *   </ul>
    * </p>
+   *
    * @param originalUser 업데이트 대상 User
-   * @param updatedUser 업데이트 될 정보
+   * @param updatedUser  업데이트 될 정보
    */
-  private void updateFields(User originalUser, UserUpdateDto updatedUser){
+  private void updateFields(User originalUser, UserUpdateDto updatedUser) {
 
     List<User> users = userRepository.findAll();
     if (updatedUser.nickname() != null) {
@@ -376,6 +397,7 @@ public class BasicUserService implements UserService {
   /**
    * 사용자를 조회하여 비밀번호 검증 후 삭제
    * 관련된 {@link UserStatus} {@link BinaryContent} 도 같이 삭제
+   *
    * @param id
    * @param password
    */
@@ -388,6 +410,8 @@ public class BasicUserService implements UserService {
 
     userRepository.delete(id);
     userStatusService.deleteByUserId(id);
-    binaryContentService.delete(user.getBinaryContentId());
+    if (user.getProfileImage() != null) {
+      binaryContentService.delete(user.getProfileImage().getUUID());
+    }
   }
 }

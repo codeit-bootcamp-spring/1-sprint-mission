@@ -48,12 +48,12 @@ public class BinaryContentServiceImplTest {
 
     user1 = new User.UserBuilder("username", "password", "email@gmail.com", "01012341234").nickname("nickname").build();
 
-    binaryContentDto = new BinaryContentDto("fileName", FileType.JPG, 3, new byte[]{1,2,3});
+    binaryContentDto = new BinaryContentDto("fileName", "FileType.JPG", 3, new byte[]{1,2,3});
     createBinaryContentDto = new CreateBinaryContentDto(
         user1.getUUID(),
         null,
         "fileName",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{1,2,3}
     );
@@ -62,7 +62,7 @@ public class BinaryContentServiceImplTest {
     content2 = new BinaryContent.BinaryContentBuilder(
         user1.getUUID(),
         "fileName2",
-        FileType.JPG,
+        "FileType.JPG",
         3,
         new byte[]{3,4,5}
     ).build();
@@ -89,7 +89,7 @@ public class BinaryContentServiceImplTest {
         .thenThrow(new UserNotFoundException());
 
     assertThatThrownBy(() -> binaryContentService.create(
-        new CreateBinaryContentDto("invalid-user-id", null, "fileName", FileType.JPG, 3, new byte[]{1, 2, 3})
+        new CreateBinaryContentDto("invalid-user-id", null, "fileName", "FileType.JPG", 3, new byte[]{1, 2, 3})
     )).isInstanceOf(UserNotFoundException.class);
   }
 

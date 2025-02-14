@@ -10,12 +10,12 @@ public record CreateBinaryContentDto(
     @NotBlank
     String fileName,
     @NotBlank
-    FileType fileType,
+    String fileType,
     long fileSize,
     byte[] data,
     boolean isProfile
 ) {
-    public CreateBinaryContentDto(String userId, String messageId, String fileName, FileType fileType, long fileSize, byte[] data) {
+    public CreateBinaryContentDto(String userId, String messageId, String fileName, String fileType, long fileSize, byte[] data) {
         this(userId, messageId, fileName, fileType, fileSize, data, false);
     }
 }

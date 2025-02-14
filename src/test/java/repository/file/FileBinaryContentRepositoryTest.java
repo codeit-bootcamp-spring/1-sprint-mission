@@ -43,12 +43,12 @@ public class FileBinaryContentRepositoryTest {
       assertTrue(file.delete(), "failed to delete file");
     }
 
-    content1 = new BinaryContent.BinaryContentBuilder("user1", "file1.png", FileType.JPG, 1024, new byte[]{1, 2, 3})
+    content1 = new BinaryContent.BinaryContentBuilder("user1", "file1.png", "FileType.JPG", 1024, new byte[]{1, 2, 3})
         .messageId("msg1")
         .channelId("channel1")
         .build();
 
-    content2 = new BinaryContent.BinaryContentBuilder("user2", "file2.mp4", FileType.MP4, 2048, new byte[]{4, 5, 6})
+    content2 = new BinaryContent.BinaryContentBuilder("user2", "file2.mp4", "FileType.MP4", 2048, new byte[]{4, 5, 6})
         .messageId("msg2")
         .channelId("channel2")
         .build();

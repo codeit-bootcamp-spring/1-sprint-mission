@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import java.util.Optional;
+import org.springframework.web.multipart.MultipartFile;
 
-public record CreateUserDto (
+public record CreateUserRequest(
     String username,
     String password,
     String email,
     String nickname,
     String phoneNumber,
-    byte[] profileImage,
-    String imageName,
-    String fileType,
-    String description){
+    MultipartFile profileImage,
+    String description
+) {
+
 }

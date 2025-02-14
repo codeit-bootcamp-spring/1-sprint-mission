@@ -3,15 +3,13 @@ package integration;
 import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
@@ -20,23 +18,18 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.util.FileType;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
 import java.util.List;
-import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.FileConstant.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
@@ -57,7 +50,7 @@ public class BasicMessageServiceIntegrationTest {
   private MessageRepository messageRepository;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
-  private User user;
+  private UserResponseDto user;
   private PrivateChannelResponseDto channel, channel2;
 
   @BeforeEach
@@ -67,30 +60,29 @@ public class BasicMessageServiceIntegrationTest {
     channelRepository.clear();;
     messageRepository.clear();
     binaryContentRepository.clear();
+    MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
     user = userService.createUser(
-        new CreateUserDto(
+        new CreateUserRequest(
             "username",
             "pwd",
             "test@example.com",
             "testNickname",
             "01012341234",
-            new byte[]{1},
-            "profileImage",
-            "jpg",
+            mockFile,
             "description"
         )
     );
 
     channel = channelService.createPrivateChannel(
         new CreatePrivateChannelDto(
-            Channel.ChannelType.VOICE, "serverId", 10, List.of(user.getUUID())
+            Channel.ChannelType.VOICE, "serverId", 10, List.of(user.userId())
         )
     );
 
     channel2 = channelService.createPrivateChannel(
         new CreatePrivateChannelDto(
-            Channel.ChannelType.VOICE, "serverId", 10, List.of(user.getUUID())
+            Channel.ChannelType.VOICE, "serverId", 10, List.of(user.userId())
         )
     );
 
@@ -98,13 +90,13 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 메시지_생성_성공(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
 
     MessageResponseDto res = messageService.createMessage(messageDto);
 
     assertThat(res).isNotNull();
     assertThat(res.data()).isEmpty();
-    assertThat(res.userId()).isEqualTo(user.getUUID());
+    assertThat(res.userId()).isEqualTo(user.userId());
     assertThat(res.content()).isEqualTo("message");
   }
 
@@ -117,14 +109,14 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 존재하지_않는_채널_메시지_생성_실패(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), "invalid-channel", "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), "invalid-channel", "message", List.of());
 
     assertThatThrownBy(() -> messageService.createMessage(messageDto)).isInstanceOf(ChannelNotFoundException.class);
   }
 
   @Test
   void 메시지_ID_조회_성공(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
 
     MessageResponseDto res = messageService.createMessage(messageDto);
     MessageResponseDto message = messageService.getMessageById(res.messageId());
@@ -140,9 +132,9 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 채널_ID_로_메시지_조회(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
-    CreateMessageDto messageDto2 = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
-    CreateMessageDto messageDto3 = new CreateMessageDto(user.getUUID(), channel2.channelId(), "channel2Message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto2 = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto3 = new CreateMessageDto(user.userId(), channel2.channelId(), "channel2Message", List.of());
 
 
     messageService.createMessage(messageDto);
@@ -158,10 +150,10 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 메시지_수정_성공(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
     MessageResponseDto created = messageService.createMessage(messageDto);
 
-    MessageUpdateDto updateDto = new MessageUpdateDto(created.messageId(), user.getUUID(), "new message", List.of());
+    MessageUpdateDto updateDto = new MessageUpdateDto(created.messageId(), user.userId(), "new message", List.of());
     MessageResponseDto updatedRes = messageService.updateMessage(updateDto);
 
     MessageResponseDto m = messageService.getMessageById(created.messageId());
@@ -179,7 +171,7 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 메시지_삭제_성공(){
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
     MessageResponseDto created = messageService.createMessage(messageDto);
 
     messageService.deleteMessage(created.messageId());
@@ -189,9 +181,9 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 메시지의_첨부파일_불러오기_성공(){
-    BinaryContentDto binaryContentDto = new BinaryContentDto("image1", FileType.JPG, 3, new byte[]{1,2,3});
-    BinaryContentDto binaryContentDto2 = new BinaryContentDto("image2", FileType.JPG, 4, new byte[]{1,2,3,4});
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of(binaryContentDto, binaryContentDto2));
+    BinaryContentDto binaryContentDto = new BinaryContentDto("image1", "FileType.JPG", 3, new byte[]{1,2,3});
+    BinaryContentDto binaryContentDto2 = new BinaryContentDto("image2", "FileType.JPG", 4, new byte[]{1,2,3,4});
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of(binaryContentDto, binaryContentDto2));
     MessageResponseDto created = messageService.createMessage(messageDto);
 
     assertThat(created.data()).extracting("fileName").contains("image1", "image2");
@@ -200,45 +192,42 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 다른_사용자의_메시지_수정_실패(){
-    User tmpUser = userService.createUser(
-        new CreateUserDto(
+    UserResponseDto tmpUser = userService.createUser(
+        new CreateUserRequest(
             "uname",
             "pwd2",
             "email2@email.com",
             "nick2",
             "01012312312",
             null,
-            null,
-            null,
+
             "description"
         )
     );
 
-    CreateMessageDto messageDto = new CreateMessageDto(user.getUUID(), channel.channelId(), "message", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(user.userId(), channel.channelId(), "message", List.of());
     MessageResponseDto created = messageService.createMessage(messageDto);
 
-    MessageUpdateDto updateDto = new MessageUpdateDto(created.messageId(), tmpUser.getUUID(), "new content", List.of());
+    MessageUpdateDto updateDto = new MessageUpdateDto(created.messageId(), tmpUser.userId(), "new content", List.of());
 
     assertThatThrownBy(() -> messageService.updateMessage(updateDto)).isInstanceOf(InvalidOperationException.class);
   }
 
   @Test
   void 채널에_속하지_않은_사용자의_메시지_생성_실패(){
-    User tmpUser = userService.createUser(
-        new CreateUserDto(
+    UserResponseDto tmpUser = userService.createUser(
+        new CreateUserRequest(
             "uname",
             "pwd2",
             "email2@email.com",
             "nick2",
             "01012312312",
             null,
-            null,
-            null,
             "description"
         )
     );
 
-    CreateMessageDto messageDto = new CreateMessageDto(tmpUser.getUUID(), channel.channelId(), "content", List.of());
+    CreateMessageDto messageDto = new CreateMessageDto(tmpUser.userId(), channel.channelId(), "content", List.of());
 
     assertThatThrownBy(() -> messageService.createMessage(messageDto)).isInstanceOf(InvalidOperationException.class );
   }

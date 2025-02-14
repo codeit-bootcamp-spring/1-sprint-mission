@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
 
     userStatusRepository.save(userStatus);
 
-    BinaryContent content = binaryContentRepository.findById(targetUser.getBinaryContentId()).orElse(null);
+    BinaryContent content = targetUser.getProfileImage();
 
     return UserResponseDto.from(targetUser, userStatus, content);
   }

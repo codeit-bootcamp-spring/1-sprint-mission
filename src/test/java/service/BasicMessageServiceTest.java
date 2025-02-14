@@ -114,7 +114,7 @@ public class BasicMessageServiceTest {
   @Test
   void testGetMessagesByChannel(){
 
-    BinaryContent binary1 = new BinaryContent.BinaryContentBuilder("user1", "file1.jpg", FileType.JPG, 1024, new byte[]{1,2,3})
+    BinaryContent binary1 = new BinaryContent.BinaryContentBuilder("user1", "file1.jpg", "FileType.JPG", 1024, new byte[]{1,2,3})
         .messageId(message1.getUUID())
         .channelId(channel1.getUUID())
         .build();
@@ -140,7 +140,7 @@ public class BasicMessageServiceTest {
   @Test
   void testUpdateMessage_Success(){
 
-    BinaryContentDto binaryDto = new BinaryContentDto("file1", FileType.JPG, 1024, new byte[]{1,2,3});
+    BinaryContentDto binaryDto = new BinaryContentDto("file1", "FileType.JPG", 1024, new byte[]{1,2,3});
     BinaryContent newBinaryContent = new BinaryContent.BinaryContentBuilder(user1.getUUID(), binaryDto.fileName(), binaryDto.fileType(), binaryDto.fileSize(), binaryDto.data()).messageId(message1.getUUID()).channelId(channel1.getUUID()).build();
 
     MessageUpdateDto updateDto = new MessageUpdateDto(message1.getUUID(), user1.getUUID(), "new content", List.of(binaryDto));
@@ -162,7 +162,7 @@ public class BasicMessageServiceTest {
 
   @Test
   void testUpdateMessage_Fail(){
-    BinaryContentDto binaryDto = new BinaryContentDto("file1", FileType.JPG, 1024, new byte[]{1,2,3});
+    BinaryContentDto binaryDto = new BinaryContentDto("file1", "FileType.JPG", 1024, new byte[]{1,2,3});
 
     MessageUpdateDto updateDto = new MessageUpdateDto(message1.getUUID(), user1.getUUID(), "new content", List.of(binaryDto));
 

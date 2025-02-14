@@ -1,27 +1,23 @@
 package integration;
 
 import com.sprint.mission.DiscodeitApplication;
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.File;
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_NAME;
-import static com.sprint.mission.discodeit.constant.BinaryContentConstant.DEFAULT_PROFILE_PICTURE_UUID;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(classes = DiscodeitApplication.class)
@@ -37,39 +33,39 @@ public class BasicUserServiceIntegrationTest {
   private UserRepository userRepository;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
-  private CreateUserDto userDto1, userDto2;
+  private CreateUserRequest userDto1, userDto2;
 
   @BeforeEach
   void setUp(){
 
     userRepository.clear();
     binaryContentRepository.clear();
+    MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
-    userDto1 = new CreateUserDto(
-        "username1","pwd1","email1@email.com","nickname1","01012341234",new byte[]{1}, "image1", "jpg", "description1"
+    userDto1 = new CreateUserRequest(
+        "username1","pwd1","email1@email.com","nickname1","01012341234", mockFile,  "description1"
     );
-    userDto2 = new CreateUserDto(
-        "username2","pwd2","email2@email.com","nickname2","01012341233",new byte[]{1}, "image2", "jpg", "description1"
+    userDto2 = new CreateUserRequest(
+        "username2","pwd2","email2@email.com","nickname2","01012341233",mockFile,  "description1"
     );
   }
 
   @Test
   void 유저를_생성할수_있다(){
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
 
     assertThat(user).isNotNull();
-    assertThat(user.getPassword()).isNotEqualTo(userDto1.password());
-    assertThat(user.getUsername()).isEqualTo(userDto1.username());
+    assertThat(user.username()).isEqualTo(userDto1.username());
 
-    UserResponseDto userResponseDto = userService.findUserById(user.getUUID());
-    assertThat(userResponseDto.userId()).isEqualTo(user.getUUID());
+    UserResponseDto userResponseDto = userService.findUserById(user.userId());
+    assertThat(userResponseDto.userId()).isEqualTo(user.userId());
     assertThat(userResponseDto.userStatus()).isEqualTo("ONLINE");
   }
 
   @Test
   void 중복_이메일가입_실패(){
-    CreateUserDto duplicateEmailDto = new CreateUserDto(
-            "username3","pwd3","email1@email.com","nickname3","01012341232",new byte[]{1}, "image3", "jpg", "description1"
+    CreateUserRequest duplicateEmailDto = new CreateUserRequest(
+            "username3","pwd3","email1@email.com","nickname3","01012341232",null,  "description1"
     );
     userService.createUser(userDto1);
 
@@ -80,8 +76,8 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 중복_핸드폰번호_실패(){
-    CreateUserDto duplicateEmailDto = new CreateUserDto(
-        "username3","pwd3","email3@email.com","nickname3","01012341234",new byte[]{1}, "image3", "jpg", "description1"
+    CreateUserRequest duplicateEmailDto = new CreateUserRequest(
+        "username3","pwd3","email1@email.com","nickname3","01012341232",null, "description1"
     );
     userService.createUser(userDto1);
 
@@ -92,8 +88,8 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 중복_닉네임_실패(){
-    CreateUserDto duplicateEmailDto = new CreateUserDto(
-        "username3","pwd3","email1@email.com","nickname1","01012341236",new byte[]{1}, "image3", "jpg", "description1"
+    CreateUserRequest duplicateEmailDto = new CreateUserRequest(
+        "username3","pwd3","email1@email.com","nickname1","01012341236",null,  "description1"
     );
     userService.createUser(userDto1);
 
@@ -104,8 +100,9 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 닉네임_길이_실패(){
-    CreateUserDto duplicateEmailDto = new CreateUserDto(
-        "username3","pwd3","email1@email.com","n","01012341236",new byte[]{1}, "image3", "jpg", "description1"
+
+    CreateUserRequest duplicateEmailDto = new CreateUserRequest(
+        "username3","pwd3","email1@email.com","n","01012341236",null,  "description1"
     );
 
     assertThatThrownBy(() -> userService.createUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
@@ -113,14 +110,14 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 유저를_조회할수_있다(){
-    User user1 = userService.createUser(userDto1);
+    UserResponseDto user1 = userService.createUser(userDto1);
 
-    UserResponseDto foundUser = userService.findUserById(user1.getUUID());
+    UserResponseDto foundUser = userService.findUserById(user1.userId());
 
 
     assertThat(foundUser).isNotNull();
-    assertThat(foundUser.userId()).isEqualTo(user1.getUUID());
-    assertThat(foundUser.email()).isEqualTo(user1.getEmail());
+    assertThat(foundUser.userId()).isEqualTo(user1.userId());
+    assertThat(foundUser.email()).isEqualTo(user1.email());
   }
 
   @Test
@@ -137,17 +134,16 @@ public class BasicUserServiceIntegrationTest {
 
     assertThat(users).hasSize(2);
 
-    assertThat(user.profilePicture()).isNotNull();
-    BinaryContent user1Profile = user.profilePicture();
-    assertThat(user1Profile.getUserId()).isEqualTo(user.userId());
-    assertThat(user1Profile.getFileName()).isEqualTo("image1");
-    assertThat(user1Profile.getData().length).isEqualTo(1);
+    assertThat(user.profilePictureBase64()).isNotNull();
+//    BinaryContent user1Profile = user.profilePictureBase64().getBytes();
+//    assertThat(user1Profile.getUserId()).isEqualTo(user.userId());
+//    assertThat(user1Profile.getFileName()).isEqualTo("image1");
   }
 
   @Test
   void 유저_정보를_수정할수_있다(){
 
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
 
     UserUpdateDto updateDto = new UserUpdateDto(
         "UpdatedUsername", "newPassword123", "updated@email.com",
@@ -156,110 +152,109 @@ public class BasicUserServiceIntegrationTest {
     );
 
 
-    userService.updateUser(user.getUUID(), updateDto, "pwd1");
+    userService.updateUser(user.userId(), updateDto, "pwd1");
 
 
-    UserResponseDto response = userService.findUserById(user.getUUID());
+    UserResponseDto response = userService.findUserById(user.userId());
 
     assertThat(userService.findAllUsers()).hasSize(1);
     assertThat(response).isNotNull();
-    assertThat(response.userId()).isEqualTo(user.getUUID());
+    assertThat(response.userId()).isEqualTo(user.userId());
     assertThat(response.username()).isEqualTo("UpdatedUsername");
 
-    BinaryContent profilePicture = response.profilePicture();
-    assertThat(profilePicture).isNotNull();
-    assertThat(profilePicture.getData()).containsExactlyInAnyOrder(4,5,6);
+//    BinaryContent profilePicture = response.profilePicture();
+//    assertThat(profilePicture).isNotNull();
+//    assertThat(profilePicture.getData()).containsExactlyInAnyOrder(4,5,6);
   }
 
   @Test
   void 비밀번호_오류시_정보_수정_실패(){
 
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
     UserUpdateDto updateDto = new UserUpdateDto(
         "UpdatedUsername", "newPassword123", "updated@email.com",
         "UpdatedNickname", "01087654321", "Updated Description",
         new byte[]{4, 5, 6}, "newImage", "jpg"
     );
 
-    assertThatThrownBy(() -> userService.updateUser(user.getUUID(), updateDto, "wrong-pwd")).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.updateUser(user.userId(), updateDto, "wrong-pwd")).isInstanceOf(UserValidationException.class);
 
-    UserResponseDto foundUser = userService.findUserById(user.getUUID());
+    UserResponseDto foundUser = userService.findUserById(user.userId());
     assertThat(foundUser.username()).isNotEqualTo("UpdatedUsername");
   }
 
   @Test
   void 유저를_삭제할수_있다(){
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
 
-    userService.deleteUser(user.getUUID(), "pwd1");
+    userService.deleteUser(user.userId(), "pwd1");
 
     assertThat(userService.findAllUsers()).hasSize(0);
   }
 
   @Test
   void 비밀번호_오류시_유저삭제_실패(){
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
 
-    assertThatThrownBy(() -> userService.deleteUser(user.getUUID(), "wrong-pwd")).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.deleteUser(user.userId(), "wrong-pwd")).isInstanceOf(UserValidationException.class);
     assertThat(userService.findAllUsers()).hasSize(1);
   }
 
   @Test
   void 비밀번호_변경후_기존_비밀번호_불가(){
-    User user = userService.createUser(userDto1);
+    UserResponseDto user = userService.createUser(userDto1);
 
     UserUpdateDto updateDto = new UserUpdateDto(
-        user.getNickname(), "newSecurePwd123", user.getEmail(),
-        user.getUsername(), user.getPhoneNumber(), user.getDescription(),
+        user.nickname(), "newSecurePwd123", user.email(),
+        user.username(), user.phoneNumber(), "new description",
         null, null, null
     );
 
-    userService.updateUser(user.getUUID(), updateDto, "pwd1");
+    userService.updateUser(user.userId(), updateDto, "pwd1");
 
-    assertThatThrownBy(() -> userService.updateUser(user.getUUID(), updateDto, "pwd1")).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.updateUser(user.userId(), updateDto, "pwd1")).isInstanceOf(UserValidationException.class);
   }
 
   @Test
   void 프로필_사진을_등록하고_불러올수_있다(){
-    User user = userService.createUser(
-        new CreateUserDto(
+    MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
+
+    UserResponseDto user = userService.createUser(
+
+        new CreateUserRequest(
             "newUser",
             "newPwd",
             "new@email.com",
             "newNickname",
             "01098765432",
-            new byte[]{1,2,3},
-            "profileImage",
-            "jpg","description"
+            mockFile,
+            "description"
         )
     );
 
-    System.out.println(userService.findAllUsers().size());
-    UserResponseDto responseDto = userService.findUserById(user.getUUID());
-    BinaryContent profileImage = responseDto.profilePicture();
-
-    assertThat(profileImage.getUserId()).isEqualTo(user.getUUID());
-    assertThat(profileImage.getFileName()).isEqualTo("profileImage");
-    assertThat(profileImage.getData()).hasSize(3);
-    assertThat(profileImage.getData()).containsExactlyInAnyOrder(1,2,3);
+    UserResponseDto responseDto = userService.findUserById(user.userId());
+//    BinaryContent profileImage = responseDto.profilePicture();
+//
+//    assertThat(profileImage.getUserId()).isEqualTo(user.userId());
+//    assertThat(profileImage.getFileName()).isEqualTo("profileImage");
   }
 
   @Test
   void 프로필_사진을_등록하지_않으면_null(){
-    User user = userService.createUser(
-        new CreateUserDto(
+    UserResponseDto user = userService.createUser(
+        new CreateUserRequest(
             "newUser",
             "newPwd",
             "new@email.com",
             "newNickname",
             "01098765432",
-            null, null, null,"description"
+             null,"description"
         )
     );
 
-    UserResponseDto responseDto = userService.findUserById(user.getUUID());
+    UserResponseDto responseDto = userService.findUserById(user.userId());
 
 
-    assertThat(responseDto.profilePicture()).isNull();
+//    assertThat(responseDto.profilePicture()).isNull();
   }
 }

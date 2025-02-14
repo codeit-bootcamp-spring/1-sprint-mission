@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.constant.UserConstant;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
@@ -21,11 +20,11 @@ public class User implements Serializable {
   private String email;
   private String nickname;
   private String phoneNumber;
-  private String binaryContentId;
   private String description;
   private String userStatusId;
   private Instant createdAt;
   private Instant updatedAt;
+  private BinaryContent profileImage;
 
   private User(UserBuilder builder) {
     this.UUID = UuidGenerator.generateUUID();
@@ -34,7 +33,7 @@ public class User implements Serializable {
     this.email = builder.email;
     this.nickname = builder.nickname;
     this.phoneNumber = builder.phoneNumber;
-    this.binaryContentId = builder.binaryContentId;
+    this.profileImage = builder.profilePicture;
     this.description = builder.description;
     this.userStatusId = builder.userStatusId;
     this.createdAt = Instant.now();
@@ -48,7 +47,7 @@ public class User implements Serializable {
     private String userStatusId;
     private String nickname;
     private String phoneNumber;
-    private String binaryContentId;
+    private BinaryContent profilePicture;
     private String description;
 
     public UserBuilder(String username, String password, String email, String phoneNumber) throws UserValidationException {
@@ -63,8 +62,8 @@ public class User implements Serializable {
       return this;
     }
 
-    public UserBuilder binaryContentId(String binaryContentId ) {
-      this.binaryContentId = binaryContentId;
+    public UserBuilder binaryContentId(BinaryContent profilePicture) {
+      this.profilePicture = profilePicture;
       return this;
     }
 
@@ -89,7 +88,7 @@ public class User implements Serializable {
         "USER: username='" + username + '\'' +
         ", email='" + email + '\'' +
         ", nickname='" + nickname + '\'' +
-        ", phoneNumber='" + phoneNumber + '\'' + ", binaryID: " + binaryContentId +
+        ", phoneNumber='" + phoneNumber + '\'' +
         '}';
   }
 

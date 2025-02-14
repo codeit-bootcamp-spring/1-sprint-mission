@@ -27,14 +27,14 @@ public class JCFBinaryContentRepositoryTest {
   void setUp(){
     repository = new JCFBinaryContentRepository();
     repository.clear();
-    binaryContent1 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
+    binaryContent1 = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1}).build();
 
-    binaryContent2 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1})
+    binaryContent2 = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1})
         .channelId("channel1")
         .messageId("message1")
         .build();
 
-    binaryContent3 = new BinaryContent.BinaryContentBuilder("user2", "file2", FileType.JPG, 10, new byte[]{1,1,1,1})
+    binaryContent3 = new BinaryContent.BinaryContentBuilder("user2", "file2", "FileType.JPG", 10, new byte[]{1,1,1,1})
         .channelId("channel2")
         .messageId("message2")
         .build();
@@ -46,7 +46,7 @@ public class JCFBinaryContentRepositoryTest {
 
   @Test
   void testSave(){
-    BinaryContent newContent = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
+    BinaryContent newContent = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1}).build();
     repository.save(newContent);
 
     Optional<BinaryContent> saved = repository.findById(newContent.getUUID());
@@ -55,9 +55,9 @@ public class JCFBinaryContentRepositoryTest {
 
   @Test
   void testSaveMultipleBinaryContentAndFindAll(){
-    BinaryContent newContent1 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
-    BinaryContent newContent2 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
-    BinaryContent newContent3 = new BinaryContent.BinaryContentBuilder("user1", "file1", FileType.JPG, 10, new byte[]{1,1,1,1}).build();
+    BinaryContent newContent1 = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1}).build();
+    BinaryContent newContent2 = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1}).build();
+    BinaryContent newContent3 = new BinaryContent.BinaryContentBuilder("user1", "file1", "FileType.JPG", 10, new byte[]{1,1,1,1}).build();
 
     repository.saveMultipleBinaryContent(List.of(newContent1, newContent2, newContent3));
 
