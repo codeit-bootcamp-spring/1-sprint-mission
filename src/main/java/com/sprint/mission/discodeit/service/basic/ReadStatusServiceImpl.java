@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -77,6 +79,17 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public List<ReadStatus> findAllByChannelId(String channelId) {
     return readStatusRepository.findByChannelId(channelId);
+  }
+
+  @Override
+  public Map<String, List<String>> getUserIdsForChannelReadStatuses(List<Channel> channels) {
+    List<String> channelIds = channels.stream().map(Channel::getUUID).toList();
+    return channelIds.stream()
+        .collect(Collectors.toMap(
+            id -> id,
+            id -> readStatusRepository.findByChannelId(id).stream()
+                .map(ReadStatus::getUserId).toList()
+        ));
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
@@ -17,7 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -28,9 +31,6 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  private final EntityValidator validator;
-
-  private final BinaryContentService binaryContentService;
 
   @Override
   public Message createMessage(Message message) {
@@ -56,6 +56,24 @@ public class BasicMessageService implements MessageService {
   public List<Message> getMessagesByChannel(String channelId) {
     return messageRepository.findByChannel(channelId);
   }
+
+  @Override
+  public Message getLatestMessageByChannel(String channelId) {
+    return messageRepository.findLatestChannelMessage(channelId).orElse(null);
+  }
+
+  @Override
+  public Map<String, Instant> getLatestMessageForChannels(List<Channel> channels) {
+    List<String> channelIds = channels.stream().map(Channel::getUUID).toList();
+    return channelIds.stream()
+        .collect(Collectors.toMap(
+            id -> id,
+            id -> messageRepository.findLatestChannelMessage(id)
+                .map(Message::getCreatedAt)
+                .orElse(Instant.EPOCH)
+        ));
+  }
+
 
   @Override
   public void deleteMessage(String messageId) {

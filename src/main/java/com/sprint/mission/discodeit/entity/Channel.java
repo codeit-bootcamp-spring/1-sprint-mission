@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +55,7 @@ public class Channel implements Serializable {
     private ChannelType channelType;
     private int maxNumberOfPeople = 50;
     private Boolean isPrivate = false;
-    private List<String> participatingUsers;
+    private List<String> participatingUsers = new ArrayList<>();
 
     public ChannelBuilder(String channelName, ChannelType channelType) {
       if (channelName == null || channelName.isEmpty()) {

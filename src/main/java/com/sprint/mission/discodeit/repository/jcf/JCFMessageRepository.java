@@ -1,13 +1,10 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,7 +56,7 @@ public class JCFMessageRepository implements MessageRepository{
   }
 
   @Override
-  public Message findLatestChannelMessage(String channelId){
+  public Optional<Message> findLatestChannelMessage(String channelId){
     return data.values().stream()
         .filter(m -> m.getChannelUUID().equals(channelId))
         .max(Comparator.comparing(Message::getCreatedAt))

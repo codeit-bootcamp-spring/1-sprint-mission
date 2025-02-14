@@ -15,16 +15,12 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -35,6 +31,7 @@ public class BasicMessageFacade implements MessageFacade {
   private final MessageService messageService;
   private final MessageMapper messageMapper;
   private final BinaryContentService binaryContentService;
+  private final ChannelService channelService;
   private final EntityValidator validator;
 
   @Override
@@ -44,7 +41,7 @@ public class BasicMessageFacade implements MessageFacade {
 
     Channel channel = validator.findOrThrow(Channel.class, messageDto.getChannelId(), new ChannelNotFoundException());
 
-    checkIfUserBelongsToPrivateChannel(channel, messageDto);
+    channelService.validateUserAccess(channel, user.getUUID());
 
     Message message = messageService.createMessage(messageMapper.toEntity(messageDto));
 
@@ -94,11 +91,4 @@ public class BasicMessageFacade implements MessageFacade {
     messageService.deleteMessage(messageId);
   }
 
-  private void checkIfUserBelongsToPrivateChannel(Channel channel, CreateMessageDto messageDto) {
-    if (channel.getIsPrivate()) {
-      channel.getParticipatingUsers().stream().filter(id -> id.equals(messageDto.getUserId())).findAny().orElseThrow(
-          () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
-      );
-    }
-  }
 }

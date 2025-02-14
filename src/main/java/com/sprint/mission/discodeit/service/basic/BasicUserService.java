@@ -48,7 +48,6 @@ public class BasicUserService implements UserService {
 
     // user 생성
     return userRepository.create(user);
-
   }
 
   @Override

@@ -15,17 +15,4 @@ public record FindChannelResponseDto(
     List<String> userIds,
     int maxNumberOfPeople
 ) {
-  public static FindChannelResponseDto from(Channel channel, Instant lastMessagedAt, List<String> userIds){
-    boolean isPrivate = channel.getIsPrivate();
-    return new FindChannelResponseDto(
-        channel.getUUID(),
-        isPrivate ? null : channel.getChannelName(),
-        channel.getServerUUID(),
-        channel.getChannelType(),
-        channel.getCreatedAt(),
-        lastMessagedAt,
-        userIds,
-        channel.getMaxNumberOfPeople()
-    );
-  }
 }

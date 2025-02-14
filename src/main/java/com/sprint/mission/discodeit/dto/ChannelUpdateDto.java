@@ -16,7 +16,6 @@ public class ChannelUpdateDto {
   @Max(50)
   private Integer maxNumberOfPeople;
 
-
   public ChannelUpdateDto(String channelId, String channelName, Integer maxNumberOfPeople) {
     this.channelId = channelId;
     this.channelName = channelName;
