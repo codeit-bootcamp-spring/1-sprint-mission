@@ -26,16 +26,15 @@ public class UserStatusServiceImpl implements UserStatusService {
   private final EntityValidator validator;
 
   @Override
-  public UserStatus create(CreateUserStatusDto dto) {
+  public UserStatus create(UserStatus status) {
 
-    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
+    validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
 
-    if (userStatusRepository.findByUserId(dto.userId()).isPresent()) {
+    if (userStatusRepository.findByUserId(status.getUserId()).isPresent()) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
 
-    UserStatus userStatus = new UserStatus(dto.userId(), Instant.now());
-    return userStatusRepository.save(userStatus);
+    return userStatusRepository.save(status);
   }
 
   @Override
@@ -46,7 +45,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatus findByUserId(String userId) {
     validator.findOrThrow(User.class, userId, new UserNotFoundException());
-    return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new CreateUserStatusDto(userId, Instant.now())));
+    return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new UserStatus(userId, Instant.now())));
   }
 
   @Override

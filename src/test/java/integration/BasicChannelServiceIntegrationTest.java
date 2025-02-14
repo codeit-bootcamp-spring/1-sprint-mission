@@ -68,8 +68,8 @@ public class BasicChannelServiceIntegrationTest {
         "Test Description"
     );
 
-    user = userService.createUser(userDto);
-    user2 = userService.createUser(userDto2);
+    user = userService.saveUser(userDto);
+    user2 = userService.saveUser(userDto2);
   }
 
   @Test

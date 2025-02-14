@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
@@ -28,15 +27,19 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   private final EntityValidator validator;
 
   @Override
-  public BinaryContent create(CreateBinaryContentDto dto) {
+  public BinaryContent create(BinaryContent content) {
 
-    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
+    validator.findOrThrow(User.class, content.getUserId(), new UserNotFoundException());
 
-    BinaryContent binaryContent = dto.isProfile()
-        ? new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).isProfilePicture().build()
-        : new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).build();
+    // 기존에 존재하던 프로필 삭제. 그냥 교채로 바꿀수도?
+    if (content.isProfilePicture()) {
+      BinaryContent originalProfile = binaryContentRepository.findByUserId(content.getUserId()).stream().filter(BinaryContent::isProfilePicture).findFirst().orElse(null);
+      if (originalProfile != null) {
+        binaryContentRepository.deleteById(originalProfile.getUUID());
+      }
+    }
 
-    return binaryContentRepository.save(binaryContent);
+    return binaryContentRepository.save(content);
   }
 
   @Override

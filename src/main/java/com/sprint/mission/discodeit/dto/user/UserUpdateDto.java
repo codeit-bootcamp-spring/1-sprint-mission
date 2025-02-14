@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.user;
 
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -12,8 +13,6 @@ public record UserUpdateDto(
     String nickname,
     String phoneNumber,
     String description,
-    byte[] profileImage,
-    String imageName,
-    String fileType
+    MultipartFile profileImage
 ) {}
 

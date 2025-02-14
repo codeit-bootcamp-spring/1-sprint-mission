@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
       throw new UserValidationException();
     }
 
-    UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new CreateUserStatusDto(targetUser.getUUID(),Instant.now())));
+    UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getUUID(),Instant.now())));
 
     userStatus.updateLastOnline();
 

@@ -99,7 +99,7 @@ public class BasicUserServiceTest {
       return new UserStatus(dto.userId(), dto.lastOnlineAt());
     });
 
-    UserResponseDto user = userService.createUser(createUserDto);
+    UserResponseDto user = userService.saveUser(createUserDto);
 
     assertThat(createUserDto.username()).isEqualTo(user.username());
     assertThat(createUserDto.email()).isEqualTo(user.email());
@@ -135,7 +135,7 @@ public class BasicUserServiceTest {
         "description"
     );
 
-    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_INVALID_EMAIL);
+    assertThatThrownBy(() -> userService.saveUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_INVALID_EMAIL);
   }
 
   @Test
@@ -154,7 +154,7 @@ public class BasicUserServiceTest {
 
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
-    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_EMAIL);
+    assertThatThrownBy(() -> userService.saveUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_EMAIL);
   }
 
   @Test
@@ -170,7 +170,7 @@ public class BasicUserServiceTest {
         mockFile,
         "description"
     );
-    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_INVALID_PHONE);
+    assertThatThrownBy(() -> userService.saveUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_INVALID_PHONE);
   }
 
   @Test
@@ -189,7 +189,7 @@ public class BasicUserServiceTest {
 
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
 
-    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_PHONE);
+    assertThatThrownBy(() -> userService.saveUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(DUPLICATE_PHONE);
   }
 
 
@@ -208,7 +208,7 @@ public class BasicUserServiceTest {
     );
 
     when(userRepository.findAll()).thenReturn(List.of(user1, user2));
-    assertThatThrownBy(() -> userService.createUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_USERNAME_LENGTH);
+    assertThatThrownBy(() -> userService.saveUser(createUserDto)).isInstanceOf(UserValidationException.class).hasMessageContaining(ERROR_USERNAME_LENGTH);
   }
 
   @Test

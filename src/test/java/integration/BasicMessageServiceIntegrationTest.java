@@ -21,7 +21,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.FileType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class BasicMessageServiceIntegrationTest {
     binaryContentRepository.clear();
     MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
-    user = userService.createUser(
+    user = userService.saveUser(
         new CreateUserRequest(
             "username",
             "pwd",
@@ -192,7 +191,7 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 다른_사용자의_메시지_수정_실패(){
-    UserResponseDto tmpUser = userService.createUser(
+    UserResponseDto tmpUser = userService.saveUser(
         new CreateUserRequest(
             "uname",
             "pwd2",
@@ -215,7 +214,7 @@ public class BasicMessageServiceIntegrationTest {
 
   @Test
   void 채널에_속하지_않은_사용자의_메시지_생성_실패(){
-    UserResponseDto tmpUser = userService.createUser(
+    UserResponseDto tmpUser = userService.saveUser(
         new CreateUserRequest(
             "uname",
             "pwd2",

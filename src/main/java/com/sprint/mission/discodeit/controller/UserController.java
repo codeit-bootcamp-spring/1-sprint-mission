@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.facade.UserFacade;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class UserController {
+
   private final UserService userService;
+  private final UserFacade userFacade;
 
   @RequestMapping(value = "/user-form", method = RequestMethod.GET)
   public String getUserForm(){
@@ -27,7 +30,7 @@ public class UserController {
   @RequestMapping(value = "/user", method = RequestMethod.POST)
   public String createUser(@Valid @ModelAttribute CreateUserRequest userDto, Model model){
 
-    UserResponseDto user = userService.createUser(userDto);
+    UserResponseDto user = userFacade.createUser(userDto);
     model.addAttribute("user", user);
 
     log.info("encoded data: {}", user.profilePictureBase64());

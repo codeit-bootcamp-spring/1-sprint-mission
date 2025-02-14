@@ -54,7 +54,7 @@ public class ReadStatusIntegrationTest {
     readStatusRepository.clear();
     MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
-    user = userService.createUser(
+    user = userService.saveUser(
         new CreateUserRequest(
             "username",
             "pwd",
@@ -75,7 +75,7 @@ public class ReadStatusIntegrationTest {
 
   @Test
   void ReadStatus_생성_성공(){
-    UserResponseDto tmpUser = userService.createUser(
+    UserResponseDto tmpUser = userService.saveUser(
         new CreateUserRequest(
             "uname",
             "pwd2",
@@ -105,7 +105,7 @@ public class ReadStatusIntegrationTest {
 
   @Test
   void ReadStatus_조회_성공(){
-    UserResponseDto tmpUser = userService.createUser(
+    UserResponseDto tmpUser = userService.saveUser(
         new CreateUserRequest(
             "uname",
             "pwd2",

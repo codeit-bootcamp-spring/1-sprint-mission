@@ -4,7 +4,6 @@ import com.sprint.mission.DiscodeitApplication;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -52,7 +51,7 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 유저를_생성할수_있다(){
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
 
     assertThat(user).isNotNull();
     assertThat(user.username()).isEqualTo(userDto1.username());
@@ -67,9 +66,9 @@ public class BasicUserServiceIntegrationTest {
     CreateUserRequest duplicateEmailDto = new CreateUserRequest(
             "username3","pwd3","email1@email.com","nickname3","01012341232",null,  "description1"
     );
-    userService.createUser(userDto1);
+    userService.saveUser(userDto1);
 
-    assertThatThrownBy(() -> userService.createUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.saveUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
 
     assertThat(userService.findAllUsers()).hasSize(1);
   }
@@ -79,9 +78,9 @@ public class BasicUserServiceIntegrationTest {
     CreateUserRequest duplicateEmailDto = new CreateUserRequest(
         "username3","pwd3","email1@email.com","nickname3","01012341232",null, "description1"
     );
-    userService.createUser(userDto1);
+    userService.saveUser(userDto1);
 
-    assertThatThrownBy(() -> userService.createUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.saveUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
 
     assertThat(userService.findAllUsers()).hasSize(1);
   }
@@ -91,9 +90,9 @@ public class BasicUserServiceIntegrationTest {
     CreateUserRequest duplicateEmailDto = new CreateUserRequest(
         "username3","pwd3","email1@email.com","nickname1","01012341236",null,  "description1"
     );
-    userService.createUser(userDto1);
+    userService.saveUser(userDto1);
 
-    assertThatThrownBy(() -> userService.createUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.saveUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
 
     assertThat(userService.findAllUsers()).hasSize(1);
   }
@@ -105,12 +104,12 @@ public class BasicUserServiceIntegrationTest {
         "username3","pwd3","email1@email.com","n","01012341236",null,  "description1"
     );
 
-    assertThatThrownBy(() -> userService.createUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
+    assertThatThrownBy(() -> userService.saveUser(duplicateEmailDto)).isInstanceOf(UserValidationException.class);
   }
 
   @Test
   void 유저를_조회할수_있다(){
-    UserResponseDto user1 = userService.createUser(userDto1);
+    UserResponseDto user1 = userService.saveUser(userDto1);
 
     UserResponseDto foundUser = userService.findUserById(user1.userId());
 
@@ -122,8 +121,8 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 모든_유저를_조회할_수_있다(){
-    userService.createUser(userDto1);
-    userService.createUser(userDto2);
+    userService.saveUser(userDto1);
+    userService.saveUser(userDto2);
 
     List<UserResponseDto> users = userService.findAllUsers();
 
@@ -143,7 +142,7 @@ public class BasicUserServiceIntegrationTest {
   @Test
   void 유저_정보를_수정할수_있다(){
 
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
 
     UserUpdateDto updateDto = new UserUpdateDto(
         "UpdatedUsername", "newPassword123", "updated@email.com",
@@ -170,7 +169,7 @@ public class BasicUserServiceIntegrationTest {
   @Test
   void 비밀번호_오류시_정보_수정_실패(){
 
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
     UserUpdateDto updateDto = new UserUpdateDto(
         "UpdatedUsername", "newPassword123", "updated@email.com",
         "UpdatedNickname", "01087654321", "Updated Description",
@@ -185,7 +184,7 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 유저를_삭제할수_있다(){
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
 
     userService.deleteUser(user.userId(), "pwd1");
 
@@ -194,7 +193,7 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 비밀번호_오류시_유저삭제_실패(){
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
 
     assertThatThrownBy(() -> userService.deleteUser(user.userId(), "wrong-pwd")).isInstanceOf(UserValidationException.class);
     assertThat(userService.findAllUsers()).hasSize(1);
@@ -202,7 +201,7 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 비밀번호_변경후_기존_비밀번호_불가(){
-    UserResponseDto user = userService.createUser(userDto1);
+    UserResponseDto user = userService.saveUser(userDto1);
 
     UserUpdateDto updateDto = new UserUpdateDto(
         user.nickname(), "newSecurePwd123", user.email(),
@@ -219,7 +218,7 @@ public class BasicUserServiceIntegrationTest {
   void 프로필_사진을_등록하고_불러올수_있다(){
     MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
-    UserResponseDto user = userService.createUser(
+    UserResponseDto user = userService.saveUser(
 
         new CreateUserRequest(
             "newUser",
@@ -241,7 +240,7 @@ public class BasicUserServiceIntegrationTest {
 
   @Test
   void 프로필_사진을_등록하지_않으면_null(){
-    UserResponseDto user = userService.createUser(
+    UserResponseDto user = userService.saveUser(
         new CreateUserRequest(
             "newUser",
             "newPwd",

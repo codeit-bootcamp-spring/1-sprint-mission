@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -32,6 +33,8 @@ public class AuthServiceIntegrationTest {
   private UserStatusRepository userStatusRepository;
   @Autowired
   private BinaryContentRepository binaryContentRepository;
+  @Autowired
+  private UserMapper userMapper;
   private CreateUserRequest userDto;
 
   @Value("${app.file.user-file}")
@@ -52,7 +55,7 @@ public class AuthServiceIntegrationTest {
 
   @Test
   void 유저_로그인_성공(){
-    UserResponseDto user = userService.createUser(userDto);
+    UserResponseDto user = userService.saveUser(userDto);
 
     UserResponseDto response = authService.login(user.username(), "password123");
 
@@ -68,7 +71,7 @@ public class AuthServiceIntegrationTest {
 
   @Test
   void 잘못된_비밀번호_로그인_실패(){
-    UserResponseDto user = userService.createUser(userDto);
+    UserResponseDto user = userService.saveUser(userDto);
 
     assertThatThrownBy(() -> authService.login(user.username(), "wrongPwd")).isInstanceOf(UserValidationException.class);
   }

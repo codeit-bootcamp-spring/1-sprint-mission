@@ -42,7 +42,7 @@ public class UserStatusServiceImplIntegrationTest {
   userStatusRepository.clear();
     MockMultipartFile mockFile = new MockMultipartFile("image", "test.jpg", "image/jpeg", "fake image".getBytes());
 
-    user = userService.createUser(
+    user = userService.saveUser(
         new CreateUserRequest(
             "username",
             "pwd",
@@ -96,7 +96,7 @@ public class UserStatusServiceImplIntegrationTest {
 
   @Test
   void 모든_UserStatus_조회_성공() {
-    UserResponseDto tmpUser = userService.createUser(
+    UserResponseDto tmpUser = userService.saveUser(
         new CreateUserRequest(
             "uname",
             "pwd2",
