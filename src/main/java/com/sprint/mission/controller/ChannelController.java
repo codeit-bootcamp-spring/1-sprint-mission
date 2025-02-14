@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,21 +47,25 @@ public class ChannelController {
     }
 
     @GetMapping("/channels/{userId}")
-    public ResponseEntity<List<FindUserDto>> findAllByUserId(@PathVariable UUID userId) {
+    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable UUID userId) {
+        List<Channel> findAllChannel = channelService.findAllByUserId(userId);
+        List<FindChannelDto> findChannelDtoList = findAllChannel.stream()
+                .map(this::getFindChannelDto).collect(Collectors.toCollection(ArrayList::new));
 
-        return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
     }
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity<String> update(@PathVariable UUID userId, @RequestBody UserDtoForRequest requestDTO) {
-        userService.update(userId, requestDTO);
+    @PatchMapping("/{channelId}")
+    public ResponseEntity<String> update(@PathVariable UUID channelId, @RequestBody ChannelDtoForRequest requestDTO) {
+
+        channelService.update(channelId, requestDTO);
         return ResponseEntity.ok("Successfully updated");
     }
 
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@PathVariable UUID userId) {
-        userService.delete(userId);
+    @DeleteMapping("/{channelId}")
+    public ResponseEntity<String> delete(@PathVariable UUID channelId) {
+        channelService.delete(channelId);
         return ResponseEntity.ok("Successfully deleted");
     }
 

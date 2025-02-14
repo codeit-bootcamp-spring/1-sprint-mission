@@ -59,10 +59,8 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public List<FindChannelDto> findAll() {
-        return channelRepository.findAll().stream()
-                .map((channel) -> getFindChannelDto(channel))
-                .collect(Collectors.toCollection(ArrayList::new));
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
     }
 
     /**
@@ -70,21 +68,19 @@ public class JCFChannelService implements ChannelService {
      * [ ] PUBLIC 채널 목록은 전체 조회합니다.
      * [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
      */
-    public List<FindChannelDto> findAllByUserId(UUID userId) {
+    public List<Channel> findAllByUserId(UUID userId) {
 
         // 1. Public 채널
-        ArrayList<FindChannelDto> findChannelListDto = channelRepository.findAll().stream()
+        List<Channel> findChannelList = channelRepository.findAll().stream()
                 .filter((channel) -> channel.getChannelType().equals(ChannelType.PUBLIC))
-                .map(this::getFindChannelDto)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         // 2. USER가 참여한 PRIVATE 채널을 1번에 더하기
         userRepository.findById(userId).ifPresent((user) -> {
             user.getChannels().stream()
-                    .filter((channel -> channel.getChannelType().equals(ChannelType.PRIVATE)))
-                    .forEach((joiningPrivateChannel) -> findChannelListDto.add(new FindPrivateChannelDto(joiningPrivateChannel)));
+                    .filter((channel -> channel.getChannelType().equals(ChannelType.PRIVATE)));
         });
-        return findChannelListDto;
+        return findChannelList;
     }
 
     @Override
