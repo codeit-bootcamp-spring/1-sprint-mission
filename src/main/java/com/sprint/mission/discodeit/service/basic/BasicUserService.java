@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.domain.Mimetype;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,26 +49,33 @@ public class BasicUserService implements UserService {
         if(request.profileImageId() != null){
             BinaryContent profileImage = binaryContentRepository.findById(request.profileImageId());
             user.setProfileImage(profileImage);
+        }else{
+            BinaryContent profileImage = new BinaryContent(user.getId(), Mimetype.User);
+            user.setProfileImage(profileImage);
         }
 
-        userStatusRepository.save(new UserStatus(user.getId()));
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
 
-        return UserResponse.fromEntity(user);
+        return UserResponse.fromEntity(user , userStatus.isOnline());
     }
 
     @Override
     public UserResponse readOne(UUID id) {
         User user = userRepository.findById(id);
-        // TODO user readOne -> isOnline
-        userStatusRepository.findByUserId(user.getId());
+        boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
 
-        return UserResponse.fromEntity(user);
+        return UserResponse.fromEntity(user, isOnline);
     }
 
     @Override
     public List<UserResponse> readAll() {
         List<User> users = userRepository.readAll();
-        List<UserResponse> responses = (List<UserResponse>) users.stream().map(user -> UserResponse.fromEntity(user));
+        List<UserResponse> responses = users.stream().map(user -> {
+                                            boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
+                                            return UserResponse.fromEntity(user, isOnline);
+                                        })
+                                        .collect(Collectors.toList());
 
         return responses;
     }
@@ -87,8 +96,10 @@ public class BasicUserService implements UserService {
             }
 
             User user = userRepository.modify(id, new User(updatedUserReq.username(), updatedUserReq.password(), updatedUserReq.email(), updatedUserReq.phoneNumber()));
+            boolean isOnline = userStatusRepository.findByUserId(id).isOnline();
 
-            return UserResponse.fromEntity(user);
+            System.out.println("업데이트가 완료되었습니다.");
+            return UserResponse.fromEntity(user, isOnline);
 
         } catch (DataNotFoundException e){
             throw new DataNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);

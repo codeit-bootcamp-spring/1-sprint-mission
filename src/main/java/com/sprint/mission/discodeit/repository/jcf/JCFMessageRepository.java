@@ -34,7 +34,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> readAll(UUID id){
         List<Message> list =  data.values().stream()
-                                        .filter(message -> message.getChannel() != null && message.getChannel().getId().equals(id))
+                                        .filter(message -> message.getChannelId() != null && message.getChannelId().equals(id))
                                         .collect(Collectors.toList());
 
         return list;
@@ -48,10 +48,7 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public boolean deleteById(UUID id) {
         try {
-            String sender = data.get(id).getSender().getUsername();
-            String content = data.get(id).getContent();
             data.remove(id);
-            System.out.println(sender + "님의 메시지(" +content +")를 삭제되었습니다.");
             return true;
         } catch (NullPointerException e){
             System.out.println("유효하지 않은 메시지입니다.\n" + e);

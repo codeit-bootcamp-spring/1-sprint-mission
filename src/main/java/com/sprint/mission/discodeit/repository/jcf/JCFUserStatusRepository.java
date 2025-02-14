@@ -17,12 +17,13 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public JCFUserStatusRepository() { this.data = new HashMap<>(); }
 
     @Override
+    public void save(UserStatus userStatus) {
+        data.put(userStatus.getUserid(), userStatus);
+    }
+
+    @Override
     public UserStatus findByUserId(UUID userid) {
         return data.get(userid);
     }
 
-    @Override
-    public void save(UserStatus userStatus) {
-        data.put(userStatus.getId() ,new UserStatus(userStatus.getUserid()));
-    }
 }

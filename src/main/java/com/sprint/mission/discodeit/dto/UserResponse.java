@@ -11,7 +11,7 @@ public record UserResponse(
         String phoneNumber,
         boolean isOnline
 ) {
-    public static UserResponse fromEntity(User user) {
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), false);
+    public static UserResponse fromEntity(User user, Boolean isOnline) {
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), isOnline);
     }
 }

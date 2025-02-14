@@ -1,24 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.domain.Mimetype;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class BinaryContent implements Serializable {
     private static final long getSerialVersionUID = 1L;
     private UUID id;
     private final Instant createdAt;
-    private final String userId;
-    private final String messageId;
-    private final byte[] content;
-    private final String mimetype;
+    private final UUID typeId;
+//    private final byte[] content;
+    private final Mimetype mimetype;
 
-    public BinaryContent(String userId, String messageId, byte[] content, String mimetype) {
+    public BinaryContent(UUID typeId, Mimetype mimetype) {
         this.id = id != null ? id : UUID.randomUUID();
         this.createdAt = Instant.ofEpochMilli(System.currentTimeMillis());
-        this.userId = userId;
-        this.messageId = messageId;
-        this.content = content;
+        this.typeId = typeId;
+//        this.content = content;
         this.mimetype = mimetype;
     }
 }

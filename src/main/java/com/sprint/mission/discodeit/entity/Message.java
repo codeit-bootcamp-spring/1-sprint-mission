@@ -1,30 +1,28 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 
-@Getter
+@Getter @Setter
 public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private String content;
-    private User sender;
-    private User recipient;
-    private Channel channel;
+    private UUID senderId;
+    private UUID recipientId;
+    private UUID channelId;
+    private BinaryContent attachedFileId;
 
-
-    public Message(String content, User sender, Channel channel) {
+    public Message(String content, UUID senderId, UUID recipientId, UUID channelId) {
         super();
         this.content = content;
-        this.sender = sender;
-        this.channel = channel;
-    }
-
-    public Message(String content, User sender, User recipient) {
-        super();
-        this.content = content;
-        this.sender = sender;
-        this.recipient = recipient;
+        this.senderId = senderId;
+        this.recipientId = recipientId;
+        this.channelId = channelId;
     }
 }

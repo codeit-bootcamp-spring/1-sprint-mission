@@ -19,7 +19,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public boolean save(Channel channel) {
         data.put(channel.getId(), channel);
-        System.out.println(channel.getName() + " 채널이 오픈되었습니다.");
+        System.out.println(channel.getChannelType() + " 채널이 오픈되었습니다.");
         return true;
     }
 

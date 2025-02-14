@@ -107,10 +107,6 @@ public class FileUserRepository implements UserRepository, FileService<User> {
             existingUser.setPassword(modifiedUser.getPassword());
             existingUser.setEmail(modifiedUser.getEmail());
             existingUser.setPhoneNumber(modifiedUser.getPhoneNumber());
-            existingUser.setAddr(modifiedUser.getAddr());
-            existingUser.setAge(modifiedUser.getAge());
-            existingUser.setHobby(modifiedUser.getHobby());
-            existingUser.setInterest(modifiedUser.getInterest());
             existingUser.update();
             saveToFile(users);
             return modifiedUser;
