@@ -1,12 +1,8 @@
 package com.sprint.mission.discodeit.controller.message;
 
-import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.net.URI;
 import java.util.List;
@@ -28,9 +24,9 @@ public class MessageReadStatusController {
         this.readStatusService = readStatusService;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> findByUserId(
-            @PathVariable(name = "id") UUID userId
+            @PathVariable(name = "userId") UUID userId
     ) {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
@@ -43,9 +39,9 @@ public class MessageReadStatusController {
         return ResponseEntity.created(URI.create("/")).build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateReadStatusByChannelId(
-            @PathVariable(name = "id") UUID userId,
+            @PathVariable(name = "userId") UUID userId,
             @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest
     ) {
         List<ReadStatus> allByUserId = readStatusService.findAllByUserId(userId);

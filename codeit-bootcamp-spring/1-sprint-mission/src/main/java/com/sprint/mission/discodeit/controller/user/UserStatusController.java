@@ -20,9 +20,9 @@ public class UserStatusController {
         this.userStatusService = userStatusService;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateUserStatus(
-            @PathVariable(name = "id") UUID userId,
+            @PathVariable(name = "userId") UUID userId,
             @RequestBody UserStatusUpdateRequest userStatusUpdateRequest
     ) {
         userStatusService.update(userId, userStatusUpdateRequest);

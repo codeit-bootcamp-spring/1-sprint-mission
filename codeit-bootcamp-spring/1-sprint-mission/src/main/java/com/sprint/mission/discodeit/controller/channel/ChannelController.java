@@ -25,9 +25,9 @@ public class ChannelController {
         this.channelService = channelService;
     }
 
-    @RequestMapping(value = "/all/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/all/{userId}", method = RequestMethod.GET)
     public ResponseEntity<List<ChannelDto>> getAll(
-            @PathVariable(name = "id") UUID userId
+            @PathVariable(name = "userId") UUID userId
     ) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
@@ -48,18 +48,18 @@ public class ChannelController {
         return ResponseEntity.created(URI.create("/")).build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateChannel(
-            @PathVariable(name = "id") UUID channelId,
+            @PathVariable(name = "channelId") UUID channelId,
             @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest
     ) {
         channelService.update(channelId, publicChannelUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteChannel(
-            @PathVariable(name = "id") UUID channelId
+            @PathVariable(name = "channelId") UUID channelId
     ) {
         channelService.delete(channelId);
         return ResponseEntity.ok().build();

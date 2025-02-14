@@ -25,9 +25,9 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
     public ResponseEntity<List<Message>> findByChannel(
-            @PathVariable(name = "id") UUID channelId
+            @PathVariable(name = "channelId") UUID channelId
     ) {
         return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
     }
@@ -41,18 +41,18 @@ public class MessageController {
         return ResponseEntity.created(URI.create("/")).build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateMessage(
-            @PathVariable(name = "id") UUID messageId,
+            @PathVariable(name = "messageId") UUID messageId,
             @RequestBody MessageUpdateRequest messageUpdateRequest
     ) {
         messageService.update(messageId, messageUpdateRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{messageId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteMessage(
-            @PathVariable(name = "id") UUID messageId
+            @PathVariable(name = "messageId") UUID messageId
     ) {
         messageService.delete(messageId);
         return ResponseEntity.ok().build();

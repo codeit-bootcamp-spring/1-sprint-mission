@@ -21,9 +21,9 @@ public class BinaryContentController {
         this.binaryContentService = binaryContentService;
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContent> findById(@PathVariable UUID id) {
-        return ResponseEntity.ok(binaryContentService.find(id));
+    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> findById(@PathVariable UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.find(binaryContentId));
     }
 
     @RequestMapping(method = RequestMethod.POST)

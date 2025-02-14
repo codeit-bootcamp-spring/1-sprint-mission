@@ -26,7 +26,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(
             @RequestBody UserCreateRequest userCreateRequest,
             @RequestBody(required = false) BinaryContentCreateRequest binaryContentCreateRequest
@@ -40,9 +40,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateUser(
-            @PathVariable(name = "id") UUID userId,
+            @PathVariable(name = "userId") UUID userId,
             @RequestBody UserUpdateRequest userUpdateRequest,
             @RequestBody(required = false) BinaryContentCreateRequest binaryContentCreateRequest
     ) {
@@ -50,9 +50,9 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(
-            @PathVariable(name = "id") UUID userId
+            @PathVariable(name = "userId") UUID userId
     ) {
         userService.delete(userId);
         return ResponseEntity.ok().build();
