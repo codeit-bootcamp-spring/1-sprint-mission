@@ -2,22 +2,6 @@ spring:
   application:
     name: discodeit
 
-  datasource:
-    url: jdbc:h2:file:./data/h2db
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-
 discodeit:
   repository:
     type: file   # jcf | file
