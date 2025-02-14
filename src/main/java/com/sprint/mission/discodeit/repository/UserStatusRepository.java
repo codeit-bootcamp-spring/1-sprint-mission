@@ -8,8 +8,6 @@ public interface UserStatusRepository {
 
     UserStatus findById(String id);
 
-    UserStatus findByUserId(String userId);
-
     List<UserStatus> findAll();
 
     UserStatus save(UserStatus userStatus);
