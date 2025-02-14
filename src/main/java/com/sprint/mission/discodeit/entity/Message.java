@@ -11,11 +11,11 @@ public class Message implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
     private final Instant createdAt;
-    @Setter private Instant updatedAt;
+    private Instant updatedAt;
     private UUID id;
     private User author;
     private Channel channel;
-    @Setter private String content;
+    private String content;
 
 
     public Message(User User, Channel channel, String content){

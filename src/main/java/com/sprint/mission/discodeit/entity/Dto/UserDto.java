@@ -19,14 +19,16 @@ public record UserDto(
         return new UserDto(user.getCreatedAt(), user.getUpdatedAt(), user.getId(), user.getEmail(), user.getUserName(), user.getProfilePictureId(), user.getUserStatusId());
     }
 
-    public record CreateUserRequest(String userName, String email, String password, UUID userStatusId) {
+    public record CreateUserRequest(String userName, String email, String password, UUID id) {
     }
 
-    public record UpdateProfilePictureRequest(UUID userId, UUID profilePictureId) {}
+    public record DeleteUserRequest(String userName) {}
 
-    public record DeleteProfilePictureRequest(UUID userId) {}
+    public record UpdateProfilePictureRequest(String userName, String profilePicturePath) {}
 
-    public record GetProfilePictureRequest(UUID userId) {}
+    public record DeleteProfilePictureRequest(String userName) {}
+
+    public record GetProfilePictureRequest(String userName) {}
 
     public record LoginUserRequest(User user, String password) {}
 

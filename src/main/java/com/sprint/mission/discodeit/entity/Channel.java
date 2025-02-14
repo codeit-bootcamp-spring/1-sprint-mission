@@ -13,12 +13,12 @@ public class Channel implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
     private final Instant createdAt;
-    @Setter private Instant updatedAt;
+    private Instant updatedAt;
     private UUID id;
-    @Setter private String channelName;
-    @Setter private ArrayList<UUID> members;
-    @Setter private ChannelType type;
-    @Setter private String description;
+    private String channelName;
+    private ArrayList<UUID> members;
+    private ChannelType type;
+    private String description;
 
     public Channel(ChannelType type, String channelName, String description) {
         this.id = UUID.randomUUID();
@@ -29,8 +29,6 @@ public class Channel implements Serializable, Entity {
         this.type = type;
         this.description = description;
     }
-
-    //todo 엔티티 객체에서 수정을 하면 업데이트시간이 바뀌어야하는데 그걸 지정하기위해 클래스에 @Getter 지정은 못하는건가? (엔티티 전부 해당)
 
     //업데이트시간 변경
     public void setUpdatedAt(){this.updatedAt = Instant.now();}

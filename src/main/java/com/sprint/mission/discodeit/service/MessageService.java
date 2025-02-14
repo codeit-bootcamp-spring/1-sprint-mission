@@ -6,19 +6,16 @@ import java.util.UUID;
 
 
 public interface MessageService {
-    HashMap<UUID, Message> getMessagesMap();
+    HashMap<UUID, Message> getChannelMessagesMap(UUID channelId);
 
     UUID createMessage(UUID authorId, UUID channelId, String content);
 
-    Message getMessageById(UUID messageId);
+    Message findMessageById(UUID channelId, UUID messageId);
 
-    boolean reviseMessageContent(UUID messageId, String content);
+    boolean reviseMessageContent(UUID channelId, UUID messageId, String content);
 
-    boolean deleteMessage(UUID messageId);
+    boolean deleteMessage(UUID channelId, UUID messageId);
 
-    boolean isMessageExist(UUID messageId);
+    boolean isMessageExist(UUID channelId, UUID messageId);
 
-    String getMessageContent(UUID messageId);
-
-    boolean printMessageDetails(UUID messageId);
 }

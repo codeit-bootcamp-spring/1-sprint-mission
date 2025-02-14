@@ -4,66 +4,74 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class JCFMessageRepository implements MessageRepository {
-    private static final HashMap<UUID, Message> messagesMap = new HashMap<UUID, Message>();
+    private static final LinkedHashMap<UUID, LinkedHashMap> allChannelmessageMaps = new LinkedHashMap<UUID, LinkedHashMap>();
 
-    // 외부에서 생성자 접근 불가
-    private JCFMessageRepository() {}
-
-    // 레포지토리 객체 LazyHolder 싱글톤 구현.
-    private static class JCFMessageRepositoryHolder {
-        private static final JCFMessageRepository INSTANCE = new JCFMessageRepository();
-    }
-
-    // 외부에서 호출 가능한 싱글톤 인스턴스.
-    public static JCFMessageRepository getInstance() {
-        return JCFMessageRepositoryHolder.INSTANCE;
-    }
-
-    // 모든 메세지 객체가 담기는 해쉬맵 반환
+    // 모든 채널별 해시맵이 담기는 해시맵 반환
     @Override
-    public HashMap<UUID, Message> getMessagesMap() {
-        return messagesMap;
+    public LinkedHashMap<UUID, Message> getChannelMessagesMap(UUID channelId) throws Exception {
+        return allChannelmessageMaps.get(channelId);
     }
 
-    // 특정 메세지 객체 여부에 따라 객체 혹은 null 반환.
+
+    // 특정 메세지 객체 반환
     @Override
-    public Message getMessage(UUID messageId) {
-        if (messagesMap.containsKey(messageId) == false) {
-            return null;
+    public Message getMessage(UUID channelId, UUID messageId) throws Exception {
+        Message message = getChannelMessagesMap(channelId).get(messageId);
+        if (message == null) {
+            throw new NoSuchElementException("해당 메세지가 존재하지 않습니다.");
         }
-        return messagesMap.get(messageId);
+        return message;
     }
 
     // 특정 메세지 객체 여부 확인 후 삭제.
     @Override
-    public boolean deleteMessage(UUID Id) {
-        if (messagesMap.containsKey(Id) == false) {
-            return false;
+    public boolean deleteMessage(UUID channelId, UUID messageId) throws Exception {
+        LinkedHashMap<UUID, Message> messagesMap = getChannelMessagesMap(channelId);
+        if (messagesMap.containsKey(messageId) == false) {
+            throw new NoSuchElementException("해당 메세지가 존재하지 않습니다.");
         }
-        messagesMap.remove(Id);
+        messagesMap.remove(messageId);
         return true;
     }
 
     // 전달받은 메세지 객체 null 여부 확인 후 메세지 해쉬맵에 추가.
     @Override
-    public boolean addMessage(Message message) {
-        if (message == null) {
-            return false;
+    public boolean saveMessage(UUID channelId, Message message) throws Exception {
+        if (message == null || channelId == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 message가 null인 상태입니다.");
+
         }
+        LinkedHashMap<UUID, Message> messagesMap = getChannelMessagesMap(channelId);
         messagesMap.put(message.getId(), message);
         return true;
     }
 
     //메세지 존재여부 리턴
     @Override
-    public boolean isMessageExist(UUID messageId) {
+    public boolean isMessageExist(UUID channelId, UUID messageId) throws Exception {
+        if (messageId == null || channelId == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 message가 null인 상태입니다.");
+
+        }
+        LinkedHashMap<UUID, Message> messagesMap = getChannelMessagesMap(channelId);
         if (messagesMap.containsKey(messageId) == false) {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean addChannelMessagesMap(UUID channelId, LinkedHashMap<UUID, Message> messagesMap) throws Exception {
+        if (channelId == null || messagesMap == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 messagesMap null인 상태입니다.");
+        }
+        allChannelmessageMaps.put(channelId, messagesMap);
+        return false;
     }
 
 }

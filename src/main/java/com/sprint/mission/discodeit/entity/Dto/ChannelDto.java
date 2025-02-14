@@ -16,9 +16,20 @@ public record ChannelDto(
         ChannelType type,
         String description
 ) {
+
+    //이너클래스 파라미터는 유저에게 입력받을 값.
     public static ChannelDto from(Channel channel) {
         return new ChannelDto(channel.getId(), channel.getChannelName(), channel.getMembers(), channel.getCreatedAt(), channel.getUpdatedAt(), channel.getType(), channel.getDescription());
     }
+
+    public record CreatePublicChannelRequest(String channelName, String description){};
+
+    public record CreatePrivateChannelRequest(String channelName, String description, String ...memberNames){};
+
+    public record AddChannelMemberRequest(String channelName, String memberName){};
+
+    public record DeleteChannelRequest(String Channel){};
+
 
     //todo 겟 멤버스 메서드를 반환하면 채널에 속해있는 유저들의 객체가 그대로 반환된다. 보안 ㄱㅊ?
     //todo Dto만들때 어떤건 특정속성 제외하고 보내고싶다면 어떻게 구별하지 ? (채널유저메세지 전부 해당)

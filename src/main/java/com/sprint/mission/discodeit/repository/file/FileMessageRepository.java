@@ -5,69 +5,57 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
 
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
-    String mainMessageRepository = "Message\\mainOIMessageRepository";
-
-
-
-    /* 외부에서 생성자 접근 불가
-    private FileMessageRepository() {
-        fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), mainMessageRepository);
-    }
-    // 레포지토리 객체 LazyHolder 싱글톤 구현.
-    private static class FileMessageRepositoryHolder {
-        private static final FileMessageRepository INSTANCE = new FileMessageRepository();
-    }
-    // 외부에서 호출 가능한 싱글톤 인스턴스.
-    public static FileMessageRepository getInstance() {
-        return FileMessageRepositoryHolder.INSTANCE;
-    }
-    */
-
+    String mainMessageRepository = "Message\\mainOIMessageRepository\\";
 
 
     // 모든 메세지 객체가 담기는 해쉬맵 반환
     @Override
-    public HashMap<UUID, Message> getMessagesMap() {
+    public LinkedHashMap<UUID, Message> getChannelMessagesMap(UUID channelId) throws Exception {
 
-        return (HashMap<UUID, Message>) fileIOHandler.deserializeHashMap(mainMessageRepository);
+        LinkedHashMap<UUID, Message> channelMessagesMap = (LinkedHashMap<UUID, Message>) fileIOHandler.deserializeLinkedHashMap(mainMessageRepository + channelId.toString());
+        return channelMessagesMap;
     }
 
-    // 특정 메세지 객체 여부에 따라 객체 혹은 null 반환.
+    // 특정 메세지 객체 반환
     @Override
-    public Message getMessage(UUID messageId) {
-        HashMap<UUID, Message> messagesMap = (HashMap<UUID, Message>) fileIOHandler.deserializeHashMap(mainMessageRepository);
-        if (messagesMap.containsKey(messageId) == false) {
-            return null;
+    public Message getMessage(UUID channelId, UUID messageId) throws Exception {
+        LinkedHashMap<UUID, Message> ChannelMessagesMap = getChannelMessagesMap(channelId);
+        Message message = ChannelMessagesMap.get(messageId);
+        if (message == null) {
+            throw new NoSuchElementException("해당 메세지가 존재하지 않습니다.");
         }
-        return messagesMap.get(messageId);
+        return message;
     }
 
     // 특정 메세지 객체 여부 확인 후 삭제. 불값 반환
     @Override
-    public boolean deleteMessage(UUID messageId) {
-        HashMap<UUID, Message> messagesMap = (HashMap<UUID, Message>) fileIOHandler.deserializeHashMap(mainMessageRepository);
+    public boolean deleteMessage(UUID channelId, UUID messageId) throws Exception {
+        LinkedHashMap<UUID, Message> messagesMap = getChannelMessagesMap(channelId);
         if (messagesMap.containsKey(messageId) == false) {
-            return false;
+            throw new NoSuchElementException("해당 메세지가 존재하지 않습니다.");
         }
         messagesMap.remove(messageId);
-        fileIOHandler.serializeHashMap(messagesMap, mainMessageRepository);
+        fileIOHandler.serializeLinkedHashMap(messagesMap, mainMessageRepository+messageId.toString());
 
         return true;
     }
 
     // 전달받은 메세지 객체 null 여부 확인 후 메세지 해쉬맵에 추가.
     @Override
-    public boolean addMessage(Message message) {
-        if (message == null) {
-            return false;
+    public boolean saveMessage(UUID channelId, Message message) throws Exception {
+        if (message == null || channelId == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 message가 null인 상태입니다.");
+
         }
-        HashMap<UUID, Message> messagesMap = (HashMap<UUID, Message>) fileIOHandler.deserializeHashMap(mainMessageRepository);
+        LinkedHashMap<UUID, Message> messagesMap = (LinkedHashMap<UUID, Message>) fileIOHandler.deserializeLinkedHashMap(mainMessageRepository+ channelId.toString());
         messagesMap.put(message.getId(), message);
         fileIOHandler.serializeHashMap(messagesMap, mainMessageRepository);
         return true;
@@ -75,16 +63,25 @@ public class FileMessageRepository implements MessageRepository {
 
     //메세지 존재여부 리턴
     @Override
-    public boolean isMessageExist(UUID messageId) {
-        HashMap<UUID, Message> messagesMap = (HashMap<UUID, Message>) fileIOHandler.deserializeHashMap(mainMessageRepository);
+    public boolean isMessageExist(UUID channelId, UUID messageId) throws Exception {
+        if (messageId == null || channelId == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 message가 null인 상태입니다.");
+        }
+        LinkedHashMap<UUID, Message> messagesMap = (LinkedHashMap<UUID, Message>) fileIOHandler.deserializeLinkedHashMap(mainMessageRepository+ channelId.toString());
         if (messagesMap.containsKey(messageId) == false) {
             return false;
         }
         return true;
     }
 
-
-
-
-
+    @Override
+    public boolean addChannelMessagesMap(UUID channelId, LinkedHashMap<UUID, Message> messagesMap) throws Exception {
+        if (channelId == null || messagesMap == null) {
+            throw new NullPointerException("파라미터로 전달된 channelId 혹은 messagesMap null인 상태입니다.");
+        }
+        fileIOHandler.serializeLinkedHashMap(messagesMap,mainMessageRepository+channelId.toString());
+        return false;
+    }
 }
+
+

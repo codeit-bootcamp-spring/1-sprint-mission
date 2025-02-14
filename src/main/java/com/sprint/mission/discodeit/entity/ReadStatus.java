@@ -21,7 +21,7 @@ public class ReadStatus implements Serializable, Entity {
     // 멤버가 그 채널에 들어올 때 업데이트앳이 갱신되는건가? id는 유저, 채널과 별개로 이 객체 자체의 id인건가?
 
     // 생성자
-    private ReadStatus() {
+    public ReadStatus() {
         id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();

@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 //todo IO핸들러를 싱글톤객체로 호출하고있는데, Bean에 넣고 꺼내쓰는게 낫나?
@@ -52,6 +53,36 @@ public class FileIOHandler {
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (HashMap<UUID, ? extends Entity>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e){
+            throw new IOException("엔티티맵 역직렬화 실패", e);
+        }
+    }
+
+    //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
+    public boolean serializeLinkedHashMap(LinkedHashMap<UUID, ? extends Entity> entityMap, String fileName) throws IOException {
+        if (entityMap == null || fileName == null) {
+            throw new NullPointerException("IO 핸들러에 전달된 엔티티맵 혹은 파일이름이 null인 상태입니다.");
+        }
+        String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+             ObjectOutputStream oos = new ObjectOutputStream(fos))
+        {
+            oos.writeObject(entityMap);
+            return true;
+        } catch (IOException e) {
+            throw new IOException("엔티티맵 직렬화에 실패했습니다. 실패한 파일 경로", e);
+        }
+    }
+
+    //역직렬화 성공여부에 따라 해쉬맵 or null 반환
+    public LinkedHashMap<UUID, ? extends Entity> deserializeLinkedHashMap(String fileName) throws IOException {
+        if (fileName == null) {
+            throw new NullPointerException("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
+        }
+        String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
+        try (FileInputStream fis = new FileInputStream(filePath);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (LinkedHashMap<UUID, ? extends Entity>) ois.readObject();
         } catch (IOException | ClassNotFoundException e){
             throw new IOException("엔티티맵 역직렬화 실패", e);
         }

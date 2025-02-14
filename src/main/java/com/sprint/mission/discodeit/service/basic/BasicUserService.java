@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,14 +17,13 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
     //todo find, findAll 메서드가 이런 용도인게 맞나?..
     //유저 리턴
     @Override
     public UserDto findUserById(UUID userId) {
         if (userId == null) {
-            System.err.println("userId is null");
+            System.err.println("유저 id가 null인 상태입니다. 입력값을 확인해주세요.");
             return null;
         }
         try {
@@ -34,6 +32,7 @@ public class BasicUserService implements UserService {
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.err.println("유저 불러오기 실패");
             return null;
         }
     }
@@ -46,6 +45,7 @@ public class BasicUserService implements UserService {
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.err.println("유저 불러오기 실패");
             return null;
         }
     }
@@ -54,14 +54,15 @@ public class BasicUserService implements UserService {
     @Override
     public String getUserNameById(UUID userId) {
         if (userId == null){
-            System.err.println("userId is null");
+            System.err.println("유저 id가 null인 상태입니다. 입력값을 확인해주세요.");
             return null;
         }
         try {
-            return UserDto.ShowUserNameResponse.from(userRepository.getUserById(userId)).userName();
+            return findUserById(userId).userName();
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.err.println("유저 이름 불러오기 실패");
             return null;
         }
     }
@@ -75,7 +76,7 @@ public class BasicUserService implements UserService {
         }
         // 이메일, 이름 중복검사하는 과정에서 예외를 던져놨기 때문에 try-catch 사용
         try {
-            if (userRepository.isUserExistByUserName(userName) == true) {
+            if (userRepository.isUserExistByName(userName) == true) {
                 System.out.println("동일한 이름이 존재합니다.");
                 return null;
             } else if (userRepository.isUserExistByEmail(email) == true) {
@@ -88,8 +89,7 @@ public class BasicUserService implements UserService {
         }
         try {
             UserStatus newUserStatus = new UserStatus();
-            UserDto.CreateUserRequest newUserDto = new UserDto.CreateUserRequest(userName, email, password, newUserStatus.getId());
-            User newUser = new User(newUserDto.userName(), newUserDto.email(), newUserDto.password(), newUserDto.userStatusId());
+            User newUser = new User(userName, email, password, newUserStatus.getId());
             userRepository.saveUser(newUser);
             //todo 유저스테이터스 레포지토리 구현 후 스테이터스 저장하기
             //userStatusRepository.saveUserStatus(newUserstatus);
@@ -98,6 +98,7 @@ public class BasicUserService implements UserService {
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.out.println("유저 생성 실패.");
             return null;
         }
     }
@@ -136,16 +137,17 @@ public class BasicUserService implements UserService {
             return false;
         }
         try {
-            User user = userRepository.getUserById(userId);
+            UserDto user = findUserById(userId);
             //todo 아직 바이너리콘텐트/유저스테이터스 레포지토리 구현안돼있어서 주석처리.
-            //binaryRepository.delete(user.getProfilePictureId());
-            //UserStatusRepository.delete(user.getUserStatusId());
+            //binaryRepository.delete(user.id());
+            //UserStatusRepository.delete(user.id());
             userRepository.deleteUser(userId);
             System.out.println("유저 삭제 성공!");
             return true;
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.out.println("유저 삭제 실패.");
             return false;
         }
 
@@ -167,6 +169,7 @@ public class BasicUserService implements UserService {
         } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.out.println("유저 이름 변경 실패.");
             return false;
         }
     }
@@ -195,7 +198,7 @@ public class BasicUserService implements UserService {
             System.out.println(user.getUserName() + " 프로필사진 변경 성공!");
             return true;
         }
-     */
+
 
     //프로필사진 삭제
     @Override
@@ -205,8 +208,10 @@ public class BasicUserService implements UserService {
         }
         try {
             User user = userRepository.getUserById(userId);
+            UUID profilePictureId = user.getProfilePictureId();
             user.setProfilePicture(null);
             userRepository.saveUser(user);
+            BinaryContentRepository.deleteBinaryContent(profilePictureId);
             System.out.println(user.getUserName() + " 프로필사진 삭제 성공!");
             return true;
         } catch (Exception e){
@@ -215,6 +220,7 @@ public class BasicUserService implements UserService {
             return false;
         }
     }
+    */
 
     //todo AuthService 클래스 위치 여기에 둬도 되나?
     public class AuthService{
@@ -231,6 +237,7 @@ public class BasicUserService implements UserService {
             } catch (Exception e) {
                 System.err.println(e.getMessage());
                 e.printStackTrace();
+                System.out.println("로그인 실패.");
                 return false;
             }
         }
