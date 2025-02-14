@@ -11,7 +11,7 @@ public interface ChannelRepository {
 
     Channel findById(UUID channelId);
 
-    List<Channel> findAll();
+    List<Channel> findAllByUserId(UUID userId);
 
     void updateChannel(Channel channel);
 

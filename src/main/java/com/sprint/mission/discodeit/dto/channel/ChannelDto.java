@@ -1,11 +1,9 @@
-package com.sprint.mission.discodeit.dto;
+package com.sprint.mission.discodeit.dto.channel;
 
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.Value;
 
 @Value(staticConstructor = "of")
 public class ChannelDto {
-    ChannelType type;
     String name;
     String description;
 }

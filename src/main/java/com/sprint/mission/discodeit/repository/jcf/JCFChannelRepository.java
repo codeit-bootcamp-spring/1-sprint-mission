@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFChannelRepository implements ChannelRepository {
 
@@ -33,8 +34,16 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+    public List<Channel> findAllByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(c -> {
+                    try {
+                        return c.getType() == ChannelType.PUBLIC || c.getUser(userId) != null;
+                    } catch (NotFoundException e) {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -5,8 +5,8 @@ public class FileIOException extends RuntimeException {
         super(msg);
     }
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
-    }
+//    @Override
+//    public synchronized Throwable fillInStackTrace() {
+//        return this;
+//    }
 }

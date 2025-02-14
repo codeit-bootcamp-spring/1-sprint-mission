@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,16 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
 @RequiredArgsConstructor
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final Path filePath;
+    private final String directory = "channels";
     private final String FILE_EXTENSION = ".ser";
 
-    static {
-        filePath = Path.of(System.getProperty("user.dir"), "channels");
-        FileManager.createDirectory(filePath);
-    }
+    private final FileManager fileManager = new FileManager(directory);
+    private final Path filePath = fileManager.getPath();
 
     @Override
     public Channel save(Channel channel) {
@@ -48,17 +49,23 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findAllByUserId(UUID userId) {
         File[] files = filePath.toFile().listFiles();
         List<Channel> channels = new ArrayList<>(100);
+
+        if (files == null) {
+            return channels;
+        }
 
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Channel channel = (Channel) ois.readObject();
-                channels.add(channel);
+                if (channel.getType() == ChannelType.PUBLIC || channel.getUser(userId) != null) {
+                    channels.add(channel);
+                }
             } catch (IOException | ClassNotFoundException e) {
                 throw new FileIOException("channels 읽기 실패");
-            }
+            } catch (NotFoundException ignored) {}
         }
         return channels;
     }
