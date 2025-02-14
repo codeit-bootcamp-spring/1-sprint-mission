@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
-/*
-*  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 선언한 인터페이스
-* */
+
 public interface ChannelService {
-    void addChannel(Channel channel);
-    Channel getChannel(UUID id);
-    List<Channel> getAllChannels();
-    void updateChannel(UUID id, String newName);
-    void deleteChannel(UUID id);
+    Channel create(ChannelType type, String name, String description);
+    Channel find(UUID channelId);
+    List<Channel> findAll();
+    Channel update(UUID channelId, String newName, String newDescription);
+    void delete(UUID channelId);
 }

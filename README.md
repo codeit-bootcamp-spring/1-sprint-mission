@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Spring 백엔드 트랙 1기 스프린트 미션 제출 리포지토리
 
 ## 1. 미션의 주요 기능과 목적
@@ -49,3 +50,7 @@
 ## 5.2. CRUD 기능
 - 각 도메인 모델(User, Channel, Message)에 대해 CRUD 기능을 제공합니다.
 - create(), read(), update(), delete() 메소드가 각각 구현되어 있으며, 각 도메인 모델에 대한 데이터 조작이 가능합니다.
+=======
+# 0-spring-mission
+스프린트 미션 모범 답안 리포지토리입니다.
+>>>>>>> Stashed changes

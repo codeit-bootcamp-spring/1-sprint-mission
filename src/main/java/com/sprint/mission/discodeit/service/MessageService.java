@@ -5,14 +5,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 import java.util.UUID;
 
-/*
- *  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 선언한 인터페이스
- * */
-
 public interface MessageService {
-    void addMessage(Message message);
-    Message getMessage(UUID id);
-    List<Message> getAllMessages();
-    void updateMessage(UUID id, String newContent);
-    void deleteMessage(UUID id);
+    Message create(String content, UUID channelId, UUID authorId);
+    Message find(UUID messageId);
+    List<Message> findAll();
+    Message update(UUID messageId, String newContent);
+    void delete(UUID messageId);
 }

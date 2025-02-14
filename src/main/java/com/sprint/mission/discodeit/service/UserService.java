@@ -5,14 +5,10 @@ import com.sprint.mission.discodeit.entity.User;
 import java.util.List;
 import java.util.UUID;
 
-/*
- *  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 선언한 인터페이스
- * */
-
 public interface UserService {
-    void addUser(User user);
-    User getUser(UUID id);
-    List<User> getAllUsers();
-    void updateUser(UUID id, String newUsername, String newPassword);
-    void deleteUser(UUID id);
+    User create(String username, String email, String password);
+    User find(UUID userId);
+    List<User> findAll();
+    User update(UUID userId, String newUsername, String newEmail, String newPassword);
+    void delete(UUID userId);
 }

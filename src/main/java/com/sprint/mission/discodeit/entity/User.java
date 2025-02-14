@@ -1,58 +1,70 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User {
-    private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
     private String username;
+    private String email;
     private String password;
 
-    public User(String username, String password) {
-        // 유효성 검사 추가
-        if (username == null || username.trim().isEmpty()) {
-            throw new IllegalArgumentException("사용자 이름이 비어있습니다.");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            throw new IllegalArgumentException("비밀번호가 비어있습니다.");
-        }
-        if (password.length() < 10) {
-            throw new IllegalArgumentException("비밀번호는 10자리 이상이어야 합니다.");
-        }
-
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.username = username;
+        this.email = email;
         this.password = password;
     }
 
-    // 각 필드의 Getter 함수 정의
-    public UUID getId() { return id; }
-    public String getUsername() { return username; }
-    public long getCreatedAt() { return createdAt; }
-    public long getUpdatedAt() { return updatedAt; }
-    public String getPassword() { return password; }
-
-    public void updateUsername(String newUsername) {
-        // 업데이트 시에도 유효성 검사 추가
-        if (newUsername == null || newUsername.trim().isEmpty()) {
-            throw new IllegalArgumentException("새 사용자 이름이 비어있습니다.");
-        }
-        this.username = newUsername;
-        this.updatedAt = System.currentTimeMillis();
+    public UUID getId() {
+        return id;
     }
 
-    public void updatePassword(String newPassword) {
-        // 업데이트 시에도 유효성 검사 추가
-        if (newPassword == null || newPassword.trim().isEmpty()) {
-            throw new IllegalArgumentException("새 비밀번호가 비어 있습니다.");
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
         }
-        if (newPassword.length() < 10) {
-            throw new IllegalArgumentException("새 비밀번호는 10자리 이상이어야 합니다.");
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
         }
-        this.password = newPassword;
-        this.updatedAt = System.currentTimeMillis();
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
