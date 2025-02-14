@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.dto.user;
+package com.sprint.mission.discodeit.dto.BinaryContent;
 
 import com.sprint.mission.discodeit.entity.data.ContentType;
 
-import java.util.UUID;
-
-public record BinaryContentDTO(
+public record CreateDTO(
+        ContentType contentType,
         String filename,
         String fileType,
         byte[] data

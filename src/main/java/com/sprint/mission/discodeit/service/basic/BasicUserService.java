@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContent.CreateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserIdDTO;
 import com.sprint.mission.discodeit.dto.user.CreatedUserDataDTO;
 import com.sprint.mission.discodeit.dto.user.BinaryContentDTO;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.data.BinaryContent;
+import com.sprint.mission.discodeit.entity.data.ContentType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -29,13 +32,22 @@ public class BasicUserService implements UserService {
     @Override
     public User createUser(CreatedUserDataDTO data, BinaryContentDTO proFile) {
         try {
+            User user = null;
             userValidator.validateUser(data.name(), data.email(), data.password());
-            User user = new User(data.name(), data.email(), data.id(), data.password());
-            userRepository.save(user);
-
             if(proFile != null){
-                binaryContentService.created(proFile);
+                CreateDTO createDTO = new CreateDTO(
+                        ContentType.PROFILE_IMAGE,
+                        proFile.filename(),
+                        proFile.fileType(),
+                        proFile.data()
+                );
+                BinaryContent content = binaryContentService.created(createDTO);
+                user = new User(data.name(), data.email(), data.id(), data.password(), content.getId());
+            }else{
+                user = new User(data.name(), data.email(), data.id(), data.password());
             }
+
+            userRepository.save(user);
             UserIdDTO statusDTO = new UserIdDTO(user.getId());
             userStatusService.created(statusDTO);
 
@@ -46,7 +58,9 @@ public class BasicUserService implements UserService {
         }
     }
 
-
+    public User createUser(CreatedUserDataDTO data){
+        return createUser(data, null);
+    }
 
 
     @Override

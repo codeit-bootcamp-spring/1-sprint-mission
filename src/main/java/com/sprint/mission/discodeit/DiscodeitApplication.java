@@ -19,17 +19,17 @@ import java.util.UUID;
 @SpringBootApplication
 public class DiscodeitApplication {
 
-	static User setupUser(UserService userService){
-		User user = userService.createUser
-				("코드일","codeit1234@codeit.com","codeit1234","1Q2w3e4r@");
-		return user;
-	}
-
-	static User setupUser2(UserService userService){
-		User user = userService.createUser
-				("코드이","code1234@codeit.com","codeit1234","1q2W3e4r@");
-		return user;
-	}
+//	static User setupUser(UserService userService){
+//		User user = userService.createUser
+//				("코드일","codeit1234@codeit.com","codeit1234","1Q2w3e4r@");
+//		return user;
+//	}
+//
+//	static User setupUser2(UserService userService){
+//		User user = userService.createUser
+//				("코드이","code1234@codeit.com","codeit1234","1q2W3e4r@");
+//		return user;
+//	}
 
 
 	static Channel setupChannel(ChannelService channelService){

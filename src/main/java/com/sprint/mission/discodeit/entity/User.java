@@ -22,6 +22,7 @@ public class User implements Serializable {
     private String email;
     private String password;
     private String accountId;
+    private UUID binaryContentId;
 
 
     public User(String name, String email,String iD ,String password){
@@ -32,6 +33,16 @@ public class User implements Serializable {
         this.email = email;
         this.accountId = iD;
         this.password = password;
+    }
+    public User(String name, String email,String iD ,String password,UUID binaryContentId ){
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+        this.name = name;
+        this.email = email;
+        this.accountId = iD;
+        this.password = password;
+        this.binaryContentId = binaryContentId;
     }
 
 

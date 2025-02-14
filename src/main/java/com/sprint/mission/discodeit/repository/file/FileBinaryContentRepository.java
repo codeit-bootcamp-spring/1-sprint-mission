@@ -53,6 +53,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         }
         return binaryContent;
     }
+    //이미지파일의 id로 조회
     @Override
     public Optional<BinaryContent> findById(UUID id) {
         Path[] directories = {PROFILE_IMAGE, MESSAGE_IMAGE};
