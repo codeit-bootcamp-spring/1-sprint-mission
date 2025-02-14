@@ -33,7 +33,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userRepository.findById(createUserStatusDto.userId()) == null){
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        if (userStatusRepository.findByUserId(createUserStatusDto.userId()) != null) {
+        if (userStatusRepository.findById(createUserStatusDto.userId()) != null) {
             throw new IllegalArgumentException("userStatus already exists");
         }
         UserStatus userStatus = new UserStatus(createUserStatusDto.userId());
