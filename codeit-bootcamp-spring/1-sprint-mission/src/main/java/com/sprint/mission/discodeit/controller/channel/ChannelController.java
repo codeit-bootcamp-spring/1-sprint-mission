@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,7 +32,7 @@ public class ChannelController {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
 
-    @RequestMapping(name = "/public", method = RequestMethod.POST)
+    @RequestMapping(value = "/public", method = RequestMethod.POST)
     public ResponseEntity<Void> createPublicChannel(
             @RequestBody PublicChannelCreateRequest publicChannelCreateRequest
     ) {
@@ -41,7 +40,7 @@ public class ChannelController {
         return ResponseEntity.created(URI.create("/")).build();
     }
 
-    @RequestMapping(name = "/private", method = RequestMethod.POST)
+    @RequestMapping(value = "/private", method = RequestMethod.POST)
     public ResponseEntity<Void> createPrivateChannel(
             @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest
     ) {

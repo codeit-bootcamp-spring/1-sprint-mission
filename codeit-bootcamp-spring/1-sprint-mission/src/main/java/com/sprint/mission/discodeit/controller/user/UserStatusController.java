@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller.user;
 
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import java.time.Instant;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
