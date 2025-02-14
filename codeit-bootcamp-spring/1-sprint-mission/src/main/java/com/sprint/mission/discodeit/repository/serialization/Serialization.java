@@ -9,6 +9,12 @@ import java.nio.file.Path;
 
 public class Serialization<T> {
 
+    private final Class<T> type;
+
+    public Serialization(Class<T> type) {
+        this.type = type;
+    }
+
     public void serialize(Path path, T t) {
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
@@ -25,7 +31,7 @@ public class Serialization<T> {
                 FileInputStream fis = new FileInputStream(path.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis)
         ) {
-            return (T) ois.readObject();
+            return type.cast(ois.readObject());
         } catch (IOException | ClassNotFoundException exception) {
             throw new RuntimeException(exception);
         }

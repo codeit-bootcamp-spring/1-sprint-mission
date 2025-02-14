@@ -22,7 +22,7 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private static final Serialization<BinaryContent> SERIALIZATION = new Serialization<>();
+    private static final Serialization<BinaryContent> SERIALIZATION = new Serialization<>(BinaryContent.class);
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
