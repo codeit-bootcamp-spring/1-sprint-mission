@@ -5,19 +5,16 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BasicUserStautsService implements UserStatusService {
-  @Qualifier("file")
   private final UserStatusRepository userStatusRepository;
-  @Qualifier("file")
   private final UserRepository userRepository;
   
   @Override

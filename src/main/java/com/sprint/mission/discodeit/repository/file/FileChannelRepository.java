@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.FileIO;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import java.io.File;
 import java.nio.file.Path;
@@ -16,17 +16,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@Qualifier("file")
-@AllArgsConstructor
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
   private final Path DIRECTORY = Paths.get("repository-data", "channels");
   private final String EXTENSION = ".ser";
   private final FileIO fileIO;
-  
-  @Qualifier("file")
-  private UserRepository userRepository;
-  @Qualifier("file")
-  private MessageRepository messageRepository;
+  private final UserRepository userRepository;
+  private final MessageRepository messageRepository;
   
   private Path resolvePath(UUID id) {
     return DIRECTORY.resolve(id + EXTENSION);

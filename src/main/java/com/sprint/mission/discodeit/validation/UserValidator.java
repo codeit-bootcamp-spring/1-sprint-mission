@@ -2,19 +2,22 @@ package com.sprint.mission.discodeit.validation;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class UserValidator {
-  @Qualifier("jcf")
   private final UserRepository userRepository;
+  @Value("${discodeit.repository.type}")
+  private String repositoryType;
+  
+  public UserValidator(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
   
   private boolean isUniqueName(String name) {
     return userRepository.findAll().stream()
-        .anyMatch(u -> u.getName().equals(name));
+        .noneMatch(u -> u.getName().equals(name));
   }
   
   private boolean isValidEmail(String email) {
@@ -23,7 +26,7 @@ public class UserValidator {
   
   private boolean isUniqueEmail(String email) {
     return userRepository.findAll().stream()
-        .anyMatch(u -> u.getEmail().equals(email));
+        .noneMatch(u -> u.getEmail().equals(email));
   }
   
   public boolean validateUser(CreateUserDto userDto) {

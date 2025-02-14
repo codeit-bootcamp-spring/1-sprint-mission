@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.util.FileIO;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import java.io.File;
 import java.nio.file.Path;
@@ -14,8 +14,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@Qualifier("file")
 @AllArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileReadStatusRepository implements ReadStatusRepository {
   private final Path DIRECTORY = Paths.get("repository-data", "read-statuses");
   private final String EXTENSION = ".ser";

@@ -11,8 +11,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +19,11 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-  @Qualifier("file")
   private final ChannelRepository channelRepository;
-  @Qualifier("file")
   private final UserRepository userRepository;
-  @Qualifier("file")
   private final ReadStatusRepository readStatusRepository;
-  @Qualifier("file")
   private final MessageRepository messageRepository;
   
   @Override
@@ -60,7 +55,12 @@ public class BasicChannelService implements ChannelService {
   public FindChannelDto findByName(String name) {
     Channel channel = channelRepository.findByName(name).orElseThrow(() ->
         new NoSuchElementException("channel not found: " + name));
-    int lastMessageIndex = messageRepository.findAllByChannel(channel.getId()).lastIndexOf(this);
+    
+    if (messageRepository.findAllByChannel(channel.getId()).isEmpty()) {
+      return new FindChannelDto(channel.getId(), channel.getName(), channel.getDescription(), null, channel.getMemberIds());
+    }
+    
+    int lastMessageIndex = messageRepository.findAllByChannel(channel.getId()).size() - 1;
     Long lastMessageTime = messageRepository.findAllByChannel(channel.getId()).get(lastMessageIndex).getUpdatedAt();
     return new FindChannelDto(channel.getId(), channel.getName(), channel.getDescription(), lastMessageTime, channel.getMemberIds());
   }

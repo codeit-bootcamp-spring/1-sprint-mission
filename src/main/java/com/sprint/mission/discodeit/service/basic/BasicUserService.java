@@ -11,8 +11,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.UserValidator;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +18,37 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
 public class BasicUserService implements UserService {
-  @Qualifier("file")
   private final UserRepository userRepository;
-  @Qualifier("file")
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentRepository binaryContentRepository;
   private final Encryptor encryptor;
-  private UserValidator userValidator;
-  @Qualifier("file")
-  private BinaryContentRepository binaryContentRepository;
+  private final UserValidator userValidator;
+  
+  public BasicUserService(UserRepository userRepository,
+                          UserStatusRepository userStatusRepository,
+                          BinaryContentRepository binaryContentRepository,
+                          Encryptor encryptor,
+                          UserValidator userValidator) {
+    this.userRepository = userRepository;
+    this.userStatusRepository = userStatusRepository;
+    this.binaryContentRepository = binaryContentRepository;
+    this.encryptor = encryptor;
+    this.userValidator = userValidator;
+  }
   
   @Override
   public void createUser(CreateUserDto createUserDto) {
     if (userValidator.validateUser(createUserDto)) {
-      User user = new User(createUserDto.password(), createUserDto.name(), createUserDto.email(), encryptor, createUserDto.profileImage());
+      String salt = encryptor.getSalt();
+      String encryptedPassword = encryptor.encryptPassword(createUserDto.password(), salt);
+      User user = new User(encryptedPassword, salt, createUserDto.name(), createUserDto.email(), createUserDto.profileImage());
       UserStatus userStatus = new UserStatus(user.getId());
       userRepository.save(user);
       userStatusRepository.save(userStatus);
+    } else {
+      throw new IllegalArgumentException("Failed to create user.");
     }
-    throw new IllegalArgumentException("Failed to create user.");
   }
   
   @Override
@@ -91,7 +100,9 @@ public class BasicUserService implements UserService {
   public void updatePassword(UpdateUserDto updateUserDto) {
     User user = userRepository.findById(updateUserDto.id())
         .orElseThrow(() -> new NoSuchElementException("user not found with id: " + updateUserDto.id()));
-    user.updatePassword(updateUserDto.newPassword());
+    String salt = encryptor.getSalt();
+    String encryptedPassword = encryptor.encryptPassword(updateUserDto.newPassword(), salt);
+    user.updatePassword(encryptedPassword, salt);
   }
   
   @Override
