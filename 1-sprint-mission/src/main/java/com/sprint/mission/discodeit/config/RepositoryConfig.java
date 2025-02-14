@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RepositoryConfig {
 
-    
+
     //UserRepository Bean 등록
     @Bean
     @ConditionalOnProperty(name = "discodiet.repository.type", havingValue = "jcf", matchIfMissing = true)
