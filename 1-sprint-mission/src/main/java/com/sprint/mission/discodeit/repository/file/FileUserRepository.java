@@ -1,86 +1,104 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "tmp/users.ser";
-    private final List<User> userList;
+    private static final String FILE_PATH = "tmp/entity/users.ser";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<UUID, User> userdata;
 
     public FileUserRepository() {
-        this.userList = loadFromFile();
+        this.userdata = loadFromFile();
+    }
+
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return userdata.values().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
 
     @Override
-    public void save(User user) {
-        if(userList.stream().anyMatch(u -> u.getUserId().equals(user.getUserId()))){
-            throw new IllegalArgumentException("Duplicate User ID: " + user.getUserId());
-        }
-        userList.add(user);
+    public User save(User user) {
+        userdata.put(user.getId(), user);
         saveToFile();
+        return user;
     }
 
     @Override
-    public User findById(String userId) {
-        User findUser = loadFromFile().stream()
-                .filter(user -> user.getUserId().equals(userId))
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(userdata.values().stream()
+                .filter(user -> user.getId().equals(id))
                 .findFirst()
-                .orElse(null);
-        if(findUser == null){
-            throw new IllegalArgumentException("User with ID " +userId + " not found.");
-        }
-        return findUser;
+                .orElseThrow(() -> new IllegalArgumentException("Not found User")));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(loadFromFile());
+        return new ArrayList<>(userdata.values());
     }
 
+
     @Override
-    public void delete(String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be null or empty.");
-        }
-        userList.removeIf(user -> user.getUserId().equals(userId));
+    public void deleteById(UUID id) {
+        userdata.remove(id);
         saveToFile();
     }
 
+    @Override
+    public boolean existsByPassword(String password) {
+        return userdata.values().stream().anyMatch(user -> user.getPassword().equals(password));
+    }
 
+    @Override
+    public boolean existsById(UUID id) {
+        return userdata.containsKey(id);
+    }
 
-    private List<User> loadFromFile() {
+    @Override
+    public boolean existsByEmail(String email) {
+        return userdata.values().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return Optional.ofNullable(userdata.values().stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Not User Found")));
+    }
+
+    private Map<UUID, User> loadFromFile() {
         File file = new File(FILE_PATH);
-        if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>();
+        if (!file.exists()) {
+            return new HashMap<>();
         }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (List<User>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Initializing empty list.");
-            return new ArrayList<>();
-        }catch (EOFException e){
-            System.out.println("EOFException: File is empty or corrupted. Initializing empty list.");
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+        try {
+            return objectMapper.readValue(file, new TypeReference<Map<UUID, User>>() {});
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return new HashMap<>();
         }
     }
 
     private void saveToFile() {
         try (ObjectOutputStream oos
                      = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(userList);
+            oos.writeObject(userdata);
         } catch (IOException e) {
-
             throw new RuntimeException("Failed to save users to file.", e);
         }
 
     }
+
+
 
 }

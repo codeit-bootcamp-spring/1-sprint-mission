@@ -1,45 +1,68 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel extends BaseEntity implements Serializable {
-    @Serial
+@Getter
+@Setter
+public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
+    //
+    private UUID id;
+    private User owner;
+    //
+    private String name; // public 채널 용
+    private String description; // public 채널 용
+    //
+    private ChannelType type;
 
-    private final UUID channelUuid;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String channelTitle;
-    private final String userId;
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt;
 
-    public Channel(String channelTitle, String userId){
-        channelUuid = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.channelTitle = channelTitle;
-        this.userId = userId;
+    private Instant lastMessageAt = Instant.EPOCH;
+
+    public Channel(User owner, ChannelType type) {
+        if(type != ChannelType.PRIVATE){
+            throw new IllegalArgumentException("Invalid channel type");
+        }
+        this.id = UUID.randomUUID();
+        this.owner = owner;
+        this.type = type;
+        this.updatedAt = this.createdAt;
     }
 
-// Get 메소드
-    public String getChannelTitle() {
-        return channelTitle;
+
+
+    public Channel(User owner, String name, String description, ChannelType type) {
+        if(type != ChannelType.PUBLIC){
+            throw new IllegalArgumentException("Invalid channel type");
+        }
+        this.id = UUID.randomUUID();
+        this.owner = owner;
+        this.type = type;
+        this.name = name;
+        this.description = description;
+        this.updatedAt = this.createdAt;
     }
 
-    public String getUserId() {
-        return userId;
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-
-    public String getChannelUuid() {
-        return channelUuid.toString();
-    }
-
-//update 메소드
-
-    public void setChannelTitle(String channelTitle) {
-        this.channelTitle = channelTitle;
-        updateUpdatedAt();
-    }
-
 }
