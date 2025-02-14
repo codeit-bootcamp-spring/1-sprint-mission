@@ -39,13 +39,13 @@ public class BasicUserService implements UserService {
         userRepository.save(newUser);
 
         // 프로필 이미지 저장 (선택적)
-        if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
+        if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null && userProfileImageDTO.imageData().length > 0) {
             BinaryContent binaryContent = new BinaryContent(
                     UUID.randomUUID(),
                     newUser.getId(),
                     null,
                     userProfileImageDTO.fileName(),
-                    "image/jpeg",
+                    userProfileImageDTO.contentType(),
                     userProfileImageDTO.imageData()
             );
             binaryContentRepository.save(binaryContent);
@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
         userStatusRepository.save(userStatus);
 
         boolean isOnline = userStatus.isOnline();
-        log.info("User created: {} (email: {})", userCreateDTO.username(), userCreateDTO.email());
+        log.error("User created: {} (email: {})", userCreateDTO.username(), userCreateDTO.email());
 
         return new UserDTO(
                 newUser.getId(),
@@ -113,11 +113,11 @@ public class BasicUserService implements UserService {
             //업데이트
             user.update(userUpdateDTO.newUsername(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
             userRepository.save(user);
+
             //프로필 이미지 저장 (선택적으로)
             if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
                 //기존 이미지 삭제 , 이미지 저장
                 binaryContentRepository.deleteByUserId(user.getId());
-
                 BinaryContent binaryContent = new BinaryContent(
                         UUID.randomUUID(),
                         user.getId(),
@@ -128,10 +128,13 @@ public class BasicUserService implements UserService {
                 );
                 binaryContentRepository.save(binaryContent);
             }
-            boolean isOnline = userStatusRepository.findByUserId(user.getId())
-                    .map(UserStatus::isOnline)
-                    .orElse(false);
-            return new UserDTO(user.getId(),
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElse(new UserStatus(user, Instant.now()));
+        userStatus.updateLastSeenAt(Instant.now());
+        userStatusRepository.save(userStatus);
+
+        boolean isOnline = userStatus.isOnline();
+        return new UserDTO(user.getId(),
                     user.getUsername(),
                     user.getEmail(),
                     user.getCreatedAt(),
