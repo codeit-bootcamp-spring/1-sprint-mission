@@ -72,13 +72,19 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(Message message) {
-        Path filePath = directory.resolve(message.getId() + ".ser");
+    public void delete(UUID messageId) {
+        Path filePath = directory.resolve(messageId + ".ser");
 
         try {
             Files.delete(filePath);
         } catch (IOException e) {
             System.out.println("삭제에 실패하였습니다.");
         }
+    }
+
+    @Override
+    public boolean existsById(UUID messageId) {
+        Path filePath = directory.resolve(messageId + ".ser");
+        return Files.exists(filePath);
     }
 }

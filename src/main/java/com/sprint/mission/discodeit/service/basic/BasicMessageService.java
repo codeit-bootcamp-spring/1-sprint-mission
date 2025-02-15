@@ -80,7 +80,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageResponseDto update(MessageUpdateRequestDto messageUpdateRequestDto) {
         Message message = messageRepository.find(messageUpdateRequestDto.id());
-        
+
         message.updateContent(messageUpdateRequestDto.content());
         messageRepository.save(message);
 
@@ -89,7 +89,10 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        Message message = find(messageId);
-        messageRepository.delete(message);
+        Message message = Optional.ofNullable(messageRepository.find(messageId))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
+
+        message.getBinaryContentData().forEach(binaryContentService::delete);
+        messageRepository.delete(messageId);
     }
 }
