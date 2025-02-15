@@ -26,6 +26,10 @@ public class ReadStatus implements Serializable {
         this.userId = userId;
     }
 
+    public void updateUpdatedAt() {
+        this.updatedAt = Instant.now();
+    }
+
     public boolean isSameChannelId(UUID channelId) {
         return this.channelId.equals(channelId);
     }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponseDto createPrivateChannel(ChannelCreateRequestDto channelCreateRequestDto) {
         Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, channelCreateRequestDto.users()));
         channelCreateRequestDto.users()
-                .forEach(user -> readStatusService.create(ReadStatusDto.from(channel.getId(), user)));
+                .forEach(user -> readStatusService.create(ReadStatusCreateDto.from(channel.getId(), user)));
         return getChannelInfo(channel);
     }
 
