@@ -40,7 +40,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public void deleteByUserId(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
     }
 }

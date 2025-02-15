@@ -90,7 +90,7 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
         binaryContentService.delete(userRepository.find(userId).getBinaryContentId());
-        userStatusService.delete(userId);
+        userStatusService.deleteByUserId(userId);
         userRepository.delete(userId);
     }
 

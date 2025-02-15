@@ -10,5 +10,5 @@ public interface UserStatusService {
     UserStatus find(UUID userStatusId);
     UserStatus findByUserId(UUID userId);
     OnlineStatus getOnlineStatus(UUID userId);
-    void delete (UUID userId);
+    void deleteByUserId(UUID userId);
 }
