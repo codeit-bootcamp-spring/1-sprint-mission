@@ -22,8 +22,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message save(String content, User sender, UUID channelId) {
-        Message message = new Message(content, sender, channelId);
+    public Message save(Message message) {
         Path filePath = directory.resolve(message.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
