@@ -24,6 +24,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public UserStatus find(UUID userStatusId) {
+        return null;
+    }
+
+    @Override
     public UserStatus findByUserId(UUID userId) {
         return null;
     }
@@ -32,5 +37,10 @@ public class BasicUserStatusService implements UserStatusService {
     public OnlineStatus getOnlineStatus(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
         return userStatus.calculateOnlineStatus();
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        UserStatus userStatus = findByUserId(userId);
     }
 }

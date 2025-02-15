@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public interface UserStatusService {
     UserStatus create(UUID userId);
+    UserStatus find(UUID userStatusId);
     UserStatus findByUserId(UUID userId);
     OnlineStatus getOnlineStatus(UUID userId);
+    void delete (UUID userId);
 }

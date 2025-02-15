@@ -80,9 +80,12 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID userId) {
-        User user = userRepository.find(userId);
-        validateUserExists(user);
-        userRepository.delete(user);
+        if (!userRepository.existsById(userId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
+        binaryContentService.delete(userRepository.find(userId).getBinaryContentId());
+        userStatusService.delete(userId);
+        userRepository.delete(userId);
     }
 
     @Override

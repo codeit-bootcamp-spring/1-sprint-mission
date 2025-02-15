@@ -21,4 +21,9 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContent find(UUID binaryContentId) {
         return null;
     }
+
+    @Override
+    public void delete(UUID binaryContentId) {
+
+    }
 }

@@ -70,8 +70,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(User user) {
-        Path filePath = directory.resolve(user.getId() + ".ser");
+    public void delete(UUID userId) {
+        Path filePath = directory.resolve(userId + ".ser");
 
         try {
             Files.delete(filePath);
