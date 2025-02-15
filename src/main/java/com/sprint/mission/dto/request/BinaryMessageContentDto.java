@@ -15,21 +15,13 @@ public class BinaryMessageContentDto {
     //private final UUID id;
     //private final Instant createdAt;
 
-    private final byte[] bytes;
+    private final List<byte[]> bytes;
     private final UUID messageId;
 
-    public BinaryMessageContentDto(BinaryMessageContent contents) {
+    public BinaryMessageContentDto(UUID messageId, List<byte[]> contents) {
         //this.id = contents.getId();
         //this.createdAt = contents.getCreatedAt();
-        this.messageId = contents.getMessageId();
-        this.bytes = contents.getBytes();
+        this.messageId = messageId;
+        this.bytes = contents;
     }
-
-    //
-//    public BinaryContentDto BinaryUserContentDto(UUID userId, byte[] bytes){
-//        BinaryContentDto bcd = new BinaryContentDto(bytes);
-//        bcd.userId = userId;
-//        bcd.bytes = bytes;
-//        return bcd;
-//    }
 }

@@ -24,7 +24,7 @@ public class FindPrivateChannelDto implements FindChannelDto {
         this.channelType = channel.getChannelType();
         this.description = channel.getDescription();
         this.name = channel.getName();
-        this.userIdList =channel.getUserList().stream()
+        this.userIdList = channel.getUserList().stream()
                 .map(User::getId)
                 .collect(Collectors.toCollection(ArrayList::new));
         this.lastMessageTime = channel.getLastMessageTime();

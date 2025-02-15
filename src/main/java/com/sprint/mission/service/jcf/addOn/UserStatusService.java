@@ -24,8 +24,8 @@ public class UserStatusService {
         }
     }
 
-    public Optional<UserStatus> findById(UUID userId){
-        return userStatusRepository.findById(userId);
+    public UserStatus findById(UUID userId){
+        return userStatusRepository.findById(userId).orElseThrow(() -> new NotFoundId("userId에 맞는 userstatus가 존재하지 않습니다"));
     }
 
     public List<UserStatus> findAll(){

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class Message implements Serializable, Comparable<Message> {
     private final Instant createAt;
     private Instant updateAt;
 
-    private List<BinaryMessageContent> BinaryContent;
+    private List<byte[]> attachments = new ArrayList<>();
     private String content;
 
     // 무조건 메시지는 CREATE로 생성하도록
@@ -37,6 +38,10 @@ public class Message implements Serializable, Comparable<Message> {
         Message createdMessage = new Message(channel, user, message);
         channel.updateLastMessageTime(); // 채널에서 메시지 마지막 시간 초기화
         return createdMessage;
+    }
+
+    public void addAttachment(byte[] bytes){
+        attachments.add(bytes);
     }
 
     // 나중에, equals hashcode

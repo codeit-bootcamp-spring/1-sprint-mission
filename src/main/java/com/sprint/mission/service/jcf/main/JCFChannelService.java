@@ -12,8 +12,10 @@ import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
+import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.exception.DuplicateName;
 import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class JCFChannelService implements ChannelService {
     private final JCFUserService userService;
     private final JCFUserRepository userRepository;
     private final UserStatusService userStatusService;
+    private final JCFMessageService messageService;
 
     @Override
     public void create(ChannelDtoForRequest requestDTO) {
@@ -52,22 +55,17 @@ public class JCFChannelService implements ChannelService {
         channelRepository.save(updatingChannel);
     }
 
-    @Override
-    public Channel findById(UUID channelId) {
-        return channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
-
-    }
-
-    @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
-    }
 
     /**
      * [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
      * [ ] PUBLIC 채널 목록은 전체 조회합니다.
      * [ ] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
      */
+    @Override
+    public Channel findById(UUID channelId) {
+        return channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+    }
+
     public List<Channel> findAllByUserId(UUID userId) {
 
         // 1. Public 채널
@@ -84,37 +82,48 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
+
+
+
+    @Override
     public void delete(UUID channelId) {
         Channel deletingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+
+        deletingChannel.getMessageList().forEach((message) -> {
+            messageService.delete(message.getId());
+        });
+
         deletingChannel.getUserList().forEach(user -> {
                     user.getChannels().remove(deletingChannel);
+                    // JPA가 아니므로 user의 수정사항을 다시 저장하기
                     userRepository.save(user);
-                    // JPA 쓰고 싶다....
                 });
 
         channelRepository.delete(channelId);
     }
 
-    public void addUser(User user, Channel channel) {
-        channel.addUser(user);
-    }
-
-
     public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId) {
-        List<User> userList = channelRepository.findById(channelId)
-                .filter((findChannel) -> !findChannel.getChannelType().equals(ChannelType.PUBLIC))
-                .map(Channel::getUserList)
-                .orElse(new ArrayList<>());
+        Channel inChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        if (inChannel.getChannelType().equals(ChannelType.PUBLIC)) {
+            throw new RuntimeException("Public 채널은 유저별 lastReadTime 호출 불가");
+        }
 
         // 유저별 이 채널 마지막 readTime
+        // 이 때 쓰는 findUserDto는 profile null
         Map<FindUserDto, Instant> readTimeMap = new HashMap<>();
-        for (User user : userList) {
+        for (User user : inChannel.getUserList()) {
             userStatusService.findById(user.getId()).ifPresentOrElse((userStatus) -> {
                 readTimeMap.put(new FindUserDto(user, userStatus.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
             }, () -> readTimeMap.put(new FindUserDto(user, false), null));
         }
         return readTimeMap;
     }
+
+
+
 
     /**
      * 중복 검증
@@ -136,6 +145,11 @@ public class JCFChannelService implements ChannelService {
                 ? new FindPrivateChannelDto(findedChannel)
                 : new FindPublicChannelDto(findedChannel));
     }
+
+    //
+//    public void addUser(User user, Channel channel) {
+//        channel.addUser(user);
+//    }
 
 }
 

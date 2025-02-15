@@ -29,11 +29,12 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/channels")
 public class ChannelController {
 
     private final JCFChannelService channelService;
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> save(@RequestBody ChannelDtoForRequest requestDTO) {
         channelService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -46,7 +47,8 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.OK).body(getFindChannelDto(findChannel));
     }
 
-    @GetMapping("/channels/{userId}")
+
+    @GetMapping(value = "/{usersId}/channels")
     public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable UUID userId) {
         List<Channel> findAllChannel = channelService.findAllByUserId(userId);
         List<FindChannelDto> findChannelDtoList = findAllChannel.stream()
@@ -57,7 +59,9 @@ public class ChannelController {
 
     @PatchMapping("/{channelId}")
     public ResponseEntity<String> update(@PathVariable UUID channelId, @RequestBody ChannelDtoForRequest requestDTO) {
-
+        if (requestDTO.getChannelType().equals(ChannelType.PRIVATE)){
+            return ResponseEntity.badRequest().body("PRIVATE 채널은 수정 불가능입니다.");
+        }
         channelService.update(channelId, requestDTO);
         return ResponseEntity.ok("Successfully updated");
     }

@@ -4,6 +4,7 @@ import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -18,14 +19,7 @@ public class BinaryMessageContent{
     private final UUID id;
     private final UUID messageId;
     private final Instant createdAt;
-    private final byte[] bytes;
-
-    public BinaryMessageContent(UUID messageId, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.messageId = messageId;
-        this.createdAt = Instant.now();
-        this.bytes = bytes;
-    }
+    private List<byte[]> bytes;
 
     public BinaryMessageContent(BinaryMessageContentDto dto) {
         this.id = UUID.randomUUID();
@@ -33,5 +27,4 @@ public class BinaryMessageContent{
         this.createdAt = Instant.now();
         this.bytes = dto.getBytes();
     }
-
 }

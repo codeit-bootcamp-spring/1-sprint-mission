@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Service
 public interface UserService {
-    User create(UserDtoForRequest dto) ;
+    void create(UserDtoForRequest dto) ;
     void update(UUID userId, UserDtoForRequest dto);
     User findById(UUID id);
     List<User> findAll();

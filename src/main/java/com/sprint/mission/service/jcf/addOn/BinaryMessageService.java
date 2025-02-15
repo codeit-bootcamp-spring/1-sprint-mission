@@ -23,16 +23,20 @@ public class BinaryMessageService {
         repository.save(new BinaryMessageContent(dto));
     }
 
-    public BinaryMessageContentDto findById(UUID messageId){
-        return repository.findById(messageId)
-                .map((bmc) -> new BinaryMessageContentDto(bmc))
-                .orElseThrow(NotFoundId::new);
+    // DTO변환은 컨트롤러에서
+    public BinaryMessageContent findById(UUID messageId){
+        return repository.findById(messageId).orElseThrow(NotFoundId::new);
     }
 
-    public List<BinaryMessageContentDto> findAll(){
-         return repository.findAll().stream()
-                 .map((bmc) -> new BinaryMessageContentDto(bmc))
-                 .collect(Collectors.toCollection(ArrayList::new));
+
+    public List<BinaryMessageContent> findAllByIn(List<UUID> messageIdList){
+        List<BinaryMessageContent> binaryMessageContentList = new ArrayList<>();
+        messageIdList.forEach(messageId -> repository.findById(messageId).ifPresent(binaryMessageContentList::add));
+        return binaryMessageContentList;
+    }
+
+    public List<BinaryMessageContent> findAll(){
+         return repository.findAll();
     }
 
     public void delete(UUID messageId){

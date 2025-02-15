@@ -25,6 +25,7 @@ public class User implements Serializable {
 
     private final Instant createAt;
     private Instant updateAt;
+//    private byte[] profile;
 
     private final List<Channel> channels = new ArrayList<>();
 

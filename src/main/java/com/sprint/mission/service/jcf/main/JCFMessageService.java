@@ -30,49 +30,30 @@ public class JCFMessageService {
 
 
     public void create(MessageDtoForCreate responseDto) {
-        // FindChannelDto byId = channelService.findById(dto.getChannelId());
-        // 아직 컨트롤러가 없어서 Sevice 이용하면 DTO 반환...
-        // [ ] 선택적으로 여러 개의 첨부파일을 같이 등록할 수 있습니다.
-        // [ ] DTO를 활용해 파라미터를 그룹화합니다.
         Channel writtenChannel = channelRepository.findById(responseDto.getChannelId())
                 .orElseThrow(() -> new NotFoundId("wrong channelId"));
         User writer = userRepository.findById(responseDto.getUserId())
                 .orElseThrow(() -> new NotFoundId("wrong userId"));
 
-        Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent()); // 첨부파일 미포함 메시지
+        // 첨부파일 미포함 메시지
+        Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent());
 
         // 첨부파일 적용
-        List<BinaryMessageContent> bmc = responseDto.getBinaryMessageContent();
+        List<byte[]> bmc = responseDto.getAttachments();
         if (!bmc.isEmpty()) {
-            createdMessage.setBinaryContent(bmc);
-            bmc.forEach((binaryMessageContent)
-                    -> binaryMessageService.create(new BinaryMessageContentDto(binaryMessageContent)));
+            createdMessage.setAttachments(bmc);
+            binaryMessageService.create(new BinaryMessageContentDto(createdMessage.getId(), bmc));
         }
         messageRepository.save(createdMessage);
     }
 
+    // 메시지 binary data는 수정 불가
     public void update(MessageDtoForUpdate updateDto) {
         Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
                 .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
 
-        List<BinaryMessageContent> bmc = updateDto.getBinaryMessageContent();
-        if (!bmc.isEmpty()) {
-            // message에 첨부파일들 등록
-            updatingMessage.setBinaryContent(bmc);
-            // binaryMessage 저장소에 저장
-            bmc.forEach((binaryMessageContent) -> {
-                binaryMessageService.create(new BinaryMessageContentDto(binaryMessageContent));
-            });
-        }
-
         updatingMessage.setContent(updateDto.getChangeContent());
-
         messageRepository.save(updatingMessage);
-    }
-
-    //@Override
-    public Optional<Message> findById(UUID messageId) {
-        return messageRepository.findById(messageId);
     }
 
     //@Override
@@ -84,6 +65,12 @@ public class JCFMessageService {
     //@Override
     public void delete(UUID messageId) {
         binaryMessageService.delete(messageId);
-        messageRepository.delete(messageId);
+        if (messageRepository.existsById(messageId)) messageRepository.delete(messageId);
+        else throw new NotFoundId("message 삭제 실패 : wrong id");
+    }
+
+    //@Override
+    public Message findById(UUID channelId) {
+        return messageRepository.findById(channelId).orElseThrow(NotFoundId::new);
     }
 }

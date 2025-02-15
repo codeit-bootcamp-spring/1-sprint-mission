@@ -16,16 +16,9 @@ public class DiscodeitApplication {
 		JCFUserService userService = context.getBean(JCFUserService.class);
 
 		UserDtoForRequest userDtoForRequest = new UserDtoForRequest("userA", "1234", "id");
-		User userA = userService.create(userDtoForRequest);
+		userService.create(userDtoForRequest);
 
-		UserDtoForRequest updateForm = new UserDtoForRequest("userA-1", "SSS", "icb");
-		userService.update(userA.getId(), updateForm);
-//		ChannelService channelService = context.getBean(ChannelService.class);
-//		MessageService messageService = context.getBean(MessageService.class);
-//
-//		System.out.println("UserService Bean: " + userService);
-//		System.out.println("ChannelService Bean: " + channelService);
-//		System.out.println("MessageService Bean: " + messageService);
-//		// yml 설정 공부 하기
+		//UserDtoForRequest updateForm = new UserDtoForRequest("userA-1", "SSS", "icb");
+		//userService.update(userA.getId(), updateForm);
 	}
 }

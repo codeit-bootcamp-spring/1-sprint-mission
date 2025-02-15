@@ -12,6 +12,6 @@ public class MessageDtoForCreate {
     private UUID channelId;
     private UUID userId;
     private String content;
-    private List<BinaryMessageContent> binaryMessageContent;
+    private List<byte[]> attachments;
 
 }

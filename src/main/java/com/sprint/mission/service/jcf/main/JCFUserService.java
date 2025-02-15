@@ -35,7 +35,9 @@ public class JCFUserService implements UserService {
 
         // 선택적 프로필 생성
         BinaryProfileContent profileImg = userDto.getProfileImg();
-        if (!(profileImg == null)) profileService.create(new BinaryProfileContentDto(profileImg));
+        if (!(profileImg == null)) {
+            profileService.create(new BinaryProfileContentDto(profileImg));
+        }
 
         // UserStatus 생성
         userStatusService.create(user.getId());

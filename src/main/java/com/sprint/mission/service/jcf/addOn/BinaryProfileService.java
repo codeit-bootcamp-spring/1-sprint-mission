@@ -1,5 +1,6 @@
 package com.sprint.mission.service.jcf.addOn;
 
+import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryProfileRepository;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;
@@ -20,17 +21,17 @@ public class BinaryProfileService {
         repository.save(new BinaryProfileContent(dto));
     }
 
-    public BinaryProfileContentDto findById(UUID userId) {
-        return repository.findById(userId)
-                .map(profileContent
-                        -> new BinaryProfileContentDto(profileContent))
-                .orElseThrow(NotFoundId::new);
+    public BinaryProfileContent findById(UUID userId) {
+        return repository.findById(userId).orElseThrow(NotFoundId::new);
+//                .map(profileContent
+//                        -> new BinaryProfileContentDto(profileContent))
+//                .orElseThrow(NotFoundId::new);
     }
 
-    public List<BinaryProfileContentDto> findAll() {
-        return repository.findAll().stream()
-                .map(bpc -> new BinaryProfileContentDto(bpc))
-                .collect(Collectors.toCollection(ArrayList::new));
+    public List<BinaryProfileContent> findAll() {
+        return repository.findAll();
+//                .map(bpc -> new BinaryProfileContentDto(bpc))
+//                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void delete(UUID messageId) {

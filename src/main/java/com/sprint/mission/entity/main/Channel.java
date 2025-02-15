@@ -23,7 +23,10 @@ public class Channel implements Serializable {
     private String name;
     private Instant lastMessageTime;
 
+
     private final List<User> userList = new ArrayList<>();
+    private final List<Message> messageList = new ArrayList<>();
+
 
     public Channel(String name, String description, ChannelType channelType) {
         this.id = UUID.randomUUID();

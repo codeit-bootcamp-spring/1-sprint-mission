@@ -24,7 +24,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @SneakyThrows
     @Override
-    public Message save(Message message) {
+    public void save(Message message) {
         Path msDirectPath = getMsDirectPath(message.getId());
 
         if (!Files.exists(msDirectPath)) {
@@ -34,7 +34,6 @@ public class FileMessageRepository implements MessageRepository {
         ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(msDirectPath));
         oos.writeObject(message);
         oos.close();
-        return message;
     }
 
 

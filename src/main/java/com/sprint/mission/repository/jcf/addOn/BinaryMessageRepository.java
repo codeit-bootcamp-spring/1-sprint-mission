@@ -17,6 +17,7 @@ public class BinaryMessageRepository {
     //delete
     //[ ] id로 삭제합니다.
 
+    // KEY : messageId
     private final Map<UUID, BinaryMessageContent> data = new HashMap<>();
 
     public void save(BinaryMessageContent binaryContent){
