@@ -7,7 +7,7 @@ import java.util.*;
 
 public class FileMessageRepository implements MessageRepository {
   private final List<Message> data;
-  public FileMessageRepository(SerializationUtil<Message> util, String filePath){
+  public FileMessageRepository(SerializationUtil<Message> util){
     this.data = util.loadData();
   }
 

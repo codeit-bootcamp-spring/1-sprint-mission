@@ -24,7 +24,7 @@ public class SerializationUtil<T> {
   public List<T> loadData(){
     try (FileInputStream fis = new FileInputStream(FILE_PATH);
          ObjectInputStream ois = new ObjectInputStream(fis)) {
-      return (List<T>) ois.readObject();
+      return (List<T>) ois.readObject(); // Object 타입으로 반환하므로 (List<T>)로 캐스팅해주고 있음.
     } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
       return new ArrayList<>();

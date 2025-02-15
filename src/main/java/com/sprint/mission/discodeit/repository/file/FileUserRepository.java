@@ -10,7 +10,7 @@ import java.io.*;
 
 public class FileUserRepository implements UserRepository {
   private final List<User> data;
-  public FileUserRepository(SerializationUtil<User> util, String filePath) {
+  public FileUserRepository(SerializationUtil<User> util) {
     this.data = util.loadData(); // 이 부분, filePath 매개변수 이해 잘 안됨
   }
 

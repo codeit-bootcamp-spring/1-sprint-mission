@@ -5,19 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0dd1794-1d53-4f90-8a48-de7ed0b464e5" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileMessageRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileChannelRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/FileJavaApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/FileJavaApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Message.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/jcf/JCFUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/JavaApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/JavaApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/entity/Channel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileMessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileMessageRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/repository/file/FileUserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileChannelService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/service/file/FileMessageService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/util/SerializationUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/discodeit/util/SerializationUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CodeInsightWorkspaceSettings">
+    <option name="optimizeImportsOnTheFly" value="true" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -73,6 +77,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProblemsViewState">
+    <option name="proportion" value="0.6795048" />
     <option name="showPreview" value="true" />
   </component>
   <component name="ProjectColorInfo">{
@@ -87,6 +92,7 @@
   "keyToString": {
     "Application.FileMain.executor": "Run",
     "Application.JCFChannelService.executor": "Run",
+    "Application.JavaApplication.executor": "Run",
     "Application.Main.executor": "Run",
     "Gradle.1-sprint-mission 빌드.executor": "Run",
     "Gradle.1-sprint-mission.executor": "Run",
@@ -106,7 +112,7 @@
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "settings.editor.selected.configurable": "preferences.fileTypes",
     "vue.rearranger.settings.migration": "true",
     "애플리케이션.Main.executor": "Run"
   }
@@ -147,8 +153,8 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.JCFChannelService" />
       <item itemvalue="Application.FileMain" />
+      <item itemvalue="Application.JCFChannelService" />
     </list>
   </component>
   <component name="SharedIndexes">
@@ -206,7 +212,13 @@
       <workItem from="1738748205401" duration="1123000" />
       <workItem from="1738806312925" duration="14030000" />
       <workItem from="1738828862599" duration="4603000" />
-      <workItem from="1739339479289" duration="22324000" />
+      <workItem from="1739339479289" duration="22923000" />
+      <workItem from="1739405254789" duration="1931000" />
+      <workItem from="1739427741870" duration="187000" />
+      <workItem from="1739428808736" duration="970000" />
+      <workItem from="1739501281617" duration="1000" />
+      <workItem from="1739506049013" duration="5948000" />
+      <workItem from="1739514477362" duration="8457000" />
     </task>
     <servers />
   </component>
