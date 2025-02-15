@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -29,16 +30,16 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
-    public User create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+    public UserResponseDto create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userRequestDto.name(), userRequestDto.email());
         validateDuplicateName(userRequestDto.name());
         validateDuplicateEmail(userRequestDto.email());
 
         BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
         User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
-        userStatusService.create(user.getId());
+        UserStatus userStatus = userStatusService.create(user.getId());
 
-        return user;
+        return UserResponseDto.from(user, binaryContent, userStatus.calculateOnlineStatus());
     }
 
     @Override
@@ -62,17 +63,19 @@ public class BasicUserService implements UserService {
                 .toList();
     }
     @Override
-    public void update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());
         User user = userRepository.find(userUpdateRequestDto.userId());
         validateUserExists(user);
-        
+
         if (binaryContentRequestDto != null) {
             BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
             user.updateBinaryContentId(binaryContent.getId());
         }
         user.update(userUpdateRequestDto.name(), userUpdateRequestDto.email(), userUpdateRequestDto.password());
         userRepository.save(user);
+
+        return UserResponseDto.from(user, binaryContentService.find(user.getBinaryContentId()), userStatusService.findByUserId(user.getId()).calculateOnlineStatus());
     }
 
     @Override

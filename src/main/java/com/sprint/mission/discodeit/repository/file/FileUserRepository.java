@@ -79,4 +79,10 @@ public class FileUserRepository implements UserRepository {
             System.out.println("삭제에 실패하였습니다.");
         }
     }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        Path filePath = directory.resolve(userId + ".ser");
+        return Files.exists(filePath);
+    }
 }

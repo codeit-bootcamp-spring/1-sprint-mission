@@ -35,4 +35,9 @@ public class JCFUserRepository implements UserRepository {
     public void delete(User user) {
         users.remove(user.getId());
     }
+
+    @Override
+    public boolean existsById(UUID userId) {
+        return users.containsKey(userId);
+    }
 }
