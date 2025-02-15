@@ -31,6 +31,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(readstatus -> readstatus.isSameChannelId(channelId))
+                .toList();
+    }
+
+    @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return data.values().stream()
                 .filter(readstatus -> readstatus.isSameUserId(userId))
@@ -39,6 +46,11 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void delete(UUID readStatusId) {
+        data.remove(readStatusId);
+    }
 
+    @Override
+    public boolean existsById(UUID readStatusId) {
+        return data.containsKey(readStatusId);
     }
 }

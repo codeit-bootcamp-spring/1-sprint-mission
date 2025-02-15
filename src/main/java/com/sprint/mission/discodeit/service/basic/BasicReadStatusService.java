@@ -58,11 +58,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void delete(UUID readStatusId) {
-
+        if (!readStatusRepository.existsById(readStatusId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다.");
+        }
+        readStatusRepository.delete(readStatusId);
     }
 
     @Override
     public void deleteByChannelId(UUID channelId) {
-
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+        readStatuses.forEach(readStatus -> readStatusRepository.delete(readStatus.getId()));
     }
 }
