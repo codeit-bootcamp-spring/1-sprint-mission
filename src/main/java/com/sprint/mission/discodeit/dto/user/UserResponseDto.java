@@ -13,7 +13,6 @@ public record UserResponseDto(
         byte[] binaryContentData,
         OnlineStatus onlineStatus
 ) {
-
     public static UserResponseDto from(User user, BinaryContent binaryContent, OnlineStatus onlineStatus) {
         return new UserResponseDto(user.getId(), user.getName(), user.getEmail(), binaryContent.getData(), onlineStatus);
     }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,8 +45,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto find(UUID userId) {
-        User user = userRepository.find(userId);
-        validateUserExists(user);
+        User user = Optional.ofNullable(userRepository.find(userId))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
         return getUserInfo(user);
     }
@@ -70,8 +71,8 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());
-        User user = userRepository.find(userUpdateRequestDto.userId());
-        validateUserExists(user);
+        User user = Optional.ofNullable(userRepository.find(userUpdateRequestDto.userId()))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
         if (binaryContentRequestDto != null) {
             BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
@@ -91,13 +92,6 @@ public class BasicUserService implements UserService {
         binaryContentService.delete(userRepository.find(userId).getBinaryContentId());
         userStatusService.delete(userId);
         userRepository.delete(userId);
-    }
-
-    @Override
-    public void validateUserExists(User user) {
-        if (user == null) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
-        }
     }
 
     @Override

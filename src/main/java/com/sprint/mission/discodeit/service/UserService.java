@@ -16,7 +16,6 @@ public interface UserService {
     UserResponseDto getUserInfo(User user);
     UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto);
     void delete(UUID userId);
-    void validateUserExists(User user);
     void validateDuplicateName(String name);
     void validateDuplicateEmail(String email);
 }
