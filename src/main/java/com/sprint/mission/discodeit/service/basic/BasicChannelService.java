@@ -48,14 +48,21 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel find(UUID channelId) {
-        return Optional.ofNullable(channelRepository.find(channelId))
+    public ChannelResponseDto find(UUID channelId) {
+        // TODO: 메시지 정보 포함
+        Channel channel = Optional.ofNullable(channelRepository.find(channelId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+        return getChannelInfo(channel);
     }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<ChannelResponseDto> findAll() {
+        // TODO: 메시지 정보 포함
+        List<Channel> channels = channelRepository.findAll();
+
+        return channels.stream()
+                .map(this::getChannelInfo)
+                .toList();
     }
 
     @Override
