@@ -3,8 +3,11 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.stereotype.Repository;
+
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
   private final List<Message> data;
   public FileMessageRepository(SerializationUtil<Message> util){

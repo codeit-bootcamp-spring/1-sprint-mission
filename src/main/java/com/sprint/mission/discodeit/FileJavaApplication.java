@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Gender;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 
 import java.io.IOException;
@@ -49,13 +49,13 @@ public class FileJavaApplication {
 
 
     FileUserRepository fileUserRepository = new FileUserRepository(userUtil);
-    FileUserService fileUserService = new FileUserService(fileUserRepository);
+    BasicUserService fileUserService = new BasicUserService(fileUserRepository);
 
     FileChannelRepository fileChannelRepository = new FileChannelRepository(channelUtil);
-    FileChannelService fileChannelService = new FileChannelService(fileChannelRepository);
+    BasicChannelService fileChannelService = new BasicChannelService(fileChannelRepository);
 
     FileMessageRepository fileMessageRepository = new FileMessageRepository(messageUtil);
-    FileMessageService fileMessageService = new FileMessageService(fileMessageRepository);
+    BasicMessageService fileMessageService = new BasicMessageService(fileMessageRepository);
 
     // ===== 회원 직렬화 =====
     System.out.println("\n===== 회원 서비스 CRUD =====");

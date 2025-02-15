@@ -4,10 +4,14 @@ import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
-import java.io.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
+@Repository
 public class FileUserRepository implements UserRepository {
   private final List<User> data;
   public FileUserRepository(SerializationUtil<User> util) {

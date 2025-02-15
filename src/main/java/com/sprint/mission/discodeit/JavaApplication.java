@@ -7,15 +7,15 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 
 
 
@@ -23,13 +23,13 @@ public class JavaApplication {
   public static void main(String[] args) {
     // 서비스 초기화 변수/타입 인터페이스로 하는 건지 구현체로 하는 건지 헷갈
     ChannelRepository channelRepository = new JCFChannelRepository();
-    ChannelService channelService = new JCFChannelService(channelRepository);
+    ChannelService channelService = new BasicChannelService(channelRepository);
 
     UserRepository userRepository = new JCFUserRepository();
-    UserService userService = new JCFUserService(userRepository);
+    UserService userService = new BasicUserService(userRepository);
 
     MessageRepository messageRepository = new JCFMessageRepository();
-    MessageService messageService = new JCFMessageService(messageRepository);
+    MessageService messageService = new BasicMessageService(messageRepository);
 
     // ===== 회원 =====
     System.out.println("\n===== 회원 서비스 CRUD =====");
