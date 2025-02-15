@@ -60,11 +60,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDto getChannelInfo(Channel channel) {
-        return new ChannelResponseDto(channel.getId(),
-                channel.getType(),
-                channel.getName(),
-                channel.getIntroduction(),
-                channel.getParticipants());
+        return ChannelResponseDto.from(channel.getId(), channel.getType(),
+                channel.getName(), channel.getIntroduction(), channel.getParticipants());
     }
 
     @Override

@@ -12,4 +12,7 @@ public record ChannelResponseDto(
         String introduction,
         List<UUID> users
 ) {
+    public static ChannelResponseDto from(UUID id, ChannelType type, String name, String introduction, List<UUID> users) {
+        return new ChannelResponseDto(id, type, name, introduction, users);
+    }
 }
