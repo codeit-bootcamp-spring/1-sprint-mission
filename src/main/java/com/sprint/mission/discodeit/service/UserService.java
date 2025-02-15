@@ -13,6 +13,7 @@ public interface UserService {
     UserResponseDto create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto);
     UserResponseDto find(UUID userId);
     List<UserResponseDto> findAll();
+    UserResponseDto getUserInfo(User user);
     UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto);
     void delete(UUID userId);
     void validateUserExists(User user);

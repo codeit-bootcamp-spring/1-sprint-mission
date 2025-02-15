@@ -27,6 +27,16 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public User findByName(String name) {
+        for (User user : users.values()) {
+            if (user.isSameName(name)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public List<User> findAll() {
         return users.values().stream().toList();
     }

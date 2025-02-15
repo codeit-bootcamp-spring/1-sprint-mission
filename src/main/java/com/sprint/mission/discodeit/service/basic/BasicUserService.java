@@ -46,10 +46,8 @@ public class BasicUserService implements UserService {
     public UserResponseDto find(UUID userId) {
         User user = userRepository.find(userId);
         validateUserExists(user);
-        BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
-        OnlineStatus onlineStatus = userStatusService.getOnlineStatus(userId);
 
-        return UserResponseDto.from(user, binaryContent, onlineStatus);
+        return getUserInfo(user);
     }
 
     @Override
@@ -57,11 +55,18 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAll();
 
         return users.stream()
-                .map(user -> UserResponseDto.from(user,
-                        binaryContentService.find(user.getBinaryContentId()),
-                        userStatusService.getOnlineStatus(user.getId())))
+                .map(this::getUserInfo)
                 .toList();
     }
+
+    @Override
+    public UserResponseDto getUserInfo(User user) {
+        BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+        OnlineStatus onlineStatus = userStatusService.getOnlineStatus(user.getId());
+
+        return UserResponseDto.from(user, binaryContent, onlineStatus);
+    }
+
     @Override
     public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());

@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
@@ -43,6 +44,28 @@ public class FileUserRepository implements UserRepository {
             Object data = ois.readObject();
             return (User) data;
         } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public User findByName(String name) {
+        try {
+            return Files.list(directory)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            return null;
+                        }
+                    }).filter(Objects::nonNull)
+                    .filter(user -> user.isSameName(name))
+                    .findFirst()
+                    .orElse(null);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

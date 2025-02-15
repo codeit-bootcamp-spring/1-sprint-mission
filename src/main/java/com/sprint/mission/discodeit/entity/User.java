@@ -72,6 +72,14 @@ public class User implements Serializable {
         return true;
     }
 
+    public boolean isSameName(String name) {
+        return this.name.equals(name);
+    }
+
+    public boolean isSamePassword(String password) {
+        return BCrypt.checkpw(this.password, password);
+    }
+
     public void validateDuplicateName(String name) {
         if (this.name.equals(name)) {
             throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
