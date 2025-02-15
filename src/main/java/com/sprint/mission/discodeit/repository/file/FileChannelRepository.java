@@ -72,13 +72,19 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(Channel channel) {
-        Path filePath = directory.resolve(channel.getId() + ".ser");
+    public void delete(UUID channelId) {
+        Path filePath = directory.resolve(channelId + ".ser");
 
         try {
             Files.delete(filePath);
         } catch (IOException e) {
             System.out.println("삭제에 실패하였습니다.");
         }
+    }
+
+    @Override
+    public boolean existsById(UUID channelId) {
+        Path filePath = directory.resolve(channelId + ".ser");
+        return Files.exists(filePath);
     }
 }

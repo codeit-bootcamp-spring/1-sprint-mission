@@ -6,4 +6,5 @@ import java.util.UUID;
 
 public interface ReadStatusService {
     ReadStatus create(UUID channelId, UUID userId);
+    void deleteByChannelId(UUID channelId);
 }

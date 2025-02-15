@@ -15,4 +15,9 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus create(UUID channelId, UUID userId) {
         return new ReadStatus(channelId, userId);
     }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+
+    }
 }

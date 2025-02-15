@@ -10,5 +10,6 @@ public interface ChannelRepository {
     Channel save(Channel channel);
     Channel find(UUID channelId);
     List<Channel> findAll();
-    void delete(Channel channel);
+    void delete(UUID channelId);
+    boolean existsById(UUID channelId);
 }
