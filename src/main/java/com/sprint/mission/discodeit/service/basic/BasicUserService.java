@@ -1,120 +1,82 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private UserRepository userRepository;
-    private ChannelService channelService;
-    private MessageService messageService;
-
-    @Autowired
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public void setService(ChannelService channelService, MessageService messageService) {
-        this.channelService = channelService;
-        this.messageService = messageService;
-    }
-
+    private final UserRepository userRepository;
     @Override
-    public User createUser(String name, String email,String password) {
-        if (iscorrectName(name) && iscorrectEmail(email)) {
-            User newUser = new User(name, email, password);
-            userRepository.save(newUser);
-            System.out.println("환영합니다! " + newUser.getUserName() + "님 반갑습니다.");
-            return newUser;
-        }
-        return null;
-    }
-
-    @Override
-    public void updateUserName(UUID userId, String newName) {
-        try {
-            User user = searchById(userId);
-            String name = user.getUserName();
-            user.setUserName(newName);
-            userRepository.save(user);
-            System.out.println(name + "님의 이름이" + newName + "으로 변경되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다.");
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void updateUserEmail(UUID userId, String email) {
-        try {
-            if(iscorrectEmail(email)) {
-                System.out.println("이미 존재하는 이메일 입니다.");
-                return;
-            }
-            User user = searchById(userId);
-            user.setUserEmail(email);
-            userRepository.save(user);
-            System.out.println(user.getUserName() + "님의 이메일이" + email + "로 변경되었습니다.");
-        } catch (NoSuchElementException e) {
-            System.out.println("존재하지 않는 사용자입니다.");
-            e.printStackTrace();
-        }
-
-
-    }
-
-    @Override
-    public List<User> getAllUserList() {
-        return userRepository.findAll().values().stream().collect(Collectors.toList());
-    }
-
-    @Override
-    public User searchById(UUID userId) {
-        User user = userRepository.findById(userId);
-        if(user == null) {
-            System.out.println("사용자가 존재하지 않습니다.");
-        }
+    public User createUser(UserCreateDTO userCreateDTO) {
+        if(checkEmailDuplicate(userCreateDTO.getUserEmail())){
+            throw new IllegalArgumentException(userCreateDTO.getUserEmail() + "이미 가입한 적이 있는 email 입니다.");}
+        if(checkNameDuplicate(userCreateDTO.getUserName())) {
+            throw new IllegalArgumentException(userCreateDTO.getUserName() + "이미 존재하는 닉네임입니다."); }
+        User user = new User(userCreateDTO);
+        userRepository.save(user);
         return user;
     }
 
     @Override
-    public void deleteUser(UUID userId) {
-        User user = searchById(userId);
-        if(user == null) {
-            System.out.println("해당 사용자가 존재하지 않습니다.");
-        } else  {
+    public User findById(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("UserId :" + userId + "를 찾을 수 없습니다."));
+    }
+
+    @Override
+    public List<User> findAll() {
+        Map<UUID, User> data = userRepository.findAll();
+        List<User> userList = new ArrayList<>();
+        if(data.isEmpty()) return userList;
+        data.values().stream().sorted(Comparator.comparing(user -> user.getCreatedAt())).forEach(user -> {
+            userList.add(user);
+        });
+        return userList;
+    }
+
+    @Override
+    public User update(UUID userId, UserUpdateDTO userUpdateDTO) {
+        if(checkEmailDuplicate(userUpdateDTO.getUserEmail())) {
+            throw new IllegalArgumentException(userUpdateDTO.getUserEmail() + "이미 가입되어 있는 이메일 입니다.");
+        }
+        if(checkNameDuplicate(userUpdateDTO.getUserName())) {
+            throw new IllegalArgumentException(userUpdateDTO.getUserName() + "이미 존재하는 닉네임입니다.");
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("UserId : " + userId + "를 찾을 수 없습니다."));
+        user.update(userUpdateDTO);
+        userRepository.save(user);
+        return user;
+    }
+
+    @Override
+    public void delete(UUID userId) {
+        if(userRepository.existsById(userId)){
             userRepository.delete(userId);
-            System.out.println("사용자가 탈퇴되었습니다.");
+        } else {
+            throw new NoSuchElementException("UserId : " + userId + "를 찾을 수 없습니다.");
         }
 
     }
-    private boolean iscorrectName(String name) {
-        if (name.isBlank()) {
-            System.out.println("이름을 입력해주세요");
-        } else if (name.length() < 2) {
-            System.out.println("이름은 두글자 이상 입력해주세요");
-        } else {
-            return true;
-        }
-        return false;
+
+    @Override
+    public boolean checkNameDuplicate(String userName) {
+        Map<UUID, User> userMap = userRepository.findAll();
+        if(userMap == null || userMap.isEmpty()) return false;
+        return userMap.values().stream().anyMatch(user -> user.getUserName().equals(userName));
     }
-    private boolean iscorrectEmail(String email) {
-        String emailFormat = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-        if (!email.matches(emailFormat)) {
-            System.out.println("이메일 형식이 올바르지 않습니다.");
-        }
-        return email.matches(emailFormat);
+
+    @Override
+    public boolean checkEmailDuplicate(String userEmail) {
+        Map<UUID,User> userMap = userRepository.findAll();
+        if(userMap == null || userMap.isEmpty()) return false;
+        userMap.values().stream().anyMatch(user -> user.getUserEmail().equals(userEmail));
+        return false;
     }
 }

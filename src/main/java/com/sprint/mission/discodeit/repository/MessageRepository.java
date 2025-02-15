@@ -6,13 +6,15 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
   void save(Message message);
-  Message findById(UUID messageId);
-  void delete(UUID messageId);
+  Optional<Message> findById(UUID messageId);
   Map<UUID, Message> findAll();
+  void delete(UUID messageId);
+  boolean existsById(UUID messageId);
 }
 
 

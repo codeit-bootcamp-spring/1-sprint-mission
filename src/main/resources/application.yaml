@@ -6,3 +6,13 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+
+discodeit :
+  repository :
+    type: file
+    channel : ./tmp/channels.ser
+    user : ./tmp/users.ser
+    message : ./tmp/messages.ser
+    BinaryContent : ./tmp/binaryContents.ser
+    userStatus : ./tmp/userStatus.ser
+    readStatus : ./tmp/readStatus.ser

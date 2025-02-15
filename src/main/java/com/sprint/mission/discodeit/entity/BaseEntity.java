@@ -1,51 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class BaseEntity implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id ;
-    private final long createdAt;
-    private long updatedAt;
+@Getter
+public abstract class BaseEntity implements Serializable {
 
-    //생성자
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
+
     public BaseEntity() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
-    //getter method
-    public UUID getId() {
-        return id;
+    //update
+    public void updateTime(Instant updateTime) {
+        this.updatedAt = updateTime;
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
 
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
-    public void setUpdatedAt(long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    //필드 수정 -> update 메소드
-    public void update(long updatedAt) {
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-        return "BaseEntity{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }
