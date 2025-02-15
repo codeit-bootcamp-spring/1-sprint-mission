@@ -1,27 +1,26 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel {
-
-    private final UUID id;
-    private final Long createdAt;
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Long createdAt;
     private Long updatedAt;
+    //
+    private ChannelType type;
+    private String name;
+    private String description;
 
-    private String channelName; // 채널명
-    private int peopleCount; // 채널에 있는 사람 수
-    private User adminUser; // 채널의 관리자
-
-    // 추가적으로 필요한 필드값들은 메소드 만들면서 추가하도록 하자.
-    // 지금 넣어봤자 계속 바뀔 것 같다.
-
-    public Channel(String channelName, User adminUser) {
-        // 고유한 채널을 식별하기 위한 ID.
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.channelName = channelName;
-        this.adminUser = adminUser;
-
+    public Channel(ChannelType type, String name, String description) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
     public UUID getId() {
@@ -36,27 +35,31 @@ public class Channel {
         return updatedAt;
     }
 
-    public String getChannelName() {
-        return channelName;
+    public ChannelType getType() {
+        return type;
     }
 
-    public int getPeopleCount() {
-        return peopleCount;
+    public String getName() {
+        return name;
     }
 
-    public User getAdminUser() {
-        return adminUser;
+    public String getDescription() {
+        return description;
     }
 
-    public void updateChannelName(String newName) {
-        channelName = newName;
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    public void updateAdminUser(User newUser) {
-        adminUser = newUser;
-    }
-
-    public void updateUpdatedAt(Long newUpdatedAt) {
-        updatedAt = newUpdatedAt;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }

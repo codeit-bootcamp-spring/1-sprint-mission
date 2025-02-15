@@ -1,40 +1,27 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User {
-    private final UUID id; // 유저 식별을 위한 UUID
-    private final Long createdAt; // 생성 시점 시간
-    private static Long updatedAt; // 정보 변경 시점 시간
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    // 추가적으로 필요한 필드값들은 메소드 만들면서 추가하도록 하자.
-    // 지금 넣어봤자 계속 바뀔 것 같다.
-    private String userNickName; // 유저의 닉네임.
-    private String userEmail; // 유저의 이메일. 로그인할때 사용하도록 하자.
-    private String password; // 로그인시 필요한 비밀번호
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
 
-    private User(String userEmail, String userNickName, String password) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.userNickName = userNickName;
-        this.userEmail = userEmail;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
+        this.username = username;
+        this.email = email;
         this.password = password;
-    }
-
-    private User(String userEmail, String userNickName, String password, long updatedTimeStamp) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.userNickName = userNickName;
-        this.userEmail = userEmail;
-        this.password = password;
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public static User createUser(String userEmail, String userNickName, String password, boolean isUpdated) {
-        if (isUpdated) {
-            return new User(userEmail, userNickName, password, System.currentTimeMillis());
-        }
-        return new User(userEmail, userNickName, password);
     }
 
     public UUID getId() {
@@ -49,32 +36,35 @@ public class User {
         return updatedAt;
     }
 
-    public String getUserNickName() {
-        return userNickName;
+    public String getUsername() {
+        return username;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void updatePassword(String newpassword) {
-        password = newpassword;
-    }
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    public void updateUserNickName(String newnickname) {
-        userNickName = newnickname;
-    }
-
-    public void updateUserEmail(String newemail) {
-        userEmail = newemail;
-    }
-
-    public static String updateUpdatedAt(long newupdatedAt) {
-        updatedAt = newupdatedAt;
-        return updatedAt.toString();
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
