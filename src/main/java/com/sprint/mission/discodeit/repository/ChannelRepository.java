@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelRepository {
-    Channel save(String name, String introduction, User owner);
+    Channel save(Channel channel);
     Channel find(UUID channelId);
     List<Channel> findAll();
     void update(Channel channel, String name, String introduction);

@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,10 +22,29 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator validator;
 
+    private final ReadStatusService readStatusService;
+
     @Override
-    public Channel create(String name, String introduction, User owner) {
-        validator.validate(name, introduction);
-        return channelRepository.save(name, introduction, owner);
+    public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
+        if (channelCreateRequestDto.type() == ChannelType.PUBLIC) {
+            return createPublicChannel(channelCreateRequestDto);
+        }
+        return createPrivateChannel(channelCreateRequestDto);
+    }
+
+    @Override
+    public ChannelResponseDto createPublicChannel(ChannelCreateRequestDto channelCreateRequestDto) {
+        validator.validate(channelCreateRequestDto.name(), channelCreateRequestDto.introduction());
+        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, channelCreateRequestDto.name(),channelCreateRequestDto.introduction()));
+        return getChannelInfo(channel);
+    }
+
+    @Override
+    public ChannelResponseDto createPrivateChannel(ChannelCreateRequestDto channelCreateRequestDto) {
+        Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, channelCreateRequestDto.users()));
+        channelCreateRequestDto.users().stream()
+                .map(user -> readStatusService.create(channel.getId(), user));
+        return getChannelInfo(channel);
     }
 
     @Override
@@ -37,8 +59,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public String getInfo(UUID channelId) {
-        return find(channelId).toString();
+    public ChannelResponseDto getChannelInfo(Channel channel) {
+        return new ChannelResponseDto(channel.getId(),
+                channel.getType(),
+                channel.getName(),
+                channel.getIntroduction(),
+                channel.getParticipants());
     }
 
     @Override
