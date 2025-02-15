@@ -4,7 +4,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -12,11 +11,11 @@ public class Channel extends BaseEntity implements  Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final User admin;
+    private final List<User> memberList;
     private String channelName;
     private ChannelType type;
-    private final List<User> memberList;
 
-    @Builder
+
     public Channel(ChannelType type, String channelName, User admin) {
         super();
         memberList = new ArrayList<>();

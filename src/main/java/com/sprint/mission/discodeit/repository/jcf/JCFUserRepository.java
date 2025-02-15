@@ -29,6 +29,19 @@ public class JCFUserRepository implements UserRepository {
                 .toList();
     }
 
+
+    @Override
+    public boolean existsName(String userName) {
+        return this.users.values().stream()
+                .anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsEmail(String email) {
+        return this.users.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
     @Override
     public boolean existsId(UUID id) {
         return this.users.containsKey(id);

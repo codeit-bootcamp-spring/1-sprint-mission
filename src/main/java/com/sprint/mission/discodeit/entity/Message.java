@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.entity;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
-
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -15,7 +13,6 @@ public class Message extends BaseEntity implements Serializable {
     private final UUID writerId;
     private String content;
 
-    @Builder
     public Message(UUID channelId, String content, UUID writerId) {
         super();
         this.channelId = channelId;

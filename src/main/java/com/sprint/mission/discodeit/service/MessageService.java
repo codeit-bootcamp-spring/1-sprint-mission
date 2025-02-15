@@ -11,6 +11,6 @@ public interface MessageService {
     Message findByChannel(UUID channelId);
     Message findByUser(UUID userId);
     List<Message> findAll();
-    Message update(UUID messageId, String newContent);
-    void delete(UUID messageId);
+    Message update(UUID messageId, UUID writerId, String newContent);
+    void delete(UUID messageId, UUID writerId);
 }

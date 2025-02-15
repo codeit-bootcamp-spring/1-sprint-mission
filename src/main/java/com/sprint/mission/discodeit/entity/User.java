@@ -2,8 +2,6 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
-
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -14,7 +12,7 @@ public class User extends BaseEntity implements  Serializable {
     private String userName;
     private String email;
 
-    @Builder
+
     public User(String userName, String email, String password) {
         super();
         this.userName = userName;
