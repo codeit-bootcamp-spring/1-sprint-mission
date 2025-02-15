@@ -10,6 +10,5 @@ public interface ChannelRepository {
     Channel save(Channel channel);
     Channel find(UUID channelId);
     List<Channel> findAll();
-    void update(Channel channel, String name, String introduction);
     void delete(Channel channel);
 }

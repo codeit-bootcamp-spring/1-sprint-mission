@@ -72,21 +72,6 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void update(Channel channel, String name, String introduction) {
-        channel.update(name, introduction);
-
-        Path filePath = directory.resolve(channel.getId() + ".ser");
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(channel);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void delete(Channel channel) {
         Path filePath = directory.resolve(channel.getId() + ".ser");
 

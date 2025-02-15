@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -72,10 +73,15 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID channelId, String name, String introduction) {
-        validator.validate(name, introduction);
-        Channel channel = find(channelId);
-        channelRepository.update(channel, name, introduction);
+    public ChannelResponseDto update(ChannelUpdateRequestDto channelUpdateRequestDto) {
+        validator.validate(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
+        Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequestDto.id()))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
+
+        channel.update(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
+        channelRepository.save(channel);
+
+        return getChannelInfo(channel);
     }
 
     @Override
