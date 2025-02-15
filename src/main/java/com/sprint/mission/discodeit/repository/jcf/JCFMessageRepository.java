@@ -34,11 +34,6 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void update(Message message, String content) {
-        message.updateContent(content);
-    }
-
-    @Override
     public void delete(Message message) {
         messages.remove(message.getId());
     }

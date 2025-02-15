@@ -72,21 +72,6 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void update(Message message, String content) {
-        message.updateContent(content);
-
-        Path filePath = directory.resolve(message.getId() + ".ser");
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(message);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void delete(Message message) {
         Path filePath = directory.resolve(message.getId() + ".ser");
 
