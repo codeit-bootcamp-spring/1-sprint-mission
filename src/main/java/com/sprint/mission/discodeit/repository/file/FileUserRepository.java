@@ -93,9 +93,7 @@ public class FileUserRepository implements UserRepository {
             throw new RuntimeException(e);
         }
     }
-
-
-
+    
     @Override
     public void delete(UUID userId) {
         Path filePath = directory.resolve(userId + ".ser");
