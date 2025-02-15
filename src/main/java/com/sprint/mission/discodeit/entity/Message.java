@@ -42,4 +42,8 @@ public class Message implements Serializable {
             updateUpdatedAt();
         }
     }
+
+    public boolean isSameChannelId(UUID channelId) {
+        return this.channelId.equals(channelId);
+    }
 }
