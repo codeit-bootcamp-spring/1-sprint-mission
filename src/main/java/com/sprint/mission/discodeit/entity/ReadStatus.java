@@ -29,4 +29,8 @@ public class ReadStatus implements Serializable {
     public boolean isSameChannelId(UUID channelId) {
         return this.channelId.equals(channelId);
     }
+
+    public boolean isSameUserId(UUID userId) {
+        return this.userId.equals(userId);
+    }
 }

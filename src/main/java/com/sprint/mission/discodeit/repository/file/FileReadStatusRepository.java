@@ -5,9 +5,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -38,7 +36,16 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        return null;
+        Path filePath = directory.resolve(readStatusId + ".ser");
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (ReadStatus) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,12 +39,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        return null;
+        return Optional.ofNullable(readStatusRepository.find(readStatusId))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return List.of();
+        return readStatusRepository.findAllByUserId(userId);
     }
 
     @Override

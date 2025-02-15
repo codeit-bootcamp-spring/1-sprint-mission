@@ -27,12 +27,14 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus find(UUID readStatusId) {
-        return null;
+        return data.get(readStatusId);
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        return List.of();
+        return data.values().stream()
+                .filter(readstatus -> readstatus.isSameUserId(userId))
+                .toList();
     }
 
     @Override
