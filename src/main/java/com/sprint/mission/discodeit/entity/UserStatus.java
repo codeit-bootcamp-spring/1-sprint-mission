@@ -21,7 +21,7 @@ public class UserStatus implements Serializable {
         OFFLINE,
     }
 
-    public UserStatus createUserStatus(UUID userId) {
+    public static UserStatus createUserStatus(UUID userId) {
         return createUserStatus(userId);
     }
 
@@ -37,8 +37,7 @@ public class UserStatus implements Serializable {
         return this.status;
     }
 
-    // 레파지토리에서 해야할 거 같은데,,,? 시간을 다루는 거라 여기서 하나?
-    private void updateStatus() {
+    public void updateStatus() {
         Instant ValidTime = this.updatedAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
         if (ValidTime.compareTo(Instant.now()) > 0) {
             this.status = Status.ONLINE;

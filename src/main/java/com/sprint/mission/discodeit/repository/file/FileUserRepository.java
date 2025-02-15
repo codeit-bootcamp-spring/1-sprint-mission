@@ -25,8 +25,13 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
-        Map<UUID, User> savedUserMap = loadUserMapToFile();
-        return Optional.ofNullable(savedUserMap.get(id));
+        return Optional.ofNullable(loadUserMapToFile().get(id));
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        return loadUserMapToFile().values().stream()
+                .filter(user -> user.getName().equals(name)).findAny();
     }
 
     @Override
@@ -39,6 +44,23 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> savedUserMap = loadUserMapToFile();
         savedUserMap.remove(id);
         saveUserMapToFile(savedUserMap);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return loadUserMapToFile().containsKey(id);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return loadUserMapToFile().values().stream()
+                .anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return loadUserMapToFile().values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
     }
 
     private void saveUserMapToFile(Map<UUID, User> saveUserMap) {

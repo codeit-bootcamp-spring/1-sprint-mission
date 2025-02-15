@@ -31,9 +31,25 @@ public class FileMessageRepository implements MessageRepository {
         return fileManager.loadListToFile();
     }
 
-    public void deleteById(UUID messageId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return fileManager.loadListToFile().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
+    }
+
+    public void deleteById(UUID id) {
         Map<UUID, Message> savedMessageList = loadMessageMapToFile();
-        savedMessageList.remove(messageId);
+        savedMessageList.remove(id);
+        saveMessageMapToFile(savedMessageList);
+    }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+        for (UUID id : savedMessageList.keySet()) {
+            if (savedMessageList.get(id).getChannelId().equals(channelId)) {
+                savedMessageList.remove(id);
+            }
+        }
         saveMessageMapToFile(savedMessageList);
     }
 

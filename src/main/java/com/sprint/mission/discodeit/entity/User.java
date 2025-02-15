@@ -32,15 +32,15 @@ public class User implements Serializable {
 
     public void update(String newName, String newEmail, String newPassword) {
         boolean isChanged = false;
-        if (!newName.equals(this.name)) {
+        if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
             isChanged = true;
         }
-        if (!newEmail.equals(this.email)) {
+        if (newEmail != null && !newEmail.equals(this.email)) {
             this.email = newEmail;
             isChanged = true;
         }
-        if (!newPassword.equals(this.password)) {
+        if (newPassword != null && !newPassword.equals(this.password)) {
             this.password = newPassword;
             isChanged = true;
         }
