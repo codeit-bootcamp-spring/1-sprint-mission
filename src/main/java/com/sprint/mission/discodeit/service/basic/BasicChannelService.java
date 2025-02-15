@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,7 @@ public class BasicChannelService implements ChannelService {
         try {
             //실제로 유저가 존재하는지 검증
             for (UUID userId : memberId) {
-                if (userRepository.isUserExistenceByUUID(userId)==false) {
+                if (userRepository.isUserExistByUUID(userId)==false) {
                     throw new NoSuchElementException("해당 uuid를 가진 유저가 존재하지 않습니다.");
                 };
             }
@@ -98,11 +97,31 @@ public class BasicChannelService implements ChannelService {
         }
         try {
             Channel channel = channelRepository.getChannel(channelId);
-            return ChannelDto.from(channel);
+            return ChannelDto.from(channel, messageRepository.getLastMessageCreatedAt(channelId));
         }catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
             System.out.println("채널 반환 실패.");
+            return null;
+        }
+    }
+
+    @Override
+    public List<ChannelDto> findAllByUserId(UUID userId) {
+        try {
+            HashMap<UUID, Channel> channelsMap = channelRepository.getChannelsMap();
+            if (channelsMap.isEmpty()==true){
+                System.out.println("채널이 존재하지 않습니다.");
+                return null;
+            }
+            List<Channel> channelsCanShowUser = channelsMap.values().stream().filter(channel -> channel.getMembers().contains(userId) || channel.getType().equals(ChannelType.PUBLIC)).collect(Collectors.toList());
+            return channelsCanShowUser.stream().map(
+                    channel-> ChannelDto.from(channel, messageRepository.getLastMessageCreatedAt(channel.getId()))).collect(Collectors.toList());
+
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("모든 채널 반환 실패.");
             return null;
         }
     }
@@ -131,6 +150,9 @@ public class BasicChannelService implements ChannelService {
             return false;
         }
         try {
+            messageRepository.deleteChannelMessagesMap(channelId);
+
+            readStatusRepository.deleteChannelReadStatusMap(channelId);
             channelRepository.deleteChannel(channelId);
             System.out.println("채널 삭제 성공!");
             return true;
@@ -144,19 +166,24 @@ public class BasicChannelService implements ChannelService {
 
     //채널명 변경
     @Override
-    public boolean changeChannelName(UUID channelId, String newName) {
-        if (channelId == null || newName == null){
-            System.out.println("채널 이름 변경 실패. 입력값이 null인 상태입니다.");
+    public boolean changeChannelDescription(UUID channelId, String newDescription) {
+        if (channelId == null || newDescription == null){
+            System.out.println("채널 설명 변경 실패. 입력값이 null인 상태입니다.");
             return false;
         }
         try {
-            channelRepository.getChannel(channelId).setChannelName(newName);
-            System.out.println("채널 이름 변경 성공!");
+            Channel channel = channelRepository.getChannel(channelId);
+            if (channel.getType().equals(ChannelType.PRIVATE)){
+                System.out.println("Private 채널은 수정 불가합니다.");
+                return false;
+            }
+            channel.setDescription(newDescription);
+            System.out.println("채널 설명 변경 성공!");
             return true;
         }catch (Exception e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
-            System.out.println("채널 이름 변경 실패");
+            System.out.println("채널 설명 변경 실패");
             return false;
         }
     }

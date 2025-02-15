@@ -1,11 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
-import com.sprint.mission.discodeit.entity.Type.ChannelType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,9 +12,11 @@ public interface ChannelService {
 
     ChannelDto findChannelById(UUID channelId);
 
+    List<ChannelDto> findAllByUserId(UUID userId);
+
     boolean deleteChannel(UUID channelId);
 
-    boolean changeChannelName(UUID channelId, String newName);
+    boolean changeChannelDescription(UUID channelId, String newName);
 
     boolean addChannelMember(UUID channelID, UUID memberID);
 

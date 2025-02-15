@@ -88,6 +88,27 @@ public class FileIOHandler {
         }
     }
 
+    //파일 삭제하기
+    public boolean deleteFile(String filePath){
+        if (filePath == null) {
+            throw new NullPointerException("IO 핸들러에 전달된 파일경로가 null인 상태입니다.");
+        }
+        File file = new File(System.getProperty("user.dir") + "\\" + filePath);
+
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("파일 삭제 성공!");
+                return true;
+            } else {
+                System.out.println("파일 삭제 실패");
+                return false;
+            }
+        } else {
+            System.out.println("파일 삭제 실패. 해당 파일이 존재하지 않습니다. ");
+            return false;
+        }
+    }
+
     //이미지 불러오기.
     public BufferedImage loadImage(String imagePath) throws IOException {
         if (imagePath == null) {
@@ -114,6 +135,6 @@ public class FileIOHandler {
         } catch (IOException e) {
             throw new IOException("이미지 불러오기 중 오류가 발생했습니다", e);
         }
-
     }
+
 }

@@ -55,4 +55,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         return true;
     }
 
+    @Override
+    public boolean deleteChannelReadStatusMap(UUID channelId) {
+        if (channelId == null) {
+            return false;
+        }
+        return fileIOHandler.deleteFile(allReadStatusMapRepository + channelId.toString());
+    }
+
 }

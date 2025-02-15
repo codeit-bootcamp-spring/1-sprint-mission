@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -56,7 +56,7 @@ public class FileUserRepository implements UserRepository {
 
     //해당 UUID를 가진 유저 존재여부 확인해서 반환
     @Override
-    public boolean isUserExistenceByUUID(UUID userId) throws Exception{
+    public boolean isUserExistByUUID(UUID userId) throws Exception{
         HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
         if (usersMap.containsKey(userId) == false) {
             return false;

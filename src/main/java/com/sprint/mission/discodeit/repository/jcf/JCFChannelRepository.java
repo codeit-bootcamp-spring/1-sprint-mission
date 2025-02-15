@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
@@ -32,7 +31,7 @@ public class JCFChannelRepository implements ChannelRepository {
         //해시맵은 존재하는 key를 삭제하면 삭제한 요소를 반환하지만 없는 key를 삭제하면 null 반환.
         if (channelsMap.remove(channelId)==null){
             throw new NoSuchElementException("해당 uuid를 가진 채널이 존재하지 않습니다.");
-        };
+        }
         return true;
     }
 
@@ -53,7 +52,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean addChannelMember(UUID channelId, UUID memberId){;
+    public boolean addChannelMember(UUID channelId, UUID memberId){
         if (channelId==null || memberId==null) {
             return false;
         }

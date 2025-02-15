@@ -34,9 +34,10 @@ public class DiscodeitApplication {
     }
 
     static void RepositoryClear(){
-        try{FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
-            FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
-            FileIOHandler.getInstance().serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
+        FileIOHandler fileIOHandler = FileIOHandler.getInstance();
+        try{fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
+            fileIOHandler.serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
+            fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
 
         }catch (Exception e){
             e.printStackTrace();

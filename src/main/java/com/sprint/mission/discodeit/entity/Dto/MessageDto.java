@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record MessageDto(
@@ -18,4 +19,8 @@ public record MessageDto(
     public static MessageDto fromDto(Message message) {
         return new MessageDto(message.getCreatedAt(), message.getUpdatedAt(), message.getId(), message.getAuthor(), message.getChannel(), message.getContent());
     }
+
+    //attachmentsPaths는 null 가능.
+    public record CreateMessageRequest(String userName, String channelName, String content, List<String> attachmentsPaths) {}
+
 }

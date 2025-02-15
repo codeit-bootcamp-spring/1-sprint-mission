@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -52,16 +51,16 @@ public class BasicMessageService implements MessageService {
             return null;
         }
     }
-
+    //!!!!!!!!!!!!!여기 이미지 추가하는 코드 작성하기!!!!!!!!!
     //메세지 생성. 'MessagesMap'에 uuid-메세지객체 주소 넣어줌.
     @Override
-    public UUID createMessage(UUID authorId, UUID channelId, String content) {
+    public UUID createMessage(UUID authorId, UUID channelId, String content, String ...attachmentsPaths) {
         if (authorId == null || channelId == null || content == null) {
             System.out.println("메세지 생성 실패. 입력값을 확인해주세요.");
             return null;
         }
         try {
-            if (userRepository.isUserExistenceByUUID(authorId) == false || channelRepository.isChannelExist(channelId) == false){
+            if (userRepository.isUserExistByUUID(authorId) == false || channelRepository.isChannelExist(channelId) == false){
                 System.out.println("메세지 생성 실패. 입력한 id를가진 유저나 채널이 존재하지 않습니다.");
             }
             Message newMessage = new Message(userRepository.getUserById(authorId), channelRepository.getChannel(channelId), content);

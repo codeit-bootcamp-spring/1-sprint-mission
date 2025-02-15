@@ -4,14 +4,12 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
-
+    //todo UUID로 검색할일이 거의 없을것같아서 LinkedHashMap보다 그냥 ArrayList쓰는게 나을것같은데 시간이없어서 일단 수정 못함.. 나중에수정하기
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
     String mainMessageRepository = "Message\\mainOIMessageRepository\\";
 
@@ -44,8 +42,15 @@ public class FileMessageRepository implements MessageRepository {
         }
         messagesMap.remove(messageId);
         fileIOHandler.serializeLinkedHashMap(messagesMap, mainMessageRepository+messageId.toString());
-
         return true;
+    }
+
+    @Override
+    public boolean deleteChannelMessagesMap(UUID channelId){
+        if (channelId == null) {
+            return false;
+        }
+        return fileIOHandler.deleteFile(mainMessageRepository + channelId.toString());
     }
 
     // 전달받은 메세지 객체 null 여부 확인 후 메세지 해쉬맵에 추가.
@@ -74,6 +79,7 @@ public class FileMessageRepository implements MessageRepository {
         return true;
     }
 
+    //채널 만들면 메세지앱도 같이 만들어져서 이 메서드 호출됨. 파라미터로 받은 메세지맵을 전체메세지맵에 추가.
     @Override
     public boolean addChannelMessagesMap(UUID channelId, LinkedHashMap<UUID, Message> messagesMap) throws Exception {
         if (channelId == null || messagesMap == null) {
@@ -81,6 +87,18 @@ public class FileMessageRepository implements MessageRepository {
         }
         fileIOHandler.serializeLinkedHashMap(messagesMap,mainMessageRepository+channelId.toString());
         return false;
+    }
+
+    //todo 이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
+    //가장 최근에 생성된 메세지 생성시간 반환. 메세지가 비어있으면 null 가능해서 옵셔널 반환.
+    @Override
+    public Optional<Instant> getLastMessageCreatedAt(UUID channelId){
+        try {
+            LinkedHashMap<UUID, Message> channelMap = getChannelMessagesMap(channelId);
+            return Optional.ofNullable((Instant) channelMap.values().toArray()[channelMap.size() - 1]);
+        }catch (Exception e){
+            return Optional.empty();
+        }
     }
 }
 

@@ -54,6 +54,18 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         return true;
     }
 
+    @Override
+    public boolean deleteChannelReadStatusMap(UUID channelId) {
+        if (channelId == null) {
+            return false;
+        }
+        if (allReadStatusMaps.remove(channelId)==null){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 
 }
 

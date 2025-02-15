@@ -9,7 +9,7 @@ public interface UserRepository {
      HashMap<UUID, User> getUsersMap() throws Exception;
      boolean deleteUser(UUID userId) throws Exception;
      boolean saveUser(User user) throws Exception;
-     boolean isUserExistenceByUUID(UUID userId) throws Exception;
+     boolean isUserExistByUUID(UUID userId) throws Exception;
      boolean isUserExistByName(String userName) throws Exception;
      boolean isUserExistByEmail(String email) throws Exception;
      boolean validateUserToLogin(String userName, String password) throws Exception;

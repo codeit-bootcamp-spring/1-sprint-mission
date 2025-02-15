@@ -51,4 +51,6 @@ public class Channel implements Serializable, Entity {
         this.setUpdatedAt();
     }
 
+    //
+
 }
