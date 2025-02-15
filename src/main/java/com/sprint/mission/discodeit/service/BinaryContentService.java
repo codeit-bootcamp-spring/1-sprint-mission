@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface BinaryContentService {
     BinaryContent create(BinaryContentRequestDto binaryContentRequestDto);
-    BinaryContent findByUserId(UUID userId);
+    BinaryContent find(UUID binaryContentId);
 }

@@ -17,7 +17,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        users.put(user.getId() ,user);
+        users.put(user.getId(), user);
         return user;
     }
 
@@ -29,16 +29,6 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public List<User> findAll() {
         return users.values().stream().toList();
-    }
-
-    @Override
-    public void update(User user, String name, String email) {
-        user.update(name, email);
-    }
-
-    @Override
-    public void updatePassword(User user, String originalPassword, String newPassword) {
-        user.updatePassword(originalPassword, newPassword);
     }
 
     @Override

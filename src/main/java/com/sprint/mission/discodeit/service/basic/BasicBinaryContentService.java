@@ -11,13 +11,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
+
     @Override
     public BinaryContent create(BinaryContentRequestDto binaryContentRequestDto) {
         return new BinaryContent(binaryContentRequestDto.data());
     }
 
     @Override
-    public BinaryContent findByUserId(UUID userId) {
+    public BinaryContent find(UUID binaryContentId) {
         return null;
     }
 }

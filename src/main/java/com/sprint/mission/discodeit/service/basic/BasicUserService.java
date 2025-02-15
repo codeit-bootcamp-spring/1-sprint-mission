@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.UserResponseDto;
+import com.sprint.mission.discodeit.dto.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -44,7 +45,7 @@ public class BasicUserService implements UserService {
     public UserResponseDto find(UUID userId) {
         User user = userRepository.find(userId);
         validateUserExists(user);
-        BinaryContent binaryContent = binaryContentService.findByUserId(userId);
+        BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
         OnlineStatus onlineStatus = userStatusService.getOnlineStatus(userId);
 
         return UserResponseDto.from(user, binaryContent, onlineStatus);
@@ -56,25 +57,22 @@ public class BasicUserService implements UserService {
 
         return users.stream()
                 .map(user -> UserResponseDto.from(user,
-                        binaryContentService.findByUserId(user.getId()),
+                        binaryContentService.find(user.getBinaryContentId()),
                         userStatusService.getOnlineStatus(user.getId())))
                 .toList();
     }
-
     @Override
-    public void update(UUID userId, String name, String email) {
-        validator.validate(name, email);
-        User user = userRepository.find(userId);
+    public void update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+        validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());
+        User user = userRepository.find(userUpdateRequestDto.userId());
         validateUserExists(user);
-        userRepository.update(user, name, email);
-    }
-
-    @Override
-    public void updatePassword(UUID userId, String originalPassword, String newPassword) {
-        User user = userRepository.find(userId);
-        validateUserExists(user);
-        userRepository.updatePassword(user, originalPassword, newPassword);
-        user.updateUpdatedAt();
+        
+        if (binaryContentRequestDto != null) {
+            BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
+            user.updateBinaryContentId(binaryContent.getId());
+        }
+        user.update(userUpdateRequestDto.name(), userUpdateRequestDto.email(), userUpdateRequestDto.password());
+        userRepository.save(user);
     }
 
     @Override

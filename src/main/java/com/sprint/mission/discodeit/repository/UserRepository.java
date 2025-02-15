@@ -9,7 +9,5 @@ public interface UserRepository {
     User save(User user);
     User find(UUID userId);
     List<User> findAll();
-    void update(User user, String name, String email);
-    void updatePassword(User user, String originalPassword, String newPassword);
     void delete(User user);
 }

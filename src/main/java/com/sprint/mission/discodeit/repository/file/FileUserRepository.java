@@ -70,36 +70,6 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(User user, String name, String email) {
-        user.update(name, email);
-
-        Path filePath = directory.resolve(user.getId() + ".ser");
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(user);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void updatePassword(User user, String originalPassword, String newPassword) {
-        user.updatePassword(originalPassword, newPassword);
-
-        Path filePath = directory.resolve(user.getId() + ".ser");
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
-        ) {
-            oos.writeObject(user);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void delete(User user) {
         Path filePath = directory.resolve(user.getId() + ".ser");
 

@@ -38,17 +38,18 @@ public class User implements Serializable {
 
     public void updateBinaryContentId(UUID binaryContentId) {
         this.binaryContentId = binaryContentId;
+        updateUpdatedAt();
     }
 
-    public void update(String name, String email) {
-        boolean updated = updateName(name) || updateEmail(email);
+    public void update(String name, String email, String password) {
+        boolean updated = updateName(name) || updateEmail(email) || updatePassword(password);
         if (updated) {
             updateUpdatedAt();
         }
     }
 
     public boolean updateName(String name) {
-        if (this.name.equals(name)) {
+        if (name.isBlank() || this.name.equals(name)) {
             return false;
         }
         this.name = name;
@@ -56,18 +57,19 @@ public class User implements Serializable {
     }
 
     public boolean updateEmail(String email) {
-        if (this.email.equals(email)) {
+        if (name.isBlank() || this.email.equals(email)) {
             return false;
         }
         this.email = email;
         return true;
     }
 
-    public void updatePassword(String originalPassword, String newPassword) {
-        if (!BCrypt.checkpw(originalPassword, password) || BCrypt.checkpw(newPassword, password)) {
-            throw new IllegalArgumentException("[ERROR] 비밀번호 변경에 실패하였습니다.");
+    public boolean updatePassword(String newPassword) {
+        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
+            return false;
         }
         this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        return true;
     }
 
     public void validateDuplicateName(String name) {
