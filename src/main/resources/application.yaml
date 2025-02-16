@@ -1,7 +1,10 @@
 spring.application.name: discodeit
+spring:
+  profiles:
+    active: file
 discodeit:
   repository:
-    type: jcf
+    type: file
     file-directories:
       binaryContents: src/main/resources/data/serialized/binaryContents
       channels: src/main/resources/data/serialized/channels

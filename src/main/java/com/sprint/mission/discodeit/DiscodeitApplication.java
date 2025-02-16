@@ -56,7 +56,7 @@ public class DiscodeitApplication {
 		System.out.println(foundUsers);
 		// 수정
 		System.out.println("유저 수정");
-		System.out.println(userService.update(new UserUpdateRequestDto(userResponseDto.id(), "uuser", "uuser@codeit.kr", "1234", null),
+		System.out.println(userService.update(new UserUpdateRequestDto(userResponseDto.id(), "uuser", "uuser@codeit.kr", "", null),
 				new BinaryContentRequestDto(null)));
 		// 삭제
 		userService.delete(userResponseDto.id());

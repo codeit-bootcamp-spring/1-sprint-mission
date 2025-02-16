@@ -2,7 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
@@ -15,12 +16,12 @@ import java.util.UUID;
 
 @Repository
 @Scope("singleton")
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Profile("file")
 public class FileUserStatusRepository implements UserStatusRepository {
     private final Path directory;
 
-    public FileUserStatusRepository() {
-        this.directory = Paths.get("src", "main", "resources", "data", "serialized", "userStatuses");
+    public FileUserStatusRepository(@Value("${discodeit.repository.file-directories.userStatuses}") String directory) {
+        this.directory = Paths.get(directory);
     }
 
     @Override
