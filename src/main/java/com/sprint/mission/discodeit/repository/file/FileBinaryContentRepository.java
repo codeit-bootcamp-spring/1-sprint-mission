@@ -75,11 +75,18 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void delete(UUID binaryContentId) {
+        Path filePath = directory.resolve(binaryContentId + ".ser");
 
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제에 실패하였습니다.");
+        }
     }
 
     @Override
     public boolean existsById(UUID binaryContentId) {
-        return false;
+        Path filePath = directory.resolve(binaryContentId + ".ser");
+        return Files.exists(filePath);
     }
 }

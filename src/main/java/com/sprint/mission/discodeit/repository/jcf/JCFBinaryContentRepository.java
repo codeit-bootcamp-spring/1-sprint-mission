@@ -37,11 +37,11 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void delete(UUID binaryContentId) {
-
+        data.remove(binaryContentId);
     }
 
     @Override
     public boolean existsById(UUID binaryContentId) {
-        return false;
+        return data.containsKey(binaryContentId);
     }
 }
