@@ -106,10 +106,12 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        // TODO: 메시지 삭제
         if (!channelRepository.existsById(channelId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
+        messageRepository.findAll().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .forEach(message -> messageRepository.delete(message.getId()));
         readStatusService.deleteByChannelId(channelId);
         channelRepository.delete(channelId);
     }
