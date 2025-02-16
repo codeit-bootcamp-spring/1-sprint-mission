@@ -1,14 +1,12 @@
-package com.sprint.mission.discodeit.repository.domain.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
-import com.sprint.mission.discodeit.domain.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor

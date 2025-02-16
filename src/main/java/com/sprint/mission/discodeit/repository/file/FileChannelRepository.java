@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -89,6 +86,7 @@ public class FileChannelRepository implements ChannelRepository {
             System.out.println("채널을 찾을 수 없습니다.");
             return null;
         }
+        //readStatus업데이트
         messages = loadMessagesFromSer(CHANNEL_MESSAGES);
         List<UUID> messageUuidList = messages.get(channel.getId());
         return new ArrayList<>(messageUuidList);

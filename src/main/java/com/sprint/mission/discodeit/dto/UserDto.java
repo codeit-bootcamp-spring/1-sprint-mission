@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;

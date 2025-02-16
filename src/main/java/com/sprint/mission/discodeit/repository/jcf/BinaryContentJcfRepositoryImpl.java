@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.repository.domain.jcf;
+package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import lombok.RequiredArgsConstructor;

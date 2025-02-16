@@ -1,7 +1,6 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.domain.BinaryContent;
-import com.sprint.mission.discodeit.domain.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -88,7 +87,6 @@ public class DiscodeitApplication {
         for (UserDto user : users) {
             System.out.println(user);
         }
-
         System.out.println("====================================================");
         System.out.println("채널 단건 조회");
         System.out.println(channelService.find(channel1));
@@ -164,6 +162,9 @@ public class DiscodeitApplication {
         System.out.println("update readStatus : 위에서 찾은 두개의 ReadStatus에서 두 번째 값을 첫 번째 값에 덮어씀");
         readStatusService.update(readStatusByUserId.get(0), readStatusByUserId.get(1));
         readStatusByUserId = readStatusService.findAllByUserId(user3);
+        System.out.println("update readStatus : 메시지를 유저 아이디를 통해 찾을 떄 UserStatus 업데이트 ");
+        messageService.findAllByUserId(user3).forEach(System.out::println);
+        System.out.println("====================================================");
         System.out.println("두 값의 ID값은 변하지 않고 나머지는 바뀔 수 있는데 위 예시는 ChannelId가 가장 먼저 확인할 수 있다.");
         System.out.println("readStatusByUserId = " + readStatusByUserId);
         System.out.println("readStatusByUserId.size() = " + readStatusByUserId.size());
@@ -219,19 +220,6 @@ public class DiscodeitApplication {
 
 
     }
-    /*static UserDto setupUser(UserService userService) {
-        return userService.createUser(new UserDto("woody", "woodyPassword", "woody@naver.com"));
-    }
-
-    static ChannelDto setupChannel(ChannelService channelService) {
-        return channelService.create(new ChannelDto("공지", ChannelType.PUBLIC));
-    }
-
-    static void messageCreateTest(MessageService messageService, ChannelDto channelDto, UserDto author) {
-        UUID messageId = messageService.create(new MessageDto(null, author.id(), channelDto.id(), null, null, "안녕", null));
-        Message message = messageService.findById(messageId);
-        System.out.println("메시지 생성: " + message.getId());
-    }*/
 
     private static void resetMessageFile(String filename) {
         try {

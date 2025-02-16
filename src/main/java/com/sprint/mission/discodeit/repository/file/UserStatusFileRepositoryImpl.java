@@ -1,7 +1,6 @@
-package com.sprint.mission.discodeit.repository.domain.file;
+package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
-import com.sprint.mission.discodeit.domain.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 

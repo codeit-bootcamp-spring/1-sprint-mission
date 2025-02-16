@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.domain;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,18 +42,21 @@ public class ReadStatusService{
             System.out.println("아이디를 찾을 수 없습니다.");
             return null;
         }
+        readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now()));
         return new ReadStatusDto(readStatus);
     }
 
     public List<ReadStatusDto> findAll() {
         List<ReadStatusDto> readStatusDtos = new ArrayList<>();
         readStatusRepository.findAll().forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        readStatusRepository.findAll().forEach(readStatus -> readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now())));
         return readStatusDtos;
     }
 
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         List<ReadStatusDto> readStatusDtos = new ArrayList<>();
         readStatusRepository.findAllByUserId(userId).forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        readStatusRepository.findAllByUserId(userId).forEach(readStatus -> readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now())));
         return readStatusDtos;
     }
 
@@ -64,6 +68,7 @@ public class ReadStatusService{
         }
         List<ReadStatusDto> readStatusDtos = new ArrayList<>();
         readStatusRepository.findAllByChannelId(channelId).forEach(readStatus -> readStatusDtos.add(new ReadStatusDto(readStatus)));
+        readStatusRepository.findAllByUserId(channelId).forEach(readStatus -> readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now())));
         return readStatusDtos;
     }
 

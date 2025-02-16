@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.domain;
+package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.UserStatusDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 @Entity

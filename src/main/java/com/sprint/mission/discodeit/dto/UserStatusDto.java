@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.domain.Status;
-import com.sprint.mission.discodeit.domain.UserStatus;
-import lombok.Setter;
+import com.sprint.mission.discodeit.entity.Status;
+import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.time.Instant;
 import java.util.UUID;

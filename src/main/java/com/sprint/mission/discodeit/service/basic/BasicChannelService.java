@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -89,13 +89,18 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelFindAllDto findAllByUserId(UUID userId) {
-        List<Channel> channels = readStatusRepository.findAllByUserId(userId).stream().map(ReadStatus::getChannelId).map(s -> channelRepository.findById(s)).toList();
+        List<Channel> channels = readStatusRepository.findAllByUserId(userId).stream().map(ReadStatus::getChannelId).map(channelRepository::findById).toList();
         Map<UUID, Instant> latestMessagesInstant = new HashMap<>();
         List<UUID> list = channels.stream().map(Channel::getId).toList(); //채널 ID
         for (UUID uuid : list) {
             List<Message> messagesById = messageRepository.findMessagesById(uuid);
             Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();
             latestMessagesInstant.put(uuid, updatedAt);
+        }
+        //채널 속 해당 유저 ID에 대한 ReadStatus 값 최신화
+        List<ReadStatus> findAllByUserId = readStatusRepository.findAllByUserId(userId);
+        for (ReadStatus readStatus : findAllByUserId) {
+            readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now()));
         }
         return new ChannelFindAllDto(channels, latestMessagesInstant, null);
     }

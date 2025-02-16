@@ -18,6 +18,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     public List<UUID> findMessagesByChannelId(UUID uuid) {
+        //readStatus업데이트
         List<UUID> messageUuidList = messages.get(uuid); //채널이 가진 메시지 리스트 반환
         return new ArrayList<>(messageUuidList);
     }
