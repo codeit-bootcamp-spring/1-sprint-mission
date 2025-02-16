@@ -9,12 +9,12 @@ import java.util.UUID;
 public class UserStatus {
     private UUID id;
     private User user;
-    private Instant lastSeenAt;
+    private Instant lastSeenAt = Instant.EPOCH;
 
     public UserStatus(User user, Instant lastSeenAt) {
         this.id = UUID.randomUUID();
         this.user = user;
-        this.lastSeenAt = lastSeenAt;
+        this.lastSeenAt = (lastSeenAt != null) ? lastSeenAt : Instant.EPOCH;
     }
 
     public void updateLastSeenAt(Instant newLastActiveAt) {
