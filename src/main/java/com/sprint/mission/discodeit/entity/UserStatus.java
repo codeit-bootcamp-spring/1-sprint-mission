@@ -35,4 +35,8 @@ public class UserStatus implements Serializable {
         }
         return OnlineStatus.ONLINE;
     }
+
+    public boolean isSameUserId(UUID userId) {
+        return this.userId.equals(userId);
+    }
 }

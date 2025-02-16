@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -38,7 +39,7 @@ public class BasicUserService implements UserService {
 
         BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
         User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
-        UserStatus userStatus = userStatusService.create(user.getId());
+        UserStatus userStatus = userStatusService.create(UserStatusCreateDto.from(user.getId()));
 
         return UserResponseDto.from(user, binaryContent, userStatus.calculateOnlineStatus());
     }
