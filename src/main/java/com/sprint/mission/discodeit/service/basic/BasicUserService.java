@@ -20,11 +20,9 @@ public class BasicUserService implements UserService {
     @Autowired
     private final UserRepository userRepository;
     public BasicUserService(UserRepository userRepository){this.userRepository = userRepository;}
-
     @Autowired
     private final BinaryContentRepository binaryContentRepository;
     public BasicUserService(BinaryContentRepository binaryContentRepository){this.binaryContentRepository = binaryContentRepository;}
-
     @Autowired
     private final UserStatusRepository userStatusRepository;
     public BasicUserService(UserStatusRepository userStatusRepository){this.userStatusRepository = userStatusRepository;}
@@ -47,7 +45,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<UserDto> readUser(UserDto userDto) {
+    public Optional<UserDto> findUser(UserDto userDto) {
         Optional<UserDto> usr = userRepository.findById(userDto.user().getId());
         usr.ifPresent(u -> System.out.println("조회된 회원: " + u));
         // TODO : 패스워드 정보 제외시키기
@@ -55,7 +53,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserDto> readAllUsers() {
+    public List<UserDto> findAllUsers() {
         List<UserDto> users = userRepository.findAll();
         if(users != null && !users.isEmpty()){
             System.out.println("전체 회원 목록: " + users);

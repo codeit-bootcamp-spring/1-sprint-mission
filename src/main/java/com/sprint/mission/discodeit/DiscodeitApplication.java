@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.dto.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.Gender;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -43,7 +47,7 @@ public class DiscodeitApplication {
 		init(directory);
 
 		SerializationUtil<UserDto> userUtil = new SerializationUtil<>();
-		SerializationUtil<Channel> channelUtil = new SerializationUtil<>();
+		SerializationUtil<ChannelDto> channelUtil = new SerializationUtil<>();
 		SerializationUtil<Message> messageUtil = new SerializationUtil<>();
 
 		// 서비스 초기화 : Bean 이용
@@ -75,10 +79,10 @@ public class DiscodeitApplication {
 		}
 
 		// 조회 - 단건
-		userService.readUser(userDto1);
+		userService.findUser(userDto1);
 
 		// 조회 - 다건
-		userService.readAllUsers();
+		userService.findAllUsers();
 
 		// 수정 & 조회
 		UpdateUserDto updateUserDto1 = new UpdateUserDto(user1.getId(), user1.getName(), user1.getAge(), user1.getGender(), null);
@@ -98,39 +102,51 @@ public class DiscodeitApplication {
 		// deserializedUsers.forEach(System.out::println);
 
 
-		// ===== 채널 직렬화 =====
-		System.out.println("\n===== 채널 서비스 CRUD =====");
-		// 등록
-		Channel channel1 = new Channel("스터디 채널", "자바 공부, 상호 피드백");
-		boolean c1 = channelService.createChannel(channel1);
-
-		Channel channel2 = new Channel("잡담 채널", "아무말 해도 되는 공간");
-		boolean c2 = channelService.createChannel(channel2);
-
-		if (c1 || c2) {
-			List<Channel> channelList = channelService.getAllChannels();
-			channelUtil.saveData(channelList);
-		}
-
-		// 조회 - 단건
-		channelService.readChannel(channel1.getId());
-
-		// 조회 - 다건
-		channelService.readAllChannels();
-
-		// 수정 & 조회
-		channelService.updateChannel(channel1.getId(), "스프링 스터디", "스프링 공부, 상호 피드백");
-		channelUtil.saveData(channelService.getAllChannels());
-
-		// 삭제 & 조회
-		channelService.deleteChannel(channel1.getId());
-		channelUtil.saveData(channelService.getAllChannels());
-
-		// ===== 채널 파일 역직렬화 =====
-		System.out.println("\n===== 파일에서 채널 데이터 불러오기 =====");
-		List<Channel> deserializedChannels = channelUtil.loadData();
-		for (Channel c : deserializedChannels)
-			System.out.println(c);
+//		// ===== 채널 직렬화 =====
+//		System.out.println("\n===== 채널 서비스 CRUD =====");
+//
+//		// 등록
+//		Channel channel1 = new Channel("스터디 채널", "자바 공부, 상호 피드백");
+//		// TODO : 유저랑 메세지가 이렇게 새로 생성한 리스트에 들어가는게 맞나....? 뭔가 찝찝
+//		// 유저 리스트 생성
+//		List<User> ch1Participants = List.of(user1, user2);
+//		// 메시지 리스트 (초기에는 비어 있음)
+//		List<Message> ch1Messages = Collections.emptyList();
+//		ChannelDto channelDto1 = new ChannelDto(channel1, ch1Participants, ch1Messages, true); //
+//		boolean c1 = channelService.createPrivateChannel(channelDto1);
+//
+//		Channel channel2 = new Channel("잡담 채널", "아무말 해도 되는 공간");
+//		// 유저 리스트 생성
+//		List<User> ch2Participants = List.of(user1, user2);
+//		// 메세지 리스트 (초기에는 비어 있음)
+//		List<Message> ch2Messages = Collections.emptyList();
+//		ChannelDto channelDto2 = new ChannelDto(channel2, ch2Participants, ch2Messages, false);
+//		boolean c2 = channelService.createPublicChannel(channelDto2);
+//
+//		if (c1 || c2) {
+//			List<ChannelDto> channelList = channelService.getAllChannels();
+//			channelUtil.saveData(channelList);
+//		}
+//
+//		// 조회 - 단건
+//		channelService.findPublicChannel(channeDto1);
+//
+//		// 조회 - 다건
+//		channelService.readAllChannels();
+//
+//		// 수정 & 조회
+//		channelService.updatePublicChannel(channelDto1);
+//		channelUtil.saveData(channelService.getAllChannels());
+//
+//		// 삭제 & 조회
+//		channelService.deleteChannel(channel1.getId());
+//		channelUtil.saveData(channelService.getAllChannels());
+//
+//		// ===== 채널 파일 역직렬화 =====
+//		System.out.println("\n===== 파일에서 채널 데이터 불러오기 =====");
+//		List<Channel> deserializedChannels = channelUtil.loadData();
+//		for (Channel c : deserializedChannels)
+//			System.out.println(c);
 
 
 		// ===== 메세지 직렬화 =====
@@ -144,10 +160,11 @@ public class DiscodeitApplication {
 		userService.createUser(userDto3);
 
 		// 등록
-		Message message1 = new Message("자바 질문톡방", messageSender.getId());
+		// TODO : 채널 아이디랑 연결시켜야할듯
+		Message message1 = new Message("질문1", messageSender.getId());
 		boolean m1 = messageService.createMessage(message1);
 
-		Message message2 = new Message("스프링 질문톡방", messageSender.getId());
+		Message message2 = new Message("질문2", messageSender.getId());
 		boolean m2 = messageService.createMessage(message2);
 
 		if (m1 || m2) {

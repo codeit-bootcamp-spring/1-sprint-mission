@@ -10,9 +10,9 @@ import java.util.UUID;
 public interface UserService {
   boolean createUser(UserDto userDto);
 
-  Optional<UserDto> readUser(UserDto userDto);
+  Optional<UserDto> findUser(UserDto userDto);
 
-  List<UserDto> readAllUsers();
+  List<UserDto> findAllUsers();
 
   void updateUser(UpdateUserDto updateUserDto);
 

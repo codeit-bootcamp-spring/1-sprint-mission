@@ -16,8 +16,8 @@ public class ReadStatus implements Serializable {
     private final Instant createdAt = Instant.now();
     private Instant updatedAt = null;
     private final User user;
-    private final Channel channel;
-    private final Message message;
+    private final UUID channelId;
+    private final UUID messageId;
 
     public void update() {
         this.updatedAt = Instant.now();
