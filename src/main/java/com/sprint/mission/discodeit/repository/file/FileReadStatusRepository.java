@@ -23,11 +23,18 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     FileIOHandler fileIOHandler = FileIOHandler.getInstance();
     String allReadStatusMapRepository = "Channel\\ChannelReadStatusMap\\";
 
-    //채널 uuid를 이름으로 직렬화되어있는 channelReadStatusMap 객체를 반환.
+    //채널 uuid를 이름으로 직렬화되어있는 channelReadStatusMap 객체를 반환. 채널마다 맵이 존재하며, 유저uuid를 키로, 해당 readStatus객체를 밸류로 가지고있음
     @Override
     public HashMap<UUID, ReadStatus> getChannelReadStatusMap(UUID channelId) throws IOException {
         return (HashMap<UUID, ReadStatus>)fileIOHandler.deserializeHashMap(allReadStatusMapRepository+channelId.toString());
     }
+
+    @Override
+    public ReadStatus getReadStatus(UUID channelId, UUID userId) throws IOException {
+        HashMap<UUID, ReadStatus> channelMap = getChannelReadStatusMap(channelId);
+        return channelMap.get(userId);
+    }
+
 
     @Override
     public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap) throws IOException{

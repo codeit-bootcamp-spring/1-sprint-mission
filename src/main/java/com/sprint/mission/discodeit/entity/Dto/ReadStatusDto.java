@@ -6,11 +6,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusDto(
-        UUID id,
+        UUID userId,
         Instant createdAt,
         Instant updatedAt
 ) {
     public static ReadStatusDto from(ReadStatus readStatus) {
-        return new ReadStatusDto(readStatus.getId(), readStatus.getCreatedAt(), readStatus.getUpdatedAt());
+        return new ReadStatusDto(readStatus.getUserId(), readStatus.getCreatedAt(), readStatus.getUpdatedAt());
     }
 }

@@ -10,6 +10,7 @@ public interface ReadStatusRepository {
     //채널마다 HashMap<멤버id, readStatus객체> 해시맵을 만들어 채널에 속한 멤버들의 readStatus를 저장한다.
 
     public HashMap<UUID, ReadStatus> getChannelReadStatusMap(UUID channelsMap) throws IOException;
+    public ReadStatus getReadStatus(UUID channelId, UUID userId) throws IOException;
     public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap) throws IOException;
     public boolean saveReadStatus(UUID channelId, UUID userId, ReadStatus readStatus) throws IOException;
     public boolean deleteReadStatus(UUID channelId, UUID userId) throws IOException;

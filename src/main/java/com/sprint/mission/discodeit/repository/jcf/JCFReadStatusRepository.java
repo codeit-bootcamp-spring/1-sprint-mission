@@ -28,6 +28,12 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
         return allReadStatusMaps.get(channelMapId);
     }
 
+    @Override
+    public ReadStatus getReadStatus(UUID channelId, UUID userId) throws IOException {
+        HashMap<UUID, ReadStatus> channelMap = getChannelReadStatusMap(channelId);
+        return channelMap.get(userId);
+    }
+
     //채널별 맵인 channelReadStatusMap을 allReadStatusMaps에 저장
     @Override
     public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap) throws IOException {

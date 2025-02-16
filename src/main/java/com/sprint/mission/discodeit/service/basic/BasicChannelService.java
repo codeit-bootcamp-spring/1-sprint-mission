@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
             messageRepository.addChannelMessagesMap(newChannel.getId(), channelMessageMap);
             //채널 생성과 동시에 channelReadStatusMap 생성. 유저마다 readStatus 객체 생성해서 channelReadStatusMap에 삽입.
             HashMap<UUID, ReadStatus> channelReadStatusMap = new HashMap<UUID, ReadStatus>();
-            Stream.of(memberId).forEach(_memberId -> channelReadStatusMap.put(_memberId, new ReadStatus()));
+            Stream.of(memberId).forEach(_memberId -> channelReadStatusMap.put(_memberId, new ReadStatus(_memberId)));
             //레포지토리에 저장.
             readStatusRepository.addChannelReadStatusMap(newChannel.getId(), channelReadStatusMap);
             newChannel.setMembers(new ArrayList<UUID>(List.of(memberId)));

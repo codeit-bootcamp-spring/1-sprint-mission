@@ -9,9 +9,11 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import java.util.UUID;
@@ -50,7 +52,7 @@ public class JavaApplication {
         UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository);
         MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, fileIOHandler);
         ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, userService, messageRepository);
-
+        ReadStatusService readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, messageRepository, channelService, channelRepository);
 
 
 
