@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.dto.channel.request;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record CreatePrivateChannelRequest(
-	UUID userId1,
-	UUID userId2
+	UUID authorId,
+	UUID receiverId,
+	Instant createdAt
 ) {
 }

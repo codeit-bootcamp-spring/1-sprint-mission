@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,21 +29,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DiscodeitApplication {
 
-	static UserResponse setupUser(UserService userService) {
-		CreateUserRequest createUserRequest = new CreateUserRequest("woody", "woody1234", "woody", "woody@codeit.com",
-			null); // profileImage (MultipartFile, 없으므로 null)
+	static UserResponse setupUser(UserService userService, CreateUserRequest createUserRequest) {
 		return userService.createUser(createUserRequest);
 	}
 
-	static Channel setupChannel(ChannelService channelService, UUID participantId) {
-		CreatePublicChannelRequest createChannelRequest = new CreatePublicChannelRequest("공지", "공지 채널입니다.",
-			List.of(participantId));
+	static Channel setupChannel(ChannelService channelService, UUID creatorId, List<UUID> participantIds) {
+		CreatePublicChannelRequest createChannelRequest = new CreatePublicChannelRequest(creatorId, "공지", "공지 채널입니다.",
+			participantIds);
 		return channelService.createPublicChannel(createChannelRequest);
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 		CreateMessageRequest createMessageRequest = new CreateMessageRequest("안녕하세요.", author.getId(), channel.getId(),
-			List.of());
+			null, Instant.now(), List.of());
 		MessageResponse response = messageService.create(createMessageRequest);
 		log.info("메시지 생성: " + response.id());
 	}
@@ -69,15 +69,28 @@ public class DiscodeitApplication {
 		log.info("binaryContentService = " + binaryContentService);
 
 		log.info("setupUser 메서드 시작 :::");
-		UserResponse userResponse = setupUser(userService);
+		CreateUserRequest createUser1 = new CreateUserRequest("woody", "woody1234", "woody", "woody@codeit.com",
+			null);
+		UserResponse user1 = setupUser(userService, createUser1);
+
+		CreateUserRequest createUser2 = new CreateUserRequest("joon", "joon1234", "joon", "joon@codeit.com", null);
+		UserResponse user2 = setupUser(userService, createUser2);
+
+		CreateUserRequest createUser3 = new CreateUserRequest("min", "min1234", "min", "min@codeit.com", null);
+		UserResponse user3 = setupUser(userService, createUser3);
+
+		CreateUserRequest createUser4 = new CreateUserRequest("pokemon", "pokemon1234", "pokemon", "pokemon@codeit.com",
+			null);
+		UserResponse user4 = setupUser(userService, createUser4);
 		log.info("setupUser 메서드 완료 :::");
 
 		log.info("findUserEntity 메서드 시작 :::");
-		User user = userService.findUserEntity(userResponse.id());
+		User user = userService.findUserEntity(user1.id());
 		log.info("findUserEntity 메서드 완료 :::");
 
 		log.info("setupChannel 메서드 시작 :::");
-		Channel channel = setupChannel(channelService, user.getId());
+		List<UUID> participants = Arrays.asList(user2.id(), user3.id(), user4.id());
+		Channel channel = setupChannel(channelService, user1.id(), participants);
 		log.info("setupChannel 메서드 완료 :::");
 
 		log.info("messageCreateTest 메서드 시작 :::");

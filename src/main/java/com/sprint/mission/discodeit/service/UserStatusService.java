@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public interface UserStatusService {
 
 	UserStatus update(UUID id, UpdateUserStatusRequest request);
 
-	UserStatus updateByUserId(UUID userId, UpdateUserStatusRequest request);
+	UserStatus updateByUserId(UUID userId, Instant lastActiveAt);
 
 	void deleteByUserId(UUID id);
 }

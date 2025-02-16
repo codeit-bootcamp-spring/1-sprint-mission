@@ -8,12 +8,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sprint.mission.discodeit.dto.binaryContent.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.response.BinaryContentResponse;
+import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.response.ChannelListResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContentType;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -46,19 +50,40 @@ public class BasicMessageService implements MessageService {
 		// 사용자와 채널 존재 여부 확인
 		UserResponse author = userService.findUser(request.authorId());
 		ChannelResponse channel = channelService.find(request.channelId());
-
+		UUID channelId = request.channelId();
 		// 메시지 작성자가 채널 참여자인지 확인
 		if (!channel.participants().containsKey(request.authorId())) {
 			throw new IllegalArgumentException(
 				"Author is not a participant of the channel: " + request.channelId());
 		}
 
+		// Private Channel 생성 로직 추가 (디스코드도 private은 메세지를 상대방에게 보내야지 channel 추가 public은 초대를 먼저 한 후 메시지를 보낸다)
+		// findPrivateChannelBetweenUsers는 나중에 구현...
+		if (channelId == null) {
+			UUID recipientId = request.receiverId(); // 메시지 수신자 ID 가져오기
+
+			// 모든 채널 조회 후 PRIVATE 채널 찾기
+			List<ChannelListResponse> allChannels = channelService.findAllByUserId(request.authorId());
+			for (ChannelListResponse existChannel : allChannels) {
+				if (existChannel.channelType() == ChannelType.PRIVATE &&
+					existChannel.participants().containsKey(author.id()) &&
+					existChannel.participants().containsKey(recipientId)) {
+					channelId = existChannel.id(); // 기존 채널 사용
+					break;
+				}
+			}
+
+			// 기존 채널이 없으면 새 Private 채널 생성
+			if (channelId == null) {
+				CreatePrivateChannelRequest privateChannelRequest = new CreatePrivateChannelRequest(author.id(),
+					recipientId, request.createdAt());
+				Channel privateChannel = channelService.createPrivateChannel(privateChannelRequest);
+				channelId = privateChannel.getId();
+			}
+		}
+
 		// 메시지 기본 정보 생성 및 저장
-		Message message = new Message(
-			request.content(),
-			request.authorId(),
-			request.channelId()
-		);
+		Message message = new Message(request.content(), request.authorId(), request.channelId());
 		Message savedMessage = messageRepository.save(message);
 
 		// 첨부파일이 있는 경우 처리

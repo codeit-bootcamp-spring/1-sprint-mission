@@ -23,18 +23,21 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 
 public class BasicChannelService implements ChannelService {
 	private final ChannelRepository channelRepository;
 	private final UserService userService;
 	private final ReadStatusService readStatusService;
+	private final UserStatusService userStatusService;
 	private final MessageRepository messageRepository;
 
 	public BasicChannelService(ChannelRepository channelRepository, UserService userService,
-		ReadStatusService readStatusService, MessageRepository messageRepository) {
+		ReadStatusService readStatusService, UserStatusService userStatusService, MessageRepository messageRepository) {
 		this.channelRepository = channelRepository;
 		this.userService = userService;
 		this.readStatusService = readStatusService;
+		this.userStatusService = userStatusService;
 		this.messageRepository = messageRepository;
 	}
 
@@ -47,22 +50,28 @@ public class BasicChannelService implements ChannelService {
 	public Channel createPrivateChannel(CreatePrivateChannelRequest request) {
 		// 참여자 확인 User객체가 아닌 dto로 받게 되는데
 		// user객체에는 온라인 상태를 나타내주는 변수가 없기 때문에 해당 변수를 포함한 userresponse를 받는게 더 낫겠다는 생각을 하였다.
-		UserResponse user1 = userService.findUser(request.userId1());
-		UserResponse user2 = userService.findUser(request.userId2());
+		UserResponse author = userService.findUser(request.authorId());
+
+		//보내는 사람은 온라인 받는 사람은 아직 받지 않았으니 온라인 처리를 하지 않음
+		//Todo 만약 receiver가 온라인 상태라면?
+		userStatusService.updateByUserId(author.id(), request.createdAt());
+		UserResponse receiver = userService.findUser(request.receiverId());
 
 		// 참여자 맵 생성
 		Map<UUID, UserResponse> participants = new HashMap<>();
-		participants.put(request.userId1(), user1);
-		participants.put(request.userId2(), user2);
+		participants.put(request.authorId(), author);
+		participants.put(request.receiverId(), receiver);
 
 		// 채널 생성
 		Channel channel = new Channel(null, null, participants, new ArrayList<>(), ChannelType.PRIVATE);
 		Channel savedChannel = channelRepository.save(channel);
 
 		// ReadStatus 생성 - 각 참여자의 읽음 상태 초기화
-		CreateReadStatusRequest readStatus1 = new CreateReadStatusRequest(request.userId1(), savedChannel.getId(), null,
+		CreateReadStatusRequest readStatus1 = new CreateReadStatusRequest(request.authorId(), savedChannel.getId(),
+			null,
 			Instant.now());
-		CreateReadStatusRequest readStatus2 = new CreateReadStatusRequest(request.userId2(), savedChannel.getId(), null,
+		CreateReadStatusRequest readStatus2 = new CreateReadStatusRequest(request.receiverId(), savedChannel.getId(),
+			null,
 			Instant.now());
 
 		readStatusService.create(readStatus1);
@@ -79,6 +88,9 @@ public class BasicChannelService implements ChannelService {
 	@Override
 	public Channel createPublicChannel(CreatePublicChannelRequest request) {
 		Map<UUID, UserResponse> participants = new HashMap<>();
+
+		//creator도 channel에 추가
+		participants.put(request.creatorId(), userService.findUser(request.creatorId()));
 
 		// 모든 참여자 정보 조회 및 저장
 		for (UUID userId : request.participantIds()) {

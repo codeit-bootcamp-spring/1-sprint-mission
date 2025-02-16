@@ -39,8 +39,9 @@ public class ServiceConfig {
 
 	@Bean
 	public ChannelService channelService(ChannelRepository channelRepository, UserService userService,
-		ReadStatusService readStatusService, MessageRepository messageRepository) {
-		return new BasicChannelService(channelRepository, userService, readStatusService, messageRepository);
+		ReadStatusService readStatusService, UserStatusService userStatusService, MessageRepository messageRepository) {
+		return new BasicChannelService(channelRepository, userService, readStatusService, userStatusService,
+			messageRepository);
 	}
 
 	@Bean
