@@ -4,9 +4,15 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
@@ -47,43 +53,43 @@ public class FileJavaApplication {
     SerializationUtil<Channel> channelUtil = new SerializationUtil<>();
     SerializationUtil<Message> messageUtil = new SerializationUtil<>();
 
-
-    FileUserRepository fileUserRepository = new FileUserRepository(userUtil);
-    BasicUserService fileUserService = new BasicUserService(fileUserRepository);
-
-    FileChannelRepository fileChannelRepository = new FileChannelRepository(channelUtil);
-    BasicChannelService fileChannelService = new BasicChannelService(fileChannelRepository);
-
-    FileMessageRepository fileMessageRepository = new FileMessageRepository(messageUtil);
-    BasicMessageService fileMessageService = new BasicMessageService(fileMessageRepository);
+    // 인터페이스로 선언하고, 구현체로 초기화
+    // 레포지토리 초기화
+    UserRepository userRepository = new FileUserRepository(userUtil);
+    ChannelRepository channelRepository = new FileChannelRepository(channelUtil);
+    MessageRepository messageRepository = new FileMessageRepository(messageUtil);
+    // 서비스 초기화
+    UserService userService = new BasicUserService(userRepository);
+    ChannelService channelService = new BasicChannelService(channelRepository);
+    MessageService messageService = new BasicMessageService(messageRepository);
 
     // ===== 회원 직렬화 =====
     System.out.println("\n===== 회원 서비스 CRUD =====");
     // 등록
     User user1 = new User("정연경", 24, Gender.FEMALE);
-    boolean u1 = fileUserService.createUser(user1);
+    boolean u1 = userService.createUser(user1);
 
     User user2 = new User("신서연", 23, Gender.FEMALE);
-    boolean u2 = fileUserService.createUser(user2);
+    boolean u2 = userService.createUser(user2);
 
     if (u1 || u2) {
-      List<User> userList = fileUserRepository.findAll(); // 직렬화 대상!! : 최종 리스트 readAllUsers()
+      List<User> userList = userRepository.findAll(); // 직렬화 대상!! : 최종 리스트 readAllUsers()
       userUtil.saveData(userList);
     }
 
     // 조회 - 단건
-    fileUserService.readUser(user1.getId());
+    userService.readUser(user1.getId());
 
     // 조회 - 다건
-    fileUserService.readAllUsers();
+    userService.readAllUsers();
 
     // 수정 & 조회
-    fileUserService.updateUser(user1.getId(), "정연경", 23, Gender.FEMALE);
-    userUtil.saveData(fileUserRepository.findAll());
+    userService.updateUser(user1.getId(), "정연경", 23, Gender.FEMALE);
+    userUtil.saveData(userRepository.findAll());
 
     // 삭제 & 조회
-    fileUserService.deleteUser(user1.getId());
-    userUtil.saveData(fileUserRepository.findAll());
+    userService.deleteUser(user1.getId());
+    userUtil.saveData(userRepository.findAll());
 
     // ===== 회원 파일 역직렬화 =====
     // for문 써서 리스트 객체 하나하나 프린트 해줘야 함
@@ -98,29 +104,29 @@ public class FileJavaApplication {
     System.out.println("\n===== 채널 서비스 CRUD =====");
     // 등록
     Channel channel1 = new Channel("스터디 채널", "자바 공부, 상호 피드백");
-    boolean c1 = fileChannelService.createChannel(channel1);
+    boolean c1 = channelService.createChannel(channel1);
 
     Channel channel2 = new Channel("잡담 채널", "아무말 해도 되는 공간");
-    boolean c2 = fileChannelService.createChannel(channel2);
+    boolean c2 = channelService.createChannel(channel2);
 
     if (c1 || c2) {
-      List<Channel> channelList = fileChannelRepository.findAll();
+      List<Channel> channelList = channelRepository.findAll();
       channelUtil.saveData(channelList);
     }
 
     // 조회 - 단건
-    fileChannelService.readChannel(channel1.getId());
+    channelService.readChannel(channel1.getId());
 
     // 조회 - 다건
-    fileChannelService.readAllChannels();
+    channelService.readAllChannels();
 
     // 수정 & 조회
-    fileChannelService.updateChannel(channel1.getId(), "스프링 스터디", "스프링 공부, 상호 피드백");
-    channelUtil.saveData(fileChannelRepository.findAll());
+    channelService.updateChannel(channel1.getId(), "스프링 스터디", "스프링 공부, 상호 피드백");
+    channelUtil.saveData(channelRepository.findAll());
 
     // 삭제 & 조회
-    fileChannelService.deleteChannel(channel1.getId());
-    channelUtil.saveData(fileChannelRepository.findAll());
+    channelService.deleteChannel(channel1.getId());
+    channelUtil.saveData(channelRepository.findAll());
 
     // ===== 채널 파일 역직렬화 =====
     System.out.println("\n===== 파일에서 채널 데이터 불러오기 =====");
@@ -134,33 +140,33 @@ public class FileJavaApplication {
 
     // 메세지 보낼 회원 등록
     User messageSender = new User("김예은", 25, Gender.FEMALE);
-    fileUserService.createUser(messageSender);
+    userService.createUser(messageSender);
 
     // 등록
     Message message1 = new Message("자바 질문톡방", messageSender.getId());
-    boolean m1 = fileMessageService.createMessage(message1);
+    boolean m1 = messageService.createMessage(message1);
 
     Message message2 = new Message("스프링 질문톡방", messageSender.getId());
-    boolean m2 = fileMessageService.createMessage(message2);
+    boolean m2 = messageService.createMessage(message2);
 
     if (m1 || m2) {
-      List<Message> messageList = fileMessageRepository.findAll();
+      List<Message> messageList = messageRepository.findAll();
       messageUtil.saveData(messageList);
     }
 
     // 조회 - 단건
-    fileMessageService.readMessage(message1.getId());
+    messageService.readMessage(message1.getId());
 
     // 조회 - 다건
-    fileMessageService.readAllMessages();
+    messageService.readAllMessages();
 
     // 수정 & 조회
-    fileMessageService.updateMessage(message1.getId(), "스프링 스터디", messageSender.getId());
-    messageUtil.saveData(fileMessageRepository.findAll());
+    messageService.updateMessage(message1.getId(), "스프링 스터디", messageSender.getId());
+    messageUtil.saveData(messageRepository.findAll());
 
     // 삭제 & 조회
-    fileMessageService.deleteMessage(message1.getId());
-    messageUtil.saveData(fileMessageRepository.findAll());
+    messageService.deleteMessage(message1.getId());
+    messageUtil.saveData(messageRepository.findAll());
 
     // ===== 채널 파일 역직렬화 =====
     System.out.println("\n===== 파일에서 메세지 데이터 불러오기 =====");

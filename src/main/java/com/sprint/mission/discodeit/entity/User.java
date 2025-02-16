@@ -1,52 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
 // User 파일이 Gender 파일과 같은 패키지 안에 있으므로 따로 임포트하지 않아도 됨
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
+
 import java.io.Serializable;
 import java.util.UUID;
 
-
+@Getter
+@RequiredArgsConstructor
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private UUID id;
-  private Long createdAt;
-  private Long updatedAt;
+  private final UUID id = UUID.randomUUID();
+  private final Long createdAt = System.currentTimeMillis();
+  private Long updatedAt = null;
+
+  @NonNull
   private String name;
-  private int age;
+  @NonNull
+  private int age; // 기본 타입은 null이 될 수가 없더라도 @NonNull로 명시를 해줘야 @RequiredArgsConstructor가 인식을 함
+  @NonNull
   private Gender gender;
 
-  public User(String name, int age, Gender gender) {
-    this.id = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = this.createdAt;
-    this.name = name;
-    this.age = age;
-    this.gender = gender;
-  }
-
-  public UUID getId() {
-    return id;
-  }
-
-  public Long getCreatedAt() {
-    return createdAt;
-  }
-
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public int getAge() {
-    return age;
-  }
-
-  public Gender getGender() {
-    return gender;
-  }
 
   public void update(String name, int age, Gender gender) {
     this.name = name;

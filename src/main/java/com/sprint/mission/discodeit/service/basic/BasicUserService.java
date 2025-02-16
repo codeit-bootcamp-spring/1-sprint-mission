@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Gender;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @Service
 public class BasicUserService implements UserService {
+    @Autowired
     private final UserRepository userRepository;
     public BasicUserService(UserRepository userRepository){this.userRepository = userRepository;}
 
@@ -66,5 +68,10 @@ public class BasicUserService implements UserService {
             List<User> allUsers = userRepository.findAll();
             System.out.println("삭제 후 전체 회원 목록: " + allUsers);
         }
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 }

@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class BasicChannelService implements ChannelService {
+    @Autowired
     private final ChannelRepository channelRepository;
     public BasicChannelService(ChannelRepository channelRepository){this.channelRepository = channelRepository;}
 
@@ -62,5 +67,10 @@ public class BasicChannelService implements ChannelService {
             List<Channel> allChannels = channelRepository.findAll();
             System.out.println("삭제 후 전체 채널 목록: " + allChannels);
         }
+    }
+
+    @Override
+    public List<Channel> getAllChannels() {
+        return channelRepository.findAll();
     }
 }

@@ -3,12 +3,17 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class BasicMessageService implements MessageService {
+    @Autowired
     private final MessageRepository messageRepository;
     public BasicMessageService(MessageRepository messageRepository){this.messageRepository = messageRepository;}
 
@@ -62,5 +67,10 @@ public class BasicMessageService implements MessageService {
             List<Message> allMessages = messageRepository.findAll();
             System.out.println("삭제 후 전체 메세지 목록: " + allMessages);
         }
+    }
+
+    @Override
+    public List<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 }
