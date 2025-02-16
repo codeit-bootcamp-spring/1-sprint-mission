@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -17,15 +19,20 @@ import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
-    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "messages");
+    @Value("${discodeit.repository.file-directory}")
+    private String directory;
+
+    private Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
     @PostConstruct
-    public void init() {
+    private void init() {
+        directoryPath = Path.of(System.getProperty("user.dir"), directory, "messages");
         fileManager.createDirectory(directoryPath);
     }
 

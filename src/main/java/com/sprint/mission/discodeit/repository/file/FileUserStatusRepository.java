@@ -6,7 +6,8 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -16,18 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Primary
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserStatusRepository implements UserStatusRepository {
 
-    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "user_statuses");
+    @Value("${discodeit.repository.file-directory}")
+    private String directory;
+
+    private Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
     @PostConstruct
-    public void init() {
+    private void init() {
+        directoryPath = Path.of(System.getProperty("user.dir"), directory, "user_statuses");
         fileManager.createDirectory(directoryPath);
     }
 
@@ -48,7 +53,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
         Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (UserStatus)ois.readObject();
+            return (UserStatus) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             throw new NotFoundException("등록되지 않은 UserStatus입니다.");
         }

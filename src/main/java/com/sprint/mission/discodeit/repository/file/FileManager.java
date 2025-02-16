@@ -23,29 +23,28 @@ public class FileManager {
     }
 
     public void createFile(Path path, byte[] data) {
-        Path filePath = path.resolve(path);
         try {
-            Files.write(filePath, data);
+            Files.write(path, data);
         } catch (IOException e) {
-            throw new FileIOException("파일 생성 실패: " + filePath);
+            throw new FileIOException("파일 생성 실패: " + path);
         }
     }
 
     public byte[] readFile(Path path) {
-        Path filePath = path.resolve(path);
         try {
-            return Files.readAllBytes(filePath);
+            return Files.readAllBytes(path);
         } catch (IOException e) {
-            throw new FileIOException("파일 읽기 실패: " + filePath);
+            throw new FileIOException("파일 읽기 실패: " + path);
         }
     }
 
     public void deleteFile(Path path) {
-        Path filePath = path.resolve(path);
-        try {
-            Files.delete(filePath);
-        } catch (IOException e) {
-            throw new FileIOException("파일 삭제 실패: " + filePath);
+        if (Files.exists(path)) {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                throw new FileIOException("파일 삭제 실패: " + path);
+            }
         }
     }
 }

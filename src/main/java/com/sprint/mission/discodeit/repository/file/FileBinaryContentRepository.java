@@ -7,7 +7,8 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -18,18 +19,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Primary
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private final Path directoryPath = Path.of(System.getProperty("user.dir"), "binary_contents");
+    @Value("${discodeit.repository.file-directory}")
+    private String directory;
+
+    private Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
     @PostConstruct
     private void init() {
+        directoryPath = Path.of(System.getProperty("user.dir"), directory, "binary_contents");
         fileManager.createDirectory(directoryPath);
     }
 
