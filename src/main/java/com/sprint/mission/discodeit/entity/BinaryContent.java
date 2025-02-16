@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -20,5 +21,9 @@ public class BinaryContent implements Serializable {
         this.createdAt = Instant.now();
 
         this.data = data;
+    }
+
+    public boolean containsId(List<UUID> ids) {
+        return ids.contains(this.id);
     }
 }

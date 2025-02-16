@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,19 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent find(UUID binaryContentId) {
         return Optional.ofNullable(binaryContentRepository.find(binaryContentId))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
+    }
+
+    @Override
+    public List<BinaryContent> findAll() {
+        return binaryContentRepository.findAll();
+    }
+
+    @Override
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        return Optional.ofNullable(findAll().stream()
+                .filter(binaryContent -> binaryContent.containsId(binaryContentIds))
+                .toList())
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
