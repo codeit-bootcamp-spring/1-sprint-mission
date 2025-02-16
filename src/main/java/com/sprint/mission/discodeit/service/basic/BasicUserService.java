@@ -1,13 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
+import com.sprint.mission.discodeit.entity.Type.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final FileIOHandler fileIOHandler;
+    private final BinaryContentRepository binaryContentRepository;
 
     //todo find, findAll 메서드가 이런 용도인게 맞나?..
     //유저 리턴
@@ -103,8 +110,7 @@ public class BasicUserService implements UserService {
         }
     }
 
-    //todo 아직 바이너리콘텐트레포지토리 구현안돼있어서 주석처리.(미션3에서 지금 구현하지 않기를 요구). 레포지토리 구현 후 수정필요.
-    /*
+
     //유저 생성과 동시에 프로필사진 등록.
     @Override
     public UUID createUser(String userName, String email,String password, String profilePicturePath) {
@@ -112,22 +118,28 @@ public class BasicUserService implements UserService {
             System.out.println("유저 생성 실패. 입력값을 확인해주세요.");
             return null;
         }
-
-        User newUser = new User(userName, email, password);
-        //OI핸들러에 경로넘겨주고 그 경로에 있던 이미지 받아오기
-        BufferedImage profilePicture = fileIOHandler.loadImage(profilePicturePath);
-        //받아온 이미지를 바이너리객체로 만들기
-        BinaryContent uploadedProfilePicture = new BinaryContent(newUser.getId(), BinaryContentType.Profile_Picture, profilePicture);
-        //프로필사진 바이너리객체를 바이너리레포지토리에 저장.
-        BinaryContentRepository.addBinaryContent(BinaryContentType.Profile_Picture, uploadedProfilePicture);
-        //새로만든 유저객체에 프로필사진 등록
-        newUser.setProfilePicture(uploadedProfilePicture.getId());
-        //유저 객체 레포지토리에 저장
-        userRepository.addUser(newUser);
-        System.out.println(userName + " 유저 생성 성공!");
-        return newUser.getId();
+        try {
+            UserStatus newUserStatus = new UserStatus();
+            User newUser = new User(userName, email, password, newUserStatus.getId());
+            //OI핸들러에 경로넘겨주고 그 경로에 있던 이미지 받아오기
+            BufferedImage profilePicture = fileIOHandler.loadImage(profilePicturePath);
+            //받아온 이미지를 바이너리객체로 만들기
+            BinaryContent binaryProfilePicture = new BinaryContent(newUser.getId(), BinaryContentType.Profile_Picture, profilePicture);
+            //프로필사진 바이너리객체를 바이너리레포지토리에 저장.
+            binaryContentRepository.saveBinaryContent(binaryProfilePicture);
+            //새로만든 유저객체에 프로필사진 등록
+            newUser.setProfilePicture(binaryProfilePicture.getId());
+            //유저 객체 레포지토리에 저장
+            userRepository.saveUser(newUser);
+            System.out.println(userName + " 유저 생성 성공!");
+            return newUser.getId();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("유저 생성 실패.");
+            return null;
+        }
     }
-    */
 
     //UUID를 통해 유저 객체를 찾아 삭제. 성공여부 리턴
     @Override
@@ -174,53 +186,63 @@ public class BasicUserService implements UserService {
         }
     }
 
-
-
-    //todo 아직 바이너리콘텐트레포지토리 구현안돼있어서 주석처리. (미션3에서 지금 구현하지 않기를 요구). userDto에 updateDto 작성해놓음.
-    /*
     //프로필사진 변경
     @Override
     public boolean changeProfilePicture(UUID userId, String profilePicturePath){
-        if (userId == null || profilePicturePath == null || userRepository.isUserExist(userId)==false){
+        if (userId == null || profilePicturePath == null || userRepository.isUserExistByUUID(userId)==false){
             System.out.println("프로필사진 변경 실패. 입력값을 확인해주세요.");
             return false;
         }
+        try {
             //OI핸들러에 경로넘겨주고 그 경로에 있던 이미지 받아오기
             BufferedImage profilePicture = fileIOHandler.loadImage(profilePicturePath);
             //받아온 이미지를 바이너리객체로 만들기
             BinaryContent uploadedProfilePicture = new BinaryContent(userId, BinaryContentType.Profile_Picture, profilePicture);
             //프로필사진 바이너리객체를 바이너리레포지토리에 저장.
-            BinaryContentRepository.saveBinaryContent(BinaryContentType.Profile_Picture, uploadedProfilePicture);
+            binaryContentRepository.saveBinaryContent(uploadedProfilePicture);
             //유저객체에 프로필사진 등록
-            User user = userRepository.getUser(userId)
+            User user = userRepository.getUserById(userId);
+            if (user.getProfilePictureId() != null) {
+                binaryContentRepository.deleteBinaryContent(user.getProfilePictureId());
+            }
             user.setProfilePicture(uploadedProfilePicture.getId());
-            userRepository.saveUser(user)
+            userRepository.saveUser(user);
             System.out.println(user.getUserName() + " 프로필사진 변경 성공!");
             return true;
+        }catch (Exception e){
+            System.err.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("프로필사진 변경 실패.");
+            return false;
         }
-
+    }
 
     //프로필사진 삭제
     @Override
     public boolean deleteProfilePicture(UUID userId) {
         if (userId == null) {
+            System.out.println("프로필사진 삭제 실패. 입력값을 확인해주세요.");
             return false;
         }
         try {
             User user = userRepository.getUserById(userId);
             UUID profilePictureId = user.getProfilePictureId();
+            //원래 프사 없었으면 걍 true 반환.
+            if (profilePictureId == null) {
+                return true;
+            }
             user.setProfilePicture(null);
             userRepository.saveUser(user);
-            BinaryContentRepository.deleteBinaryContent(profilePictureId);
+            binaryContentRepository.deleteBinaryContent(profilePictureId);
             System.out.println(user.getUserName() + " 프로필사진 삭제 성공!");
             return true;
         } catch (Exception e){
             System.err.println(e.getMessage());
             e.printStackTrace();
+            System.out.println("프로필사진 삭제 실패.");
             return false;
         }
     }
-    */
 
     //todo AuthService 클래스 위치 여기에 둬도 되나?
     public class AuthService{

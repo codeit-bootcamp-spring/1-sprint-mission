@@ -89,6 +89,7 @@ public class FileIOHandler {
         }
     }
 
+    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
     //파일 삭제하기
     public boolean deleteFile(String filePath){
         if (filePath == null) {
@@ -110,7 +111,7 @@ public class FileIOHandler {
         }
     }
 
-    //todo 예외 반환 안함
+    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
     //이미지 불러오기.
     public BufferedImage loadImage(String imagePath){
         if (imagePath == null) {
@@ -127,6 +128,7 @@ public class FileIOHandler {
         }
     }
 
+    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
     //바이너리컨텐츠 객체 직렬화
     public boolean serializeBinaryContent(BinaryContent binaryContent, String binaryContentPath){
         if (binaryContent == null || binaryContentPath == null) {
@@ -144,6 +146,7 @@ public class FileIOHandler {
         }
     }
 
+    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
     //역직렬화 성공여부에 따라 바이너리컨텐츠 or null 반환
     public BinaryContent deserializeBinaryContent(String binaryContentPath){
         if (binaryContentPath == null) {

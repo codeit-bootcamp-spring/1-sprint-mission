@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BinaryContentRepository {
     BinaryContent getBinaryContent(BinaryContentType type, UUID binaryContentId);
-    boolean deleteBinaryContent(BinaryContentType type, UUID binaryContentId);
+    boolean deleteBinaryContent(UUID binaryContentId);
     boolean saveBinaryContent(BinaryContent binaryContent);
     boolean isBinaryContentExist(BinaryContentType type, UUID binaryContentId);
 }

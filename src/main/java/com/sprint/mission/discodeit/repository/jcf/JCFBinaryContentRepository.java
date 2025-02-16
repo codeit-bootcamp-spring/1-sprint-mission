@@ -17,7 +17,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public boolean deleteBinaryContent(BinaryContentType type, UUID binaryContentId) {
+    public boolean deleteBinaryContent(UUID binaryContentId) {
         return binaryContentsMap.remove(binaryContentId)!=null;
     }
 

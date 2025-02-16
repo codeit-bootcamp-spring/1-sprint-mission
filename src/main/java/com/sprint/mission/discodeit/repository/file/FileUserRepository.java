@@ -54,14 +54,19 @@ public class FileUserRepository implements UserRepository {
         return true;
     }
 
+    //우선 여기서 캐치함!!!
     //해당 UUID를 가진 유저 존재여부 확인해서 반환
     @Override
-    public boolean isUserExistByUUID(UUID userId) throws Exception{
-        HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
-        if (usersMap.containsKey(userId) == false) {
+    public boolean isUserExistByUUID(UUID userId){
+        try{
+            HashMap<UUID, User> usersMap = (HashMap<UUID, User>) fileIOHandler.deserializeHashMap(mainUserRepository);
+            return usersMap.containsKey(userId);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("유저 존재여부 확인을 실패하였습니다. ");
             return false;
         }
-        return true;
     }
 
     //해당 이름을 가진 유저 존재여부 확인해서 반환

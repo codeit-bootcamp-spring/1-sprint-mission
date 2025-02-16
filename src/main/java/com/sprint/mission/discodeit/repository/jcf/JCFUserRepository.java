@@ -49,11 +49,8 @@ public class JCFUserRepository implements UserRepository {
 
     //유저 존재하는지 UUID로 확인
     @Override
-    public boolean isUserExistByUUID(UUID userId) throws Exception {
-        if (usersMap.containsKey(userId) == false) {
-            return false;
-        }
-        return true;
+    public boolean isUserExistByUUID(UUID userId){
+        return usersMap.containsKey(userId);
     }
 
     //유저 존재하는지 이름으로 확인

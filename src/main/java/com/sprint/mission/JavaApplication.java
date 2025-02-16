@@ -47,7 +47,7 @@ public class JavaApplication {
         BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
         FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
-        UserService userService = new BasicUserService(userRepository);
+        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository);
         MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, fileIOHandler);
         ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, userService, messageRepository);
 

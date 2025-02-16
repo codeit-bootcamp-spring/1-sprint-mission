@@ -19,7 +19,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public boolean deleteBinaryContent(BinaryContentType type, UUID binaryContentId) {
+    public boolean deleteBinaryContent(UUID binaryContentId) {
         return fileIOHandler.deleteFile(BinaryContentRepositoryPath+binaryContentId.toString());
     }
 

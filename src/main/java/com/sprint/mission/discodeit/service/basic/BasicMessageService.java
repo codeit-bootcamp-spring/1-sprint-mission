@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Type.BinaryContentType;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -44,6 +46,7 @@ public class BasicMessageService implements MessageService {
         }
     }
 
+    //채널에 속한 메세지 해쉬맵으로 반환.
     @Override
     public LinkedHashMap<UUID, Message> getChannelMessagesMap(UUID channelId) {
         if (channelId == null){
@@ -56,6 +59,24 @@ public class BasicMessageService implements MessageService {
             e.printStackTrace();
             System.out.println(e.getMessage());
             System.out.println("채널별 메세지맵 반환 실패. ");
+            return null;
+        }
+    }
+
+    //해당채널에 속한 메세지 리스트 반환. 생성된 메세지 존재하지 않을시 빈 리스트 반환.
+    @Override
+    public List<MessageDto> findAllMessagesByChannelId(UUID channelId) {
+        if (channelId == null){
+            System.out.println("채널별 메세지리스트 반환 실패. 입력값이 null인 상태입니다.");
+            return null;
+        }
+        try {
+            HashMap<UUID, Message> messagesMap = messageRepository.getChannelMessagesMap(channelId);
+            return messagesMap.size()>0 ? messagesMap.values().stream().map(message -> MessageDto.from(message)).collect(Collectors.toList()):Collections.emptyList();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("채널별 메세지리스트 반환 실패." );
             return null;
         }
     }
@@ -126,6 +147,13 @@ public class BasicMessageService implements MessageService {
             return false;
         }
         try {
+            Message message = messageRepository.getMessage(channelId, messageId);
+            if (message == null){
+                return false;
+            }
+            if (message.getBinaryContentsId().size() > 0){
+                message.getBinaryContentsId().stream().forEach(binaryContentId -> binaryContentRepository.deleteBinaryContent(binaryContentId));
+            }
             messageRepository.deleteMessage(channelId, messageId);
             System.out.println("메세지 삭제 성공!");
             return true;
