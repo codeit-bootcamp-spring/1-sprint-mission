@@ -33,8 +33,12 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto) {
-        userRepository.existsById(messageCreateRequestDto.authorId());
-        channelRepository.existsById(messageCreateRequestDto.channelId());
+        if (!userRepository.existsById(messageCreateRequestDto.authorId())) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
+        if (!channelRepository.existsById(messageCreateRequestDto.channelId())) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
+        }
         validator.validate(messageCreateRequestDto.content());
 
         List<UUID> binaryContentData = messageCreateRequestDto.binaryContentData().stream()

@@ -27,8 +27,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus create(ReadStatusCreateDto readStatusDto) {
-        channelRepository.existsById(readStatusDto.channelId());
-        userRepository.existsById(readStatusDto.userId());
+        if (!channelRepository.existsById(readStatusDto.channelId())) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
+        }
+        if (!userRepository.existsById(readStatusDto.userId())) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
 
         findAllByUserId(readStatusDto.userId())
                 .forEach(readStatus -> {
