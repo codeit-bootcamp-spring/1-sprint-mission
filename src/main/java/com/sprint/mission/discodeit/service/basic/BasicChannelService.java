@@ -1,63 +1,65 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
+    @Override
+    public ChannelResponse createChannel(CreateChannelRequest request) {
+        Channel channel = channelRepository.save(new Channel(request.channelName()));
+        return new ChannelResponse(channel.getChannelName());
     }
 
     @Override
-    public Channel createChannel(String channelName) {
-        return channelRepository.save(new Channel(channelName));
+    public List<ChannelResponse> getChannels() {
+        return channelRepository.getAllChannels().stream().map(channel -> new ChannelResponse(channel.getChannelName())).collect(Collectors.toList());
     }
 
     @Override
-    public Map<UUID, Channel> getChannels() {
-        return channelRepository.getAllChannels().stream()
-                .collect(Collectors.toMap(Channel::getId, channel -> channel));
+    public Optional<ChannelResponse> getChannel(UUID uuid) {
+        return Optional.ofNullable(channelRepository.getChannelById(uuid)).map(channel -> new ChannelResponse(channel.getChannelName()));
     }
 
     @Override
-    public Optional<Channel> getChannel(UUID uuid) {
-        return Optional.ofNullable(channelRepository.getChannelById(uuid));
+    public Optional<ChannelResponse> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
+        return Optional.ofNullable(channelRepository.getChannelById(channelUUID)).map(channel -> {
+            channel.addMessageToChannel(messageUUID);
+            return channelRepository.save(channel);
+        }).map(channel -> new ChannelResponse(channel.getChannelName()));
     }
 
     @Override
-    public Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
+    public List<UUID> getMessagesUUIDFromChannel(UUID uuid) {
+        return Optional.ofNullable(channelRepository.getChannelById(uuid)).orElseThrow().getMessageList();
+    }
 
-        return Optional.ofNullable(channelRepository.getChannelById(channelUUID))
-                .map(channel -> {
-                    channel.addMessageToChannel(messageUUID);
-                    return channelRepository.save(channel);
-                });
+
+    @Override
+    public Optional<ChannelResponse> updateChannel(UUID uuid, String channelName) {
+        return Optional.ofNullable(channelRepository.getChannelById(uuid)).map(channel -> {
+            channel.updateChannelName(channelName);
+            return channelRepository.save(channel);
+        }).map(channel -> new ChannelResponse(channel.getChannelName()));
     }
 
     @Override
-    public Optional<Channel> updateChannel(UUID uuid, String channelName) {
-        return Optional.ofNullable(channelRepository.getChannelById(uuid))
-                .map(channel -> {
-                    channel.updateChannelName(channelName);
-                    return channelRepository.save(channel);
-                });
-    }
-
-    @Override
-    public Optional<Channel> deleteChannel(UUID uuid) {
-        return Optional.ofNullable(channelRepository.getChannelById(uuid))
-                .map(channel -> {
-                    channelRepository.deleteChannelById(uuid);
-                    channelRepository.save();
-                    return channel;
-                });
+    public void deleteChannel(UUID uuid) {
+        Optional.ofNullable(channelRepository.getChannelById(uuid)).map(channel -> {
+            channelRepository.deleteChannelById(uuid);
+            channelRepository.save();
+            return null;
+        });
     }
 }

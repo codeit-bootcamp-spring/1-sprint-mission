@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.collection;
 import com.sprint.mission.discodeit.entity.User;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,5 +50,9 @@ public class Users implements Serializable {
     // 읽기 전용 맵 반환
     public Map<UUID, User> asReadOnly() {
         return Collections.unmodifiableMap(users);
+    }
+
+    public List<User> getUsersList() {
+        return new ArrayList<>(users.values());
     }
 }

@@ -1,131 +1,154 @@
 package com.sprint.mission.discodeit.service.file;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import java.io.File;
-import java.util.Map;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.UUID;
 import java.util.Optional;
 
-class FileChannelServiceTest {
-    private static final String TEST_FILE_PATH = "data/test_channels.dat";
 
-    private FileChannelService fileChannelService;
+class FileChannelServiceTest {
+    @Mock
+    private FileChannelRepository channelRepository;
+
+    @InjectMocks
+    private FileChannelService channelService;
 
     @BeforeEach
     void setUp() {
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            assertTrue(file.delete(), "테스트 파일 삭제 실패");
-        }
-
-        fileChannelService = new FileChannelService(TEST_FILE_PATH);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     @DisplayName("채널을 생성한다.")
     void testCreateChannel() {
         // given
-        Channel channel = fileChannelService.createChannel("testChannel");
+        String channelName = "channel1";
+        CreateChannelRequest request = new CreateChannelRequest(channelName);
 
         // when
-        Map<UUID, Channel> channels = fileChannelService.getChannels();
+        ChannelResponse response = channelService.createChannel(request);
 
         // then
-        assertNotNull(channel);
-        assertEquals("testChannel", channel.getChannelName());
-        assertEquals(1, channels.size());
-        assertTrue(channels.containsKey(channel.getId()));
+        assertNotNull(response);
+        assertEquals(channelName, response.channel());
     }
 
     @Test
     @DisplayName("채널을 생성하고 단일 조회를 한다")
     void testGetChannel() {
         // given
-        Channel channel = fileChannelService.createChannel("testChannel");
+        String channelName = "channel1";
+        CreateChannelRequest request = new CreateChannelRequest(channelName);
+        Channel channel = new Channel(request.channelName());
 
         // when
-        Optional<Channel> foundChannel = fileChannelService.getChannel(channel.getId());
+        when(channelRepository.getChannelById(any())).thenReturn(Optional.of(channel));
+        ChannelResponse response = channelService.createChannel(request);
+        Optional<ChannelResponse> findChannel = channelService.getChannel(channel.getId());
 
         // then
-        assertTrue(foundChannel.isPresent());
-        assertEquals("testChannel", foundChannel.get().getChannelName());
+        assertTrue(findChannel.isPresent());
+        assertEquals(channelName, findChannel.get().channel());
     }
 
     @Test
     @DisplayName("채널을 생성하고 메시지를 추가한 후 확인한다")
     void testAddMessageToChannel() {
         // given
-        Channel channel = fileChannelService.createChannel("testChannel");
-        UUID messageUUID = UUID.randomUUID();
+        String channelName = "channel1";
+        CreateChannelRequest request = new CreateChannelRequest(channelName);
+        Channel channel = new Channel(request.channelName());
+
+        String userName1 = "username1";
+        String userEmail1 = "email1@email.com";
+        User user1 = new User(userName1, userEmail1);
+
+        String message1 = "message1";
+
+        Message newMessage = new Message(message1, user1.getId(), channel.getId());
 
         // when
-        Optional<Channel> updatedChannel = fileChannelService.addMessageToChannel(channel.getId(), messageUUID);
+        when(channelRepository.getChannelById(any())).thenReturn(Optional.of(channel));
+        ChannelResponse response = channelService.createChannel(request);
 
         // then
-        assertTrue(updatedChannel.isPresent());
-        assertEquals(updatedChannel.get().getMessageList().getFirst(), messageUUID);
+        assertEquals(channelName, response.channel());
+        assertEquals(0, channel.getMessageList().size());
+
+        // when
+        Optional<ChannelResponse> addResponse = channelService.addMessageToChannel(newMessage.getId(), channel.getId());
+
+        // then
+        assertTrue(addResponse.isPresent());
+        assertEquals(channelName, addResponse.get().channel());
+        assertEquals(1, channel.getMessageList().size());
+
     }
 
     @Test
     @DisplayName("채널을 생성하고 이름을 업데이트 후 확인한다")
     void testUpdateChannel() {
         // given
-        Channel channel = fileChannelService.createChannel("testChannel");
+        String channelName = "channel1";
+        CreateChannelRequest request = new CreateChannelRequest(channelName);
+        Channel channel = new Channel(request.channelName());
 
         // when
-        Optional<Channel> updatedChannel = fileChannelService.updateChannel(channel.getId(), "updatedChannel");
+        when(channelRepository.getChannelById(any())).thenReturn(Optional.of(channel));
+        ChannelResponse response = channelService.createChannel(request);
 
         // then
-        assertTrue(updatedChannel.isPresent());
-        assertEquals("updatedChannel", updatedChannel.get().getChannelName());
+        assertEquals(channelName, response.channel());
 
-        Optional<Channel> foundChannel = fileChannelService.getChannel(channel.getId());
-        assertTrue(foundChannel.isPresent());
-        assertEquals("updatedChannel", foundChannel.get().getChannelName());
+        // when
+        String updateChannelName = "updateChannel1";
+        Optional<ChannelResponse> updateResponse = channelService.updateChannel(channel.getId(), updateChannelName);
+
+        // then
+        assertTrue(updateResponse.isPresent());
+        assertEquals(updateChannelName, updateResponse.get().channel());
     }
 
     @Test
     @DisplayName("채널을 생성하고 삭제한 후 확인한다")
     void testDeleteChannel() {
         // given
-        Channel channel = fileChannelService.createChannel("testChannel");
+        String channelName = "channel1";
+        CreateChannelRequest request = new CreateChannelRequest(channelName);
+        Channel channel = new Channel(request.channelName());
 
         // when
-        Optional<Channel> deletedChannel = fileChannelService.deleteChannel(channel.getId());
+        when(channelRepository.getChannelById(any())).thenReturn(Optional.of(channel));
+        ChannelResponse response = channelService.createChannel(request);
+        Optional<ChannelResponse> channelResponse = channelService.getChannel(channel.getId());
 
         // then
-        assertTrue(deletedChannel.isPresent());
-        assertEquals("testChannel", deletedChannel.get().getChannelName());
-
-        Optional<Channel> foundChannel = fileChannelService.getChannel(channel.getId());
-        assertFalse(foundChannel.isPresent());
-
-        Map<UUID, Channel> channels = fileChannelService.getChannels();
-        assertTrue(channels.isEmpty());
-    }
-
-    @Test
-    @DisplayName("채널을 생성하고 새로운 서비스를 만들 때 로드가 되는지 확인한다")
-    void testPersistenceAcrossInstances() {
-        // given
-        Channel channel = fileChannelService.createChannel("persistentChannel");
+        assertTrue(channelResponse.isPresent());
+        assertEquals(channelName, channelResponse.get().channel());
 
         // when
-        FileChannelService newServiceInstance = new FileChannelService(TEST_FILE_PATH);
+        when(channelRepository.getChannelById(any())).thenReturn(Optional.empty());
+        channelService.deleteChannel(channel.getId());
 
-        // then: 채널 정보가 새로운 인스턴스에서도 정상적으로 조회되는지 확인
-        Optional<Channel> foundChannel = newServiceInstance.getChannel(channel.getId());
-        assertTrue(foundChannel.isPresent());
-        assertEquals("persistentChannel", foundChannel.get().getChannelName());
+        // then
+        Optional<ChannelResponse> deletedChannel = channelService.getChannel(channel.getId());
+        assertTrue(deletedChannel.isEmpty());
     }
 }

@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -13,32 +16,31 @@ public class User implements Serializable {
     private final Long createdAt;
     private Long updatedAt;
     private String username;
+    private String email;
+    private UserStatus status;
+    private Map<UUID, ReadStatus> readStatuses;
+    private BinaryContent profileImage;
 
-    public User(String username) {
+    public User(String username, String email) {
         this.id = UUID.randomUUID();
         this.username = username;
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        this.email = email;
+        this.createdAt = Instant.now().toEpochMilli();
         this.updatedAt = createdAt;
     }
 
     public void updateUsername(String username) {
         this.username = username;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 
-    public UUID getId() {
-        return id;
+    public void updateProfileImage(BinaryContent newProfileImage) {
+        this.profileImage = newProfileImage;
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
+    public void updateUserStatus(UserStatus newStatus) {
+        this.status = newStatus;
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 }

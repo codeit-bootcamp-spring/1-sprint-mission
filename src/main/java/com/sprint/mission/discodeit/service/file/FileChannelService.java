@@ -1,87 +1,73 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.collection.Channels;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "feature.service", havingValue = "file")
 public class FileChannelService implements ChannelService {
-    private final String filePath;
-    private final Channels channels;
+    private final FileChannelRepository repository;
 
-    public FileChannelService(String filePath) {
-        this.filePath = filePath;
-        this.channels = loadFromFile().orElseGet(Channels::new);
+    @Override
+    public ChannelResponse createChannel(CreateChannelRequest request) {
+        Channel newChannel = new Channel(request.channelName());
+        repository.save(newChannel);
+        return new ChannelResponse(newChannel.getChannelName());
     }
 
     @Override
-    public Channel createChannel(String channelName) {
-        Channel newChannel = new Channel(channelName);
-        channels.add(newChannel);
-        saveToFile();
-        return newChannel;
+    public List<ChannelResponse> getChannels() {
+        return repository.getAllChannels().stream()
+                .map(channel -> new ChannelResponse(channel.getChannelName()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Channel> getChannel(UUID uuid) {
-        return channels.get(uuid);
+    public Optional<ChannelResponse> getChannel(UUID id) {
+        return repository.getChannelById(id)
+                .map(channel -> new ChannelResponse(channel.getChannelName()));
     }
 
     @Override
-    public Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
-        Optional<Channel> updatedChannel = channels.addMessageToChannel(channelUUID, messageUUID);
-        if (updatedChannel.isPresent()) {
-            saveToFile();
-        }
-        return updatedChannel;
+    public List<UUID> getMessagesUUIDFromChannel(UUID channelId) {
+        return repository.getChannelById(channelId)
+                .map(Channel::getMessageList)
+                .orElseThrow(() -> new RuntimeException("채널을 찾을 수 없습니다."));
     }
 
     @Override
-    public Optional<Channel> updateChannel(UUID uuid, String channelName) {
-        Optional<Channel> updatedChannel = channels.updateName(uuid, channelName);
-        if (updatedChannel.isPresent()) {
-            saveToFile();
-        }
-        return updatedChannel;
+    public Optional<ChannelResponse> addMessageToChannel(UUID channelId, UUID messageId) {
+        return repository.getChannelById(channelId).map(channel -> {
+            channel.addMessageToChannel(messageId);
+            repository.save(channel);
+            return new ChannelResponse(channel.getChannelName());
+        });
     }
 
     @Override
-    public Optional<Channel> deleteChannel(UUID uuid) {
-        Optional<Channel> removedChannel = channels.remove(uuid);
-        if (removedChannel.isPresent()) {
-            saveToFile();
-        }
-        return removedChannel;
+    public Optional<ChannelResponse> updateChannel(UUID id, String newName) {
+        return repository.getChannelById(id).map(channel -> {
+            channel.updateChannelName(newName);
+            repository.save(channel);
+            return new ChannelResponse(channel.getChannelName());
+        });
     }
 
     @Override
-    public Map<UUID, Channel> getChannels() {
-        return channels.asReadOnly();
-    }
-
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            throw new RuntimeException("채널을 저장하는데 실패", e);
-        }
-    }
-
-    private Optional<Channels> loadFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return Optional.of((Channels) ois.readObject());
-        } catch (FileNotFoundException e) {
-            return Optional.empty();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("채널을 불러오는데 실패", e);
-        }
+    public void deleteChannel(UUID id) {
+        Optional<Channel> removedChannel = repository.getChannelById(id);
+        removedChannel.ifPresent(channel -> repository.deleteById(id));
     }
 }
