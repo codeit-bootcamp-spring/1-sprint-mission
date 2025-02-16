@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
+import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -35,13 +37,13 @@ public class BasicMessageService implements MessageService {
 
         try {
             //수정해야함
-            User userByUUID = userService.findById(createMessageDto.userId());
-            ChannelResponseDto channelDto = channelService.findById(createMessageDto.channelId());
-            if (!channelService.isUserInChannel(channelDto.id(), userByUUID.getId())) {
-                System.out.println("User with id " + userByUUID.getId() + " not found in this channel.");
+            UserResponseDto user = userService.findById(createMessageDto.userId());
+            ChannelResponseDto channel = channelService.findById(createMessageDto.channelId());
+            if (!channelService.isUserInChannel(channel.id(), user.id())) {
+                System.out.println("User with id " + user.id() + " not found in this channel.");
                 throw new CustomException(ErrorCode.USER_NOT_IN_CHANNEL);
             }
-            Message message = new Message(userByUUID, createMessageDto.content(), channelDto.id());
+            Message message = new Message(user.id(), createMessageDto.content(),channel.id());
             return messageRepository.save(message);
         } catch (CustomException e) {
             System.out.println("Failed to create message. User: " + createMessageDto.userId() + " Channel: " + createMessageDto.channelId() + " Content: " + createMessageDto.content());
@@ -55,15 +57,15 @@ public class BasicMessageService implements MessageService {
 
     }
 
-    public Message create(CreateMessageDto createMessageDto, List<BinaryContent> binaryContents) throws CustomException {
+    public Message create(CreateMessageDto createMessageDto, List<CreateBinaryContentDto> binaryContents) throws CustomException {
         Message message = create(createMessageDto);
 
         if(binaryContents == null || binaryContents.isEmpty()) {
             throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
         }
-        for(BinaryContent binaryContent : binaryContents) {
-            binaryContentService.create(binaryContent);
-            message.addImages(binaryContent.getId());
+        for(CreateBinaryContentDto binaryContentDto : binaryContents) {
+            ResponseBinaryContentDto  responseBinaryContentDto= binaryContentService.create(binaryContentDto);
+            message.addImages(responseBinaryContentDto.id());
         }
         return messageRepository.save(message);
     }
@@ -126,6 +128,6 @@ public class BasicMessageService implements MessageService {
             binaryContentService.deleteById(imageId);
         }
 
-        return messageRepository.delete(message);
+        return messageRepository.delete(messageId);
     }
 }

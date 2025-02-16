@@ -9,7 +9,7 @@ public record ResponseBinaryContentDto(
         byte[] binaryImage,
         Instant createdAt
 ) {
-    public ResponseBinaryContentDto from(BinaryContent binaryContent) {
+    public static ResponseBinaryContentDto from(BinaryContent binaryContent) {
         return new ResponseBinaryContentDto(
                 binaryContent.getId(),
                 binaryContent.getBinaryImage(),
