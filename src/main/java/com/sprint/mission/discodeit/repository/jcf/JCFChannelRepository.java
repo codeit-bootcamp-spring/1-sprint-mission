@@ -15,35 +15,35 @@ import java.util.UUID;
 @Scope("singleton")
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels;
+    private final Map<UUID, Channel> data;
 
     public JCFChannelRepository() {
-        this.channels = new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     @Override
     public Channel save(Channel channel) {
-        channels.put(channel.getId(), channel);
+        data.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
     public Channel find(UUID channelId) {
-        return channels.get(channelId);
+        return data.get(channelId);
     }
 
     @Override
     public List<Channel> findAll() {
-        return channels.values().stream().toList();
+        return data.values().stream().toList();
     }
 
     @Override
     public void delete(UUID channelId) {
-        channels.remove(channelId);
+        data.remove(channelId);
     }
 
     @Override
     public boolean existsById(UUID channelId) {
-        return channels.containsKey(channelId);
+        return data.containsKey(channelId);
     }
 }

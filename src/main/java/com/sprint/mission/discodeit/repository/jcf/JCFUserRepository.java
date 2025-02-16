@@ -15,26 +15,26 @@ import java.util.UUID;
 @Scope("singleton")
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> users;
+    private final Map<UUID, User> data;
 
     public JCFUserRepository() {
-        this.users = new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     @Override
     public User save(User user) {
-        users.put(user.getId(), user);
+        data.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User find(UUID userId) {
-        return users.get(userId);
+        return data.get(userId);
     }
 
     @Override
     public User findByName(String name) {
-        for (User user : users.values()) {
+        for (User user : data.values()) {
             if (user.isSameName(name)) {
                 return user;
             }
@@ -44,16 +44,16 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return users.values().stream().toList();
+        return data.values().stream().toList();
     }
 
     @Override
     public void delete(UUID userId) {
-        users.remove(userId);
+        data.remove(userId);
     }
 
     @Override
     public boolean existsById(UUID userId) {
-        return users.containsKey(userId);
+        return data.containsKey(userId);
     }
 }

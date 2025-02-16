@@ -15,35 +15,35 @@ import java.util.UUID;
 @Scope("singleton")
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> messages;
+    private final Map<UUID, Message> data;
 
     public JCFMessageRepository() {
-        this.messages = new HashMap<>();
+        this.data = new HashMap<>();
     }
 
     @Override
     public Message save(Message message) {
-        messages.put(message.getId(), message);
+        data.put(message.getId(), message);
         return message;
     }
 
     @Override
     public Message find(UUID messageId) {
-        return messages.get(messageId);
+        return data.get(messageId);
     }
 
     @Override
     public List<Message> findAll() {
-        return messages.values().stream().toList();
+        return data.values().stream().toList();
     }
 
     @Override
     public void delete(UUID messageId) {
-        messages.remove(messageId);
+        data.remove(messageId);
     }
 
     @Override
     public boolean existsById(UUID messageId) {
-        return messages.containsKey(messageId);
+        return data.containsKey(messageId);
     }
 }
