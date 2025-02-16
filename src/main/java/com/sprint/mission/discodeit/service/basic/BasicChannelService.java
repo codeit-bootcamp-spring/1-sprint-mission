@@ -20,7 +20,6 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -30,16 +29,13 @@ public class BasicChannelService implements ChannelService {
 	private final UserService userService;
 	private final ReadStatusService readStatusService;
 	private final MessageRepository messageRepository;
-	private final ReadStatusRepository readStatusRepository;
 
 	public BasicChannelService(ChannelRepository channelRepository, UserService userService,
-		ReadStatusService readStatusService, MessageRepository messageRepository,
-		ReadStatusRepository readStatusRepository) {
+		ReadStatusService readStatusService, MessageRepository messageRepository) {
 		this.channelRepository = channelRepository;
 		this.userService = userService;
 		this.readStatusService = readStatusService;
 		this.messageRepository = messageRepository;
-		this.readStatusRepository = readStatusRepository;
 	}
 
 	/**
@@ -64,9 +60,9 @@ public class BasicChannelService implements ChannelService {
 		Channel savedChannel = channelRepository.save(channel);
 
 		// ReadStatus 생성 - 각 참여자의 읽음 상태 초기화
-		CreateReadStatusRequest readStatus1 = new CreateReadStatusRequest(request.userId1(), savedChannel.getId(),
+		CreateReadStatusRequest readStatus1 = new CreateReadStatusRequest(request.userId1(), savedChannel.getId(), null,
 			Instant.now());
-		CreateReadStatusRequest readStatus2 = new CreateReadStatusRequest(request.userId2(), savedChannel.getId(),
+		CreateReadStatusRequest readStatus2 = new CreateReadStatusRequest(request.userId2(), savedChannel.getId(), null,
 			Instant.now());
 
 		readStatusService.create(readStatus1);
@@ -205,8 +201,19 @@ public class BasicChannelService implements ChannelService {
 
 		channelRepository.save(channel);
 
+		// 채널의 최신 메시지 조회
+		Message latestMessageOpt = messageRepository.findLatestMessageByChannelId(channel.getId())
+			.orElse(null);
+		UUID latestMessageId;
+		if (latestMessageOpt != null) {
+			latestMessageId = latestMessageOpt.getId();
+		} else {
+			latestMessageId = null;
+		}
+
 		// 새로운 참여자의 ReadStatus 생성
-		CreateReadStatusRequest readStatusRequest = new CreateReadStatusRequest(userId, channelId, Instant.now());
+		CreateReadStatusRequest readStatusRequest = new CreateReadStatusRequest(userId, channelId, latestMessageId,
+			Instant.now());
 		readStatusService.create(readStatusRequest);
 	}
 
@@ -221,8 +228,7 @@ public class BasicChannelService implements ChannelService {
 
 		// 관련 도메인 삭제 (메시지, 읽음 상태)
 		messageRepository.deleteAllByChannelId(channelId);
-		readStatusRepository.deleteAllByChannelId(channelId);
-
+		readStatusService.deleteAllByChannelId(channelId);
 		channelRepository.delete(channelId);
 	}
 }

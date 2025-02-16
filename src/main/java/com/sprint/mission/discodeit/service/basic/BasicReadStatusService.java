@@ -112,4 +112,13 @@ public class BasicReadStatusService implements ReadStatusService {
 			.orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 		readStatusRepository.deleteByUserIdAndChannelId(status.getUserId(), status.getChannelId());
 	}
+
+	/**
+	 * 채널이 삭제될시 readStatus도 같이 삭제
+	 * @param channelId
+	 */
+	@Override
+	public void deleteAllByChannelId(UUID channelId) {
+		readStatusRepository.deleteAllByChannelId(channelId);
+	}
 }
