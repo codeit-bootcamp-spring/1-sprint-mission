@@ -30,7 +30,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus create(CreateUserStatusDto createUserStatusDto) throws CustomException {
-        if (userRepository.findById(createUserStatusDto.userId()) == null){
+        if (userRepository.findById(createUserStatusDto.userId()) == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         if (userStatusRepository.findById(createUserStatusDto.userId()) != null) {
@@ -42,20 +42,18 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateByUserId(String userStatusId, UpdateUserStatusDto updateUserStatusDto) {
-        
-        if (userRepository.findById(updateUserStatusDto.userId()) == null){
+    public UserStatus updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
+
+        if (userRepository.findById(id) == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        UserStatus userStatus = userStatusRepository.findById(userStatusId);
+        UserStatus userStatus = userStatusRepository.findById(id);
         if (userStatus == null) {
             throw new IllegalArgumentException("userStatus not found");
         }
-
-        if (userStatus.isUpdated(updateUserStatusDto)) {
+        if (userStatus.isUpdated(updateUserStatusDto.updateAt())) {
             return userStatusRepository.save(userStatus);
         }
-
         return userStatus;
     }
 

@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.entity.status;
 
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
@@ -25,7 +23,8 @@ public class UserStatus implements Serializable {
         return Instant.now().minusSeconds(USER_ACTIVE_TIMEOUT_SECONDS).isBefore(updatedAt);
     }
 
-    public boolean isUpdated(UpdateUserStatusDto updateUserStatusDto) {
-        return updateUserStatusDto.updateAt() != updatedAt;
+    // 이 메소드가 왜 필요한지 생각해보자.
+    public boolean isUpdated(Instant updatedAt) {
+        return this.updatedAt != updatedAt;
     }
 }

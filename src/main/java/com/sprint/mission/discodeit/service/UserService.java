@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 
@@ -10,20 +11,20 @@ import java.util.List;
 public interface UserService {
 
     //생성
-    User create(CreateUserDto createUserDto);
+    UserResponseDto create(CreateUserDto createUserDto);
 
     //모두 읽기
     List<User> findAll();
 
     //읽기
     //단건 조회 - UUID
-    User findById(String userId);
+    UserResponseDto findById(String userId);
 
     //단건 조회 - 이메일로 조회
-    User findByEmail(String email);
+    UserResponseDto findByEmail(String email);
 
     //다건 조회 - 닉네임
-    List<User> findAllContainsNickname(String nickname);
+    List<UserResponseDto> findAllContainsNickname(String nickname);
 
     //다건 조회 - 계정 상태
     List<User> findAllByAccountStatus(AccountStatus accountStatus);
