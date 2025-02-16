@@ -43,7 +43,14 @@ public class Channel implements Serializable {
     }
 
     public void update(String name, String introduction) {
-        boolean updated = updateName(name) || updateIntroduction(introduction);
+        boolean updated = false;
+        if (updateName(name)) {
+            updated = true;
+        }
+        if (updateIntroduction(introduction)) {
+            updated = true;
+        }
+
         if (updated) {
             updateUpdatedAt();
         }

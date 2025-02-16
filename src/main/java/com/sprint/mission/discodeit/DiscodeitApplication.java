@@ -1,6 +1,13 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -25,31 +32,34 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-//	static void userCRUDTest(UserService userService) {
-//		// 생성
-//		User user = userService.create("user", "user@codeit.com", "qwer1234");
-//		System.out.println("유저 생성");
-//		System.out.println(userService.getInfo(user.getId()));
-//		// 조회
-//		User foundUser = userService.find(user.getId());
-//		System.out.println("유저 조회(단건)");
-//		System.out.println(userService.getInfo(foundUser.getId()));
-//		List<User> foundUsers = userService.findAll();
-//		System.out.println("유저 조회(다건): " + foundUsers.size() + System.lineSeparator());
-//		// 수정
-//		userService.update(user.getId(), "uuuuser", "user@codeit.com");
-//		System.out.println("유저 수정");
-//		System.out.println(userService.getInfo(user.getId()));
-//		// 삭제
-//		userService.delete(user.getId());
-//		List<User> foundUsersAfterDelete = userService.findAll();
-//		System.out.println("유저 삭제: " + foundUsersAfterDelete.size() + System.lineSeparator());
-//	}
-//
+	static void userCRUDTest(UserService userService) {
+		// 생성
+		UserResponseDto userResponseDto = userService.create(new UserCreateRequestDto("user1", "user1@codeit.kr", "1234", null),
+				new BinaryContentRequestDto(null));
+		System.out.println("유저 생성");
+		System.out.println(userResponseDto);
+		// 조회
+		System.out.println("유저 조회(단건)");
+		System.out.println(userService.find(userResponseDto.id()));
+		List<UserResponseDto> foundUsers = userService.findAll();
+		System.out.println("유저 조회(다건): " + foundUsers.size());
+		System.out.println(foundUsers);
+		// 수정
+		System.out.println("유저 수정");
+		System.out.println(userService.update(new UserUpdateRequestDto(userResponseDto.id(), "uuser", "uuser@codeit.kr", "1234", null),
+				new BinaryContentRequestDto(null)));
+		// 삭제
+		userService.delete(userResponseDto.id());
+		List<UserResponseDto> foundUsersAfterDelete = userService.findAll();
+		System.out.println("유저 삭제: " + foundUsersAfterDelete.size() + System.lineSeparator());
+	}
+
 //	static void channelCRUDTest(ChannelService channelService, User owner) {
 //		// 생성
 //		Channel channel = channelService.create("공지", "공지 채널입니다.", owner);
@@ -93,48 +103,35 @@ public class DiscodeitApplication {
 //		System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size() + System.lineSeparator());
 //	}
 //
-//	static User setupUser(UserService userService) {
-//		User user = userService.create("user", "user1@codeit.com", "qwer1234");
-//		return user;
-//	}
-//
-//	static Channel setupChannel(ChannelService channelService, User owner) {
-//		Channel channel = channelService.create("공지", "공지 채널입니다.", owner);
-//		return channel;
-//	}
-//
-//	static UserService userServiceInit() {
-//        UserRepository userRepository = new FileUserRepository();
-//		UserValidator validator = new UserValidator();
-//		return new BasicUserService(userRepository, validator);
-//	}
-//
-//	static ChannelService channelServiceInit() {
-//        ChannelRepository channelRepository = new FileChannelRepository();
-//		ChannelValidator validator = new ChannelValidator();
-//		return new BasicChannelService(channelRepository, validator);
-//	}
-//
-//	static MessageService messageServiceInit(UserService userService, ChannelService channelService) {
-//        MessageRepository messageRepository = new FileMessageRepository();
-//		MessageValidator validator = new MessageValidator();
-//		return new BasicMessageService(messageRepository, validator, userService, channelService);
-//	}
+	static UserResponseDto setupUser(UserService userService) {
+        return userService.create(new UserCreateRequestDto("user", "user@codeit.kr", "1234", null),
+				new BinaryContentRequestDto(null));
+	}
+
+	static ChannelResponseDto setupPublicChannel(ChannelService channelService) {
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+	}
+
+	static ChannelResponseDto setupPrivateChannel(ChannelService channelService, UserResponseDto userResponseDto) {
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "introduction",
+				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
+	}
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
 		// 서비스 초기화
-//		UserService userService = userServiceInit();
-//		ChannelService channelService = channelServiceInit();
-//		MessageService messageService = messageServiceInit(userService, channelService);
-//
+		UserService userService = context.getBean(UserService.class);
+		ChannelService channelService = context.getBean(ChannelService.class);
+		MessageService messageService = context.getBean(MessageService.class);
+
 //		// 셋업
-//		User user = setupUser(userService);
-//		Channel channel = setupChannel(channelService, user);
+		UserResponseDto userResponseDto = setupUser(userService);
+		ChannelResponseDto publicChannelResponseDto = setupPublicChannel(channelService);
+		ChannelResponseDto privateChannelResponseDto = setupPrivateChannel(channelService, userResponseDto);
 //
 //		// 테스트
-//		userCRUDTest(userService);
+		userCRUDTest(userService);
 //		channelCRUDTest(channelService, user);
 //		messageCRUDTest(messageService, channel, user);
 

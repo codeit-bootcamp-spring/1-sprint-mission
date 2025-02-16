@@ -1,8 +1,7 @@
 spring.application.name: discodeit
-discodeit.repository.type: jcf
 discodeit:
   repository:
-    type: file
+    type: jcf
     file-directories:
       binaryContents: src/main/resources/data/serialized/binaryContents
       channels: src/main/resources/data/serialized/channels

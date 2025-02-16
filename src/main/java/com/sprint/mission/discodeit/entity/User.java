@@ -42,7 +42,17 @@ public class User implements Serializable {
     }
 
     public void update(String name, String email, String password) {
-        boolean updated = updateName(name) || updateEmail(email) || updatePassword(password);
+        boolean updated = false;
+        if (updateName(name)) {
+            updated = true;
+        }
+        if (updateEmail(email)) {
+            updated = true;
+        }
+        if (updatePassword(password)) {
+            updated = true;
+        }
+
         if (updated) {
             updateUpdatedAt();
         }
@@ -57,7 +67,7 @@ public class User implements Serializable {
     }
 
     public boolean updateEmail(String email) {
-        if (name.isBlank() || this.email.equals(email)) {
+        if (email.isBlank() || this.email.equals(email)) {
             return false;
         }
         this.email = email;
