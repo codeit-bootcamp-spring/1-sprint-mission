@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.global.config;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({FileRepositoryConfig.class, JCFRepositoryConfig.class, ServiceConfig.class})
+@ComponentScan(basePackages = "com.sprint.mission.discodeit.global.config")
 public class AppConfig {
 
 }
