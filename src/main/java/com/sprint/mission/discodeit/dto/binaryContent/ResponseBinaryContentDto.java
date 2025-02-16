@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto.binaryContent;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+
 import java.time.Instant;
 
 public record ResponseBinaryContentDto(
@@ -7,4 +9,11 @@ public record ResponseBinaryContentDto(
         byte[] binaryImage,
         Instant createdAt
 ) {
+    public ResponseBinaryContentDto from(BinaryContent binaryContent) {
+        return new ResponseBinaryContentDto(
+                binaryContent.getId(),
+                binaryContent.getBinaryImage(),
+                binaryContent.getCreatedAt()
+        );
+    }
 }

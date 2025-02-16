@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
@@ -25,6 +26,17 @@ public record ChannelResponseDto(
     @Override
     public String toString() {
         return "[ChannelResponseDto] id=" + id + "/ channelName=" + channelName + "/ channelType=" + channelType + "/ channelCategory=" + channelCategory + "description="+description + "/ lastMessageTimestamp=" + lastMessageTimestamp + "/ userIds=" + userIds.stream().toList() + "]" ;
+    }
+    public static ChannelResponseDto from(Channel channel) {
+        return new ChannelResponseDto(
+                channel.getId(),
+                channel.getChannelName(),
+                channel.getChannelType(),
+                channel.getChannelCategory(),
+                channel.getDescription(),
+                channel.getCreatedAt(),
+                channel.getUserSet().stream().toList()
+        );
     }
 
 }
