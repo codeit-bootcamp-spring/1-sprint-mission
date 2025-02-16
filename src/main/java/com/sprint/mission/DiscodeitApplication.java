@@ -24,9 +24,4 @@ public class DiscodeitApplication {
 		//UserDtoForRequest updateForm = new UserDtoForRequest("userA-1", "SSS", "icb");
 		//userService.update(userA.getId(), updateForm);
 	}
-
-	@Component
-	static class MultipartCheck {
-
-	}
 }

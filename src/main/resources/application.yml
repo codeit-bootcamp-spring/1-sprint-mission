@@ -7,8 +7,11 @@ spring:
       max-file-size: 100MB # 요청 파일 하나당 허용 사이즈
       max-request-size: 100MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
       file-size-threshold: 20KB
-#      resolve-lazily: true  # 요청이 들어오기 전까지 multipart 데이터를 처리하지 않도록 설정
       location: C:\uploadfile
+
+discodeit:
+  repository:
+    type: jcf
 
 
 server:

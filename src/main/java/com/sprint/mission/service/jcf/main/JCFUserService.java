@@ -4,6 +4,8 @@ package com.sprint.mission.service.jcf.main;
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;
@@ -26,14 +28,14 @@ public class JCFUserService implements UserService {
     private final JCFUserRepository userRepository;
     private final BinaryProfileService profileService;
     private final UserStatusService userStatusService;
+    private final JCFChannelRepository channelRepository;
 
     // 테스트에서 create 후 userId 필요해서 임시적 USER 반환 (할거면 나중에 컨트롤러에서)
     @Override
     public void create(UserDtoForRequest userDto) {
         isDuplicateNameEmail(userDto.getUsername(), userDto.getEmail());
-        System.out.println("userDto = " + userDto);
+
         User user = User.createUserByRequestDto(userDto);
-        System.out.println("저장할 유저 = " + user);
         // 선택적 프로필 생성
         byte[] profileImg = userDto.getProfileImgAsByte();
         if (!(profileImg == null)) {
@@ -77,16 +79,21 @@ public class JCFUserService implements UserService {
 
     //관련된 도메인도 같이 삭제 -> BinaryContent(프로필), Userstatus
     @Override
-    public void delete(UUID userID) {
-        if (!userRepository.existsById(userID)) return;
+    public void delete(UUID userId) {
+        //if (!userRepository.existsById(userId)) throw new NotFoundId();
 
-        userRepository.delete(userID);
-        userStatusService.delete(userID);
-        profileService.delete(userID);
+        User deletingUser = userRepository.findById(userId).orElseThrow(NotFoundId::new);
+        deletingUser.getChannels().forEach(channel -> {
+            channel.removeUser(deletingUser);
+            channelRepository.save(channel);
+        });
+
+        userRepository.delete(userId);
+        userStatusService.delete(userId);
+        profileService.delete(userId);
     }
 
     // 온라인 / 오프라인 메서드 나중에
-
 
     public void joinChannel(UUID userId, UUID channelId) {
         userRepository.findById(userId).ifPresent((joiningUser) -> {

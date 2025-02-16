@@ -10,6 +10,7 @@ import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
+import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JCFMessageService {
+public class JCFMessageService implements MessageService {
 
     private final JCFMessageRepository messageRepository;
     private final JCFChannelRepository channelRepository;
@@ -29,6 +30,7 @@ public class JCFMessageService {
     private final BinaryMessageService binaryMessageService;
 
 
+    @Override
     public void create(MessageDtoForCreate responseDto) {
         Channel writtenChannel = channelRepository.findById(responseDto.getChannelId())
                 .orElseThrow(() -> new NotFoundId("wrong channelId"));
@@ -50,7 +52,7 @@ public class JCFMessageService {
         messageRepository.save(createdMessage);
     }
 
-
+    @Override
     public void update(MessageDtoForUpdate updateDto) {
         Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
                 .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
@@ -61,20 +63,20 @@ public class JCFMessageService {
         messageRepository.save(updatingMessage);
     }
 
-    //@Override
+    @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return channelRepository.findById(channelId).map(messageRepository::findAllByChannel)
                 .orElseGet(ArrayList::new);
     }
 
-    //@Override
+    @Override
     public void delete(UUID messageId) {
         binaryMessageService.delete(messageId);
         if (messageRepository.existsById(messageId)) messageRepository.delete(messageId);
         else throw new NotFoundId("message 삭제 실패 : wrong id");
     }
 
-    //@Override
+    @Override
     public Message findById(UUID channelId) {
         return messageRepository.findById(channelId).orElseThrow(NotFoundId::new);
     }

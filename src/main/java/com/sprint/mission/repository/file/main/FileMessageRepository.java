@@ -1,9 +1,9 @@
-package com.sprint.mission.repository.file;
+package com.sprint.mission.repository.file.main;
 
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.repository.MessageRepository;
-import com.sprint.mission.service.exception.NotFoundId;
 import lombok.SneakyThrows;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -70,7 +70,6 @@ public class FileMessageRepository implements MessageRepository {
     public boolean existsById(UUID messageId) {
         return Files.exists(getMsDirectPath(messageId));
     }
-
 
     /**
      * 편의 메서드

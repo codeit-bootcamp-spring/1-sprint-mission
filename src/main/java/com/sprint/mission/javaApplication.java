@@ -18,7 +18,7 @@ public class javaApplication {
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         // 유저 생성 테스트
     }

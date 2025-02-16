@@ -12,6 +12,9 @@ import java.util.UUID;
 public interface ChannelService {
 
     void create(ChannelDtoForRequest dto);
+
+    List<Channel> findAllByUserId(UUID userId);
+
     List<Channel> findAll();
     Channel findById(UUID id);
     void update(UUID channelId, ChannelDtoForRequest dto);

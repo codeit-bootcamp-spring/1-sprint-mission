@@ -3,12 +3,11 @@
 //import com.sprint.mission.controller.ChannelController;
 //import com.sprint.mission.controller.MessageController;
 //import com.sprint.mission.controller.UserController;
-//import com.sprint.mission.controller.file.FileChannelController;
-//import com.sprint.mission.controller.file.FileMessageController;
-//import com.sprint.mission.controller.file.FileUserController;
 //import com.sprint.mission.entity.main.Channel;
 //import com.sprint.mission.entity.main.Message;
 //import com.sprint.mission.entity.main.User;
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.stereotype.Component;
 //
 //import java.io.IOException;
 //import java.util.ArrayList;
@@ -16,6 +15,7 @@
 //import java.util.Random;
 //import java.util.Set;
 //
+//@RequiredArgsConstructor
 //public class fileApplication {
 //
 //    private static final ChannelController fileChannelController = new FileChannelController();

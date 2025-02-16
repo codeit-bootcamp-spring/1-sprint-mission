@@ -1,12 +1,12 @@
-package com.sprint.mission.repository.file;
+package com.sprint.mission.repository.file.main;
 
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,11 +17,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-
 public class FileChannelRepository implements ChannelRepository {
     private static final Path CHANNEL_DIRECT_PATH = Path.of("channelDirectory");
 
-    //@Override
     @SneakyThrows
     @Override
     public void save(Channel channel) {
@@ -35,7 +33,6 @@ public class FileChannelRepository implements ChannelRepository {
             oos.writeObject(channel);
         }
     }
-
 
 
     @SneakyThrows

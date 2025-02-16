@@ -13,10 +13,8 @@ import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.exception.DuplicateName;
 import com.sprint.mission.service.exception.NotFoundId;
-import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +43,7 @@ public class JCFChannelService implements ChannelService {
          * 의문점 : ????? 채널을 생성했는데 어떻게 바로 User가 있지???
          * 이런 부분 떔에 PUBLIC-PRIVATE 분리해야 될 이유를 찾지 못했다.
          */
-        Channel createdChannel = Channel.createChannelByRequestDto(requestDTO);
-        channelRepository.save(createdChannel);
+        channelRepository.save(Channel.createChannelByRequestDto(requestDTO));
     }
 
     @Override
@@ -67,6 +64,7 @@ public class JCFChannelService implements ChannelService {
         return channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
     }
 
+    @Override
     public List<Channel> findAllByUserId(UUID userId) {
 
         // 1. Public 채널
@@ -88,7 +86,6 @@ public class JCFChannelService implements ChannelService {
     }
 
 
-
     @Override
     public void delete(UUID channelId) {
         Channel deletingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
@@ -98,10 +95,10 @@ public class JCFChannelService implements ChannelService {
         });
 
         deletingChannel.getUserList().forEach(user -> {
-                    user.getChannels().remove(deletingChannel);
-                    // JPA가 아니므로 user의 수정사항을 다시 저장하기
-                    userRepository.save(user);
-                });
+            user.getChannels().remove(deletingChannel);
+            // JPA가 아니므로 user의 수정사항을 다시 저장하기
+            userRepository.save(user);
+        });
 
         channelRepository.delete(channelId);
     }
@@ -121,8 +118,6 @@ public class JCFChannelService implements ChannelService {
         }
         return readTimeMap;
     }
-
-
 
 
     /**
