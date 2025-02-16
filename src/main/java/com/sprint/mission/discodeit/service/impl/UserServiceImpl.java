@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +44,15 @@ public class UserServiceImpl implements UserService {
         user.setUsername(createUserDTO.getUsername());
         user.setEmail(createUserDTO.getEmail());
         user.setPassword(createUserDTO.getPassword());
+        user = userRepository.save(user);
+
+        // UserStatus 생성
+        UserStatus userStatus = new UserStatus();
+        userStatus.setUserId(user.getId());
+        userStatus.setLastActiveAt(Instant.now());
+        userStatus.setIsActive(true);  // 기본값으로 true 설정
+
+        userStatusRepository.save(userStatus);
 
         // 프로필 이미지가 제공되면 설정
         if (createUserDTO.getProfileImage() != null) {
@@ -52,15 +62,6 @@ public class UserServiceImpl implements UserService {
             binaryContentRepository.save(binaryContent);
         }
 
-        // UserStatus 생성
-        UserStatus userStatus = new UserStatus();
-        userStatus.setUserId(user.getId());
-        userStatus.setLastActiveAt(LocalDateTime.now());
-        userStatus.setIsActive(true);  // 기본값으로 true 설정
-
-        userRepository.save(user);
-        userStatusRepository.save(userStatus);
-
         return user;
     }
 
@@ -69,7 +70,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         // UserStatus 조회
-        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(() -> new RuntimeException("UserStatus not found"));
+        UserStatus userStatus = userStatusRepository.findByUserId(userId).orElse(new UserStatus(userId, Instant.now(), false));
 
         // UserResponseDTO로 반환
         return new UserResponseDTO(
@@ -85,7 +86,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponseDTO> findAll() {
         return userRepository.findAll().stream().map(user -> {
             // UserStatus 조회
-            UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElseThrow();
+            UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(new UserStatus(user.getId(), Instant.now(), false));
 
             return new UserResponseDTO(
                     user.getId(),
@@ -101,15 +102,6 @@ public class UserServiceImpl implements UserService {
     public User update(UUID userId, UpdateUserDTO updateUserDTO) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 새로운 프로필 이미지가 있다면 기존 이미지 삭제 후 새로운 이미지 저장
-        if (updateUserDTO.getNewProfileImage() != null) {
-            binaryContentRepository.deleteByUserId(userId);  // 기존 이미지 삭제
-            BinaryContent binaryContent = new BinaryContent();
-            binaryContent.setUserId(userId);
-            binaryContent.setContent(updateUserDTO.getNewProfileImage());  // 새로운 이미지 데이터
-            binaryContentRepository.save(binaryContent);
-        }
-
         // 사용자 정보 업데이트
         if (updateUserDTO.getUsername() != null) {
             user.setUsername(updateUserDTO.getUsername());
@@ -121,13 +113,33 @@ public class UserServiceImpl implements UserService {
             user.setPassword(updateUserDTO.getPassword());
         }
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        // UserStatus 업데이트 (lastActiveAt 업데이트)
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElse(new UserStatus(userId, Instant.now(), true));
+        userStatus.setLastActiveAt(Instant.now());
+        userStatusRepository.save(userStatus);
+
+        // 새로운 프로필 이미지가 있다면 기존 이미지 삭제 후 새로운 이미지 저장
+        if (updateUserDTO.getNewProfileImage() != null) {
+            binaryContentRepository.deleteByUserId(userId);  // 기존 이미지 삭제
+            BinaryContent binaryContent = new BinaryContent();
+            binaryContent.setUserId(userId);
+            binaryContent.setContent(updateUserDTO.getNewProfileImage());  // 새로운 이미지 데이터
+            binaryContentRepository.save(binaryContent);
+        }
+
         return user;
     }
 
     @Override
     public void delete(UUID userId) {
-        // UserStatus와 BinaryContent 삭제
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+
+        // UserStatus 및 BinaryContent 삭제
         userStatusRepository.deleteByUserId(userId);
         binaryContentRepository.deleteByUserId(userId);
 

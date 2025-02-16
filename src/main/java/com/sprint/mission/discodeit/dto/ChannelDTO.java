@@ -13,6 +13,8 @@ public class ChannelDTO {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PrivateChannelDTO {
+        private String name;
+        private String description;
         private List<UUID> userIds;  // 참여할 유저들의 ID
     }
 

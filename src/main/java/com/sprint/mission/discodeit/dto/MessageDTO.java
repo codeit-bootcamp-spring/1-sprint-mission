@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ public class MessageDTO {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     public static class CreateMessageDTO {
         private String content;
         private UUID channelId;

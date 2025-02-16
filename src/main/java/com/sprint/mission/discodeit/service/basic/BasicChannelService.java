@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -18,8 +19,14 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
+    public Channel createPrivateChannel(ChannelDTO.PrivateChannelDTO privateChannelDTO) {
+        Channel channel = new Channel(ChannelType.PRIVATE, privateChannelDTO.getName(), privateChannelDTO.getDescription());
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public Channel createPublicChannel(ChannelDTO.PublicChannelDTO publicChannelDTO) {
+        Channel channel = new Channel(ChannelType.PUBLIC, publicChannelDTO.getName(), publicChannelDTO.getDescription());
         return channelRepository.save(channel);
     }
 
@@ -35,10 +42,17 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, String newName, String newDescription) {
+    public List<Channel> findAllByUserId(UUID userId) {
+        return List.of();
+    }
+
+    @Override
+    public Channel update(UUID channelId, ChannelDTO.UpdateChannelDTO updateChannelDTO) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
-        channel.update(newName, newDescription);
+
+        channel.update(updateChannelDTO.getNewName(), updateChannelDTO.getNewDescription());
+
         return channelRepository.save(channel);
     }
 

@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.CreateUserDTO;
+import com.sprint.mission.discodeit.dto.UpdateUserDTO;
+import com.sprint.mission.discodeit.dto.UserResponseDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -17,27 +20,30 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(String username, String email, String password) {
-        User user = new User(username, email, password);
+    public User create(CreateUserDTO createUserDTO) {
+        User user = new User(createUserDTO.getUsername(), createUserDTO.getPassword(), createUserDTO.getEmail());
         return userRepository.save(user);
     }
 
     @Override
-    public User find(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    public UserResponseDTO find(UUID userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        return new UserResponseDTO(user);
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserResponseDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+    public User update(UUID userId, UpdateUserDTO updateUserDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
-        user.update(newUsername, newEmail, newPassword);
+        user.update(updateUserDTO.getUsername(), updateUserDTO.getPassword(), updateUserDTO.getEmail());
         return userRepository.save(user);
     }
 
