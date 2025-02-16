@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +16,7 @@ public class Message implements Serializable, Entity {
     private User author;
     private Channel channel;
     private String content;
+    private List<UUID> binaryContentsId;
 
 
     public Message(User User, Channel channel, String content){
@@ -26,6 +27,17 @@ public class Message implements Serializable, Entity {
         this.channel = channel;
         this.content = content;
     }
+
+    public Message(User User, Channel channel, String content, List<UUID> binaryContentsId){
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.author = User;
+        this.channel = channel;
+        this.content = content;
+        this.binaryContentsId = binaryContentsId;
+    }
+
 
 
     //업데이트시간 변경

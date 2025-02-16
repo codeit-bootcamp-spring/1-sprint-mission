@@ -1,15 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Type.BinaryContentType;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +24,8 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final FileIOHandler fileIOHandler;
 
     //해당 메세지 객체 리턴
     @Override
@@ -51,10 +59,45 @@ public class BasicMessageService implements MessageService {
             return null;
         }
     }
-    //!!!!!!!!!!!!!여기 이미지 추가하는 코드 작성하기!!!!!!!!!
+
+    //첨부파일 포함해서 메세지 생성. 'MessagesMap'에 uuid-메세지객체 주소 넣어줌.
+    @Override
+    public UUID createMessageWithBinaryContents(UUID authorId, UUID channelId, String content, String... attachmentsPaths) {
+        if (authorId == null || channelId == null || content == null || attachmentsPaths == null) {
+            System.out.println("메세지 생성 실패. 입력값을 확인해주세요.");
+            return null;
+        }
+
+        try {
+            if (userRepository.isUserExistByUUID(authorId) == false || channelRepository.isChannelExist(channelId) == false){
+                System.out.println("메세지 생성 실패. 입력한 id를가진 유저나 채널이 존재하지 않습니다.");
+            }
+            List<BufferedImage> images = Stream.of(attachmentsPaths).map(path -> fileIOHandler.loadImage(path)).collect(Collectors.toList());
+            ArrayList<UUID> binaryImagesId = new ArrayList<>();
+            for (BufferedImage image : images){
+                if (image == null){
+                    continue;
+                }
+                BinaryContent binaryimage = new BinaryContent(authorId, BinaryContentType.Aettached_File, image);
+                binaryContentRepository.saveBinaryContent(binaryimage);
+                binaryImagesId.add(binaryimage.getId());
+            }
+            Message newMessage = new Message(userRepository.getUserById(authorId), channelRepository.getChannel(channelId), content, binaryImagesId);
+            messageRepository.saveMessage(channelId, newMessage);
+            System.out.println("메세지 생성 성공!");
+            return newMessage.getId();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("메세지 생성 실패");
+            return null;
+        }
+    }
+
     //메세지 생성. 'MessagesMap'에 uuid-메세지객체 주소 넣어줌.
     @Override
-    public UUID createMessage(UUID authorId, UUID channelId, String content, String ...attachmentsPaths) {
+    public UUID createMessage(UUID authorId, UUID channelId, String content) {
         if (authorId == null || channelId == null || content == null) {
             System.out.println("메세지 생성 실패. 입력값을 확인해주세요.");
             return null;

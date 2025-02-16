@@ -8,7 +8,8 @@ import java.util.UUID;
 public interface MessageService {
     HashMap<UUID, Message> getChannelMessagesMap(UUID channelId);
 
-    UUID createMessage(UUID authorId, UUID channelId, String content, String ...attachmentsPaths);
+    UUID createMessageWithBinaryContents(UUID authorId, UUID channelId, String content, String ...attachmentsPaths);
+    UUID createMessage(UUID authorId, UUID channelId, String content);
 
     Message findMessageById(UUID channelId, UUID messageId);
 

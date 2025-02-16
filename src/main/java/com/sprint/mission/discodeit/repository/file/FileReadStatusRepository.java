@@ -28,6 +28,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public HashMap<UUID, ReadStatus> getChannelReadStatusMap(UUID channelId) throws IOException {
         return (HashMap<UUID, ReadStatus>)fileIOHandler.deserializeHashMap(allReadStatusMapRepository+channelId.toString());
     }
+
     @Override
     public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap) throws IOException{
         fileIOHandler.serializeHashMap(readStatusMap,allReadStatusMapRepository+channelId.toString());

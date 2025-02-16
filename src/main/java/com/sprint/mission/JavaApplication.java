@@ -5,14 +5,8 @@ import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -50,9 +44,11 @@ public class JavaApplication {
         ChannelRepository channelRepository = new FileChannelRepository();
         MessageRepository messageRepository = new FileMessageRepository();
         ReadStatusRepository readStatusRepository = new FileReadStatusRepository();
+        BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
+        FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
         UserService userService = new BasicUserService(userRepository);
-        MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, fileIOHandler);
         ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, userService, messageRepository);
 
 

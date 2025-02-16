@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Entity;
 import org.springframework.stereotype.Component;
 
@@ -109,31 +110,52 @@ public class FileIOHandler {
         }
     }
 
+    //todo 예외 반환 안함
     //이미지 불러오기.
-    public BufferedImage loadImage(String imagePath) throws IOException {
+    public BufferedImage loadImage(String imagePath){
         if (imagePath == null) {
-            throw new NullPointerException("IO 핸들러에 전달된 이미지경로가 null인 상태입니다.");
+            System.out.println("이미지 로드 실패. IO핸들러에 null이 전달되었습니다.");
+            return null;
         }
-
         try {
             File image = new File(imagePath);
             return ImageIO.read(image);
         } catch (IOException e) {
-            throw new IOException("이미지 불러오기 중 오류가 발생했습니다", e);
+            e.printStackTrace();
+            System.out.println("이미지 로드 실패.");
+            return null;
         }
     }
 
-    //이미지 저장하기
-    public boolean saveImage(BufferedImage image, String imagePath) throws IOException{
-        if (image == null || imagePath == null) {
+    //바이너리컨텐츠 객체 직렬화
+    public boolean serializeBinaryContent(BinaryContent binaryContent, String binaryContentPath){
+        if (binaryContent == null || binaryContentPath == null) {
             return false;
         }
-        try {
-            File outputImage = new File(imagePath);
-            ImageIO.write(image, "jpg",outputImage);
+        try (FileOutputStream fos = new FileOutputStream(binaryContentPath);
+             ObjectOutputStream oos = new ObjectOutputStream(fos))
+        {
+            oos.writeObject(binaryContent);
             return true;
         } catch (IOException e) {
-            throw new IOException("이미지 불러오기 중 오류가 발생했습니다", e);
+            e.printStackTrace();
+            System.out.println("BinaryContent 직렬화에 실패했습니다. 실패한 파일 경로: " + binaryContentPath);
+            return false;
+        }
+    }
+
+    //역직렬화 성공여부에 따라 바이너리컨텐츠 or null 반환
+    public BinaryContent deserializeBinaryContent(String binaryContentPath){
+        if (binaryContentPath == null) {
+            throw new NullPointerException("IO 핸들러에 전달된 파일경로가 null인 상태입니다.");
+        }
+        try (FileInputStream fis = new FileInputStream(binaryContentPath);
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            return (BinaryContent) ois.readObject();
+        } catch (IOException | ClassNotFoundException e){
+            e.printStackTrace();
+            System.out.println("BinaryContent 직렬화에 실패했습니다. 실패한 파일 경로: " + binaryContentPath);
+            return null;
         }
     }
 
