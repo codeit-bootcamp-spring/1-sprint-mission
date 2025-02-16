@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,9 @@ public interface ChannelService {
     ChannelResponseDto createPrivateChannel(ChannelCreateRequestDto channelCreateRequestDto);
     ChannelResponseDto find(UUID channelId);
     List<ChannelResponseDto> findAll();
-    ChannelResponseDto getChannelInfo(Channel channel);
+    List<ChannelResponseDto> findAllByUserId(UUID userId);
+    Instant findLastMessageTime(UUID channelId);
+    ChannelResponseDto getChannelInfo(Channel channel, Instant lastMessageTime);
     ChannelResponseDto update(ChannelUpdateRequestDto channelUpdateRequestDto);
     void delete(UUID channelId);
 }

@@ -65,6 +65,10 @@ public class Channel implements Serializable {
         return true;
     }
 
+    public boolean containsUser(UUID userId) {
+        return this.participants.contains(userId);
+    }
+
     @Override
     public String toString() {
         return String.format(
