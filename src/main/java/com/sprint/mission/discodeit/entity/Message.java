@@ -1,48 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID id;
+
+    private final UUID id;
     private String content;
     private User sender;
     private Channel channel;
 
-    private long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public Message(String content, Channel channel, User sender) {
         this.id = UUID.randomUUID();
         this.content = content;
         this.channel = channel;
         this.sender = sender;
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
     }
 
-    public UUID getId() {
-        return id;
-    }
-    public String getContent() {
-        return content;
-    }
-    public Channel getChannel() {
-        return channel;
-    }
-    public User getSender() {
-        return sender;
-    }
-    public long getCreatedAt() {
-        return createdAt;
-    }
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
 
     public void updateContent(String content) {
         this.content = content;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     public String toString() {

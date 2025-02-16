@@ -2,13 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-
+@Repository
 public class FileChannelRepository implements ChannelRepository {
     public static final Path DIRECTORY = Paths.get(System.getProperty("user.dir"), "data/channel");
 
@@ -43,8 +45,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     // 조회
-    public Channel loadChannel(Channel channel) {
-        Path filePath = DIRECTORY.resolve(channel.getId().toString().concat(".ser"));
+    public Channel loadChannel(UUID uuid) {
+        Path filePath = DIRECTORY.resolve(uuid.toString().concat(".ser"));
 
         if (Files.exists(filePath)) {
             try (

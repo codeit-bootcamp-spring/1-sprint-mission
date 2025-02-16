@@ -16,4 +16,5 @@ public interface MessageRepository {
 
     // 삭제
     boolean deleteMessage(Message message);
+
 }
