@@ -29,6 +29,10 @@ public class UserStatus implements Serializable {
         this.updatedAt = Instant.now();
     }
 
+    public void update() {
+        updateUpdatedAt();
+    }
+
     public OnlineStatus calculateOnlineStatus() {
         if (Duration.between(updatedAt, Instant.now()).toMinutes() >= 5) {
             return OnlineStatus.OFFLINE;

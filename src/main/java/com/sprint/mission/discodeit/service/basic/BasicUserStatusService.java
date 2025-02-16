@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -59,6 +61,20 @@ public class BasicUserStatusService implements UserStatusService {
     public OnlineStatus getOnlineStatus(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
         return userStatus.calculateOnlineStatus();
+    }
+
+    @Override
+    public UserStatus update(UserStatusUpdateDto userStatusUpdateDto) {
+        UserStatus userStatus = find(userStatusUpdateDto.id());
+        userStatus.update();
+        return userStatus;
+    }
+
+    @Override
+    public UserStatus updateByUserUd(UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
+        UserStatus userStatus = findByUserId(userStatusUpdateByUserIdDto.userId());
+        userStatus.update();
+        return userStatus;
     }
 
     @Override
