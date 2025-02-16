@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
 // User 파일이 Gender 파일과 같은 패키지 안에 있으므로 따로 임포트하지 않아도 됨
+
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -14,8 +16,8 @@ public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final UUID id = UUID.randomUUID();
-  private final Long createdAt = System.currentTimeMillis();
-  private Long updatedAt = null;
+  private final Instant createdAt = Instant.now();
+  private Instant updatedAt = null;
 
   @NonNull
   private String name;
@@ -29,7 +31,7 @@ public class User implements Serializable {
     this.name = name;
     this.age = age;
     this.gender = gender;
-    this.updatedAt = System.currentTimeMillis();
+    this.updatedAt = Instant.now();
   }
 
   @Override

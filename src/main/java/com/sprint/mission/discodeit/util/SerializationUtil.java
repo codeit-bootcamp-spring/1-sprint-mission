@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.util;
 
 import java.io.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class SerializationUtil<T> {
