@@ -16,22 +16,25 @@ public class BinaryProfileContent {
     // updateAt 필드는 정의 X
     // id 참조 필드 추가 (user, message)
 
-    private final UUID id;
-    private final UUID userId;
-    private final Instant createdAt;
-    private final byte[] bytes;
-
-    public BinaryProfileContent(UUID userId, BinaryProfileContent profileImg) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.createdAt = Instant.now();
-        this.bytes = profileImg.getBytes();
-    }
+    private UUID id;
+    private UUID userId;
+    private Instant createdAt;
+    private byte[] bytes;
 
     public BinaryProfileContent(BinaryProfileContentDto dto) {
         this.id = UUID.randomUUID();
         this.userId = dto.getUserId();
         this.createdAt = Instant.now();
         this.bytes = dto.getBytes();
+    }
+
+    public BinaryProfileContent() {}
+
+
+    public BinaryProfileContent(UUID userId, BinaryProfileContent profileImg) {
+        this.id = UUID.randomUUID();
+        this.userId = userId;
+        this.createdAt = Instant.now();
+        this.bytes = profileImg.getBytes();
     }
 }

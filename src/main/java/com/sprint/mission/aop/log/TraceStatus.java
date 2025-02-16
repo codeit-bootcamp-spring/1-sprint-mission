@@ -7,9 +7,9 @@ import org.aspectj.lang.ProceedingJoinPoint;
 @Getter
 public class TraceStatus {
 
-    private TraceId traceId;
-    private Long startTime;
-    private ProceedingJoinPoint joinPoint;
+    private final TraceId traceId;
+    private final Long startTime;
+    private final ProceedingJoinPoint joinPoint;
 
     public TraceStatus(TraceId traceId, Long startTime, ProceedingJoinPoint joinPoint) {
         this.traceId = traceId;

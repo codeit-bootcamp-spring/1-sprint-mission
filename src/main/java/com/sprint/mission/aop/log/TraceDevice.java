@@ -36,7 +36,6 @@ public class TraceDevice {
     private void synchronize() {
         TraceId traceId = traceHolder.get();
         if (traceId == null) {
-//            log.info("======================================================");
             traceHolder.set(new TraceId());
         }
         else traceHolder.set(traceId.createNextId());

@@ -69,6 +69,11 @@ public class FileMessageRepository implements MessageRepository {
         Files.delete(getMsDirectPath(messageId));
     }
 
+    @Override
+    public boolean existsById(UUID messageId) {
+        return false;
+    }
+
 
     /**
      * 편의 메서드

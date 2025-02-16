@@ -43,6 +43,7 @@ public class User implements Serializable {
     }
 
     public static User createUserByRequestDto(UserDtoForRequest dto){
+
         return new User(dto.getUsername(), dto.getPassword(), dto.getEmail());
     }
 
@@ -72,6 +73,6 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + name + "]" + "=> email: " + email + ", password: " + password;
+        return "[" + name + "]" + " => email: " + email + ", password: " + password;
     }
 }

@@ -22,7 +22,7 @@ public class BinaryProfileService {
     }
 
     public BinaryProfileContent findById(UUID userId) {
-        return repository.findById(userId).orElseThrow(NotFoundId::new);
+        return repository.findById(userId).orElse(new BinaryProfileContent());
 //                .map(profileContent
 //                        -> new BinaryProfileContentDto(profileContent))
 //                .orElseThrow(NotFoundId::new);

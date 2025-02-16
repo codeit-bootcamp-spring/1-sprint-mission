@@ -31,12 +31,14 @@ public class JCFUserService implements UserService {
     @Override
     public void create(UserDtoForRequest userDto) {
         isDuplicateNameEmail(userDto.getUsername(), userDto.getEmail());
+        System.out.println("userDto = " + userDto);
         User user = User.createUserByRequestDto(userDto);
-
+        System.out.println("저장할 유저 = " + user);
         // 선택적 프로필 생성
-        BinaryProfileContent profileImg = userDto.getProfileImg();
+        byte[] profileImg = userDto.getProfileImgAsByte();
         if (!(profileImg == null)) {
-            profileService.create(new BinaryProfileContentDto(profileImg));
+            // 이걸 굳이 dto로 보내야하나....
+            profileService.create(new BinaryProfileContentDto(user, profileImg));
         }
 
         // UserStatus 생성
@@ -55,12 +57,12 @@ public class JCFUserService implements UserService {
         User updatingUser = userRepository.findById(userId).orElseThrow(NotFoundId::new);
         updatingUser.updateByRequestDTO(updateDto);
 
-        if (updateDto.getProfileImg() != null) {
-            profileService.create(new BinaryProfileContentDto(updateDto.getProfileImg()));
+        byte[] profileImg = updateDto.getProfileImgAsByte();
+        if (profileImg != null) {
+            profileService.create(new BinaryProfileContentDto(updatingUser, profileImg));
         }
 
         userRepository.save(updatingUser);
-
     }
 
     @Override

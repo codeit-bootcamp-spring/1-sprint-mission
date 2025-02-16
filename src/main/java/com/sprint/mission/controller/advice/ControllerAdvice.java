@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class ControllerAdvice {
 
+    // 나중에 에러 반환 클래스만들어서 객체로 전달하기
     @ExceptionHandler(value = NotFoundId.class)
     public ResponseEntity<Map<String, String>> notFoundExHandler(NotFoundId e){
         HttpStatus status = HttpStatus.NOT_FOUND;
@@ -66,8 +68,9 @@ public class ControllerAdvice {
         HashMap<String, String> map = new HashMap<>();
         map.put("code", "500");
         map.put("error type", status.getReasonPhrase());
+
         if (e.getMessage().isBlank()) map.put("message", "서버 내 에러 발생");
-        else map.put("message", e.getMessage());
+        else map.put("message", e.toString() + e.getCause());
         return new ResponseEntity<>(map, status);
     }
 }

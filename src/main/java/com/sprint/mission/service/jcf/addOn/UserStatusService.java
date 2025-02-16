@@ -26,6 +26,7 @@ public class UserStatusService {
 
     public UserStatus findById(UUID userId){
         return userStatusRepository.findById(userId).orElseThrow(() -> new NotFoundId("userId에 맞는 userstatus가 존재하지 않습니다"));
+        // 이걸 그냥 빈 Userstatus로 반환할지 오류 터트릴지 고민
     }
 
     public List<UserStatus> findAll(){

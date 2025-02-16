@@ -44,15 +44,20 @@ public class JCFMessageService {
             createdMessage.setAttachments(bmc);
             binaryMessageService.create(new BinaryMessageContentDto(createdMessage.getId(), bmc));
         }
+        writtenChannel.updateLastMessageTime();
+        channelRepository.save(writtenChannel);
+
         messageRepository.save(createdMessage);
     }
 
-    // 메시지 binary data는 수정 불가
+
     public void update(MessageDtoForUpdate updateDto) {
         Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
                 .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
 
         updatingMessage.setContent(updateDto.getChangeContent());
+        // 메시지 binary data는 수정 불가
+        // 수정해도 채널의 lastMessageTime은 불변?
         messageRepository.save(updatingMessage);
     }
 

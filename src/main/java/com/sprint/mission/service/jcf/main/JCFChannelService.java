@@ -1,6 +1,7 @@
 package com.sprint.mission.service.jcf.main;
 
 
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;
@@ -115,9 +116,8 @@ public class JCFChannelService implements ChannelService {
         // 이 때 쓰는 findUserDto는 profile null
         Map<FindUserDto, Instant> readTimeMap = new HashMap<>();
         for (User user : inChannel.getUserList()) {
-            userStatusService.findById(user.getId()).ifPresentOrElse((userStatus) -> {
-                readTimeMap.put(new FindUserDto(user, userStatus.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
-            }, () -> readTimeMap.put(new FindUserDto(user, false), null));
+            UserStatus status = userStatusService.findById(user.getId());
+            readTimeMap.put(new FindUserDto(user, status.isOnline()), user.getReadStatus().findLastReadByChannel(channelId));
         }
         return readTimeMap;
     }

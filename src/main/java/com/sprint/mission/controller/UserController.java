@@ -1,6 +1,8 @@
 package com.sprint.mission.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.request.UserDtoForRequest2;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
@@ -12,12 +14,15 @@ import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,31 +35,30 @@ public class UserController {
 
     private final JCFUserService userService;
     private final UserStatusService userStatusService;
-    private final JCFChannelService channelService;
     private final BinaryProfileService binaryProfileService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
-    // 패스워드 정보 제외
-    @PostMapping
-    public ResponseEntity<String> create(@RequestBody UserDtoForRequest requestDTO) {
+    //@ModelAttribute UserDtoForRequest requestDTO << 이거 써도 되지만 PUT, PATCH에서는 못 쓰기에 일관성 있게 RequestPart
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<String> create(@RequestPart(value = "dto") UserDtoForRequest requestDTO,
+                                         @RequestPart(value = "profileImg") MultipartFile profile) {
+        requestDTO.setProfileImg(profile);
         userService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("User created successfully");
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<FindUserDto> findById(@PathVariable UUID userId){
+    public ResponseEntity<FindUserDto> findById(@PathVariable UUID userId) {
         User findUser = userService.findById(userId);
         BinaryProfileContent profile = binaryProfileService.findById(userId);
-        Boolean isOnline = userStatusService.findById(userId)
-                .map(UserStatus::isOnline)
-                .orElse(false);
+        boolean isOnline = userStatusService.findById(userId).isOnline();
         return ResponseEntity.status(HttpStatus.OK).body(new FindUserDto(findUser, profile.getBytes(), isOnline));
     }
 
     @GetMapping
-    public ResponseEntity<List<FindUserDto>> findAll(){
+    public ResponseEntity<List<FindUserDto>> findAll() {
         Map<User, UserStatus> statusMapByUser = userStatusService.findStatusMapByUserList(userService.findAll());
 
         List<FindUserDto> userListDTO = new ArrayList<>();
@@ -65,15 +69,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
     }
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity<String> update(@PathVariable UUID userId, @RequestBody UserDtoForRequest requestDTO){
+    @PatchMapping(path = "/{userId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<String> update(@PathVariable UUID userId,
+                                         @RequestPart(value = "dto") UserDtoForRequest requestDTO,
+                                         @RequestPart(value = "profileImg") MultipartFile changedImage) {
+        requestDTO.setProfileImg(changedImage);
         userService.update(userId, requestDTO);
         return ResponseEntity.ok("Successfully updated");
     }
 
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@PathVariable UUID userId){
+    public ResponseEntity<String> delete(@PathVariable UUID userId) {
         userService.delete(userId);
         return ResponseEntity.ok("Successfully deleted");
     }
