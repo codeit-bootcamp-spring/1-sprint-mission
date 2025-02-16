@@ -1,8 +1,8 @@
-spring:
-  application:
-    name: discodeit
+  spring:
+    application:
+      name: discodeit
 
-discodeit:
-  repository:
-    type: jcf   # jcf | file
-    file-directory: .discodeit
+  discodeit:
+    repository:
+      type: jcf   # jcf | file
+      file-directory: .discodeit/data/
