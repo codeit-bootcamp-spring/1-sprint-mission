@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -38,12 +39,38 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return null;
+        Path filePath = directory.resolve(binaryContentId + ".ser");
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (BinaryContent) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<BinaryContent> findAll() {
-        return List.of();
+        try {
+            List<BinaryContent> binaryContents = Files.list(directory)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (BinaryContent) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return binaryContents;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

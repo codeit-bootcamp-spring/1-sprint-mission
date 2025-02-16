@@ -27,12 +27,12 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return null;
+        return data.get(binaryContentId);
     }
 
     @Override
     public List<BinaryContent> findAll() {
-        return List.of();
+        return data.values().stream().toList();
     }
 
     @Override
