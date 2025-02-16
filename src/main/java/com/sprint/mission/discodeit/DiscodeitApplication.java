@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
@@ -60,27 +61,52 @@ public class DiscodeitApplication {
 		System.out.println("유저 삭제: " + foundUsersAfterDelete.size() + System.lineSeparator());
 	}
 
-//	static void channelCRUDTest(ChannelService channelService, User owner) {
-//		// 생성
-//		Channel channel = channelService.create("공지", "공지 채널입니다.", owner);
-//		System.out.println("채널 생성");
-//		System.out.println(channelService.getInfo(channel.getId()));
-//		// 조회
-//		Channel foundChannel = channelService.find(channel.getId());
-//		System.out.println("채널 조회(단건)");
-//		System.out.println(channelService.getInfo(foundChannel.getId()));
-//		List<Channel> foundChannels = channelService.findAll();
-//		System.out.println("채널 조회(다건): " + foundChannels.size() + System.lineSeparator());
-//		// 수정
-//		channelService.update(channel.getId(), "공지", "공지입니다");
-//		System.out.println("채널 수정");
-//		System.out.println(channelService.getInfo(channel.getId()));
-//		// 삭제
-//		channelService.delete(channel.getId());
-//		List<Channel> foundChannelsAfterDelete = channelService.findAll();
-//		System.out.println("채널 삭제: " + foundChannelsAfterDelete.size() + System.lineSeparator());
-//	}
-//
+	static void publicChannelCRUDTest(ChannelService channelService) {
+		System.out.println("PUBLIC 채널");
+
+		// 생성
+		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+		System.out.println("채널 생성");
+		System.out.println(channelResponseDto);
+		// 조회
+		ChannelResponseDto foundChannel = channelService.find(channelResponseDto.id());
+		System.out.println("채널 조회(단건)");
+		System.out.println(foundChannel);
+		List<ChannelResponseDto> foundChannels = channelService.findAll();
+		System.out.println("채널 조회(다건): " + foundChannels.size());
+		System.out.println(foundChannels);
+		// 수정
+		System.out.println("채널 수정");
+		System.out.println(channelService.update(new ChannelUpdateRequestDto(channelResponseDto.id(), "공지", "공지입니다")));
+		// 삭제
+		channelService.delete(channelResponseDto.id());
+		List<ChannelResponseDto> foundChannelsAfterDelete = channelService.findAll();
+		System.out.println("채널 삭제: " + foundChannelsAfterDelete.size() + System.lineSeparator());
+	}
+
+	static void privateChannelCRUDTest(UserService userService, ChannelService channelService) {
+		System.out.println("PRIVATE 채널");
+		UserResponseDto userResponseDto = userService.create(new UserCreateRequestDto("user2", "user2@codeit.kr", "1234", null),
+				new BinaryContentRequestDto(null));
+
+		// 생성
+		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, null, null,
+				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
+		System.out.println("채널 생성");
+		System.out.println(channelResponseDto);
+		// 조회
+		ChannelResponseDto foundChannel = channelService.find(channelResponseDto.id());
+		System.out.println("채널 조회(단건)");
+		System.out.println(foundChannel);
+		List<ChannelResponseDto> foundChannels = channelService.findAllByUserId(userResponseDto.id());
+		System.out.println("채널 조회(By userID): " + foundChannels.size());
+		System.out.println(foundChannels);
+		// 삭제
+		channelService.delete(channelResponseDto.id());
+		List<ChannelResponseDto> foundChannelsAfterDelete = channelService.findAll();
+		System.out.println("채널 삭제: " + foundChannelsAfterDelete.size() + System.lineSeparator());
+	}
+
 //	static void messageCRUDTest(MessageService messageService, Channel channel, User author) {
 //		// 생성
 //		Message message = messageService.create("안녕하세요.", author, channel.getId());
@@ -132,7 +158,8 @@ public class DiscodeitApplication {
 //
 //		// 테스트
 		userCRUDTest(userService);
-//		channelCRUDTest(channelService, user);
+		publicChannelCRUDTest(channelService);
+		privateChannelCRUDTest(userService, channelService);
 //		messageCRUDTest(messageService, channel, user);
 
 		// 파일 지우기
