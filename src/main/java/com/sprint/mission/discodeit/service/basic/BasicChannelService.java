@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -15,6 +16,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Instant;
@@ -35,13 +37,16 @@ public class BasicChannelService implements ChannelService {
 
     private final ReadStatusService readStatusService;
 
+    private final UserStatusService userStatusService;
+
     @Override
-    public Channel create(CreateChannelDto createChannelDto) {
-        return channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
+    public ChannelResponseDto create(CreateChannelDto createChannelDto) {
+        Channel channel = channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
+        return ChannelResponseDto.from(channel);
     }
 
     //private 인 경우, userId 리스트 매개변수 필요
-    private Channel create(CreateChannelDto createChannelDto, List<String> userIds) {
+    private ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds) {
         Channel channel = new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null);
 
         for (String userId : userIds) {
@@ -49,13 +54,9 @@ public class BasicChannelService implements ChannelService {
             readStatusService.create(new CreateReadStatusDto(channel.getId(), userId));
             channel.getUserSet().add(user.getId());
         }
-        return channelRepository.save(channel);
+        Channel savedChannel = channelRepository.save(channel);
+        return ChannelResponseDto.from(savedChannel);
     }
-
-//    @Override
-//    public List<Channel> findAll() {
-//        return channelRepository.findAll();
-//    }
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(String userId) {
@@ -116,17 +117,28 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAllByChannelName(String channelName) throws CustomException {
-        return channelRepository.findAll().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
+    public List<ChannelResponseDto> findAllByChannelName(String channelName) throws CustomException {
+        List<Channel> channels = channelRepository.findAll().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
+        List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
+        for(Channel channel: channels) {
+            channelResponseDtos.add(ChannelResponseDto.from(channel));
+        }
+        return channelResponseDtos;
     }
 
     @Override
-    public List<Channel> findByChannelType(ChannelType channelType) {
-        return channelRepository.findAll().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
+    public List<ChannelResponseDto> findByChannelType(ChannelType channelType) {
+        List<Channel> channels = channelRepository.findAll().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
+        List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
+        for(Channel channel: channels) {
+            channelResponseDtos.add(ChannelResponseDto.from(channel));
+        }
+        return channelResponseDtos;
+
     }
 
     @Override
-    public Channel updateChannel(String channelId, UpdateChannelDto updateChannelDto) throws CustomException {
+    public ChannelResponseDto updateChannel(String channelId, UpdateChannelDto updateChannelDto) throws CustomException {
         Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
@@ -140,7 +152,10 @@ public class BasicChannelService implements ChannelService {
         if (channel.isUpdated(updateChannelDto)) {
             channel.setUpdatedAt(updateChannelDto.updatedAt());
         }
-        return channelRepository.save(channel);
+
+        channelRepository.save(channel);
+
+        return ChannelResponseDto.from(channel);
     }
 
     @Override
@@ -158,21 +173,20 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<User> findAllUserInChannel(Channel channel) throws CustomException {
+    public List<UserResponseDto> findAllUserInChannel(Channel channel) throws CustomException {
         Channel ch = channelRepository.findById(channel.getId());
         if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
-        List<User> result = new ArrayList<>();
+        List<UserResponseDto> result = new ArrayList<>();
         for(String userId: ch.getUserSet()) {
             User user = userRepository.findById(userId);
             if (user == null) {
                 throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }
-            result.add(user);
+            result.add(UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()));
         }
-
         return result;
     }
 
