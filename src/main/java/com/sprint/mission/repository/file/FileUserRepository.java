@@ -1,6 +1,7 @@
 package com.sprint.mission.repository.file;
 
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.exception.NotFoundId;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +21,14 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
-public class FileUserRepository {
+public class FileUserRepository implements UserRepository {
 
     // User 디렉토리 Path 객체
     private static final Path USER_DIRECT_PATH = Path.of("userDirectory");
 
     //@Override
     @SneakyThrows
-    public User save(User user) {
+    public void save(User user) {
         Path filePath = USER_DIRECT_PATH.resolve(user.getId() + ".ser");
 
         // 파일 존재하지 않으면(나중에 수정할 때 saveUser메서드 활용해야 하므로 구분 필요할것 같음
@@ -38,17 +39,17 @@ public class FileUserRepository {
         ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath));
         oos.writeObject(user);
         oos.close();
-        return user;
     }
 
     /**
      * 조회
      */
-//@Override
+
     @SneakyThrows
-    public Optional<User> findById(UUID id) {
+    @Override
+    public Optional<User> findById(UUID userId) {
         // 1. id로 filePath 얻기
-        Path userFilePath = getUserFilePath(id);
+        Path userFilePath = getUserFilePath(userId);
 
         // 2. 1에서 얻은 filePath가 유효한지 테스트
         if (!Files.exists(userFilePath)) {
@@ -62,40 +63,28 @@ public class FileUserRepository {
         }
     }
 
-    //@Override
     @SneakyThrows
+    @Override
     public List<User> findAll() {
-        if (!Files.exists(USER_DIRECT_PATH)) {
-            log.info("No exist USER dir");
-            return new ArrayList<>();
-        } else {
-            return Files.list(USER_DIRECT_PATH)
-                    .filter(path -> path.toString().endsWith(".ser"))
-                    .map((serFilePath) -> readUserFromFile(serFilePath)) // 역직렬화
-                    //.map(this::readUserFromFile)
-                    .collect(Collectors.toCollection(ArrayList::new));
-        }
+        return Files.exists(USER_DIRECT_PATH)
+                ? Files.list(USER_DIRECT_PATH)
+                .filter(path -> path.toString().endsWith(".ser"))
+                .map(this::readUserFromFile)
+                .collect(Collectors.toCollection(ArrayList::new))
+                : new ArrayList<>();
     }
 
-    //@Override
     @SneakyThrows
+    @Override
     public void delete(UUID userId) {
         Files.delete(getUserFilePath(userId));
-//        try {
-//            Files.delete(getUserFilePath(user.getId()));
-//        } catch (NoSuchFileException e) {
-//            throw new RuntimeException(String.format(
-//                    "[%s] %s의 파일은 존재하지 않습니다", user.getFirstId(), user.getName()), e);
-//        } catch (IOException e) {
-//            System.out.println("User 파일 삭제 중 오류 발생");
-//            e.printStackTrace();
-//        }
-//
-//        System.out.printf("%s 파일 삭제 완료", user.getName());
-//        System.out.println();
     }
 
-
+    @SneakyThrows
+    @Override
+    public boolean existsById(UUID userId) {
+        return Files.exists(getUserFilePath(userId));
+    }
 
     /**
      * 편의 메서드 모음

@@ -1,10 +1,12 @@
 package com.sprint.mission.repository.file;
 
 import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.repository.ChannelRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -16,12 +18,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 
-public class FileChannelRepository {
+public class FileChannelRepository implements ChannelRepository {
     private static final Path CHANNEL_DIRECT_PATH = Path.of("channelDirectory");
 
     //@Override
     @SneakyThrows
-    public Channel save(Channel channel) {
+    @Override
+    public void save(Channel channel) {
         Path channelPath = getChannelDirectPath(channel.getId());
 
         if (!Files.exists(channelPath)) {
@@ -30,34 +33,40 @@ public class FileChannelRepository {
 
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(channelPath))) {
             oos.writeObject(channel);
-            return channel;
         }
     }
 
 
-    //@Override
+
     @SneakyThrows
+    @Override
     public Optional<Channel> findById(UUID id) {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(getChannelDirectPath(id)))) {
             return Optional.ofNullable((Channel) ois.readObject());
         }
     }
 
-    //@Override
     @SneakyThrows
+    @Override
     public List<Channel> findAll() {
         return Files.exists(CHANNEL_DIRECT_PATH)
                 ? Files.list(CHANNEL_DIRECT_PATH)
                 .filter(path -> path.toString().endsWith(".ser"))
-                .map((path) -> readChannelFromFile(path))
+                .map(this::readChannelFromFile)
                 .collect(Collectors.toCollection(ArrayList::new))
                 : new ArrayList<>();
     }
 
-    //@Override
+
     @SneakyThrows
-    public void delete(Channel channel) {
-        Files.delete(getChannelDirectPath(channel.getId()));
+    @Override
+    public void delete(UUID channelId) {
+        Files.delete(getChannelDirectPath(channelId));
+    }
+
+    @Override
+    public boolean existsById(UUID channelId) {
+        return Files.exists(getChannelDirectPath(channelId));
     }
 
     /**

@@ -19,9 +19,6 @@ public class FileMessageRepository implements MessageRepository {
 
     private static final Path MS_DIRECT_PATH = Path.of("MS_Directory");
 
-    // 수정, 생성이 쓰는 메서드
-    // 수정, 생성 오류 메시지 따로 설정하기 위해 throws
-
     @SneakyThrows
     @Override
     public void save(Message message) {
@@ -71,7 +68,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public boolean existsById(UUID messageId) {
-        return false;
+        return Files.exists(getMsDirectPath(messageId));
     }
 
 
