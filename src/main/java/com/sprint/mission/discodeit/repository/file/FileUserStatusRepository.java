@@ -72,4 +72,21 @@ public class FileUserStatusRepository implements UserStatusRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void delete(UUID userStatusId) {
+        Path filePath = directory.resolve(userStatusId + ".ser");
+
+        try {
+            Files.delete(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제에 실패하였습니다.");
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID userStatusId) {
+        Path filePath = directory.resolve(userStatusId + ".ser");
+        return Files.exists(filePath);
+    }
 }

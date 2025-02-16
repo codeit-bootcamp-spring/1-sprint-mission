@@ -78,7 +78,14 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public void delete(UUID userStatusId) {
+        userStatusRepository.existsById(userStatusId);
+        userStatusRepository.delete(userStatusId);
+    }
+
+    @Override
     public void deleteByUserId(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
+        userStatusRepository.delete(userStatus.getUserId());
     }
 }

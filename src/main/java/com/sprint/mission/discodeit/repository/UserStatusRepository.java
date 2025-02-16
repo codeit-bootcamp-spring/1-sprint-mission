@@ -9,4 +9,6 @@ public interface UserStatusRepository {
     UserStatus save(UserStatus userStatus);
     UserStatus find(UUID userStatusId);
     List<UserStatus> findAll();
+    void delete(UUID userStatusId);
+    boolean existsById(UUID userStatusId);
 }

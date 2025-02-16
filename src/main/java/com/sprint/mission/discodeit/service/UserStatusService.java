@@ -17,5 +17,6 @@ public interface UserStatusService {
     OnlineStatus getOnlineStatus(UUID userId);
     UserStatus update(UserStatusUpdateDto userStatusUpdateDto);
     UserStatus updateByUserUd(UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto);
+    void delete(UUID userStatusId);
     void deleteByUserId(UUID userId);
 }

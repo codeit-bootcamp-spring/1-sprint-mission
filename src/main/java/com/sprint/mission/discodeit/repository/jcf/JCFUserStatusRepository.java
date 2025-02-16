@@ -35,4 +35,14 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public List<UserStatus> findAll() {
         return data.values().stream().toList();
     }
+
+    @Override
+    public void delete(UUID userStatusId) {
+        data.remove(userStatusId);
+    }
+
+    @Override
+    public boolean existsById(UUID userStatusId) {
+        return data.containsKey(userStatusId);
+    }
 }
