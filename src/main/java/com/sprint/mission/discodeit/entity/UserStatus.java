@@ -18,6 +18,7 @@ public class UserStatus implements Serializable {
     private Instant updatedAt = null;
     @NonNull
     private boolean active = false;
+    private final UUID userId;  // User 객체를 참조
 
     public void checkActiveStatus(){
         if(updatedAt!=null && Instant.now().minusSeconds(300).isBefore(updatedAt)) {

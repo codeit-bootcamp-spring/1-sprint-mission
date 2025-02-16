@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Gender;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.LoginDto;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +21,25 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     public BasicUserService(UserRepository userRepository){this.userRepository = userRepository;}
 
+    @Autowired
+    private final BinaryContentRepository binaryContentRepository;
+    public BasicUserService(BinaryContentRepository binaryContentRepository){this.binaryContentRepository = binaryContentRepository;}
+
+    @Autowired
+    private final UserStatusRepository userStatusRepository;
+    public BasicUserService(UserStatusRepository userStatusRepository){this.userStatusRepository = userStatusRepository;}
+
+
     @Override
-    public boolean createUser(User user) {
-        boolean created = userRepository.save(user);
+    public boolean createUser(UserDto userDto) {
+        // TODO : username과 email은 다른 유저와 같으면 안되는 거 처리 (validate..?)
+
+        boolean created = userRepository.save(userDto);
         if(created){
-            System.out.println("생성된 회원: " + user);
+            if(userDto.profileImageUrl() != null){
+                binaryContentRepository.saveProfileImage(userDto.profileImageUrl(), userDto.user().getId());
+            }
+            System.out.println("생성된 회원: " + userDto);
             return true;
         } else{
             return false;
@@ -30,15 +47,16 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public Optional<User> readUser(UUID id) {
-        Optional<User> usr = userRepository.findById(id);
+    public Optional<UserDto> readUser(UserDto userDto) {
+        Optional<UserDto> usr = userRepository.findById(userDto.user().getId());
         usr.ifPresent(u -> System.out.println("조회된 회원: " + u));
+        // TODO : 패스워드 정보 제외시키기
         return usr;
     }
 
     @Override
-    public List<User> readAllUsers() {
-        List<User> users = userRepository.findAll();
+    public List<UserDto> readAllUsers() {
+        List<UserDto> users = userRepository.findAll();
         if(users != null && !users.isEmpty()){
             System.out.println("전체 회원 목록: " + users);
             return users;
@@ -48,30 +66,48 @@ public class BasicUserService implements UserService {
         }
     }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     @Override
-    public void updateUser(UUID id, String name, int age, Gender gender) {
-        boolean updated = userRepository.updateOne(id, name, age, gender);
+    public void updateUser(UpdateUserDto updateUserDto) {
+        UUID id = updateUserDto.id();
+        boolean updated = userRepository.updateOne(
+                updateUserDto.id(),
+                updateUserDto.name(),
+                updateUserDto.age(),
+                updateUserDto.gender()
+        );
+
         if (updated) {
-            Optional<User> usr = userRepository.findById(id);
+            if (updateUserDto.profileImageUrl() != null) {
+                binaryContentRepository.saveProfileImage(updateUserDto.profileImageUrl(), id);
+            }
+
+            Optional<UserDto> usr = userRepository.findById(id);
             usr.ifPresent(u -> System.out.println("수정된 회원: " + u));
-            List<User> allUsers = userRepository.findAll();
+            List<UserDto> allUsers = userRepository.findAll();
             System.out.println("수정 후 전체 회원 목록: " + allUsers);
         }
     }
 
     @Override
     public void deleteUser(UUID id) {
+        // 관련 도메인 삭제
+        binaryContentRepository.deleteAllByUserId(id);
+        userStatusRepository.deleteAllByUserId(id);
+
         boolean deleted = userRepository.deleteOne(id);
-        if (deleted){
-            Optional<User> usr = userRepository.findById(id);
-            System.out.println("삭제된 회원: " + usr); // 존재안하면 안하는데로 Optional.isEmpty 가 뜨는지 확인
-            List<User> allUsers = userRepository.findAll();
+        if (deleted) {
+            Optional<UserDto> usr = userRepository.findById(id);
+            System.out.println("삭제된 회원: " + usr);
+            List<UserDto> allUsers = userRepository.findAll();
             System.out.println("삭제 후 전체 회원 목록: " + allUsers);
         }
     }
 
+    // TODO : LoginDto로 AuthService 구현
+
     @Override
-    public List<User> getAllUsers() {
+    public List<UserDto> getAllUsers() {
         return userRepository.findAll();
     }
 }

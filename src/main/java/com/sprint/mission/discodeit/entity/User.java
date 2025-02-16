@@ -5,13 +5,15 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@RequiredArgsConstructor // 롬복은 나중에 생성자 호출할 때 파라미터로 뭘 줘야하는지 헷갈림
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -22,7 +24,7 @@ public class User implements Serializable {
   @NonNull
   private String name;
   @NonNull
-  private int age; // 기본 타입은 null이 될 수가 없더라도 @NonNull로 명시를 해줘야 @RequiredArgsConstructor가 인식을 함
+  private int age; // 기본 타입은 null이 될 수가 없더라도 @NonNull로 명시를 해줘야 @RequiredArgsConstructor가 인식을 하는거 아닌가..?
   @NonNull
   private Gender gender;
 

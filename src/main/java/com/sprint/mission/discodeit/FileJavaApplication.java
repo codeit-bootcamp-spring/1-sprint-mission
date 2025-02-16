@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Gender;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -49,7 +48,7 @@ public class FileJavaApplication {
     Path directory = Paths.get("data"); // 폴더 경로를 지정하는 부분. data는 파일을 저장할 폴더 이름일 뿐. 마음대로 변경 가능
     init(directory);
 
-    SerializationUtil<User> userUtil = new SerializationUtil<>();
+    SerializationUtil<UserDto> userUtil = new SerializationUtil<>();
     SerializationUtil<Channel> channelUtil = new SerializationUtil<>();
     SerializationUtil<Message> messageUtil = new SerializationUtil<>();
 
@@ -67,37 +66,46 @@ public class FileJavaApplication {
     System.out.println("\n===== 회원 서비스 CRUD =====");
     // 등록
     User user1 = new User("정연경", 24, Gender.FEMALE);
-    boolean u1 = userService.createUser(user1);
+    // UserStatus 생성, user에 연결
+    UserStatus userStatus1 = new UserStatus(user1.getId()); // UserStatus 엔티티에 UUID userId 선언해서 가능 > 이해 잘 안댐
+    UserDto userDto1 = new UserDto(user1, null, userStatus1);
+    boolean u1 = userService.createUser(userDto1);
 
     User user2 = new User("신서연", 23, Gender.FEMALE);
-    boolean u2 = userService.createUser(user2);
+    // UserStatus 생성, user에 연결
+    UserStatus userStatus2 = new UserStatus(user1.getId());
+    UserDto userDto2 = new UserDto(user2, null, userStatus2);
+    boolean u2 = userService.createUser(userDto2);
 
     if (u1 || u2) {
-      List<User> userList = userRepository.findAll(); // 직렬화 대상!! : 최종 리스트 readAllUsers()
+      List<UserDto> userList = userService.getAllUsers(); // 직렬화 대상!! : 최종 리스트 readAllUsers()
       userUtil.saveData(userList);
     }
 
     // 조회 - 단건
-    userService.readUser(user1.getId());
+    userService.readUser(userDto1);
 
     // 조회 - 다건
     userService.readAllUsers();
 
     // 수정 & 조회
-    userService.updateUser(user1.getId(), "정연경", 23, Gender.FEMALE);
-    userUtil.saveData(userRepository.findAll());
+    UpdateUserDto updateUserDto1 = new UpdateUserDto(user1.getId(), user1.getName(), user1.getAge(), user1.getGender(), null);
+    userService.updateUser(updateUserDto1);
+    userUtil.saveData(userService.getAllUsers());
 
     // 삭제 & 조회
     userService.deleteUser(user1.getId());
-    userUtil.saveData(userRepository.findAll());
+    userUtil.saveData(userService.getAllUsers());
 
     // ===== 회원 파일 역직렬화 =====
     // for문 써서 리스트 객체 하나하나 프린트 해줘야 함
     System.out.println("\n===== 파일에서 회원 데이터 불러오기 =====");
-    List<User> deserializedUsers = userUtil.loadData();
-    for (User u : deserializedUsers)
+    List<UserDto> deserializedUsers = userUtil.loadData();
+    for (UserDto u : deserializedUsers)
       System.out.println(u);
     // deserializedUsers.forEach(System.out::println);
+
+
 
 
     // ===== 채널 직렬화 =====
@@ -140,7 +148,10 @@ public class FileJavaApplication {
 
     // 메세지 보낼 회원 등록
     User messageSender = new User("김예은", 25, Gender.FEMALE);
-    userService.createUser(messageSender);
+    // UserStatus 생성, user에 연결
+    UserStatus userStatus3 = new UserStatus(messageSender.getId());
+    UserDto userDto3 = new UserDto(messageSender, null, userStatus3);
+    userService.createUser(userDto3);
 
     // 등록
     Message message1 = new Message("자바 질문톡방", messageSender.getId());
