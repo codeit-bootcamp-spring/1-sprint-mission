@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        img { width: 50px; height: 50px; border-radius: 50%; }
+        button { padding: 5px 10px; margin-right: 5px; cursor: pointer; }
+    </style>
+    <script>
+        function deleteUser(button) {
+            let userId = button.getAttribute("data-id"); // 🔥 안전하게 userId 가져오기
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                fetch("/user/" + userId, {
+                    method: "DELETE"
+                }).then(response => {
+                    if (response.ok) {
+                        alert("사용자가 삭제되었습니다.");
+                        location.reload();
+                    } else {
+                        alert("삭제 실패.");
+                    }
+                }).catch(error => console.error("Error:", error));
+            }
+        }
+    </script>
+</head>
+<body>
+
+<h2>User List</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Nickname</th>
+        <th>Phone</th>
+        <th>Created At</th>
+        <th>Last Online</th>
+        <th>Status</th>
+        <th>Profile Picture</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.userId}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.nickname}"></td>
+        <td th:text="${user.phoneNumber}"></td>
+        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${#temporals.format(user.lastOnlineAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${user.userStatus}"></td>
+        <td>
+            <img th:if="${user.profilePictureBase64}" th:src="'data:image/png;base64,' + ${user.profilePictureBase64}" alt="Profile Image"/>
+            <span th:unless="${user.profilePictureBase64}">No Image</span>
+        </td>
+        <td>
+            <a th:href="@{/api/v1/user-update-form/{id}(id=${user.userId})}">
+                <button>수정</button>
+            </a>
+            <button data-id="${user.userId}" onclick="deleteUser(this)">삭제</button>  <!-- ✅ 수정된 부분 -->
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

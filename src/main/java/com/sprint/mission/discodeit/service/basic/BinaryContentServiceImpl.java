@@ -69,7 +69,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds) {
 
     if (userIds == null || userIds.isEmpty()) return Collections.emptyMap();
-
     List<BinaryContent> profiles = binaryContentRepository.findProfilesOf(userIds);
 
     return profiles.stream()
@@ -117,13 +116,16 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     List<BinaryContent> savedFiles = newFiles.stream()
         .map(file -> {
           try {
-            return new BinaryContent.BinaryContentBuilder(
+            return new BinaryContent(
                 userId,
+                message.getUUID(),
+                message.getChannelId(),
                 file.getOriginalFilename(),
                 file.getContentType(),
                 file.getSize(),
-                file.getBytes()
-            ).messageId(message.getUUID()).build();
+                file.getBytes(),
+                false
+            );
           } catch (IOException e) {
             throw new InvalidOperationException("파일 저장 실패");
           }

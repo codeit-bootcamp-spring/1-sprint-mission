@@ -25,8 +25,8 @@ public record MessageResponseDto(
 
     return new MessageResponseDto(
         message.getUUID(),
-        message.getUserUUID(),
-        message.getChannelUUID(),
+        message.getUserId(),
+        message.getChannelId(),
         message.getContent(),
         message.getCreatedAt(),
         base64Encoded

@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -14,7 +13,7 @@ import java.util.Objects;
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String UUID;
+  private final String UUID;
   private String username;
   private String password;
   private String email;
@@ -24,73 +23,31 @@ public class User implements Serializable {
 
   private Instant createdAt;
   private Instant updatedAt;
+
   private BinaryContent profileImage;
   private UserStatus status;
 
-  private User(UserBuilder builder) {
+  public User(String username, String password, String email, String nickname, String phoneNumber, String description) {
     this.UUID = UuidGenerator.generateUUID();
-    this.username = builder.username;
-    this.password = builder.password;
-    this.email = builder.email;
-    this.nickname = builder.nickname;
-    this.phoneNumber = builder.phoneNumber;
-    this.profileImage = builder.profilePicture;
-    this.description = builder.description;
-    this.status = builder.status;
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.nickname = nickname;
+    this.phoneNumber = phoneNumber;
+    this.description = description;
     this.createdAt = Instant.now();
     this.updatedAt = Instant.now();
+    this.profileImage = null;
+    this.status = null;
   }
-
-  public static class UserBuilder {
-    private final String username;
-    private final String password;
-    private final String email;
-    private UserStatus status;
-    private String nickname;
-    private String phoneNumber;
-    private BinaryContent profilePicture;
-    private String description;
-
-    public UserBuilder(String username, String password, String email, String phoneNumber) throws UserValidationException {
-      this.username = username;
-      this.password = password;
-      this.email = email;
-      this.phoneNumber = phoneNumber;
-    }
-
-    public UserBuilder nickname(String nickname) throws UserValidationException {
-      this.nickname = nickname;
-      return this;
-    }
-
-    public UserBuilder profilePicture(BinaryContent profilePicture) {
-      this.profilePicture = profilePicture;
-      return this;
-    }
-
-    public UserBuilder description(String description) {
-      this.description = description;
-      return this;
-    }
-
-    public UserBuilder userStatus(UserStatus status){
-      this.status = status;
-      return this;
-    }
-
-    public User build() {
-      return new User(this);
-    }
-  }
-
   @Override
   public String toString() {
     return
-        "USER: username='" + username + '\'' +
-        ", email='" + email + '\'' +
-        ", nickname='" + nickname + '\'' +
-        ", phoneNumber='" + phoneNumber + '\'' +
-        '}';
+        "USER: username='" + username + '\''
+            + ", email='" + email + '\''
+            + ", nickname='" + nickname + '\''
+            + ", phoneNumber='" + phoneNumber + '\''
+            + '}';
   }
 
   @Override

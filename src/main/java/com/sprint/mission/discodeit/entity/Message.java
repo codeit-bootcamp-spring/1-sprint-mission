@@ -17,75 +17,31 @@ import java.util.Objects;
 public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    Message message = (Message) o;
-    return Objects.equals(UUID, message.UUID);
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(UUID);
-  }
 
-  private String UUID;
-  private String userUUID;
-  private String channelUUID;
+  private final String UUID;
+  private final String userId;
+  private final String channelId;
   private String content;
   private Boolean isEdited;
   private final Instant createdAt;
   private Instant updatedAt;
-  private List<BinaryContent> binaryContents;
-  private String threadUUID;
+  private List<BinaryContent> binaryContents = new ArrayList<>();
 
-  private Message(MessageBuilder builder) {
-    this.UUID = builder.UUID;
-    this.userUUID = builder.userUUID;
-    this.channelUUID = builder.channelUUID;
-    this.content = builder.content;
-    this.binaryContents = builder.binaryContents;
-    this.threadUUID = builder.threadUUID;
-    this.isEdited = builder.isEdited;
-    this.createdAt = builder.createdAt;
-    this.updatedAt = builder.updatedAt;
-  }
-
-  public static class MessageBuilder {
-    private final String UUID;
-    private final String userUUID;
-    private final String channelUUID;
-    private final String content;
-    private Boolean isEdited = false;
-    private List<BinaryContent> binaryContents = new ArrayList<>();
-    private String threadUUID = "";
-    private final Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
-
-    public MessageBuilder(String userUUID, String channelUUID, String content) throws MessageValidationException {
-      if (userUUID == null || channelUUID == null || content == null) {
-        throw new MessageValidationException();
-      }
-      this.UUID = UuidGenerator.generateUUID();
-      this.userUUID = userUUID;
-      this.channelUUID = channelUUID;
-      this.content = content;
-    }
-
-    public MessageBuilder binaryContents(List<BinaryContent> binaryContents) {
-      this.binaryContents = binaryContents;
-      return this;
-    }
-
-    public MessageBuilder threadUUID(String threadUUID) {
-      this.threadUUID = threadUUID == null ? "" : threadUUID;
-      return this;
-    }
-
-    public Message build() {
-      return new Message(this);
-    }
+  public Message(
+      String userId,
+      String channelId,
+      String content,
+      List<BinaryContent> binaryContents
+      ) {
+    this.UUID = UuidGenerator.generateUUID();
+    this.userId = userId;
+    this.channelId = channelId;
+    this.content = content;
+    this.binaryContents = binaryContents;
+    this.isEdited = false;
+    this.createdAt = Instant.now();
+    this.updatedAt = Instant.now();
   }
 
   public void setContent(String content) {
@@ -112,9 +68,22 @@ public class Message implements Serializable {
   public String toString() {
     return "Message{" +
         "UUID='" + UUID + '\'' +
-        ", userUUID='" + userUUID + '\'' +
-        ", channelUUID='" + channelUUID + '\'' +
+        ", userUUID='" + userId + '\'' +
+        ", channelUUID='" + channelId + '\'' +
         ", content='" + content + '\'' +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Message message = (Message) o;
+    return Objects.equals(UUID, message.UUID);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(UUID);
   }
 }

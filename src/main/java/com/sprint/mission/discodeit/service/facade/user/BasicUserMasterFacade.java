@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.facade;
+package com.sprint.mission.discodeit.service.facade.user;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
@@ -7,14 +7,13 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -26,37 +25,40 @@ import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class BasicUserFacade implements UserFacade {
+public class BasicUserMasterFacade implements UserMasterFacade {
   private final UserMapper userMapper;
   private final BinaryContentMapper binaryContentMapper;
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final UserStatusService userStatusService;
 
+  private final UserCreationFacade userCreationFacade;
   @Override
   public UserResponseDto createUser(CreateUserRequest request) {
-    User user = userMapper.from(request);
-    user = userService.saveUser(user);
-
-    UserStatus userStatus = userStatusService.create(new UserStatus(user.getUUID(), Instant.now()));
-
-    BinaryContent profileImage = null;
-    if (request.profileImage() != null && !request.profileImage().isEmpty()) {
-      try {
-        profileImage = binaryContentMapper.toProfilePicture(request.profileImage(), user.getUUID());
-        user.setProfileImage(profileImage);
-      } catch (IOException e) {
-        throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
-      }
-    }
-
-    user.setStatus(userStatus);
-
-    user = userService.update(user);
-
-    return userMapper.from(user, userStatus, profileImage);
+//
+//    User user = userService.saveUser(userMapper.from(request));
+//
+//    UserStatus userStatus = userStatusService.create(new UserStatus(user.getUUID(), Instant.now()));
+//
+//
+//    BinaryContent profileImage = null;
+//    if (request.profileImage() != null && !request.profileImage().isEmpty()) {
+//
+//      profileImage = binaryContentMapper.toProfilePicture(request.profileImage(), user.getUUID());
+//      user.setProfileImage(profileImage);
+//      binaryContentService.create(profileImage);
+//
+//    }
+//
+//    user.setStatus(userStatus);
+//
+//    user = userService.update(user);
+//
+//    return userMapper.from(user, userStatus, profileImage);
+    return userCreationFacade.createUser(request);
   }
 
   @Override
@@ -68,36 +70,44 @@ public class BasicUserFacade implements UserFacade {
     return userMapper.from(user, status, content);
   }
 
+  // TODO : 사진 업데이트 안됨
   @Override
-  public UserResponseDto updateUser(String userId, UserUpdateDto updateDto, String plainPassword) {
-
-    User user = userService.updateUser(userId, updateDto, plainPassword);
+  public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
+    log.info("[User Update] 요청 수신 : userId={}, updateFields={}", userId, updateDto);
+    User user = userService.updateUser(userId, updateDto, updateDto.inputPassword());
+    log.info("[User Update] 사용자 정보 업데이트 완료: userId={}", userId);
 
     BinaryContent profileImage = null;
     if (updateDto.profileImage() != null && !updateDto.profileImage().isEmpty()) {
+      log.info("[User Update] 프로필 이미지 변경 요청 확인: userId={}", userId);
       if (user.getProfileImage() != null) {
+        log.info("[User Update] 기존 프로필 이미지 삭제: imageId={}", user.getProfileImage().getFileName());
         binaryContentService.delete(user.getProfileImage().getUUID());
       }
 
-      try {
-        profileImage = binaryContentMapper.toProfilePicture(updateDto.profileImage(), user.getUUID());
-        user.setProfileImage(profileImage);
-      } catch (IOException e) {
-        throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
-      }
+
+      profileImage = binaryContentMapper.toProfilePicture(updateDto.profileImage(), user.getUUID());
+      user.setProfileImage(profileImage);
+      binaryContentService.create(profileImage);
+      log.info("[User Update] 새로운 프로필 이미지 저장 완료: userId={}, imageId={}, imageName={}", userId, profileImage.getUUID(), profileImage.getFileName());
+
+
     }
 
     User updatedUser = userService.update(user);
-
-    return UserResponseDto.from(updatedUser, updatedUser.getStatus(), updatedUser.getProfileImage());
+    log.info("[User Update] 사용자 최종 업데이트 완료: userId={}", userId);
+    return userMapper.from(updatedUser, updatedUser.getStatus(), updatedUser.getProfileImage());
   }
 
   @Override
   public List<UserResponseDto> findAllUsers() {
+
     List<User> users = userService.findAllUsers();
     Set<String> userIdSet = mapToUserUuids(users);
     Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSet);
+
     Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSet);
+
 
     return createMultipleUserResponses(users, userStatusMap, binaryContentMap);
   }
@@ -128,7 +138,7 @@ public class BasicUserFacade implements UserFacade {
         .map(user -> {
           UserStatus userStatus = getOrCreateUserStatus(userStatusMap, user.getUUID());
           BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
-          return UserResponseDto.from(user, userStatus, profilePicture);
+          return userMapper.from(user, userStatus, profilePicture);
         }).toList();
   }
 

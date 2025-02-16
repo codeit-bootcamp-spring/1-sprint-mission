@@ -178,7 +178,7 @@ public class BasicUserService implements UserService {
     if (updatedUser.description() != null) {
       originalUser.setDescription(updatedUser.description());
     }
-    if (updatedUser.password() != null) {
+    if (updatedUser.password() != null && !updatedUser.password().isBlank()) {
       originalUser.setPassword(PasswordEncryptor.hashPassword(updatedUser.password()));
     }
   }

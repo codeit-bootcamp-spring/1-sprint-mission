@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -27,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
   private final UserStatusService userStatusService;
-  private final BinaryContentRepository binaryContentRepository;
+  private final UserMapper userMapper;
 
   @Override
   public UserResponseDto login(String username, String password) {
@@ -46,6 +47,6 @@ public class AuthServiceImpl implements AuthService {
 
     BinaryContent content = targetUser.getProfileImage();
 
-    return UserResponseDto.from(targetUser, userStatus, content);
+    return userMapper.from(targetUser, userStatus, content);
   }
 }

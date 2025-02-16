@@ -59,7 +59,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message getLatestMessageByChannel(String channelId) {
-    return messageRepository.findLatestChannelMessage(channelId).orElse(null);
+    return messageRepository.findLatestChannelMessage(channelId);
   }
 
   @Override
@@ -68,9 +68,7 @@ public class BasicMessageService implements MessageService {
     return channelIds.stream()
         .collect(Collectors.toMap(
             id -> id,
-            id -> messageRepository.findLatestChannelMessage(id)
-                .map(Message::getCreatedAt)
-                .orElse(Instant.EPOCH)
+            id -> messageRepository.findLatestChannelMessage(id).getCreatedAt()
         ));
   }
 

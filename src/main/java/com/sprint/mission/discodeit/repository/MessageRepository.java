@@ -10,7 +10,7 @@ public interface MessageRepository extends BaseRepository<Message,String> {
 
   List<Message> findByChannel(String channelId);
   List<Message> findAll();
-  Optional<Message> findLatestChannelMessage(String channelId);
+  Message findLatestChannelMessage(String channelId);
   Message update(Message message);
   void delete(String id);
   void deleteByChannel(String channelId);

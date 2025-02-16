@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.exception.RequiredFieldEmptyException;
 import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
+import jakarta.annotation.Nullable;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -14,8 +15,10 @@ import java.util.Objects;
 public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
   private final String UUID;
+  @Nullable
   private String channelId;
   private final String userId;
+  @Nullable
   private final String messageId;
   private final String fileName;
   private final String fileType;
@@ -23,55 +26,24 @@ public class BinaryContent implements Serializable {
   private final byte[] data;
   private final boolean isProfilePicture;
   private final Instant createdAt;
-
-  private BinaryContent(BinaryContentBuilder builder){
+  public BinaryContent(String userId,
+                        String messageId,
+                        String channelId,
+                        String fileName,
+                        String fileType,
+                        long fileSize,
+                        byte[] data,
+                        boolean isProfilePicture){
     this.UUID = UuidGenerator.generateUUID();
-    this.userId = builder.userId;
-    this.messageId = builder.messageId;
-    this.channelId = builder.channelId;
-    this.fileName = builder.fileName;
-    this.fileType = builder.fileType;
-    this.fileSize = builder.fileSize;
-    this.data = builder.data;
-    this.isProfilePicture = builder.isProfilePicture;
+    this.userId = userId;
+    this.messageId = messageId;
+    this.channelId = channelId;
+    this.fileName = fileName;
+    this.fileType = fileType;
+    this.fileSize = fileSize;
+    this.data = data;
+    this.isProfilePicture = isProfilePicture;
     this.createdAt = Instant.now();
-  }
-  public static class BinaryContentBuilder {
-    private final String userId;
-    private String messageId;
-    private String channelId;
-    private final String fileName;
-    private final String fileType;
-    private final long fileSize;
-    private final byte[] data;
-    private boolean isProfilePicture;
-
-    public BinaryContentBuilder(String userId, String fileName, String fileType, long fileSize, byte[] data) {
-      this.isProfilePicture = false;
-      this.userId = userId;
-      this.fileName = fileName;
-      this.fileType = fileType;
-      this.fileSize = fileSize;
-      this.data = data;
-    }
-
-    public BinaryContentBuilder messageId(String messageId) {
-      this.messageId = messageId;
-      return this;
-    }
-
-    public BinaryContentBuilder channelId(String channelId){
-      this.channelId = channelId;
-      return this;
-    }
-
-    public BinaryContentBuilder isProfilePicture(){
-      this.isProfilePicture = true;
-      return this;
-    }
-    public BinaryContent build() {
-      return new BinaryContent(this);
-    }
   }
 
   @Override

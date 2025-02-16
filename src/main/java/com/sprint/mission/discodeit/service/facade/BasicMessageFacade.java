@@ -11,10 +11,12 @@ import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,7 @@ public class BasicMessageFacade implements MessageFacade {
 
   private final MessageService messageService;
   private final MessageMapper messageMapper;
+  private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
   private final ChannelService channelService;
   private final EntityValidator validator;
@@ -38,30 +41,33 @@ public class BasicMessageFacade implements MessageFacade {
   public MessageResponseDto createMessage(CreateMessageDto messageDto) {
 
     User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
-
     Channel channel = validator.findOrThrow(Channel.class, messageDto.getChannelId(), new ChannelNotFoundException());
 
     channelService.validateUserAccess(channel, user.getUUID());
 
-    Message message = messageService.createMessage(messageMapper.toEntity(messageDto));
+    Message message = messageMapper.toEntity(messageDto);
 
-    List<BinaryContent> binaryContents = binaryContentService.saveBinaryContentsForMessage(message);
+    List<BinaryContent> binaryContents = binaryContentMapper.fromMessageDto(messageDto, message.getUUID());
+    message.setBinaryContents(binaryContents);
 
-    // TODO : base64Encoding 중복임
-    return MessageResponseDto.from(message);
+    message = messageService.createMessage(message);
+    binaryContents = binaryContentService.saveBinaryContentsForMessage(message);
+
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
   public MessageResponseDto findMessageById(String id) {
     Message message = messageService.getMessageById(id);
-    return MessageResponseDto.from(message);
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
   public List<MessageResponseDto> findMessagesByChannel(String channelId) {
     List<Message> channelMessages = messageService.getMessagesByChannel(channelId);
     return channelMessages.stream()
-        .map(MessageResponseDto::from).toList();
+        .map(messageMapper::toResponseDto)
+        .toList();
   }
 
   @Override
@@ -70,7 +76,7 @@ public class BasicMessageFacade implements MessageFacade {
     User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
     Message message = validator.findOrThrow(Message.class, messageDto.getMessageId(), new MessageNotFoundException());
 
-    if (!message.getUserUUID().equals(user.getUUID())) {
+    if (!message.getUserId().equals(user.getUUID())) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
 
@@ -82,7 +88,7 @@ public class BasicMessageFacade implements MessageFacade {
 
     messageService.updateMessage(message, messageDto.getContent());
 
-    return MessageResponseDto.from(message);
+    return messageMapper.toResponseDto(message);
   }
 
   @Override

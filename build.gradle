@@ -28,7 +28,8 @@ dependencies {
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     // Logging
     implementation 'org.slf4j:slf4j-api:2.0.9'
     //implementation 'ch.qos.logback:logback-classic:1.4.11'
@@ -36,6 +37,9 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

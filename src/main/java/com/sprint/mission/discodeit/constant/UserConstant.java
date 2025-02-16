@@ -6,6 +6,8 @@ public class UserConstant {
   public static final int USERNAME_MAX_LENGTH = 100;
   public static final int PASSWORD_MIN_LENGTH = 5;
   public static final int PASSWORD_MAX_LENGTH = 100;
+  public static final int NICKNAME_MIN_LENGTH = 2;
+  public static final int NICKNAME_MAX_LENGTH = 100;
   public static final String PHONE_REGEX = "^(01[016789]-?\\d{3,4}-?\\d{4})$|^(\\d{2,3}-?\\d{3,4}-?\\d{4})$";
   public static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
   public static final String DEFAULT_PROFILE_PICTURE_URL = "https://default-profile-pic.com";

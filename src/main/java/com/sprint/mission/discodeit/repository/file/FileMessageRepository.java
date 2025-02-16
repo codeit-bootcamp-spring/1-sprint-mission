@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   @Override
   public List<Message> findByChannel(String channelId) {
     List<Message> messages = loadAll(Message.class);
-    return messages.stream().filter(m -> m.getChannelUUID().equals(channelId)).toList();
+    return messages.stream().filter(m -> m.getChannelId().equals(channelId)).toList();
   }
 
   @Override
@@ -47,10 +48,10 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   }
 
   @Override
-  public Optional<Message> findLatestChannelMessage(String channelId) {
+  public Message findLatestChannelMessage(String channelId) {
     List<Message> messages = loadAll(Message.class);
-    return messages.stream().filter(m -> m.getChannelUUID().equals(channelId))
-        .max(Comparator.comparing(Message::getCreatedAt));
+    return messages.stream().filter(m -> m.getChannelId().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt)).orElse(null);
   }
 
   @Override
@@ -82,7 +83,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   public void deleteByChannel(String channelId) {
     List<Message> messages = loadAll(Message.class);
 
-    messages.removeIf(message -> message.getChannelUUID().equals(channelId));
+    messages.removeIf(message -> message.getChannelId().equals(channelId));
 
     saveAll(messages);
   }
