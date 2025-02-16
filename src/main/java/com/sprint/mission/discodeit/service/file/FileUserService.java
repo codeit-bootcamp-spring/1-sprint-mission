@@ -1,15 +1,24 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.form.CheckUserDto;
+import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRespository;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 
 public class FileUserService implements UserService {
 
-    private final UserRepository fileUserRespository=new FileUserRespository();
+    private final UserRepository fileUserRespository;
+
+    public FileUserService(UserRepository fileUserRespository) {
+        this.fileUserRespository = fileUserRespository;
+    }
 
     @Override
     public void createUser(User user) {
@@ -17,8 +26,13 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public Optional<User> findUser(UUID id) {
-        return fileUserRespository.findById(id);
+    public Optional<CheckUserDto> findUser(UUID id) {
+        return fileUserRespository.findById(id).map(CheckUserDto::new);
+    }
+
+    @Override
+    public Optional<CheckUserDto> findByloginId(String loginId) {
+        return fileUserRespository.findByloginId(loginId).map(CheckUserDto::new);
     }
 
     @Override
@@ -27,28 +41,18 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public void updateUserName(UUID id, String userName) {
-        if(fileUserRespository.findById(id).isPresent()) {
-            fileUserRespository.updateUserName(id,userName);
-        }else {
-            throw new RuntimeException("해당 User가 존재하지 않습니다.");
-        }
-    }
-
-    @Override
-    public void updateUserEmail(UUID id, String userEmail) {
-        if(fileUserRespository.findById(id).isPresent()) {
-            fileUserRespository.updateUserEmail(id,userEmail);
-        }else {
-            throw new RuntimeException("해당 User가 존재하지 않습니다.");
-        }
+    public void updateUser(UUID id, UserUpdateDto userParam) {
+        validateFileUserExits(id);
+        fileUserRespository.updateUser(id,userParam);
     }
 
     @Override
     public void deleteUser(UUID id) {
-        if(fileUserRespository.findById(id).isPresent()) {
-            fileUserRespository.deleteUser(id);
-        }else{
+        validateFileUserExits(id);
+        fileUserRespository.deleteUser(id);
+    }
+    private void validateFileUserExits(UUID uuid) {
+        if (!fileUserRespository.findById(uuid).isPresent()) {
             throw new RuntimeException("해당 User가 존재하지 않습니다.");
         }
     }

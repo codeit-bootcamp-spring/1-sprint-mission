@@ -1,31 +1,46 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+
 
 public class FileUserRespository implements UserRepository{
     private static final String FILE_PATH = "temp/users-obj.dat";
     private final Map<UUID,User> data=new HashMap<>();
     @Override
-    public void createUser(UUID id, User user) {
+    public User createUser(UUID id, User user) {
         data.put(id,user);
         save();
+        return user;
     }
 
     @Override
-    public void updateUserName(UUID id, String name) {
-        data.get(id).updateUserName(name);
+    public void updateUser(UUID id, UserUpdateDto userParam) {
+        Map<UUID, User> lists = load();
+        User findUser = lists.get(id);
+        findUser.setUserName(userParam.getUserName());
+        findUser.setUserEmail(userParam.getUserEmail());
+        findUser.setLoginId(userParam.getLoginId());
+        findUser.setPassword(userParam.getPassword());
+        findUser.setAttachProfile(userParam.getAttachProfile());
         save();
     }
 
-    @Override
-    public void updateUserEmail(UUID id, String email) {
-        data.get(id).updateUserEmail(email);
-        save();
-    }
 
     @Override
     public void deleteUser(UUID id) {
@@ -37,6 +52,17 @@ public class FileUserRespository implements UserRepository{
     public Optional<User> findById(UUID id) {
         Map<UUID, User> loadUsers = load();
         return Optional.ofNullable(loadUsers.get(id));
+    }
+
+    @Override
+    public Optional<User> findByloginId(String loginId) {
+        List<User> all=findAll();
+        for (User user : all) {
+            if(user.getLoginId().equals(loginId)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -66,3 +92,4 @@ public class FileUserRespository implements UserRepository{
         }
     }
 }
+

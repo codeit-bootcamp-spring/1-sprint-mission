@@ -1,41 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
+@Data
 public class User extends BaseEntity implements Serializable {
-   private String userName;
-   private String userEmail;
 
-    public User(String userName, String userEmail) {
+    @NotEmpty
+    private String userName;
+    @NotEmpty
+    private String userEmail;
+    @NotEmpty
+    private transient String password;
+    @NotEmpty
+    private String loginId;
+
+    private BinaryContent attachProfile;
+    private UserStatus userStatus;
+    private ReadStatus readStatus;
+
+    public User(String loginId, String password, String userName, String userEmail) {
         super();
+        this.loginId = loginId;
+        this.password = password;
         this.userName = userName;
         this.userEmail = userEmail;
     }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void updateUserName(String userName) {
+    public User(String loginId, String password, String userName, String userEmail,BinaryContent attachProfile) {
+        super();
+        this.loginId = loginId;
+        this.password = password;
         this.userName = userName;
-        setUpdatedAt();
-    }
-
-    public void updateUserEmail(String userEmail) {
         this.userEmail = userEmail;
-        setUpdatedAt();
-    }
-
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "userName='" + userName + '\'' +
-                ", userEmail='" + userEmail + '\'' +
-                '}';
+        this.attachProfile = attachProfile;
     }
 }

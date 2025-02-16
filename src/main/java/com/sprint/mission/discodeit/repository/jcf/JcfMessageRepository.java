@@ -3,7 +3,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 
 public class JcfMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data=new HashMap<>();
@@ -31,6 +37,5 @@ public class JcfMessageRepository implements MessageRepository {
     public List<Message> findAll() {
         return new ArrayList<>(data.values());
     }
-
 
 }

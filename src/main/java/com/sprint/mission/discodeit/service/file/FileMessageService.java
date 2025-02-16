@@ -5,10 +5,17 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 
 public class FileMessageService implements MessageService {
-    private final MessageRepository messageRepository=new FileMessageRepository();
+    private final MessageRepository messageRepository;
+
+    public FileMessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
     @Override
     public void messageSave(Message message) {
@@ -27,18 +34,17 @@ public class FileMessageService implements MessageService {
 
     @Override
     public void updateMessage(UUID id, String updateMessage) {
-        if(messageRepository.findById(id).isPresent()) {
-          messageRepository.updateMessage(id,updateMessage);
-        }else {
-            throw new RuntimeException("해당 User가 존재하지 않습니다.");
-        }
+        validateFileMessageExits(id);
+        messageRepository.updateMessage(id,updateMessage);
     }
 
     @Override
     public void deleteMessage(UUID id) {
-        if (messageRepository.findById(id).isPresent()) {
-            messageRepository.deleteMessage(id);
-        }else {
+        validateFileMessageExits(id);
+        messageRepository.deleteMessage(id);
+    }
+    private void validateFileMessageExits(UUID uuid) {
+        if (!messageRepository.findById(uuid).isPresent()) {
             throw new RuntimeException("해당 User가 존재하지 않습니다.");
         }
     }

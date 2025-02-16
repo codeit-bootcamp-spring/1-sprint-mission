@@ -1,27 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
+@Repository
+@Slf4j
 public class JcfUserRepository implements UserRepository {
 
-    private final Map<UUID, User> data = new HashMap<>();
+    private static final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public void createUser(UUID id, User user) {
+    public User createUser(UUID id, User user) {
+        log.info("save: user={}", user);
         data.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public void updateUserName(UUID id, String name) {
-        data.get(id).updateUserName(name);
-    }
-
-    @Override
-    public void updateUserEmail(UUID id, String email) {
-        data.get(id).updateUserEmail(email);
+    public void updateUser(UUID id, UserUpdateDto userParam) {
+        User findUser = data.get(id);
+        findUser.setUserName(userParam.getUserName());
+        findUser.setUserEmail(userParam.getUserEmail());
+        findUser.setLoginId(userParam.getLoginId());
+        findUser.setPassword(userParam.getPassword());
+        findUser.setAttachProfile(userParam.getAttachProfile());
+        findUser.setUpdatedAt();
     }
 
     @Override
@@ -32,6 +45,17 @@ public class JcfUserRepository implements UserRepository {
     @Override
     public Optional<User> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public Optional<User> findByloginId(String loginId) {
+        List<User> all=findAll();
+        for (User user : all) {
+            if(user.getLoginId().equals(loginId)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

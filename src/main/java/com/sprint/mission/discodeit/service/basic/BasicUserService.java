@@ -1,15 +1,14 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.form.CheckUserDto;
 import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JcfUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -18,20 +17,24 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class JcfUserService implements UserService {
+public class BasicUserService implements UserService {
     private final UserRepository userRepository;
 
     @Override
     public void createUser(User user) {
-        if (user.getUserName().trim().isEmpty()) {
-            log.info("이름을 입력해주세요.");
-            return;
-        }
-        if (user.getUserEmail().trim().isEmpty()) {
-            log.info("이메일을 입력해주세요.");
-            return;
+        List<User> all = userRepository.findAll();
+        for (User findUser : all) {
+            if (user.getUserName().equals(findUser.getUserName())) {
+                log.info("중복된 이름입니다.");
+                return;
+            }
+            if (user.getUserEmail().equals(findUser.getUserEmail())) {
+                log.info("중복된 이메일입니다.");
+                return;
+            }
         }
         userRepository.createUser(user.getId(), user);
+        UserStatus userStatus = new UserStatus(user.getId());
     }
 
     @Override
@@ -65,5 +68,4 @@ public class JcfUserService implements UserService {
             throw new RuntimeException("해당 User가 존재하지 않습니다.");
         }
     }
-
 }

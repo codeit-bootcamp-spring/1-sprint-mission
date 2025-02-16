@@ -1,24 +1,24 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.form.PrivateChannelDto;
 import com.sprint.mission.discodeit.entity.form.PublicChannelDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
+@Service
 @Slf4j
 @RequiredArgsConstructor
-public class JcfChannelService implements ChannelService {
+public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
 
@@ -85,4 +85,3 @@ public class JcfChannelService implements ChannelService {
         }
     }
 }
-
