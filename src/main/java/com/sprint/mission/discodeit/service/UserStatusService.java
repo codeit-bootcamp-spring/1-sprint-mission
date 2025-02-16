@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface UserStatusService {
     UserStatus create(UUID userId);
-    UserStatus find(UUID id);
+    UserStatus findById(UUID id);
     UserStatus findByUserId(UUID userId);
     UserStatus updateByUserId(UUID userId);
     List<UserStatus> findAll();
-    void delete(UUID id);
+    void deleteById(UUID id);
     void deleteByUserId(UUID userId);
 }

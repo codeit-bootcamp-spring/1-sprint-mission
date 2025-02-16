@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.USER, userId
         );
-        log.info("Create User Profile : {}", newFile.getId());
+        log.info("Create User Profile : {}", newFile);
         return binaryContentRepository.save(newFile);
     }
 
@@ -47,7 +47,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent find(UUID id) {
+    public BinaryContent findById(UUID id) {
         return binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("File does not exists"));
     }
@@ -58,7 +58,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         binaryContentRepository.deleteById(id);
     }
 

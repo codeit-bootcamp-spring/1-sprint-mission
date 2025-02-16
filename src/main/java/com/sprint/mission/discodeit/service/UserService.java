@@ -9,11 +9,9 @@ import java.util.UUID;
 
 public interface UserService {
     UserResponse createUser(UserRequest request);
-    List<UserResponse> getAllUserList();
-    UserResponse searchById(UUID id);
-
+    List<UserResponse> findAll();
+    UserResponse findById(UUID id);
     User findByIdOrThrow(UUID id);
-
-    void updateUser(UUID id, UserRequest request);
-    void deleteUser(UUID id);
+    void update(UUID id, UserRequest request);
+    void deleteById(UUID id);
 }

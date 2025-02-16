@@ -42,5 +42,17 @@ public class BinaryContent implements Serializable {
         this.messageId = messageId;
     }
 
+    @Override
+    public String toString() {
+        return "BinaryContent{id:" + id
+                + ",userId:" + userId
+                + ",createdAt:" + createdAt
+                + ",fileName:" + fileName
+                + ",contentType:" + contentType
+                + ",parentType:" + parentType
+                + ",userId:" + userId
+                + ",messageId:" + messageId
+                + "}";
+    }
 
 }

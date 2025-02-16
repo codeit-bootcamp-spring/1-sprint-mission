@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -34,12 +32,12 @@ public class BasicReadStatusService implements ReadStatusService {
         }
         ReadStatus newReadStatus = ReadStatus.createReadStatus(userId, channelId);
         readStatusRepository.save(newReadStatus);
-        log.info("Create Read Status : {}", newReadStatus.getId());
+        log.info("Create Read Status : {}", newReadStatus);
         return newReadStatus;
     }
 
     @Override
-    public ReadStatus find(UUID id) {
+    public ReadStatus findById(UUID id) {
         return readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Read Status does not exist"));
     }
@@ -56,13 +54,13 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus update(UUID id) {
-        ReadStatus readStatus = find(id);
+        ReadStatus readStatus = findById(id);
         readStatus.updateUpdateAt();
         return readStatusRepository.save(readStatus);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         readStatusRepository.deleteById(id);
     }
 

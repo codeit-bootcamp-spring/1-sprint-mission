@@ -65,7 +65,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponse searchById(UUID id) {
+    public ChannelResponse findById(UUID id) {
         Channel channel = findByIdOrThrow(id);
         return ChannelResponse.entityToDto(channel, getLastMessageTime(id), findJoinUsersById(id));
         // ChannelResponse.entityToDto(channel) 로 한다면
@@ -73,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponse updateChannel(UUID id, ChannelRequest.Update request) {
+    public ChannelResponse update(UUID id, ChannelRequest.Update request) {
         Channel channel = findByIdOrThrow(id);
 
         if (channel.getChannelType() == Channel.ChannelType.PRIVATE) {
@@ -88,7 +88,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(UUID id) {
+    public void deleteById(UUID id) {
 //        messageService.deleteAllByChannelId(id); // 굳이 서비스 단에서 불러와야할까?
         messageRepository.findAllByChannelId(id);
         readStatusService.deleteAllByChannelId(id);

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +12,7 @@ public class FileManager<T> {
     private final Path FILE_PATH;
 
     public FileManager(String filePathInRoot) {
-        FILE_PATH = Paths.get(System.getProperty("user.dir"), filePathInRoot);
+        FILE_PATH = Paths.get(System.getProperty("user.dir"), "tmp" , filePathInRoot);
     }
 
     public void saveListToFile(List<T> saveList) {

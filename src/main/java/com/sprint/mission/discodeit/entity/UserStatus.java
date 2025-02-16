@@ -45,4 +45,14 @@ public class UserStatus implements Serializable {
             this.status = Status.OFFLINE;
         }
     }
+
+    @Override
+    public String toString() {
+        return "UserStatus{id:" + id
+                + ",userId:" + userId
+                + ",status:" + status
+                + ",createdAt:" + createdAt
+                + ",updateAt:" + updatedAt
+                + "}";
+    }
 }

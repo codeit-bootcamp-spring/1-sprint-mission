@@ -19,7 +19,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
-//    private final UserService userService;
+//    private final UserService userService;  순환 참조 발생
 
     @Override
     public UserStatus create(UUID userId) {
@@ -27,13 +27,13 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatusRepository.existsByUserId(userId)) {
             throw new DuplicateRequestException("UserStatus already exists");
         }
-        UserStatus userStatus = UserStatus.createUserStatus(userId);
-        log.info("Create UserStatus: {}" , userStatus.getId());
-        return userStatusRepository.save(userStatus);
+        UserStatus newUserStatus = UserStatus.createUserStatus(userId);
+        log.info("Create UserStatus: {}" , newUserStatus);
+        return userStatusRepository.save(newUserStatus);
     }
 
     @Override
-    public UserStatus find(UUID id) {
+    public UserStatus findById(UUID id) {
         return userStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User Status does not exist"));
     }
@@ -57,7 +57,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         userStatusRepository.deleteById(id);
     }
 

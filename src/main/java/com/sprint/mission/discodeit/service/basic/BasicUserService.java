@@ -51,20 +51,20 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResponse> getAllUserList() {
+    public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
                 .map(user -> UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId())))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserResponse searchById(UUID id) {
+    public UserResponse findById(UUID id) {
         User user = findByIdOrThrow(id);
         return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
     }
 
     @Override
-    public void updateUser(UUID id,UserRequest request) {
+    public void update(UUID id, UserRequest request) {
         User user = findByIdOrThrow(id);
         String newName = null;
         String newEmail = null;
@@ -90,7 +90,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void deleteUser(UUID id) {
+    public void deleteById(UUID id) {
         findByIdOrThrow(id);
         binaryContentService.deleteByUserId(id);
         userStatusService.deleteByUserId(id);
