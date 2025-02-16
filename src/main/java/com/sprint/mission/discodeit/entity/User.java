@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
-import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -21,7 +19,7 @@ public class User implements Serializable, Entity {
     private String password;
     private UUID userStatusId;
 
-    public User(String userName, String email, String password, UUID userStatusId) {
+    public User(String userName, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.userName = userName;

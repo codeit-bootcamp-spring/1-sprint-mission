@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -38,7 +39,7 @@ public class DiscodeitApplication {
         try{fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
             fileIOHandler.serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
             fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
-
+            fileIOHandler.serializeHashMap(new HashMap<UUID, UserStatus>(), "Message\\mainOIUserStatusRepository");
         }catch (Exception e){
             e.printStackTrace();
             e.getMessage();

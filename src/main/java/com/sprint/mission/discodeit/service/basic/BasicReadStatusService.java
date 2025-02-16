@@ -29,7 +29,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     //리드스테이터스 객체 생성하여 레포지토리에 저장
     @Override
-    public UUID createReadStatus(UUID userId, UUID channelId) {
+    public ReadStatus createReadStatus(UUID userId, UUID channelId) {
         if (userId == null || channelId == null) {
             System.out.println("readStatus 생성 실패. 입력값을 확인해주세요.");
             return null;
@@ -40,7 +40,7 @@ public class BasicReadStatusService implements ReadStatusService {
             }
             ReadStatus newReadStatus = new ReadStatus(userId);
             readStatusRepository.saveReadStatus(channelId, userId, newReadStatus);
-            return newReadStatus.getUserId();
+            return newReadStatus;
         }catch (Exception e){
             e.printStackTrace();
             System.out.println(e.getMessage());

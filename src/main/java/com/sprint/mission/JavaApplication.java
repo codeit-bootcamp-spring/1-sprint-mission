@@ -7,14 +7,8 @@ import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.repository.file.*;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.*;
 
 import java.util.UUID;
 
@@ -47,9 +41,10 @@ public class JavaApplication {
         MessageRepository messageRepository = new FileMessageRepository();
         ReadStatusRepository readStatusRepository = new FileReadStatusRepository();
         BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
+        UserStatusService userStatusService = new BasicUserStatusService();
         FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
-        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository);
+        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository, userStatusService);
         MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, fileIOHandler);
         ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, userService, messageRepository);
         ReadStatusService readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, messageRepository, channelService, channelRepository);

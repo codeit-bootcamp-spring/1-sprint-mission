@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.file.FileIOHandler;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final FileIOHandler fileIOHandler;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusService userStatusService;
 
     //todo find, findAll 메서드가 이런 용도인게 맞나?..
     //유저 리턴
@@ -95,11 +97,11 @@ public class BasicUserService implements UserService {
             e.printStackTrace();
         }
         try {
-            UserStatus newUserStatus = new UserStatus();
-            User newUser = new User(userName, email, password, newUserStatus.getId());
+            User newUser = new User(userName, email, password);
+            UserStatus newUserStatus = new UserStatus(newUser.getId());
             userRepository.saveUser(newUser);
             //todo 유저스테이터스 레포지토리 구현 후 스테이터스 저장하기
-            //userStatusRepository.saveUserStatus(newUserstatus);
+            userStatusService.createUserStatus(newUser.getId());
             System.out.println(userName + " 유저 생성 성공!");
             return UserDto.from(newUser).id();
         } catch (Exception e){
@@ -119,8 +121,9 @@ public class BasicUserService implements UserService {
             return null;
         }
         try {
-            UserStatus newUserStatus = new UserStatus();
-            User newUser = new User(userName, email, password, newUserStatus.getId());
+
+            User newUser = new User(userName, email, password);
+            UserStatus newUserStatus = new UserStatus(newUser.getId());
             //OI핸들러에 경로넘겨주고 그 경로에 있던 이미지 받아오기
             BufferedImage profilePicture = fileIOHandler.loadImage(profilePicturePath);
             //받아온 이미지를 바이너리객체로 만들기

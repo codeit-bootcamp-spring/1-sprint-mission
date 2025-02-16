@@ -30,9 +30,10 @@ public class FileIOHandler {
     }
 
     //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
-    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName) throws IOException {
+    public boolean serializeHashMap(HashMap<UUID, ? extends Entity> entityMap, String fileName){
         if (entityMap == null || fileName == null) {
-            throw new NullPointerException("IO 핸들러에 전달된 엔티티맵 혹은 파일이름이 null인 상태입니다.");
+            System.out.println("IO 핸들러에 전달된 엔티티맵 혹은 파일이름이 null인 상태입니다.");
+            return false;
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileOutputStream fos = new FileOutputStream(filePath);
@@ -41,21 +42,27 @@ public class FileIOHandler {
             oos.writeObject(entityMap);
             return true;
         } catch (IOException e) {
-            throw new IOException("엔티티맵 직렬화에 실패했습니다. 실패한 파일 경로", e);
+            e.printStackTrace();
+            System.out.println("엔티티맵 직렬화 실패");
+            return false;
         }
     }
 
+    //IO예외 캐치해서 여기서 죽임.
     //역직렬화 성공여부에 따라 해쉬맵 or null 반환
-    public HashMap<UUID, ? extends Entity> deserializeHashMap(String fileName) throws IOException {
+    public HashMap<UUID, ? extends Entity> deserializeHashMap(String fileName){
         if (fileName == null) {
-            throw new NullPointerException("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
+            System.out.println("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
+            return null;
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (HashMap<UUID, ? extends Entity>) ois.readObject();
         } catch (IOException | ClassNotFoundException e){
-            throw new IOException("엔티티맵 역직렬화 실패", e);
+            e.printStackTrace();
+            System.out.println("엔티티맵 역직렬화 실패");
+            return null;
         }
     }
 
@@ -74,18 +81,21 @@ public class FileIOHandler {
             throw new IOException("엔티티맵 직렬화에 실패했습니다. 실패한 파일 경로", e);
         }
     }
-
+    //IO예외 캐치해서 여기서 죽임.
     //역직렬화 성공여부에 따라 해쉬맵 or null 반환
-    public LinkedHashMap<UUID, ? extends Entity> deserializeLinkedHashMap(String fileName) throws IOException {
+    public LinkedHashMap<UUID, ? extends Entity> deserializeLinkedHashMap(String fileName){
         if (fileName == null) {
-            throw new NullPointerException("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
+            System.out.println("IO 핸들러에 전달된 파일이름이 null인 상태입니다.");
+            return null;
         }
         String filePath = System.getProperty("user.dir") + "\\serFiles\\" + fileName + ".ser";
         try (FileInputStream fis = new FileInputStream(filePath);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
             return (LinkedHashMap<UUID, ? extends Entity>) ois.readObject();
         } catch (IOException | ClassNotFoundException e){
-            throw new IOException("엔티티맵 역직렬화 실패", e);
+            e.printStackTrace();
+            System.out.println("링크드해쉬맵 역직렬화 실패");
+            return null;
         }
     }
 
@@ -111,7 +121,7 @@ public class FileIOHandler {
         }
     }
 
-    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
+    //IO예외 캐치해서 여기서 죽임.
     //이미지 불러오기.
     public BufferedImage loadImage(String imagePath){
         if (imagePath == null) {
@@ -128,7 +138,7 @@ public class FileIOHandler {
         }
     }
 
-    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
+    //IO예외 캐치해서 여기서 죽임.
     //바이너리컨텐츠 객체 직렬화
     public boolean serializeBinaryContent(BinaryContent binaryContent, String binaryContentPath){
         if (binaryContent == null || binaryContentPath == null) {
@@ -146,7 +156,7 @@ public class FileIOHandler {
         }
     }
 
-    //이 메서드만 우선 IO예외 캐치해서 여기서 죽임.
+    //IO예외 캐치해서 여기서 죽임.
     //역직렬화 성공여부에 따라 바이너리컨텐츠 or null 반환
     public BinaryContent deserializeBinaryContent(String binaryContentPath){
         if (binaryContentPath == null) {
