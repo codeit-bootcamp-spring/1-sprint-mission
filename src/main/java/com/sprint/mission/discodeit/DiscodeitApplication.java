@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.entity.channel.Channel;
+import com.sprint.mission.discodeit.entity.channel.ChannelType;
+import com.sprint.mission.discodeit.entity.message.Message;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -41,26 +44,26 @@ public class DiscodeitApplication {
 
 	private void testUserService() {
 		System.out.println("10명의 기본 사용자 등록\n");
-
+		UUID dummy = UUID.randomUUID();
 		List<User> testUsers = Arrays.asList(
-				new User("김철수", "kim@test.com", "1234"),
-				new User("이영희", "lee@test.com", "1234"),
-				new User("박지성", "park@test.com", "1234"),
-				new User("정민수", "jung@test.com", "1234"),
-				new User("강다혜", "kang@test.com", "1234"),
-				new User("조성민", "cho@test.com", "1234"),
-				new User("윤서연", "yoon@test.com", "1234"),
-				new User("장미란", "jang@test.com", "1234"),
-				new User("임준호", "lim@test.com", "1234"),
-				new User("한지민", "han@test.com", "1234")
+				new User("김철수", "kim@test.com", "1234", dummy),
+				new User("이영희", "lee@test.com", "1234", dummy),
+				new User("박지성", "park@test.com", "1234",dummy),
+				new User("정민수", "jung@test.com", "1234",dummy),
+				new User("강다혜", "kang@test.com", "1234",dummy),
+				new User("조성민", "cho@test.com", "1234",dummy),
+				new User("윤서연", "yoon@test.com", "1234",dummy),
+				new User("장미란", "jang@test.com", "1234",dummy),
+				new User("임준호", "lim@test.com", "1234",dummy),
+				new User("한지민", "han@test.com", "1234",dummy)
 		);
 
 		testUsers.forEach(user -> {
 			User createdUser = userService.register(user);
-			System.out.printf("사용자 등록 완료 - 이름: %s, 이메일: %s, 상태: %s%n",
+			System.out.printf("사용자 등록 완료 - 이름: %s, 이메일: %s",
 					createdUser.getName(),
-					createdUser.getEmail(),
-					createdUser.getStatus());
+					createdUser.getEmail()
+			);
 		});
 
 
@@ -72,8 +75,8 @@ public class DiscodeitApplication {
 		User gildongUser = userService.register(user);
 		System.out.printf("사용자 등록 완료 - 이름: %s, 이메일: %s, 상태: %s%n",
 				gildongUser.getName(),
-				gildongUser.getEmail(),
-				gildongUser.getStatus());
+				gildongUser.getEmail()
+		);
 
 		// 2. 유저 조회(단건)
 		System.out.println("\n최근 등록한 아이디 " + gildongUser.getId() + "인 유저 조회 ");
@@ -97,7 +100,7 @@ public class DiscodeitApplication {
 		// 5. 수정된 유저 데이터 조회
 		System.out.println("\n수정된 유저 " + gildongUser.getId() + "의 정보 조회 ");
 		Optional<User> verifyUpdate = userService.getUserDetails(gildongUser.getId());
-		verifyUpdate.ifPresent(u -> System.out.println("수정된 이메일: " + u.getEmail() + " 수정된 상태 : " + u.getStatus()));
+		verifyUpdate.ifPresent(u -> System.out.println("수정된 이메일: " + u.getEmail()));
 
 		// 6. 유저 삭제
 		System.out.println("\n유저 삭제 ");

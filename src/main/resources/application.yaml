@@ -8,6 +8,9 @@ data:
     users: ${data.path.base-dir}/users.ser
     channels: ${data.path.base-dir}/channels.ser
     messages: ${data.path.base-dir}/messages.ser
+    userstatus: ${data.path.base-dir}/userstatus.ser
+    readstatus: ${data.path.base-dir}/readstatus.ser
+    binarycontent: ${data.path.base-dir}/binarycontent.ser
 
 logging:
   level:

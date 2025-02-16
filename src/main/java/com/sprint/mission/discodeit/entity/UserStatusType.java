@@ -1,5 +1,0 @@
-package com.sprint.mission.discodeit.entity;
-
-public enum UserStatusType {
-    OFFLINE, ONLINE, IDLE
-}

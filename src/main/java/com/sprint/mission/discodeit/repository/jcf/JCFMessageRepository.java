@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +26,16 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public Optional<Instant> findRecentMessageByChannelId(UUID channelId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+
     }
 
     @Override
