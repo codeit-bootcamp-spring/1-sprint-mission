@@ -2,44 +2,51 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
-import org.springframework.stereotype.Repository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
+@Slf4j
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final String FILE_PATH = "tmp/entity/channel.ser";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private final Map<User, List<Channel>> channelData;
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final String filePath;
+    private final Map<UUID, List<Channel>> channelData;
 
-
-
-    public FileChannelRepository() {
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+        if(!fileDirectory.endsWith("/")) {
+            fileDirectory += "/";
+        }
+        this.filePath = fileDirectory + "channel.json";
+        log.info("***** FileChannelRepository CONSTRUCTOR CALLED *****"); // 활성화 됐는지 확인
+        ensureDirectoryExists(this.filePath);
         this.channelData = loadFromFile();
     }
 
     @Override
     public Channel save(Channel channel) {
-        List<Channel> channels = new ArrayList<>();
+        UUID ownerId = channel.getOwner().getId();
+        List<Channel> channels = channelData.computeIfAbsent(ownerId, k -> new ArrayList<>());
         channels.add(channel);
-        channelData.put(channel.getOwner(), channels);
         saveToFile();
         return channel;
     }
 
     @Override
     public Optional<Channel> findById(UUID id) {
-        return Optional.ofNullable(channelData.values().stream()
+        return channelData.values().stream()
                 .flatMap(List::stream)
                 .filter(channel -> channel.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found Channel ")));
+                .findFirst();
     }
 
     @Override
@@ -53,34 +60,32 @@ public class FileChannelRepository implements ChannelRepository {
     public List<Channel> findAllByType(ChannelType type) {
         return channelData.values().stream()
                 .flatMap(List::stream)
-                .filter(channel -> channel.getType() ==type)
+                .filter(channel -> channel.getType() == type)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteByChannel(Channel channel) {
-        List<Channel> channels = channelData.get(channel.getOwner());
-        if(channels != null) {
+        UUID ownerId = channel.getOwner().getId();
+        List<Channel> channels = channelData.get(ownerId);
+        if (channels != null) {
             channels.remove(channel);
-            if(channels.isEmpty()) {
-                channelData.remove(channel.getOwner());
+            if (channels.isEmpty()) {
+                channelData.remove(ownerId);
             }
             saveToFile();
         }
     }
 
-
     @Override
     public boolean existsByUser(User user) {
-        return channelData.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(channel -> channel.getOwner().equals(user));
+        return channelData.containsKey(user.getId());
     }
-
 
     @Override
     public List<Channel> findAllByOwnerAndType(User owner, ChannelType type) {
-        return channelData.getOrDefault(owner, new ArrayList<>())
+        UUID ownerId = owner.getId();
+        return channelData.getOrDefault(ownerId, new ArrayList<>())
                 .stream()
                 .filter(channel -> channel.getType() == type)
                 .collect(Collectors.toList());
@@ -95,27 +100,40 @@ public class FileChannelRepository implements ChannelRepository {
                 .collect(Collectors.toList());
     }
 
-    private Map<User, List<Channel>> loadFromFile() {
-        File file = new File(FILE_PATH);
+    //
+
+
+    private void ensureDirectoryExists(String fileDirectory) {
+        File directory = new File(fileDirectory);
+        File parentDirectory = directory.getParentFile();
+        if (!parentDirectory.exists()) {
+            parentDirectory.mkdirs();
+        }
+    }
+
+    private Map<UUID, List<Channel>> loadFromFile() {
+        File file = new File(filePath);
         if (!file.exists()) {
-            return new HashMap<>();
+            return new ConcurrentHashMap<>();
         }
         try {
-            return objectMapper.readValue(file, new TypeReference<Map<User, List<Channel>>>(){});
+            return objectMapper.readValue(
+                    file,
+                    new TypeReference<Map<UUID, List<Channel>>> () {}
+            );
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-            return new HashMap<>();
+            System.err.println(e.getMessage());
+            return new ConcurrentHashMap<>();
         }
     }
 
     private void saveToFile() {
-        try (ObjectOutputStream oos
-                     = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channelData);
+        File file = new File(filePath);
+        try {
+            objectMapper.writeValue(file, channelData);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save channel to file.", e);
         }
-
     }
 
 

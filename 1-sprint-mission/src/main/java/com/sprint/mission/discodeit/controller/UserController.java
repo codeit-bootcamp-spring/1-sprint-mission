@@ -53,6 +53,12 @@ public class UserController {
         return authService.login(userLoginRequestDTO);
     }
 
+    //오류 테스트 앤드 포인트
+    @GetMapping("/test-exception")
+    public void testException() {
+        throw new RuntimeException("Test error log");
+    }
+
 
 
 }

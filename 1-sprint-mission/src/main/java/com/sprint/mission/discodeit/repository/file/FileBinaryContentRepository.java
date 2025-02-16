@@ -2,31 +2,31 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private static final String FILE_PATH = "tmp/binary_content.ser";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private final Map<UUID, BinaryContent>binaryContentData;
 
-    public FileBinaryContentRepository() {
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final String filePath;
+    private final Map<UUID, BinaryContent> binaryContentData;
+
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+        if(!fileDirectory.endsWith("/")) {
+            fileDirectory += "/";
+        }
+        this.filePath = fileDirectory + "binary_content.json";
+
+        ensureDirectoryExists(this.filePath);
         this.binaryContentData = loadFromFile();
     }
-
 
     @Override
     public void save(BinaryContent binaryContent) {
@@ -84,24 +84,36 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                 .anyMatch(content -> userId.equals(content.getUserId()));
     }
 
+
+    private void ensureDirectoryExists(String directoryPath) {
+        File directory = new File(directoryPath);
+        File parentDirectory = directory.getParentFile();
+        if (!parentDirectory.exists()) {
+            parentDirectory.mkdirs();
+        }
+    }
+
     private Map<UUID, BinaryContent> loadFromFile() {
-        File file = new File(FILE_PATH);
-        if(!file.exists()){
+        File file = new File(filePath);
+        if (!file.exists()) {
             return new ConcurrentHashMap<>();
         }
         try {
-            return objectMapper.readValue(file, new TypeReference<Map<UUID, BinaryContent>>() {});
+            return objectMapper.readValue(file,
+                    new TypeReference<Map<UUID, BinaryContent>>() {});
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
             return new ConcurrentHashMap<>();
         }
     }
 
     private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(binaryContentData);
+        File file = new File(filePath);
+        try {
+            objectMapper.writeValue(file, binaryContentData);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save binary content data to file.", e);
+            throw new RuntimeException("Failed to save binary content data.", e);
         }
     }
+
 }

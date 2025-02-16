@@ -24,6 +24,9 @@ public class UserStatus {
     }
 
     public boolean isOnline() {
+        if(lastSeenAt == null) {
+            return false;
+        }
         return lastSeenAt.plusSeconds(300).isAfter(Instant.now());
     }
 

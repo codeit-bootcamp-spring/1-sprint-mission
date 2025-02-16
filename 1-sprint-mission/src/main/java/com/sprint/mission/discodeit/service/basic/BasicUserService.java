@@ -11,28 +11,37 @@ import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentReposit
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import com.sprint.mission.discodeit.service.interfacepac.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class BasicUserService implements UserService {
+
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
 
 
+    public BasicUserService(UserRepository userRepository,
+                            BinaryContentRepository binaryContentRepository,
+                            UserStatusRepository userStatusRepository) {
+        this.userRepository = userRepository;
+        this.binaryContentRepository = binaryContentRepository;
+        this.userStatusRepository = userStatusRepository;
+    }
+
     @Override
+
     public UserDTO create(UserCreateDTO userCreateDTO, UserProfileImageDTO userProfileImageDTO) {
-        if (userRepository.existsByEmail(userCreateDTO.email()) ||
-                userRepository.existsByUsername(userCreateDTO.username())) {
-            throw new IllegalArgumentException("User with email " + userCreateDTO.email() + " already exists");
+        if (userRepository.existsByEmail(userCreateDTO.email())){
+            throw new IllegalArgumentException("User email " + userCreateDTO.email() + " already exists");
+        }
+        if(userRepository.existsByUsername(userCreateDTO.username())) {
+            throw new IllegalArgumentException("UserName " + userCreateDTO.username() + " already exists");
         }
         // 새 사용자 생성, 저장
         User newUser = new User(userCreateDTO.username(),userCreateDTO.email() ,userCreateDTO.password() );
@@ -51,11 +60,11 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(binaryContent);
         }
         //사용자 상태 생성, 저장
-        UserStatus userStatus = new UserStatus(newUser, Instant.now());
+        UserStatus userStatus = new UserStatus(newUser, null);
         userStatusRepository.save(userStatus);
 
         boolean isOnline = userStatus.isOnline();
-        log.error("User created: {} (email: {})", userCreateDTO.username(), userCreateDTO.email());
+        log.info("User created: {} (email: {}) , User Online : {} ", userCreateDTO.username(), userCreateDTO.email(), isOnline);
 
         return new UserDTO(
                 newUser.getId(),
@@ -128,12 +137,10 @@ public class BasicUserService implements UserService {
                 );
                 binaryContentRepository.save(binaryContent);
             }
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                .orElse(new UserStatus(user, Instant.now()));
-        userStatus.updateLastSeenAt(Instant.now());
-        userStatusRepository.save(userStatus);
+        boolean isOnline = userStatusRepository.findByUserId(user.getId())
+                .map(UserStatus::isOnline)
+                .orElse(false);
 
-        boolean isOnline = userStatus.isOnline();
         return new UserDTO(user.getId(),
                     user.getUsername(),
                     user.getEmail(),
@@ -159,7 +166,7 @@ public class BasicUserService implements UserService {
 
             //user 삭제
             userRepository.deleteById(userId);
-            log.error("User: {} deleted", userId);
+            log.info("User: {} deleted", userId);
         }
 
 
