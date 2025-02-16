@@ -16,6 +16,7 @@ public class Channel extends BaseEntity implements Serializable {
 	private String name;
 	private String description;
 	private Map<UUID, UserResponse> participants;
+	//messagelist는 hashmap은 순서 보장을 안하니 list, linkedHashMap중에 고민
 	private List<Message> messageList;
 	private ChannelType channelType;
 

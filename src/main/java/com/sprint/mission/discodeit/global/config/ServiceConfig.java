@@ -59,8 +59,8 @@ public class ServiceConfig {
 
 	@Bean
 	public ReadStatusService readStatusService(ReadStatusRepository readStatusRepository, UserRepository userRepository,
-		ChannelRepository channelRepository) {
-		return new BasicReadStatusService(readStatusRepository, userRepository, channelRepository);
+		ChannelRepository channelRepository, MessageRepository messageRepository) {
+		return new BasicReadStatusService(readStatusRepository, userRepository, channelRepository, messageRepository);
 	}
 
 	@Bean

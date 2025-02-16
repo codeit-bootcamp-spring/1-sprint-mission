@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusReque
 import com.sprint.mission.discodeit.dto.readStatus.request.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -15,17 +16,19 @@ public class BasicReadStatusService implements ReadStatusService {
 	private final ReadStatusRepository readStatusRepository;
 	private final UserRepository userRepository;
 	private final ChannelRepository channelRepository;
+	private final MessageRepository messageRepository;
 
 	public BasicReadStatusService(ReadStatusRepository readStatusRepository, UserRepository userRepository,
-		ChannelRepository channelRepository) {
+		ChannelRepository channelRepository, MessageRepository messageRepository) {
 		this.readStatusRepository = readStatusRepository;
 		this.userRepository = userRepository;
 		this.channelRepository = channelRepository;
+		this.messageRepository = messageRepository;
 	}
 
 	/**
 	 * 새로운 읽음 상태를 생성합니다.
-	 * @param request 읽음 상태 생성 요청 정보 (사용자 ID, 채널 ID, 마지막 읽은 시간)
+	 * @param request 읽음 상태 생성 요청 정보 (사용자 ID, 채널 ID, 메시지 ID, 마지막 읽은 시각)
 	 * @return 생성된 읽음 상태
 	 * @throws IllegalArgumentException 사용자나 채널이 존재하지 않거나, 이미 읽음 상태가 존재하는 경우
 	 */
@@ -45,8 +48,13 @@ public class BasicReadStatusService implements ReadStatusService {
 			throw new IllegalArgumentException("ReadStatus already exists");
 		}
 
+		//메시지 존재 여부 확인
+		messageRepository.findById(request.messageId())
+			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
+
 		// 새로운 읽음 상태 생성 및 저장
-		ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(), request.lastReadAt());
+		ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(), request.messageId(),
+			request.lastReadAt());
 		return readStatusRepository.save(readStatus);
 	}
 
@@ -75,7 +83,7 @@ public class BasicReadStatusService implements ReadStatusService {
 	/**
 	 * 읽음 상태를 업데이트합니다.
 	 * @param id 읽음 상태 ID
-	 * @param request 상태 업데이트 요청 정보 (마지막 읽은 시간)
+	 * @param request 상태 업데이트 요청 정보 (새로운 기준 메시지 ID와 마지막 읽은 시각)
 	 * @return 업데이트된 읽음 상태
 	 * @throws IllegalArgumentException 읽음 상태가 존재하지 않는 경우
 	 */
@@ -85,7 +93,10 @@ public class BasicReadStatusService implements ReadStatusService {
 		ReadStatus readStatus = readStatusRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 
-		readStatus.updateLastReadAt(request.lastReadAt());
+		messageRepository.findById(request.messageId())
+			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
+
+		readStatus.updateLastReadAt(request.messageId(), request.lastReadAt());
 		return readStatusRepository.save(readStatus);
 	}
 
