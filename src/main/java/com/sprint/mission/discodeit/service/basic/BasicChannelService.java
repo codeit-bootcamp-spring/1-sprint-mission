@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.ChannelService;
-
 import java.util.UUID;
 
 public class BasicChannelService {
@@ -14,14 +13,15 @@ public class BasicChannelService {
     public static Channel setupChannel(ChannelService channelService, Channel channelInfoToCreate) {
         printStartInfo("setupChannel(ChannelService, Channel)");
 
-        Channel channel = channelService.createChannel(channelInfoToCreate);
+        Channel channel = channelService.registerChannel(channelInfoToCreate);
 
         printArgsAndUserInfo(channelInfoToCreate.getId(), channel, "Already exist!");
 
         return channel;
     }
 
-    public static Channel updateChannel(ChannelService channelService, UUID key, Channel channelInfoToUpdate) {
+    public static Channel updateChannel(ChannelService channelService, UUID key,
+        Channel channelInfoToUpdate) {
         printStartInfo("updateChannel(ChannelService, UUID, Channel)");
 
         Channel channel = channelService.updateChannelById(key, channelInfoToUpdate);
@@ -34,7 +34,7 @@ public class BasicChannelService {
     public static Channel searchChannel(ChannelService channelService, UUID key) {
         printStartInfo("searchChannel(ChannelService, UUID)");
 
-        Channel channel = channelService.findChannelById(key);
+        Channel channel = channelService.searchChannelById(key);
 
         printArgsAndUserInfo(key, channel, "Not exist!");
 

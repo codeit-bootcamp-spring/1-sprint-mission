@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.exception;
 import static com.sprint.mission.discodeit.constant.IntegerConstant.*;
 import static com.sprint.mission.discodeit.constant.StringConstant.*;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
     INVALID_ID_FORMAT("Id must not be '" + EMPTY_UUID.getValue() + "'"),
     INVALID_TIME_FORMAT("Time must not be " + EMPTY_TIME.getValue()),
@@ -18,7 +21,4 @@ public enum ErrorCode {
         this.description = description;
     }
 
-    public String getDescription() {
-        return description;
-    }
 }

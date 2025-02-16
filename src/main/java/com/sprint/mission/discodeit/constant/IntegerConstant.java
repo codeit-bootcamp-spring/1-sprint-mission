@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.constant;
 
+import java.time.Instant;
+import lombok.Getter;
+
+@Getter
 public enum IntegerConstant {
     NOT_FOUND(-1),
-    EMPTY_TIME(0),
     MAX_NAME_LENGTH(10),
     PHONE_NUMBER_LENGTH(11),
     MAX_CONTENT_LENGTH(20),
@@ -14,8 +17,5 @@ public enum IntegerConstant {
         this.value = value;
     }
 
-    public int getValue() {
-        return value;
-    }
 }
 

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.UserService;
-
 import java.util.UUID;
 
 public class BasicUserService {
@@ -13,7 +13,7 @@ public class BasicUserService {
     public static User setupUser(UserService userService, User userInfoToCreate) {
         printStartInfo("setupUser(UserService, User)");
 
-        User user = userService.createUser(userInfoToCreate);
+        User user = userService.registerUser(userInfoToCreate);
 
         printArgsAndUserInfo(userInfoToCreate.getId(), user, "Already exist!");
 
@@ -33,7 +33,7 @@ public class BasicUserService {
     public static User searchUser(UserService userService, UUID key) {
         printStartInfo("searchUser(UserService, UUID)");
 
-        User user = userService.findUserById(key);
+        User user = userService.searchUserById(key);
 
         printArgsAndUserInfo(key, user, "Not exist!");
 

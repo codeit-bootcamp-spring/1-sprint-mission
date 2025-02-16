@@ -5,38 +5,43 @@ import com.sprint.mission.discodeit.exception.InvalidFormatException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
-
 import java.util.UUID;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FileMessageService implements MessageService {
+
     private final MessageRepository messageRepository;
-    private final MessageValidator  messageValidator;
+    private final MessageValidator messageValidator;
 
     public FileMessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
-        messageValidator       = MessageValidator.getInstance();
+        messageValidator = MessageValidator.getInstance();
     }
 
     /**
-     * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from {@code messageInfoToCreate}
+     * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from
+     * {@code messageInfoToCreate}
      */
     @Override
-    public Message createMessage(Message messageInfoToCreate) throws InvalidFormatException {
+    public Message registerMessage(Message messageInfoToCreate) throws InvalidFormatException {
         validateFormat(messageInfoToCreate);
 
         return messageRepository.createMessage(messageInfoToCreate);
     }
 
     @Override
-    public Message findMessageById(UUID key) {
+    public Message searchMessageById(UUID key) {
         return messageRepository.findMessageById(key);
     }
 
     /**
-     * Update the Message while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code messageInfoToUpdate}
+     * Update the Message while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields
+     * from {@code messageInfoToUpdate}
      */
     @Override
-    public Message updateMessageById(UUID key, Message messageInfoToUpdate) throws InvalidFormatException {
+    public Message updateMessageById(UUID key, Message messageInfoToUpdate)
+        throws InvalidFormatException {
         validateFormat(messageInfoToUpdate);
 
         return messageRepository.updateMessageById(key, messageInfoToUpdate);

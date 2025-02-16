@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.logger.service.ServiceLogger;
 import com.sprint.mission.discodeit.service.MessageService;
-
 import java.util.UUID;
 
 public class BasicMessageService {
@@ -13,14 +12,15 @@ public class BasicMessageService {
     public static Message setupMessage(MessageService messageService, Message messageInfoToCreate) {
         printStartInfo("setupMessage(MessageService, Message)");
 
-        Message message = messageService.createMessage(messageInfoToCreate);
+        Message message = messageService.registerMessage(messageInfoToCreate);
 
         printArgsAndMessageInfo(messageInfoToCreate.getId(), message, "Already exist!");
 
         return message;
     }
 
-    public static Message updateMessage(MessageService messageService, UUID key, Message messageInfoToUpdate) {
+    public static Message updateMessage(MessageService messageService, UUID key,
+        Message messageInfoToUpdate) {
         printStartInfo("updateMessage(MessageService, UUID, Message)");
 
         Message message = messageService.updateMessageById(key, messageInfoToUpdate);
@@ -33,7 +33,7 @@ public class BasicMessageService {
     public static Message searchMessage(MessageService messageService, UUID key) {
         printStartInfo("searchMessage(MessageService, UUID)");
 
-        Message message = messageService.findMessageById(key);
+        Message message = messageService.searchMessageById(key);
 
         printArgsAndMessageInfo(key, message, "Not exist!");
 
@@ -55,7 +55,8 @@ public class BasicMessageService {
         logger.info(startInfo);
     }
 
-    private static void printArgsAndMessageInfo(UUID key, Message message, String messageWhenEmpty) {
+    private static void printArgsAndMessageInfo(UUID key, Message message,
+        String messageWhenEmpty) {
         logger.info("pass UUID '" + key + "'! ");
         if (message == Message.EMPTY_MESSAGE) {
             logger.info(messageWhenEmpty);
