@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
@@ -34,6 +35,20 @@ public class FileUserStatusRepository implements UserStatusRepository {
             throw new RuntimeException(e);
         }
         return userStatus;
+    }
+
+    @Override
+    public UserStatus find(UUID userStatusId) {
+        Path filePath = directory.resolve(userStatusId + ".ser");
+        try (
+                FileInputStream fis = new FileInputStream(filePath.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis);
+        ) {
+            Object data = ois.readObject();
+            return (UserStatus) data;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

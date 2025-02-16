@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -31,18 +32,22 @@ public class BasicUserStatusService implements UserStatusService {
                         throw new IllegalArgumentException("[ERROR] 이미 존재하는 데이터입니다.");
                     }
                 });
-        
+
         return userStatusRepository.save(new UserStatus(userStatusCreateDto.userId()));
     }
 
     @Override
     public UserStatus find(UUID userStatusId) {
-        return null;
+        return Optional.ofNullable(userStatusRepository.find(userStatusId))
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
     @Override
     public UserStatus findByUserId(UUID userId) {
-        return null;
+        return findAll().stream()
+                .filter(userStatus -> userStatus.isSameUserId(userId))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
     }
 
     @Override

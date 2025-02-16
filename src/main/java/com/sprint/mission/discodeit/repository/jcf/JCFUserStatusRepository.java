@@ -27,6 +27,11 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public UserStatus find(UUID userStatusId) {
+        return data.get(userStatusId);
+    }
+
+    @Override
     public List<UserStatus> findAll() {
         return data.values().stream().toList();
     }
