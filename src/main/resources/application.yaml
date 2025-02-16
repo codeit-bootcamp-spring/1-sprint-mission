@@ -1,2 +1,12 @@
-spring.application.name=discodeit
-discodeit.repository/type=jcf
+spring.application.name: discodeit
+discodeit.repository.type: jcf
+discodeit:
+  repository:
+    type: file
+    file-directories:
+      binaryContents: src/main/resources/data/serialized/binaryContents
+      channels: src/main/resources/data/serialized/channels
+      messages: src/main/resources/data/serialized/messages
+      readStatuses: src/main/resources/data/serialized/readStatuses
+      users: src/main/resources/data/serialized/users
+      userStatuses: src/main/resources/data/serialized/userStatuses
