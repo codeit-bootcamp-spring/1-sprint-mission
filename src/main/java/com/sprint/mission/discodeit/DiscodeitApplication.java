@@ -124,13 +124,19 @@ public class DiscodeitApplication {
 		messageService.readAllByChannelId(spring.getId()).stream().forEach(System.out::println);
 		System.out.println();
 
+		System.out.println("===== 파일 생성 =====");
 		String fileName = "test.jpg";
 		Path path = Path.of(System.getProperty("user.dir"), fileName);
-
 		byte[] data = Files.readAllBytes(path);
 		BinaryContent content = binaryContentService.create(BinaryContentDto.of(fileName, BelongType.MESSAGE, message1.getId(), data));
 
+		System.out.println("===== 파일 가져오기 =====");
 		BinaryContentDto contentDto = binaryContentService.find(content.getId());
+		System.out.println(contentDto.getName());
+
+		System.out.println("===== 파일이 등록된 메세지 삭제시 파일도 같이 삭제됨");
 		messageService.deleteMessage(message1.getId());
+		System.out.println("===== 등록된 message =====");
+		messageService.readAllByChannelId(spring.getId()).stream().forEach(System.out::println);
 	}
 }
