@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
@@ -24,6 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.USER, userId
         );
+        log.info("Create User Profile : {}", newFile.getId());
         return binaryContentRepository.save(newFile);
     }
 
@@ -33,7 +36,14 @@ public class BasicBinaryContentService implements BinaryContentService {
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.MESSAGE, messageId
         );
+        log.info("Create Message file : {}", newFile.getId());
         return binaryContentRepository.save(newFile);
+    }
+
+    @Override
+    public BinaryContent updateUserProfileFile(MultipartFile file, UUID userId) {
+        binaryContentRepository.deleteByUserId(userId);
+        return createUserProfileFile(file, userId);
     }
 
     @Override

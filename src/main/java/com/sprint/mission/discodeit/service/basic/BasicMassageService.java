@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.validation.MessageValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -38,8 +39,9 @@ public class BasicMassageService implements MessageService {
             Message newMessage = Message.createMessage(request.content(), request.channelId(), request.userId());
             messageRepository.save(newMessage);
 
-            if (!request.files().isEmpty()) {
-                request.files().forEach(binaryContentService::create);
+            List<MultipartFile> messageFiles = request.files();
+            if (messageFiles != null) {
+                messageFiles.forEach(file -> binaryContentService.createMessageFile(file, newMessage.getId()));
             }
 
             log.info("Create Message: {}", newMessage);
@@ -66,10 +68,11 @@ public class BasicMassageService implements MessageService {
             message.update(request.content());
             messageRepository.save(message);
 
-            if (!request.files().isEmpty()) {
-                request.files().forEach(binaryContentService::create);
-                // 기존 파일들 삭제하기
+            List<MultipartFile> messageFiles = request.files();
+            if (messageFiles != null) {
+                messageFiles.forEach(file -> binaryContentService.createMessageFile(file, id));
             }
+
             log.info("update message: {}", message);
         }
     }

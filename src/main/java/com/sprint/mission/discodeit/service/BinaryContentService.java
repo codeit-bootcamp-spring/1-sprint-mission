@@ -10,6 +10,7 @@ public interface BinaryContentService {
 
     BinaryContent createUserProfileFile(MultipartFile file, UUID userId);
     BinaryContent createMessageFile(MultipartFile file, UUID messageId);
+    BinaryContent updateUserProfileFile(MultipartFile file, UUID userId);
     BinaryContent find(UUID id);
     List<BinaryContent> findAllByIdIn(List<UUID> ids);
     void delete(UUID id);

@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
-@Primary
+//@Primary
 public class FileUserRepository implements UserRepository {
     private static final String FILE_PATH = "tmp/user.ser";
     private final FileManager<User> fileManager =  new FileManager<>(FILE_PATH);

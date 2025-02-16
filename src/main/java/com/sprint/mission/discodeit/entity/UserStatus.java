@@ -22,7 +22,7 @@ public class UserStatus implements Serializable {
     }
 
     public static UserStatus createUserStatus(UUID userId) {
-        return createUserStatus(userId);
+        return new UserStatus(userId);
     }
 
     private UserStatus(UUID userId) {

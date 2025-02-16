@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -41,7 +40,7 @@ public class BasicUserService implements UserService {
             UserStatus newUserStatus = userStatusService.create(newUser.getId());
 
             MultipartFile userProfileImg = request.file();
-            if (!userProfileImg.isEmpty()) {
+            if (userProfileImg != null) {
                 binaryContentService.createUserProfileFile(userProfileImg, newUser.getId());
             }
 
@@ -83,21 +82,16 @@ public class BasicUserService implements UserService {
         user.update(newName, newEmail, newPassword);
         userRepository.save(user);
 
-        if (request.file() != null) {
-            MultipartFile imageFile = request.file();
-            BinaryContent newImage = BinaryContent.createBinaryContent(
-                    imageFile.getName(), imageFile.getContentType(), convertToBytes(imageFile),
-                    BinaryContent.ParentType.USER, user.getId()
-            );
-            binaryContentService.deleteByUserId(id);
-            binaryContentService.create(imageFile);
+        MultipartFile userProfileImg = request.file();
+        if (userProfileImg != null) {
+            binaryContentService.updateUserProfileFile(userProfileImg, id);
         }
         log.info("Update User :{}", user);
     }
 
     @Override
     public void deleteUser(UUID id) {
-        User user = findByIdOrThrow(id);
+        findByIdOrThrow(id);
         binaryContentService.deleteByUserId(id);
         userStatusService.deleteByUserId(id);
         userRepository.deleteById(id);

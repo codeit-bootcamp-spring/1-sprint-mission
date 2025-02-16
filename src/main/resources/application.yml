@@ -10,3 +10,4 @@ logging:
 #    name: ${user.dir}/log/test.log
   level:
     com.sprint.mission.discodeit : info
+

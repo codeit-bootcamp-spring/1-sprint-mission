@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
+@Primary
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
@@ -27,6 +29,13 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByName(String name) {
+        return data.values().stream()
+                .filter(user -> user.getName().equals(name))
+                .findAny();
+    }
+
+    @Override
     public List<User> findAll() {
         return data.values().stream().collect(Collectors.toList());
     }
@@ -34,5 +43,20 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public void deleteById(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return data.values().stream().anyMatch(user -> user.getId().equals(id));
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return data.values().stream().anyMatch(user -> user.getName().equals(name));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return data.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }

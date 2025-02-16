@@ -7,12 +7,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
@@ -25,6 +27,7 @@ public class BasicAuthService implements AuthService {
         if (!findUser.getPassword().equals(request.password())) {
             throw new NoSuchElementException("Entered the wrong password.");
         }
+        log.info("user login : {}", findUser.getId());
         return UserResponse.entityToDto(findUser, userStatusService.findByUserId(findUser.getId()));
     }
 }

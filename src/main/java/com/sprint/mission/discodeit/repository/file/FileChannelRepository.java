@@ -10,7 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
-@Primary
+//@Primary
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "tmp/channel.ser";
     private final FileManager<Channel> fileManager =  new FileManager<>(FILE_PATH);

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -26,7 +27,8 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator channelValidator;
-    private final MessageService messageService;
+//    private final MessageService messageService; // 순환 참조 발생함.
+    private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
 
     @Override
@@ -87,7 +89,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID id) {
-        messageService.deleteAllByChannelId(id); // 굳이 서비스 단에서 불러와야할까?
+//        messageService.deleteAllByChannelId(id); // 굳이 서비스 단에서 불러와야할까?
+        messageRepository.findAllByChannelId(id);
         readStatusService.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
     }
@@ -99,7 +102,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     private Instant getLastMessageTime(UUID id) {
-        List<Message> channelMessages = messageService.findAllByChannelId(id);
+        //List<Message> channelMessages = messageService.findAllByChannelId(id);
+        List<Message> channelMessages = messageRepository.findAllByChannelId(id);
         if  (channelMessages.isEmpty()) {
             return null;
         }

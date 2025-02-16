@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,18 +15,20 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
-    private final UserService userService;
+//    private final UserService userService;
 
     @Override
     public UserStatus create(UUID userId) {
-        userService.findByIdOrThrow(userId);
+//        userService.findByIdOrThrow(userId);
         if (userStatusRepository.existsByUserId(userId)) {
             throw new DuplicateRequestException("UserStatus already exists");
         }
         UserStatus userStatus = UserStatus.createUserStatus(userId);
+        log.info("Create UserStatus: {}" , userStatus.getId());
         return userStatusRepository.save(userStatus);
     }
 
