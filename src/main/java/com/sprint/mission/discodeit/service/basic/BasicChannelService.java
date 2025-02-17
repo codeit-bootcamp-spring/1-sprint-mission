@@ -34,7 +34,6 @@ public class BasicChannelService implements ChannelService {
     // 조회(Read)만 하기 때문에 순환 참조를 해결하려고 사용한 방법이지만, 단일 책임 원칙에서 벗어나는 것 같아 옳지 않은 방법이지 않나 싶습니다.
     private final UserRepository userRepository;
 
-    //메세지의 경우 다른 곳에서 Service 를 이용해 message
     private final MessageRepository messageRepository;
 
     private final ReadStatusService readStatusService;
@@ -44,7 +43,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponseDto create(CreateChannelDto createChannelDto) {
         Channel channel = channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
-        return ChannelResponseDto.from(channel);
+        return ChannelResponseDto.from(channel, null, null);
     }
 
     //private 인 경우, userId 리스트 매개변수 필요
@@ -57,7 +56,7 @@ public class BasicChannelService implements ChannelService {
             channel.getUserSet().add(user.getId());
         }
         Channel savedChannel = channelRepository.save(channel);
-        return ChannelResponseDto.from(savedChannel);
+        return ChannelResponseDto.from(savedChannel, null, savedChannel.getUserSet().stream().toList());
     }
 
     @Override
@@ -72,23 +71,10 @@ public class BasicChannelService implements ChannelService {
                 continue;
             }
 
-            Optional<Instant> lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
-                    .map(Message::getCreatedAt)
-                    .max(Instant::compareTo);
-
             List<String> userIds = ( channel.getChannelType() == ChannelType.PRIVATE ? channel.getUserSet().stream().toList() : null );
 
-            if(channel.getChannelType() == ChannelType.PRIVATE) {
-                channelResponseDtos.add(new ChannelResponseDto(
-                        channel.getId(),
-                        channel.getChannelName(),
-                        channel.getChannelType(),
-                        channel.getChannelCategory(),
-                        channel.getDescription(),
-                        lastMessageTimestamp.orElse(null),
-                        userIds
-                ));
-            }
+            channelResponseDtos.add(ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), userIds));
+
         }
 
         return channelResponseDtos;
@@ -101,21 +87,9 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
-        Optional<Instant> lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
-                .map(Message::getCreatedAt)
-                .max(Instant::compareTo);
-
         List<String> userIds = ( channel.getChannelType() == ChannelType.PRIVATE ? channel.getUserSet().stream().toList() : null );
 
-        return new ChannelResponseDto(
-                channel.getId(),
-                channel.getChannelName(),
-                channel.getChannelType(),
-                channel.getChannelCategory(),
-                channel.getDescription(),
-                lastMessageTimestamp.orElse(null),
-                userIds
-        );
+        return ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), userIds);
     }
 
     @Override
@@ -123,7 +97,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll().stream().filter(c -> c.getChannelName().contains(channelName)).toList();
         List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
         for(Channel channel: channels) {
-            channelResponseDtos.add(ChannelResponseDto.from(channel));
+            channelResponseDtos.add(ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), channel.getUserSet().stream().toList()));
         }
         return channelResponseDtos;
     }
@@ -133,7 +107,7 @@ public class BasicChannelService implements ChannelService {
         List<Channel> channels = channelRepository.findAll().stream().filter(c -> c.getChannelType().equals(channelType)).toList();
         List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
         for(Channel channel: channels) {
-            channelResponseDtos.add(ChannelResponseDto.from(channel));
+            channelResponseDtos.add(ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), channel.getUserSet().stream().toList()));
         }
         return channelResponseDtos;
 
@@ -157,7 +131,7 @@ public class BasicChannelService implements ChannelService {
 
         channelRepository.save(channel);
 
-        return ChannelResponseDto.from(channel);
+        return ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), channel.getUserSet().stream().toList());
     }
 
     @Override
@@ -175,8 +149,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<UserResponseDto> findAllUserInChannel(Channel channel) throws CustomException {
-        Channel ch = channelRepository.findById(channel.getId());
+    public List<UserResponseDto> findAllUserInChannel(String channelId) throws CustomException {
+        Channel ch = channelRepository.findById(channelId);
         if (ch == null) {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
@@ -228,5 +202,12 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(channelId);
         User user = userRepository.findById(userId);
         return channel.getUserSet().contains(user.getId());
+    }
+
+    public Instant getLastMessageTimestamp(Channel channel) throws CustomException {
+        Instant lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
+                .map(Message::getCreatedAt)
+                .max(Instant::compareTo).orElse(null);
+        return lastMessageTimestamp;
     }
 }

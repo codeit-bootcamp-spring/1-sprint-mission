@@ -25,17 +25,19 @@ public record ChannelResponseDto(
 ) {
     @Override
     public String toString() {
-        return "[ChannelResponseDto] id=" + id + "/ channelName=" + channelName + "/ channelType=" + channelType + "/ channelCategory=" + channelCategory + "description="+description + "/ lastMessageTimestamp=" + lastMessageTimestamp + "/ userIds=" + userIds.stream().toList() + "]" ;
+        return "[ChannelResponseDto] {id: " + id + " channelName: " + channelName + " channelType: " + channelType + " channelCategory: " + channelCategory + " description: " + description +
+                " lastMessageTimestamp: " + lastMessageTimestamp + " userIds: " + (userIds != null ? userIds.stream().toList() : "Public Channel") + "]";
     }
-    public static ChannelResponseDto from(Channel channel) {
+
+    public static ChannelResponseDto from(Channel channel, Instant lastMessageTimestamp, List<String> userIds) {
         return new ChannelResponseDto(
                 channel.getId(),
                 channel.getChannelName(),
                 channel.getChannelType(),
                 channel.getChannelCategory(),
                 channel.getDescription(),
-                channel.getCreatedAt(),
-                channel.getUserSet().stream().toList()
+                lastMessageTimestamp,
+                userIds
         );
     }
 
