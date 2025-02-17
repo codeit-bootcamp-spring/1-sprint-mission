@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,21 +16,24 @@ public class Message implements Serializable {                  // 메시지 (�
 
     // 공통 필드
     private final UUID id;              // pk
-    private final Long createdAt;       // 생성 시간
-    private Long updatedAt;             // 수정 시간
+    private final Instant createdAt;    // 생성 시간
+    private Instant updatedAt;          // 수정 시간
 
     private final UUID channelId;       // 메시지가 속해있는 채널
     private final UUID writerId;        // 작성자 id
     private String context;             // 메시지 내용
+    private List<UUID> imagesId;       // 첨부 이미지 id
+
 
     // 생성자
-    public Message(Channel channel, String context, UUID writerId){
+    public Message(UUID channelId, UUID writerId, String context, List<UUID> imagesId){
         id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
+        createdAt = Instant.now();
 
-        this.channelId = channel.getId();
+        this.channelId = channelId;
         validationAndSetContext(context);
         this.writerId = writerId;
+        this.imagesId = imagesId;
     }
 
 
@@ -38,8 +43,12 @@ public class Message implements Serializable {                  // 메시지 (�
         updateUpdateAt();
     }
 
+    public void updateAttachedImageId(List<UUID> attachedImagesId) {
+        this.imagesId = attachedImagesId;
+    }
+
     public void updateUpdateAt(){
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
 

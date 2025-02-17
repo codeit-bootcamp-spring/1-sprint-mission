@@ -26,7 +26,7 @@ public class FileMessageRepository implements MessageRepository, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Path messageDirectory = Paths.get(System.getProperty("user.dir"), "message");
+    private final Path messageDirectory = Paths.get(System.getProperty("user.dir"), "/data/message");
 
     public FileMessageRepository() {
         init();

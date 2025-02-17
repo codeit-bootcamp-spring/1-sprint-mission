@@ -1,149 +1,110 @@
 package com.sprint.mission.discodeit.test;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.channelDto.CreatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channelDto.FindChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channelDto.UpdatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.service.ChannelMessageService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.view.DisplayChannel;
+import lombok.RequiredArgsConstructor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class ChannelTest {
 
     private static int channelIndex = 1;
 
-    // 채널 생성
-    public static Channel setUpChannel(User user, ChannelService channelService, UserService userService) throws IOException {
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final ChannelMessageService channelMessageService;
 
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//
-//        System.out.println("채널명 입력 :");
-//        String name = br.readLine();
-//
-//        System.out.println("채널 설명 입력 :");
-//        String explanation = br.readLine();
+    // 채널 생성
+    public UUID setUpPublicChannel(UUID ownerId) throws IOException {
 
         String name = "test" + channelIndex;
         String explanation = "테스트용 채널" + (channelIndex++);
 
-        Channel channel = new Channel(user, name, explanation);
+        CreatePublicChannelRequestDto channel = new CreatePublicChannelRequestDto(ownerId, name, explanation);
 
-        channelService.create(channel);
+        UUID id = channelService.createPublic(channel);
+
+        channelMessageService.getLastMessageTime(id);
 
         System.out.println("================================================================================");
         System.out.println("채널 생성 결과 : ");
-        DisplayChannel.displayChannel(channel, userService);
+        DisplayChannel.displayChannel(channelService.find(id), userService);
         System.out.println("================================================================================");
 
-        return channel;
+        return id;
     }
 
     // 채널 정보 수정
-    public static void updateChannel(UUID id, ChannelService channelService, UserService userService) throws IOException {
+    public void updateChannel(UUID id) throws IOException {
+        String category = "updateCategory";
+        String name = "updateName";
+        String explanation = "updateExplanation";
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        UpdatePublicChannelRequestDto updatePublicChannelRequestDto = new UpdatePublicChannelRequestDto(id, category, name, explanation, true);
 
+        channelService.updateChannel(updatePublicChannelRequestDto);
+        channelMessageService.getLastMessageTime(id);
 
-        loopOut:
-        while (true) {
-            System.out.println("================================================================================");
-            System.out.println("1. 현재 채널 정보 확인");
-            System.out.println("2. 카테고리 변경");
-            System.out.println("3. 채널명 변경");
-            System.out.println("4. 채널 설명 변경");
-            System.out.println("5. 종료");
-            System.out.println("================================================================================");
-
-            String menu = br.readLine();
-
-            Channel channel = channelService.read(id);
-
-            try {
-                switch (menu) {
-                    case "1":
-                        System.out.println("================================================================================");
-                        System.out.println("현재 정보 : ");
-                        DisplayChannel.displayChannel(channel, userService);
-                        System.out.println("================================================================================");
-                        break;
-
-                    case "2":
-                        System.out.println("카테고리 입력 :");
-                        String category = br.readLine();
-                        channelService.updateCategory(id, category);
-                        break;
-
-                    case "3":
-                        System.out.println("채널명 입력 :");
-                        String name = br.readLine();
-                        channelService.updateName(id, name);
-                        break;
-
-                    case "4":
-                        System.out.println("채널 설명 입력 :");
-                        String explanation = br.readLine();
-                        channelService.updateExplanation(id, explanation);
-                        break;
-
-                    case "5":
-                        System.out.println("종료합니다.");
-                        break loopOut;
-
-                    default:
-                        System.out.println("1 ~ 5 중 하나를 선택해주세요.");
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
+        System.out.println("================================================================================");
+        System.out.println("채널 수정 결과 : ");
+        DisplayChannel.displayChannel(channelService.find(id), userService);
+        System.out.println("================================================================================");
     }
 
     // 채널 멤버 추가
-    public static void addMember(UUID id, UUID memberId, ChannelService channelService, UserService userService) {
+    public void addMember(UUID id, UUID memberId) {
 
-        Channel channel = channelService.read(id);
+        FindChannelResponseDto channel = channelService.find(id);
 
         System.out.println("멤버 추가 전 :");
         DisplayChannel.displayChannel(channel, userService);
 
         channelService.addMember(id, memberId);
-        channel = channelService.read(id);
+        channelMessageService.getLastMessageTime(id);
+        channel = channelService.find(id);
 
         System.out.println("멤버 추가 후 :");
         DisplayChannel.displayChannel(channel, userService);
     }
 
     // 채널 멤버 삭제
-    public static void deleteMember(UUID id, UUID memberId, ChannelService channelService, UserService userService) {
+    public void deleteMember(UUID id, UUID memberId) {
 
-        Channel channel = channelService.read(id);
+        channelMessageService.getLastMessageTime(id);
+        FindChannelResponseDto channel = channelService.find(id);
 
         System.out.println("멤버 삭제 전 :");
         DisplayChannel.displayChannel(channel, userService);
 
         channelService.deleteMember(id, memberId);
-        channel = channelService.read(id);
+        channel = channelService.find(id);
 
         System.out.println("멤버 삭제 후 :");
         DisplayChannel.displayChannel(channel, userService);
     }
 
     // 채널 삭제
-    public static void deleteChannel(UUID id, ChannelService channelService, UserService userService) {
+    public void deleteChannel(UUID id, UUID userId) {
+
+        channelMessageService.getLastMessageTime(id);
 
         System.out.println("================================================================================");
         System.out.println("채널 삭제 전 목록 :");
-        DisplayChannel.displayAllChannel(channelService.readAll(), userService);
+        DisplayChannel.displayAllChannel(channelService.findAllByUserId(userId), userService);
         System.out.println("================================================================================");
 
         channelService.delete(id);
 
         System.out.println("================================================================================");
         System.out.println("채널 삭제 후 목록 :");
-        DisplayChannel.displayAllChannel(channelService.readAll(), userService);
+        DisplayChannel.displayAllChannel(channelService.findAllByUserId(userId), userService);
         System.out.println("================================================================================");
     }
 }

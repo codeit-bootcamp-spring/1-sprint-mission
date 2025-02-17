@@ -27,7 +27,7 @@ public class FileUserRepository implements UserRepository, Serializable {
     private static final long serialVersionUID = 1L;
 
     // 변경 가능성 없으므로 객체 생성 시 멤버 변수로 초기화
-    private final Path userDirectory = Paths.get(System.getProperty("user.dir"), "user");
+    private final Path userDirectory = Paths.get(System.getProperty("user.dir"), "/data/user");
 
     public FileUserRepository() {
         init();

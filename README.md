@@ -182,42 +182,98 @@
 4. Lombok 적용
    1. entity getter()를 @Getter로 대체
    2. Basic*Service의 생성자를 @RequiredArgsConstructor로 대체
+5. 시간 타입 변경
+   - 시간 다루는 필드의 타입을 Instant로 변경 (각 entity의 createAt, updateAt)
+6. 도메인 추가
+   1. ReadStatus : 사용자가 채널별 마지막으로 메시지를 읽은 시간을 표현하는 도메인 모델
+   2. UserStatus : 사용자별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델
+   3. BinaryContent : 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델
+7. 추가한 도메인별 레포지토리 인터페이스 선언(*Repository)
+8. UserService 고도화
+   1. create
+      - 이름과 이메일 중복 검사 로직 추가
+      - User() 생성자 매개변수에 ProfileImage를 넣음 -> User 삭제 시 프로필 사진 함께 삭제
+        - 프로필 사진 관련 작업 시 null 관련 작업 필요 -> null일 때 대체 이미지 생성 등
+   2. find, findeAll
+      - 해당하는 데이터를 DTO 형태로 반환
+   3. update
+      - 들어온 데이터가 null이 아닐 경우만 수정하여 저장
+   4. delete
+      - 데이터 삭제
+      - User 밑에 프로필 사진과 UserStatus 필드가 있기 때문에 User 삭제 시 함께 삭제됨
+9. AuthService 구현
+   - name과 password를 통해 로그인 가능하도록 구현
+   - 로그인 실패 시 예외처리
+10. ChannelService 고도화
+   1. create
+      - private 채널과 public 채널 만드는 메서드 분리
+      - private 채널 생성 시 이름, 채널 설명이 null로 들어감 -> 이걸 통해 private과 public 채널 구분
+   2. find
+      - 해당 채널의 가장 최근 메시지 시간 정보 포함
+        - 처음에는 messageService를 통해 메시지 시간을 가져오려 했으나 상호참조 문제로 ChannelMessageService를 만듦
+      - private과 public dto를 나누고, 반환 타입을 두 dto가 구현하고 있는 인터페이스로 지정함으로써 private과 public을 구분해서 반환
+   3. findAllById
+      - id를 넣어서 해당 user가 가입되어 있는 private 채널과 현존하는 모든 public 채널을 볼 수 있도록 함
+   4. update
+      - public의 경우 채널 관련 정보를 수정할 수 있으나 private은 불가
+        - public인 경우 updatePublicDto로 넘어온 값 중 null이 아닌 값만 반영하여 수정
+      - 멤버의 경우 public/private에 관계없이 수정 가능해야 한다고 생각하여 기존 로직 유지
+   5. delete
+      - basicChannelMessageService 단에서 해당 채널의 모든 메시지를 찾아 삭제
+      - 이후 채널 삭제
 
 ### 수정사항
+1. Email 클래스의 이메일 가입 여부 관련 로직을 Basic*Service로 옮김
+   - Email 클래스가 UserRepository에 의존함으로써 책임 분리가 명확하지 않은 문제 해결
+2. VO의 update*() 메서드 삭제
+   - VO는 불변성을 보장해야 하므로 수정 관련 메서드 삭제
 
 ### 트러블 슈팅
 1. git add 시 CRLF 문제 발생
    ```bash
-   tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
-      $ git add .
-      warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'build.gradle', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'gradle/wrapper/gradle-wrapper.properties', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'settings.gradle', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of '.gitattributes', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'src/main/resources/application.yml', LF will be replaced by CRLF the next time Git touches it
-      warning: in the working copy of 'src/test/java/com/sprint/mission/discodeit/DiscodeitApplicationTests.java', LF will be replaced by CRLF the next time Git touches it
+    tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
+    $ git add .
+    warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'build.gradle', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'gradle/wrapper/gradle-wrapper.properties', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'settings.gradle', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of '.gitattributes', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'src/main/java/com/sprint/mission/discodeit/DiscodeitApplication.java', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'src/main/resources/application.yml', LF will be replaced by CRLF the next time Git touches it
+    warning: in the working copy of 'src/test/java/com/sprint/mission/discodeit/DiscodeitApplicationTests.java', LF will be replaced by CRLF the next time Git touches it
    ```
    - 원인
      - Windows의 경우 line ending으로 CR(Carriage-Return, \r)과 LF(Line Feed, \n)을 사용하고, Unix와 Mac OS는 LF만 사용
      - 이 차이로 인해 git에서 잘못 인식하여 생기는 문제
      - 실제 코드는 변경되지 않았는데 CR/LF때문에 변경으로 착각함
    - 해결
-     - 
+      - core.autocrlf를 true로 설정
+          ```bash
+          git config --global core.autocrlf true
+          ```
+   > 참고 : [[Git] CRLF 개행 문자 차이로 인한 경고 해결하기](https://velog.io/@rain98/%EA%B9%83%ED%97%88%EB%B8%8C-non-fast-forward-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0)
+   
 2.  git push 시 `non-fast-forward` 문제 발생
-   ```bash
-tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
-$ git push origin part1-한성지-sprint3
-To github.com:hyanyul/1-sprint-mission.git
- ! [rejected]        part1-한성지-sprint3 -> part1-한성지-sprint3 (non-fast-forward)
-error: failed to push some refs to 'github.com:hyanyul/1-sprint-mission.git'
-hint: Updates were rejected because the tip of your current branch is behind
-hint: its remote counterpart. If you want to integrate the remote changes,
-hint: use 'git pull' before pushing again.
-hint: See the 'Note about fast-forwards' in 'git push --help' for details.
-   ```
-   - 원인
-     - 깃헙에 생성된 원격 저장소와 로컬에 생성된 저장소 간 공통분모가 없는 상태에서 병합하려는 시도로 인해 발생
+      ```bash
+      tjdwl@notebook MINGW64 /c/Source/1-sprint-mission (part1-한성지-sprint3)
+      $ git push origin part1-한성지-sprint3
+      To github.com:hyanyul/1-sprint-mission.git
+      ! [rejected]        part1-한성지-sprint3 -> part1-한성지-sprint3 (non-fast-forward)
+      error: failed to push some refs to 'github.com:hyanyul/1-sprint-mission.git'
+      hint: Updates were rejected because the tip of your current branch is behind
+      hint: its remote counterpart. If you want to integrate the remote changes,
+      hint: use 'git pull' before pushing again.
+      hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+    ```
+    - 원인
+      - 깃헙에 생성된 원격 저장소와 로컬에 생성된 저장소 간 공통분모가 없는 상태에서 병합하려는 시도로 인해 발생
+     - 해결
+        - `force`를 이용해 강제 push
+          ```bash
+          $ git push origin part1-한성지-sprint3 --force
+          ```
+   > 참고 : [깃허브 non-fast-forward 에러 해결하기](https://velog.io/@rain98/%EA%B9%83%ED%97%88%EB%B8%8C-non-fast-forward-%EC%97%90%EB%9F%AC-%ED%95%B4%EA%B2%B0%ED%95%98%EA%B8%B0)
 
+
+   
 ### 추후 수정할 부분

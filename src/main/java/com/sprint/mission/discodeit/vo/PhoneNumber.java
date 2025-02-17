@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.validation;
+package com.sprint.mission.discodeit.vo;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,23 +16,20 @@ public class PhoneNumber implements Serializable {
 
     // 생성자
     public PhoneNumber(String phoneNumber) {
-        phoneNumber = checkNull(phoneNumber);
-        phoneNumberValidation(phoneNumber);
-        this.phoneNumber = phoneNumber.trim();
-    }
-
-    // 전화번호 수정
-    public void updatePhoneNumber(String phoneNumber) {
-        phoneNumber = checkNull(phoneNumber);
-        phoneNumberValidation(phoneNumber);
+        phoneNumber = phoneNumberValidation(phoneNumber);
         this.phoneNumber = phoneNumber.trim();
     }
 
     // 전화번호 유효성 검사
-    public void phoneNumberValidation(String phoneNumber) {
+    public String phoneNumberValidation(String phoneNumber) {
+
+        phoneNumber = checkNull(phoneNumber);
+
         if (matchPhoneNumber(phoneNumber)) {
             throw new IllegalArgumentException("올바르지 않은 전화번호 형식입니다.");
         }
+
+        return phoneNumber;
     }
 
     // 전화번호가 null인지 확인하고 아니라면 trim()하여 반환

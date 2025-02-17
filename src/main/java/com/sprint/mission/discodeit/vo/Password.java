@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.validation;
+package com.sprint.mission.discodeit.vo;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,24 +15,21 @@ public class Password implements Serializable {
 
     // 생성자
     public Password(String password) {
-        password = checkNull(password);
-        passwordValidation(password);
-        this.password = password;
-    }
-
-    // 비밀번호 수정
-    public void updatePassword(String password) {
-        password = checkNull(password);
-        passwordValidation(password);
+        password = passwordValidation(password);
         this.password = password;
     }
 
     // 비밀번호 유효성 검사
-    public void passwordValidation(String password) {
+    public String passwordValidation(String password) {
+
+        password = checkNull(password);
+
         if (matchPassword(password)) {
             throw new IllegalArgumentException("올바르지 않은 비밀번호 형식입니다.\n" +
                     "비밀번호는 대문자, 소문자, 숫자, 특수문자를 각각 하나 이상 포함해야 하며, 6자리 이상이어야 합니다.");
         }
+
+        return password;
     }
 
     // 비밀번호가 null인지 확인하고 아니라면 trim()하여 반환

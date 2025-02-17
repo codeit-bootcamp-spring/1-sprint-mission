@@ -26,7 +26,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Path channelDirectory = Paths.get(System.getProperty("user.dir"), "channel");
+    private final Path channelDirectory = Paths.get(System.getProperty("user.dir"), "/data/channel");
 
     public FileChannelRepository(){
         init();
