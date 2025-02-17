@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 import java.util.HashMap;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "app.user-repository", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
 
     // 유저 객체가 담기는 해쉬맵

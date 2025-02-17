@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 import java.util.HashMap;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "app.userStatus-repository", havingValue = "jcf")
 public class JCFUserStatusRepository implements UserStatusRepository {
     HashMap<UUID, UserStatus> userStatusMap = new HashMap<UUID, UserStatus>();
 
@@ -28,7 +31,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return true;
     }
 
-    //유저스테이터스맵의 객체 삭제. IO핸들러 저장까지 정상적으로 완료됐다면 true.
+    //유저스테이터스맵의 객체 삭제.
     @Override
     public boolean deleteUserStatusById(UUID userId) {
         if (userStatusMap.remove(userId) == null) {System.out.println("해당 userId의 userStatus가 Map에 존재하지 않습니다. "); return false;}

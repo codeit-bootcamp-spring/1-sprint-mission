@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "app.channel-repository", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
     // 모든 채널 객체가 담기는 해쉬맵

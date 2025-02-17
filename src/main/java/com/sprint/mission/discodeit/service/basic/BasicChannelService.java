@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Dto.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.Type.BinaryContentType;
 import com.sprint.mission.discodeit.entity.Type.ChannelType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final UserService userService;
     private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     //프라이빗 타입 채널 생성.
     @Override
@@ -49,8 +49,10 @@ public class BasicChannelService implements ChannelService {
         messageRepository.addChannelMessagesMap(newChannel.getId(), channelMessageMap);
 
         //채널 생성과 동시에 channelReadStatusMap 생성. 유저마다 readStatus 객체 생성해서 channelReadStatusMap에 삽입.
+        //채널 생성과 동시에 바이너리 객체들을 저장할 채널별 바이너리컨텐츠맵 생성후 삽입.
         HashMap<UUID, ReadStatus> channelReadStatusMap = new HashMap<UUID, ReadStatus>();
         Stream.of(memberId).forEach(_memberId -> channelReadStatusMap.put(_memberId, new ReadStatus(_memberId)));
+        binaryContentRepository.saveBinaryContentsMap(BinaryContentType.Aettached_File, newChannel.getId(), new LinkedHashMap<UUID, BinaryContent>());
 
         //레포지토리에 저장.
         readStatusRepository.addChannelReadStatusMap(newChannel.getId(), channelReadStatusMap);
@@ -122,7 +124,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public boolean deleteChannel(UUID channelId) {
         if (channelId == null){System.out.println("채널 삭제 실패. 입력값이 null인 상태입니다."); return false; }
-        if (messageRepository.deleteChannelMessagesMap(channelId) || readStatusRepository.deleteChannelReadStatusMap(channelId) || channelRepository.deleteChannel(channelId)){
+        if (messageRepository.deleteChannelMessagesMap(channelId) || readStatusRepository.deleteChannelReadStatusMap(channelId)
+                || channelRepository.deleteChannel(channelId) || binaryContentRepository.deleteBinaryContentMap(BinaryContentType.Aettached_File, channelId)){
             System.out.println("채널 삭제 성공!"); return true;
         } else { System.out.println("채널 삭제 도중 정상적으로 삭제되지 않은 부분이 있습니다."); return false;}
     }

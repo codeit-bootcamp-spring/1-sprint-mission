@@ -2,9 +2,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+
 import java.util.HashMap;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "app.readStatus-repository", havingValue = "jcf")
 public class JCFReadStatusRepository implements ReadStatusRepository {
 
     // 외부에서 생성자 접근 불가

@@ -2,12 +2,14 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "app.message-repository", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
     //todo UUID로 검색할일이 거의 없을것같아서 LinkedHashMap보다 그냥 ArrayList쓰는게 나을것같은데 시간이없어서 일단 수정 못함.. 나중에수정하기
     private static final LinkedHashMap<UUID, LinkedHashMap> allChannelmessageMaps = new LinkedHashMap<UUID, LinkedHashMap>();
