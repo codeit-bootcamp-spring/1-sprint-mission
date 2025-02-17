@@ -33,7 +33,7 @@ public interface UserService {
     //List<User> getUserByUserStatus(UserStatus userStatus);
 
     //수정
-    User updateUser(String userId, UpdateUserDto updateUserDto);
+    UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto);
 
     //삭제
     boolean deleteUser(String userId);

@@ -102,7 +102,7 @@ public class BasicUserService implements UserService {
     //update user의 반환타입을 Dto 로 변경하려 하였으나
     //아래랑 종속적이라... 문제가 됨 -> 수정필요
     @Override
-    public User updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
+    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
         User user = userRepository.findById(userId);
 
         if (user == null) {
@@ -115,14 +115,16 @@ public class BasicUserService implements UserService {
             user.setUpdatedAt(updateUserDto.updatedAt());
         }
 
-        return userRepository.save(user);
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isActive());
     }
 
     // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
-    public User updateUser(String userId, UpdateUserDto updateUserDto, CreateBinaryContentDto createBinaryContentDto) throws CustomException {
-        User user = updateUser(userId, updateUserDto);
+    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, CreateBinaryContentDto createBinaryContentDto) throws CustomException {
+        User user = userRepository.findById(userId);
 
-        if (user.getProfileImageId() == null || user.getProfileImageId().isEmpty()) {
+        updateUser(userId, updateUserDto);
+
+        if (createBinaryContentDto.binaryImage() == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
@@ -130,7 +132,7 @@ public class BasicUserService implements UserService {
 
         user.setProfileImageId(binaryContentService.create(createBinaryContentDto).id());
 
-        return userRepository.save(user);
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isActive());
     }
 
 

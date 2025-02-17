@@ -1,3 +1,4 @@
+/*
 package com.sprint.mission;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
@@ -370,3 +371,4 @@ public class DiscodeitApplication {
     }
 
 }
+*/
