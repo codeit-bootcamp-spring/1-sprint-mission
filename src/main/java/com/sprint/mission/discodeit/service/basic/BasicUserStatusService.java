@@ -14,12 +14,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class BasicUserStatusService implements UserStatusService{
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+    UserStatusRepository userStatusRepository;
+    UserRepository userRepository;
 
     //유저스테이터스 생성
     @Override
     public UserStatus createUserStatus(UUID userId){
+        if (userRepository.isUserExistByUUID(userId)) {System.out.println("해당 유저가 유저레포지토리에 존재하지 않습니다.");}
         if (userStatusRepository.isUserStatus(userId)==true) {System.out.println("해당 유저의 UserStatusService는 이미 존재합니다.");}
         UserStatus newUserStatus = new UserStatus(userId);
         return (userStatusRepository.addUserStatus(newUserStatus)) ? newUserStatus : null;

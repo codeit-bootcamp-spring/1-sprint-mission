@@ -41,14 +41,12 @@ public class JavaApplication {
         MessageRepository messageRepository = new FileMessageRepository();
         ReadStatusRepository readStatusRepository = new FileReadStatusRepository();
         BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
-        UserStatusRepository userStatusRepository = new FileUserStatusRepository();
-        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+        UserStatusService userStatusService = new BasicUserStatusService();
         FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
-        BinaryContentService binaryContentService = new BasicBinaryContentService();
-        MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, binaryContentService);
-        ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, messageRepository, binaryContentRepository);
-        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository, userStatusService, channelService);
+        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository, userStatusService);
+        MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, fileIOHandler);
+        ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, userService, messageRepository);
         ReadStatusService readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, messageRepository, channelService, channelRepository);
 
 
