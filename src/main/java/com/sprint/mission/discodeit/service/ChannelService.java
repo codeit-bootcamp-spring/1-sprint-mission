@@ -13,6 +13,8 @@ public interface ChannelService {
     //생성
     ChannelResponseDto create(CreateChannelDto createChannelDto);
 
+    ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds);
+
     //모두 읽기
     List<ChannelResponseDto> findAllByUserId(String userId);
 

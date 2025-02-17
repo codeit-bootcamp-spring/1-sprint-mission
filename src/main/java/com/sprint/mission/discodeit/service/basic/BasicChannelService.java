@@ -47,7 +47,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     //private 인 경우, userId 리스트 매개변수 필요
-    private ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds) {
+    @Override
+    public ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds) {
         Channel channel = new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null);
 
         for (String userId : userIds) {
