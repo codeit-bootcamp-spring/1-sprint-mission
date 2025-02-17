@@ -36,4 +36,15 @@ public class ReadStatus implements Serializable {
         this.updatedAt = Instant.now();
     }
 
+    @Override
+    public String toString() {
+        return "ReadStatus{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", userId=" + userId +
+                ", channelId=" + channelId +
+                ", lastReadAt=" + lastReadAt +
+                '}';
+    }
 }

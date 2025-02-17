@@ -74,7 +74,7 @@ public class DiscodeitApplication {
         System.out.println();
 
         //채널 삭제
-        channelService.deleteChannel(privateChannelId1);
+        //channelService.deleteChannel(privateChannelId1);
 
         //채널 다건 조회
         System.out.println("Channel 전체 조회 - 채널 삭제 확인");
