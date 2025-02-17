@@ -161,7 +161,7 @@ public class BasicChannelService implements ChannelService {
             if (user == null) {
                 throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }
-            result.add(UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()));
+            result.add(UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()));
         }
         return result;
     }
