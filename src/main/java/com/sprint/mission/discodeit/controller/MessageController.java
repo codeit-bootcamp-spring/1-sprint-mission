@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -29,5 +31,17 @@ public class MessageController {
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId, @ModelAttribute MessageUpdateDto messageDto){
     MessageResponseDto message = messageMasterFacade.updateMessage(messageId, messageDto  );
     return ResponseEntity.ok(message);
+  }
+
+  @RequestMapping(value = "/message/{messageId}", method = RequestMethod.DELETE)
+  public ResponseEntity<String> deleteMessage(@PathVariable String messageId){
+    messageMasterFacade.deleteMessage(messageId);
+    return ResponseEntity.ok("successfully deleted");
+  }
+
+  @RequestMapping(value = "/channel/{channelId}/message", method = RequestMethod.GET)
+  public ResponseEntity<List<MessageResponseDto>> getChannelMessages(@PathVariable String channelId){
+    List<MessageResponseDto> messages = messageMasterFacade.findMessagesByChannel(channelId);
+    return ResponseEntity.ok(messages);
   }
 }
