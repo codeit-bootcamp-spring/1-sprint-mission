@@ -89,6 +89,9 @@ public class BasicChannelService implements ChannelService {
 	public Channel createPublicChannel(CreatePublicChannelRequest request) {
 		Map<UUID, UserResponse> participants = new HashMap<>();
 
+		//유저 online처리
+		userStatusService.updateByUserId(request.creatorId(), request.createdAt());
+
 		//creator도 channel에 추가
 		participants.put(request.creatorId(), userService.findUser(request.creatorId()));
 
@@ -138,6 +141,8 @@ public class BasicChannelService implements ChannelService {
 	public List<ChannelListResponse> findAllByUserId(UUID userId) {
 		// 사용자 존재 확인
 		userService.findUser(userId);
+		// 사용자 존재한다면 online으로 처리
+		userStatusService.updateByUserId(userId, Instant.now());
 
 		// PUBLIC 채널 전체와 사용자의 PRIVATE 채널 조회
 		List<Channel> publicChannels = channelRepository.findAllPublicChannels();
@@ -203,6 +208,7 @@ public class BasicChannelService implements ChannelService {
 	 * @param channelId 채널 ID
 	 * @param userId 새로운 참여자 ID
 	 */
+	//Todo inviter를 명시하는게 좋을까..?
 	@Override
 	public void addParticipantToChannel(UUID channelId, UUID userId) {
 		Channel channel = channelRepository.findById(channelId)

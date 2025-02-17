@@ -24,18 +24,21 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 
 public class BasicMessageService implements MessageService {
 	private final MessageRepository messageRepository;
 	private final UserService userService;
+	private final UserStatusService userStatusService;
 	private final ChannelService channelService;
 	private final BinaryContentService binaryContentService;
 
 	public BasicMessageService(MessageRepository messageRepository, UserService userService,
-		ChannelService channelService,
+		UserStatusService userStatusService, ChannelService channelService,
 		BinaryContentService binaryContentService) {
 		this.messageRepository = messageRepository;
 		this.userService = userService;
+		this.userStatusService = userStatusService;
 		this.channelService = channelService;
 		this.binaryContentService = binaryContentService;
 	}
@@ -49,6 +52,8 @@ public class BasicMessageService implements MessageService {
 	public MessageResponse create(CreateMessageRequest request) {
 		// 사용자와 채널 존재 여부 확인
 		UserResponse author = userService.findUser(request.authorId());
+		// 사용자 online 처리
+		userStatusService.updateByUserId(author.id(), request.createdAt());
 		ChannelResponse channel = channelService.find(request.channelId());
 		UUID channelId = request.channelId();
 		// 메시지 작성자가 채널 참여자인지 확인

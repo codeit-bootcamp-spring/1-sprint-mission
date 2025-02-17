@@ -26,6 +26,7 @@ import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 
 @Configuration
 public class ServiceConfig {
+
 	@Bean
 	public UserService userService(UserRepository userRepository, UserStatusService userStatusService,
 		BinaryContentService binaryContentService) {
@@ -33,8 +34,8 @@ public class ServiceConfig {
 	}
 
 	@Bean
-	public AuthService authService(UserRepository userRepository, UserStatusRepository userStatusRepository) {
-		return new BasicAuthService(userRepository, userStatusRepository);
+	public AuthService authService(UserRepository userRepository, UserStatusService userStatusService) {
+		return new BasicAuthService(userRepository, userStatusService);
 	}
 
 	@Bean
@@ -46,8 +47,10 @@ public class ServiceConfig {
 
 	@Bean
 	public MessageService messageService(MessageRepository messageRepository, UserService userService,
+		UserStatusService userStatusService,
 		ChannelService channelService, BinaryContentService binaryContentService) {
-		return new BasicMessageService(messageRepository, userService, channelService, binaryContentService);
+		return new BasicMessageService(messageRepository, userService, userStatusService, channelService,
+			binaryContentService);
 	}
 
 	@Bean

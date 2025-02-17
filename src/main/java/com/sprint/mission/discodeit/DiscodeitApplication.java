@@ -35,7 +35,7 @@ public class DiscodeitApplication {
 
 	static Channel setupChannel(ChannelService channelService, UUID creatorId, List<UUID> participantIds) {
 		CreatePublicChannelRequest createChannelRequest = new CreatePublicChannelRequest(creatorId, "공지", "공지 채널입니다.",
-			participantIds);
+			participantIds, Instant.now());
 		return channelService.createPublicChannel(createChannelRequest);
 	}
 
