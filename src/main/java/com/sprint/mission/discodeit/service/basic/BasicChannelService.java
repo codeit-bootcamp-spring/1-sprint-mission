@@ -4,17 +4,17 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service // Bean으로 등록
+@RequiredArgsConstructor // Lombok: final 필드를 위한 생성자 자동 생성
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
-
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
-    }
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
@@ -25,7 +25,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel find(UUID channelId) {
         return channelRepository.findById(channelId)
-                        .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
     }
 
     @Override
