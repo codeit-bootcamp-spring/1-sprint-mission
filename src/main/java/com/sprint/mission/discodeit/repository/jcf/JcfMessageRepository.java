@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.ArrayList;

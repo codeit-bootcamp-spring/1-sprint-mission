@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;

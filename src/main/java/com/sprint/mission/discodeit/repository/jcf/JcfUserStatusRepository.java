@@ -1,11 +1,8 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.form.CheckUserDto;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-
-import java.util.UUID;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.form.CheckUserDto;
 
 public class JcfUserStatusRepository {
     private UserStatus userStatus;

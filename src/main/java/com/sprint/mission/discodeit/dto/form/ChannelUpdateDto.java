@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.entity.form;
+package com.sprint.mission.discodeit.dto.form;
 
-import com.sprint.mission.discodeit.entity.BaseEntity;
+import com.sprint.mission.discodeit.dto.entity.BaseEntity;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.entity.UserStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;

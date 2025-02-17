@@ -1,14 +1,9 @@
-package com.sprint.mission.discodeit.entity.form;
+package com.sprint.mission.discodeit.dto.form;
 
-import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.entity.BaseEntity;
+import com.sprint.mission.discodeit.dto.entity.BinaryContent;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
-import java.util.UUID;
 
 @Getter
 public class UserUpdateDto extends BaseEntity {

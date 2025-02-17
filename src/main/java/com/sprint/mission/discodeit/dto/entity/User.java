@@ -1,15 +1,14 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.dto.entity;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-@Data
+
+@Getter
 public class User extends BaseEntity implements Serializable {
 
     @NotEmpty
@@ -22,8 +21,6 @@ public class User extends BaseEntity implements Serializable {
     private String loginId;
 
     private BinaryContent attachProfile;
-    private UserStatus userStatus;
-    private ReadStatus readStatus;
 
     public User(String loginId, String password, String userName, String userEmail) {
         super();

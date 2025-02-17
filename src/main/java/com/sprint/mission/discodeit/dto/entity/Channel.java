@@ -1,10 +1,11 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.dto.entity;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 public class Channel extends BaseEntity implements Serializable {
@@ -12,7 +13,7 @@ public class Channel extends BaseEntity implements Serializable {
     private String channelName;
     private String description;
     private ChannelGroup channelGroup;
-    private ReadStatus readStatus;
+    private UUID madeUserId;
 
     public Channel(String channelName, String description, ChannelGroup channelGroup) {
         super();
@@ -20,14 +21,12 @@ public class Channel extends BaseEntity implements Serializable {
         if (channelGroup.equals("PUBLIC")) {
             this.channelName = channelName;
             this.description = description;
+            this.madeUserId = Participant.getUser
         }
     }
-    public Channel(ReadStatus readStatus,ChannelGroup channelGroup) {
+    public Channel(ChannelGroup channelGroup) {
         super();
         this.channelGroup = channelGroup;
-        if (channelGroup.equals("PRIVATE")) {
-            this.readStatus=readStatus;
-        }
     }
 
 

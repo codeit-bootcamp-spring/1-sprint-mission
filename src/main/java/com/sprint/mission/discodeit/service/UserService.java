@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.form.CheckUserDto;
-import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.form.CheckUserDto;
+import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.form.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,16 +20,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-@Component
+
 @Slf4j
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "temp/channels-obj.dat";
     private final Map<UUID, Channel> data=new HashMap<>();
 
     @Override
-    public void createChannel(UUID id, Channel channel) {
+    public Channel createChannel(UUID id, Channel channel) {
         data.put(id, channel);
         save();
+        return channel;
     }
 
     @Override

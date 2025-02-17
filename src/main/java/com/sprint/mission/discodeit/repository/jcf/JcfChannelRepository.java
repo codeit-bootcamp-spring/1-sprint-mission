@@ -1,13 +1,10 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.form.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.form.PrivateChannelDto;
-import com.sprint.mission.discodeit.entity.form.PublicChannelDto;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,12 +14,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
+@Repository
 public class JcfChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data=new HashMap<>();
 
     @Override
-    public void createChannel(UUID id, Channel channel) {
+    public Channel createChannel(UUID id, Channel channel) {
         data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
@@ -61,4 +60,5 @@ public class JcfChannelRepository implements ChannelRepository {
     public List<Channel> findAll() {
         return new ArrayList<>(data.values());
     }
+
 }

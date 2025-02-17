@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit.entity.form;
+package com.sprint.mission.discodeit.dto.form;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import jakarta.validation.constraints.NotEmpty;
+import com.sprint.mission.discodeit.dto.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.entity.UserStatus;
 import lombok.Getter;
 
 @Getter

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.form.ChannelUpdateDto;
-import com.sprint.mission.discodeit.entity.form.PrivateChannelDto;
-import com.sprint.mission.discodeit.entity.form.PublicChannelDto;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.form.PrivateChannelDto;
+import com.sprint.mission.discodeit.dto.form.PublicChannelDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void createPublicChannel(PublicChannelDto channelParam) {
+    public void createPublicChannel(PublicChannelDto channelParam,UUID userId) {
         if (channelParam.getChannelName().trim().isEmpty()) {
             log.info("채널 이름을 입력해주세요.");
             return;
@@ -38,12 +38,12 @@ public class FileChannelService implements ChannelService {
         channelRepository.createChannel(channel.getId(),channel);
     }
     @Override
-    public void createPrivateChannel(PrivateChannelDto channelParam) {
+    public void createPrivateChannel(PrivateChannelDto channelParam,UUID userId) {
         if (!channelParam.getChannelGroup().equals("PRIVATE")) {
             log.info("PRIVATE 채널이 아닙니다.");
             return;
         }
-        Channel channel = new Channel(channelParam.getReadStatus(),channelParam.getChannelGroup());
+        Channel channel = new Channel(channelParam.getChannelGroup());
         channelRepository.createChannel(channel.getId(), channel);
     }
     @Override

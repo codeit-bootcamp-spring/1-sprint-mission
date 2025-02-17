@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.form.CheckUserDto;
-import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.entity.UserStatus;
+import com.sprint.mission.discodeit.dto.form.CheckUserDto;
+import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JcfParticipantRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final JcfParticipantRepository participantRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public void createUser(User user) {

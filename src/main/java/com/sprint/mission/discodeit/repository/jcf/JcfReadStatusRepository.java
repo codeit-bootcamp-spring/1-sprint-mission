@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,14 +22,39 @@ public class JcfReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> findByUserId(UUID userId) {
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
         List<ReadStatus> all = findAll();
+        List<ReadStatus> allByUserId= new ArrayList<>();
         for (ReadStatus readStatus : all) {
             if(readStatus.getUserId().equals(userId)) {
-                return Optional.of(readStatus);
+                allByUserId.add(readStatus);
+                return allByUserId;
             }
         }
-        return Optional.empty();
+        return null;
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> all = findAll();
+        List<ReadStatus> allByChannelId= new ArrayList<>();
+        for (ReadStatus readStatus : all) {
+            if(readStatus.getChannelId().equals(channelId)) {
+                allByChannelId.add(readStatus);
+                return allByChannelId;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        data.remove(id);
     }
 
     @Override

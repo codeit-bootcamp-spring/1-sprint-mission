@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.form.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
 
 import java.util.List;
 import java.util.Optional;

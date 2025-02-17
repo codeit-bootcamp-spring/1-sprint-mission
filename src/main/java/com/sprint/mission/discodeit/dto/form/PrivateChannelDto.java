@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.entity.form;
+package com.sprint.mission.discodeit.dto.form;
 
-import com.sprint.mission.discodeit.entity.BaseEntity;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelGroup;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.entity.BaseEntity;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.entity.ChannelGroup;
+import com.sprint.mission.discodeit.dto.entity.ReadStatus;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ public class PrivateChannelDto extends BaseEntity {
     private List<UUID> userList=new ArrayList<>();
 
     public PrivateChannelDto(Channel channel) {
-        this.readStatus = channel.getReadStatus();
         this.channelGroup = channel.getChannelGroup();
         userList.add(readStatus.getUserId());
     }
