@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.user;
 
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.dto.request.user.*;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDTO;
 import com.sprint.mission.discodeit.dto.response.user.UserDTO;

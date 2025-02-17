@@ -64,6 +64,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponseDTO createPublicChannel(PublicChannelCreateDTO requestDTO) {
+        log.info("Received PublicChannelCreateDTO with ownerId: {}", requestDTO.ownerId());
         //채널 소유자 확인
         User owner = userRepository.findById(requestDTO.ownerId())
                 .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
@@ -157,7 +158,7 @@ public class BasicChannelService implements ChannelService {
             throw new UnsupportedOperationException("Private channels are not supported");
         }
 
-        channel.update(updateDTO.name(), updateDTO.description());
+        channel.update(updateDTO.newName(), updateDTO.newDescription());
 
         channelRepository.save(channel);
 
@@ -184,6 +185,5 @@ public class BasicChannelService implements ChannelService {
         //채널 삭제
         channelRepository.deleteByChannel(channel);
 
-        log.error("Deleted channel: {}", channelId);
     }
 }
