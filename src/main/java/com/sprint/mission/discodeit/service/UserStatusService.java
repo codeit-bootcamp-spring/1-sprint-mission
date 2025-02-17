@@ -12,7 +12,6 @@ public interface UserStatusService {
   UserStatus find(String id);
   UserStatus findByUserId(String userId);
   List<UserStatus> findAll();
-  UserStatus update(UpdateUserStatusDto dto);
   UserStatus updateByUserId(String userId, UpdateUserStatusDto dto);
   Map<String, UserStatus> mapUserToUserStatus(Set<String> users);
   void delete(String id);

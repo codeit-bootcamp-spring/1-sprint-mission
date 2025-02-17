@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.util.UserStatusType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,6 +11,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Getter
+@Setter
 public class UserStatus implements Serializable {
   private static final long serialVersionUID = 1L;
 

@@ -27,7 +27,6 @@ public class UserUpdateFacadeImpl implements UserUpdateFacade {
   @Override
   public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
     log.info("[User Update] : 요청 수신={} , 수신 정보={}", userId, updateDto);
-
     User user = userService.updateUser(userId, updateDto, updateDto.inputPassword());
     log.info("[User Update] : 기본 정보 업데이트 완료.");
 

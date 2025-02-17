@@ -194,6 +194,7 @@ public class BasicUserService implements UserService {
   public void deleteUser(String id, String password) {
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
 
+
     checkPasswordIsCorrect(password, user.getPassword());
 
     userRepository.delete(id);

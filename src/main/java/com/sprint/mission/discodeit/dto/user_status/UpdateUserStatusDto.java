@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.dto.user_status;
 
-import java.time.Instant;
+import com.sprint.mission.discodeit.util.UserStatusType;
+
 
 public record UpdateUserStatusDto(
-    String uuid,
-    Instant lastOnlineAt
+    UserStatusType status
 ) {
 }

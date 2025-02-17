@@ -67,6 +67,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds) {
 
     if (userIds == null || userIds.isEmpty()) return Collections.emptyMap();
+
     List<BinaryContent> profiles = binaryContentRepository.findProfilesOf(userIds);
 
     return profiles.stream()

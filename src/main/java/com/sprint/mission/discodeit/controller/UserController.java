@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,6 +21,13 @@ import java.util.List;
 public class UserController {
 
   private final UserMasterFacade userFacade;
+
+  @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+  public String getUser(@PathVariable String id, Model model) {
+    UserResponseDto user = userFacade.findUserById(id);
+    model.addAttribute("user", user);
+    return "user/userInfo";
+  }
 
   @RequestMapping(value = "/user-form", method = RequestMethod.GET)
   public String getUserForm() {
@@ -56,6 +64,14 @@ public class UserController {
 
     model.addAttribute("user", user);
     return "redirect:/api/v1/users";
+  }
+
+  @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
+  public String deleteUser(@PathVariable String id, @RequestParam String password) {
+    System.out.println(id + " " + password);
+    userFacade.deleteUser(id, password);
+    return "redirect:/api/v1/users";
+
   }
 
 }

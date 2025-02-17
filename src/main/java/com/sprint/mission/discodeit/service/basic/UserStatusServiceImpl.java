@@ -53,17 +53,6 @@ public class UserStatusServiceImpl implements UserStatusService {
     return userStatusRepository.findAll();
   }
 
-  @Override
-  public UserStatus update(UpdateUserStatusDto dto) {
-
-    UserStatus userStatus = find(dto.uuid());
-
-    userStatus.updateLastOnline();
-
-    userStatusRepository.save(userStatus);
-
-    return userStatus;
-  }
 
   @Override
   public UserStatus updateByUserId(String userId, UpdateUserStatusDto dto) {
@@ -74,7 +63,7 @@ public class UserStatusServiceImpl implements UserStatusService {
         () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
     );
 
-    status.updateLastOnline();
+    status.setUserStatus(dto.status());
 
     userStatusRepository.save(status);
 

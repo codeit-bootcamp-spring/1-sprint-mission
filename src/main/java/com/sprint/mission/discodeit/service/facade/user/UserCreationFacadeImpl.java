@@ -34,8 +34,8 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
   public UserResponseDto createUser(CreateUserRequest userDto) {
 
     User user = userMapper.toEntity(userDto);
-    user.setStatus(new UserStatus(user.getUUID(), Instant.now()));
 
+    user.setStatus(new UserStatus(user.getUUID(), Instant.now()));
     userService.saveUser(user);
     userStatusService.create(user.getStatus());
 
