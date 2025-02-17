@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -30,8 +32,21 @@ public class ChannelController {
   }
 
   @RequestMapping(value = "/{id}/update", method = RequestMethod.PATCH)
-  public ResponseEntity<FindChannelResponseDto> updateChannel(@PathVariable String id, @RequestBody ChannelUpdateDto channelDto){
+  public ResponseEntity<FindChannelResponseDto> updateChannel(@PathVariable String id, @RequestBody ChannelUpdateDto channelDto) {
     FindChannelResponseDto channel = channelMasterFacade.updateChannel(id, channelDto);
     return ResponseEntity.ok(channel);
   }
+
+  @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+  public ResponseEntity<String> deleteChannel(@PathVariable String id) {
+    channelMasterFacade.deleteChannel(id);
+    return ResponseEntity.ok("successfully deleted");
+  }
+
+  @RequestMapping(value = "/user/{id}", method = RequestMethod.GET)
+  public ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@PathVariable String id){
+    List<FindChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(id);
+    return ResponseEntity.ok(channels);
+  }
+
 }

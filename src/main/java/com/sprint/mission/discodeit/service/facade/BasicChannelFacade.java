@@ -65,7 +65,6 @@ public class BasicChannelFacade implements ChannelMasterFacade {
     // user 가 조회할 수 있는 모든 Channel
     List<Channel> channels = channelService.findAllChannelsByUserId(userId, statuses);
 
-
     Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
     Map<String, List<String>> channelReadStatuses = readStatusService.getUserIdsForChannelReadStatuses(channels);
 

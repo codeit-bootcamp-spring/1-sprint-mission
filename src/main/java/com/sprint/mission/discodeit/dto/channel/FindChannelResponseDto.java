@@ -10,6 +10,7 @@ public record FindChannelResponseDto(
     String channelName,
     String serverId,
     Channel.ChannelType channelType,
+    boolean isPrivate,
     Instant createdAt,
     Instant lastMessagedAt,
     List<String> userIds,

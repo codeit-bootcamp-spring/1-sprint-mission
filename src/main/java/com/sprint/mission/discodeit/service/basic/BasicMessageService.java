@@ -68,7 +68,9 @@ public class BasicMessageService implements MessageService {
     return channelIds.stream()
         .collect(Collectors.toMap(
             id -> id,
-            id -> messageRepository.findLatestChannelMessage(id).getCreatedAt()
+            id -> Optional.ofNullable(
+                messageRepository.findLatestChannelMessage(id)
+            ).map(Message::getCreatedAt).orElse(Instant.EPOCH)
         ));
   }
 
