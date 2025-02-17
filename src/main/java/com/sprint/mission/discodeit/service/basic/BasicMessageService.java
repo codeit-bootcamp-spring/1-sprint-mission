@@ -106,7 +106,7 @@ public class BasicMessageService implements MessageService {
 			}
 		}
 
-		return createMessageResponse(savedMessage, attachments);
+		return MessageResponse.from(savedMessage, attachments);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class BasicMessageService implements MessageService {
 		List<BinaryContentResponse> attachments = binaryContentService
 			.findAllByMessageId(messageId);
 
-		return createMessageResponse(message, attachments);
+		return MessageResponse.from(message, attachments);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class BasicMessageService implements MessageService {
 		for (Message message : messages) {
 			List<BinaryContentResponse> attachments = binaryContentService
 				.findAllByMessageId(message.getId());
-			responses.add(createMessageResponse(message, attachments));
+			responses.add(MessageResponse.from(message, attachments));
 		}
 
 		return responses;
@@ -186,7 +186,7 @@ public class BasicMessageService implements MessageService {
 			}
 		}
 
-		return createMessageResponse(updatedMessage, currentAttachments);
+		return MessageResponse.from(updatedMessage, currentAttachments);
 	}
 
 	/**
@@ -208,14 +208,4 @@ public class BasicMessageService implements MessageService {
 		messageRepository.delete(messageId);
 	}
 
-	/**
-	 * 메시지 엔티티와 첨부파일 목록으로 메시지 응답을 생성합니다.
-	 * @param message 메시지 엔티티
-	 * @param attachments 첨부파일 응답 목록
-	 * @return 메시지 응답
-	 */
-	private MessageResponse createMessageResponse(Message message, List<BinaryContentResponse> attachments) {
-		return new MessageResponse(message.getId(), message.getContent(), message.getAuthorId(), message.getChannelId(),
-			attachments, message.getCreatedAt(), message.getUpdatedAt());
-	}
 }
