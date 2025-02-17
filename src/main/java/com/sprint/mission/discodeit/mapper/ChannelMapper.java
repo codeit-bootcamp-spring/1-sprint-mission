@@ -42,6 +42,7 @@ public interface ChannelMapper {
   @Mapping(source = "serverUUID", target = "serverId")
   @Mapping(source = "channelType", target = "channelType")
   @Mapping(source = "createdAt", target = "createdAt")
+  @Mapping(source = "isPrivate", target = "isPrivate")
   @Mapping(source = "participatingUsers", target = "participants")
   PrivateChannelResponseDto toPrivateDto(Channel channel);
 
