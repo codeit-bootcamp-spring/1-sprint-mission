@@ -12,8 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class MessageUpdateDto {
-    @NotNull
-    private String messageId;
+
     @NotNull
     private String userId;
     @NotBlank

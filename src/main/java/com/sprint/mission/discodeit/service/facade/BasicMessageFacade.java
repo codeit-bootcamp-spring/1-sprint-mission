@@ -82,10 +82,10 @@ public class BasicMessageFacade implements MessageMasterFacade {
   }
 
   @Override
-  public MessageResponseDto updateMessage(MessageUpdateDto messageDto) {
+  public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
 
     User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
-    Message message = validator.findOrThrow(Message.class, messageDto.getMessageId(), new MessageNotFoundException());
+    Message message = validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
 
     if (!message.getUserId().equals(user.getUUID())) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
@@ -93,7 +93,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
 
     List<MultipartFile> incomingFiles = messageDto.getBinaryContent();
 
-    List<BinaryContent> savedFiles = binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
+    List<BinaryContent> savedFiles = incomingFiles == null || incomingFiles.isEmpty() ? Collections.emptyList() : binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
 
     message.setBinaryContents(savedFiles);
 

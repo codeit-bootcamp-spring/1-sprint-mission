@@ -10,6 +10,6 @@ public interface MessageMasterFacade {
   MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId);
   MessageResponseDto findMessageById(String id);
   List<MessageResponseDto> findMessagesByChannel(String channelId);
-  MessageResponseDto updateMessage(MessageUpdateDto messageDto);
+  MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto);
   void deleteMessage(String messageId);
 }

@@ -101,6 +101,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getUUID());
 
+
     Set<String> newFileNames = newFiles.stream()
         .map(MultipartFile::getOriginalFilename)
         .collect(Collectors.toSet());
