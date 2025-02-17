@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusRequest;
-import com.sprint.mission.discodeit.dto.userStatus.response.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -63,14 +62,13 @@ public class BasicUserStatusService implements UserStatusService {
 
 	/**
 	 * 사용자 상태를 업데이트합니다.
-	 * @param id 사용자 상태 ID
 	 * @param request 상태 업데이트 요청 정보
 	 * @return 업데이트된 사용자 상태
 	 */
 	@Override
-	public UserStatus update(UUID id, UpdateUserStatusRequest request) {
+	public UserStatus update(UpdateUserStatusRequest request) {
 		// 사용자 상태 조회 및 업데이트
-		UserStatus userStatus = userStatusRepository.findById(id)
+		UserStatus userStatus = userStatusRepository.findById(request.userId())
 			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
 		userStatus.updateLastActiveTime(request.lastActiveAt());
@@ -79,19 +77,18 @@ public class BasicUserStatusService implements UserStatusService {
 
 	/**
 	 * 사용자 ID로 상태를 업데이트합니다.
-	 * @param userId 사용자 ID
-	 * @param lastActiveAt 상태 업데이트 요청 정보
+	 * @param request 상태 업데이트 요청 정보
 	 * @return 업데이트된 사용자 상태
 	 */
 	//createUserRequest dto와 받는 파라미터들은 같은데 그냥 createUserRequest를 사용하는게 맞을까? 원래 dto UpdateUserStatusRequest
 	@Override
-	public UserStatus updateByUserId(UUID userId, Instant lastActiveAt) {
+	public UserStatus updateByUserId(UpdateUserStatusRequest request) {
 		// 사용자 상태 조회 및 업데이트
-		UserStatus userStatus = userStatusRepository.findByUserId(userId)
+		UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
 			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
 		// 백엔드에서 시간을 now로 update하는것이 아닌 프론트 기준으로 보낸 시간을 update하는 걸로 수정
-		userStatus.updateLastActiveTime(lastActiveAt);
+		userStatus.updateLastActiveTime(request.lastActiveAt());
 		return userStatusRepository.save(userStatus);
 	}
 

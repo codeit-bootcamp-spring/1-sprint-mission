@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.dto.userStatus.request.CreateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -116,10 +117,11 @@ public class BasicUserService implements UserService {
 	 * @return 업데이트된 사용자 객체
 	 */
 	@Override
-	public User updateUser(UUID existUserId, UpdateUserRequest request) {
+	public UserResponse updateUser(UUID existUserId, UpdateUserRequest request) {
 		User user = userRepository.findById(existUserId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
+		UserStatus userStatus = userStatusService.updateByUserId(
+			new UpdateUserStatusRequest(user.getId(), request.requestAt()));
 		// 프로필 이미지 업데이트
 		if (request.profileImage() != null) {
 			try {
@@ -138,8 +140,8 @@ public class BasicUserService implements UserService {
 		user.updateUserid(request.userid());
 		user.updateUsername(request.username());
 		user.updateUserEmail(request.email());
-
-		return userRepository.save(user);
+		userRepository.save(user);
+		return createUserResponse(user, userStatus);
 	}
 
 	/**

@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.dto.channel.response.ChannelListResponse;
 import com.sprint.mission.discodeit.dto.channel.response.ChannelResponse;
 import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
+import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -54,7 +55,7 @@ public class BasicChannelService implements ChannelService {
 
 		//보내는 사람은 온라인 받는 사람은 아직 받지 않았으니 온라인 처리를 하지 않음
 		//Todo 만약 receiver가 온라인 상태라면?
-		userStatusService.updateByUserId(author.id(), request.createdAt());
+		userStatusService.updateByUserId(new UpdateUserStatusRequest(author.id(), request.createdAt()));
 		UserResponse receiver = userService.findUser(request.receiverId());
 
 		// 참여자 맵 생성
@@ -90,7 +91,7 @@ public class BasicChannelService implements ChannelService {
 		Map<UUID, UserResponse> participants = new HashMap<>();
 
 		//유저 online처리
-		userStatusService.updateByUserId(request.creatorId(), request.createdAt());
+		userStatusService.updateByUserId(new UpdateUserStatusRequest(request.creatorId(), request.createdAt()));
 
 		//creator도 channel에 추가
 		participants.put(request.creatorId(), userService.findUser(request.creatorId()));
@@ -142,7 +143,7 @@ public class BasicChannelService implements ChannelService {
 		// 사용자 존재 확인
 		userService.findUser(userId);
 		// 사용자 존재한다면 online으로 처리
-		userStatusService.updateByUserId(userId, Instant.now());
+		userStatusService.updateByUserId(new UpdateUserStatusRequest(userId, Instant.now()));
 
 		// PUBLIC 채널 전체와 사용자의 PRIVATE 채널 조회
 		List<Channel> publicChannels = channelRepository.findAllPublicChannels();

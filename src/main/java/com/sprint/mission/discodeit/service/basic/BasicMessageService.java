@@ -15,6 +15,7 @@ import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
+import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.BinaryContentType;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -53,7 +54,7 @@ public class BasicMessageService implements MessageService {
 		// 사용자와 채널 존재 여부 확인
 		UserResponse author = userService.findUser(request.authorId());
 		// 사용자 online 처리
-		userStatusService.updateByUserId(author.id(), request.createdAt());
+		userStatusService.updateByUserId(new UpdateUserStatusRequest(author.id(), request.createdAt()));
 		ChannelResponse channel = channelService.find(request.channelId());
 		UUID channelId = request.channelId();
 		// 메시지 작성자가 채널 참여자인지 확인
