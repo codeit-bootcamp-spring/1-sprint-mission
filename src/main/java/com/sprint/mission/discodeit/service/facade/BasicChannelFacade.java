@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.facade;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -76,9 +78,13 @@ public class BasicChannelFacade implements ChannelMasterFacade {
   }
 
   @Override
-  public FindChannelResponseDto updateChannel(ChannelUpdateDto channelUpdateDto) {
-    Channel channel = channelService.updateChannel(channelUpdateDto.getChannelId(), channelUpdateDto.getChannelName(), channelUpdateDto.getMaxNumberOfPeople());
-    Instant lastMessageTime = messageService.getLatestMessageByChannel(channel.getUUID()).getCreatedAt();
+  public FindChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
+    Channel channel = channelService.updateChannel(channelId, channelUpdateDto.getChannelName(), channelUpdateDto.getMaxNumberOfPeople());
+    Instant lastMessageTime = Optional.ofNullable(
+        messageService.getLatestMessageByChannel(channel.getUUID())
+        )
+        .map(Message::getCreatedAt)
+        .orElse(Instant.EPOCH);
     List<String> userIds = channel.getParticipatingUsers();
     return channelMapper.toFindChannelDto(
         channel,

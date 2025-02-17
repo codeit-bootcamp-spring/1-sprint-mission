@@ -12,6 +12,6 @@ public interface ChannelMasterFacade {
   FindChannelResponseDto getChannelById(String channelId);
   List<FindChannelResponseDto> findAllChannelsByUserId(String userId);
 
-  FindChannelResponseDto updateChannel(ChannelUpdateDto channelUpdateDto);
+  FindChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto);
   void deleteChannel(String channelId);
 }

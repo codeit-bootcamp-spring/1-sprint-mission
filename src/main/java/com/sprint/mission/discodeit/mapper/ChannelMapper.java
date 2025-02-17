@@ -35,6 +35,7 @@ public interface ChannelMapper {
   @Mapping(source = "channelType", target = "channelType")
   @Mapping(source = "channelName", target = "channelName")
   @Mapping(source = "createdAt", target = "createdAt")
+  @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
   @Mapping(target = "isPrivate", constant = "false") // 공개 채널이므로 false
   PublicChannelResponseDto toPublicDto(Channel channel);
 

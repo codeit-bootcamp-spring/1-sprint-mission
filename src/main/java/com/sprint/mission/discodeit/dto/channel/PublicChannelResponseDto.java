@@ -10,6 +10,7 @@ public record PublicChannelResponseDto(
     Channel.ChannelType channelType,
     String channelName,
     Instant createdAt,
+    int maxNumberOfPeople,
     boolean isPrivate
 ) {
 }
