@@ -108,10 +108,11 @@ public class BasicUserService implements UserService {
         UUID profileImageId = user.getProfileImageId();
         UUID userStatusId = user.getUserStatus().getUserId();
 
-        userRepository.delete(id);
-        
         // 유저 삭제 이벤트 발생
         eventPublisher.publishEvent(new UserDeletedEvent(id, profileImageId, userStatusId));
+
+        userRepository.delete(id);
+
     }
 
     // 유저 존재 여부 확인

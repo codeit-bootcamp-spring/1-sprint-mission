@@ -135,10 +135,11 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelRepository.load().get(id);
 
-        channelRepository.delete(id);
-
         // 채널 삭제 이벤트 발생
         eventPublisher.publishEvent(new ChannelDeletedEvent(channel));
+
+        channelRepository.delete(id);
+
     }
 
     // 채널 존재 여부 확인
