@@ -1,77 +1,68 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-public class User {
+@Getter
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    private final UUID uuID;
-    private final Long createdAt;
-    private Long updatedAt;
     private final String name;
     private String email;
     private String password;
-    private String iD;
+    private String accountId;
+    private UUID binaryContentId;
 
 
     public User(String name, String email,String iD ,String password){
-        this.uuID = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
         this.name = name;
         this.email = email;
-        this.iD = iD;
+        this.accountId = iD;
         this.password = password;
     }
-
-    public UUID getuuID() {
-        return uuID;
+    public User(String name, String email,String iD ,String password,UUID binaryContentId ){
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
+        this.name = name;
+        this.email = email;
+        this.accountId = iD;
+        this.password = password;
+        this.binaryContentId = binaryContentId;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword(){
-        return password;
-    }
-
-    public String getId() {
-        return iD;
-    }
 
     public void update(String email, String iD, String password){
         this.email = email;
-        this.iD = iD;
+        this.accountId = iD;
         this.password = password;
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     @Override
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "User{\n" +
-                "UUID : " + uuID +
-                ", \ncreatedAt : " + sdf.format(new Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new Date(updatedAt)) +
+                "UUID : " + id +
+                ", \ncreatedAt : " + createdAt +
+                ", \nupdatedAt : " + updatedAt +
                 ", \nname : " + name +
                 ", \nemail : " + email +
-                ", \nid : " + iD + "\n}";
+                ", \nid : " + accountId + "\n}";
     }
-
 
 }

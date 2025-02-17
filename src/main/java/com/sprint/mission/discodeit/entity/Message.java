@@ -1,65 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
-public class Message {
+@Getter
+public class Message implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    private final UUID msguuId;
-    private final Channel destinationCh;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
+
     private String content;
-    private final User SendUser;
 
+    private final UUID channelId;
+    private final UUID authorId;
 
-    public Message(User SendUser, Channel destinationCh, String content) {
-        this.msguuId = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+
         this.updatedAt = this.createdAt;
         this.content = content;
-        this.SendUser = SendUser;
-        this.destinationCh = destinationCh;
+        this.authorId = authorId;
+        this.channelId = channelId;
     }
 
-    public UUID getMsguuId() {
-        return msguuId;
-    }
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public User  SendUser() {
-        return SendUser;
-    }
-
-    public Channel getDestinationChannel() {
-        return destinationCh;
-    }
-
-    public void update(String content) {
-        this.content = content;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
+    public void update(String newContent) {
+        this.content = newContent;
+        this.updatedAt = Instant.now(); // 수정 시간을 갱신
     }
 
     @Override
     public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "Message{\n" +
-                "UUId=" + msguuId +
-                ", \ndestinationChannel : " + destinationCh.getChannelName() +
-                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) +
+                "UUId=" + id +
+                ", \ndestinationChannel ID : " + channelId +
+                ", \ncreatedAt : " + createdAt +
+                ", \nupdatedAt : " + updatedAt +
                 ", \ncontent : " + content + '\'' +
-                ", \nsendUser : " + SendUser.getName() + "\n}";
+                ", \nsendUser ID : " + authorId + "\n}";
     }
 
 }

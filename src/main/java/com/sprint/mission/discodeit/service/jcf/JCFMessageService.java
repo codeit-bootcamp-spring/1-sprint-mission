@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ExceptionText;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -12,7 +11,7 @@ import java.util.*;
 
 public class JCFMessageService implements MessageService {
     //< 채널 UUID < 메시지 UUID, 매시지 객체 >>
-    private final Map<UUID, Map<UUID, Message>> msgData = new HashMap<>();
+    private final Map<UUID, Map<UUID, Message>> data = new HashMap<>();
     private final MessageValidator validationService;
 
     public JCFMessageService(MessageValidator validationService) {
@@ -20,58 +19,54 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message CreateMsg(User user, Channel channel, String content) {
-        if (!validationService.validateMessage(user, channel, content)){
-            throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
+    public Message createMsg(String content, UUID channelId, UUID authorId){
+        if (validationService.validateMessage(authorId, channelId, content)){
+            Message msg = new Message(content,channelId,authorId);
+            data.putIfAbsent(msg.getChannelId(), new HashMap<>());
+            data.get(msg.getChannelId()).put(msg.getId(), msg);
+            return msg;
         }
-        Message msg = new Message(user, channel, content);
-        msgData.putIfAbsent(msg.getDestinationChannel().getuuId(), new HashMap<>());
-        msgData.get(msg.getDestinationChannel().getuuId()).put(msg.getMsguuId(), msg);
-        return msg;
+        throw new CustomException(ExceptionText.MESSAGE_CREATION_FAILED);
     }
 
     @Override
-    public Message getMessage(UUID msgId) {
-        for (Map<UUID, Message> channelMessages : msgData.values()) {
-            if (channelMessages.containsKey(msgId)) {
-                return channelMessages.get(msgId);
+    public Message find(UUID msgUuid) {
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            if (channelMessages.containsKey(msgUuid)) {
+                return channelMessages.get(msgUuid);
             }
         }
-        System.out.println("Message with ID " + msgId + " not found.");
+        System.out.println("Message with ID " + msgUuid + " not found.");
         return null;
     }
 
     @Override
-    public Map<UUID, Map<UUID, Message>> getAllMsg() {
-        return new HashMap<>(msgData);
+    public List<Message> findAll() {
+        List<Message> allMessages = new ArrayList<>();
+
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            allMessages.addAll(channelMessages.values()); // 각 채널의 모든 메시지를 추가
+        }
+
+        return allMessages;
     }
 
     @Override
-    public void updateMsg(UUID msgId, String newContent) {
-        Message msg = getMessage(msgId);
+    public Message update(UUID msgUuid, String newContent) {
+        Message msg = find(msgUuid);
         msg.update(newContent);
         System.out.println("Message content has been updated --> ("+ newContent + ")");
-
+        return null;
     }
 
     @Override
-    public void deleteMsg(UUID msgId) {
-        for (Map<UUID, Message> channelMessages : msgData.values()) {
-            if (channelMessages.containsKey(msgId)) {
-                channelMessages.remove(msgId);
-                System.out.println("Message " + msgId + " deleted.");
-                return;
+    public void delete(UUID msgUuid) {
+        for (Map<UUID, Message> channelMessages : data.values()) {
+            if (channelMessages.containsKey(msgUuid)) {
+                channelMessages.remove(msgUuid);
+                System.out.println("Message " + msgUuid + " deleted.");
             }
         }
-        System.out.println("Message not found: " + msgId);
-    }
-
-    @Override
-    public void deleteMessagesByChannel(UUID channelId) {
-        if (!msgData.containsKey(channelId)) {
-            System.out.println("No messages found for channel ID");
-        }
-        msgData.remove(channelId);
-        System.out.println("All messages for channel " + channelId + " have been deleted.");
+        System.out.println("Message not found: " + msgUuid);
     }
 }

@@ -1,19 +1,21 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.user.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.user.CreatedUserDataDTO;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
 
-    User CreateUser(String name, String email,String iD ,String password);
+    User createUser(CreatedUserDataDTO data, BinaryContentDTO proFile);
 
-    User getUser(UUID id);
+    User find(UUID uuid);
 
-    HashMap<UUID, User> getAllUsers();
+    List<User> findAll();
 
-    void updateUser(UUID uuID, String email, String iD, String password);
+    User update(UUID uuid, String email, String iD, String password);
 
-    void deleteUser(UUID useruuId);
+    void delete(UUID uuid);
 }
