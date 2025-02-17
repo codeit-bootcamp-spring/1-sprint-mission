@@ -1,84 +1,162 @@
 package some_path._1sprintmission.discodeit.repository.file;
 
+import org.springframework.stereotype.Repository;
 import some_path._1sprintmission.discodeit.entiry.User;
 import some_path._1sprintmission.discodeit.repository.UserRepository;
 import some_path._1sprintmission.discodeit.entiry.enums.UserType;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+@Repository
 public class FileUserRepository implements UserRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    private final String filename;
+    public FileUserRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
-    public FileUserRepository(String filename) {
-        this.filename = filename;
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
+    @Override
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
     }
 
     @Override
     public List<User> findAll() {
-        List<User> users = new ArrayList<>();
-        File file = new File(filename);
-
-        if (!file.exists()) {
-            return users;
-        }
-
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                User user = parseUser(line);
-                if (user != null) {
-                    users.add(user);
-                }
-            }
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return users;
     }
 
     @Override
-    public void saveAll(List<User> users) {
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), StandardCharsets.UTF_8))) {
-            for (User user : users) {
-                String userString = userToString(user);
-                bw.write(userString);
-                bw.newLine();
-            }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public boolean existsByUsername(String userName) {
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return false;
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
-    private User parseUser(String line) {
-        String[] parts = line.split(",");
-        if (parts.length < 5) {
-            System.err.println("Invalid user data: " + line);
-            return null;
+    @Override
+    public boolean isDiscriminatorDuplicate(String username, int discriminator) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .anyMatch(user -> user.getUsername().equals(username) && user.getDiscriminator() == discriminator);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        String username = parts[0].trim();
-        String email = parts[1].trim();
-        String phone = parts[2].trim();
-        UserType userType = UserType.valueOf(parts[3].trim());
-        String introduce = parts[4].trim();
-
-        User user = new User(username, email, phone);
-        user.setUserType(userType);
-        user.setIntroduce(introduce);
-        user.setVerified(Boolean.FALSE);
-        return user;
     }
 
-    private String userToString(User user) {
-        return user.getUsername() + ","
-                + user.getUserEmail() + ","
-                + user.getUserPhone() + ","
-                + user.getUserType() + ","
-                + user.getIntroduce();
+    @Override
+    public Optional<User> findByUserName(String username) {
+        try (Stream<Path> files = Files.list(DIRECTORY)) {
+            return files
+                    .map(this::readUserFromFile)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .filter(user -> user.getUsername().equals(username))
+                    .findFirst();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read user files", e);
+        }
     }
+
+    private Optional<User> readUserFromFile(Path path) {
+        try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+        ) {
+            return Optional.of((User) ois.readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+
 }

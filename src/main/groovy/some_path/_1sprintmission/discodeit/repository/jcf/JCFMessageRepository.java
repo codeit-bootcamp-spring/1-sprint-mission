@@ -1,59 +1,63 @@
 package some_path._1sprintmission.discodeit.repository.jcf;
 
 
+import some_path._1sprintmission.discodeit.dto.MessageUpdateRequestDTO;
 import some_path._1sprintmission.discodeit.entiry.Channel;
 import some_path._1sprintmission.discodeit.entiry.Message;
+import some_path._1sprintmission.discodeit.repository.MessageRepository;
 
 import java.util.*;
 
-public class JCFMessageRepository {
-    private final Map<UUID, Message> messageData = new HashMap<>();
-    private final Map<UUID, Channel> channelData;
+public class JCFMessageRepository implements MessageRepository {
+    private final Map<UUID, Message> data;
 
-    public JCFMessageRepository(Map<UUID, Channel> channelData) {
-        this.channelData = channelData;
+    public JCFMessageRepository() {
+        this.data = new HashMap<>();
     }
 
-    // Save a message
-    public void save(Channel channel, Message message) {
-        messageData.put(message.getId(), message);
-        channel.addMessage(message); // Add the message to the channel
+    @Override
+    public Message save(Message message) {
+        this.data.put(message.getId(), message);
+        return message;
     }
 
-    // Find a message by ID
+    @Override
     public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(messageData.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
-    // Find all messages
+    @Override
+    public Message update(MessageUpdateRequestDTO request) {
+        return null;
+    }
+
+    @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messageData.values());
+        return this.data.values().stream().toList();
     }
 
-    // Find all messages by channel
-    public List<Message> findAllByChannel(UUID channelId) {
-        Channel channel = channelData.get(channelId);
-        return channel != null ? channel.getMessages() : Collections.emptyList();
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
-    // Delete a message
-    public void delete(Message message) {
-        messageData.remove(message.getId());
-        Channel channel = channelData.get(message.getId());
-        if (channel != null) {
-            channel.getMessages().remove(message); // Remove the message from the channel
-        }
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
-    // Update a message
-    public void update(Message oldMessage, Message updatedMessage) {
-        messageData.put(oldMessage.getId(), updatedMessage);
+    @Override
+    public void deleteBySender(UUID senderId) {
+        this.data.entrySet().removeIf(entry -> entry.getValue().getSender().equals(senderId));
+    }
 
-        // Update message in the channel
-        Channel channel = channelData.get(oldMessage.getId());
-        if (channel != null) {
-            channel.getMessages().remove(oldMessage);
-            channel.getMessages().add(updatedMessage);
-        }
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return null;
     }
 }

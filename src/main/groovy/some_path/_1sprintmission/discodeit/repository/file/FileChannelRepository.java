@@ -1,118 +1,142 @@
 package some_path._1sprintmission.discodeit.repository.file;
 
+import org.springframework.stereotype.Repository;
 import some_path._1sprintmission.discodeit.entiry.Channel;
 import some_path._1sprintmission.discodeit.entiry.Message;
 import some_path._1sprintmission.discodeit.entiry.User;
 import some_path._1sprintmission.discodeit.repository.ChannelRepository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
-    private final String filePath;
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileChannelRepository(String filePath) {
-        this.filePath = filePath;
+    public FileChannelRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public void saveAll(List<Channel> channels) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (Channel channel : channels) {
-                writer.write(serializeChannel(channel));
-                writer.newLine();
-            }
-            System.out.println("Channels saved to file successfully.");
+    public Channel save(Channel channel) {
+        Path path = resolvePath(channel.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(channel);
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error saving channels to file.");
+            throw new RuntimeException(e);
         }
+        return channel;
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
     public List<Channel> findAll() {
-        List<Channel> channels = new ArrayList<>();
-        File file = new File(filePath);
-
-        if (!file.exists() || file.length() == 0) {
-            System.out.println("File does not exist or is empty. Returning empty channel list.");
-            return channels;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                channels.add(parseChannel(line));
-            }
-            System.out.println("Channels loaded from file successfully.");
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Channel) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error loading channels from file.");
+            throw new RuntimeException(e);
         }
-
-        return channels;
     }
 
-    private String serializeChannel(Channel channel) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(channel.getName()).append("|");
-
-        String userIds = channel.getMembers().stream()
-                .map(user -> user.getUsername() + ":" + user.getUserEmail() + ":" + user.getUserPhone())
-                .collect(Collectors.joining(","));
-        sb.append(userIds).append("|");
-
-        String messageContents = channel.getMessages().stream()
-                .map(message -> message.getSender().getUsername() + ":" + message.getSender().getUserEmail() + ":" + message.getSender().getUserPhone() + ":" + message.getContent())
-                .collect(Collectors.joining(","));
-        sb.append(messageContents);
-
-        return sb.toString();
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 
-    private Channel parseChannel(String line) {
-        String[] parts = line.split("\\|");
-        if (parts.length != 3) {
-            throw new IllegalArgumentException("Invalid channel format in file.");
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        String name = parts[0];
-        Channel channel = new Channel(name);
+    @Override
+    public Optional<Channel> findByInviteCode(String inviteCode) {
+        Channel channelNullable = null;
+        Path path = resolvePath(UUID.fromString(inviteCode));
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(channelNullable);
+    }
 
-        if (!parts[1].isEmpty()) {
-            String[] userDetails = parts[1].split(",");
-            for (String userDetail : userDetails) {
-                String[] userParts = userDetail.split(":");
-                if (userParts.length != 3) {
-                    throw new IllegalArgumentException("Invalid user format in channel data.");
+    @Override
+    public List<Channel> findAllByUsersContaining(User user) {
+        List<Channel> channels = new ArrayList<>();
+        try (Stream<Path> files = Files.list(DIRECTORY)) {
+            files.forEach(path -> {
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
+                    Channel channel = (Channel) ois.readObject();
+                    if (channel.getUsers().contains(user)) {
+                        channels.add(channel);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-
-                String username = userParts[0];
-                String email = userParts[1];
-                String phone = userParts[2];
-
-                User user = new User(username, email, phone);
-                user.joinChannel(channel);
-            }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        if (!parts[2].isEmpty()) {
-            String[] messageContents = parts[2].split(",");
-            for (String messageDetail : messageContents) {
-                String[] messageParts = messageDetail.split(":");
-                String senderUsername = messageParts.length > 0 ? messageParts[0] : "UnknownSender";
-                String senderEmail = messageParts.length > 1 ? messageParts[1] : "unknown@gmail.com";
-                String senderPhone = messageParts.length > 2 ? messageParts[2] : "010-0000-0000";
-                String content = messageParts.length > 3 ? messageParts[3] : "No content";
-
-                User sender = new User(senderUsername, senderEmail, senderPhone);
-                Message message = new Message(sender, content);
-                channel.addMessage(message);
-            }
-        }
-
-        return channel;
+        return channels;
     }
 }

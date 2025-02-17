@@ -1,36 +1,35 @@
 package some_path._1sprintmission.discodeit.entiry;
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    private final User sender;       // 메시지를 보낸 사용자
-    private final String content;    // 메시지 내용
-    private final long sentAt;       // 보낸 시간 (Unix timestamp)
+@Getter
+public class Message extends BaseEntity implements Serializable {
 
-    public Message(User sender, String content) {
+    private UUID sender;       // 메시지를 보낸 사용자
+    private String content;    // 메시지 내용
+    private Instant sentAt;       // 보낸 시간 (Unix timestamp)
+    private UUID channel;
+
+
+    public Message(UUID channelId, UUID senderId, String content) {
         super();
-        this.sender = sender;
+        this.sender = senderId;
         this.content = content;
-        this.sentAt = Instant.now().getEpochSecond(); // 현재 시간
+        this.sentAt = Instant.from(LocalDateTime.now()); // 현재 시간
+        this.channel = channelId;
     }
 
-    public User getSender() {
-        return sender;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public long getSentAt() {
-        return sentAt;
-    }
 
     @Override
     public String toString() {
         return "Message{" +
                 "id=" + getId() +
-                ", sender=" + sender.getUsername() +
+                ", sender=" + sender.toString() +
                 ", content='" + content + '\'' +
                 ", sentAt=" + sentAt +
                 '}';
