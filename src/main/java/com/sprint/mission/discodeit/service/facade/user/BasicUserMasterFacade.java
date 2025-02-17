@@ -37,6 +37,7 @@ public class BasicUserMasterFacade implements UserMasterFacade {
 
   private final UserCreationFacade userCreationFacade;
   private final UserUpdateFacade userUpdateFacade;
+  private final UserFindFacade userFindFacade;
   @Override
   public UserResponseDto createUser(CreateUserRequest request) {
     return userCreationFacade.createUser(request);
@@ -44,11 +45,7 @@ public class BasicUserMasterFacade implements UserMasterFacade {
 
   @Override
   public UserResponseDto findUserById(String id) {
-    User user = userService.findUserById(id);
-    UserStatus status = user.getStatus();
-    BinaryContent content = user.getProfileImage();
-
-    return userMapper.toDto(user, status, content);
+    return userFindFacade.findUserById(id);
   }
 
   @Override
@@ -58,15 +55,7 @@ public class BasicUserMasterFacade implements UserMasterFacade {
 
   @Override
   public List<UserResponseDto> findAllUsers() {
-
-    List<User> users = userService.findAllUsers();
-    Set<String> userIdSet = mapToUserUuids(users);
-    Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSet);
-
-    Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSet);
-
-
-    return createMultipleUserResponses(users, userStatusMap, binaryContentMap);
+    return userFindFacade.findAllUsers();
   }
 
   @Override
@@ -86,22 +75,4 @@ public class BasicUserMasterFacade implements UserMasterFacade {
         .collect(Collectors.toSet());
   }
 
-  private List<UserResponseDto> createMultipleUserResponses(
-      List<User> users,
-      Map<String, UserStatus> userStatusMap,
-      Map<String, BinaryContent> binaryContentMap
-  ) {
-    return users.stream()
-        .map(user -> {
-          UserStatus userStatus = getOrCreateUserStatus(userStatusMap, user.getUUID());
-          BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
-          return userMapper.toDto(user, userStatus, profilePicture);
-        }).toList();
-  }
-
-  private UserStatus getOrCreateUserStatus(Map<String, UserStatus> userStatusMap, String userId) {
-    return userStatusMap.containsKey(userId)
-        ? userStatusMap.get(userId)
-        : userStatusService.create(new UserStatus(userId, Instant.now()));
-  }
 }
