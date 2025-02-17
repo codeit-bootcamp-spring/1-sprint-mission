@@ -16,7 +16,7 @@ public interface MessageService {
 
     UUID createMessage(UUID authorId, UUID channelId, String content);
 
-    Message findMessageById(UUID channelId, UUID messageId);
+    MessageDto findMessageById(UUID channelId, UUID messageId);
 
     boolean reviseMessageContent(UUID channelId, UUID messageId, String content);
 

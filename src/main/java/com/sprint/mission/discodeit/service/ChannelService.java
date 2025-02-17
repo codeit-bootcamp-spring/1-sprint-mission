@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +23,9 @@ public interface ChannelService {
 
     String getChannelNameById(UUID userId);
 
-    boolean printAllMemberNames(UUID channelId);
+    List<UserDto> findAllMembers(UUID channelId);
+
+    boolean deleteMember(UUID channelId, UUID memberId);
 
 
 }

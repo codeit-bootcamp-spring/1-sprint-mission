@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -24,6 +23,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     //유저 스테이터스 객체 유저스테이터스맵에 추가.
     @Override
     public boolean addUserStatus(UserStatus userStatus) {
+        if (userStatus == null) {System.out.println("파라미터에 전달된 userStatus 객체가 null인 상태입니다. "); return false;}
         userStatusMap.put(userStatus.getUserId(), userStatus);
         return true;
     }
@@ -31,10 +31,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     //유저스테이터스맵의 객체 삭제. IO핸들러 저장까지 정상적으로 완료됐다면 true.
     @Override
     public boolean deleteUserStatusById(UUID userId) {
-        if (userStatusMap.remove(userId) == null) {
-            System.err.println("해당 userId의 userStatus가 Map에 존재하지 않습니다. ");
-            return false;
-        }
+        if (userStatusMap.remove(userId) == null) {System.out.println("해당 userId의 userStatus가 Map에 존재하지 않습니다. "); return false;}
         return true;
     }
 
@@ -49,8 +46,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public boolean updateUserStatus(UUID userId) {
         UserStatus userStatus = userStatusMap.get(userId);
         if (userStatus == null) {
-            return false;
-        }
+            System.out.println("해당 userId의 userStatus가 Map에 존재하지 않습니다. "); return false; }
         userStatus.updateStatus();
         return true;
     }

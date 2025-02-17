@@ -2,11 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 public class JCFReadStatusRepository implements ReadStatusRepository {
@@ -29,47 +25,42 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus getReadStatus(UUID channelId, UUID userId) throws IOException {
+    public ReadStatus getReadStatus(UUID channelId, UUID userId){
         HashMap<UUID, ReadStatus> channelMap = getChannelReadStatusMap(channelId);
         return channelMap.get(userId);
     }
 
     //채널별 맵인 channelReadStatusMap을 allReadStatusMaps에 저장
     @Override
-    public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap) throws IOException {
+    public boolean addChannelReadStatusMap(UUID channelId, HashMap<UUID, ReadStatus> readStatusMap){
         this.allReadStatusMaps.put(channelId, readStatusMap);
         return true;
     }
 
     //readStatus 객체를 채널별 맵 channelReadStatusMap에 저장
     @Override
-    public boolean saveReadStatus(UUID channelId, UUID userId, ReadStatus readStatus) throws IOException {
-        HashMap<UUID, ReadStatus> readStatusMap = Optional.ofNullable(this.allReadStatusMaps.get(channelId)).orElseThrow(() -> new NoSuchElementException("해당 채널의 readStatusMap이 레포지토리에 존재하지 않습니다."));
+    public boolean saveReadStatus(UUID channelId, UUID userId, ReadStatus readStatus){
+        HashMap<UUID, ReadStatus> readStatusMap = this.allReadStatusMaps.get(channelId);
+        if (readStatusMap == null){System.out.println("해당 채널의 readStatusMap이 레포지토리에 존재하지 않습니다."); return false;}
+        if (readStatus == null){System.out.println("전달된 readStatus가 null인 상태로, channelReadStatusMap에 저장할 수 없습니다."); return false;}
         readStatusMap.put(userId, readStatus);
         return true;
     }
 
     //채널 readStatusMap의 readStatus를 찾아 삭제함.
-    //정상적으로 삭제될경우 삭제된 요소가 반환되므로 null이 반환될경우 존재하지 않는 key를 삭제 시도한 것으로 보고 예외를 던짐.
     @Override
-    public boolean deleteReadStatus(UUID channelId, UUID userId) throws IOException {
-        HashMap<UUID, ReadStatus> readStatusMap = Optional.ofNullable(this.allReadStatusMaps.get(channelId)).orElseThrow(() -> new NoSuchElementException("해당 채널의 readStatusMap이 레포지토리에 존재하지 않습니다."));
-        if (readStatusMap.remove(userId).equals(null)) {
-            throw new NoSuchElementException("해당 uuid를 가진 readStatus 객체가 채널 readStatusMap에 없습니다.");
-        }
+    public boolean deleteReadStatus(UUID channelId, UUID userId){
+        HashMap<UUID, ReadStatus> readStatusMap = this.allReadStatusMaps.get(channelId);
+        if (readStatusMap == null){System.out.println("해당 채널의 readStatusMap이 레포지토리에 존재하지 않습니다."); return false;}
+        if (readStatusMap.remove(userId)==null) {
+            System.out.println("해당 uuid를 가진 readStatus 객체가 채널 readStatusMap에 없습니다."); return false;}
         return true;
     }
 
+    //채널의 ReadStatusMap 삭제.
     @Override
     public boolean deleteChannelReadStatusMap(UUID channelId) {
-        if (channelId == null) {
-            return false;
-        }
-        if (allReadStatusMaps.remove(channelId)==null){
-            return false;
-        }else{
-            return true;
-        }
+        return allReadStatusMaps.remove(channelId)!=null;
     }
 
 

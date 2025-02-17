@@ -3,11 +3,9 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Entity;
 import org.springframework.stereotype.Component;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
@@ -67,7 +65,7 @@ public class FileIOHandler {
     }
 
     //해쉬맵과 파일이름 받아서 직렬화. 직렬화 수행여부 리턴
-    public boolean serializeLinkedHashMap(LinkedHashMap<UUID, ? extends Entity> entityMap, String fileName) throws IOException {
+    public boolean serializeLinkedHashMap(LinkedHashMap<UUID, ? extends Entity> entityMap, String fileName){
         if (entityMap == null || fileName == null) {
             throw new NullPointerException("IO 핸들러에 전달된 엔티티맵 혹은 파일이름이 null인 상태입니다.");
         }
@@ -78,7 +76,9 @@ public class FileIOHandler {
             oos.writeObject(entityMap);
             return true;
         } catch (IOException e) {
-            throw new IOException("엔티티맵 직렬화에 실패했습니다. 실패한 파일 경로", e);
+            e.printStackTrace();
+            System.out.println("엔티티맵 역직렬화 실패");
+            return false;
         }
     }
     //IO예외 캐치해서 여기서 죽임.

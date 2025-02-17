@@ -15,8 +15,6 @@ public interface UserService {
 
     List<UserDto> findAllUsers();
 
-    String getUserNameById(UUID id);
-
     boolean deleteUser(UUID userId);
 
     boolean changeUserName(UUID userId, String newName);
