@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-@Service // Bean으로 등록
-@RequiredArgsConstructor // Lombok: final 필드를 위한 생성자 자동 생성
+@Service
+@RequiredArgsConstructor // final 필드에 대한 생성자 자동 생성
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
     @Override
     public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
+        Channel channel = new Channel(type, name, description); // Cannot resolve constructor 'Channel(ChannelType, String, String)'
         return channelRepository.save(channel);
     }
 

@@ -1,51 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.AllArgsConstructor;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@AllArgsConstructor // 모든 필드를 포함한 생성자 생성
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private Long createdAt;
+    private final UUID id = UUID.randomUUID();
+    private final Long createdAt = Instant.now().getEpochSecond();
     private Long updatedAt;
-    //
     private String username;
     private String email;
     private String password;
 
     public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        //
         this.username = username;
         this.email = email;
         this.password = password;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
+        this.updatedAt = Instant.now().getEpochSecond(); // 생성시 updatedAt 설정
     }
 
     public void update(String newUsername, String newEmail, String newPassword) {
