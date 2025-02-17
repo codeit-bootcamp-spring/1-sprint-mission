@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import com.sprint.mission.discodeit.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,11 +47,40 @@ public class BasicUserService implements UserService {
         User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
         userRepository.save(user);
 
-        if(request.profileImageId() != null){
-            BinaryContent profileImage = binaryContentRepository.findById(request.profileImageId());
-            user.setProfileImage(profileImage);
-        }else{
-            BinaryContent profileImage = new BinaryContent(user.getId(), Mimetype.User);
+//        if(request.profileImageId() != null){
+//            BinaryContent profileImage = binaryContentRepository.findById(request.profileImageId());
+//            user.setProfileImage(profileImage);
+//        }else{
+//            BinaryContent profileImage = new BinaryContent(user.getId(), Mimetype.User);
+//            user.setProfileImage(profileImage);
+//        }
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatusRepository.save(userStatus);
+
+        return UserResponse.fromEntity(user , userStatus.isOnline());
+    }
+
+    @Override
+    public UserResponse create(UserRequest request, MultipartFile file) {
+
+        if(!validator.isValidEmail(request.email())){
+            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
+            System.out.println(new ValidationException("Invalid email format : " + request.email()));
+        }
+
+        if(!validator.isValidPhoneNumber(request.phoneNumber())){
+            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
+            System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber()));
+        }
+
+        User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
+        userRepository.save(user);
+
+        BinaryContent profileImage = null;
+        if(!file.isEmpty()){
+            System.out.println("123121212121");
+            profileImage = binaryContentRepository.save(file, user.getId());
             user.setProfileImage(profileImage);
         }
 
@@ -71,12 +101,16 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> readAll() {
         List<User> users = userRepository.readAll();
-        List<UserResponse> responses = users.stream().map(user -> {
-                                            boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
-                                            return UserResponse.fromEntity(user, isOnline);
-                                        })
-                                        .collect(Collectors.toList());
 
+        List<UserResponse> responses = users.stream().map(user -> {
+                    try {
+                        boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
+                        return UserResponse.fromEntity(user, isOnline);
+                    } catch (NullPointerException e){
+                        throw new NullPointerException("user id 값이 null 입니다." + e.getMessage());
+                    }
+                })
+                .collect(Collectors.toList());
         return responses;
     }
 

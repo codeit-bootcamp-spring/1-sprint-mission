@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelResponse(
+        UUID id,
         String name,
         String description,
         List<UUID> member,
@@ -16,6 +17,7 @@ public record ChannelResponse(
 ) {
     public static ChannelResponse fromEntity(Channel channel){
         return new ChannelResponse(
+            channel.getId(),
             channel.getName(),
             channel.getDescription(),
             channel.getMember(),

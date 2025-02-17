@@ -6,8 +6,6 @@ import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.dto.PrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.PublicChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.BaseRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -24,15 +22,16 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponse create(ChannelRequest request) {
+        ChannelResponse response;
         if(request.channelType() == ChannelType.Private){
             PrivateChannelRequest privateChannel = new PrivateChannelRequest(request.member(), request.owner(), request.channelType());
-            privateChannelCreate(privateChannel);
+            response = privateChannelCreate(privateChannel);
         }else{
             PublicChannelRequest publicChannel = new PublicChannelRequest(request.name(), request.description(), request.owner(), request.channelType());
-            publicChannelCreate(publicChannel);
+            response = publicChannelCreate(publicChannel);
         }
 
-        return null;
+        return response;
     }
 
     private ChannelResponse privateChannelCreate(PrivateChannelRequest request){
@@ -77,8 +76,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    public List<ChannelResponse> publicChannelReadAll() {
+        List<Channel> channels = channelRepository.readAll();
+        List<ChannelResponse> responses = channels.stream()
+                .filter(channel -> channel.getChannelType().equals(ChannelType.Public))
+                .map(channel -> ChannelResponse.fromEntity(channel))
+                .collect(Collectors.toList());
+        return responses;
+    }
+
+    @Override
     public ChannelResponse update(UUID id, ChannelRequest updateChannel) {
-        if(updateChannel.channelType() == ChannelType.Private) {
+        if(channelRepository.findById(id).getChannelType() == ChannelType.Private) {
             System.out.println("Private Channel은 수정할수 없습니다.");
             return null;
         }

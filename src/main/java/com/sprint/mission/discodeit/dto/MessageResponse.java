@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.UUID;
 
 public record MessageResponse(
+        UUID id,
         String content,
         UUID senderId,
         UUID recipientId,
@@ -12,6 +13,7 @@ public record MessageResponse(
 ) {
     public static MessageResponse fromEntity(Message message){
         return new MessageResponse(
+                message.getId(),
                 message.getContent(),
                 message.getSenderId(),
                 message.getRecipientId(),

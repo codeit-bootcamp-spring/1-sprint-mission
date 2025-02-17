@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,13 +54,13 @@ public class BasicMessageService implements MessageService{
 
         repository.save(message);
 
-        if(messageRequest.attachedFileId() != null){
-            BinaryContent profileImage = binaryContentRepository.findById(messageRequest.attachedFileId());
-            message.setAttachedFileId(profileImage);
-        }else{
-            BinaryContent profileImage = new BinaryContent(message.getId(), Mimetype.Message);
-            message.setAttachedFileId(profileImage);
-        }
+//        if(messageRequest.attachedFileId() != null){
+//            BinaryContent profileImage = binaryContentRepository.findById(messageRequest.attachedFileId());
+//            message.setAttachedFileId(profileImage);
+//        }else{
+//            BinaryContent profileImage = new BinaryContent(message.getId(), Mimetype.Message);
+//            message.setAttachedFileId(profileImage);
+//        }
 
         return MessageResponse.fromEntity(message);
     }
@@ -72,9 +73,20 @@ public class BasicMessageService implements MessageService{
     @Override
     public List<MessageResponse> readAll() {
         List<Message> messages = repository.readAll();
-        List<MessageResponse> responses = (List<MessageResponse>) messages.stream().map(message ->
-                MessageResponse.fromEntity(message)
-        );
+        List<MessageResponse> responses = messages.stream()
+                            .map(message -> MessageResponse.fromEntity(message))
+                            .collect(Collectors.toList());
+        return responses;
+    }
+
+
+    @Override
+    public List<MessageResponse> channelMessageReadAll(UUID channelId) {
+        List<Message> messages = repository.readAll();
+        List<MessageResponse> responses = messages.stream()
+                .filter(message -> message.getChannelId() !=null && message.getChannelId().equals(channelId))
+                .map(message -> MessageResponse.fromEntity(message))
+                .collect(Collectors.toList());
         return responses;
     }
 
@@ -95,8 +107,4 @@ public class BasicMessageService implements MessageService{
         return repository.deleteById(id);
     }
 
-    @Override
-    public List<MessageResponse> readAll(UUID id) {
-        return null;
-    }
 }

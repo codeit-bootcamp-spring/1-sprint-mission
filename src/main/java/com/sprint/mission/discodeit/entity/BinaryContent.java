@@ -13,14 +13,14 @@ public class BinaryContent implements Serializable {
     private UUID id;
     private final Instant createdAt;
     private final UUID typeId;
-//    private final byte[] content;
+    private final byte[] content;
     private final Mimetype mimetype;
 
-    public BinaryContent(UUID typeId, Mimetype mimetype) {
+    public BinaryContent(UUID typeId, byte[] content, Mimetype mimetype) {
         this.id = id != null ? id : UUID.randomUUID();
         this.createdAt = Instant.ofEpochMilli(System.currentTimeMillis());
         this.typeId = typeId;
-//        this.content = content;
+        this.content = content;
         this.mimetype = mimetype;
     }
 }

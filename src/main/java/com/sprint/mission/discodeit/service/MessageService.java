@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService extends CRUDService<MessageRequest, MessageResponse> {
-    List<MessageResponse> readAll(UUID id);
+    List<MessageResponse> channelMessageReadAll(UUID channelId);
 }
