@@ -10,12 +10,6 @@ import java.util.List;
 
 public abstract class FileService {
 
-    private final Path baseDirectory = Paths.get(System.getProperty("user.dir")).resolve("data");
-
-    public Path getBaseDirectory() {
-        return baseDirectory;
-    }
-
     public static <T> List<T> load(Path directory) {
         if (Files.exists(directory)) {
             try {
