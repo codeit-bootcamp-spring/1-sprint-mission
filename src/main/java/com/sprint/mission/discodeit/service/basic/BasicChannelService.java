@@ -35,8 +35,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public UUID createPublic(String name, String description) {
         channelValidator.validateChannel(name, description);
-        Channel channel = new Channel(name, description, ChannelType.PUBLIC);
-        return channelRepository.save(channel);
+        return channelRepository.save(new Channel(name, description, ChannelType.PUBLIC));
     }
 
     @Override
@@ -45,7 +44,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(channel);
         channel.addUsers(userId);
 
-        UserServiceFindDTO findUserDTO = userService.find(userId);
+        UserServiceFindDTO findUserDTO = userService.find(userId); //dto를 사용하는게 맞나?
         readStatusService.create(new ReadStatusCreateDTO(findUserDTO.getId(), channel.getId()));
         return channel.getId();
     }
@@ -131,7 +130,6 @@ public class BasicChannelService implements ChannelService {
         messageService.findAll().stream()
                 .filter(message -> message.getChannelId().equals(findChannel.getId()))
                 .forEach(message -> messageService.delete(message.getId()));
-
 
         return channelRepository.delete(findChannel.getId());
     }

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserServiceUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,6 @@ public interface UserService {
     UserServiceFindDTO find(UUID id);
     List<UserServiceFindDTO> findAll();
     User update(UserServiceUpdateDTO userServiceUpdateDTO);
-    UUID updateUserOnline(UUID userId, UserStatusType type);
+    UUID updateUserOnline(UUID userId, Instant time);
     UUID delete(UUID id);
 }

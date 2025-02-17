@@ -27,7 +27,6 @@ public class UserValidator {
         validateUsername(username);
         validateEmail(email);
         checkDuplicateUser(username, email);
-
     }
 
     public void validateUserId(UUID userId){

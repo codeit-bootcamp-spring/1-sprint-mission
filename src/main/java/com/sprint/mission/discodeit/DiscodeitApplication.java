@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.config.AppConfig;
 import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindAllByUserIdDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
 import com.sprint.mission.discodeit.dto.message.MessageServiceCreateDTO;
@@ -9,6 +8,7 @@ import com.sprint.mission.discodeit.dto.user.UserServiceCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserServiceUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -18,6 +18,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.time.Instant;
 import java.util.UUID;
 
 
@@ -42,7 +43,7 @@ public class DiscodeitApplication {
         System.out.println("\n\nUser Test");
 
         //온라인 상태 업데이트
-        userService.updateUserOnline(user1Id, UserStatusType.OFFLINE);
+        userService.updateUserOnline(user1Id, Instant.now());
 
         //수정확인
         System.out.println("user 조회 - 수정 확인");
@@ -92,6 +93,8 @@ public class DiscodeitApplication {
         for(Message message : messageService.findAllByChannelId(publicChannelId1)) System.out.println(message);
         System.out.println();
 
+        System.out.println("ReadStatus 조회");
+        for(ReadStatus readStatus : readStatusService.findAll()) System.out.println(readStatus);
     }
 }
 

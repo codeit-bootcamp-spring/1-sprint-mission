@@ -17,12 +17,10 @@ public class UserStatusValidator {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
 
-
     public void validateUserStatus(UUID userId){
         validateUserId(userId);
         checkDuplicateUserStatus(userId);
     }
-
 
     public void validateUserId(UUID userId){
         User findUser = userRepository.findOne(userId);

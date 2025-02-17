@@ -1,14 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
 import com.sprint.mission.discodeit.dto.message.MessageServiceCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageServiceUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +33,7 @@ public class BasicMessageService implements MessageService {
 
         if(dto.getFiles() != null && !dto.getFiles().isEmpty()){
             for(MultipartFile file : dto.getFiles()){
-                UUID bId = binaryContentService.create(new BinaryContentCreateDTO(
-                        dto.getUserId(),
-                        dto.getChannelId(),
-                        file));
+                UUID bId = binaryContentService.create(new BinaryContentCreateDTO(file));
                 message.addBinaryContent(bId);
             }
         }
@@ -79,7 +73,6 @@ public class BasicMessageService implements MessageService {
         for(UUID binaryContentId : findMessage.getBinaryContentIds()){
             binaryContentService.delete(binaryContentId);
         }
-
         return messageRepository.delete(findMessage.getId());
     }
 }

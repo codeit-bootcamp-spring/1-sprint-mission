@@ -25,6 +25,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public UUID create(ReadStatusCreateDTO dto) {
         readStatusValidator.validateReadStatus(dto.getUserId(), dto.getChannelId());
         ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId());
+        readStatusRepository.save(readStatus);
         return readStatus.getId();
     }
 

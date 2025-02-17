@@ -1,10 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final Instant createdAt;
@@ -13,6 +18,7 @@ public class User implements Serializable {
     private String username;
     private String email;
     private String password;
+    private UUID binaryContentId;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
@@ -23,35 +29,15 @@ public class User implements Serializable {
         this.password = password;
     }
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
+    public void updateBinaryContentId(UUID binaryContentId) {
+        this.binaryContentId = binaryContentId;
     }
 
     public void setUpdatedAt() {
         this.updatedAt = Instant.now();
     }
 
+    //validator 에서 중복 검사 했으니 그냥 set만 하면 될듯
     public void setUser(String username, String email) {
         if(username !=null && !username.equals(this.username)){
             this.username = username;
@@ -66,9 +52,6 @@ public class User implements Serializable {
         }
         setUpdatedAt();
     }
-
-
-
 
     public void setUsername(String username) {
         if(username ==null && username.equals(this.username)){
@@ -86,8 +69,6 @@ public class User implements Serializable {
         setUpdatedAt();
     }
 
-
-
     public void setPassword(String password) {
         if(password ==null && password.equals(this.password)){
             throw new IllegalArgumentException("입력한 값이 null 혹은 중복입니다.");
@@ -96,25 +77,9 @@ public class User implements Serializable {
         setUpdatedAt();
     }
 
-
-
     public boolean userCompare(UUID id){
         if(id.equals(this.id)) return true;
         else return false;
-    }
-
-
-    public static boolean validation(String username, String email, String password){
-        if (username == null || username.isEmpty()) {
-            return false;
-        }
-        if (email == null || email.isEmpty() || !email.matches("^[\\w.-]+@[\\w-]+\\.[a-zA-Z]{2,6}$")) {
-            return false;
-        }
-        if (password == null || password.isEmpty()) {
-            return false;
-        }
-        return true;
     }
 
 
