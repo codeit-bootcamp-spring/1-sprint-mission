@@ -21,7 +21,7 @@ import java.util.*;
 @Service("FileUserStatusService")
 public class FileUserStatusService extends JFCUserStatusService implements UserStatusRepository,Serializable {
 
-    private static final String fileName = Paths.get("src", "main", "repo", "userStatus.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "userStatus.txt").toString();
 
     public FileUserStatusService(){
         this.userStatusMap= loadUserStatusText();
@@ -123,8 +123,10 @@ public class FileUserStatusService extends JFCUserStatusService implements UserS
                 Instant updatedAt = node.has("updatedAt") && !node.get("updatedAt").isNull()
                         ? Instant.ofEpochMilli(node.get("updatedAt").asLong())
                         : null;
+                boolean isOnline = node.has("isOnline") && node.get("isOnline").asBoolean();
 
-                UserStatus userStatus = UserStatus.makeAllUserStatus(id, createdAt, updatedAt,userId);
+
+                UserStatus userStatus = UserStatus.makeAllUserStatus(id, createdAt, updatedAt,userId,isOnline);
                 loadTxt.put(id, userStatus);
                 userRepository.add(userId);
             }
@@ -152,6 +154,7 @@ public class FileUserStatusService extends JFCUserStatusService implements UserS
                 Data.put("createdAt", userStatus.getCreatedAt().toEpochMilli());
                 Data.put("updatedAt", userStatus.getUpdatedAt() != null ? userStatus.getUpdatedAt().toEpochMilli() : null);
                 Data.put("userId", userStatus.getUserId());
+                Data.put("isOnline", userStatus.isOnline());
 
 
                 saveData.put(entry.getKey(), Data);

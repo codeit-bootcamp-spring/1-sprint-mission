@@ -25,9 +25,7 @@ public record ChannelDto(
                 .max(Instant::compareTo)
                 .orElse(null);
 
-        List<UUID> userIds = channel.getChannelType() == ChannelType.PRIVATE
-                ? channel.getUserList().keySet().stream().map(User::getId).toList()
-                : List.of();
+        List<UUID> userIds =  channel.getUserList().keySet().stream().map(User::getId).toList();
 
         return new ChannelDto(
                 channel.getId(),
@@ -38,5 +36,11 @@ public record ChannelDto(
                 latestMessageTime,
                 userIds
         );
+    }
+
+    public static List<ChannelDto> fromEntity(List<Channel> channel) {
+        return channel.stream()
+                .map((ChannelDto::fromEntity))
+                .collect(Collectors.toList());
     }
 }

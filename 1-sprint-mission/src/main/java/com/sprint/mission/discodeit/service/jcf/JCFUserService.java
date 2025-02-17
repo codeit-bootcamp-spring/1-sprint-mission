@@ -7,10 +7,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 @Service("JCFUserService")
@@ -28,6 +30,10 @@ public class JCFUserService implements UserService {
     @Autowired
     @Qualifier("FileMessageService")
     private MessageService jfMessageService;
+
+    @Autowired
+    @Qualifier("FileUserStatusService")
+    private UserStatusService jfUserStatusService;
 
     @Override
     public void createNewUser(String name,String password,String email) {
@@ -52,21 +58,18 @@ public class JCFUserService implements UserService {
     @Override
     public <T> List<User> readUser(T key) {
         LinkedHashMap<UUID, User> foundUser=new LinkedHashMap<>();
-
         if (key instanceof String) {
             foundUser = findUser((String) key);
         } else if (key instanceof UUID) {
             foundUser = findUser((UUID) key);
         }
 
-
         if (foundUser.isEmpty()) {
             return null;
         }
-        List<User> userList = foundUser.values().stream()
+        List<User> userLista = foundUser.values().stream()
                 .toList();
-
-        return userList;
+        return userLista;
     }
 
 
@@ -101,6 +104,36 @@ public class JCFUserService implements UserService {
     public boolean deleteUser(String name,String password) {
         LinkedHashMap<UUID,User> instance = findUser(name);
         return deleteUserInfo(instance, password);
+    }
+
+    @Override
+    public <T> void updateUserStatus(T user) {
+        List<User> userList = readUser(user);
+
+        if (userList == null || userList.isEmpty()) {
+            System.err.println("해당 사용자를 찾을 수 없습니다.");
+            return;
+        }
+
+        UserStatus userStatus = userList.get(0).getUserStatus();
+        if (userStatus == null) {
+            System.err.println("사용자의 상태 정보를 찾을 수 없습니다.");
+            return;
+        }
+
+        UUID find = userStatus.getId();
+        if (find == null) {
+            System.err.println("사용자의 상태 ID가 존재하지 않습니다.");
+            return;
+        }
+
+        UserStatus existingStatus = jfUserStatusService.findById(find);
+        if (existingStatus == null) {
+            System.err.println("해당 ID의 사용자 상태 정보를 찾을 수 없습니다.");
+            return;
+        }
+
+        existingStatus.updateIsOnlien();
     }
 
     @Override
@@ -186,7 +219,7 @@ public class JCFUserService implements UserService {
     protected LinkedHashMap<UUID,User> findUser(UUID id){
         LinkedHashMap<UUID,User> findUser=new LinkedHashMap<>();
 
-        System.out.println(readUserAll());
+        //System.out.println(readUserAll());
 
         findUser.put(id,userList.get(id));
         return findUser;
@@ -200,7 +233,7 @@ public class JCFUserService implements UserService {
             return false;
         }else if(instance.size()==1){
             User firstUser = instance.entrySet().iterator().next().getValue();
-            if(!firstUser.checkPassword(password)){
+            if(firstUser.checkPassword(password)){
                 System.out.println("비번틀림");
                 return false;
             }

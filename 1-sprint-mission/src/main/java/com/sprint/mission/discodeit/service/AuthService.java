@@ -4,5 +4,5 @@ import com.sprint.mission.discodeit.DTO.LoginRequestDTO;
 import com.sprint.mission.discodeit.DTO.UserDTO;
 
 public interface AuthService {
-    UserDTO login(LoginRequestDTO loginRequestDTO);
+    boolean login(String name, String password);
 }

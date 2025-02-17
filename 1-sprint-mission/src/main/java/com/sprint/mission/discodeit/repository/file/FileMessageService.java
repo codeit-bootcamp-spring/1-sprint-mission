@@ -28,7 +28,7 @@ import java.util.*;
 @Service("FileMessageService")
 public class FileMessageService extends JCFMessageService implements MessageService, MessageRepository {
 
-    private static final String fileName = Paths.get("src", "main", "repo", "message.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "message.txt").toString();
     @Autowired
     @Qualifier("JCFBinaryContentService")
     private final BinaryContentService JCFBinaryContentService;

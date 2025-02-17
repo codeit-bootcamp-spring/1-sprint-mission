@@ -34,7 +34,7 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
     private final JCFReadStatusService jcfReadStatusService;
     private final JFCUserStatusService jfcUserStatusService;
 
-    private static final String fileName = Paths.get("src", "main", "repo", "channel.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "channel.txt").toString();
 
     public FileChannelService(@Qualifier("FileUserService") UserService jcUserService, @Qualifier("FileMessageService") JCFMessageService jcfMessageService, @Qualifier("FileReadStatusService") JCFReadStatusService jcfReadStatusService, @Qualifier("FileUserStatusService") JFCUserStatusService jfcUserStatusService){
         this.jcUserService = jcUserService;
@@ -261,4 +261,12 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
         super.createPrivateChannel();
         saveChannelText();
     }
+    @Override
+    public <T,K,C,Q> boolean sendMessageInUser(T channel, K sender, C reciver,Q message){
+        boolean result=super.sendMessageInUser(channel,sender,reciver,message);
+        saveChannelText();
+        return result;
+    }
+
+
 }

@@ -95,10 +95,13 @@ public class User implements Comparable<User>{
                 " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))+"\n";
     }
 
-    private long convertString(String str){
+    private long convertString(String str) {
+        if (str.length() > 8) {
+            str = str.substring(0, 8);
+        }
+
         StringBuilder sb = new StringBuilder();
         int mask = 921;
-
 
         for (char c : str.toCharArray()) {
             int encryptedChar = c ^ mask;
@@ -111,8 +114,13 @@ public class User implements Comparable<User>{
             sb.append("0");
         }
 
+        if (sb.length() > 64) {
+            sb.setLength(64);
+        }
+
         return Long.parseUnsignedLong(sb.toString(), 2);
     }
+
 
 
     @Override

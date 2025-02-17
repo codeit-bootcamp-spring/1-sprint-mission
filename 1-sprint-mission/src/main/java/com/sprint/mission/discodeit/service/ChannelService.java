@@ -24,7 +24,7 @@ public interface ChannelService {
     List<ChannelDto> findAllByUserName(String userName);
     boolean updateChannel(ChannelDto channelDto);
     boolean addMessageToChannel(String channelName,String title);
-
+    <T,K,C,Q> boolean sendMessageInUser(T channel, K sender, C reciver,Q message);
     void createPrivateChannel( );
     void deleteUserToChannel(String channelName, String userName);
 }

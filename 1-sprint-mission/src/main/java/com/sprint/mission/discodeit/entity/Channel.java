@@ -65,7 +65,7 @@ public class Channel {
     }
 
     public void addUser(User user,UserStatus userStatus){
-/// /빈 호출 순서
+
         System.out.println(user.getName()+"    "+userStatus.getId());
         System.out.println(channelName);
         userList.put(user,userStatus);

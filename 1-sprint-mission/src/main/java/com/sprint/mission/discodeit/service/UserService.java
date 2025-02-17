@@ -15,6 +15,7 @@ public interface UserService {
     boolean updateUserName(UUID id,String changeName);
     boolean deleteUser(UUID id,String password);
     boolean deleteUser(String name,String password);
+    <T> void updateUserStatus(T user);
 
     boolean updateUserSelfImg(String name,char [] img);
     boolean updateUserSelfImg(UUID id,char [] img);

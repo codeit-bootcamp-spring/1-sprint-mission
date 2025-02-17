@@ -9,29 +9,28 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service("JCFAuthService")
 public class JCFAuthService implements AuthService {
 
-    private final JCFUserService userService;
-    public JCFAuthService(@Qualifier("FileUserService") JCFUserService userService){
+    private final UserService userService;
+    public JCFAuthService(@Qualifier("FileUserService") UserService userService){
         this.userService=userService;
     }
     @Override
-    public UserDTO login(LoginRequestDTO loginRequestDTO) {
-        String username = loginRequestDTO.username();
-        String password = loginRequestDTO.password();
+    public boolean login(String name,String password) {
 
+        List<User> user = userService.readUser(name);
+        if (user != null) {
+            if (user.get(0).checkPassword(password)) {
 
-        User user = userService.findUser(username)
-                .values().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 로그인 정보입니다."));
-
-
-        if (!user.checkPassword(password)) {
-            throw new IllegalArgumentException("유효하지 않은 로그인 정보입니다.");
+                return true;
+            }
+        } else {
+            return false;
         }
-
-        return UserDTO.fromEntity(user);
+        return false;
     }
+
 }

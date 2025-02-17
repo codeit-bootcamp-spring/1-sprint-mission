@@ -30,7 +30,7 @@ import static com.sprint.mission.discodeit.entity.User.createUserAll;
 public class FileUserService extends JCFUserService implements Serializable, UserRepository {
     private static final long serialVersionUID = 1L;
 
-    private static final String fileName = Paths.get("src", "main", "repo", "user.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "user.txt").toString();
     private final BinaryContentService JCFBinaryContentService;
     private final UserStatusService JFCUserStatusService;
     private final JCFMessageService jcfMessageService;

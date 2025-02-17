@@ -28,7 +28,7 @@ public class FileBinaryContentService extends JCFBinaryContentService implements
     public void cleanup() {
         saveBinaryContentText();
     }
-    private static final String fileName = Paths.get("src", "main", "repo", "binaryContent.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "binaryContent.txt").toString();
     @Override
     public BinaryContent create(char[] img) {
         BinaryContent binaryContent=super.create(img);

@@ -340,4 +340,21 @@ public class JCFChannelService implements ChannelService {
         firstChannel.deleteUser(userName);
 
     }
+
+    @Override
+    public <T,K,C,Q> boolean sendMessageInUser(T channel, K sender, C reciver,Q message){
+        Channel findChannel=getSingleChannel(channel);
+        if(findChannel==null)
+            return false;
+        boolean result=userService.sendMessageToUser(sender,reciver,message);
+        if(result){
+            findChannel.addMessage(messageService.readMessage(message).get(0));
+        }else{
+            return false;
+        }
+        return true;
+    }
+
+
+
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.DTO;
+package com.sprint.mission.discodeit.DTO.message;
 
 import com.sprint.mission.discodeit.entity.Message;
 
@@ -35,5 +35,11 @@ public record MessageDto(
                 message.getSenderId(),
                 message.getReceiverId()
         );
+    }
+
+    public static List<MessageDto> fromEntity(List<Message> message) {
+        return message.stream()
+                .map(MessageDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

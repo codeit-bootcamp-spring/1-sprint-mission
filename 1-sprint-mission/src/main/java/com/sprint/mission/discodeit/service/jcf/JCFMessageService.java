@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.DTO.MessageDto;
+import com.sprint.mission.discodeit.DTO.message.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -198,6 +198,7 @@ public class JCFMessageService implements MessageService {
         }
 
     }
+
 
     @Override
     public void addMessage(Message m) {

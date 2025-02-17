@@ -23,7 +23,7 @@ import java.util.*;
 public class FileReadStatusService extends JCFReadStatusService implements ReadStatusRepository,Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String fileName = Paths.get("src", "main", "repo", "readStatus.txt").toString();
+    private static final String fileName = Paths.get("1-sprint-mission","1-sprint-mission","src", "main", "repo", "readStatus.txt").toString();
     public FileReadStatusService(){
         readStatusMap= loadReadStatusText();
     }
