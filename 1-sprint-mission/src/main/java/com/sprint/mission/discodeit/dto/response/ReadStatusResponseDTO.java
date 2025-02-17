@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusResponseDTO(
-        UUID id,
+        UUID readStatusId,
         UUID userId,
         UUID channelId,
         Instant lastReadAt
