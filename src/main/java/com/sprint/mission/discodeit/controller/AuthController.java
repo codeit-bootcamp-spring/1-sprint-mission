@@ -12,9 +12,6 @@ import com.sprint.mission.discodeit.dto.user.response.UserResponse;
 import com.sprint.mission.discodeit.global.dto.CommonResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
@@ -26,7 +23,7 @@ public class AuthController {
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public ResponseEntity<CommonResponse<?>> login(@RequestBody LoginUserRequest request) {
+	public ResponseEntity<CommonResponse<UserResponse>> login(@RequestBody LoginUserRequest request) {
 		UserResponse loginResponse = authService.login(request);
 		return new ResponseEntity<>(CommonResponse.success("Login successful", loginResponse), HttpStatus.OK);
 	}

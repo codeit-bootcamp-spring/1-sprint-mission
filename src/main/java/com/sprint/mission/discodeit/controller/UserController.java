@@ -62,14 +62,14 @@ public class UserController {
 
 	//사용자 삭제
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable UUID userId) {
+	public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("id") UUID userId) {
 		userService.deleteUser(userId);
 		return new ResponseEntity<>(CommonResponse.success("User deleted successfully", null), HttpStatus.OK);
 	}
 
 	//사용자 온라인 상태 업데이트
 	@RequestMapping(value = "/update-status/{id}", method = RequestMethod.PATCH)
-	public ResponseEntity<CommonResponse<Void>> updateUserStatus(@PathVariable UUID userId,
+	public ResponseEntity<CommonResponse<Void>> updateUserStatus(@PathVariable("id") UUID userId,
 		@RequestBody UpdateUserStatusRequest request) {
 		userStatusService.update(request);
 		return new ResponseEntity<>(CommonResponse.success("User status updated", null), HttpStatus.OK);

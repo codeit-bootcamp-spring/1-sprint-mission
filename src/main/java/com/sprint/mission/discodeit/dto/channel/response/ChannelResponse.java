@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.dto.user.response.UserResponse;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 public record ChannelResponse(
@@ -17,4 +18,16 @@ public record ChannelResponse(
 	Instant createdAt,
 	Instant updatedAt
 ) {
+	public static ChannelResponse from(Channel channel) {
+		return new ChannelResponse(
+			channel.getId(),
+			channel.getName(),
+			channel.getDescription(),
+			channel.getParticipants(),
+			channel.getLastMessageAt(),
+			channel.getChannelType(),
+			channel.getCreatedAt(),
+			channel.getUpdatedAt()
+		);
+	}
 }

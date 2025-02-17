@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,16 +17,19 @@ public class Channel extends BaseEntity implements Serializable {
 	private String name;
 	private String description;
 	private Map<UUID, UserResponse> participants;
+	private Instant lastMessageAt;
 	//messagelist는 hashmap은 순서 보장을 안하니 list, linkedHashMap중에 고민
 	private List<Message> messageList;
 	private ChannelType channelType;
 
-	public Channel(String name, String description, Map<UUID, UserResponse> participants, List<Message> messageList,
+	public Channel(String name, String description, Map<UUID, UserResponse> participants, Instant lastMessageAt,
+		List<Message> messageList,
 		ChannelType channelType) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.participants = participants;
+		this.lastMessageAt = Instant.now();
 		this.messageList = messageList;
 		this.channelType = channelType;
 	}
@@ -47,6 +51,10 @@ public class Channel extends BaseEntity implements Serializable {
 
 	public void updateParticipants(Map<UUID, UserResponse> participants) {
 		this.participants = participants;
+	}
+
+	public void updateLastMessageAt(Instant newLastMessageAt) {
+		this.lastMessageAt = newLastMessageAt;
 	}
 
 	public void updateMessageList(List<Message> messageList) {

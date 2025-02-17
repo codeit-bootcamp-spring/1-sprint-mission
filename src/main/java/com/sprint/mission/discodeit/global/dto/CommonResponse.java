@@ -17,8 +17,8 @@ public class CommonResponse<T> {
 	private final LocalDateTime timestamp = LocalDateTime.now();
 
 	// 기본 성공 응답 (200 OK)
-	public static <T> CommonResponse<T> success() {
-		return new CommonResponse<>("SUCCESS", "요청이 성공적으로 처리되었습니다.", null, HttpStatus.OK);
+	public static <T> CommonResponse<T> success(String message) {
+		return new CommonResponse<>("SUCCESS", message, null, HttpStatus.OK);
 	}
 
 	// 데이터와 함께 성공 응답 (200 OK)

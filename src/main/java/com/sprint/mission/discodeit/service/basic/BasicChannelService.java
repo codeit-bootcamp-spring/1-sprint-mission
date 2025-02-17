@@ -64,7 +64,8 @@ public class BasicChannelService implements ChannelService {
 		participants.put(request.receiverId(), receiver);
 
 		// 채널 생성
-		Channel channel = new Channel(null, null, participants, new ArrayList<>(), ChannelType.PRIVATE);
+		Channel channel = new Channel(null, null, participants, request.createdAt(), new ArrayList<>(),
+			ChannelType.PRIVATE);
 		Channel savedChannel = channelRepository.save(channel);
 
 		// ReadStatus 생성 - 각 참여자의 읽음 상태 초기화
@@ -102,7 +103,8 @@ public class BasicChannelService implements ChannelService {
 			participants.put(userId, user);
 		}
 
-		Channel channel = new Channel(request.name(), request.description(), participants, new ArrayList<>(),
+		Channel channel = new Channel(request.name(), request.description(), participants, request.createdAt(),
+			new ArrayList<>(),
 			ChannelType.PUBLIC);
 
 		return channelRepository.save(channel);
@@ -127,10 +129,9 @@ public class BasicChannelService implements ChannelService {
 		} else {
 			lastMessageAt = channel.getCreatedAt();
 		}
+		channel.updateLastMessageAt(lastMessageAt);
 
-		return new ChannelResponse(channel.getId(), channel.getName(), channel.getDescription(),
-			channel.getParticipants(), lastMessageAt, channel.getChannelType(), channel.getCreatedAt(),
-			channel.getUpdatedAt());
+		return ChannelResponse.from(channel);
 	}
 
 	/**
@@ -164,10 +165,8 @@ public class BasicChannelService implements ChannelService {
 			} else {
 				lastMessageAt = channel.getCreatedAt();
 			}
-
-			ChannelListResponse response = new ChannelListResponse(channel.getId(), channel.getName(),
-				channel.getDescription(), channel.getParticipants(), lastMessageAt, channel.getChannelType(),
-				channel.getCreatedAt(), channel.getUpdatedAt());
+			channel.updateLastMessageAt(lastMessageAt);
+			ChannelListResponse response = ChannelListResponse.from(channel);
 			responses.add(response);
 		}
 
@@ -246,8 +245,8 @@ public class BasicChannelService implements ChannelService {
 			.orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
 		// 관련 도메인 삭제 (메시지, 읽음 상태)
-		messageRepository.deleteAllByChannelId(channelId);
-		readStatusService.deleteAllByChannelId(channelId);
-		channelRepository.delete(channelId);
+		messageRepository.deleteAllByChannelId(channel.getId());
+		readStatusService.deleteAllByChannelId(channel.getId());
+		channelRepository.delete(channel.getId());
 	}
 }
