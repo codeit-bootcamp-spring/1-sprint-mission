@@ -5,6 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 
 public record UserUpdateRequestWrapper(
         UserUpdateRequest userUpdateRequest,
-        BinaryContentCreateRequest profileRequest
+        BinaryContentCreateRequest profileUpdateRequest
 ) {
 }

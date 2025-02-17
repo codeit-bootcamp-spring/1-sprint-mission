@@ -5,9 +5,10 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.validation.ValidateUserStatus;
+import com.sprint.mission.discodeit.validation.UserStatusValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,68 +20,59 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
-    private final ValidateUserStatus validateUserStatus;
+    private final UserStatusValidator userStatusValidator;
+    private final UserStatusMapper userStatusMapper;
 
     @Override
     public UserStatusDto create(UserStatusCreateRequest request) {
-        // validateUserStatus.validateUserStatus(request.userId());
-
         UUID userId = request.userId();
         Instant lastActiveAt = request.lastActiveAt();
+
+        userStatusValidator.validateUser(userId);
+
         UserStatus userStatus = new UserStatus(userId, lastActiveAt);
-        userStatusRepository.save(userStatus);
-        return changeToDto(userStatus);
+
+        UserStatus createdUserStatus = userStatusRepository.save(userStatus);
+        return userStatusMapper.userStatusEntityToDto(createdUserStatus);
     }
 
     @Override
     public UserStatusDto findById(UUID userStatusId) {
-        UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
-        return changeToDto(userStatus);
+        return userStatusRepository.findById(userStatusId)
+                .map(userStatusMapper::userStatusEntityToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
     }
 
     @Override
     public List<UserStatusDto> findAll() {
         return userStatusRepository.findAll().stream()
-                .map(this::changeToDto)
+                .map(userStatusMapper::userStatusEntityToDto)
                 .toList();
     }
 
     @Override
     public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request) {
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
         Instant newLastActiveAt = request.newLastActiveAt();
         userStatus.update(newLastActiveAt);
         UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
-        return changeToDto(updatedUserStatus);
+        return userStatusMapper.userStatusEntityToDto(updatedUserStatus);
     }
 
     @Override
     public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("User status not found: User id: " + userId));
         Instant newLastActiveAt = request.newLastActiveAt();
         userStatus.update(newLastActiveAt);
         UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
-        return changeToDto(updatedUserStatus);
+        return userStatusMapper.userStatusEntityToDto(updatedUserStatus);
     }
 
     @Override
     public void delete(UUID userStatusId) {
-        if (!userStatusRepository.existsById(userStatusId)) {
-            throw new ResourceNotFoundException("User Status not found.");
-        }
+        userStatusValidator.validateUserStatus(userStatusId);
         userStatusRepository.deleteById(userStatusId);
-    }
-
-    private UserStatusDto changeToDto(UserStatus userStatus) {
-        return new UserStatusDto(
-                userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastActiveAt(),
-                userStatus.getCreatedAt(),
-                userStatus.getUpdatedAt()
-        );
     }
 }

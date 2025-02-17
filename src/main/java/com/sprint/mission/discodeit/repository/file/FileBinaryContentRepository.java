@@ -33,35 +33,37 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        store = loadBinaryContentsFromJson();
         store.put(binaryContent.getId(), binaryContent);
         saveBinaryContentsToJson(store);
         return binaryContent;
     }
     @Override
     public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(loadBinaryContentsFromJson().get(id));
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        List<BinaryContent> binaryContents= new ArrayList<>();
-        for (UUID id : ids){
-            binaryContents.add(loadBinaryContentsFromJson().get(id));
+        List<BinaryContent> binaryContents = new ArrayList<>();
+        for (UUID id : ids) {
+            BinaryContent binaryContent = store.get(id);
+            if (binaryContent != null) { // null 체크 추가
+                binaryContents.add(binaryContent);
+            }
         }
         return binaryContents;
     }
 
     @Override
     public boolean existsById(UUID id){
-        return loadBinaryContentsFromJson().containsKey(id);
+        return store.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        store = loadBinaryContentsFromJson();
-        store.remove(id);
-        saveBinaryContentsToJson(store);
+        if (store.remove(id) != null){
+            saveBinaryContentsToJson(store);
+        }
     }
 
     private Map<UUID, BinaryContent> loadBinaryContentsFromJson() {

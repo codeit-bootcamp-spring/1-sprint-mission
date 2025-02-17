@@ -27,7 +27,6 @@ public class FileChannelRepository implements ChannelRepository {
         this.channelJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        // 처름에 로드
         store = loadChannelFromJson();
     }
 

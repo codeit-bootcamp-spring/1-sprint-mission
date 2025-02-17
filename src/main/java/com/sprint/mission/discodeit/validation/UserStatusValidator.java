@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.validation;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -13,26 +11,20 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class ValidateUserStatus {
+public class UserStatusValidator {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
 
-    public void validateUserStatus(UUID userId){
-        validateUser(userId);
-        validateDuplicateUserId(userId);
-    }
-
-    // 이미 UserStatus가 존재할 경우
-    public void validateDuplicateUserId(UUID userId){
-        if (userStatusRepository.existsByUserId(userId)){
-            throw new DuplicateResourceException("UserStatus already exists.");
+    public void validateUserStatus(UUID userStatusId){
+        if (userStatusRepository.existsById(userStatusId)){
+            throw new ResourceNotFoundException("User status not found: " + userStatusId);
         }
     }
 
     // User가 존재하지 않을 경우
     public void validateUser(UUID userId){
-        if (userRepository.findByUserId(userId).isEmpty()){
-            throw new ResourceNotFoundException("User not found.");
+        if (!userRepository.existsById(userId)){
+            throw new ResourceNotFoundException("User not found: " + userId);
         }
     }
 

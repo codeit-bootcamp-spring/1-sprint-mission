@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.dto.wrapper.UserCreateRequestWrapper;
 import com.sprint.mission.discodeit.dto.wrapper.UserUpdateRequestWrapper;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,9 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserCreateRequestWrapper userCreateRequestWrapper) {
         UserCreateRequest userCreateRequest = userCreateRequestWrapper.userCreateRequest();
-        BinaryContentCreateRequest profileRequest = userCreateRequestWrapper.ProfileCreateRequest();
+        BinaryContentCreateRequest profileCreateRequest = userCreateRequestWrapper.profileCreateRequest();
 
-        UserDto userDto = userService.create(userCreateRequest, Optional.ofNullable(profileRequest));
+        UserDto userDto = userService.create(userCreateRequest, Optional.ofNullable(profileCreateRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
 
@@ -41,9 +42,9 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@PathVariable UUID userId,
                                               @RequestBody UserUpdateRequestWrapper userUpdateRequestWrapper) {
         UserUpdateRequest userUpdateRequest = userUpdateRequestWrapper.userUpdateRequest();
-        BinaryContentCreateRequest profileRequest = userUpdateRequestWrapper.profileRequest();
+        BinaryContentCreateRequest profileUpdateRequest = userUpdateRequestWrapper.profileUpdateRequest();
 
-        UserDto userDto = userService.update(userId, userUpdateRequest, Optional.ofNullable(profileRequest));
+        UserDto userDto = userService.update(userId, userUpdateRequest, Optional.ofNullable(profileUpdateRequest));
         return ResponseEntity.ok(userDto);
     }
 

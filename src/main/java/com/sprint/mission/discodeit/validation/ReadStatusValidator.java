@@ -12,38 +12,33 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class ValidateReadStatus {
+public class ReadStatusValidator {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
 
-    public void validateReadStatus(UUID channelId, UUID userId){
-        validateChannel(channelId);
-        validateUser(userId);
-        validateDuplicateReadStatus(channelId, userId);
-    }
-
     public void validateChannel(UUID channelId){
         if (channelRepository.findById(channelId).isEmpty()){
-            throw new ResourceNotFoundException("Channel not found.");
+            throw new ResourceNotFoundException("Channel not found: " + channelId);
         }
     }
 
     public void validateUser(UUID userId){
-        if (userRepository.findByUserId(userId).isEmpty()){
-            throw new ResourceNotFoundException("User not found.");
+        if (userRepository.findById(userId).isEmpty()){
+            throw new ResourceNotFoundException("User not found: " + userId);
         }
     }
 
     public void validateDuplicateReadStatus(UUID channelId, UUID userId){
-        if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)){
-            throw new DuplicateResourceException("ReadStatus already exists.");
+        if (readStatusRepository.findAllByUserId(userId).stream()
+                .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))){
+            throw new DuplicateResourceException("ReadStatus already exists. " + "User id: " + userId + ". Channel id: " + channelId);
         }
     }
 
     public void validateReadStatus(UUID readStatusId){
         if (readStatusRepository.findById(readStatusId).isEmpty()){
-            throw new ResourceNotFoundException("ReadStatus not found.");
+            throw new ResourceNotFoundException("Read status not found: " + readStatusId);
         }
     }
 }

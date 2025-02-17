@@ -5,6 +5,6 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 
 public record UserCreateRequestWrapper(
         UserCreateRequest userCreateRequest,
-        BinaryContentCreateRequest ProfileCreateRequest
+        BinaryContentCreateRequest profileCreateRequest
 ) {
 }

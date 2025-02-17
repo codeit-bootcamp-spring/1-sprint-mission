@@ -1,14 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
 @Getter
 public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Id
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
