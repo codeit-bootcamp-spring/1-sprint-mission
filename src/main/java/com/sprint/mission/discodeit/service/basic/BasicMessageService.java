@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Type.BinaryContentType;
@@ -8,15 +7,12 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileIOHandler;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +22,7 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final FileIOHandler fileIOHandler;
+    private final BinaryContentService binaryContentService;
 
     //해당 메세지 객체 리턴
     @Override
@@ -60,14 +56,7 @@ public class BasicMessageService implements MessageService {
         if (authorId == null || channelId == null || content == null || attachmentsPaths == null) {System.out.println("메세지 생성 실패. 입력값을 확인해주세요."); return null;}
         if (userRepository.isUserExistByUUID(authorId) == false || channelRepository.isChannelExist(channelId) == false){
             System.out.println("메세지 생성 실패. 입력한 id를 가진 유저나 채널이 존재하지 않습니다."); }
-        List<BufferedImage> images = Stream.of(attachmentsPaths).map(path -> fileIOHandler.loadImage(path)).collect(Collectors.toList());
-        ArrayList<UUID> binaryImagesId = new ArrayList<>();
-        for (BufferedImage image : images){
-            if (image == null){ System.out.println("불러오기 실패한 이미지는 건너뜁니다. "); continue; }
-            BinaryContent binaryimage = new BinaryContent(authorId, BinaryContentType.Aettached_File, image);
-            binaryContentRepository.saveBinaryContent(binaryimage);
-            binaryImagesId.add(binaryimage.getId());
-        }
+        List<UUID> binaryImagesId =Arrays.stream(attachmentsPaths).map(path -> binaryContentService.createBinaryContent(path, BinaryContentType.Aettached_File, authorId, channelId).getId()).collect(Collectors.toList());
         Message newMessage = new Message(userRepository.getUserById(authorId), channelRepository.getChannel(channelId), content, binaryImagesId);
         messageRepository.saveMessage(channelId, newMessage);
         System.out.println("메세지 생성 성공!");
@@ -93,7 +82,7 @@ public class BasicMessageService implements MessageService {
             System.out.println("메세지 삭제 실패. 입력값을 확인해주세요."); return false; }
         Message message = messageRepository.getMessage(channelId, messageId);
         if (message.getBinaryContentsId().size() > 0){
-            message.getBinaryContentsId().stream().forEach(binaryContentId -> binaryContentRepository.deleteBinaryContent(binaryContentId));
+            message.getBinaryContentsId().stream().forEach(binaryContentId -> binaryContentRepository.deleteBinaryContent(BinaryContentType.Aettached_File, channelId, binaryContentId));
         }
         messageRepository.deleteMessage(channelId, messageId);
         System.out.println("메세지 삭제 성공!");

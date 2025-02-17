@@ -19,6 +19,19 @@ import java.util.UUID;
 
 @SpringBootApplication
 public class DiscodeitApplication {
+
+    static void RepositoryClear(){
+        FileIOHandler fileIOHandler = FileIOHandler.getInstance();
+        try{fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
+            fileIOHandler.serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
+            fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
+            fileIOHandler.serializeHashMap(new HashMap<UUID, UserStatus>(), "UserStatus\\mainOIUserStatusRepository");
+        }catch (Exception e){
+            e.printStackTrace();
+            e.getMessage();
+        }
+    }
+
     static UserDto setupUser(UserService userService) {
         UUID user1 = userService.createUser("woody", "woody@codeit.com", "woody1234");
         return userService.findUserById(user1);
@@ -34,17 +47,6 @@ public class DiscodeitApplication {
         System.out.println("메시지 생성: " + message1);
     }
 
-    static void RepositoryClear(){
-        FileIOHandler fileIOHandler = FileIOHandler.getInstance();
-        try{fileIOHandler.serializeHashMap(new HashMap<UUID, Channel>(), "Channel\\mainOIChannelRepository");
-            fileIOHandler.serializeHashMap(new HashMap<UUID, User>(), "User\\mainOIUserRepository");
-            fileIOHandler.serializeHashMap(new HashMap<UUID, Message>(), "Message\\mainOIMessageRepository");
-            fileIOHandler.serializeHashMap(new HashMap<UUID, UserStatus>(), "Message\\mainOIUserStatusRepository");
-        }catch (Exception e){
-            e.printStackTrace();
-            e.getMessage();
-        }
-    }
 
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
