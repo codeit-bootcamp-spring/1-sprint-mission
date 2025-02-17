@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +27,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+
 
     @Override
     public User create(UserCreateRequest userRequest, UserProfileImageRequest profileImage) {
@@ -93,7 +95,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(profile);
         }
 
-        // ✅ 반환값 추가 (UserDTO로 변환하여 반환)
+        //  반환값 추가 (UserDTO로 변환하여 반환)
         return UserDTO.from(user, userStatusRepository.findByUserId(user.getId()).orElse(null));
     }
 
