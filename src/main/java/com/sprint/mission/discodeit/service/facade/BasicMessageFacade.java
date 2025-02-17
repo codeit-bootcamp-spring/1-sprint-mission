@@ -16,13 +16,14 @@ import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -46,12 +47,22 @@ public class BasicMessageFacade implements MessageFacade {
     channelService.validateUserAccess(channel, user.getUUID());
 
     Message message = messageMapper.toEntity(messageDto);
+    messageService.createMessage(message);
 
-    List<BinaryContent> binaryContents = binaryContentMapper.fromMessageDto(messageDto, message.getUUID());
+
+    List<BinaryContent> binaryContents = Optional.ofNullable(messageDto.getMultipart())
+        .filter(files -> !files.isEmpty())
+        .map(files -> binaryContentMapper.fromMessageFiles(
+            files, messageDto.getUserId(), messageDto.getChannelId(), message.getUUID()
+        ))
+        .orElse(Collections.emptyList());
+
     message.setBinaryContents(binaryContents);
 
-    message = messageService.createMessage(message);
-    binaryContents = binaryContentService.saveBinaryContentsForMessage(message);
+    binaryContentService.saveBinaryContentsForMessage(message.getUUID(), binaryContents);
+
+    // 이후 DB 생기면 삭제
+    messageService.updateMessage(message, message.getContent());
 
     return messageMapper.toResponseDto(message);
   }

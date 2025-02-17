@@ -51,6 +51,7 @@ public class UserController {
 
   @RequestMapping(value = "/user/{id}", method = RequestMethod.POST)
   public String updateUser(@PathVariable String id, @Valid @ModelAttribute UserUpdateDto userDto, Model model) {
+
     UserResponseDto user = userFacade.updateUser(id, userDto);
 
     model.addAttribute("user", user);

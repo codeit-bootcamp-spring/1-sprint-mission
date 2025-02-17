@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +16,8 @@ public interface BinaryContentService {
   Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds);
   void delete(String id);
   void deleteByMessageId(String messageId);
-  List<BinaryContent> saveBinaryContentsForMessage(Message message);
+  List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents);
   List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<MultipartFile> binaryContentDtos);
+  BinaryContent updateProfile(String userId, BinaryContent profileImage);
   Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
 }

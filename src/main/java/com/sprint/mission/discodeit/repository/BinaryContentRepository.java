@@ -16,6 +16,7 @@ public interface BinaryContentRepository extends BaseRepository<BinaryContent, S
   List<BinaryContent> findByChannel(String channelId);
   List<BinaryContent> findByMessageId(String messageId);
   List<BinaryContent> findProfilesOf(Set<String> users);
+  BinaryContent findByUserIdAndIsProfilePictureTrue(String userId);
   void deleteByUserId(String userId);
   void deleteByMessageId(String messageId);
   void deleteById(String id);

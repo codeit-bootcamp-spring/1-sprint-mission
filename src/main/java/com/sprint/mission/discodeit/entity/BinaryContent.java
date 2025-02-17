@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import jakarta.annotation.Nullable;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Getter
+@Setter
 public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
   private final String UUID;

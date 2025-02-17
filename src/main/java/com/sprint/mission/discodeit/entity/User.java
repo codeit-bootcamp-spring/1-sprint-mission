@@ -28,13 +28,16 @@ public class User implements Serializable {
   private UserStatus status;
 
   public User(String username, String password, String email, String nickname, String phoneNumber, String description) {
+
     this.UUID = UuidGenerator.generateUUID();
+
     this.username = username;
     this.password = password;
     this.email = email;
     this.nickname = nickname;
     this.phoneNumber = phoneNumber;
     this.description = description;
+
     this.createdAt = Instant.now();
     this.updatedAt = Instant.now();
     this.profileImage = null;

@@ -50,8 +50,10 @@ public class UserAndBinaryContentMapperTest {
     );
 
 
-    user = userMapper.from(req);
-    profile = binaryContentMapper.toProfilePicture(file, user.getUUID());
+    user = userMapper.toEntity(req);
+
+    profile = binaryContentMapper.toProfileBinaryContent(file, user.getUUID());
+
     status = new UserStatus(user.getUUID(), Instant.now());
   }
 
@@ -73,8 +75,8 @@ public class UserAndBinaryContentMapperTest {
     );
 
 
-    User user = userMapper.from(req);
-    BinaryContent content = binaryContentMapper.toProfilePicture(file, user.getUUID());
+    User user = userMapper.toEntity(req);
+    BinaryContent content = binaryContentMapper.toProfileBinaryContent(file, user.getUUID());
 
 
 
@@ -99,7 +101,7 @@ public class UserAndBinaryContentMapperTest {
 
   @Test
   void testMapToDto(){
-    UserResponseDto resp = userMapper.from(user, status, profile);
+    UserResponseDto resp = userMapper.toDto(user, status, profile);
 
     assertThat(resp).isNotNull();
     assertThat(resp.profilePictureBase64()).isEqualTo(Base64.getEncoder().encodeToString(profile.getData()));

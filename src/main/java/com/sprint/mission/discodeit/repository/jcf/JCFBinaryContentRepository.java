@@ -71,6 +71,13 @@ public class JCFBinaryContentRepository implements BinaryContentRepository{
   }
 
   @Override
+  public BinaryContent findByUserIdAndIsProfilePictureTrue(String userId) {
+    return data.values().stream()
+        .filter(content -> Objects.equals(userId, content.getUserId()) && content.isProfilePicture())
+        .findFirst().orElse(null);
+  }
+
+  @Override
   public void deleteByUserId(String userId) {
     data.values().removeIf(content -> content.getUserId().equals(userId));
   }

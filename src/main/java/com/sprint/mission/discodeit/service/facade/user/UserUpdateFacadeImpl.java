@@ -1,55 +1,51 @@
 package com.sprint.mission.discodeit.service.facade.user;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserCreationFacadeImpl implements UserCreationFacade {
+public class UserUpdateFacadeImpl implements UserUpdateFacade {
 
   private final UserService userService;
   private final UserMapper userMapper;
 
-  private final UserStatusService userStatusService;
-
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
-
   @Override
-  public UserResponseDto createUser(CreateUserRequest userDto) {
+  public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
+    log.info("[User Update] : 요청 수신={} , 수신 정보={}", userId, updateDto);
 
-    User user = userMapper.toEntity(userDto);
-    user.setStatus(new UserStatus(user.getUUID(), Instant.now()));
+    User user = userService.updateUser(userId, updateDto, updateDto.inputPassword());
+    log.info("[User Update] : 기본 정보 업데이트 완료.");
 
-    userService.saveUser(user);
-    userStatusService.create(user.getStatus());
+    if(updateDto.profileImage() != null && !updateDto.profileImage().isEmpty()){
 
-    if(userDto.profileImage() != null && !userDto.profileImage().isEmpty()){
-      BinaryContent profile = binaryContentMapper.toProfileBinaryContent(userDto.profileImage(), user.getUUID());
-
+      log.info("[User Update] : 프로필 업데이트 시작");
+      BinaryContent profile = binaryContentMapper.toProfileBinaryContent(updateDto.profileImage(), userId);
       user.setProfileImage(profile);
+      binaryContentService.updateProfile(userId, profile);
 
-      binaryContentService.create(profile);
+      log.info("[User Update] : BinaryContent 저장 성공 = {}", profile);
 
-      // DB 사용시 삭제?
+      // DB 사용시 삭제
       userService.update(user);
+      log.info("[User Update] : user 프로필 업데이트 반영 성공");
     }
 
+    log.info("[User Update] : user 업데이트 완료");
     return userMapper.toDto(user, user.getStatus(), user.getProfileImage());
   }
 }

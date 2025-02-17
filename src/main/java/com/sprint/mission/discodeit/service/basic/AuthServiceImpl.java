@@ -47,6 +47,6 @@ public class AuthServiceImpl implements AuthService {
 
     BinaryContent content = targetUser.getProfileImage();
 
-    return userMapper.from(targetUser, userStatus, content);
+    return userMapper.toDto(targetUser, userStatus, content);
   }
 }

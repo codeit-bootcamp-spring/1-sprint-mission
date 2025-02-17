@@ -101,11 +101,19 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
   public List<BinaryContent> findProfilesOf(Set<String> users) {
     List<BinaryContent> contents = getFromFile();
 
-
-
     return contents.stream()
         .filter(content -> content.isProfilePicture() && users.contains(content.getUserId()))
         .toList();
+  }
+
+  @Override
+  public BinaryContent findByUserIdAndIsProfilePictureTrue(String userId) {
+    List<BinaryContent> contents = getFromFile();
+
+    return contents.stream()
+        .filter(content -> content.isProfilePicture() && content.getUserId().equals(userId))
+        .findFirst()
+        .orElse(null);
   }
 
   @Override

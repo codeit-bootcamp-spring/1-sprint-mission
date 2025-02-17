@@ -36,28 +36,9 @@ public class BasicUserMasterFacade implements UserMasterFacade {
   private final UserStatusService userStatusService;
 
   private final UserCreationFacade userCreationFacade;
+  private final UserUpdateFacade userUpdateFacade;
   @Override
   public UserResponseDto createUser(CreateUserRequest request) {
-//
-//    User user = userService.saveUser(userMapper.from(request));
-//
-//    UserStatus userStatus = userStatusService.create(new UserStatus(user.getUUID(), Instant.now()));
-//
-//
-//    BinaryContent profileImage = null;
-//    if (request.profileImage() != null && !request.profileImage().isEmpty()) {
-//
-//      profileImage = binaryContentMapper.toProfilePicture(request.profileImage(), user.getUUID());
-//      user.setProfileImage(profileImage);
-//      binaryContentService.create(profileImage);
-//
-//    }
-//
-//    user.setStatus(userStatus);
-//
-//    user = userService.update(user);
-//
-//    return userMapper.from(user, userStatus, profileImage);
     return userCreationFacade.createUser(request);
   }
 
@@ -67,36 +48,12 @@ public class BasicUserMasterFacade implements UserMasterFacade {
     UserStatus status = user.getStatus();
     BinaryContent content = user.getProfileImage();
 
-    return userMapper.from(user, status, content);
+    return userMapper.toDto(user, status, content);
   }
 
-  // TODO : 사진 업데이트 안됨
   @Override
   public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
-    log.info("[User Update] 요청 수신 : userId={}, updateFields={}", userId, updateDto);
-    User user = userService.updateUser(userId, updateDto, updateDto.inputPassword());
-    log.info("[User Update] 사용자 정보 업데이트 완료: userId={}", userId);
-
-    BinaryContent profileImage = null;
-    if (updateDto.profileImage() != null && !updateDto.profileImage().isEmpty()) {
-      log.info("[User Update] 프로필 이미지 변경 요청 확인: userId={}", userId);
-      if (user.getProfileImage() != null) {
-        log.info("[User Update] 기존 프로필 이미지 삭제: imageId={}", user.getProfileImage().getFileName());
-        binaryContentService.delete(user.getProfileImage().getUUID());
-      }
-
-
-      profileImage = binaryContentMapper.toProfilePicture(updateDto.profileImage(), user.getUUID());
-      user.setProfileImage(profileImage);
-      binaryContentService.create(profileImage);
-      log.info("[User Update] 새로운 프로필 이미지 저장 완료: userId={}, imageId={}, imageName={}", userId, profileImage.getUUID(), profileImage.getFileName());
-
-
-    }
-
-    User updatedUser = userService.update(user);
-    log.info("[User Update] 사용자 최종 업데이트 완료: userId={}", userId);
-    return userMapper.from(updatedUser, updatedUser.getStatus(), updatedUser.getProfileImage());
+    return userUpdateFacade.updateUser(userId, updateDto);
   }
 
   @Override
@@ -138,7 +95,7 @@ public class BasicUserMasterFacade implements UserMasterFacade {
         .map(user -> {
           UserStatus userStatus = getOrCreateUserStatus(userStatusMap, user.getUUID());
           BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
-          return userMapper.from(user, userStatus, profilePicture);
+          return userMapper.toDto(user, userStatus, profilePicture);
         }).toList();
   }
 

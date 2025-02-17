@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -86,14 +84,15 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   }
 
   @Override
-  public List<BinaryContent> saveBinaryContentsForMessage(Message message) {
-    validator.findOrThrow(Message.class, message.getUUID(), new MessageNotFoundException());
+  public List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents) {
 
-    if (message.getBinaryContents() == null || message.getBinaryContents().isEmpty()) {
+    validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
+
+    if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();
     }
 
-    return binaryContentRepository.saveMultipleBinaryContent(message.getBinaryContents());
+    return binaryContentRepository.saveMultipleBinaryContent(contents);
   }
 
   @Override
@@ -133,6 +132,18 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
 
     return binaryContentRepository.saveMultipleBinaryContent(savedFiles);
+  }
+
+  @Override
+  public BinaryContent updateProfile(String userId, BinaryContent profileImage) {
+    BinaryContent originalProfile = binaryContentRepository.findByUserIdAndIsProfilePictureTrue(userId);
+
+    return Optional.ofNullable(originalProfile)
+        .map(profile -> {
+          binaryContentRepository.deleteById(profile.getUUID());
+          return binaryContentRepository.save(profileImage);
+        })
+        .orElseGet(() -> binaryContentRepository.save(profileImage));
   }
 
   /**

@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.mapper;
 
+
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,9 +13,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ChannelMapper {
   @Mapping(target = "UUID", ignore = true)
-  @Mapping(source = "channelName", target = "channelName")
-  @Mapping(source = "channelType", target = "channelType")
-  @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
   @Mapping(target = "isPrivate", constant = "false")
   @Mapping(source = "serverId", target = "serverUUID")
   @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())") // 빈 리스트 초기화

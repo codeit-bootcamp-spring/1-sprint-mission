@@ -18,7 +18,6 @@ public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
 
 
-
   private final String UUID;
   private final String userId;
   private final String channelId;
