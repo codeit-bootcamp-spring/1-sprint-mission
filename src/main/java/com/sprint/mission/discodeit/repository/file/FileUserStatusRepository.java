@@ -1,36 +1,40 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
-
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {
-
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private final Path MAP_FILE;
-    //Map<userId, userStatusId>
-    private final Map<UUID, UUID> userStatusMap;
 
-    public FileUserStatusRepository(){
-        this.userStatusMap = new HashMap<>();
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", UserStatus.class.getSimpleName());
-        Path MAP_DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", "map");
-        this.MAP_FILE = MAP_DIRECTORY.resolve("userStatusMap.ser");
-        init(DIRECTORY);
-        init(MAP_DIRECTORY);
+    public FileUserStatusRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, UserStatus.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    private Path resolvePath(UUID id){
+    private Path resolvePath(UUID id) {
         return DIRECTORY.resolve(id + EXTENSION);
     }
 
@@ -42,8 +46,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
             oos.writeObject(userStatus);
-            userStatusMap.put(userStatus.getUserId(), userStatus.getId());
-            saveUserStatusMap();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -52,30 +54,32 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findById(UUID id) {
-        UserStatus userNullable = null;
+        UserStatus userStatusNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                userNullable = (UserStatus) ois.readObject();
+                userStatusNullable = (UserStatus) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.ofNullable(userNullable);
+        return Optional.ofNullable(userStatusNullable);
     }
 
     @Override
-    public UUID findUserStatusIdByUserId(UUID userId) {
-        return userStatusMap.get(userId);
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
     public List<UserStatus> findAll() {
-        try {
-            return Files.list(DIRECTORY)
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
@@ -94,36 +98,24 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void delete(UUID id) {
-        Optional<UserStatus> userStatus= findById(id);
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
         Path path = resolvePath(id);
         try {
             Files.delete(path);
-            userStatus.ifPresent(status -> userStatusMap.remove(status.getUserId()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void init(Path DIRECTORY) {
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private void saveUserStatusMap() {
-        try (
-                FileOutputStream fos = new FileOutputStream(MAP_FILE.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-            oos.writeObject(userStatusMap);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save userStatusMap to file", e);
-        }
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
     }
 }
-
