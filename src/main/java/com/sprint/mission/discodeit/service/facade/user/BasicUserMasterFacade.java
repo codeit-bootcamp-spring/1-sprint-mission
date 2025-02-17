@@ -29,15 +29,12 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 @Component
 @RequiredArgsConstructor
 public class BasicUserMasterFacade implements UserMasterFacade {
-  private final UserMapper userMapper;
-  private final BinaryContentMapper binaryContentMapper;
-  private final UserService userService;
-  private final BinaryContentService binaryContentService;
-  private final UserStatusService userStatusService;
 
   private final UserCreationFacade userCreationFacade;
   private final UserUpdateFacade userUpdateFacade;
   private final UserFindFacade userFindFacade;
+  private final UserDeleteFacade userDeleteFacade;
+
   @Override
   public UserResponseDto createUser(CreateUserRequest request) {
     return userCreationFacade.createUser(request);
@@ -60,19 +57,6 @@ public class BasicUserMasterFacade implements UserMasterFacade {
 
   @Override
   public void deleteUser(String id, String password) {
-    User user = userService.findUserById(id);
-
-    userService.deleteUser(id, password);
-    userStatusService.deleteByUserId(id);
-    if(user.getProfileImage()!=null){
-      binaryContentService.delete(user.getProfileImage().getUUID());
-    }
+    userDeleteFacade.delete(id, password);
   }
-
-  private Set<String> mapToUserUuids(List<User> users) {
-    return users.stream()
-        .map(User::getUUID)
-        .collect(Collectors.toSet());
-  }
-
 }
