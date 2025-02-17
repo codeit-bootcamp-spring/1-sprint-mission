@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 
 import java.util.List;
 
-public interface MessageFacade {
+public interface MessageMasterFacade {
   MessageResponseDto createMessage(CreateMessageDto messageDto);
   MessageResponseDto findMessageById(String id);
   List<MessageResponseDto> findMessagesByChannel(String channelId);

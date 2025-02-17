@@ -29,7 +29,7 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 
 @Component
 @RequiredArgsConstructor
-public class BasicMessageFacade implements MessageFacade {
+public class BasicMessageFacade implements MessageMasterFacade {
 
   private final MessageService messageService;
   private final MessageMapper messageMapper;

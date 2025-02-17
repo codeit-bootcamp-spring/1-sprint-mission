@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.dto.channel.*;
 
 import java.util.List;
 
-public interface ChannelFacade {
+public interface ChannelMasterFacade {
   PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto);
   PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto);
 
