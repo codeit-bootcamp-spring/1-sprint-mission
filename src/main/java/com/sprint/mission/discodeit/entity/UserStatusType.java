@@ -1,10 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-
-public enum UserStatusType implements Serializable {
-
+public enum UserStatusType{
     ONLINE,
-    DO_NOT_DISTURB,
     OFFLINE
 }

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.validator.UserStatusValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -52,17 +53,17 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus update(UserStatusUpdateDTO userStatusUpdateDTO) {
         UserStatus findUserStatus = userStatusRepository.findOne(userStatusUpdateDTO.getId());
-        findUserStatus.updateUserStatus(userStatusUpdateDTO.getType());
+        findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getTime());
         userStatusRepository.update(findUserStatus);
         return findUserStatus;
     }
 
     @Override
-    public UserStatus updateByUserId(UUID userId, UserStatusType type) {
+    public UserStatus updateByUserId(UUID userId,  Instant time) {
         UserStatus finduserStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("해당 userid:" + userId + "의 UserStatus 가 없습니다."));
 
-        finduserStatus.updateUserStatus(type);
+        finduserStatus.updateLastActiveAt(time);
         userStatusRepository.update(finduserStatus);
         return finduserStatus;
     }

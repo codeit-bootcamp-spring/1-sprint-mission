@@ -12,7 +12,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BinaryContentCreateDTO {
 
-    private UUID userId;
-    private UUID messageId;
     private MultipartFile file;
 }

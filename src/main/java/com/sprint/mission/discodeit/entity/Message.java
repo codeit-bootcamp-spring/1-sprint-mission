@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final Instant createdAt;
@@ -27,34 +31,6 @@ public class Message implements Serializable {
         binaryContentIds = new ArrayList<>();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public List<UUID> getBinaryContentIds() {
-        return binaryContentIds;
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
     public void setUpdatedAt() {
         this.updatedAt = Instant.now();
     }
@@ -66,13 +42,6 @@ public class Message implements Serializable {
             throw new IllegalArgumentException("입력한 메시지: "+content+"가 기존 값과 같습니다.");
         }
         setUpdatedAt();
-    }
-
-    public static boolean validation(String content){
-        if (content == null || content.isEmpty()) {
-            return false;
-        }
-        return true;
     }
 
     public void addBinaryContent(UUID binaryContentId) {

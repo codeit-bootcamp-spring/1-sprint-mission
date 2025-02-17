@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,17 +36,15 @@ public class BasicUserService implements UserService {
     public UUID create(UserServiceCreateDTO dto) {
         userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.password);
 
-        User user = new User(
-                dto.getUsername(),
-                dto.getEmail(),
-                dto.getPassword());
+        User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
         UUID userId = userRepository.save(user);
 
         if (dto.getFile() != null) {
             BinaryContentCreateDTO binaryContentCreateDTO =
-                    new BinaryContentCreateDTO(userId, null, dto.getFile());
-            binaryContentService.create(binaryContentCreateDTO);
+                    new BinaryContentCreateDTO(dto.getFile());
+            UUID binaryContentId = binaryContentService.create(binaryContentCreateDTO);
+            user.updateBinaryContentId(binaryContentId);
         }
         userStatusService.create(new UserStatusCreateDTO(userId));
 
@@ -88,37 +87,29 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UserServiceUpdateDTO dto) {
         userValidator.validateUpdateUser(dto.getId(), dto.getName(), dto.getEmail());
-
         User findUser = userRepository.findOne(dto.getId());
-
         findUser.setUser(dto.getName(), dto.getEmail());
-        userRepository.update(findUser);
 
-        //기존 사진이 있다면 만들고 삭제
-        BinaryContent findBinaryContent = binaryContentService.findAll().stream()
-                .filter(binaryContent -> binaryContent.getUserId().equals(findUser.getId()) && binaryContent.getMessageId() == null)
-                .findFirst().orElse(null);
-
+        //기존 사진이 있다면 삭제하고 만들기
         if(dto.getFile() != null){
-            if(findBinaryContent !=null){
-                binaryContentService.delete(findBinaryContent.getId());
+            if(findUser.getBinaryContentId() !=null){
+                binaryContentService.delete(findUser.getBinaryContentId());
             }
-            binaryContentService.create(new BinaryContentCreateDTO(findUser.getId(),null, dto.getFile()));
+            UUID binaryContentId = binaryContentService.create(new BinaryContentCreateDTO(dto.getFile()));
+            findUser.updateBinaryContentId(binaryContentId);
         }
+        userRepository.update(findUser);
         return findUser;
     }
 
-    //userId로 유저 상태 업데이트
     @Override
-    public UUID updateUserOnline(UUID userId, UserStatusType type){
+    public UUID updateUserOnline(UUID userId, Instant time){
         User findUser = userRepository.findOne(userId);
         Optional.ofNullable(findUser)
                 .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
-        UserStatus userStatus = userStatusService.updateByUserId(userId, type);
+        userStatusService.updateByUserId(userId, time);
         return userId;
     }
-
-    //유저Id로 유저가
 
     @Override
     public UUID delete(UUID id) {
@@ -132,14 +123,7 @@ public class BasicUserService implements UserService {
                 .ifPresent(userStatusService::delete);
 
         //프로필 이미지 삭제
-        binaryContentService.findAll().stream()
-                .filter(bC -> bC.getUserId().equals(findUser.getId()) && bC.getMessageId() == null)
-                .findFirst()
-                .map(BinaryContent::getId)
-                .ifPresent(binaryContentService::delete);
-
-        //PRIVATE 채널이 가지고 있는 채널 List 에서 삭제
-        //아직 가입이 없으니 걍 놔두자
+        binaryContentService.delete(findUser.getBinaryContentId());
 
 
         return userRepository.delete(findUser.getId());

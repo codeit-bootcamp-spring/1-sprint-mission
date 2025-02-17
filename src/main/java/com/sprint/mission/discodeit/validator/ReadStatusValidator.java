@@ -42,7 +42,6 @@ public class ReadStatusValidator {
         if (readStatusRepository.findByUserIdAndChannlId(userId, channelId).isPresent()) {
             throw new IllegalArgumentException("중복된 ReadStatus 가 존재합니다. userid: " + userId+" channelId :"+channelId);
         }
-
     }
 
 }

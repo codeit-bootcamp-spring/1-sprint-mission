@@ -81,7 +81,6 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-
     public UUID save(Channel channel) {
         data.put(channel.getId(), channel);
         saveDataToFile();
