@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
-import org.mapstruct.Context;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -53,7 +51,21 @@ public interface ChannelMapper {
   @Mapping(source = "createdAt", target = "createdAt")
   @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
   @Mapping(target = "channelName", expression = "java(channel.getIsPrivate() ? null : channel.getChannelName())")
-  FindChannelResponseDto toFindChannelDto(Channel channel, @Context Instant lastMessagedAt, @Context List<String> userIds);
+  FindChannelResponseDto toFindChannelDto(Channel channel);
 
+  default FindChannelResponseDto toFindChannelDto(Channel channel,  Instant lastMessagedAt, List<String> userIds) {
+    FindChannelResponseDto dto = toFindChannelDto(channel);
+    return new FindChannelResponseDto(
+        dto.channelId(),
+        dto.channelName(),
+        dto.serverId(),
+        dto.channelType(),
+        dto.isPrivate(),
+        dto.createdAt(),
+        lastMessagedAt,  // lastMessagedAt 추가
+        userIds,  // userIds 추가
+        dto.maxNumberOfPeople()
+    );
+  }
 
 }

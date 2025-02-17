@@ -18,8 +18,9 @@ public interface MessageMapper {
   @Mapping(target = "isEdited", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "channelId", source = "channelId")
   @Mapping(target = "binaryContents", ignore = true)
-  Message toEntity(CreateMessageDto dto);
+  Message toEntity(CreateMessageDto dto, String channelId);
 
   @Mapping(target = "messageId", source = "UUID")
   @Mapping(target = "userId", source = "userId")
@@ -30,12 +31,12 @@ public interface MessageMapper {
   MessageResponseDto toResponseDto(Message message);
 
   @AfterMapping
-  default void mapBinaryContents(@MappingTarget Message message, CreateMessageDto dto, BinaryContentMapper binaryContentMapper){
+  default void mapBinaryContents(@MappingTarget Message message, CreateMessageDto dto, String channelId, BinaryContentMapper binaryContentMapper){
     if(dto.getMultipart() != null && dto.getMultipart().isEmpty()){
       List<BinaryContent> binaryContents = binaryContentMapper.fromMessageFiles(
           dto.getMultipart(),
           dto.getUserId(),
-          dto.getChannelId(),
+          channelId,
           message.getUUID()
       );
       message.setBinaryContents(binaryContents);

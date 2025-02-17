@@ -39,21 +39,21 @@ public class BasicMessageFacade implements MessageMasterFacade {
   private final EntityValidator validator;
 
   @Override
-  public MessageResponseDto createMessage(CreateMessageDto messageDto) {
+  public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
 
     User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
-    Channel channel = validator.findOrThrow(Channel.class, messageDto.getChannelId(), new ChannelNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
 
     channelService.validateUserAccess(channel, user.getUUID());
 
-    Message message = messageMapper.toEntity(messageDto);
+    Message message = messageMapper.toEntity(messageDto, channelId);
     messageService.createMessage(message);
 
 
     List<BinaryContent> binaryContents = Optional.ofNullable(messageDto.getMultipart())
         .filter(files -> !files.isEmpty())
         .map(files -> binaryContentMapper.fromMessageFiles(
-            files, messageDto.getUserId(), messageDto.getChannelId(), message.getUUID()
+            files, messageDto.getUserId(), channelId, message.getUUID()
         ))
         .orElse(Collections.emptyList());
 

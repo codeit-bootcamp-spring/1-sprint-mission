@@ -14,7 +14,6 @@ import java.util.List;
 @Setter
 public class CreateMessageDto {
     @NotBlank private String userId;
-    @NotBlank private String channelId;
     @NotBlank @Size(min = 1, max = 1000) private String content;
     private List<MultipartFile> multipart;
 
