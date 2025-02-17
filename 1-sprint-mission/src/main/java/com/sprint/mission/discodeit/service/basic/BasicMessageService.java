@@ -50,7 +50,7 @@ public class BasicMessageService implements MessageService {
                             user.getId(),
                             newMessage.getId(),
                             fileDTO.filename(),
-                            "application/octet-stream",
+                            fileDTO.contentType(),
                             fileDTO.fileData()
                     ))
                     .toList();
@@ -155,7 +155,7 @@ public class BasicMessageService implements MessageService {
                             messageToUpdate.getUser().getId(),
                             messageToUpdate.getId(),
                             fileDTO.filename(),
-                            "application/octet-stream",
+                            fileDTO.contentType(),
                             fileDTO.fileData()
 
                     ))
@@ -195,7 +195,7 @@ public class BasicMessageService implements MessageService {
         //메시지 삭제
         messageRepository.deleteById(messageId);
 
-       log.error("Message deleted: {}", messageId);
+       log.info("Message deleted: {}", messageId);
 
     }
 }

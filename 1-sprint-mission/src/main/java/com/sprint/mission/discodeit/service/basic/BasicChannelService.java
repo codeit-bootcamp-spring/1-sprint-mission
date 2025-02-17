@@ -106,7 +106,7 @@ public class BasicChannelService implements ChannelService {
         //사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        //private 채널 조회(사용자가 참여한 채널 + 사용자가 소유한 채널) -> 레포지토리 내부에서 읽고 확인하는 로직 필요
+        //private 채널 조회(사용자가 참여한 채널 + 사용자가 소유한 채널)
         List<Channel> privateChannels = readStatusRepository.findChannelsByUser(user);
         channelRepository.findAllByOwnerAndType(user, ChannelType.PRIVATE);
 

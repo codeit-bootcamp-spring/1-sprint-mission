@@ -37,7 +37,10 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public Message save(Message message) {
         UUID userId = message.getUser().getId();
-        messageData.computeIfAbsent(userId, k -> new ArrayList<>()).add(message);
+        List<Message> messages = messageData.computeIfAbsent(userId, k -> new ArrayList<>());
+        messages.removeIf(m->m.getId().equals(message.getId()));
+
+        messages.add(message);
         saveToFile();
         return message;
     }
