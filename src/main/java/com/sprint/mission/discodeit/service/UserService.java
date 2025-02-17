@@ -14,7 +14,7 @@ public interface UserService {
     UserResponseDto create(CreateUserDto createUserDto);
 
     //모두 읽기
-    List<User> findAll();
+    List<UserResponseDto> findAll();
 
     //읽기
     //단건 조회 - UUID
@@ -27,7 +27,7 @@ public interface UserService {
     List<UserResponseDto> findAllContainsNickname(String nickname);
 
     //다건 조회 - 계정 상태
-    List<User> findAllByAccountStatus(AccountStatus accountStatus);
+    List<UserResponseDto> findAllByAccountStatus(AccountStatus accountStatus);
 
     //다건 조회 - 사용자 상태
     //List<User> getUserByUserStatus(UserStatus userStatus);

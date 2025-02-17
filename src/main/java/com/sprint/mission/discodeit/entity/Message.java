@@ -25,11 +25,11 @@ public class Message implements Serializable {
     //첨부 이미지 목록
     private final Set<String> attachmentImageIds = new HashSet<>();
 
-    public Message(User sender, String content, String channelId) {
+    public Message(String senderId, String content, String channelId) {
         this.id = UUID.randomUUID().toString();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
-        this.senderId = sender.getId();
+        this.senderId = senderId;
         this.content = content;
         this.channelId = channelId;
     }

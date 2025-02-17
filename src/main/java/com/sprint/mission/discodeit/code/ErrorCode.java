@@ -22,7 +22,10 @@ public enum ErrorCode {
 
     //ReadStatus 에러
     READ_STATUS_NOT_FOUND(5001, "해당 read status를 찾을 수 없습니다."),
-    READ_STATUS_ALREADY_EXIST(5002, "해당 유저와 채널의 ReadStatus가 이미 존재합니다.");
+    READ_STATUS_ALREADY_EXIST(5002, "해당 유저와 채널의 ReadStatus가 이미 존재합니다."),
+
+    //UserStatus 에러
+    USER_STATUS_NOT_FOUND(6001, "해당 유저의 UserStatus가 없습니다.");
 
 
     private final int code;

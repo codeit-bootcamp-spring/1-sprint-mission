@@ -34,15 +34,15 @@ public record UserResponseDto(
         );
     }
 
-    public void displayInfo() {
-        System.out.println(
+    @Override
+    public String toString() {
+        return "[UserResponseDto] {" +
                 "id: " + id +
-                        " nickname: " + nickname
-                        + " email: " + email
-                        + " isOnline: " + isOnline
-                        + " statusMessage: " + statusMessage
-                        + " accountStatus: " + accountStatus
-                        + " profileImageId: " + profileImageId
-        );
+                " nickname: " + nickname
+                + " email: " + email
+                + " isOnline: " + isOnline
+                + " statusMessage: " + statusMessage
+                + " accountStatus: " + accountStatus
+                + " profileImageId: " + profileImageId + "}";
     }
 }

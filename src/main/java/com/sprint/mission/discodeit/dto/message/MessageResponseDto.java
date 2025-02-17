@@ -28,4 +28,14 @@ public record MessageResponseDto(
                 message.getChannelId()
         );
     }
+    @Override
+    public String toString(){
+        return "[MessageResponseDto] "+
+                "{id:" +id
+                +" senderId:" +senderId
+                +" content:" +content
+                +" channelId:" +channelId
+                +" createdAt:" +createdAt
+                +" updatedAt:" +updatedAt;
+    }
 }
