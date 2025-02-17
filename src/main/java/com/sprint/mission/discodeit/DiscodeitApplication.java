@@ -11,6 +11,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.time.Instant;
+
 @SpringBootApplication
 public class DiscodeitApplication {
 
@@ -18,19 +20,24 @@ public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
 		User user = userService.create("woody", "woody@codeit.com", "woody1234");
 		System.out.println("사용자 생성: " + user.getId() + ", 이름: " + user.getUsername());
+		System.out.println("사용자 생성 시간: " + user.getCreatedAt());
 		return user;
 	}
 
 	static Channel setupChannel(ChannelService channelService) {
 		Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
 		System.out.println("채널 생성: " + channel.getId() + ", 이름: " + channel.getName());
+		System.out.println("채널 생성 시간: " + channel.getCreatedAt());
 		return channel;
 	}
 
 	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 		Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
 		System.out.println("메시지 생성: " + message.getId() + ", 내용: " + message.getContent());
+		System.out.println("메시지 생성 시간: " + message.getCreatedAt());
 	}
+
+
 
 	public static void main(String[] args) {
 		// Spring Context 초기화

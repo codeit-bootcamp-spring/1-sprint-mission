@@ -13,19 +13,21 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final UUID id = UUID.randomUUID();
-    private final Long createdAt = Instant.now().getEpochSecond();
-    private Long updatedAt;
+    private final Instant createdAt = Instant.now();  // Instant로 변경
+    private Instant updatedAt;  // Instant로 변경
     private String username;
     private String email;
     private String password;
 
+    // 새로 추가된 생성자
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.updatedAt = Instant.now().getEpochSecond(); // 생성시 updatedAt 설정
+        this.updatedAt = Instant.now();  // 생성시 updatedAt 설정
     }
 
+    // update 메서드에서 updatedAt 갱신
     public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
         if (newUsername != null && !newUsername.equals(this.username)) {
@@ -42,7 +44,7 @@ public class User implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();  // 수정 시점에 updatedAt 갱신
         }
     }
 }
