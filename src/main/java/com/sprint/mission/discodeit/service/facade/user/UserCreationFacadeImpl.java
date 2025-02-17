@@ -44,7 +44,7 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
 
       user.setProfileImage(profile);
 
-      binaryContentService.create(profile);
+      BinaryContent content = binaryContentService.create(profile);
 
       // DB 사용시 삭제?
       userService.update(user);

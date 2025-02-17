@@ -162,4 +162,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
             Collectors.toList()
         ));
   }
+
+  @Override
+  public List<BinaryContent> findAll(){
+    return binaryContentRepository.findAll();
+  }
 }

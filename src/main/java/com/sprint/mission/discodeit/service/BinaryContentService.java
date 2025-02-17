@@ -20,4 +20,6 @@ public interface BinaryContentService {
   List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<MultipartFile> binaryContentDtos);
   BinaryContent updateProfile(String userId, BinaryContent profileImage);
   Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
+
+  List<BinaryContent> findAll();
 }
