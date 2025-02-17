@@ -26,6 +26,7 @@ public class UserStatus implements Serializable {
 
         this.userId = userId;
         type = UserStatusType.ONLINE;
+        lastActiveAt = Instant.now();
 
     }
 
