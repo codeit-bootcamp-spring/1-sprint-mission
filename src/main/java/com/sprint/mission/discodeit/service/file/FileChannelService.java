@@ -65,6 +65,11 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
+    public List<UUID> findAllByUserId(UUID userId) {
+        return List.of();
+    }
+
+    @Override
     public void updateChannel(UUID id, ChannelUpdateDto channelParam) {
         validateFileChannelExits(id);
         channelRepository.updateChannel(id, channelParam);

@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto.entity;
 
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
-@Getter
+
+@Data
 public class User extends BaseEntity implements Serializable {
 
     @NotEmpty

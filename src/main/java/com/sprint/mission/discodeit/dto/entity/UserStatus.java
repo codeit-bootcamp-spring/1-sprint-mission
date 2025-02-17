@@ -1,24 +1,30 @@
 package com.sprint.mission.discodeit.dto.entity;
 
+import lombok.Getter;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class UserStatus extends BaseEntity {
-    private Onoff onoff;
-    private final Instant attendAt;
+    private Instant lastAttendAt;
     private UUID userId;
 
     public UserStatus(UUID userId) {
         super();
         this.userId = userId;
-        this.attendAt = Instant.now();
+        this.lastAttendAt = Instant.now();
     }
 
-    public boolean online() {
-        if(Instant.now().compareTo(attendAt) < 3000) {
-            return onoff == Onoff.ONLINE;
-        }
-        return onoff == Onoff.OFFLINE;
+    public void updateUserStatus(Instant newLastAttendAt) {
+        this.lastAttendAt = newLastAttendAt;
+        setUpdatedAt();
     }
 
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastAttendAt.isAfter(instantFiveMinutesAgo);
+    }
 }

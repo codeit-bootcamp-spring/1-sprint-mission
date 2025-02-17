@@ -6,19 +6,22 @@ import com.sprint.mission.discodeit.dto.entity.ChannelGroup;
 import com.sprint.mission.discodeit.dto.entity.ReadStatus;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
 
+
 @Getter
-public class PrivateChannelDto extends BaseEntity {
+public class PrivateChannelDto{
+
+    private UUID id;
+    private Instant createdAt;
     private ReadStatus readStatus;
 
     private ChannelGroup channelGroup;
-    private List<UUID> userList=new ArrayList<>();
 
     public PrivateChannelDto(Channel channel) {
+        this.id=channel.getId();
+        this.createdAt=channel.getCreatedAt();
         this.channelGroup = channel.getChannelGroup();
-        userList.add(readStatus.getUserId());
     }
 }

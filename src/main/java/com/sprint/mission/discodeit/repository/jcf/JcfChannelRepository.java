@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.entity.ChannelGroup;
 import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +28,13 @@ public class JcfChannelRepository implements ChannelRepository {
     @Override
     public void updateChannel(UUID id, ChannelUpdateDto channelUpdateDto) {
         Channel findChannel = data.get(id);
-        if (findChannel.getChannelGroup().equals("PUBLIC")) {
-            findChannel.setChannelName(channelUpdateDto.getChannelName());
-            findChannel.setDescription(channelUpdateDto.getDescription());
-            log.info("PUBLIC 채널 수정완료");
+        if (findChannel.getChannelGroup()== ChannelGroup.PRIVATE){
+            log.info("PRIVATE는 채널 수정 불가입니다.");
         }
-        log.info("PRIVATE는 채널 수정 불가입니다.");
+        findChannel.setChannelName(channelUpdateDto.getChannelName());
+        findChannel.setDescription(channelUpdateDto.getDescription());
+        findChannel.setUpdatedAt();
+        log.info("PUBLIC 채널 수정완료");
     }
 
     @Override

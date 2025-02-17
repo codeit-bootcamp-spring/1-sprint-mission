@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.entity;
 
 
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 import java.util.List;
@@ -13,8 +14,7 @@ public class Message extends BaseEntity implements Serializable {
     private UUID senderId;
     private UUID channelId;
 
-    private BinaryContent attachFile;
-    private List<BinaryContent> messageFiles;
+    private List<MultipartFile> messageFiles;
 
     public Message(String content, UUID senderId, UUID channelId) {
         super();
@@ -22,12 +22,7 @@ public class Message extends BaseEntity implements Serializable {
         this.senderId = senderId;
         this.channelId = channelId;
     }
-    //깊은 복사위한 복사 생성자
-    public Message(Message message) {
-        this.content = message.getContent();
-        this.channelId = message.channelId;
-        this.senderId=message.senderId;
-    }
+
     public void updateMessage(String content) {
         this.content = content;
         setUpdatedAt();

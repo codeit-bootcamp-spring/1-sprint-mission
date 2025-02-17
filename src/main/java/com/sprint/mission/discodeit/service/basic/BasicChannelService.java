@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.entity.Channel;
-import com.sprint.mission.discodeit.dto.entity.Participant;
 import com.sprint.mission.discodeit.dto.entity.ReadStatus;
 import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.form.PrivateChannelDto;
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +27,6 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final JcfParticipantRepository paricipantRepository;
@@ -45,27 +42,19 @@ public class BasicChannelService implements ChannelService {
             return;
         }
         Channel channel = new Channel(channelParam.getChannelName(), channelParam.getDescription(), channelParam.getChannelGroup());
-        if (!channelParam.getChannelGroup().equals("PUBLIC")) {
-            log.info("PUBLIC 채널이 아닙니다.");
-            return;
-        }
         channelRepository.createChannel(channel.getId(),channel);
         participate(userId, channel);
     }
 
     @Override
     public void createPrivateChannel(PrivateChannelDto channelParam,UUID userId) {
-        if (!channelParam.getChannelGroup().equals("PRIVATE")) {
-            log.info("PRIVATE 채널이 아닙니다.");
-            return;
-        }
         Channel channel = new Channel(channelParam.getChannelGroup());
         channelRepository.createChannel(channel.getId(), channel);
         participate(userId, channel);
         Set<UUID> participants = paricipantRepository.getParticipants(channel.getId());
         for (UUID participant : participants) {
             ReadStatus readStatus = new ReadStatus(participant,channel.getId());
-            readStatusRepository.createReadStatus(participant,readStatus);
+            readStatusRepository.createReadStatus(readStatus);
         }
     }
 
@@ -76,15 +65,11 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Optional<PrivateChannelDto> findPrivateChannel(UUID id) {
-        Optional<Channel> optionalChannel = channelRepository.findById(id);
-        Channel channel = optionalChannel.get();
-        return Optional.of(new PrivateChannelDto(channel));
+        return channelRepository.findById(id).map(PrivateChannelDto::new);
     }
     @Override
     public Optional<PublicChannelDto> findPublicChannel(UUID id) {
-        Optional<Channel> optionalChannel = channelRepository.findById(id);
-        Channel channel = optionalChannel.get();
-        return Optional.of(new PublicChannelDto(channel));
+        return channelRepository.findById(id).map(PublicChannelDto::new);
     }
 
 
@@ -108,11 +93,12 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID channelId) {
         validateChannelExits(channelId);
         channelRepository.findById(channelId);
+        messageRepository.deleteMessage(channelId);
         channelRepository.deleteChannel(channelId);
     }
     private void validateChannelExits(UUID uuid) {
-        if (!channelRepository.findById(uuid).isPresent()) {
-            throw new RuntimeException("해당 User가 존재하지 않습니다.");
+        if (channelRepository.findById(uuid).isEmpty()) {
+            throw new RuntimeException("해당 채널이 존재하지 않습니다.");
         }
     }
 }

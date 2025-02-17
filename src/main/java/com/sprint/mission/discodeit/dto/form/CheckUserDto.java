@@ -17,7 +17,6 @@ public class CheckUserDto {
     private BinaryContent attachProfile;
 
     public CheckUserDto(User user) {
-        this.status = user.getUserStatus();
         this.userName = user.getUserName();
         this.userEmail = user.getUserEmail();
         this.loginId = user.getLoginId();

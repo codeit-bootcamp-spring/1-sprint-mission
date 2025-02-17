@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.dto.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,15 +16,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component
+
 public class FileMessageRepository implements MessageRepository{
     private static final String FILE_PATH = "temp/messages-obj.dat";
     private final Map<UUID, Message> data=new HashMap<>();
 
     @Override
-    public void createMessage(UUID id, Message message) {
+    public Message createMessage(UUID id, Message message) {
         data.put(id, message);
         save();
+        return message;
     }
 
     @Override
@@ -41,6 +41,11 @@ public class FileMessageRepository implements MessageRepository{
     }
 
     @Override
+    public void deleteMessageByChannelId(UUID channelId) {
+
+    }
+
+    @Override
     public Optional<Message> findById(UUID id) {
         Map<UUID, Message> loadMessages = load();
         return Optional.ofNullable(loadMessages.get(id));
@@ -50,6 +55,11 @@ public class FileMessageRepository implements MessageRepository{
     public List<Message> findAll() {
         Map<UUID, Message> loadMessages = load();
         return new ArrayList<>(loadMessages.values());
+    }
+
+    @Override
+    public Optional<Message> findAllByChannelId(UUID channelId) {
+        return Optional.empty();
     }
 
     private void save() {

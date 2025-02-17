@@ -1,6 +1,14 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.entity.ChannelGroup;
+import com.sprint.mission.discodeit.dto.entity.Message;
 import com.sprint.mission.discodeit.dto.entity.User;
+import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.form.MessageWithContents;
+import com.sprint.mission.discodeit.dto.form.PrivateChannelDto;
+import com.sprint.mission.discodeit.dto.form.PublicChannelDto;
 import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -9,21 +17,27 @@ import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.basic.NetworkService;
+import com.sprint.mission.discodeit.util.JavaAppConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
+
 @Slf4j
 @SpringBootApplication
 public class DiscodeitApplication {
-
 	public static void main(String[] args) {
 		ApplicationContext ac=SpringApplication.run(DiscodeitApplication.class, args);
 		UserService userService=ac.getBean(BasicUserService.class);
 		ChannelService channelService=ac.getBean(BasicChannelService.class);
 		MessageService messageService=ac.getBean(BasicMessageService.class);
+
 		Scanner scanner = new Scanner(System.in);
 		System.out.print("접속 주소를 입력해 주세요:");
 		String input = scanner.nextLine();
@@ -46,30 +60,39 @@ public class DiscodeitApplication {
 			userService.deleteUser(alice.getId());
 			log.info("삭제 후 사용자 조회: " + userService.findAllUsers());
 			System.out.println();
-		/*	Channel hiChannel = new Channel(hiReadStatus,"Hi", "Introduce");
-			Channel howChannel = new Channel("How", "How about u?");
-			Channel byeChannel = new Channel("Bye", "Good Day");
-			ReadStatus hiReadStatus = new ReadStatus(alice.getId(),hiChannel.getId());
-			channelService.createChannel(hiChannel);
-			channelService.createChannel(byeChannel);
-			channelService.createChannel(howChannel);
+
+
+			Channel hiChannel = new Channel("hiChannel","Hi", ChannelGroup.PUBLIC);
+			Channel byeChannel = new Channel("byeChannel","Bye", ChannelGroup.PUBLIC);
+			Channel howChannel = new Channel("How", "How about u?", ChannelGroup.PRIVATE);
+			PublicChannelDto publicChannelHi = new PublicChannelDto(hiChannel);
+			PublicChannelDto publicChannelBye = new PublicChannelDto(byeChannel);
+			PrivateChannelDto privateChannel= new PrivateChannelDto(howChannel);
+
+			channelService.createPublicChannel(publicChannelHi,hyun.getId());
+			channelService.createPublicChannel(publicChannelBye,hyun.getId());
+			channelService.createPrivateChannel(privateChannel,yull.getId());
 			log.info("전체 채널 조회: " + channelService.findAllChannels());
-			log.info("일부 채널 조회: " + channelService.findChannel(hiChannel.getId()));
+			log.info("private 채널 조회: " + channelService.findPrivateChannel(privateChannel.getId()));
+			log.info("사용자 채널 조회: "+channelService.findAllByUserId(yull.getId()));
 			System.out.println();
 
-			channelService.updateChannelDescription(hiChannel.getId(),"hiUpdate");
-			hiChannel.updateDescription("Update Introduce");
+			ChannelUpdateDto byeUpdate = new ChannelUpdateDto("byeUpdateChannel", "Updated");
+			channelService.updateChannel(publicChannelBye.getId(), byeUpdate);
 			log.info("업데이트 후 채널 조회: " + channelService.findAllChannels());
 
+			List<UUID> channelListbyHyun = channelService.findAllByUserId(hyun.getId());
+			log.info("hyun의 채널 리스트: " + channelListbyHyun);
+
 			channelService.deleteChannel(byeChannel.getId());
-//        jcfChannelService.deleteChannel(hiChannel.getId());
 			log.info("삭제 후 채널 조회: " + channelService.findAllChannels());
 			System.out.println();
 
-			Message howMessage = new Message("Good", yull.getId(), howChannel.getId());
-//        Message hiMessage = new Message("Hi I'm alice", alice.getId(), hiChannel.getId());
+
+			BinaryContent binaryContent= new BinaryContent("testFile.txt",100L,"text/plain","this is test".getBytes(StandardCharsets.UTF_8));
+			MessageWithContents howMessage = new MessageWithContents(yull.getId(),howChannel.getId(),"Good",binaryContent);
 			Message hiMessage = new Message("Hi I'm hyun", hyun.getId(), hiChannel.getId());
-			messageService.messageSave(howMessage);
+			messageService.messageSaveWithContents(howMessage,binaryContent);
 			messageService.messageSave(hiMessage);
 			log.info("전체 메세지 조회: " + messageService.findAllMessages());
 			log.info("일부 메세지 조회:" + messageService.findMessage(howMessage.getId()));
@@ -79,7 +102,9 @@ public class DiscodeitApplication {
 			log.info("업데이트 후 메세지 조회: " + messageService.findAllMessages());
 
 			messageService.deleteMessage(hiMessage.getId());
-			log.info("삭제 후 메세지 조회: " + messageService.findAllMessages());*/
+			log.info("삭제 후 메세지 조회: " + messageService.findAllMessages());
+			log.info("howChannel 의 메세지: "+messageService.findAllByChannelId(howChannel.getId()));
+
 		}catch (Exception e) {
 			exceptionHandler(e);
 		}finally {

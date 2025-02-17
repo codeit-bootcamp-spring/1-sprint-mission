@@ -1,21 +1,60 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.entity.User;
 import com.sprint.mission.discodeit.dto.entity.UserStatus;
-import com.sprint.mission.discodeit.dto.form.CheckUserDto;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.stereotype.Repository;
 
-public class JcfUserStatusRepository {
-    private UserStatus userStatus;
-    private User user;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
-    public void createUserStatus(CheckUserDto checkUser) {
-        if (checkUser.getLoginId() == null) {
-            throw new IllegalStateException("유저를 찾을 수 없습니다.");
-        }
-        else if(checkUser.getLoginId().equals(user.getLoginId())) {
-            throw new IllegalStateException("이미 유저가 존재합니다.");
-        }
+@Repository
+public class JcfUserStatusRepository implements UserStatusRepository {
 
+    private final Map<UUID,UserStatus> data;
+
+    public JcfUserStatusRepository() {
+        this.data = new HashMap<>();
     }
 
+    @Override
+    public UserStatus save(UserStatus userStatus) {
+        data.put(userStatus.getId(), userStatus);
+        return userStatus;
+    }
+
+    @Override
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        List<UserStatus> all = findAll();
+        for (UserStatus userStatus : all) {
+            if(userStatus.getUserId().equals(userId)) {
+                return Optional.of(userStatus);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<UserStatus> findAll() {
+        return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        data.remove(id);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        UserStatus userStatus = findByUserId(userId).get();
+        data.remove(userStatus.getId());
+    }
 }

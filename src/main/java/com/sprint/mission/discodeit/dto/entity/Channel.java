@@ -16,14 +16,12 @@ public class Channel extends BaseEntity implements Serializable {
     private UUID madeUserId;
 
     public Channel(String channelName, String description, ChannelGroup channelGroup) {
-        super();
+
         this.channelGroup = channelGroup;
-        if (channelGroup.equals("PUBLIC")) {
-            this.channelName = channelName;
-            this.description = description;
-            this.madeUserId = Participant.getUser
-        }
+        this.channelName = channelName;
+        this.description = description;
     }
+
     public Channel(ChannelGroup channelGroup) {
         super();
         this.channelGroup = channelGroup;

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.dto.entity.Channel;
 import com.sprint.mission.discodeit.dto.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,11 +13,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+@Repository
 public class JcfMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data=new HashMap<>();
     @Override
-    public void createMessage(UUID id, Message message) {
+    public Message createMessage(UUID id, Message message) {
         data.put(id, message);
+        return message;
     }
 
     @Override
@@ -26,6 +30,24 @@ public class JcfMessageRepository implements MessageRepository {
     @Override
     public void deleteMessage(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public void deleteMessageByChannelId(UUID channelId) {
+        Optional<Message> messages = findAllByChannelId(channelId);
+        Message message = messages.get();
+        data.remove(message.getId());
+    }
+
+    @Override
+    public Optional<Message> findAllByChannelId(UUID channelId) {
+        List<Message> all = findAll();
+        for (Message message : all) {
+            if(message.getChannelId().equals(channelId)) {
+                return Optional.of(message);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
