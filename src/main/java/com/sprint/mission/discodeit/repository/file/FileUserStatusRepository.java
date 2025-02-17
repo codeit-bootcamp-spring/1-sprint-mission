@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@Scope("singleton")
 @Profile("file")
 public class FileUserStatusRepository implements UserStatusRepository {
     private final Path directory;
