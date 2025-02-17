@@ -88,10 +88,11 @@ public class UserStatusService {
 
     public UserStatusResponseDTO update(UserStatusUpdateDTO updateDTO){
         //userStatus 조회
-        UserStatus userStatus = userStatusRepository.findById(updateDTO.userStatusId())
-                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
-        //마지막 활동 시간 업데이트
-        userStatus.updateLastSeenAt(updateDTO.lastActiveAt());
+        UserStatus userStatus = userStatusRepository.findById(updateDTO.userId())
+                .orElseThrow(() -> new IllegalArgumentException("UserStatus not found : update fail"));
+        //현재 시간 업데이트
+        Instant now = Instant.now();
+        userStatus.updateLastSeenAt(now);
         //저장
         userStatusRepository.save(userStatus);
         // 응답 DTO 변환 후 반환
@@ -102,7 +103,7 @@ public class UserStatusService {
         );
     }
 
-    public UserStatusResponseDTO updateByUserId(UUID userId, Instant lastActiveAt){
+    public UserStatusResponseDTO updateByUserId(UUID userId){
         //id로 사용자 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -113,8 +114,9 @@ public class UserStatusService {
                     userStatusRepository.save(newUserStatus);
                     return newUserStatus;
                 });
-        //마지막 활동 시간 업데이트
-        userStatus.updateLastSeenAt(lastActiveAt);
+        //현재 활동 시간 업데이트
+        Instant now = Instant.now();
+        userStatus.updateLastSeenAt(now);
         // 저장
         userStatusRepository.save(userStatus);
         // DTO 변환, 반환
@@ -128,7 +130,7 @@ public class UserStatusService {
     public void delete(UUID userStatusId){
         //userStatus 조회
         if(!userStatusRepository.existsByUserStatusId(userStatusId)){
-            throw new IllegalArgumentException("UserStatus not found");
+            throw new IllegalArgumentException("UserStatus not found : delete fail");
         }
         //삭제
         userStatusRepository.deleteById(userStatusId);

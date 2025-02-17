@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor(force = true)
 public class UserStatus {
     private UUID id;
     private User user;
     private Instant lastSeenAt = Instant.EPOCH;
+    private boolean online;
 
     public UserStatus(User user, Instant lastSeenAt) {
         this.id = UUID.randomUUID();
