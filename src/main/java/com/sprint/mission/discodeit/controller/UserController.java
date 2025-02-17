@@ -1,20 +1,22 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequestWrapper;
+import com.sprint.mission.discodeit.dto.request.users.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.users.create.UserCreateRequestWrapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.users.create.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.users.update.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.users.update.UserUpdateRequestWrapper;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -28,14 +30,34 @@ public class UserController {
         Optional<BinaryContentCreateRequest> profileCreateRequest = userCreateRequestWrapper.profileCreateRequest();
 
         User createUser = userService.create(userCreateRequest, profileCreateRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new UserDto(
-                createUser.getId(),
-                createUser.getCreatedAt(),
-                createUser.getUpdatedAt(),
-                createUser.getUsername(),
-                createUser.getEmail(),
-                createUser.getProfileId(),
-                null
-        ));
+        URI location = URI.create("/users/" + createUser.getId());
+        return ResponseEntity.created(location).body(userService.find(createUser.getId()));
     }
+    @RequestMapping(method = RequestMethod.PUT, value = "/update/{userId}")
+    public ResponseEntity<UserDto> update(@PathVariable UUID userId,@RequestBody UserUpdateRequestWrapper userUpdateRequestWrapper){
+        UserUpdateRequest userUpdateRequest = userUpdateRequestWrapper.userUpdateRequest();
+        Optional<BinaryContentCreateRequest> binaryContentCreateRequest = userUpdateRequestWrapper.profileCreateRequest();
+
+        User updateUser = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
+        return ResponseEntity.ok(userService.find(userId));
+    }
+    @RequestMapping(method = RequestMethod.DELETE,value = "/delete/{userId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID userId){
+        try {
+            // 서비스 계층에서 delete 메서드 호출
+            userService.delete(userId);
+            // 삭제 완료 후 No Content 반환
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            // 사용자가 없으면 404 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            // 그 외의 예외는 500 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    
+
+
 }

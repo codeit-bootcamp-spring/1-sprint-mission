@@ -1,4 +1,6 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.dto.request.users.create;
+
+import com.sprint.mission.discodeit.dto.request.users.BinaryContentCreateRequest;
 
 import java.util.Optional;
 
