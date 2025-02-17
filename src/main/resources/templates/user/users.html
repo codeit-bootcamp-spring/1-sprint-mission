@@ -72,19 +72,24 @@
 
             fetch(`/api/v1/user/${selectedUserId}?password=${encodeURIComponent(password)}`, {
                 method: "DELETE"
-            }).then(response => {
-                if (response.ok) {
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        return response.text().then(errorMessage => {
+                            throw new Error(errorMessage || "❌ 삭제 실패!");
+                        });
+                    }
+                })
+                .then(redirectUrl => {
                     alert("✅ 사용자가 삭제되었습니다.");
-                    location.reload();
-                } else {
-                    response.text().then(errorMessage => {
-                        alert(`❌ 삭제 실패! ${errorMessage || "비밀번호를 확인하세요."}`);
-                    });
-                }
-            }).catch(error => {
-                console.error("🚨 삭제 요청 중 오류 발생:", error);
-                alert("⚠️ 네트워크 오류가 발생했습니다.");
-            });
+                    window.location.href = redirectUrl;
+                })
+                .catch(error => {
+                    console.error("🚨 삭제 요청 중 오류 발생:", error);
+                    alert(error.message || "⚠️ 네트워크 오류가 발생했습니다.");
+                });
         }
 
 

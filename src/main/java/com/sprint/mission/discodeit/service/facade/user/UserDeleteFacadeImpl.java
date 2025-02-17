@@ -21,8 +21,14 @@ public class UserDeleteFacadeImpl implements UserDeleteFacade {
   public void delete(String userId, String password) {
     User user = userService.findUserById(userId);
 
+    log.info("[User Delete] : 요청 시작 id={} , pwd={}", userId, password);
+
     userService.deleteUser(userId, password);
+    log.info("[User Delete] : 사용자 삭제 성공");
+
     userStatusService.deleteByUserId(userId);
+    log.info("[User Delete] : 사용자 상태 삭제 성공");
+
     if(user.getProfileImage()!=null){
       binaryContentService.delete(user.getProfileImage().getUUID());
     }

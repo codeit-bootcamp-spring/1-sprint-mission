@@ -139,8 +139,12 @@ public class BasicUserService implements UserService {
    * @param hashed 기존에 저장되어 있던 비밀번호
    */
   private void checkPasswordIsCorrect(String plain, String hashed) {
-    if (!PasswordEncryptor.checkPassword(plain, hashed))
+    log.info("[Password Check] : 비밀번호 검증 시작 plain={}, hashed={}, plainHashed={}", plain, hashed, PasswordEncryptor.hashPassword(plain));
+    if (!PasswordEncryptor.checkPassword(plain, hashed)) {
+      log.info("[Password Check] : 비밀번호 검증 실패");
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
+    }
+    log.info("[Password Check] : 비밀번호 검증 성공");
   }
 
   /**
@@ -193,7 +197,6 @@ public class BasicUserService implements UserService {
   @Override
   public void deleteUser(String id, String password) {
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
-
 
     checkPasswordIsCorrect(password, user.getPassword());
 

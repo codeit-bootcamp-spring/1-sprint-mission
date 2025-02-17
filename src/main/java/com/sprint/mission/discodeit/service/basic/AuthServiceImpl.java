@@ -16,12 +16,14 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
@@ -33,13 +35,16 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public UserResponseDto login(String username, String password) {
 
+    log.info("[Login Request] : 요청 수신");
     User targetUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     if(!PasswordEncryptor.checkPassword(password, targetUser.getPassword())){
+      log.info("[Login Request] : 비밀번호 검증 실패");
       throw new UserValidationException();
     }
 
     UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getUUID(),Instant.now())));
+    log.info("[Login Request] : 사용자 상태 성공");
 
     userStatus.updateLastOnline();
 
