@@ -3,26 +3,26 @@ package com.sprint.mission.discodeit.global.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicAuthService;
-import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.auth.service.AuthService;
+import com.sprint.mission.discodeit.message.service.BinaryContentService;
+import com.sprint.mission.discodeit.channel.service.ChannelService;
+import com.sprint.mission.discodeit.message.service.MessageService;
+import com.sprint.mission.discodeit.channel.service.ReadStatusService;
+import com.sprint.mission.discodeit.user.service.UserService;
+import com.sprint.mission.discodeit.user.service.UserStatusService;
+import com.sprint.mission.discodeit.auth.service.BasicAuthService;
+import com.sprint.mission.discodeit.message.service.BasicBinaryContentService;
+import com.sprint.mission.discodeit.channel.service.BasicChannelService;
+import com.sprint.mission.discodeit.message.service.BasicMessageService;
+import com.sprint.mission.discodeit.channel.service.BasicReadStatusService;
+import com.sprint.mission.discodeit.user.service.BasicUserService;
+import com.sprint.mission.discodeit.user.service.BasicUserStatusService;
 
 @Configuration
 public class ServiceConfig {

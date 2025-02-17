@@ -4,18 +4,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
+import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.message.repository.jcf.JCFBinaryContentRepository;
+import com.sprint.mission.discodeit.channel.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.message.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.channel.repository.jcf.JCFReadStatusRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserRepository;
+import com.sprint.mission.discodeit.user.repository.jcf.JCFUserStatusRepository;
 
 @Configuration
 @ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
