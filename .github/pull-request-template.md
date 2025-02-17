@@ -1,65 +1,228 @@
 ## 요구사항
 
 ### 기본 요구사항
-### File IO를 통한 데이터 영속화
-- [X]  다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-  - [X]  클래스 패키지명: com.sprint.mission.discodeit.service.file
-  - [X]  클래스 네이밍 규칙: File[인터페이스 이름]
-  - [X]  JCF 대신 FileIO와 객체 직렬화를 활용해 메소드를 구현하세요.
-- [X]  Application에서 서비스 구현체를 File*Service로 바꾸어 테스트해보세요.
+### Spring 프로젝트 초기화
+- [x] Spring Initializr를 통해 zip 파일을 다운로드하세요.
+  - [X] 빌드 시스템은 Gradle - Groovy를 사용합니다.
+  - [X] 언어는 Java 17를 사용합니다.
+  - [X] Spring Boot의 버전은 3.4.0입니다.
+  - [X] GroupId는 com.sprint.mission입니다.
+  - [x] ArtifactId와 Name은 discodeit입니다.
+  - [X] packaging 형식은 Jar입니다
+  - [x] Dependency를 추가합니다.
+    - [X] Lombok
+    - [x] Spring Web
+  - [X] zip 파일을 압축해제하고 원래 진행 중이던 프로젝트에 붙여넣기하세요. 일부 파일은 덮어쓰기할 수 있습니다.
+  - [X] application.properties 파일을 yaml 형식으로 변경하세요.
+  - [X] DiscodeitApplication의 main 메서드를 실행하고 로그를 확인해보세요.
+![img.png](img.png)
 
-### 서비스 구현체 분석
-- [X] JCF*Service 구현체와 File*Service 구현체를 비교하여 공통점과 차이점을 발견해보세요
-- 데이터 저장을 JCF로 하느냐 ".ser"로 하느냐, 그리고 저장할 때 이용되는 모듈들(JCF 내장 메서드, FileIO)의 차이
-  - [X] "비즈니스 로직"과 관련된 코드를 식별해보세요.
-  - [X] "저장 로직"과 관련된 코드를 식별해보세요.
+### Bean 선언 및 테스트
+- [X] File*Repository 구현체를 Repository 인터페이스의 Bean으로 등록하세요.
+- [X] Basic*Service 구현체를 Service 인터페이스의 Bean으로 등록하세요.
+- [X] JavaApplication에서 테스트했던 코드를 DiscodeitApplication에서 테스트해보세요.
+  - [x]  JavaApplication 의 main 메소드를 제외한 모든 메소드를 DiscodeitApplication클래스로 복사하세요.
+  - [x]  JavaApplication의 main 메소드에서 Service를 초기화하는 코드를 Spring Context를 활용하여 대체하세요.
+  - [x]  JavaApplication의 main 메소드의 셋업, 테스트 부분의 코드를 DiscodeitApplication클래스로 복사하세요.
 
-### 레포지토리 설계 및 구현
-- [X] "저장 로직"과 관련된 기능을 도메인 모델 별 인터페이스로 선언하세요.
-  - [X] 인터페이스 패키지명: com.sprint.mission.discodeit.repository
-  - [X] 인터페이스 네이밍 규칙: [도메인 모델 이름]Repository
-- [X] 다음의 조건을 만족하는 레포지토리 인터페이스의 구현체를 작성하세요.
-  - [X] 클래스 패키지명: com.sprint.mission.discodeit.repository.jcf
-  - [X] 클래스 네이밍 규칙: JCF[인터페이스 이름]
-  - [X] 기존에 구현한 JCF*Service 구현체의 "저장 로직"과 관련된 코드를 참고하여 구현하세요.
-- [X] 다음의 조건을 만족하는 레포지토리 인터페이스의 구현체를 작성하세요.
-  - [X] 클래스 패키지명: com.sprint.mission.discodeit.repository.file
-  - [X] 클래스 네이밍 규칙: File[인터페이스 이름]
-  - [X] 기존에 구현한 File*Service 구현체의 "저장 로직"과 관련된 코드를 참고하여 구현하세요.
+### Spring 핵심 개념 이해하기
+- [x] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
+  - IoC Container
+  - Dependency Injection
+  - Bean
+  
+### Lombok 적용
+  - [x] 도메인 모델의 getter 메소드를 @Getter로 대체해보세요.
+  - [x] Basic*Service의 생성자를 @RequiredArgsConstructor로 대체해보세요.
+
+
+### 추가 기능 요구사항
+### 시간 타입 변경하기
+- [X] 시간을 다루는 필드의 타입은 Instant로 통일합니다.
+  - 기존에 사용하던 Long보다 가독성이 뛰어나며, 시간대(Time Zone) 변환과 정밀한 시간 연산이 가능해 확장성이 높습니다.
+
+### 새로운 도메인 추가하기
+- [x] 공통: 앞서 정의한 도메인 모델과 동일하게 공통 필드(id, createdAt, updatedAt)를 포함합니다.
+- [x] ReadStatus
+  - 사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현하는 도메인 모델입니다. 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
+- [X] UserStatus
+  - 사용자 별 마지막으로 확인된 접속 시간을 표현하는 도메인 모델입니다. 사용자의 온라인 상태를 확인하기 위해 활용합니다.
+  - [x] 마지막 접속 시간을 기준으로 현재 로그인한 유저로 판단할 수 있는 메소드를 정의하세요.
+    - 마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주합니다.
+- [X] BinaryContent
+    - 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델입니다. 사용자의 프로필 이미지, 메시지에 첨부된 파일을 저장하기 위해 활용합니다.
+    - [X] 수정 불가능한 도메인 모델로 간주합니다. 따라서 updatedAt 필드는 정의하지 않습니다.
+    - [X] User, Message 도메인 모델과의 의존 관계 방향성을 잘 고려하여 id 참조 필드를 추가하세요.
+- [X] 각 도메인 모델 별 레포지토리 인터페이스를 선언하세요.
+    - 레포지토리 구현체(File, JCF)는 아직 구현하지 마세요. 이어지는 서비스 고도화 요구사항에 따라 레포지토리 인터페이스에 메소드가 추가될 수 있어요.
+
+### DTO 활용하기
+- [x]
+
+### UserService 고도화
+- 고도화
+  - create
+    - [x] 선택적으로 프로필 이미지를 같이 등록할 수 있습니다.
+    - [x] DTO를 활용해 파라미터를 그룹화합니다.
+      - 유저를 등록하기 위해 필요한 파라미터, 프로필 이미지를 등록하기 위해 필요한 파라미터 등
+    - [x] username과 email은 다른 유저와 같으면 안됩니다.
+    - [x] UserStatus를 같이 생성합니다.
+  - find, findAll
+    - DTO를 활용하여:
+      - [x] 사용자의 온라인 상태 정보를 같이 포함하세요.
+      - [X] 패스워드 정보는 제외하세요.
+  - update
+    - [x] 선택적으로 프로필 이미지를 대체할 수 있습니다.
+    - [x] DTO를 활용해 파라미터를 그룹화합니다.
+      - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+  - delete
+    - [x] 관련된 도메인도 같이 삭제합니다.
+      - BinaryContent(프로필), UserStatus <?>readStatus는 삭제 하지 않아도 되는건가?
+
+### AuthService 구현
+- login
+  - [x] username, password과 일치하는 유저가 있는지 확인합니다.
+    - [x] 일치하는 유저가 있는 경우: 유저 정보 반환
+    - [x] 일치하는 유저가 없는 경우: 예외 발생
+  - [x] DTO를 활용해 파라미터를 그룹화합니다.
+
+### ChannelService 고도화
+-  고도화
+  - create
+    - PRIVATE 채널과 PUBLIC 채널을 생성하는 메소드를 분리합니다.
+    - [x] 분리된 각각의 메소드를 DTO를 활용해 파라미터를 그룹화합니다.
+    - PRIVATE 채널을 생성할 때:
+      - [x] 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
+      - [x] name과 description 속성은 생략합니다.
+    - PUBLIC 채널을 생성할 때에는 기존 로직을 유지합니다.
+  - find
+    - DTO를 활용하여:
+      - [X] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
+      - [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+  - findAll
+    - DTO를 활용하여:
+      - [x] 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다. // TODO Channel과 Message를 어떻게 연동할 것인가 를 다시 고려한 후 고칩니다
+      - [x] PRIVATE 채널인 경우 참여한 User의 id 정보를 포함합니다.
+    - [x] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId
+    - [x] PUBLIC 채널 목록은 전체 조회합니다.
+    - [x] PRIVATE 채널은 조회한 User가 참여한 채널만 조회합니다.
+  - update
+    - [x] DTO를 활용해 파라미터를 그룹화합니다.
+     - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+    - [x] PRIVATE 채널은 수정할 수 없습니다.
+  - delete
+    - [x] 관련된 도메인도 같이 삭제합니다.
+      - Message, ReadStatus
+
+### MessageService 고도화
+- 고도화
+- create
+  - [x] 선택적으로 여러 개의 첨부파일을 같이 등록할 수 있습니다
+  - [X] DTO를 활용해 파라미터를 그룹화합니다.
+- findAll
+  - [x] 특정 Channel의 Message 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findallByChannelId
+- update
+  - [x] DTO를 활용해 파라미터를 그룹화합니다.
+    - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+- delete
+  - [x] 관련된 도메인도 같이 삭제합니다.
+    - 첨부파일(BinaryContent)
+
+
+### ReadStatusService 구현
+- create
+  - [x] DTO를 활용해 파라미터를 그룹화합니다.
+  - [X] 관련된  User가 존재하지 않으면 예외를 발생시킵니다.
+  - [x] 같은 ChannelChannel이나과 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
+- find
+  - [x] id로 조회합니다.
+-findAllByUserId
+  - [x] userId를 조건으로 조회합니다.
+- update
+  - [x] DTO를 활용해 파라미터를 그룹화합니다. 
+  - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터 => 수정할 값 파라미터는 readStatus 내부의 refresh 메서드로 대체
+- delete
+  - [x] id로 삭제합니다.
+
+### UserStatusService 고도화
+- create
+  - [x] DTO를 활용해 파라미터를 그룹화합니다.
+  - [x] 관련된 User가 존재하지 않으면 예외를 발생시킵니다.
+  - [x] 같은 User와 관련된 객체가 이미 존재하면 예외를 발생시킵니다.
+- find
+  - [x] id로 조회합니다.
+- findAll
+  - [x] 모든 객체를 조회합니다.
+- update
+  - [x] DTO를 활용해 파라미터를 그룹화합니다.
+  - 수정 대상 객체의 id 파라미터, 수정할 값 파라미터
+- updateByUserId
+  - [x] userId 로 특정 User의 객체를 업데이트합니다.
+- delete
+  - [x] id로 삭제합니다.
+  
+### BinaryContentService 구현
+- create
+  - [X] DTO를 활용해 파라미터를 그룹화합니다.
+- find
+  - [x] id로 조회합니다.
+- findAllByIdIn
+  - [x] id 목록으로 조회합니다.
+- delete
+  - [x] id로 삭제합니다.
+  
+### 새로운 도메인 Repository 구현체 구현
+- [x] 지금까지 인터페이스로 설계한 각각의 Repository를 JCF, File로 각각 구현하세요.
+
+
+### 심화 요구사항
+### Bean 다루기
+- [x]  Repository 구현체 중에 어떤 구현체를 Bean으로 등록할지 Java 코드의 변경 없이 application.yaml 설정 값을 통해 제어해보세요.
+  - [x] discodeit.repository.type 설정값에 따라 Repository 구현체가 정해집니다.
+    - [x] 값이 jcf 이거나 없으면 JCF*Repository 구현체가 Bean으로 등록되어야 합니다.
+    - [x] 값이 file 이면 File*Repository 구현체가 Bean으로 등록되어야 합니다.
+
+- [ ]  File*Repository 구현체의 파일을 저장할 디렉토리 경로를 application.yaml 설정 값을 통해 제어해보세요.
+
 
 ### 심화 요구 사항
-### 관심사 분리를 통한 레이어 간 의존성 주입
-- [X] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-  - [X] 클래스 패키지명: com.sprint.mission.discodeit.service.basic
-  - [X] 클래스 네이밍 규칙: Basic[인터페이스 이름]
-  - [X] 기존에 구현한 서비스 구현체의 "비즈니스 로직"과 관련된 코드를 참고하여 구현하세요.
-  - [X] 필요한 Repository 인터페이스를 필드로 선언하고 생성자를 통해 초기화하세요.
-  - [X] "저장 로직"은 Repository 인터페이스 필드를 활용하세요. (직접 구현하지 마세요.)
-- [X] Basic*Service 구현체를 활용하여 테스트해보세요
-  - [X]  JCF*Repository  구현체를 활용하여 테스트해보세요.
-  - [X]  File*Repository 구현체를 활용하여 테스트해보세요.
-- [X] 이전에 작성했던 코드(JCF*Service 또는 File*Service)와 비교해 어떤 차이가 있는지 정리해보세요.
-- JCF*Service, File*Service 둘다 Basic*Service의 조건으로 만들었습니다.
+
 
 ## 주요 변경사항
+1. Channel과 Message 도메인 모델에 있는 객체 참조에 대한 변경
+
+   Channel 은 User owner를 참조
+
+   Message는 Channel channel을 참조
+
+   →
+
+   Channel은 UUID ownerId 를 참조
+
+   Message는 UUID channelId 을 참조한다.
+
+   - 직접적인 의존성(Message는 Channel 있어야 생성되고, Channel은 User가 있어야 생성된다) 때문에 결합도가 높아져 변경에 대한 유연성이 부족하다고 생각했고,
+
+   - 참조한 객체의 필드를 쓸 의도를 가지지 않은 상태이기에, 리소스 측면에서 낭비라는 생각과,
+
+   - 이 채널의 주인이 누구인지, 이 메세지가 존재하는 채널이 어디인지 “가리키는 것”이 중요하기 때문에.
+</BR>또한 “가리키는 것”만을 원하는데, 전체 객체를 참조해오는 것은 의도 자체의 모호성을 높일 수 있다고 생각했다.
+
+   즉, **의존성 감소, 필요한 데이터만 불러오기, 의도를 명확하게 하기** 위해서 수정하고자 했고, 수정했습니다.
+
+
+2. 서비스 분리
+
+- channel에 참여한 유저 관리하기 -> Service 레이어에 ChannelUserService 서비스 추가 </BR>채널에 참여한 유저들을 관리하는 책임을 분리합니다. 이 서비스는 유저를 채널에 추가하거나 삭제하는 로직을 담당합니다.
+
+- 지금 단계에서는 확장을 생각하지 않아 인터페이스는 정의하지 않았습니다.
+
+3. 그외
+User, Channel, Message 도메인 관련 모든 레이어의 deleteAll과 관련된 모든 것 삭제
+MessageRepository findMessagesByChannelId() 메소드 추가
+
 
 ## 스크린샷
 
 ## 멘토에게
 
-!!!! 멘토님 이 부분이 가장 도움이 필요합니다 !!!!
-아래 글은 강사님과 FileUserRepository에 있는 findUserById(UUID id) 메서드의 버그를 고친 내용입니다.
-
-Junit을 통한 단위 테스트를 진행했고, FileUserServiceTest의 testUpdateUserNickname() 에서 진행했습니다.
-이때 이미 존재하는 ser파일에 덮어씌워지지 않고 새로운 ser 파일이 생성되는 문제를 겪었습니다.
-"이 문제는 이미 만들어진 객체를 새 객체에 덮어 씌우려고 하는데(제가 이해하긴 이랬습니다!),
-BaseEntity에서 id를 final로 쓰고 있었기 때문에덮어씌워지지 않아 새로운 파일을 생성했다."
-라는 문제였습니다.
-
-===>
-
-BaseEntity(도메인 모델) 에서 id의 final(11줄 : transient로 변경)을 변경하고, getId() 메서드에 로직을 추가하는 것으로 해결했습니다.
-
-강사님 말씀으론, 이제 getId 부분도 로직이 추가됐으니까 일반적이지 않고 꼬여있는 부분이 있다고 합니다. 제가 아직 그런 부분들이 파악이 잘 안 되는데, 앞으로 어떻게 개선해야할까요?
-[ 주로 봐야하는 파일들
-FileUserRepository(레포지토리) - FileUserService(서비스 로직) - User(도메인 모델) - BaseEntity(도메인 모델) ]

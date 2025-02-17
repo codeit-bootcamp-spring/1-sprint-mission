@@ -11,8 +11,9 @@ public class JCFChannelRepository implements ChannelRepository {
         this.channels = new HashMap<>();
     }
     @Override
-    public void saveChannel(Channel channel){
+    public Channel saveChannel(Channel channel){
         channels.put(channel.getId(), channel);
+        return channel;
     }
     @Override
     public Optional<Channel> findChannelById(UUID id){
@@ -23,12 +24,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public Collection<Channel> getAllChannels(){
         return channels.values();
     }
-    @Override
-    public void deleteAllChannels(){
-        // 추가적으로 구현할 수 있는 로직 : Channel이 message를 가지고 있다면,
-        // Channel의 하위 메세지도 삭제하기
-        channels.clear();
-    }
+
     @Override
     public void deleteChannelById(UUID id){
         // 추가적으로 구현할 수 있는 로직 : Channel이 message를 가지고 있다면,
