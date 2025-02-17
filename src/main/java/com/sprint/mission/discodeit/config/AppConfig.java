@@ -11,12 +11,13 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class AppConfig {
 
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final MessageRepository messageRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final
 
     @Bean
     public UserStatusService userStatusService() {
@@ -35,17 +36,17 @@ public class AppConfig {
 
     @Bean
     public UserService userService() {
-        return new BasicUserService(userRepository, userStatusService() ,binaryContentService());
-    }
-    //todo 순환참조 해결하기 - message <-> channel
-    @Bean
-    public MessageService messageService(){
-        return new BasicMessageService(messageRepository, userService(), channelService(), binaryContentService());
+        return new BasicUserService(userRepository, userStatusService(), binaryContentService());
     }
 
     @Bean
     public ChannelService channelService() {
         return new BasicChannelService(channelRepository, userRepository, messageRepository, readStatusService(), userStatusService());
+    }
+
+    @Bean
+    public MessageService messageService() {
+        return new BasicMessageService(messageRepository, userService(), channelService(), binaryContentService());
     }
 
 }
