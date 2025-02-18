@@ -1,58 +1,50 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+
+import java.io.File;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public class Message{
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+@Getter
+@Entity
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String content;
-    private final User user;
-    private final Channel channel;
-    private UUID authorId;
+    //
     private UUID channelId;
+    private UUID authorId;
 
-    public Message(UUID id, Long createdAt, Long updatedAt, String content, User user, Channel channel, UUID authorId, UUID channelId) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+    @OneToMany(mappedBy = "messageId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BinaryContent> attachedFiles;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.content = content;
-        this.user = user;
-        this.channel = channel;
-        this.authorId = authorId;
         this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public UUID getId() {
-        return id;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public UUID getAuthorId() { return authorId; }
-
-    public UUID getChannelId() { return channelId; }
-
-    public void update(String content) {
-        this.content = content;
-        this.updatedAt = updatedAt;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

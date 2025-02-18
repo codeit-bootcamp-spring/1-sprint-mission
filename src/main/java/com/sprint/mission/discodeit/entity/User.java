@@ -1,53 +1,71 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String userName;
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "users")
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String username;
     private String email;
     private String password;
 
-    public User(UUID id, Long createdAt, Long updatedAt, String userName, String email, String password) {
-        this.id = id;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.userName = userName;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.username = username;
         this.email = email;
         this.password = password;
     }
 
-    public UUID getId() {
-        return id;
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
+    public void setUsername(String username) {  // ✅ 직접 추가
+        this.username = username;
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
+    public void setEmail(String email) {  // ✅ 직접 추가
+        this.email = email;
     }
 
-    public String getUserName() {
-        return userName;
+    public void setPassword(String password) {  // ✅ 직접 추가
+        this.password = password;
     }
-
-    public void update(String userName) {
-        this.userName = userName;
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
-
 }

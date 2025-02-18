@@ -1,35 +1,40 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.*;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<UUID, Message> data = new HashMap<>();
+    private final Map<UUID, Message> data;
 
-    public void createMessage(Message message) {
-        data.put(message.getId(), message);
+    public JCFMessageRepository() {
+        this.data = new HashMap<>();
     }
 
-    public Optional<Message> getMessage(UUID id) {
-        return Optional.ofNullable(data.get(id));
+    @Override
+    public Message save(Message message) {
+        this.data.put(message.getId(), message);
+        return message;
     }
 
-    public List<Message> getAllMessages() {
-        return new ArrayList<>(data.values());
+    @Override
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
     }
 
-    public void updateMessage(UUID id, String content) {
-        Message message = data.get(id);
-        if (message == null) {
-            throw new IllegalArgumentException("해당 iD의 메시지를 찾을 수 없습니다: " + id);
-        }
-        message.update(content);
+    @Override
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
     }
 
-    public void deleteMessage(UUID id) {
-        data.remove(id);
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
