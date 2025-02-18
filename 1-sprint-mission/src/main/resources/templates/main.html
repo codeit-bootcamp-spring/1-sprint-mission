@@ -127,9 +127,9 @@
     function login() {
       const username = document.getElementById('authUsername').value;
       const password = document.getElementById('authPassword').value;
-      // GET 요청에 body를 보내는 것은 비표준이지만, API 코드에 맞춤
+
       fetchAndShow(`${BASE_URL}/auth/login`, {
-        method: 'GET',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
