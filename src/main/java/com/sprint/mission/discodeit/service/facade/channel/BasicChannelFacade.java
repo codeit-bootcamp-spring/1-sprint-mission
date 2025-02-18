@@ -34,6 +34,7 @@ public class BasicChannelFacade implements ChannelMasterFacade {
   private final CreateChannelFacade createChannelFacade;
   private final FindChannelFacade findChannelFacade;
   private final UpdateChannelFacade updateChannelFacade;
+  private final DeleteChannelFacade deleteChannelFacade;
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
     return createChannelFacade.createPrivateChannel(channelDto);
@@ -62,10 +63,6 @@ public class BasicChannelFacade implements ChannelMasterFacade {
 
   @Override
   public void deleteChannel(String channelId) {
-    channelService.deleteChannel(channelId);
-    readStatusService.deleteByChannel(channelId);
-    //TODO : 한번에 삭제 메서드 생성
-    messageService.getMessagesByChannel(channelId).stream()
-        .forEach(message -> messageService.deleteMessage(message.getUUID()));
+    deleteChannelFacade.deleteChannel(channelId);
   }
 }
