@@ -2,16 +2,18 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserUserStatusUpdateDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
 
     @Override
     public User createUser(UserCreateDTO userCreateDTO) {
@@ -32,6 +35,8 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
         }
         User user = new User(userCreateDTO);
+
+        userStatusService.saveExist(user.getUserStatus());
         userRepository.save(user);
         return user;
     }
@@ -75,6 +80,13 @@ public class BasicUserService implements UserService {
         user.deleteUserStatus();
         user.deleteBinaryContent();
         userRepository.delete(userID);
+    }
+
+    @Override
+    public UserUserStatusUpdateDTO updateUserStatus(UUID id, UserUserStatusUpdateDTO userUserStatusUpdateDTO) {
+        UserStatusUpdateDTO userStatusUpdateDTO = new UserStatusUpdateDTO(userUserStatusUpdateDTO.time());
+        userStatusService.updateByUserId(id, userStatusUpdateDTO);
+        return userUserStatusUpdateDTO;
     }
 
     @Override

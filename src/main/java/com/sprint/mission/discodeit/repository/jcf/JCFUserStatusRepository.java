@@ -39,6 +39,9 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         if (userId == null) {
             throw new IllegalArgumentException("Id is null.");
         }
+
+        Map<UUID, UserStatus> paramMap = userStatusMap;
+
         return userStatusMap.values().stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst()

@@ -52,8 +52,8 @@ public class UserStatus {
     }
 
     public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
-
-
-
+        this.lastAccessedAt=userStatusUpdateDTO.time();
+        this.updatedAt=Instant.now();
+        isOnline();
     }
 }
