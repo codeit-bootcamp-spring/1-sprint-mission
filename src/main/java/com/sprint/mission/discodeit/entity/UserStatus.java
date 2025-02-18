@@ -15,9 +15,9 @@ import java.util.Objects;
 public class UserStatus implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String UUID;
-  private final String userId;
-  private final Instant createdAt;
+  private String UUID;
+  private String userId;
+  private Instant createdAt;
   private Instant lastOnlineAt;
   private UserStatusType userStatus;
   private Instant updatedAt;
@@ -28,7 +28,7 @@ public class UserStatus implements Serializable {
     this.createdAt = Instant.now();
     this.updatedAt = Instant.now();
     this.lastOnlineAt = lastOnlineAt;
-    updateStatus();
+    this.userStatus = UserStatusType.ONLINE;
   }
 
   @Override
@@ -48,17 +48,8 @@ public class UserStatus implements Serializable {
     Instant now = Instant.now();
     updatedAt = now;
     lastOnlineAt = now;
-    updateStatus();
+
   }
 
-  private void updateStatus() {
-    long minutesSinceLastSeen = Duration.between(lastOnlineAt, Instant.now()).toMinutes();
-    if (minutesSinceLastSeen <= 5) {
-      userStatus = UserStatusType.ONLINE;
-    } else if (minutesSinceLastSeen <= 30) {
-      userStatus = UserStatusType.IDLE;
-    } else {
-      userStatus = UserStatusType.OFFLINE;
-    }
-  }
+
 }

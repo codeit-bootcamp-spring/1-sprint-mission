@@ -77,7 +77,7 @@ public class User implements Serializable {
   public void updateProfileImage(BinaryContent profileImage){
     this.profileImage = profileImage;
   }
-  
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
