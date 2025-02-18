@@ -1,46 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message {
+@Getter
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
 
-    // 추가적으로 필요한 필드값들은 메소드 만들면서 추가하도록 하자.
-    // 지금 넣어봤자 계속 바뀔 것 같다.
-
-    private String messageContent;
-
-    public Message(String messageContent) {
-        // 메세지를 수정, 삭제하기 위한 ID.
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.messageContent = messageContent;
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    public UUID getId() {
-        return id;
-    }
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getMessageContent() {
-        return messageContent;
-    }
-
-    public void updateMessage(String messageContent) {
-        this.messageContent = messageContent;
-    }
-
-    public void updateUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
