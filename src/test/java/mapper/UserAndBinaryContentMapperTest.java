@@ -50,7 +50,7 @@ public class UserAndBinaryContentMapperTest {
     );
 
 
-    user = userMapper.toEntity(req);
+    user = userMapper.toEntity(req, binaryContentMapper);
 
     profile = binaryContentMapper.toProfileBinaryContent(file, user.getUUID());
 
@@ -75,7 +75,7 @@ public class UserAndBinaryContentMapperTest {
     );
 
 
-    User user = userMapper.toEntity(req);
+    User user = userMapper.toEntity(req, binaryContentMapper);
     BinaryContent content = binaryContentMapper.toProfileBinaryContent(file, user.getUUID());
 
 

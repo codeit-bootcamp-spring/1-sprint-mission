@@ -26,7 +26,7 @@ public class Message implements Serializable {
   private Boolean isEdited;
   private Instant createdAt;
   private Instant updatedAt;
-  private List<BinaryContent> binaryContents = new ArrayList<>();
+  private List<BinaryContent> binaryContents;
 
   public static class MessageBuilder{
     private String UUID =  UuidGenerator.generateUUID();

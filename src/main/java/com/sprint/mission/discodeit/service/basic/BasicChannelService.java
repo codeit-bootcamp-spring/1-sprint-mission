@@ -104,9 +104,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     synchronized (channel) {
-      channel.setChannelName(channelName);
+      channel.updateChannelName(channelName);
 
-      channel.setMaxNumberOfPeople(maxNumberOfPeople);
+      channel.updateMaxNumberOfPeople(maxNumberOfPeople);
 
       channel.updateUpdatedAt();
     }

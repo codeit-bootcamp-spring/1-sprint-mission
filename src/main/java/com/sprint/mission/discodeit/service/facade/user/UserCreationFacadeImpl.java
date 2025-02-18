@@ -30,18 +30,14 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
   @Override
   public UserResponseDto createUser(CreateUserRequest userDto) {
 
-    User user = userMapper.toEntity(userDto);
+    User user = userMapper.toEntity(userDto, binaryContentMapper);
 
     user.updateStatus(new UserStatus(user.getUUID(), Instant.now()));
     userService.saveUser(user);
-    userStatusService.create(user.getStatus());
 
-    if(userDto.profileImage() != null && !userDto.profileImage().isEmpty()){
-      BinaryContent profile = binaryContentMapper.toProfileBinaryContent(userDto.profileImage(), user.getUUID());
-      user.updateProfileImage(profile);
-      binaryContentService.create(profile);
-      // DB 사용시 삭제?
-      userService.update(user);
+    userStatusService.create(user.getStatus());
+    if (userDto.profileImage() != null && !userDto.profileImage().isEmpty()) {
+      binaryContentService.create(user.getProfileImage());
     }
 
     return userMapper.toDto(user, user.getStatus(), user.getProfileImage());

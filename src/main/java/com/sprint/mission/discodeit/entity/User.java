@@ -35,6 +35,9 @@ public class User implements Serializable {
     private Instant updatedAt = Instant.now();
     private BinaryContent profileImage = null;
     private UserStatus status = null;
+    public String getUUID(){
+      return this.UUID;
+    }
   }
 
   @Override

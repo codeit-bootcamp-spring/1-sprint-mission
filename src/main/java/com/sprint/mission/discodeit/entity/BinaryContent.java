@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Getter
-@Setter
+
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class BinaryContent implements Serializable {
@@ -30,25 +30,6 @@ public class BinaryContent implements Serializable {
   private final byte[] data;
   private final boolean isProfilePicture;
   private final Instant createdAt;
-//  public BinaryContent(String userId,
-//                        String messageId,
-//                        String channelId,
-//                        String fileName,
-//                        String fileType,
-//                        long fileSize,
-//                        byte[] data,
-//                        boolean isProfilePicture){
-//    this.UUID = UuidGenerator.generateUUID();
-//    this.userId = userId;
-//    this.messageId = messageId;
-//    this.channelId = channelId;
-//    this.fileName = fileName;
-//    this.fileType = fileType;
-//    this.fileSize = fileSize;
-//    this.data = data;
-//    this.isProfilePicture = isProfilePicture;
-//    this.createdAt = Instant.now();
-//  }
 
   public static class BinaryContentBuilder{
     private String UUID = UuidGenerator.generateUUID();

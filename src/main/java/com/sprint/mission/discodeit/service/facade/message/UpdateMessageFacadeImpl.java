@@ -51,7 +51,7 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
       incoming = binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incoming);
       message.addBinaryContents(incoming);
     }
-    
+
     messageService.updateMessage(message, messageDto.getContent());
 
     return messageMapper.toResponseDto(message);

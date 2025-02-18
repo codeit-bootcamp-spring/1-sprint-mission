@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.util.UuidGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,7 +13,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class Channel implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -28,28 +32,24 @@ public class Channel implements Serializable {
   private Boolean isPrivate;
   private List<String> participatingUsers;
 
-  public Channel(
-      String serverUUID,
-      ChannelType channelType,
-      String channelName,
-      int maxNumberOfPeople,
-      Boolean isPrivate,
-      List<String> participatingUsers) {
-    this.UUID = java.util.UUID.randomUUID().toString();
-    this.serverUUID = serverUUID;
-    this.channelType = channelType;
-    this.channelName = channelName;
-    this.maxNumberOfPeople = maxNumberOfPeople;
-    this.isPrivate = isPrivate;
-    this.participatingUsers = (participatingUsers == null) ? new ArrayList<>() : participatingUsers;
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
+
+  public static class ChannelBuilder{
+    private String UUID = UuidGenerator.generateUUID();
+    private String serverUUID = "none";
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
   }
 
-  public void updatePrivate(Boolean isPrivate) {
-    this.isPrivate = isPrivate;
-    this.updatedAt = Instant.now();
+  public void updateChannelName(String channelName){
+    this.channelName = channelName;
+    updateUpdatedAt();
   }
+
+  public void updateMaxNumberOfPeople(int maxNumberOfPeople){
+    this.maxNumberOfPeople = maxNumberOfPeople;
+    updateUpdatedAt();
+  }
+
 
   public void updateUpdatedAt() {
     this.updatedAt = Instant.now();

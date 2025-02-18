@@ -3,18 +3,19 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.Channel;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.time.Instant;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false))
 public interface ChannelMapper {
   @Mapping(target = "UUID", ignore = true)
   @Mapping(target = "isPrivate", constant = "false")
   @Mapping(source = "serverId", target = "serverUUID")
-  @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())") // 빈 리스트 초기화
+  @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())")
   @Mapping(target = "createdAt", expression = "java(Instant.now())")
   @Mapping(target = "updatedAt", expression = "java(Instant.now())")
   Channel toEntity(CreateChannelDto dto);
