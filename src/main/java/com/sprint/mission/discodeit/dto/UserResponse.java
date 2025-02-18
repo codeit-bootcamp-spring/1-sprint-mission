@@ -9,9 +9,10 @@ public record UserResponse(
         String username,
         String email,
         String phoneNumber,
+        UUID profileImageId,
         boolean isOnline
 ) {
     public static UserResponse fromEntity(User user, Boolean isOnline) {
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), isOnline);
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getPhoneNumber(), user.getProfileImageId(), isOnline);
     }
 }

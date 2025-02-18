@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.Mimetype;
+
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;

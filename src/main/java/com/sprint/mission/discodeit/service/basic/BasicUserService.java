@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.Mimetype;
+
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,32 +34,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse create(UserRequest request) {
-
-        if(!validator.isValidEmail(request.email())){
-            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println(new ValidationException("Invalid email format : " + request.email()));
-        }
-
-        if(!validator.isValidPhoneNumber(request.phoneNumber())){
-            System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber()));
-        }
-
-        User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
-        userRepository.save(user);
-
-//        if(request.profileImageId() != null){
-//            BinaryContent profileImage = binaryContentRepository.findById(request.profileImageId());
-//            user.setProfileImage(profileImage);
-//        }else{
-//            BinaryContent profileImage = new BinaryContent(user.getId(), Mimetype.User);
-//            user.setProfileImage(profileImage);
-//        }
-
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatusRepository.save(userStatus);
-
-        return UserResponse.fromEntity(user , userStatus.isOnline());
+        return null;
     }
 
     @Override
@@ -78,10 +54,10 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
 
         BinaryContent profileImage = null;
-        if(!file.isEmpty()){
-            System.out.println("123121212121");
+        if(file != null && !file.isEmpty()){
             profileImage = binaryContentRepository.save(file, user.getId());
-            user.setProfileImage(profileImage);
+            System.out.println(profileImage.getId());
+            user.setProfileImageId(profileImage.getId());
         }
 
         UserStatus userStatus = new UserStatus(user.getId());

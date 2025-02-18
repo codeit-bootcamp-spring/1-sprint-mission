@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +22,10 @@ import java.util.UUID;
 public class UserRestController {
     private final UserService userService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserResponse userCreate(@RequestPart("request") UserRequest request
-                                    ,@RequestPart("file") MultipartFile file){
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public UserResponse userCreate(@RequestPart(value = "request", required = true) @NotNull @JsonProperty UserRequest request,
+                                   @RequestPart(value = "file", required = false) MultipartFile file){
+
         return userService.create(request, file);
     }
 

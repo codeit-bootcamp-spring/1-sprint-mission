@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.Mimetype;
+
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,8 +27,9 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent save(MultipartFile file, UUID userId) {
         try {
-            BinaryContent binaryContent = new BinaryContent(userId, file.getBytes(), Mimetype.User);
-            return data.put(userId, binaryContent);
+            BinaryContent binaryContent = new BinaryContent(userId, file.getOriginalFilename(), file.getContentType(), file.getBytes());
+            data.put(binaryContent.getId(), binaryContent);
+            return binaryContent;
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
         }

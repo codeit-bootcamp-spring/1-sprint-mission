@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Getter @Setter
 public class User extends BaseEntity implements Serializable {
@@ -14,7 +15,7 @@ public class User extends BaseEntity implements Serializable {
     private String password;
     private String email;
     private String phoneNumber;
-    private BinaryContent profileImage;
+    private UUID profileImageId;
 //    private String addr;
 //    private int age;
 //    private String hobby;
