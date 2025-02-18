@@ -148,8 +148,11 @@ public class FileChannelService extends JCFChannelService implements ChannelServ
                 JsonNode messageListNode=channelData.get("messageList");
                 if(messageListNode!=null){
                     for (JsonNode messageNode : messageListNode){
-                        Message message=jcfMessageService.readMessage(messageNode).get(0);
-                        messageList.add(message);
+                        List<Message> messages = jcfMessageService.readMessage(messageNode);
+                        if (!messages.isEmpty()) {  
+                            Message message = messages.get(0);
+                            messageList.add(message);
+                        }
                     }
                 }
 

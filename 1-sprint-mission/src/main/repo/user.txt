@@ -4,9 +4,9 @@
     "email" : "1234",
     "name" : "탕수육",
     "password" : 1006007921581,
-    "selfImg" : "fbc78b8c-0526-4b22-9c0a-2b0c18760b56",
-    "updatedAt" : null,
-    "userMessage" : [ "f07e7865-dc12-4bf1-95ec-da7b9743ab40" ],
+    "selfImg" : "",
+    "updatedAt" : 0,
+    "userMessage" : [ ],
     "userStatus" : "4aa5cfc9-ef42-4d32-bcde-98d057dff35b"
   },
   "7d9bc3c0-d255-4450-94bd-3e275b307c9e" : {
@@ -16,7 +16,7 @@
     "password" : 1006007921581,
     "selfImg" : "",
     "updatedAt" : 0,
-    "userMessage" : [ "f07e7865-dc12-4bf1-95ec-da7b9743ab40" ],
+    "userMessage" : [ ],
     "userStatus" : "406f1fc0-aa11-4e3b-ae04-f140d4979e18"
   }
 }
