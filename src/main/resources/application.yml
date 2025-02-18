@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: File
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: none
+  datasource:
+    url: ""
+    driver-class-name: ""
+    username: ""
+    password: ""

@@ -1,29 +1,25 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JcfMessageService;
-import com.sprint.mission.discodeit.service.jcf.JcfUserService;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
-
+@Repository
+@Profile("Jcf")
 public class JCFUserRepository implements UserRepository {
     public final Map<UUID,User> map;
-    //private JcfMessageService jcfMessageService; //수정 예정
-    private static volatile JCFUserRepository instance;
 
-    public JCFUserRepository(Map<UUID, User> list) {
-        this.map = list;
+    public JCFUserRepository() {
+        this.map = new HashMap<>();
     }
 
-
     @Override
-    public UUID save(String userName) {
-        User user = new User(userName);
-        map.put(user.getUserId(),user);
-        return user.getUserId();
+    public User save(String userName,String password, String email) {
+        User user = new User(userName,password, email);
+        map.put(user.getId(),user);
+        return user;
     }
 
     @Override
@@ -49,10 +45,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String username) {
+    public void update(UUID id, String username, String email) {
         if(map.containsKey(id)){
             User user = findUserById(id);
-            user.update(username);
+            user.update(username, email);
+            map.replace(id, user);
         }else {
             System.out.println("유저를 찾을 수 없습니다.");
         }

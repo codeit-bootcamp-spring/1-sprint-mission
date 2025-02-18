@@ -2,26 +2,25 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+@Repository
+@Profile("File")
 
 public class FileUserRepository implements UserRepository {
     private final String FILE_NAME = "C:\\Users\\ypd06\\codit\\files\\users.ser";
 
     @Override
-    public UUID save(String userName) {
+    public User save(String userName, String password,  String email) { //저장로직만 있어야하는데? 의문
         Map<UUID, User> userMap = loadFromSer(FILE_NAME);
-        if (userMap.values().stream().anyMatch(user -> user.getUserName().equals(userName))) {
-            User user = userMap.get(userMap.keySet().stream().findFirst().get());
-            System.out.println("이미 존재하는 사용자입니다.");
-            return user.getUserId(); // 중복된 사용자 이름이 있으면 처리 중단
-        }
-        User user = new User(userName);
-        userMap.put(user.getUserId(), user);
+        User user = new User(userName,password, email);
+        userMap.put(user.getId(), user);
         saveToSer(FILE_NAME, userMap);
 
-        return user.getUserId();
+        return user;
     }
 
     @Override
@@ -39,10 +38,6 @@ public class FileUserRepository implements UserRepository {
     public boolean delete(UUID id) {
         Map<UUID, User> userMap = loadFromSer(FILE_NAME);
         if(userMap.containsKey(id)){
-            /*List<Message> messagesByUserId = fileMessageService.getMessagesByUserId(id);
-            for (Message message : messagesByUserId) {
-                fileMessageService.deleteMessage(message.getMessageId());
-            }*/
             userMap.remove(id);
             saveToSer(FILE_NAME, userMap);
             return true;
@@ -52,20 +47,21 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void update(UUID id, String username) {
+    public void update(UUID id, String username, String email) {
         Map<UUID, User> userMap = loadFromSer(FILE_NAME);
         if(userMap.containsKey(id)){
             System.out.println("유저 수정 중");
             User user = findUserById(id);
-            userMap.remove(user.getUserId());
-            user.update(username);
-            userMap.put(user.getUserId(), user);
+            userMap.remove(user.getId());
+            user.update(username, email);
+            userMap.put(user.getId(), user);
             saveToSer(FILE_NAME, userMap);
 
         }else {
             System.out.println("유저를 찾을 수 없습니다.");
         }
     }
+
 
     private static void saveToSer(String fileName, Map<UUID, User> userData) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {

@@ -1,47 +1,64 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.*;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.PRIVATE)
+    private  UUID id;
+
+    @Setter(AccessLevel.PRIVATE)
+    private Instant createdAt;
+
+    private Instant updatedAt;
     private String name;
 
-    public Channel(String name) {
+    @Setter(AccessLevel.PRIVATE)
+    private ChannelType type;
+
+    public Channel(String name, ChannelType type) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.name = name;
+        this.type = type;
+    }//for public type
+    public Channel(ChannelType type) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.name = null;
+        this.type = type;
+    }//for private type
+
+    public Channel(UUID id, Instant createdAt, ChannelType type) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.type = type;
     }
 
-    public long setUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+
+    public Instant setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
         return updatedAt;
     }
 
     public void update(String name) {
         this.name = name;
-        updatedAt = setUpdatedAt();
-    }
-
-    public UUID getChannelId() {
-        return id;
-    }
-
-    public String getChannelName() {
-        return name;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
+        updatedAt = setUpdatedAt(Instant.now());
     }
 
     @Override

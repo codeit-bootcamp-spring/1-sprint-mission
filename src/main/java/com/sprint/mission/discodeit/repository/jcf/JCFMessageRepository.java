@@ -1,28 +1,35 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 //implements MessageRepository
-public class JCFMessageRepository implements MessageRepository  {
-    private final Map<UUID, Message> messageMap;
+@Repository
+@Profile("Jcf")
+@RequiredArgsConstructor
+public class JCFMessageRepository implements MessageRepository {
+    private final ChannelRepository channelRepository;
+    private Map<UUID, Message> messageMap = new HashMap<>();
 
-    public JCFMessageRepository() {
-        this.messageMap = new HashMap<>();
+/*
+
+    public UUID createMessage(UUID sender, UUID channelId, String content) {
+        Message message = new Message(sender, channelId, content);
+        messageMap.put(message.getId(), message);
+        return message.getId();
     }
 
-    public UUID createMessage(UUID sender, String content) {
-        Message message = new Message(sender, content);
-        messageMap.put(message.getMessageId(), message);
-        return message.getMessageId();
-    }
-
-    public UUID createMessage(UUID id, UUID sender, String content) {
-        Message message = new Message(sender, content);
+    public UUID createMessage(UUID id, UUID sender, UUID channelId, String content) {
+        Message message = new Message(sender, channelId, content);
         messageMap.put(id, message);
-        return message.getMessageId();
+        return message.getId();
     }
 
     public Message getMessage(UUID id) {
@@ -30,7 +37,7 @@ public class JCFMessageRepository implements MessageRepository  {
     }
 
     public List<Message> getMessagesByUserId(UUID userId) {
-        return getMessages().stream().filter(s -> s.getSender().equals(userId)).collect(Collectors.toList());
+        return getMessages().stream().filter(s -> s.getSenderId().equals(userId)).collect(Collectors.toList());
     }
 
     public List<Message> getMessages() {
@@ -41,7 +48,7 @@ public class JCFMessageRepository implements MessageRepository  {
         if (messageMap.containsKey(id)) {
             Message message = messageMap.get(id);
             message.update(content);
-        }else {
+        } else {
             System.out.println("메시지를 찾을 수 없습니다.");
         }
     }
@@ -49,16 +56,17 @@ public class JCFMessageRepository implements MessageRepository  {
     public void deleteMessage(UUID id) {
         if (messageMap.containsKey(id)) {
             messageMap.remove(id);
-        }else {
+        } else {
             System.out.println("메시지를 찾을 수 없습니다.");
         }
     }
+*/
 
     @Override
-    public UUID save(UUID sender, String content) {
-        Message message = new Message(sender, content);
-        messageMap.put(message.getMessageId(), message);
-        return message.getMessageId();
+    public UUID save(UUID sender,UUID channelId, String content) {
+        Message message = new Message(sender,channelId, content);
+        messageMap.put(message.getId(), message);
+        return message.getId();
     }
 
     @Override
@@ -68,7 +76,7 @@ public class JCFMessageRepository implements MessageRepository  {
 
     @Override
     public List<Message> findMessagesById(UUID id) {
-        return getMessages().stream().filter(s -> s.getSender().equals(id)).collect(Collectors.toList());
+        return findAll().stream().filter(s -> s.getSenderId().equals(id)).collect(Collectors.toList());
     }
 
     @Override
@@ -79,13 +87,17 @@ public class JCFMessageRepository implements MessageRepository  {
 
     @Override
     public boolean delete(UUID messageId) {
-        if(messageMap.containsKey(messageId)){
+        if (messageMap.containsKey(messageId)) {
+            //Message message = messageMap.get(messageId);
+            //initializeMessage(message);
             Message message = messageMap.get(messageId);
-            initializeMessage(message);
+            messageMap.replace(messageId, new Message());
             messageMap.remove(messageId);
+            //채널에서 해당 메시지 기록이 살아있음
+            channelRepository.deleteMessageInChannel(message.getChannelId(), messageId);
             return true;
-        }else {
-            System.out.println("메시지를 찾을 수 없습니다.");
+        } else {
+            System.out.println("messageId = " + messageId + " -> 메시지를 찾을 수 없습니다.");
             return false;
         }
     }
@@ -94,7 +106,7 @@ public class JCFMessageRepository implements MessageRepository  {
     public void update(UUID id, String content) {
         Message message = findMessageById(id);
         message.update(content);
-        messageMap.replace(message.getMessageId(), message);
+        messageMap.replace(message.getId(), message);
         System.out.println("업데이트 메시지");
         System.out.println("message = " + findMessageById(id));
     }
