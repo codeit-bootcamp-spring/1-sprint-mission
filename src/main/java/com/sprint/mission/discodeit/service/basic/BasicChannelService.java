@@ -1,52 +1,81 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.validation.ChannelValidator;
 import com.sprint.mission.discodeit.common.validation.Validator;
-import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
-import com.sprint.mission.discodeit.dto.ChannelReqDTO;
-import com.sprint.mission.discodeit.dto.ChannelResDTO;
-import com.sprint.mission.discodeit.dto.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.ChannelDTO;
+import com.sprint.mission.discodeit.dto.ReadStatusDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.enums.ChannelType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import org.apache.commons.lang3.StringUtils;
+import io.micrometer.common.util.StringUtils;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
-    private final Validator validator = new ValidatorImpl();
-    private ChannelRepository channelRepository;
+    private final Validator<Channel, ChannelDTO.request> channelValidator = new ChannelValidator();
+    private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
-    public BasicChannelService(ChannelRepository channelRepository) {
-        this.channelRepository = channelRepository;
+    @Override
+    public Long createPublicChannel(ChannelDTO.request channelReqDTO) {
+        // 생성
+        try {
+            ChannelDTO.request channelDto = ChannelDTO.request.builder()
+                    .owner(channelReqDTO.owner())
+                    .serverName(channelReqDTO.serverName())
+                    .description(StringUtils.isEmpty(channelReqDTO.description()) ? "" : channelReqDTO.description())
+                    .channelType(channelReqDTO.channelType())
+                    .recent(channelReqDTO.recent())
+                    .build();
+
+            channelValidator.validateCreate(channelDto);
+            return channelRepository.save(new Channel(channelDto));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public Long createChannel(User owner, String serverName, String description, String iconImgPath) {
-        // DTO에 user 객체 + 필요 정보 넣어서 전달되면
-        // 생성
+    public Long createPrivateChannel(ChannelDTO.request channelReqDTO) {
         try {
-            if (owner == null) {
-                throw new CustomException(ErrorCode.OWNER_CANNOT_BLANK);
+            ChannelDTO.request channelDto = ChannelDTO.request.builder()
+                    .owner(channelReqDTO.owner())
+                    .serverName(channelReqDTO.serverName().isBlank() ? "" : channelReqDTO.serverName())
+                    .description(StringUtils.isEmpty(channelReqDTO.description()) ? "" : channelReqDTO.description())
+                    .channelType(channelReqDTO.channelType())
+                    .members(channelReqDTO.members())
+                    .recent(channelReqDTO.recent())
+                    .build();
+
+            channelValidator.validateCreate(channelDto);
+            Long channelId = channelRepository.save(new Channel(channelDto));
+            Channel channel = channelRepository.load(channelId);
+
+            if (channelReqDTO.members() != null && !channelReqDTO.members().isEmpty()) {
+                for (UUID userId : channelReqDTO.members()) {
+                    channel.addMember(userId);  // 멤버 추가
+                    readStatusRepository.save(new ReadStatus(
+                            ReadStatusDTO.request.builder()
+                                    .channelId(channel.getId())
+                                    .userId(userId)
+                                    .lastReadAt(channelDto.recent())
+                                    .build()));
+                }
             }
-
-            if (serverName == null) {
-                throw new CustomException(ErrorCode.SERVERNAME_CANNOT_BLANK);
-            }
-
-            description = StringUtils.isEmpty(description) ? "" : description;
-            iconImgPath = StringUtils.isEmpty(iconImgPath) ? "defaultSeverIcon.png" : iconImgPath;
-
-            Channel channel = new Channel(new ChannelReqDTO(
-                    owner, serverName, description, iconImgPath
-            ));
-            Long channelId = channelRepository.saveChannel(channel);
             return channelId;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,70 +83,67 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResDTO getChannel(Long id) {
-        Channel channel = findChannelById(id);
+    public ChannelDTO.response find(Long id) {
+        Channel channel = channelRepository.load(id);
         if (channel == null) throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
-        return new ChannelResDTO(id, channel, channel.getOwner());
+
+        System.out.println(readStatusRepository.loadAll());
+
+        return ChannelDTO.response.builder()
+                .id(id)
+                .uuid(channel.getId())
+                .ownerId(channel.getOwnerId())
+                .serverName(channel.getServerName())
+                .description(channel.getDescription())
+                .members(channel.getMembers().isEmpty() ? Collections.emptyList() : channel.getMembers())  // UserId 목록 가져옴
+                .recentMessageTime(channel.getChannelType() == ChannelType.PUBLIC ? null : readStatusRepository.findUpToDateReadTimeByChannelId(channel.getId()))
+                .build();
     }
 
-    // TODO: 'Optional. get()' without 'isPresent()' check <- 확인
     @Override
-    public ChannelResDTO getChannel(String uuid) {
-        Map<Long, Channel> allChannels = channelRepository.loadAllChannels();
-        return allChannels.entrySet().stream()
-                .filter(entry -> entry.getValue().getId().toString().equals(uuid))
+    public ChannelDTO.response find(UUID uuid) {
+        return channelRepository.loadAll().entrySet().stream()
+                .filter(entry -> entry.getValue().getId().equals(uuid))
                 .findFirst()
-                .map(entry -> new ChannelResDTO(entry.getKey(), entry.getValue(), entry.getValue().getOwner()))
+                .map(entry -> ChannelDTO.response.builder()
+                        .id(entry.getKey())
+                        .uuid(entry.getValue().getId())
+                        .ownerId(entry.getValue().getOwnerId())
+                        .serverName(entry.getValue().getServerName())
+                        .description(entry.getValue().getDescription())
+                        .members(entry.getValue().getMembers())  // UserId 목록 가져옴
+                        .recentMessageTime(entry.getValue().getChannelType() == ChannelType.PUBLIC ? null : readStatusRepository.findUpToDateReadTimeByChannelId(entry.getValue().getId()))
+                        .build()
+                )
                 .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
     }
 
 
     @Override
-    public List<ChannelResDTO> getAllChannel() {
-        return channelRepository.loadAllChannels().entrySet().stream()
-                .map(entry ->
-                        new ChannelResDTO(entry.getKey(), entry.getValue(), entry.getValue().getOwner()))
+    public List<ChannelDTO.response> findAllByUserId(UUID userId) {
+        return channelRepository.findChannelsByUserId(userId).entrySet().stream()
+                .map(entry -> ChannelDTO.response.builder()
+                        .id(entry.getKey())
+                        .uuid(entry.getValue().getId())
+                        .ownerId(entry.getValue().getOwnerId())
+                        .serverName(entry.getValue().getServerName())
+                        .description(entry.getValue().getDescription())
+                        .members(entry.getValue().getMembers())
+                        .recentMessageTime(entry.getValue().getChannelType() == ChannelType.PUBLIC ? null : readStatusRepository.findUpToDateReadTimeByChannelId(entry.getValue().getId()))
+                        .build()
+                )
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Channel findChannelById(Long id) {
-        return channelRepository.loadChannel(id);
-    }
-
-    @Override
-    public Optional<Map.Entry<Long, Channel>> findChannelByUUID(UUID uuid) {
-        Map<Long, Channel> allChannels = channelRepository.loadAllChannels();
-        return allChannels.entrySet().stream()
-                .filter(entry -> entry.getValue().getId().equals(uuid))
-                .findFirst();
-    }
-
-    @Override
-    public boolean updateChannelInfo(Long id, ChannelUpdateDTO updateInfo) {
+    public boolean update(ChannelDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
-            Channel channel = findChannelById(id);
-            if (updateInfo.getOwner() != null && !channel.getOwner().getUserName().getName().equals(updateInfo.getOwner().getUserName().getName())) {
-                channel.updateOwner(updateInfo.getOwner());
-                isUpdated = true;
+            Channel channel = channelRepository.load(updateDTO.id());
+            if (channel.getChannelType() == ChannelType.PRIVATE) {
+                throw new CustomException(ErrorCode.PRIVATE_CANNOT_MODIFY);
             }
-
-            if (updateInfo.getServerName() != null && !channel.getServerName().getName().equals(updateInfo.getServerName())) {
-                channel.updateServerName(updateInfo.getServerName());
-                isUpdated = true;
-            }
-
-            if (updateInfo.getDescription() != null && !channel.getDescription().equals(updateInfo.getDescription())) {
-                channel.updateDescription(updateInfo.getDescription());
-                isUpdated = true;
-            }
-
-            if (updateInfo.getIconImgPath() != null && !channel.getIconImgPath().equals(updateInfo.getIconImgPath())) {
-                channel.updateIconImgPath(updateInfo.getIconImgPath());
-                isUpdated = true;
-            }
-            channelRepository.updateChannel(id, channel);
+            channelRepository.update(updateDTO.id(), channel);
             return isUpdated;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -126,17 +152,24 @@ public class BasicChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public ChannelResDTO deleteChannel(Long id) {
-        ChannelResDTO deleteChannel = getChannel(id);
-        channelRepository.deleteChannel(id);
+    public ChannelDTO.response delete(Long id) {
+        ChannelDTO.response deleteChannel = find(id);
+
+        messageRepository.deleteAllByChannelId(deleteChannel.uuid());
+        readStatusRepository.deleteAllByChannelId(deleteChannel.uuid());
+
+        channelRepository.delete(id);
         return deleteChannel;
     }
 
     @Override
-    public ChannelResDTO deleteChannel(String uuid) {
-        ChannelResDTO deleteChannel = getChannel(uuid);
-        channelRepository.deleteChannel(deleteChannel.getId());
+    public ChannelDTO.response delete(UUID uuid) {
+        ChannelDTO.response deleteChannel = find(uuid);
+
+        messageRepository.deleteAllByChannelId(uuid);
+        readStatusRepository.deleteAllByChannelId(uuid);
+
+        channelRepository.delete(deleteChannel.id());
         return deleteChannel;
     }
-
 }

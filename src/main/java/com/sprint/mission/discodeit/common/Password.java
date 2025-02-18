@@ -1,15 +1,12 @@
 package com.sprint.mission.discodeit.common;
 
-// TODO: 아무래도 비밀번호 넣을 때는 암호화가 필요함!!
+// TODO: 추후에는 암호화 부분도 추가해야 함
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public class Password {
     private String passwd;
-
-    public Password(String passwd) {
-        this.passwd = passwd;
-    }
-
-    public String getPasswd() {
-        return passwd;
-    }
-
 }

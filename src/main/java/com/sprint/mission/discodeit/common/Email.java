@@ -23,4 +23,9 @@ public class Email implements Serializable {
         this.email = email;
         this.verified = false;
     }
+
+    @Override
+    public String toString() {
+        return email;
+    }
 }

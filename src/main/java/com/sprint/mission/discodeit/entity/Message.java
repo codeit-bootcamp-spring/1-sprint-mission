@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.MessageReqDTO;
+import com.sprint.mission.discodeit.dto.MessageDTO;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -16,31 +17,44 @@ import java.util.UUID;
 @Getter
 public class Message implements Serializable {
     private UUID id;
-    private User author;    // 작성자
+    private UUID authorId;    // 작성자
     private String content; // 메시지 내용
-    private Channel channel;    // 메시지 대상 서버
+    private UUID channelId;    // 메시지 대상 서버
     private boolean status;     // 메시지 상태 (삭제 시 false -> 일정 시간 후 hard delete)
-    private long createdAt;
-    private long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 
     // 생성자
-    public Message(MessageReqDTO messageReqDTO) {
+    public Message(MessageDTO.request messageReqDTO) {
         id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        author = messageReqDTO.getAuthor();
-        channel = messageReqDTO.getChannel();
-        content = messageReqDTO.getContent();
+        createdAt = Instant.now();
+        authorId = messageReqDTO.author();
+        channelId = messageReqDTO.channel();
+        content = messageReqDTO.content();
         status = true;
+        setUpdatedAt();
     }
 
     public void updateContent(String content) {
         this.content = content;
-        updatedAt = System.currentTimeMillis();
+        setUpdatedAt();
     }
 
     public void updateStatus(boolean status) {
         this.status = status;
-        updatedAt = System.currentTimeMillis();
+        setUpdatedAt();
     }
 
+    void setUpdatedAt() {
+        updatedAt = Instant.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "id=" + id +
+                ", author=" + authorId +
+                ", content='" + content + '\'' +
+                '}';
+    }
 }

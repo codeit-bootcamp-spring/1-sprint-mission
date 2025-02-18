@@ -1,13 +1,7 @@
 package com.sprint.mission.discodeit.common.validation;
 
-public interface Validator {
-    boolean emailValidator(String email);
+public interface Validator<T, U> {
+    void validateCreate(U entity);
 
-    boolean nicknameValidator(String nickname);
-
-    boolean passwordValidator(String password);
-
-    boolean phoneNumValidator(String phoneNum);
-
-    boolean userNameValidator(String username);
+    T validateUpdate(T current, U update);
 }

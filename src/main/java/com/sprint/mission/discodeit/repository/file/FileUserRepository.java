@@ -4,35 +4,45 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
     private final Path directory;
-    private final AtomicLong idGenerator = new AtomicLong(1);
+    private final AtomicLong idGenerator = new AtomicLong(0);
 
-    public FileUserRepository(Path directory) {
+    public FileUserRepository(@Qualifier("fileUserStoragePath") Path directory) {
         this.directory = directory;
-        init(directory);
     }
 
-    private void init(Path directory) {
+    @PostConstruct  // 의존성 주입이 완료된 후 실행
+    private void init() {
         if (!Files.exists(directory)) {
             try {
                 Files.createDirectories(directory);
+                log.info("[User] User storage directory created: {}", directory.toAbsolutePath());
             } catch (IOException e) {
-                throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+                throw new CustomException(ErrorCode.FAILED_TO_CREATE_DIRECTORY);
             }
         }
     }
 
     @Override
-    public Long saveUser(User user) {
+    public Long save(User user) {
         Long id = idGenerator.getAndIncrement();
         Path filePath = directory.resolve(id + ".ser");
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
@@ -44,7 +54,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User loadUser(Long id) {
+    public User load(Long id) {
         Path filePath = directory.resolve(id + ".ser");
         if (!Files.exists(filePath)) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -57,7 +67,15 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Map<Long, User> loadAllUsers() {
+    public Map.Entry<Long, User> load(UUID uuid) {
+        return loadAll().entrySet().stream()
+                .filter(entry -> entry.getValue().getId().equals(uuid))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Override
+    public Map<Long, User> loadAll() {
         try {
             return Files.list(directory)
                     .filter(Files::isRegularFile)
@@ -77,7 +95,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void delete(Long id) {
         try {
             Files.deleteIfExists(directory.resolve(id + ".ser"));
         } catch (IOException e) {
@@ -86,12 +104,40 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateUser(Long id, User user) {
+    public void update(Long id, User user) {
         Path filePath = directory.resolve(id + ".ser");
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile()))) {
             oos.writeObject(user);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FAILED_TO_UPDATE_DATA);
         }
+    }
+
+    @Override
+    public boolean isExistByUserName(String userName) {
+        return loadAll().values().stream()
+                .anyMatch(entry -> entry.getUserName().getName().equals(userName));
+    }
+
+    @Override
+    public boolean isExistByEmail(String email) {
+        return loadAll().values().stream()
+                .anyMatch(entry -> entry.getEmail().getEmail().equals(email));
+    }
+
+    @Override
+    public boolean confirmLogin(String userName, String password) {
+        return loadAll().values().stream()
+                .anyMatch(entry ->
+                        entry.getUserName().getName().equals(userName) &&
+                                entry.getPassword().getPasswd().equals(password));
+    }
+
+    @Override
+    public Map.Entry<Long, User> findUserByUserName(String userName) {
+        return loadAll().entrySet().stream()
+                .filter(entry -> entry.getValue().getUserName().getName().equals(userName))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }

@@ -3,16 +3,30 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.Map;
+import java.util.UUID;
 
 public interface UserRepository {
 
-    public Long saveUser(User user);
+    Long save(User user);
 
-    public User loadUser(Long id);
+    User load(Long id);
 
-    public Map<Long, User> loadAllUsers();
+    Map.Entry<Long, User> load(UUID uuid);
 
-    public void deleteUser(Long id);
+    Map<Long, User> loadAll();
 
-    public void updateUser(Long id, User user);
+    void delete(Long id);
+
+    void update(Long id, User user);
+
+    // 검색 조건 달린 거 (index Id 제외)
+    Map.Entry<Long, User> findUserByUserName(String userName);
+
+    // 사용자 존재 여부 확인
+    boolean isExistByUserName(String userName);
+
+    boolean isExistByEmail(String email);
+
+    boolean confirmLogin(String userName, String password);
+
 }

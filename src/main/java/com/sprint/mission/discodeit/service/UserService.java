@@ -1,37 +1,31 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.UserResDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateDTO;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UserDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 
 public interface UserService {
 
     // 유일한 지 찾는거
 
     // 사용자 생성
-    public Long createUserData(String username, String nickname, String email, String password, String regionCode, String phone, String imgPath);
+    Long create(UserDTO.request userReqDto, MultipartFile profile);
 
     // 사용자 조회
-    public UserResDTO getUser(Long id);
+    UserDTO.response find(Long id);
 
-    public UserResDTO getUser(String userName);
+    UserDTO.response find(UUID uuid);
 
-    public List<UserResDTO> getAllUser();   // TODO: Paging 넣어 말아? <- 시간 상 가능하다면!
-
-    public User findUserById(Long id);
-
-    public Optional<Map.Entry<Long, User>> findUserByUserName(String userName);
+    List<UserDTO.response> findAll();
 
     // 사용자 정보 업데이트
     // 비밀번호랑 Active 수정은 따로 빼기
-    public boolean updateUser(Long id, UserUpdateDTO updateInfo);
+    boolean update(UserDTO.update updateDTO);
 
     // 사용자 삭제
-    public UserResDTO deleteUser(Long id);
+    Long delete(Long id);
 
-    public UserResDTO deleteUser(String userName);
+    Long delete(UUID uuid);
 }

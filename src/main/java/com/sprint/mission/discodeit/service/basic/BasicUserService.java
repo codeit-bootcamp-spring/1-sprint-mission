@@ -1,64 +1,75 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.validation.UserValidator;
 import com.sprint.mission.discodeit.common.validation.Validator;
-import com.sprint.mission.discodeit.common.validation.ValidatorImpl;
-import com.sprint.mission.discodeit.dto.UserReqDTO;
-import com.sprint.mission.discodeit.dto.UserResDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.UserStatusDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.enums.RegionCode;
-import com.sprint.mission.discodeit.enums.UserType;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.enums.ContentType;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import org.apache.commons.lang3.StringUtils;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final Validator validator = new ValidatorImpl();
-    private UserRepository userRepository;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;   // 데이터 저장소
-    }
+    private final Validator<User, UserDTO.request> userValidator = new UserValidator();
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusService userStatusService;
 
     @Override
-    public Long createUserData(String username, String nickname, String email, String password, String regionCode, String phone, String imgPath) {
+    public Long create(UserDTO.request userReqDto, MultipartFile profile) {
         // 유저 생성 로직
         try {
-            if (!validator.userNameValidator(username)) {
-                throw new CustomException(ErrorCode.INVALID_USERNAME);
+            // 유효성 검사
+            userValidator.validateCreate(userReqDto);
+
+            // 중복 검사
+            if (userRepository.isExistByEmail(userReqDto.email()) || userRepository.isExistByUserName(userReqDto.userName())) {
+                throw new CustomException(ErrorCode.USER_IS_ALREADY_EXIST);
             }
 
-            if (!validator.nicknameValidator(nickname)) {
-                throw new CustomException(ErrorCode.INVALID_NICKNAME);
+            // user 생성
+            Long userId = userRepository.save(new User(userReqDto));
+
+            // 프로필 이미지 존재 시 생성
+            if (profile != null && !profile.isEmpty()) {
+                BinaryContentDTO.request binaryContentReqDTO = BinaryContentDTO.request.builder()
+                        .contentType(ContentType.PROFILE)
+                        .referenceId(userRepository.load(userId).getId())
+                        .file(profile.getBytes())
+                        .mimeType(profile.getContentType())
+                        .filename(profile.getOriginalFilename())
+                        .build();
+                binaryContentRepository.save(new BinaryContent(binaryContentReqDTO));
             }
 
-            if (!validator.passwordValidator(password)) {
-                throw new CustomException(ErrorCode.INVALID_PASSWORD);
-            }
+            // userStatus 생성
+            userStatusRepository.save(new UserStatus(
+                    UserStatusDTO.request.builder()
+                            .userId(userRepository.load(userId).getId())
+                            .accessedAt(Instant.now())
+                            .build())
+            );
 
-            if (!validator.phoneNumValidator(phone)) {
-                throw new CustomException(ErrorCode.INVALID_PHONENUM);
-            }
-
-            if (!validator.emailValidator(email)) {
-                throw new CustomException(ErrorCode.INVALID_EMAIL);
-            }
-
-            if (StringUtils.isBlank(regionCode)) {
-                throw new CustomException(ErrorCode.REGION_CODE_IS_NOT_NULL);
-            }
-
-            imgPath = StringUtils.isBlank(imgPath) ? "defaultImg.png" : imgPath;
-
-            User user = new User(new UserReqDTO(username, nickname, email, password, regionCode, phone, imgPath));  // 유저 생성
-            Long userId = userRepository.saveUser(user);
             return userId;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -66,100 +77,104 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResDTO getUser(Long id) {
-        User user = findUserById(id);
+    public UserDTO.response find(Long id) {
+        User user = userRepository.load(id);
         if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        return new UserResDTO(id, user);
+        Map.Entry<Long, UserStatus> userStatus = userStatusRepository.findUserStatusByUserId(user.getId());
+
+        return UserDTO.response.builder()
+                .id(id)
+                .uuid(user.getId())
+                .username(user.getUserName())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .online(userStatus.getValue().isOnline())
+                .build();
     }
 
     @Override
-    public UserResDTO getUser(String userName) {
-        Optional<Map.Entry<Long, User>> user = findUserByUserName(userName);
+    public UserDTO.response find(UUID uuid) {
+        Map.Entry<Long, User> userData = userRepository.load(uuid);
+        User user = userData.getValue();
+
         if (user == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        return new UserResDTO(user.get().getKey(), user.get().getValue());
+        UserStatus userStatus = userStatusRepository.findUserStatusByUserId(user.getId()).getValue();
+
+        return UserDTO.response.builder()
+                .id(userData.getKey())
+                .uuid(user.getId())
+                .username(user.getUserName())
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .online(userStatus.isOnline())
+                .build();
     }
 
     @Override
-    public List<UserResDTO> getAllUser() {
-        return userRepository.loadAllUsers().entrySet().stream()
-                .map(entry ->
-                        new UserResDTO(entry.getKey(), entry.getValue()))
+    public List<UserDTO.response> findAll() {
+        return userRepository.loadAll().entrySet().stream()
+                .map(entry -> {
+                            Map.Entry<Long, UserStatus> userStatus = userStatusRepository.findUserStatusByUserId(entry.getValue().getId());
+                            return UserDTO.response.builder()
+                                    .id(entry.getKey())
+                                    .uuid(entry.getValue().getId())
+                                    .username(entry.getValue().getUserName())
+                                    .nickname(entry.getValue().getNickname())
+                                    .email(entry.getValue().getEmail())
+                                    .online(userStatus.getValue().isOnline())   // userStatus
+                                    .build();
+                        }
+                )
                 .collect(Collectors.toList());
     }
 
-    public User findUserById(Long id) {
-        return userRepository.loadUser(id);
-    }
-
-    // userName으로 User 객체와 해당 Long ID 반환
-    public Optional<Map.Entry<Long, User>> findUserByUserName(String userName) {
-        return userRepository.loadAllUsers().entrySet().stream()
-                .filter(entry -> entry.getValue().getUserName().getName().equals(userName))
-                .findFirst();
-    }
-
     @Override
-    public boolean updateUser(Long id, UserUpdateDTO updateInfo) {
+    public boolean update(UserDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
-            User user = findUserById(id);
-            if (updateInfo.getUserName() != null && !user.getUserName().getName().equals(updateInfo.getUserName()) && validator.userNameValidator(updateInfo.getUserName())) {
-                user.updateUserName(updateInfo.getUserName());
-                isUpdated = true;
+            User updatedUser = new UserValidator().validateUpdate(userRepository.load(updateDTO.id()), updateDTO.userReqDTO());
+            if (updatedUser == null) {
+                return isUpdated;
             }
 
-            if (updateInfo.getNickname() != null && !user.getNickname().getName().equals(updateInfo.getNickname()) && validator.nicknameValidator(updateInfo.getNickname())) {
-                user.updateNickname(updateInfo.getNickname());
-                isUpdated = true;
+            isUpdated = true;
+            if (updateDTO.profileDTO() != null) {
+                // 프로필 데이터 존재 여부
+                if (binaryContentRepository.isBinaryContentExist(updatedUser.getId())) {
+                    // 존재 시 삭제
+                    Map.Entry<Long, BinaryContent> binaryContent = binaryContentRepository.findProfileImageByMessageId(updatedUser.getId());
+                    binaryContentRepository.delete(binaryContent.getKey());
+                }
+                // 새로운 데이터 생성
+                binaryContentRepository.save(new BinaryContent(updateDTO.profileDTO()));
             }
 
-            if (updateInfo.getEmail() != null && !user.getEmail().getEmail().equals(updateInfo.getEmail()) && validator.emailValidator(updateInfo.getEmail())) {
-                user.updateEmail(updateInfo.getEmail());
-                isUpdated = true;
-            }
-
-            if (updateInfo.getUserType() != null && (user.getUserType() != UserType.fromString(updateInfo.getUserType().toUpperCase()))) {
-                user.updateUserType(UserType.fromString(updateInfo.getUserType().toUpperCase()));
-                isUpdated = true;
-            }
-
-            // phone
-            if ((updateInfo.getRegionCode() != null && updateInfo.getPhone() != null)
-                    && (!user.getPhone().getPhoneNum().equals(updateInfo.getPhone()) || user.getPhone().getRegionCode() != RegionCode.fromString(updateInfo.getRegionCode().toUpperCase()))
-                    && validator.phoneNumValidator(updateInfo.getPhone())) {
-                user.updatePhone(updateInfo.getPhone(), updateInfo.getRegionCode().toUpperCase());
-                isUpdated = true;
-            }
-
-            if (updateInfo.getImgPath() != null && !user.getUserImgPath().equals(updateInfo.getImgPath())) {
-                user.updateUserImg(updateInfo.getImgPath());
-                isUpdated = true;
-            }
-
-            if (updateInfo.getIntroduce() != null && !user.getIntroduce().equals(updateInfo.getIntroduce())) {
-                user.updateIntroduce(updateInfo.getIntroduce());
-                isUpdated = true;
-            }
-            userRepository.updateUser(id, user); // DB에 반영
+            userRepository.update(updateDTO.id(), updatedUser); // DB에 반영
             return isUpdated;
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public UserResDTO deleteUser(Long id) {
-        UserResDTO deleteUser = getUser(id);
-        userRepository.deleteUser(id);
-        return deleteUser;
+    public Long delete(Long id) {
+        User deleteUser = userRepository.load(id);
+
+        binaryContentRepository.deleteAllFileByReferenceId(deleteUser.getId());
+        userStatusRepository.deleteByUserId(deleteUser.getId());
+
+        userRepository.delete(id);
+        return id;
     }
 
     @Override
-    public UserResDTO deleteUser(String userName) {
-        UserResDTO deleteUser = getUser(userName);
-        userRepository.deleteUser(deleteUser.getId());
-        return deleteUser;
-    }
+    public Long delete(UUID uuid) {
+        Map.Entry<Long, User> deleteUser = userRepository.load(uuid);
 
+        binaryContentRepository.deleteAllFileByReferenceId(deleteUser.getValue().getId());
+        userStatusRepository.deleteByUserId(deleteUser.getValue().getId());
+
+        userRepository.delete(deleteUser.getKey());
+        return deleteUser.getKey();
+    }
 }

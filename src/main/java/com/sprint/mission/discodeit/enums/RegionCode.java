@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.enums;
 
-import org.apache.commons.lang3.StringUtils;
+import io.micrometer.common.util.StringUtils;
 
 public enum RegionCode {
     // TODO: 더 잘 활용할 수 있는 방법 생각해보기

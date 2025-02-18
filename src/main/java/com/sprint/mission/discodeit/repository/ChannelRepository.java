@@ -3,16 +3,23 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.Map;
+import java.util.UUID;
 
 public interface ChannelRepository {
 
-    public Long saveChannel(Channel channel);
+    Long save(Channel channel);
 
-    public Channel loadChannel(Long id);
+    Channel load(Long id);
 
-    public Map<Long, Channel> loadAllChannels();
+    Map.Entry<Long, Channel> load(UUID uuid);
 
-    public void deleteChannel(Long id);
+    Map<Long, Channel> loadAll();
 
-    public void updateChannel(Long id, Channel channel);
+    void update(Long id, Channel channel);
+
+    void delete(Long id);
+
+    // 조건 달린 조회
+    Map<Long, Channel> findChannelsByUserId(UUID userId);
+
 }
