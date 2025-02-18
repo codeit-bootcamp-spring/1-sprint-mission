@@ -14,20 +14,4 @@ public record MessageResponseDto(
     Instant createdAt,
     List<String> base64Data
 ) {
-
-  public static MessageResponseDto from(Message message){
-
-    List<String> base64Encoded = message.getBinaryContents().stream().map(content -> {
-      return Base64.getEncoder().encodeToString(content.getData());
-    }).toList();
-
-    return new MessageResponseDto(
-        message.getUUID(),
-        message.getUserId(),
-        message.getChannelId(),
-        message.getContent(),
-        message.getCreatedAt(),
-        base64Encoded
-    );
-  }
 }

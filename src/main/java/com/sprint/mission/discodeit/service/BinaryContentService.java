@@ -17,7 +17,7 @@ public interface BinaryContentService {
   void delete(String id);
   void deleteByMessageId(String messageId);
   List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents);
-  List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<MultipartFile> binaryContentDtos);
+  List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> incomingFiles);
   BinaryContent updateProfile(String userId, BinaryContent profileImage);
   Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
 

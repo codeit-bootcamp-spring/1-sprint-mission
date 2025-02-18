@@ -96,14 +96,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     return binaryContentRepository.saveMultipleBinaryContent(contents);
   }
 
+  // TODO : 메시지 업데이트시 이미지는 없을 수도
   @Override
-  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<MultipartFile> newFiles) {
+  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> newFiles) {
 
     List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getUUID());
 
-
     Set<String> newFileNames = newFiles.stream()
-        .map(MultipartFile::getOriginalFilename)
+        .map(BinaryContent::getFileName)
         .collect(Collectors.toSet());
 
     List<BinaryContent> filesToDelete = originalFiles.stream()
@@ -113,27 +113,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     // 기존 파일 삭제
     filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getUUID()));
 
-    // 새로운 파일 저장
-    List<BinaryContent> savedFiles = newFiles.stream()
-        .map(file -> {
-          try {
-            return new BinaryContent(
-                userId,
-                message.getUUID(),
-                message.getChannelId(),
-                file.getOriginalFilename(),
-                file.getContentType(),
-                file.getSize(),
-                file.getBytes(),
-                false
-            );
-          } catch (IOException e) {
-            throw new InvalidOperationException("파일 저장 실패");
-          }
-        }).toList();
-
-
-    return binaryContentRepository.saveMultipleBinaryContent(savedFiles);
+    return binaryContentRepository.saveMultipleBinaryContent(newFiles);
   }
 
   @Override

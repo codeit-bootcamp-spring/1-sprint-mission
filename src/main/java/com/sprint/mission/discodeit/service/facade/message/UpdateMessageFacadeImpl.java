@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -31,6 +32,7 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
   private final MessageMapper messageMapper;
   private final BinaryContentService binaryContentService;
   private final EntityValidator validator;
+  private final BinaryContentMapper binaryContentMapper;
 
 
   @Override
@@ -43,15 +45,13 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
 
-    List<MultipartFile> incomingFiles = messageDto.getBinaryContent();
-
-    List<BinaryContent> savedFiles = incomingFiles == null
-        || incomingFiles.isEmpty()
-        ? Collections.emptyList()
-        : binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
-
-    message.addBinaryContents(savedFiles);
-
+    if(messageDto.getBinaryContent() != null && !messageDto.getBinaryContent().isEmpty()) {
+      log.info("[Update Message] : 바이너리 업데이트 시작");
+      List<BinaryContent> incoming = binaryContentMapper.fromMessageFiles(messageDto.getBinaryContent(), message.getUserId(), message.getChannelId(), message.getUUID());
+      incoming = binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incoming);
+      message.addBinaryContents(incoming);
+    }
+    
     messageService.updateMessage(message, messageDto.getContent());
 
     return messageMapper.toResponseDto(message);
