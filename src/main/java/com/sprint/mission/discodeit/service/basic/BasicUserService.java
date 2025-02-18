@@ -1,20 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.constant.UserConstant;
-import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.UserConstant.*;
 
@@ -161,30 +151,27 @@ public class BasicUserService implements UserService {
    * @param updatedUser  업데이트 될 정보
    */
   private void updateFields(User originalUser, UserUpdateDto updatedUser) {
-
     List<User> users = userRepository.findAll();
 
     if (updatedUser.nickname() != null) {
       validNickname(updatedUser.nickname(), originalUser.getUUID(), users);
-      originalUser.setNickname(updatedUser.nickname());
     }
     if (updatedUser.email() != null) {
       validEmail(updatedUser.email(), originalUser.getUUID(), users);
-      originalUser.setEmail(updatedUser.email());
     }
     if (updatedUser.phoneNumber() != null) {
       validPhone(updatedUser.phoneNumber(), originalUser.getUUID(), users);
-      originalUser.setPhoneNumber(updatedUser.phoneNumber());
     }
-    if (updatedUser.username() != null) {
-      originalUser.setUsername(updatedUser.username());
-    }
-    if (updatedUser.description() != null) {
-      originalUser.setDescription(updatedUser.description());
-    }
-    if (updatedUser.password() != null && !updatedUser.password().isBlank()) {
-      originalUser.setPassword(PasswordEncryptor.hashPassword(updatedUser.password()));
-    }
+
+    originalUser.updateProfile(
+        updatedUser.username(),
+        updatedUser.email(),
+        updatedUser.nickname(),
+        updatedUser.phoneNumber(),
+        updatedUser.description(),
+        updatedUser.password() == null ? null : PasswordEncryptor.hashPassword(updatedUser.password())
+    );
+
   }
 
   /**

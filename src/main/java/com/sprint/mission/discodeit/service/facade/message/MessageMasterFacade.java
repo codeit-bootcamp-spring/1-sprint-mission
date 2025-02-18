@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.facade;
+package com.sprint.mission.discodeit.service.facade.message;
 
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;

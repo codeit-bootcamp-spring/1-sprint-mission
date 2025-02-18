@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Getter

@@ -7,10 +7,9 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {PasswordEncryptor.class, BinaryContentUtil.class})
+@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {PasswordEncryptor.class, BinaryContentUtil.class}, builder = @Builder(disableBuilder = false))
 public interface UserMapper {
 
   @Mapping(target = "UUID", ignore = true)

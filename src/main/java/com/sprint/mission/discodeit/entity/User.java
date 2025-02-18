@@ -1,19 +1,22 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String UUID;
+  private String UUID;
   private String username;
   private String password;
   private String email;
@@ -23,36 +26,58 @@ public class User implements Serializable {
 
   private Instant createdAt;
   private Instant updatedAt;
-
   private BinaryContent profileImage;
   private UserStatus status;
 
-  public User(String username, String password, String email, String nickname, String phoneNumber, String description) {
-
-    this.UUID = UuidGenerator.generateUUID();
-
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.nickname = nickname;
-    this.phoneNumber = phoneNumber;
-    this.description = description;
-
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
-    this.profileImage = null;
-    this.status = null;
+  public static class UserBuilder{
+    private String UUID = UuidGenerator.generateUUID();
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
+    private BinaryContent profileImage = null;
+    private UserStatus status = null;
   }
+
   @Override
   public String toString() {
-    return
-        "USER: username='" + username + '\''
-            + ", email='" + email + '\''
-            + ", nickname='" + nickname + '\''
-            + ", phoneNumber='" + phoneNumber + '\''
-            + '}';
+    return "User{"
+        + "UUID='" + UUID + '\''
+        + ", username='" + username + '\''
+        + ", email='" + email + '\''
+        + ", nickname='" + nickname + '\''
+        + ", phoneNumber='" + phoneNumber
+        + '\'' + ", description='" + description + '\''
+        + ", createdAt=" + createdAt
+        + ", updatedAt=" + updatedAt
+        + ", profileImage=" + (profileImage != null ? "Exists" : "None")
+        + ", status=" + status
+        + '}';
   }
 
+  public void updateProfile(
+      String username,
+      String email,
+      String nickname,
+      String phoneNumber,
+      String description,
+      String password
+  ) {
+    if (username != null) this.username = username;
+    if (email != null && email.contains("@")) this.email = email;
+    if (nickname != null) this.nickname = nickname;
+    if (phoneNumber != null) this.phoneNumber = phoneNumber;
+    if (description != null) this.description = description;
+    if (password != null) this.password = password;
+    this.updatedAt = Instant.now();
+  }
+
+  public void updateStatus(UserStatus status){
+    this.status = status;
+  }
+
+  public void updateProfileImage(BinaryContent profileImage){
+    this.profileImage = profileImage;
+  }
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

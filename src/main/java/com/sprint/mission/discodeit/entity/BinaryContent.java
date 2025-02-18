@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.exception.RequiredFieldEmptyException;
-import com.sprint.mission.discodeit.util.FileType;
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import jakarta.annotation.Nullable;
 import lombok.Getter;

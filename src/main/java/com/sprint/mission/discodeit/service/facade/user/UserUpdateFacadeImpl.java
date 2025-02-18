@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -26,15 +24,17 @@ public class UserUpdateFacadeImpl implements UserUpdateFacade {
   private final BinaryContentMapper binaryContentMapper;
   @Override
   public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
+
     log.info("[User Update] : 요청 수신={} , 수신 정보={}", userId, updateDto);
     User user = userService.updateUser(userId, updateDto, updateDto.inputPassword());
+
     log.info("[User Update] : 기본 정보 업데이트 완료.");
 
     if(updateDto.profileImage() != null && !updateDto.profileImage().isEmpty()){
 
       log.info("[User Update] : 프로필 업데이트 시작");
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(updateDto.profileImage(), userId);
-      user.setProfileImage(profile);
+      user.updateProfileImage(profile);
       binaryContentService.updateProfile(userId, profile);
 
       log.info("[User Update] : BinaryContent 저장 성공 = {}", profile);

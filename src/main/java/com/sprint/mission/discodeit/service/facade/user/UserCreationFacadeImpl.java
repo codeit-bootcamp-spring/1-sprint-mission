@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -24,9 +23,7 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
 
   private final UserService userService;
   private final UserMapper userMapper;
-
   private final UserStatusService userStatusService;
-
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
 
@@ -35,17 +32,14 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
 
     User user = userMapper.toEntity(userDto);
 
-    user.setStatus(new UserStatus(user.getUUID(), Instant.now()));
+    user.updateStatus(new UserStatus(user.getUUID(), Instant.now()));
     userService.saveUser(user);
     userStatusService.create(user.getStatus());
 
     if(userDto.profileImage() != null && !userDto.profileImage().isEmpty()){
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(userDto.profileImage(), user.getUUID());
-
-      user.setProfileImage(profile);
-
-      BinaryContent content = binaryContentService.create(profile);
-
+      user.updateProfileImage(profile);
+      binaryContentService.create(profile);
       // DB 사용시 삭제?
       userService.update(user);
     }
