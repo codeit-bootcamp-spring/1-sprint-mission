@@ -16,4 +16,6 @@ public interface MessageRepository {
     void updateMessage(Message message);
 
     void deleteMessage(UUID messageId);
+
+    void deleteByChannelId(UUID channelId);
 }

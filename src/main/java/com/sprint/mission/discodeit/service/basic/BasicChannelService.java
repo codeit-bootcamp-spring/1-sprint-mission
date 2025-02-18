@@ -63,13 +63,15 @@ public class BasicChannelService implements ChannelService {
 
         for (Channel channel : channels) {
             List<Message> messages = messageRepository.findByChannelId(channel.getId());
-            Optional<Message> message = messages.stream()
-                    .max(Comparator.comparing(Message::getCreatedAt));
+            Instant latestMessageTime = messages.stream()
+                    .max(Comparator.comparing(Message::getCreatedAt))
+                    .map(Message::getCreatedAt)
+                    .orElse(channel.getCreatedAt());
             List<UUID> userIdList = channel.getUsers().values().stream()
                     .map(User::getId)
                     .toList();
             channelInfoDtos.add(ChannelInfoDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                    channel.getType(), channel.getName(), channel.getDescription(), message.isEmpty() ? channel.getCreatedAt() : message.get().getCreatedAt(), userIdList));
+                    channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList));
         }
 
         return channelInfoDtos;
@@ -103,6 +105,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteChannel(UUID channelId) {
+        messageRepository.deleteByChannelId(channelId);
+        readStatusRepository.deleteByChannelId(channelId);
         channelRepository.deleteChannel(channelId);
     }
 }
