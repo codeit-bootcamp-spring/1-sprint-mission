@@ -1,59 +1,119 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.ErrorMessage;
-import com.sprint.mission.discodeit.common.UtilMethod;
+import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
+import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validator.UserStatusValidator;
+import com.sprint.mission.discodeit.validator.UserValidator;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final UserRepository userRepository;
 
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final BinaryContentRepository binaryContentRepository;
+
+    private final UserMapper userMapper;
+
+    private final UserValidator userValidator;
+    private final UserStatusValidator userStatusValidator;
+
+    private final MultipartFileConverter multipartFileConverter;
 
     @Override
-    public User createUser(String name, String nickname, String email, String password, String profileImageUrl) {
-        User user = User.of(name, nickname, email, password, profileImageUrl, true);
+    public User createUser(CreateUserRequest createUserRequest, MultipartFile profileImageFile) {
+
+        // name 중복 여부
+        userValidator.validateDuplicateByName(createUserRequest.name());
+        // email 중복 여부
+        userValidator.validateDuplicateUserByEmail(createUserRequest.email());
+
+        User user = userMapper.toEntity(createUserRequest);
+
+        // 이미지는 선택적으로 등록
+        updateProfileImage(user, profileImageFile);
+
+        // UserStatus 생성(추후 service layer로 교체)
+        userStatusRepository.saveUserStatus(UserStatus.of(user));
 
         return userRepository.saveUser(user);
     }
 
     @Override
-    public User findUserByIdOrThrow(UUID userId) {
-        return Optional.ofNullable(userRepository.findUserById(userId))
-                .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND.format(userId)));
+    public FindUserResponse findUserByIdOrThrow(UUID userId) {
+        User foundUser = userValidator.validateUserExistsByUserId(userId);
+        UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(foundUser);
+
+        MultipartFile profileImage = multipartFileConverter.toMultipartFile(foundUser.getProfileImage().getContent());
+
+        return userMapper.toFindUserResponse(foundUser, profileImage, userStatus.getIsOnline());
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return userRepository.findAllUsers();
+    public List<FindUserResponse> findAllUsers() {
+        return userRepository.findAllUsers().stream()
+                .map(user -> findUserByIdOrThrow(user.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User updateUser(UUID userId, String name, String nickname, String email, String password, String profileImageUrl) {
-        User foundUser = findUserByIdOrThrow(userId);
+    public User updateUser(UpdateUserRequest updateUserRequest, MultipartFile profileImageFile) {
+        User foundUser = userValidator.validateUserExistsByUserId(updateUserRequest.userId());
 
-        foundUser.updateName(name);
-        foundUser.updateNickname(nickname);
-        foundUser.updateEmail(email);
-        foundUser.updatePassword(password);
-        foundUser.updateProfileImageUrl(profileImageUrl);
-        foundUser.updateUpdatedAt(UtilMethod.getCurrentTime());
+        foundUser.updateUserInfo(updateUserRequest.name(), updateUserRequest.nickname(),
+                updateUserRequest.email(), updateUserRequest.password());
 
-        return userRepository.saveUser(foundUser);
+        updateProfileImage(foundUser, profileImageFile);
+
+        return foundUser;
     }
 
     @Override
     public void deleteUser(UUID userId) {
-        if (!userRepository.existsUser(userId)) {
-            throw new RuntimeException(ErrorMessage.USER_NOT_FOUND.format(userId));
-        }
+        // 유저 존재 여부 확인
+        User foundUser = userValidator.validateUserExistsByUserId(userId);
+
+        // UserStatus 삭제
+        UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(foundUser);
+        // service?
+        userStatusRepository.removeUserStatus(userStatus.getId());
+
+        // BinaryContent 삭제
+        // BinaryContent 존재 여부 확인 -> validator or Service
+        // binaryContentService deleteBinaryContent로 검증 및 삭제까지 가능
+        binaryContentRepository.removeBinaryContent(foundUser.getProfileImage().getId());
+
+        // 참여한 채널에서도 유저 삭제
+
+        // 유저 삭제
         userRepository.removeUser(userId);
+    }
+
+    private void updateProfileImage(User user, MultipartFile profileImageFile) {
+        if (profileImageFile != null) {
+            BinaryContent binaryContent = binaryContentRepository.saveBinaryContent(
+                    BinaryContent.of(multipartFileConverter.toByteArray(profileImageFile)));
+
+            user.updateProfileImage(binaryContent);
+        }
     }
 }
