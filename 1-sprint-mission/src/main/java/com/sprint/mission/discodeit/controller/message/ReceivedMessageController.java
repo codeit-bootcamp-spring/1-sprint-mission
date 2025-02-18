@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/received_messages")
+@RequestMapping("/api/received_messages")
 public class ReceivedMessageController {
     private final ReadStatusService readStatusService;
 

@@ -7,5 +7,5 @@ public record BinaryContentCreateDTO(
         UUID messageId,
         String filename,
         String contentType,
-        byte[] fileData
+        byte[] bytes
 ) {}

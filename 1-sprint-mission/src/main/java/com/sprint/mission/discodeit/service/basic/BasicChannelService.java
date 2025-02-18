@@ -159,7 +159,6 @@ public class BasicChannelService implements ChannelService {
         }
 
         channel.update(updateDTO.newName(), updateDTO.newDescription());
-
         channelRepository.save(channel);
 
         //변경 정보 DTO로 변환 후 반환

@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.request.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.user.UserDTO;
-import com.sprint.mission.discodeit.dto.request.user.UserProfileImageDTO;
+import com.sprint.mission.discodeit.dto.request.user.UserUpdateProfileImageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -35,8 +37,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-
-    public UserDTO create(UserCreateDTO userCreateDTO, UserProfileImageDTO userProfileImageDTO) {
+    public UserDTO create(UserCreateDTO userCreateDTO, BinaryContentCreateRequest binaryContentCreateRequest) {
         if (userRepository.existsByEmail(userCreateDTO.email())){
             throw new IllegalArgumentException("User email " + userCreateDTO.email() + " already exists");
         }
@@ -48,16 +49,20 @@ public class BasicUserService implements UserService {
         userRepository.save(newUser);
 
         // 프로필 이미지 저장 (선택적)
-        if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null && userProfileImageDTO.imageData().length > 0) {
+        UUID profileId = null;
+        if(binaryContentCreateRequest != null &&
+                binaryContentCreateRequest.bytes() != null && binaryContentCreateRequest.bytes().length > 0) {
             BinaryContent binaryContent = new BinaryContent(
                     UUID.randomUUID(),
                     newUser.getId(),
                     null,
-                    userProfileImageDTO.fileName(),
-                    userProfileImageDTO.contentType(),
-                    userProfileImageDTO.imageData()
+                    binaryContentCreateRequest.fileName(),
+                    binaryContentCreateRequest.contentType(),
+                    binaryContentCreateRequest.bytes()
+
             );
-            binaryContentRepository.save(binaryContent);
+            BinaryContent profileContent = binaryContentRepository.save(binaryContent);
+            profileId = profileContent.getId();
         }
         //사용자 상태 생성, 저장
         UserStatus userStatus = new UserStatus(newUser, null);
@@ -72,7 +77,8 @@ public class BasicUserService implements UserService {
                 newUser.getEmail(),
                 newUser.getCreatedAt(),
                 newUser.getUpdatedAt(),
-                isOnline
+                isOnline,
+                profileId
         );
     }
 
@@ -85,8 +91,19 @@ public class BasicUserService implements UserService {
         boolean isOnline = userStatusRepository.findByUserId(user.getId())
                 .map(UserStatus::isOnline)
                 .orElse(false);
+        // 프로필 이미지 ID 조회
+        Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
+        UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
         //변환 반환
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt(), user.getUpdatedAt(), isOnline);
+        return new UserDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                isOnline,
+                profileId
+        );
     }
 
     @Override
@@ -96,20 +113,23 @@ public class BasicUserService implements UserService {
                     boolean isOnline = userStatusRepository.findByUserId(user.getId())
                             .map(UserStatus::isOnline)
                             .orElse(false);
+                    Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
+                    UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
                     return new UserDTO(
                             user.getId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getCreatedAt(),
                             user.getUpdatedAt(),
-                            isOnline
+                            isOnline,
+                            profileId
                     );
                 })
                 .toList();
     }
 
     @Override
-    public UserDTO update(UserUpdateDTO userUpdateDTO, UserProfileImageDTO userProfileImageDTO) {
+    public UserDTO update(UserUpdateDTO userUpdateDTO, UserUpdateProfileImageDTO userUpdateProfileImageDTO) {
             //사용자 찾고
             User user = userRepository.findById(userUpdateDTO.id())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -124,16 +144,16 @@ public class BasicUserService implements UserService {
             userRepository.save(user);
 
             //프로필 이미지 저장 (선택적으로)
-            if(userProfileImageDTO != null && userProfileImageDTO.imageData() != null) {
+            if(userUpdateProfileImageDTO != null && userUpdateProfileImageDTO.imageData() != null) {
                 //기존 이미지 삭제 , 이미지 저장
                 binaryContentRepository.deleteByUserId(user.getId());
                 BinaryContent binaryContent = new BinaryContent(
                         UUID.randomUUID(),
                         user.getId(),
                         null,
-                        userProfileImageDTO.fileName(),
-                        "image/jpeg",
-                        userProfileImageDTO.imageData()
+                        userUpdateProfileImageDTO.fileName(),
+                        userUpdateProfileImageDTO.contentType(),
+                        userUpdateProfileImageDTO.imageData()
                 );
                 binaryContentRepository.save(binaryContent);
             }
@@ -141,12 +161,16 @@ public class BasicUserService implements UserService {
                 .map(UserStatus::isOnline)
                 .orElse(false);
 
+        Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
+        UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
+
         return new UserDTO(user.getId(),
                     user.getUsername(),
                     user.getEmail(),
                     user.getCreatedAt(),
                     user.getUpdatedAt(),
-                    isOnline
+                    isOnline,
+                profileId
             );
     }
 

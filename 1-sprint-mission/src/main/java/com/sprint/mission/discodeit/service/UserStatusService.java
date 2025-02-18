@@ -4,8 +4,10 @@ import com.sprint.mission.discodeit.dto.request.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDTO;
 import com.sprint.mission.discodeit.dto.response.user.UserDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,6 +25,7 @@ public class UserStatusService {
 
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     public UserStatusResponseDTO create(UserStatusCreateDTO createDTO){
         //사용자 조회
@@ -50,6 +54,10 @@ public class UserStatusService {
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElse(new UserStatus(user, Instant.EPOCH));
         boolean isOnline = userStatus.isOnline();
+
+        Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
+        UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
+
         // 응답 DTO 변환 후 반란
         return new UserDTO(
                 user.getId(),
@@ -57,7 +65,8 @@ public class UserStatusService {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                isOnline
+                isOnline,
+                profileId
         );
     }
 
@@ -74,13 +83,17 @@ public class UserStatusService {
                     UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
                     boolean isOnline = (userStatus != null) && userStatus.isOnline();
 
+                    Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
+                    UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
+
                     return new UserDTO(
                             user.getId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getCreatedAt(),
                             user.getUpdatedAt(),
-                            isOnline
+                            isOnline,
+                            profileId
                     );
                 })
                 .toList();

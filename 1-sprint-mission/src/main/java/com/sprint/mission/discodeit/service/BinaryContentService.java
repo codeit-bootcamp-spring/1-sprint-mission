@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -35,7 +34,7 @@ public class BinaryContentService {
                 createDTO.messageId(),
                 createDTO.filename(),
                 "application/octet-stream",
-                createDTO.fileData()
+                createDTO.bytes()
         );
         binaryContentRepository.save(binaryContent);
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
@@ -30,7 +31,7 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public MessageResponseDTO create(MessageCreateDTO messageCreateDTO) {
+    public MessageResponseDTO create(MessageCreateDTO messageCreateDTO, BinaryContentCreateRequest binaryContentCreateRequest) {
         //사용자 조회
         User user = userRepository.findById(messageCreateDTO.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found" + messageCreateDTO.userId()));
@@ -45,16 +46,32 @@ public class BasicMessageService implements MessageService {
         List<BinaryContent> attachments = new ArrayList<>();
         if (messageCreateDTO.attachments() != null && !messageCreateDTO.attachments().isEmpty()) {
             attachments = messageCreateDTO.attachments().stream()
-                    .map(fileDTO -> new BinaryContent(
-                            UUID.randomUUID(),
-                            user.getId(),
-                            newMessage.getId(),
-                            fileDTO.filename(),
-                            fileDTO.contentType(),
-                            fileDTO.fileData()
-                    ))
+                    .filter(fileDTO -> fileDTO.bytes() != null && fileDTO.bytes().length > 0)
+                    .map(fileDTO -> {
+                        BinaryContent binaryContent = new BinaryContent(
+                                UUID.randomUUID(),
+                                user.getId(),
+                                newMessage.getId(),
+                                fileDTO.fileName(),
+                                fileDTO.contentType(),
+                                fileDTO.bytes()
+                        );
+                        return binaryContentRepository.save(binaryContent);
+                    })
                     .toList();
-            attachments.forEach(binaryContentRepository::save);
+        }
+
+        if (binaryContentCreateRequest != null && binaryContentCreateRequest.bytes() != null && binaryContentCreateRequest.bytes().length > 0) {
+
+            BinaryContent binaryContent = new BinaryContent(
+                    UUID.randomUUID(),
+                    user.getId(),
+                    newMessage.getId(),
+                    binaryContentCreateRequest.fileName(),
+                    binaryContentCreateRequest.contentType(),
+                    binaryContentCreateRequest.bytes()
+            );
+            attachments.add(binaryContentRepository.save(binaryContent));
         }
         //readStatus 업데이트
         ReadStatus readStatus = readStatusRepository.findByUserAndChannel(user, channel)
@@ -156,7 +173,7 @@ public class BasicMessageService implements MessageService {
                             messageToUpdate.getId(),
                             fileDTO.filename(),
                             fileDTO.contentType(),
-                            fileDTO.fileData()
+                            fileDTO.bytes()
 
                     ))
                     .toList();

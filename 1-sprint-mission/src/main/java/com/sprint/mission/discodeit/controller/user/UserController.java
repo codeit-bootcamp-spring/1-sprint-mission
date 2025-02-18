@@ -1,17 +1,24 @@
 package com.sprint.mission.discodeit.controller.user;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.*;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDTO;
 import com.sprint.mission.discodeit.dto.response.user.UserDTO;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.service.interfacepac.UserService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
@@ -23,17 +30,31 @@ public class UserController {
     }
 
     //사용자 등록
-    @PostMapping
-    public UserDTO createUser(@RequestBody UserCreateRequestDTO createRequestDTO) {
-         return userService.create(createRequestDTO.userCreateDTO(),
-                 createRequestDTO.userProfileImageDTO());
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public UserDTO createUser(
+            @RequestPart(name = "user-create-dto") UserCreateDTO userCreateDTO,
+            @RequestPart(name = "binary-content-create-request") MultipartFile binaryContentCreateRequest
+            ) {
+        BinaryContentCreateRequest binaryContent = null;
+        if (Objects.nonNull(binaryContentCreateRequest)) {
+            try {
+                binaryContent = new BinaryContentCreateRequest(
+                        binaryContentCreateRequest.getOriginalFilename(),
+                        binaryContentCreateRequest.getContentType(),
+                        binaryContentCreateRequest.getBytes()
+                );
+            } catch (IOException exception) {
+                throw new IllegalArgumentException(exception);
+            }
+        }
+        return userService.create(userCreateDTO, binaryContent);
     }
 
     //사용자 정보 수정
     @PatchMapping
     public UserDTO updateUser(@RequestBody UserUpdateRequestDTO updateRequestDTO) {
         return userService.update(updateRequestDTO.userUpdateDTO()
-                ,updateRequestDTO.userProfileImageDTO());
+                ,updateRequestDTO.userUpdateProfileImageDTO());
     }
 
     //사용자 삭제
@@ -43,7 +64,7 @@ public class UserController {
     }
 
     //모든 사용자 조회
-    @GetMapping("/list")
+    @GetMapping("/findAll")
     public List<UserDTO> getUsers() {
         return userService.findAll();
     }

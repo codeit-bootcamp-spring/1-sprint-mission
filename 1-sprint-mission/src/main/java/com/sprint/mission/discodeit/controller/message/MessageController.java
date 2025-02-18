@@ -1,16 +1,21 @@
 package com.sprint.mission.discodeit.controller.message;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
 import com.sprint.mission.discodeit.service.interfacepac.MessageService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/api/messages")
 public class MessageController {
     private final MessageService messageService;
 
@@ -19,9 +24,24 @@ public class MessageController {
     }
 
     //메시지 생성
-    @PostMapping
-    public MessageResponseDTO createMessage(@RequestBody MessageCreateDTO messageCreateDTO) {
-        return messageService.create(messageCreateDTO);
+    @PostMapping(consumes ={MediaType.MULTIPART_FORM_DATA_VALUE})
+    public MessageResponseDTO createMessage(
+            @RequestPart("message-create-dto") MessageCreateDTO messageCreateDTO,
+            @RequestPart("binary-content-create-request") MultipartFile binaryContentCreateRequest
+    ) {
+        BinaryContentCreateRequest binaryContent = null;
+        if (Objects.nonNull(binaryContentCreateRequest)) {
+            try {
+                binaryContent = new BinaryContentCreateRequest(
+                        binaryContentCreateRequest.getOriginalFilename(),
+                        binaryContentCreateRequest.getContentType(),
+                        binaryContentCreateRequest.getBytes()
+                );
+            } catch (IOException exception) {
+                throw new IllegalArgumentException(exception);
+            }
+        }
+        return messageService.create(messageCreateDTO , binaryContent);
     }
 
     //메세지 수정

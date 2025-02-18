@@ -36,7 +36,15 @@ public class FileChannelRepository implements ChannelRepository {
     public Channel save(Channel channel) {
         UUID ownerId = channel.getOwner().getId();
         List<Channel> channels = channelData.computeIfAbsent(ownerId, k -> new ArrayList<>());
-        channels.add(channel);
+        Optional<Channel> existingChannelOpt = channels.stream()
+                .filter(ch -> channel.getId().equals(ch.getId()))
+                .findFirst();
+        if(existingChannelOpt.isPresent()) {
+            int index = channels.indexOf(existingChannelOpt.get());
+            channels.set(index, channel);
+        }else {
+            channels.add(channel);
+        }
         saveToFile();
         return channel;
     }

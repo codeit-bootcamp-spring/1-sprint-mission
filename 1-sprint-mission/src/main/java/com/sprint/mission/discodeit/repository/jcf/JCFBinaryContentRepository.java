@@ -12,8 +12,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
 
     @Override
-    public void save(BinaryContent binaryContent) {
-        storage.put(binaryContent.getId(), binaryContent);
+    public BinaryContent save(BinaryContent binaryContent) {
+        return storage.put(binaryContent.getId(), binaryContent);
     }
 
     @Override
@@ -41,6 +41,19 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
                 .map(storage::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<BinaryContent> findByUserId(UUID userId) {
+        BinaryContent latestContent = null;
+        for (BinaryContent content : storage.values()) {
+            if (userId.equals(content.getUserId())) {
+                if (latestContent == null || content.getCreatedAt().isAfter(latestContent.getCreatedAt())) {
+                    latestContent = content;
+                }
+            }
+        }
+        return Optional.ofNullable(latestContent);
     }
 
     @Override

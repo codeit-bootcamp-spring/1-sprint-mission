@@ -29,9 +29,10 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         binaryContentData.put(binaryContent.getId(), binaryContent);
         saveToFile();
+        return binaryContent;
     }
 
     @Override
@@ -58,6 +59,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         return binaryContentData.values().stream()
                 .filter(content -> ids.contains(content.getId()))
                 .toList();
+    }
+
+    @Override
+    public Optional<BinaryContent> findByUserId(UUID userId) {
+        // 생성시간이 가장 최근인 항목 선택 반환
+        return binaryContentData.values().stream()
+                .filter(content -> userId.equals(content.getUserId()))
+                .max(Comparator.comparing(BinaryContent::getCreatedAt));
     }
 
     @Override
