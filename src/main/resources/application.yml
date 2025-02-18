@@ -1,0 +1,5 @@
+discodeit:
+  repository:
+    type: file
+    file:
+      storage-path: "file-data-map/"

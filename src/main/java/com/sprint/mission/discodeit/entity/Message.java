@@ -1,30 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import lombok.Getter;
 
+import java.io.Serializable;
+import java.util.UUID;
+
+@Getter
 public class Message extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     private String content;
-    private final Channel channelId;
-    private final User senderUser;
+    private final UUID channelId;
+    private final UUID authorId;
 
-    public Message(String content, Channel channelId, User senderUser) {
+    public Message(String content, UUID channelId, UUID authorId) {
         super();
         this.content = content;
         this.channelId = channelId;
-        this.senderUser = senderUser;
+        this.authorId = authorId;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public Channel getChannelId() {
-        return channelId;
-    }
-
-    public User getSenderUser() {
-        return senderUser;
+    @Override
+    public String toString() {
+        return "Message{" +
+                "content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                '}';
     }
 
     public void update(String content) {
@@ -36,13 +37,5 @@ public class Message extends BaseEntity implements Serializable {
         if (flag){
             update();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", senderUser=" + senderUser +
-                '}';
     }
 }

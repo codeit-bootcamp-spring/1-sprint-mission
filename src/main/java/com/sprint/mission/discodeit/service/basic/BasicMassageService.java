@@ -1,54 +1,83 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
+import com.sprint.mission.discodeit.service.Interface.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMassageService implements MessageService {
-    private final MessageRepository messageRepository;
 
-    public BasicMassageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
+    @Autowired
+    private final MessageRepository messageRepository;
+    @Autowired
+    private BinaryContentService binaryContentService;
 
 
     @Override
-    public void createMessage(Message message) {
-        validateMessage(message);
-        messageRepository.createMessage(message);
+    public Message createMessage(CreateMessageRequestDto request) throws Exception {
+        Message message=new Message(request.getContent(),request.getChannelId(),request.getAuthorId());
+        Message savedMessage=messageRepository.save(message);
+        if(request.getAttachments()!=null){
+            for (MultipartFile fileData : request.getAttachments()) {
+                if (!fileData.isEmpty()) {
+                    BinaryContentCreateRequestDto binaryContentCreateRequestDto =new BinaryContentCreateRequestDto(null,request.getAuthorId(),fileData);
+                    binaryContentService.createProfile(binaryContentCreateRequestDto);
+                }
+            }
+        }
+        return savedMessage;
     }
 
     @Override
     public Optional<Message> getMessageById(UUID id) {
         return Optional.ofNullable(messageRepository.getMessageById(id)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + id + " not fount")));
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + id + " not fount")));
 
     }
 
     @Override
-    public List<Message> getAllMessage() {
+    public List<Message> getAllMessages() {
         return messageRepository.getAllMessage();
     }
 
     @Override
-    public void updateMessage(UUID id, Message updatedMessage) {
-        messageRepository.updateMessage(id, updatedMessage);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.getAllMessage()
+                .stream().filter(message -> message.getChannelId().equals(channelId))
+                .collect(Collectors.toList());
     }
 
     @Override
+    public Message updateMessage(UpdateMessageRequestDto request) {
+        Message message = messageRepository.getMessageById(request.getMessageId())
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + request.getMessageId() + " not found"));
+        message.update(request.getNewContent());
+        return messageRepository.save(message);
+    }
+
+
+    @Override
     public void deleteMessage(UUID id) {
+        binaryContentService.deleteByMessageId(id);
         messageRepository.deleteMessage(id);
     }
 
-    private void validateMessage(Message message) {
-        if (message.getContent() == null || message.getContent().isEmpty()) {
-            throw new IllegalArgumentException("Message content cannot be empty");
-        }
-        if (message.getContent().length() > 255) {
-            throw new IllegalArgumentException("Message content cannot exceed 255 characters");
-        }
+    @Override
+    public void deleteByChannelId(UUID channelID) {
+        messageRepository.deleteByChannelId(channelID);
     }
+
 }
