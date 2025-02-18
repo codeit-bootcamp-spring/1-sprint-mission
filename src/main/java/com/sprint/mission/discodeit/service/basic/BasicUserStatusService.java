@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserStatusValidator;
@@ -33,7 +32,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus find(UUID id) {
-        UserStatus findUserStatus = userStatusRepository.findOne(id);
+        UserStatus findUserStatus = userStatusRepository.find(id);
         Optional.ofNullable(findUserStatus)
                 .orElseThrow(() -> new NoSuchElementException("해당 UserStatus 가 없습니다."));
 
@@ -51,8 +50,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus findUserStatus = userStatusRepository.findOne(userStatusUpdateDTO.getId());
+    public UserStatus update(UUID userId, UserStatusUpdateDTO userStatusUpdateDTO) {
+        UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("해당 userid:" + userId + "의 UserStatus 가 없습니다."));
         findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getTime());
         userStatusRepository.update(findUserStatus);
         return findUserStatus;

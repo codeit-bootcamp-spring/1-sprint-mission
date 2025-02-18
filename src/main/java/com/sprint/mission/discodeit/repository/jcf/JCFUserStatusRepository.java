@@ -22,7 +22,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findOne(UUID id) {
+    public UserStatus find(UUID id) {
         return data.get(id);
     }
 
@@ -49,4 +49,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         data.remove(id);
         return id;
     }
+
+    @Override
+    public void deleteByUserId(UUID userId){
+        findByUserId(userId).ifPresent(uS -> delete(uS.getId()));
+    }
+
 }

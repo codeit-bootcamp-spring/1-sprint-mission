@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.message.MessageServiceCreateDTO;
-import com.sprint.mission.discodeit.dto.message.MessageServiceUpdateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
 
 import java.util.List;
@@ -13,10 +12,10 @@ public interface MessageService {
 
 
     //서비스 로직
-    UUID create(MessageServiceCreateDTO messageServiceCreateDTO);
+    UUID create(MessageCreateDTO messageCreateDTO);
     Message find(UUID id);
     List<Message> findAll();
     List<Message> findAllByChannelId(UUID ChannelId);
-    Message update(MessageServiceUpdateDTO messageServiceUpdateDTO);
+    Message update(UUID id, MessageUpdateDTO messageUpdateDTO);
     UUID delete(UUID id);
 }

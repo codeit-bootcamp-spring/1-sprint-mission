@@ -38,18 +38,10 @@ public class User implements Serializable {
     }
 
     //validator 에서 중복 검사 했으니 그냥 set만 하면 될듯
-    public void setUser(String username, String email) {
-        if(username !=null && !username.equals(this.username)){
-            this.username = username;
-        } else{
-            throw new IllegalArgumentException("입력한 Username: "+username+"이 기존 값과 같습니다.");
-        }
-
-        if(email !=null && !email.equals(this.email)) {
-            this.email = email;
-        } else{
-            throw new IllegalArgumentException("입력한 email: "+email+"이 기존 값과 같습니다.");
-        }
+    public void setUser(String username, String email, String password) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
         setUpdatedAt();
     }
 

@@ -15,15 +15,18 @@ public class JCFMessageRepository implements MessageRepository {
         data = new HashMap<>();
     }
 
+    @Override
     public UUID save(Message message) {
         data.put(message.getId(), message);
         return message.getId();
     }
 
+    @Override
     public Message findOne(UUID id) {
         return data.get(id);
     }
 
+    @Override
     public List<Message> findAll() {
         return new ArrayList<>(data.values());
     }
@@ -35,13 +38,22 @@ public class JCFMessageRepository implements MessageRepository {
         return new ArrayList<>(list);
     }
 
+    @Override
     public UUID update(Message message){
         data.put(message.getId(), message);
         return message.getId();
     }
 
+    @Override
     public UUID delete(UUID id) {
         data.remove(id);
         return id;
     }
+
+    @Override
+    public void deleteByChannelId(UUID channelId){
+        findAllByChannelId(channelId)
+                .forEach(message -> delete(message.getId()));
+    }
+
 }

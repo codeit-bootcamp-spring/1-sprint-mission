@@ -19,7 +19,6 @@ public class Channel implements Serializable {
     private String name;
     private String description;
     private ChannelType type;
-    private List<UUID> userIds;
 
     public Channel(String name, String description, ChannelType type) {
         this.id = UUID.randomUUID();
@@ -28,11 +27,6 @@ public class Channel implements Serializable {
         this.name = name;
         this.description = description;
         this.type = type;
-        userIds = new ArrayList<>();
-    }
-
-    public void addUsers(UUID userId) {
-        userIds.add(userId);
     }
 
     public void setUpdatedAt() {

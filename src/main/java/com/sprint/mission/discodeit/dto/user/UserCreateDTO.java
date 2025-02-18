@@ -5,15 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserServiceUpdateDTO {
-    private UUID id;
-    private String name;
-    private String email;
-    private MultipartFile file;
+public class UserCreateDTO {
+
+    public String username;
+    public String email;
+    public String password;
+    public MultipartFile file;
+
 }
