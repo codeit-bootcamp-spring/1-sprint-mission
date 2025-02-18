@@ -76,9 +76,10 @@ public class BasicChannelService implements ChannelService {
         Instant time = readStatusRepository.findLatestTimeByChannelId(uuid);
 
         //private일 때 userIdList 생성, Public시 null list
+        //이 아이디리스트는 readStatus에서 찾아야함.
         List<UUID> userIdList = null;
         if(channel.getType()==ChannelType.PRIVATE){
-            userIdList = userRepository.findAllUserIdByChannelId(uuid);
+            userIdList = readStatusRepository.findAllUserIdByChannelId(uuid);
         }
         ChannelFindDTO channelFindDTO = new ChannelFindDTO(channel, time, userIdList);
         return channelFindDTO;

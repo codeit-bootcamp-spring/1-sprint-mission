@@ -14,10 +14,6 @@ public class UserStatusController {
     public UserStatusController(UserStatusService userStatusService) {
         this.userStatusService = userStatusService;
     }
-//
-//    @PostMapping ("/{id}")
-//    public String updateUserStatus(@GetMapping("id") {
-//
-//    }
+
 
 }

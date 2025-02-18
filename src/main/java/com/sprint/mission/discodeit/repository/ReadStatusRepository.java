@@ -19,4 +19,6 @@ public interface ReadStatusRepository {
     Instant findLatestTimeByChannelId(UUID channeId);
 
     void deleteByChannelId(UUID id);
+
+    List<UUID> findAllUserIdByChannelId(UUID uuid);
 }

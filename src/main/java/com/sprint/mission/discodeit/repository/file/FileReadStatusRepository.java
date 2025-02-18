@@ -30,6 +30,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<UUID> findAllUserIdByChannelId(UUID uuid) {
+        return List.of();
+    }
+
+    @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return List.of();
     }

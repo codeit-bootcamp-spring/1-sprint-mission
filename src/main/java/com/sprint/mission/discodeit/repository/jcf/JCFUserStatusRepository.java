@@ -63,6 +63,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
                 .anyMatch(userStatus -> userStatus.getUserId().equals(userId));
     }
 
+
+
     @Override
     public void delete(UUID id) {
         userStatusMap.remove(id);

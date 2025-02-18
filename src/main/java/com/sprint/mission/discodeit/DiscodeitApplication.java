@@ -45,10 +45,7 @@ public class DiscodeitApplication {
 		return user;
 	}
 
-//	static Channel setupChannel(ChannelService channelService) {
-//		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널", new ArrayList<>(userRepository.load().values())), ChannelType.PUBLIC);
-//		return channel;
-//	}
+
 
 //	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 //		Message message = messageService.createMessage(author.getId(), channel.getId(), "안녕하세요");
@@ -72,20 +69,26 @@ public class DiscodeitApplication {
 		//셋업
 		User user = setupUser(userService);
 
-//		System.out.println(userService.findUserDTO(user.getId()));
-//		System.out.println(userService.isNameExist(user.getUserName()));
-//
-//		List<UUID> userList = new ArrayList<>();
-//		userList.add(user.getId());
-//
-//		//Channel channel = setupChannel(channelService);
-//		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널",userList), ChannelType.PUBLIC);
-//		System.out.println(channelService.readChannel(channel.getId()) + " " + channel.getChannelName());
-//
-//		System.out.println(channelService.findDTO(channel.getId()) + " " + channel.getChannelName());
-//
-//		channelService.deleteChannel(channel.getId());
-//		System.out.println(channelService.readAllChannel());
+
+		List<UUID> publicUserList =	new ArrayList<>();
+		List<UUID> privateUserList =	new ArrayList<>();
+
+		publicUserList = userRepository.load().values()
+				.stream()
+				.map(user1 -> user1
+						.getId())
+				.toList();
+
+		privateUserList = userRepository.load().values()
+				.stream()
+				.filter(u->u.getUserName().equals("김이박"))
+				.map(user1 -> user1
+						.getId())
+				.toList();
+
+		Channel PBChannel = new Channel(new ChannelCreateDTO("공개 채널", publicUserList), ChannelType.PUBLIC);
+		Channel PVChannel = new Channel(new ChannelCreateDTO("비공개 채널", privateUserList), ChannelType.PRIVATE);
+
 
 
 	}

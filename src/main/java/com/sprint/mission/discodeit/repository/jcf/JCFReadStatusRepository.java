@@ -54,6 +54,18 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
 
     @Override
+    public List<UUID> findAllUserIdByChannelId(UUID channelId) {
+        List<UUID> readStatusListByChannelId = readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .map(ReadStatus::getUserId)
+                .toList();
+        if (readStatusListByChannelId.isEmpty()) {
+            throw new IllegalArgumentException("해당 채널에 대한 객체가 존재하지 않습니다.");
+        }
+        return readStatusListByChannelId;
+    }
+
+    @Override
     public Instant findLatestTimeByChannelId(UUID channeId) {
             return
                     readStatusMap.values().stream()
