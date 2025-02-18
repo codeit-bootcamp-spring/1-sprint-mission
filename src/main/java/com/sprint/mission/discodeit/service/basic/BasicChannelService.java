@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.PrivateChannelModificationException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -78,7 +79,7 @@ public class BasicChannelService implements ChannelService {
     public void updateChannel(UUID channelId, ChannelDto channelDto) {
         Channel channel = channelRepository.findById(channelId);
         if (channel.getType() == ChannelType.PRIVATE) {
-            throw new UnsupportedOperationException("private 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelModificationException("private 채널은 수정할 수 없습니다.");
         }
 
         channel.updateName(channelDto.name());
