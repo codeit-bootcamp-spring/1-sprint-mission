@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -31,7 +30,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
 
     @Override
-    public UserResponse createUser(UserRequest request) {
+    public UserResponse createUser(UserRequest request, MultipartFile userProfileImage) {
         if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email()) && userValidator.isValidPassword(request.password())) {
 
             User newUser = User.createUser(request.name(), request.email(), request.password());
@@ -39,9 +38,8 @@ public class BasicUserService implements UserService {
 
             UserStatus newUserStatus = userStatusService.create(newUser.getId());
 
-            MultipartFile userProfileImg = request.file();
-            if (userProfileImg != null) {
-                binaryContentService.createUserProfileFile(userProfileImg, newUser.getId());
+            if (userProfileImage != null) {
+                binaryContentService.createUserProfileFile(userProfileImage, newUser.getId());
             }
 
             log.info("Create User: {}", newUser);
@@ -64,7 +62,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void update(UUID id, UserRequest request) {
+    public UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage) {
         User user = findByIdOrThrow(id);
         String newName = null;
         String newEmail = null;
@@ -73,20 +71,20 @@ public class BasicUserService implements UserService {
         if (request.name() != null && userValidator.isValidName(request.name())) {
             newName = request.name();
         }
-        if (request.email() != null && userValidator.isValidEmail(request.name())) {
+        if (request.email() != null && userValidator.isValidEmail(request.email())) {
             newEmail = request.email();
         }
-        if (request.password() != null && userValidator.isValidPassword(request.name())) {
+        if (request.password() != null && userValidator.isValidPassword(request.password())) {
             newPassword = request.password();
         }
         user.update(newName, newEmail, newPassword);
         userRepository.save(user);
 
-        MultipartFile userProfileImg = request.file();
-        if (userProfileImg != null) {
-            binaryContentService.updateUserProfileFile(userProfileImg, id);
+        if (userProfileImage != null) {
+            binaryContentService.updateUserProfileFile(userProfileImage, id);
         }
         log.info("Update User :{}", user);
+        return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
     }
 
     @Override
@@ -102,5 +100,4 @@ public class BasicUserService implements UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("User does not exist"));
     }
-
 }

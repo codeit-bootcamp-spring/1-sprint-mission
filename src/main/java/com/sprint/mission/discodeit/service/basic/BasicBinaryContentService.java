@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class BasicBinaryContentService implements BinaryContentService {
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.MESSAGE, messageId
         );
-        log.info("Create Message file : {}", newFile.getId());
+        log.info("Create Message Files : {}", newFile);
         return binaryContentRepository.save(newFile);
     }
 
@@ -47,14 +48,14 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public BinaryContent findByIdOrThrow(UUID id) {
         return binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("File does not exists"));
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return binaryContentRepository.findAllByIdIn(ids);
+        return ids.stream().map(this::findByIdOrThrow).collect(Collectors.toList());
     }
 
     @Override

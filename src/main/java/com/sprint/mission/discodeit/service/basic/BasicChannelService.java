@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelRequest;
 import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.dto.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -48,7 +50,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(newChannel);
 
         for (UUID userId : request.joinUsers()) {
-            readStatusService.create(userId, newChannel.getId());
+            readStatusService.create(new ReadStatusRequest(userId, newChannel.getId()));
         }
 
         log.info("Create Private Channel: {}", newChannel);
@@ -111,6 +113,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     private List<UUID> findJoinUsersById(UUID id) {
-        return readStatusService.findAllByChannelId(id).stream().map(ReadStatus::getUserId).collect(Collectors.toList());
+        return readStatusService.findAllByChannelId(id).stream().map(ReadStatusResponse::channelId).collect(Collectors.toList());
     }
 }

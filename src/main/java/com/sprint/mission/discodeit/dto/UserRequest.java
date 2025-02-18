@@ -7,8 +7,7 @@ import java.util.UUID;
 public record UserRequest(
         String name,
         String email,
-        String password,
-        MultipartFile file
+        String password
 ) {
 
     public record Login(
