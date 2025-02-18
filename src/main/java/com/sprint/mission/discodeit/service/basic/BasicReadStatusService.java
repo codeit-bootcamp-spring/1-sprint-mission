@@ -48,9 +48,9 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateDTO readStatusUpdateDTO) {
-        ReadStatus findReadStatus = readStatusRepository.findOne(readStatusUpdateDTO.getId());
-        findReadStatus.updateReadStatus(readStatusUpdateDTO.getTime());
+    public ReadStatus update(UUID id, ReadStatusUpdateDTO dto) {
+        ReadStatus findReadStatus = readStatusRepository.findOne(id);
+        findReadStatus.updateReadStatus(dto.getTime());
         readStatusRepository.update(findReadStatus);
         return findReadStatus;
     }

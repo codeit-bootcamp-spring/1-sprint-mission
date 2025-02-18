@@ -20,7 +20,6 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentValidator binaryContentValidator;
 
     @Override
     public UUID create(BinaryContentCreateDTO dto) {

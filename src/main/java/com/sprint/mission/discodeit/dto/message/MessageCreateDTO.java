@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageServiceCreateDTO {
+public class MessageCreateDTO {
 
     private String content;
     private UUID userId;

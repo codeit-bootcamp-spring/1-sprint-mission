@@ -16,7 +16,6 @@ public class UserStatus implements Serializable {
     private Instant updatedAt;
 
     private UUID userId;
-    private UserStatusType type;
     private Instant lastActiveAt;
 
     public UserStatus(UUID userId) {
@@ -25,7 +24,6 @@ public class UserStatus implements Serializable {
         this.updatedAt = Instant.now();
 
         this.userId = userId;
-        type = UserStatusType.ONLINE;
         lastActiveAt = Instant.now();
 
     }
@@ -42,10 +40,8 @@ public class UserStatus implements Serializable {
     //마지막 접속 시간이 현재 시간으로부터 5분 이내이면 현재 접속 중인 유저로 간주
     public boolean isOnline() {
         if(Duration.between(lastActiveAt, Instant.now()).toMinutes() < 5){
-            type = UserStatusType.ONLINE;
             return true;
         }else{
-            type = UserStatusType.OFFLINE;
             return false;
         }
 

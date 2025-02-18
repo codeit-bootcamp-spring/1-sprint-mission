@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
-import com.sprint.mission.discodeit.dto.auth.AuthServiceLoginDTO;
+import com.sprint.mission.discodeit.dto.auth.AuthLoginDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -17,7 +17,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public User login(AuthServiceLoginDTO dto){
+    public User login(AuthLoginDTO dto){
     return userRepository.findAll().stream()
                 .filter(user -> user.getUsername().equals(dto.getUsername())
                         && user.getPassword().equals(dto

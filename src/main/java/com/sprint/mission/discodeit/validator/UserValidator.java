@@ -22,10 +22,11 @@ public class UserValidator {
         checkDuplicateUser(username, email);
     }
 
-    public void validateUpdateUser(UUID userId, String username, String email){
+    public void validateUpdateUser(UUID userId, String username, String email, String password){
         validateUserId(userId);
         validateUsername(username);
         validateEmail(email);
+        validatePassword(password);
         checkDuplicateUser(username, email);
     }
 

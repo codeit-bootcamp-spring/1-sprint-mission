@@ -9,7 +9,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageServiceUpdateDTO {
-    private UUID id;
+public class MessageUpdateDTO {
     private String content;
 }
