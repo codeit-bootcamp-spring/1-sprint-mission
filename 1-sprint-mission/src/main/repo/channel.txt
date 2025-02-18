@@ -3,7 +3,7 @@
     "channelName" : "중식",
     "channelType" : "PUBLIC",
     "createdAt" : "1970-01-01T00:00:00Z",
-    "messageList" : [ "f07e7865-dc12-4bf1-95ec-da7b9743ab40" ],
+    "messageList" : [ ],
     "readStatus" : { },
     "updatedAt" : "1970-01-01T00:00:00Z",
     "userList" : {
