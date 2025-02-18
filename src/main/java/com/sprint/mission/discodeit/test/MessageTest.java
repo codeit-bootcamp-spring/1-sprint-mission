@@ -1,101 +1,71 @@
 package com.sprint.mission.discodeit.test;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.messageDto.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.messageDto.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.messageDto.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.view.DisplayChannel;
 import com.sprint.mission.discodeit.view.DisplayMessage;
+import lombok.RequiredArgsConstructor;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class MessageTest {
 
+    private static int messageIndex = 1;
+
+    private final MessageService messageService;
+    private final ChannelService channelService;
+    private final UserService userService;
+
     // 메시지 생성
-    public static Message setUpMessage(Channel channel, UUID writerId, MessageService messageService, ChannelService channelService, UserService userService) throws IOException {
+    public UUID setUpMessage(UUID channelId, UUID writerId) throws IOException {
 
-//        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//
-//        System.out.println("메시지 내용 입력 :");
-//        String context = br.readLine();
+        String context = "테스트용 메시지" + (messageIndex++);
 
-        String context = "테스트용 메시지입니다.";
+        CreateMessageRequestDto message = new CreateMessageRequestDto(channelId, writerId, context, null);
 
-        Message message = new Message(channel, context, writerId);
-
-        messageService.craete(message);
+        UUID id = messageService.create(message);
 
         System.out.println("================================================================================");
         System.out.println("메시지 생성 결과 : ");
-        DisplayMessage.displayMessage(message, userService, channelService);
+        DisplayMessage.displayMessage(messageService.find(id), userService, channelService);
         System.out.println("================================================================================");
 
-        return message;
+        return id;
     }
-
+    
     // 메시지 수정
-    public static void updateMessage(UUID id, MessageService messageService, ChannelService channelService, UserService userService) throws IOException {
+    public void updateMessage(UUID id) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String context = "수정된 메시지";
 
+        UpdateMessageRequestDto updateMessageRequestDto = new UpdateMessageRequestDto(id, context);
 
-        loopOut:
-        while (true) {
-            System.out.println("================================================================================");
-            System.out.println("1. 현재 메시지 정보 확인");
-            System.out.println("2. 메시지 내용 변경");
-            System.out.println("3. 종료");
-            System.out.println("================================================================================");
+        messageService.updateContext(updateMessageRequestDto);
 
-            String menu = br.readLine();
-
-            Message message = messageService.read(id);
-
-            try {
-                switch (menu) {
-                    case "1":
-                        System.out.println("================================================================================");
-                        System.out.println("현재 정보 : ");
-                        DisplayMessage.displayMessage(message, userService, channelService);
-                        System.out.println("================================================================================");
-                        break;
-
-                    case "2":
-                        System.out.println("메시지 입력 :");
-                        String context = br.readLine();
-                        messageService.updateContext(id, context);
-                        break;
-
-                    case "3":
-                        System.out.println("종료합니다.");
-                        break loopOut;
-
-                    default:
-                        System.out.println("1 ~ 3 중 하나를 선택해주세요.");
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
+        System.out.println("================================================================================");
+        System.out.println("메시지 수정 결과 : ");
+        DisplayMessage.displayMessage(messageService.find(id), userService, channelService);
+        System.out.println("================================================================================");
     }
-
+    
     // 메시지 삭제
-    public static void deleteMessage(UUID id, MessageService messageService, ChannelService channelService, UserService userService) {
+    public void deleteMessage(UUID id, UUID channelId) {
 
         System.out.println("================================================================================");
         System.out.println("메시지 삭제 전 목록 :");
-        DisplayMessage.displayAllMessage(messageService.readAll(), userService, channelService);
+        DisplayMessage.displayAllMessage(messageService.findAllByChannelId(channelId), userService, channelService);
         System.out.println("================================================================================");
 
         messageService.delete(id);
 
         System.out.println("================================================================================");
         System.out.println("메시지 삭제 후 목록 :");
-        DisplayMessage.displayAllMessage(messageService.readAll(), userService, channelService);
+        DisplayMessage.displayAllMessage(messageService.findAllByChannelId(channelId), userService, channelService);
         System.out.println("================================================================================");
     }
 }

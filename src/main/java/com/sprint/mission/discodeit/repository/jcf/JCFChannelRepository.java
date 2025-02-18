@@ -15,7 +15,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public void save(Channel channel) {
 
-        channelData.save(channel);
+       channelData.save(channel);
     }
 
     // 데이터 가져오기

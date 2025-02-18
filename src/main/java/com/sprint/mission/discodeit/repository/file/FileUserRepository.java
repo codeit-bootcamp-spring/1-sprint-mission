@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,13 +20,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileUserRepository implements UserRepository, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     // 변경 가능성 없으므로 객체 생성 시 멤버 변수로 초기화
-    private final Path userDirectory = Paths.get(System.getProperty("user.dir"), "user");
+    private final Path userDirectory = Paths.get(System.getProperty("user.dir"), "/data/user");
 
     public FileUserRepository() {
         init();

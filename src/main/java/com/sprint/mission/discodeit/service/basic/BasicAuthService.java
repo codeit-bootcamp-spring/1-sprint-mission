@@ -1,0 +1,33 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.authDto.LoginDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class BasicAuthService implements AuthService {
+
+    private final UserRepository userRepository;
+
+    @Override
+    public User login(LoginDto loginDto) {
+        return checkAccount(loginDto.name(), loginDto.password());
+    }
+
+    private User checkAccount(String name, String password) {
+        User user = userRepository.load().values().stream()
+                .filter(u -> u.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        if (user.getPassword().toString().equals(password)) {
+            return user;
+        } else {
+            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+        }
+    }
+}
