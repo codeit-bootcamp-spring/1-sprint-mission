@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.exception;
 
-public class DuplicateException extends RuntimeException {
-    public DuplicateException(String message) {
-        super(message);
-    }
+import org.springframework.http.HttpStatus;
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+public class DuplicateException extends ExpectedException {
+    public DuplicateException(String message) {
+        super(HttpStatus.CONFLICT, message);
     }
 }

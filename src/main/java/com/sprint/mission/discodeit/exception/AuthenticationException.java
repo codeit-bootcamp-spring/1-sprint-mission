@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.exception;
 
-public class AuthenticationException extends RuntimeException {
-    public AuthenticationException(String message) {
-        super(message);
-    }
+import org.springframework.http.HttpStatus;
 
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-      return this;
+public class AuthenticationException extends ExpectedException {
+    public AuthenticationException(String message) {
+        super(HttpStatus.UNAUTHORIZED, message);
     }
 }

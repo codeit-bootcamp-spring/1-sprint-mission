@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.exception;
 
-public class FileIOException extends RuntimeException {
-    public FileIOException(String msg) {
-        super(msg);
-    }
+import org.springframework.http.HttpStatus;
 
-//    @Override
-//    public synchronized Throwable fillInStackTrace() {
-//        return this;
-//    }
+public class FileIOException extends ExpectedException {
+    public FileIOException(String msg) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, msg);
+    }
 }
