@@ -1,38 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.security.Encryptor;
-import com.sprint.mission.discodeit.util.Identifiable;
+import lombok.Getter;
 import java.io.Serializable;
+import java.util.Objects;
+import java.util.Optional;
 
-public class User extends BaseEntity implements Serializable, Identifiable {
+@Getter
+public class User extends BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
-  private final Encryptor encryptor;
-  private transient String password;
+  private transient String enctyptedPassword;
+  private String salt;
   private String name;
+  private String email;
+  private Optional<BinaryContent> profileImage;
   
-  public User(String password, String name, Encryptor encryptor) {
+  public User(String encryptedPassword, String salt, String name, String email,
+              Optional<BinaryContent> profileImage) {
     super();
-    this.password = encryptor.getEncryptedPassword(password);
+    this.enctyptedPassword = Objects.requireNonNull(encryptedPassword, "password cannot be null");
+    this.salt = Objects.requireNonNull(salt, "salt cannot be null");;
     this.name = name;
-    this.encryptor = encryptor;
+    this.email = email;
+    this.profileImage = profileImage;
   }
   
-  public String getPassword() {
-    return password;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public void updatePassword(String password) {
-    this.password = encryptor.getEncryptedPassword(password);
+  public void updatePassword(String enctyptedPassword, String salt) {
+    this.enctyptedPassword = Objects.requireNonNull(enctyptedPassword, "password cannot be null");
+    this.salt = Objects.requireNonNull(salt, "salt cannot be null");;
     super.update();
   }
   
   public void updateName(String name) {
     this.name = name;
     super.update();
+  }
+  
+  public void updateProfileImage(Optional<BinaryContent> newImage) {
+    this.profileImage = newImage;
   }
 }
 

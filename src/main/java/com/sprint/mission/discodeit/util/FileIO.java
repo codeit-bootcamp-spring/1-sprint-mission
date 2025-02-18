@@ -1,99 +1,72 @@
 package com.sprint.mission.discodeit.util;
 
-import java.io.*;
+import org.springframework.stereotype.Component;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+@Component
 public class FileIO {
-  
-  public void initFile(File file) {
-    try {
-      if (!file.exists()) {
-        file.createNewFile();
-      }
-    } catch (Exception e) {
-      throw new RuntimeException("파일 초기화에 문제가 생겼습니다.");
-    }
-  }
-  
-  public List<Serializable> loadFile(File file) {
-    List<Serializable> objects = new ArrayList<>();
-    while (true) {
-      try (FileInputStream fis = new FileInputStream(file);
-           ObjectInputStream ois = new ObjectInputStream(fis)) {
-        Serializable object = (Serializable) ois.readObject();
-        objects.add(object);
-      } catch (EOFException e) {
-        break;
-      } catch (IOException | ClassNotFoundException e) {
-        throw new RuntimeException(e);
-      }
-    }
-    return objects;
-  }
-  
-  public void saveToFile(File file, Serializable object) throws FileNotFoundException {
-    try (FileOutputStream fos = new FileOutputStream(file);
-         ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+  public void saveToFile(File file, Serializable object) {
+    try (
+        FileOutputStream fos = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
       oos.writeObject(object);
     } catch (IOException e) {
-      throw new RuntimeException("파일에 저장 중 문제가 발생했습니다.", e);
+      throw new RuntimeException("파일 저장 중 오류 발생: " + file, e);
     }
   }
   
-  public void updateFile(File file, List<Serializable> objects) {
-    File tempFile = new File("temp.ser");
-    
-    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
-         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tempFile))) {
-      while (true) {
-        try {
-          Identifiable obj = (Identifiable) ois.readObject();
-        } catch (EOFException e) {
-          break;
-        }
-      }
-      
-      if (!file.delete() || !tempFile.renameTo(file)) {
-        throw new RuntimeException("파일 업데이트 중 문제가 발생했습니다.");
-      }
-      
-      for (Serializable object : objects) {
-        oos.writeObject(object);
-      }
-      
+  public <T> T loadFromFile(File file, Class<T> type) {
+    if (!file.exists()) {
+      throw new NoSuchElementException("file not found: " + file);
+    }
+    try (
+        FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis)
+    ) {
+      return type.cast(ois.readObject());
     } catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("파일 로드 중 오류 발생: " + file, e);
     }
   }
   
-  public void removeObjectFromFile(File originalFile, Identifiable object) {
-    File tempFile = new File("temp.ser");
-    
-    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(originalFile));
-         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(tempFile))) {
-      List<Identifiable> objects = new ArrayList<>();
-      while (true) {
-        try {
-          Identifiable obj = (Identifiable) ois.readObject();
-          objects.add(obj);
-        } catch (EOFException e) {
-          break;
-        }
-      }
-      
-      for (Identifiable obj : objects) {
-        if (!obj.getId().equals(object.getId())) {
-          oos.writeObject(obj);
-        }
-      }
-    } catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException(e);
+  public <T> List<T> loadAllFromDirectory(Path directory, String extension, Class<T> type) {
+    List<T> result = new ArrayList<>();
+    if (!Files.exists(directory)) {
+      return result;
     }
-    
-    if (!originalFile.delete() || !tempFile.renameTo(originalFile)) {
-      throw new RuntimeException(object + " 제거 중 문제가 발생했습니다.");
+    try {
+      Files.list(directory)
+          .filter(path -> path.toString().endsWith(extension))
+          .forEach(path -> {
+            T t = loadFromFile(path.toFile(), type);
+            result.add(t);
+          });
+    } catch (IOException e) {
+      throw new RuntimeException("디렉터리에서 파일 로드 중 오류 발생: " + directory, e);
     }
+    return result;
   }
   
+  public void deleteFile(File file) {
+    if (!file.exists()) {
+      return;
+    }
+    try {
+      Files.delete(file.toPath());
+    } catch (IOException e) {
+      throw new RuntimeException("파일 삭제 중 오류 발생: " + file, e);
+    }
+  }
 }

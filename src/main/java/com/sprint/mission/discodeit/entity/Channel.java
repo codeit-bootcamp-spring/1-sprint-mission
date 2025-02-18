@@ -1,33 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.Identifiable;
+import com.sprint.mission.discodeit.entity.constant.ChannelType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class Channel extends BaseEntity implements Serializable, Identifiable {
+@Getter
+@AllArgsConstructor
+public class Channel extends BaseEntity implements Serializable {
   private static final long serialVersionUID = 1L;
-  private final User owner;
+  private final UUID ownerId;
+  private ChannelType type;
   private String name;
-  private List<User> members;
+  private String description;
+  private List<UUID> memberIds;
   
-  public Channel(String name, User owner, List<User> members) {
-    super();
+  // public channel
+  public Channel(UUID ownerId, String name, String description) {
     this.name = name;
-    this.owner = owner;
-    this.members = members;
+    this.description = description;
+    this.type = ChannelType.PUBLIC;
+    this.ownerId = null;
   }
   
-  public User getOwner() {
-    return owner;
+  // private channel
+  public Channel(UUID ownerId, List<UUID> memberIds) {
+    this.ownerId = ownerId;
+    this.type = ChannelType.PRIVATE;
+    this.memberIds = memberIds;
   }
   
-  public String getName() {
-    return name;
+  public static Channel ofPublic(UUID ownerId, String name, String description) {
+    return new Channel(ownerId, name, description);
   }
   
-  public List<Identifiable> getMembers() {
-    return new ArrayList<>(members);
+  public static Channel ofPrivate(UUID ownerId, List<UUID> memberIds) {
+    return new Channel(ownerId, memberIds);
   }
   
   public void updateName(String name) {
@@ -35,8 +45,8 @@ public class Channel extends BaseEntity implements Serializable, Identifiable {
     super.update();
   }
   
-  public void updateMembers(List<User> members) {
-    this.members = members;
+  public void updateMembers(List<UUID> memberIds) {
+    this.memberIds = memberIds;
     super.update();
   }
   

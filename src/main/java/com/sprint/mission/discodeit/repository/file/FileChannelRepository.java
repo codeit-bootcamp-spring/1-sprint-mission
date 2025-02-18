@@ -5,63 +5,57 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.FileIO;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Serializable;
-import java.util.ArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-  private static final File file = new File("resources/channels.ser");
-  private UserRepository userRepository;
-  private MessageRepository messageRepository;
-  private FileIO fileIO;
-  private List<Channel> channels = new ArrayList<>();
+  private final Path DIRECTORY = Paths.get("repository-data", "channels");
+  private final String EXTENSION = ".ser";
+  private final FileIO fileIO;
+  private final UserRepository userRepository;
+  private final MessageRepository messageRepository;
   
-  private void loadAllChannels() {
-    fileIO.initFile(file);
-    List<Serializable> serializables = fileIO.loadFile(file);
-    channels = serializables.stream()
-        .filter(Channel.class::isInstance)
-        .map(Channel.class::cast)
-        .toList();
-  }
-  
-  @Override
-  public Optional<Channel> findChannelById(UUID id) {
-    return channels.stream().filter(c -> c.getId().equals(id)).findFirst();
-  }
-  
-  @Override
-  public Optional<Channel> findChannelByName(String name) {
-    return channels.stream().filter(c -> c.getName().equals(name)).findFirst();
-  }
-  
-  @Override
-  public List<Channel> findAllChannels() {
-    return channels.stream().toList();
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
   
   @Override
   public void save(Channel channel) {
-    try {
-      fileIO.saveToFile(file, channel);
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    }
+    File file = resolvePath(channel.getId()).toFile();
+    fileIO.saveToFile(file, channel);
   }
   
   @Override
-  public void updateRepository(Channel channel) {
+  public Optional<Channel> findById(UUID id) {
+    File file = resolvePath(id).toFile();
+    return Optional.ofNullable(fileIO.loadFromFile(file, Channel.class));
+  }
   
+  @Override
+  public Optional<Channel> findByName(String name) {
+    return findAll().stream().filter(c -> c.getName().equals(name)).findFirst();
+  }
+  
+  @Override
+  public List<Channel> findAll() {
+    return fileIO.loadAllFromDirectory(DIRECTORY, EXTENSION, Channel.class);
   }
   
   @Override
   public void remove(UUID id) {
-    Channel channel = findChannelById(id).orElse(null);
-    fileIO.removeObjectFromFile(file, channel);
+    File file = resolvePath(id).toFile();
+    if (file.exists()) {
+      file.delete();
+    }
   }
-  
 }

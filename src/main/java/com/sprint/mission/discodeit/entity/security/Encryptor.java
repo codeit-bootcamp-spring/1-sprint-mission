@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.entity.security;
 
+import org.springframework.stereotype.Service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
+@Service
 public class Encryptor {
-  private static String getSalt() {
+  public  String getSalt() {
     SecureRandom random = new SecureRandom();
     byte[] salt = new byte[20];
     random.nextBytes(salt);
@@ -16,9 +18,9 @@ public class Encryptor {
     return sb.toString();
   }
   
-  public String getEncryptedPassword(String password) {
+  public  String encryptPassword(String password, String salt) {
     String result = "";
-    String salt = getSalt();
+    
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       
@@ -26,7 +28,7 @@ public class Encryptor {
       md.update((password + salt).getBytes());
       byte[] bytes = md.digest();
       
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       for (byte b : bytes) {
         sb.append(String.format("%02x", b));
       }
@@ -36,5 +38,10 @@ public class Encryptor {
       throw new RuntimeException("Encryption algorithm not found", e);
     }
     return result;
+  }
+  
+  public boolean verifyPassword(String inputPassword, String storedEncryptedPassword, String salt) {
+    String encryptedInputPassword = encryptPassword(inputPassword, salt);
+    return encryptedInputPassword.equals(storedEncryptedPassword);
   }
 }
