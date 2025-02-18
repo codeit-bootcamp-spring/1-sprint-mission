@@ -2,11 +2,14 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     private final Map<UUID, Channel> channelList;
@@ -17,7 +20,25 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(Channel channel) {
-        channelList.put(channel.getChannelId(), channel);
+        channelList.put(channel.getId(), channel);
+        return channel;
+    }
+
+    @Override
+    public boolean isChannelExsit(UUID uuid) {
+        Channel channel = channelList.get(uuid);
+        if (channel == null) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Channel findById(UUID id) {
+        Channel channel = channelList.get(id);
+        if (channel == null) {
+            throw new IllegalArgumentException("해당 객체가 존재하지 않습니다.");
+        }
         return channel;
     }
 
@@ -25,6 +46,7 @@ public class JCFChannelRepository implements ChannelRepository {
     public Map<UUID, Channel> load() {
         return channelList;
     }
+
 
     @Override
     public void delete(UUID id) {

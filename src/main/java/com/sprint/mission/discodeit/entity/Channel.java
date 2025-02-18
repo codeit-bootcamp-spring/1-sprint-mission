@@ -1,37 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
-import java.util.ArrayList;
-import java.util.List;
+
+
+@Getter
+@Setter
 
 public class Channel implements Serializable  {
 
     private static final Long serialVersionUID = 1L;
     private final UUID id ;
+    private final Instant createdAt;
+    private Instant updatedAt;
+
     private String channelName;
-    private final Long createdAt;
-    private Long updatedAt;
+    private ChannelType type;
 
-    public Channel(String channelName){
+    public Channel(ChannelCreateDTO channelCreateDTO, ChannelType type){
         this.id = UUID.randomUUID();
-        this.channelName = channelName;
-        this.createdAt =  System.currentTimeMillis() / 1000; // 초 단위로 변환
+        this.createdAt =  Instant.now();
+        this.updatedAt=createdAt;
+
+        this.channelName = channelCreateDTO.name();
+        this.type = type;
     }
 
-    //get
-    public UUID getChannelId(){
-            return this.id;
-        }
-    public String getChannelName(){
-        return this.channelName;
-    }
-    public Long getCreatedAt(){
-        return this.createdAt;
-    }
-    public Long getUpdatedAt(){
-            return this.updatedAt;
-    }
 
     //update
     public void updateName(String name){
@@ -39,7 +38,7 @@ public class Channel implements Serializable  {
         this.updateUpdatedAt();
     }
     public void updateUpdatedAt(){
-        this.updatedAt=System.currentTimeMillis() /1000; //업데이트 시간
+        this.updatedAt=Instant.now();  //업데이트 시간
     }
 
 

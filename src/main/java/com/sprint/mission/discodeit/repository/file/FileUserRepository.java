@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 
 import java.io.File;
@@ -12,11 +13,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
-
 
     private static final String fileName = "savedata/user.ser";
     private final Map<UUID, User> userList;
@@ -32,6 +33,28 @@ public class FileUserRepository implements UserRepository {
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패 : " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public User findbyId(UUID id) {
+        return userList.get(id);
+    }
+
+    @Override
+    public Boolean existByUserId(UUID userId) {
+        return load().values().stream()
+                .anyMatch(user-> user.getId().equals(userId));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return load().values().stream()
+                .anyMatch(user -> user.getUserName().equals(username));
+    }
+
+    @Override
+    public List<UUID> findAllUserIdByChannelId(UUID uuid) {
+        return List.of();
     }
 
     @Override

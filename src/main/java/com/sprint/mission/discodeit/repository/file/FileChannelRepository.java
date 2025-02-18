@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +17,6 @@ import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
 
-
-
     private static final String fileName = "savedata/channel.ser";
     private final Map<UUID, Channel> channelList;
 
@@ -24,6 +24,14 @@ public class FileChannelRepository implements ChannelRepository {
         this.channelList = load();
     }
 
+    @Override
+    public boolean isChannelExsit(UUID uuid) {
+        Channel channel = channelList.get(uuid);
+        if (channel == null) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public Channel save(Channel channel) {
@@ -33,6 +41,12 @@ public class FileChannelRepository implements ChannelRepository {
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패 : " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Channel findById(UUID id) {
+        load();
+        return channelList.get(id);
     }
 
     @Override
