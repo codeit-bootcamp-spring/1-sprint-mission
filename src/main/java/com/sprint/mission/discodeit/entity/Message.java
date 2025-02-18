@@ -19,7 +19,7 @@ public class Message implements Serializable {                  // 메시지 (�
     private String context;             // 메시지 내용
 
     // 생성자
-    public Message(Channel channel, String context, UUID writerId) {
+    public Message(Channel channel, String context, UUID writerId){
         id = UUID.randomUUID();
         createdAt = System.currentTimeMillis();
 

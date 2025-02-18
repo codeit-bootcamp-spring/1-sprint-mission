@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {// 생성
-
     void craete(Channel channel);
 
     // 읽기
@@ -17,15 +16,12 @@ public interface ChannelService {// 생성
 
     // 수정
     void updateCategory(UUID id, String updateCategory);
-
     void updateName(UUID id, String updateName);
-
     void updateExplanation(UUID id, String updateExplanation);
 
     // 멤버 수정
     // 멤버가 List에 있을 경우 멤버 삭제, 없을 경우 추가
     void addMember(UUID id, UUID memberId);
-
     void deleteMember(UUID id, UUID memberId);
 
     // 삭제

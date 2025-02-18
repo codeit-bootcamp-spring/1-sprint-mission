@@ -14,7 +14,6 @@ public interface MessageService {
 
     // 모두 읽기
     List<Message> readAll();
-
     List<Message> readAll(UUID channelId, ChannelService channelService);
 
     // 수정

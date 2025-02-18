@@ -28,7 +28,7 @@ public class User implements Serializable {             // 유저 정보
 
 
     // 생성자
-    public User(String email, String password, String name, String nickname, String phoneNumber, UserRepository userRepository) {
+    public User(String email, String password, String name, String nickname, String phoneNumber, UserRepository userRepository){
         // 생성자
         // 공통 필드 초기화
         this.id = UUID.randomUUID();
