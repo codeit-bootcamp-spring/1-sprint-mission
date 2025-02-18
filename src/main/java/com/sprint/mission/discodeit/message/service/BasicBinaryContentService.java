@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.message.dto.request.binaryContent.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.message.dto.response.binaryContent.BinaryContentResponse;
 import com.sprint.mission.discodeit.message.entity.BinaryContent;
 import com.sprint.mission.discodeit.message.entity.BinaryContentType;
 import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
@@ -33,7 +32,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 	 * @throws RuntimeException 파일 처리 실패 시
 	 */
 	@Override
-	public BinaryContentResponse create(CreateBinaryContentRequest request) {
+	public BinaryContent create(CreateBinaryContentRequest request) {
 		// 작성자 존재 여부 확인
 		userRepository.findById(request.authorId())
 			.orElseThrow(() -> new IllegalArgumentException("Author not found"));
@@ -55,7 +54,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 			}
 
 			BinaryContent savedContent = binaryContentRepository.save(content);
-			return createBinaryContentResponse(savedContent);
+			return savedContent;
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to process file", e);
 		}
@@ -68,10 +67,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 	 * @throws IllegalArgumentException 바이너리 컨텐츠가 존재하지 않는 경우
 	 */
 	@Override
-	public BinaryContentResponse find(UUID id) {
+	public BinaryContent find(UUID id) {
 		BinaryContent content = binaryContentRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Binary content not found"));
-		return createBinaryContentResponse(content);
+		return content;
 	}
 
 	/**
@@ -81,13 +80,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 	 * @throws IllegalArgumentException 바이너리 컨텐츠가 존재하지 않는 경우
 	 */
 	@Override
-	public List<BinaryContentResponse> findAllByIdIn(List<UUID> ids) {
-		List<BinaryContentResponse> responses = new ArrayList<>();
+	public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+		List<BinaryContent> responses = new ArrayList<>();
 
 		for (UUID id : ids) {
 			BinaryContent content = binaryContentRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("Binary content not found: " + id));
-			responses.add(createBinaryContentResponse(content));
+			responses.add(content);
 		}
 
 		return responses;
@@ -100,24 +99,19 @@ public class BasicBinaryContentService implements BinaryContentService {
 	 * @throws IllegalArgumentException 메시지가 존재하지 않는 경우
 	 */
 	@Override
-	public List<BinaryContentResponse> findAllByMessageId(UUID messageId) {
+	public List<BinaryContent> findAllByMessageId(UUID messageId) {
 		// 메시지 존재 여부 확인
 		messageRepository.findById(messageId)
 			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
 		// 해당 메시지의 모든 첨부파일 조회 및 변환
 		List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
-		List<BinaryContentResponse> responses = new ArrayList<>();
 
-		for (BinaryContent content : contents) {
-			responses.add(createBinaryContentResponse(content));
-		}
-
-		return responses;
+		return contents;
 	}
 
 	/**
-	 * 프로필 사진 변경을 위한 이미지를 삭제합니다
+	 * 프로필 사진 변경 또는 회원 탈퇴를 위한 이미지를 삭제합니다
 	 * @param authorId 사용자의 id
 	 */
 	@Override
@@ -145,14 +139,4 @@ public class BasicBinaryContentService implements BinaryContentService {
 		binaryContentRepository.deleteById(id);
 	}
 
-	/**
-	 * 바이너리 컨텐츠 엔티티를 응답 객체로 변환합니다.
-	 * @param content 바이너리 컨텐츠 엔티티
-	 * @return 바이너리 컨텐츠 응답
-	 */
-	private BinaryContentResponse createBinaryContentResponse(BinaryContent content) {
-		return new BinaryContentResponse(content.getId(), content.getCreatedAt(), content.getAuthorId(),
-			content.getMessageId(), content.getContent(), content.getContentType(), content.getFileName(),
-			content.getFileSize(), content.getBinaryContentType());
-	}
 }

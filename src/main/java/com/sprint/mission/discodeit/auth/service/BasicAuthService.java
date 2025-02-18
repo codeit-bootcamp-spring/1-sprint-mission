@@ -19,7 +19,7 @@ public class BasicAuthService implements AuthService {
 
 	@Override
 	public User login(LoginUserRequest request) {
-		User user = userRepository.findByUserid(request.userId())
+		User user = userRepository.findByUserid(request.userid())
 			.orElseThrow(() -> new IllegalArgumentException("Invalid userid or password"));
 		if (!validatePassword(request.password(), user.getPassword())) {
 			throw new IllegalArgumentException("Invalid userid or password");

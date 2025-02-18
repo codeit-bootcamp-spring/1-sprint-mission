@@ -56,7 +56,7 @@ public class BasicUserStatusService implements UserStatusService {
 	 */
 	@Override
 	public List<UserStatus> findAll() {
-		return userStatusRepository.findAllOnlineUsers();
+		return userStatusRepository.findAll();
 	}
 
 	/**

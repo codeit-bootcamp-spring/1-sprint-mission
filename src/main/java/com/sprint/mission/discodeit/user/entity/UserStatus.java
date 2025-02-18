@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.user.entity;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sprint.mission.discodeit.global.entity.BaseEntity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class UserStatus extends BaseEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private final UUID userId;
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class UserStatus extends BaseEntity {
+	private UUID userId;
 	private Instant lastActiveAt;
 	private UserStatusType statusType;
 

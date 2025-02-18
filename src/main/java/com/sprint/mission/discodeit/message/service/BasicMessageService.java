@@ -1,22 +1,18 @@
 package com.sprint.mission.discodeit.message.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sprint.mission.discodeit.channel.dto.request.channel.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelListResponse;
-import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelResponse;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
 import com.sprint.mission.discodeit.message.dto.request.binaryContent.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.message.dto.request.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.message.dto.request.message.UpdateMessageRequest;
-import com.sprint.mission.discodeit.message.dto.response.binaryContent.BinaryContentResponse;
-import com.sprint.mission.discodeit.message.dto.response.message.MessageResponse;
+import com.sprint.mission.discodeit.message.entity.BinaryContent;
 import com.sprint.mission.discodeit.message.entity.BinaryContentType;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
@@ -48,15 +44,15 @@ public class BasicMessageService implements MessageService {
 	 * @return 생성된 메시지 응답
 	 */
 	@Override
-	public MessageResponse create(CreateMessageRequest request) {
+	public Message create(CreateMessageRequest request) {
 		// 사용자와 채널 존재 여부 확인
 		User author = userService.findUser(request.authorId());
 		// 사용자 online 처리
 		userStatusService.updateByUserId(new UpdateUserStatusRequest(author.getId(), request.createdAt()));
-		ChannelResponse channel = channelService.find(request.channelId());
+		Channel channel = channelService.find(request.channelId());
 		UUID channelId = request.channelId();
 		// 메시지 작성자가 채널 참여자인지 확인
-		if (!channel.participants().containsKey(request.authorId())) {
+		if (!channel.getParticipants().containsKey(request.authorId())) {
 			throw new IllegalArgumentException(
 				"Author is not a participant of the channel: " + request.channelId());
 		}
@@ -67,12 +63,12 @@ public class BasicMessageService implements MessageService {
 			UUID recipientId = request.receiverId(); // 메시지 수신자 ID 가져오기
 
 			// 모든 채널 조회 후 PRIVATE 채널 찾기
-			List<ChannelListResponse> allChannels = channelService.findAllByUserId(request.authorId());
-			for (ChannelListResponse existChannel : allChannels) {
-				if (existChannel.channelType() == ChannelType.PRIVATE &&
-					existChannel.participants().containsKey(author.getId()) &&
-					existChannel.participants().containsKey(recipientId)) {
-					channelId = existChannel.id(); // 기존 채널 사용
+			List<Channel> allChannels = channelService.findAllByUserId(request.authorId());
+			for (Channel existChannel : allChannels) {
+				if (existChannel.getChannelType() == ChannelType.PRIVATE &&
+					existChannel.getParticipants().containsKey(author.getId()) &&
+					existChannel.getParticipants().containsKey(recipientId)) {
+					channelId = existChannel.getId(); // 기존 채널 사용
 					break;
 				}
 			}
@@ -91,7 +87,6 @@ public class BasicMessageService implements MessageService {
 		Message savedMessage = messageRepository.save(message);
 
 		// 첨부파일이 있는 경우 처리
-		List<BinaryContentResponse> attachments = new ArrayList<>();
 		if (request.attachments() != null && !request.attachments().isEmpty()) {
 			for (MultipartFile file : request.attachments()) {
 				CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(
@@ -100,11 +95,11 @@ public class BasicMessageService implements MessageService {
 					file,
 					BinaryContentType.MESSAGE_ATTACHMENT
 				);
-				attachments.add(binaryContentService.create(binaryRequest));
+				binaryContentService.create(binaryRequest);
 			}
 		}
 
-		return MessageResponse.from(savedMessage, attachments);
+		return savedMessage;
 	}
 
 	/**
@@ -113,16 +108,12 @@ public class BasicMessageService implements MessageService {
 	 * @return 메시지 응답
 	 */
 	@Override
-	public MessageResponse findById(UUID messageId) {
+	public Message findById(UUID messageId) {
 		// 메시지 조회
 		Message message = messageRepository.findById(messageId)
 			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
-		// 메시지의 첨부파일 목록 조회
-		List<BinaryContentResponse> attachments = binaryContentService
-			.findAllByMessageId(messageId);
-
-		return MessageResponse.from(message, attachments);
+		return message;
 	}
 
 	/**
@@ -131,18 +122,17 @@ public class BasicMessageService implements MessageService {
 	 * @return 메시지 응답 목록
 	 */
 	@Override
-	public List<MessageResponse> findAllByChannelId(UUID channelId) {
+	public List<Message> findAllByChannelId(UUID channelId) {
 		List<Message> messages = messageRepository.findAllByChannelId(channelId);
-		List<MessageResponse> responses = new ArrayList<>();
 
-		// 각 메시지의 첨부파일 정보를 포함하여 응답 생성 캐싱을 사용해야될까...?
+		/* 각 메시지의 첨부파일 정보를 포함하여 응답 생성 캐싱을 사용해야될까...?
 		for (Message message : messages) {
 			List<BinaryContentResponse> attachments = binaryContentService
 				.findAllByMessageId(message.getId());
 			responses.add(MessageResponse.from(message, attachments));
-		}
+		}*/
 
-		return responses;
+		return messages;
 	}
 
 	/**
@@ -152,7 +142,7 @@ public class BasicMessageService implements MessageService {
 	 * @return 수정된 메시지 응답
 	 */
 	@Override
-	public MessageResponse update(UUID messageId, UpdateMessageRequest request) {
+	public Message update(UUID messageId, UpdateMessageRequest request) {
 		// 메시지 조회 및 내용 업데이트
 		Message message = messageRepository.findById(messageId)
 			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
@@ -160,7 +150,7 @@ public class BasicMessageService implements MessageService {
 		Message updatedMessage = messageRepository.save(message);
 
 		// 기존 메시지에 연결된 첨부파일 목록 조회
-		List<BinaryContentResponse> currentAttachments = binaryContentService.findAllByMessageId(messageId);
+		List<BinaryContent> currentAttachments = binaryContentService.findAllByMessageId(messageId);
 
 		// 삭제할 첨부파일 ID가 존재하면 해당 첨부파일 제거
 		if (request.attachmentsToRemove() != null && !request.attachmentsToRemove().isEmpty()) {
@@ -180,11 +170,11 @@ public class BasicMessageService implements MessageService {
 					file,
 					BinaryContentType.MESSAGE_ATTACHMENT
 				);
-				currentAttachments.add(binaryContentService.create(binaryRequest));
+				binaryContentService.create(binaryRequest);
 			}
 		}
 
-		return MessageResponse.from(updatedMessage, currentAttachments);
+		return updatedMessage;
 	}
 
 	/**
@@ -197,9 +187,9 @@ public class BasicMessageService implements MessageService {
 			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
 
 		// 메시지에 연결된 모든 첨부파일 삭제
-		List<BinaryContentResponse> attachments = binaryContentService.findAllByMessageId(messageId);
-		for (BinaryContentResponse attachment : attachments) {
-			binaryContentService.delete(attachment.id());
+		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(messageId);
+		for (BinaryContent attachment : attachments) {
+			binaryContentService.delete(attachment.getId());
 		}
 
 		// 메시지 삭제

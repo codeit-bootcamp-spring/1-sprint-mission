@@ -35,6 +35,16 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 	}
 
 	@Override
+	public List<UserStatus> findAll() {
+		List<UserStatus> users = new ArrayList<>();
+		for (UserStatus status : userStatusData.values()) {
+
+			users.add(status);
+		}
+		return users;
+	}
+
+	@Override
 	public List<UserStatus> findAllOnlineUsers() {
 		List<UserStatus> onlineUsers = new ArrayList<>();
 		for (UserStatus status : userStatusData.values()) {

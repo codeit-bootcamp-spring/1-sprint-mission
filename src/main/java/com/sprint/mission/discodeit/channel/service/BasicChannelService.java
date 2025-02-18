@@ -11,16 +11,14 @@ import java.util.UUID;
 import com.sprint.mission.discodeit.channel.dto.request.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.channel.dto.request.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.channel.dto.request.channel.UpdateChannelRequest;
-import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelListResponse;
-import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelResponse;
 import com.sprint.mission.discodeit.channel.dto.request.readStatus.CreateReadStatusRequest;
-import com.sprint.mission.discodeit.user.dto.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
-import com.sprint.mission.discodeit.message.entity.Message;
-import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.user.dto.request.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.user.service.UserStatusService;
 
@@ -114,7 +112,7 @@ public class BasicChannelService implements ChannelService {
 	 * @return 채널 상세 정보
 	 */
 	@Override
-	public ChannelResponse find(UUID channelId) {
+	public Channel find(UUID channelId) {
 		Channel channel = channelRepository.findById(channelId)
 			.orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
@@ -129,7 +127,7 @@ public class BasicChannelService implements ChannelService {
 		}
 		channel.updateLastMessageAt(lastMessageAt);
 
-		return ChannelResponse.from(channel);
+		return channel;
 	}
 
 	/**
@@ -138,7 +136,7 @@ public class BasicChannelService implements ChannelService {
 	 * @return 채널 목록
 	 */
 	@Override
-	public List<ChannelListResponse> findAllByUserId(UUID userId) {
+	public List<Channel> findAllByUserId(UUID userId) {
 		// 사용자 존재 확인
 		userService.findUser(userId);
 		// 사용자 존재한다면 online으로 처리
@@ -152,7 +150,7 @@ public class BasicChannelService implements ChannelService {
 		allChannels.addAll(publicChannels);
 		allChannels.addAll(privateChannels);
 
-		List<ChannelListResponse> responses = new ArrayList<>();
+		List<Channel> responses = new ArrayList<>();
 
 		for (Channel channel : allChannels) {
 			Optional<Message> latestMessage = messageRepository.findLatestMessageByChannelId(channel.getId());
@@ -164,8 +162,7 @@ public class BasicChannelService implements ChannelService {
 				lastMessageAt = channel.getCreatedAt();
 			}
 			channel.updateLastMessageAt(lastMessageAt);
-			ChannelListResponse response = ChannelListResponse.from(channel);
-			responses.add(response);
+			responses.add(channel);
 		}
 
 		return responses;

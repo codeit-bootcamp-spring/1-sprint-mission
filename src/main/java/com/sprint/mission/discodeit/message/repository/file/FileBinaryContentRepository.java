@@ -7,19 +7,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.global.util.FileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
 import com.sprint.mission.discodeit.message.entity.BinaryContent;
 import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
 	private final Path rootDir;
-	private static final String BINARYCONTENT_FILE = "binarycontent.ser";
+	private static final String BINARYCONTENT_FILE = "binarycontent.json";
 	private final FileStorage<BinaryContent> fileStorage;
 
 	public FileBinaryContentRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(BinaryContent.class);
+		this.fileStorage = new JsonFileStorage<>(BinaryContent.class);
 		fileStorage.init(rootDir);
 	}
 

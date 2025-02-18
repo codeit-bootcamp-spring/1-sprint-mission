@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.channel.dto.request.channel.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.channel.dto.request.channel.UpdateChannelRequest;
-import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelListResponse;
 import com.sprint.mission.discodeit.channel.dto.response.channel.ChannelResponse;
-import com.sprint.mission.discodeit.message.dto.request.message.CreateMessageRequest;
-import com.sprint.mission.discodeit.message.dto.response.message.MessageResponse;
+import com.sprint.mission.discodeit.channel.dto.response.channel.PrivateChannelResponse;
 import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.global.dto.CommonResponse;
+import com.sprint.mission.discodeit.channel.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.channel.service.ChannelService;
+import com.sprint.mission.discodeit.global.dto.CommonResponse;
+import com.sprint.mission.discodeit.message.dto.request.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.service.MessageService;
 
 @RestController
@@ -28,19 +29,22 @@ public class ChannelController {
 
 	private final ChannelService channelService;
 	private final MessageService messageService;
+	private final ChannelMapper channelMapper;
 
-	public ChannelController(ChannelService channelService, MessageService messageService) {
+	public ChannelController(ChannelService channelService, MessageService messageService,
+		ChannelMapper channelMapper) {
 		this.channelService = channelService;
 		this.messageService = messageService;
+		this.channelMapper = channelMapper;
 	}
 
-	//private channel은 message가 생성될때 같이 생성이 되는데 이건 그렇다면 messagechannel로 가는게 맞는거 아닌가....
 	@RequestMapping(value = "/create-privateChannel", method = RequestMethod.POST)
-	public ResponseEntity<CommonResponse<ChannelResponse>> createPrivateChannel(@RequestBody
+	public ResponseEntity<CommonResponse<PrivateChannelResponse>> createPrivateChannel(@RequestBody
 	CreateMessageRequest request) {
-		MessageResponse messageResponse = messageService.create(request);
-		ChannelResponse channelResponse = channelService.find(messageResponse.channelId());
-		return new ResponseEntity<>(CommonResponse.success("Private Chanel Created!", channelResponse), HttpStatus.OK);
+		Message messageResponse = messageService.create(request);
+		Channel channelResponse = channelService.find(messageResponse.getChannelId());
+		PrivateChannelResponse response = channelMapper.channelToPrivateChannelResponse(channelResponse);
+		return new ResponseEntity<>(CommonResponse.success("Private Chanel Created!", response), HttpStatus.OK);
 	}
 
 	//public Channel 생성
@@ -48,8 +52,9 @@ public class ChannelController {
 	public ResponseEntity<CommonResponse<ChannelResponse>> createPrivateChannel(@RequestBody
 	CreatePublicChannelRequest request) {
 		Channel channelResponse = channelService.createPublicChannel(request);
+		ChannelResponse response = channelMapper.channelToChannelResponse(channelResponse);
 		return new ResponseEntity<>(
-			CommonResponse.success("Private Chanel Created!", ChannelResponse.from(channelResponse)), HttpStatus.OK);
+			CommonResponse.success("Private Chanel Created!", response), HttpStatus.OK);
 	}
 
 	//공개 채널 정보 수정
@@ -57,18 +62,19 @@ public class ChannelController {
 	public ResponseEntity<CommonResponse<ChannelResponse>> updatePublicChannel(@PathVariable("id") UUID channelId,
 		UpdateChannelRequest request) {
 		Channel updatedChannel = channelService.updateChannel(channelId, request);
-
+		ChannelResponse response = channelMapper.channelToChannelResponse(updatedChannel);
 		return new ResponseEntity<>(
-			CommonResponse.success("Channel updated successfully", ChannelResponse.from(updatedChannel)),
+			CommonResponse.success("Channel updated successfully", response),
 			HttpStatus.OK);
 	}
 
 	//특정 사용자가 볼 수 있는 모든 채널 목록을 조회
 	@RequestMapping(value = "/find-all/{id}", method = RequestMethod.GET)
-	public ResponseEntity<CommonResponse<List<ChannelListResponse>>> getAllChannelsByUser(
+	public ResponseEntity<CommonResponse<List<ChannelResponse>>> getAllChannelsByUser(
 		@PathVariable("id") UUID userId) {
-		List<ChannelListResponse> channels = channelService.findAllByUserId(userId);
-		return new ResponseEntity<>(CommonResponse.success("User's channels get successfully", channels),
+		List<Channel> channels = channelService.findAllByUserId(userId);
+		List<ChannelResponse> responses = channelMapper.channelListToChannelResponseList(channels);
+		return new ResponseEntity<>(CommonResponse.success("User's channels get successfully", responses),
 			HttpStatus.OK);
 	}
 

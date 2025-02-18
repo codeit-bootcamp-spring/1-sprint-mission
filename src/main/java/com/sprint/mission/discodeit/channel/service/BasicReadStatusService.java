@@ -7,8 +7,8 @@ import com.sprint.mission.discodeit.channel.dto.request.readStatus.CreateReadSta
 import com.sprint.mission.discodeit.channel.dto.request.readStatus.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.channel.entity.ReadStatus;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 
 public class BasicReadStatusService implements ReadStatusService {
@@ -47,9 +47,11 @@ public class BasicReadStatusService implements ReadStatusService {
 			throw new IllegalArgumentException("ReadStatus already exists");
 		}
 
-		//메시지 존재 여부 확인
-		messageRepository.findById(request.messageId())
-			.orElseThrow(() -> new IllegalArgumentException("Message not found"));
+		// messageId가 null이 아닐 때만 메시지 존재 여부 확인
+		if (request.messageId() != null) {
+			messageRepository.findById(request.messageId())
+				.orElseThrow(() -> new IllegalArgumentException("Message not found"));
+		}
 
 		// 새로운 읽음 상태 생성 및 저장
 		ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(), request.messageId(),
@@ -81,15 +83,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
 	/**
 	 * 읽음 상태를 업데이트합니다.
-	 * @param id 읽음 상태 ID
-	 * @param request 상태 업데이트 요청 정보 (새로운 기준 메시지 ID와 마지막 읽은 시각)
+	 * @param request 상태 업데이트 요청 정보 (특정 유저, 채널과 마지막 읽은 시각)
 	 * @return 업데이트된 읽음 상태
 	 * @throws IllegalArgumentException 읽음 상태가 존재하지 않는 경우
 	 */
 	@Override
-	public ReadStatus update(UUID id, UpdateReadStatusRequest request) {
+	public ReadStatus update(UpdateReadStatusRequest request) {
 		// 읽음 상태 조회 및 업데이트
-		ReadStatus readStatus = readStatusRepository.findById(id)
+		ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
 			.orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 
 		messageRepository.findById(request.messageId())

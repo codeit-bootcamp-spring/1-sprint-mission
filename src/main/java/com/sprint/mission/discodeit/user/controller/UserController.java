@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +24,11 @@ import com.sprint.mission.discodeit.user.mapper.UserMapper;
 import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.user.service.UserStatusService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("api/users")
+@Slf4j
 public class UserController {
 	private final UserService userService;
 	private final UserStatusService userStatusService;
@@ -36,8 +41,9 @@ public class UserController {
 	}
 
 	//사용자 등록
-	@RequestMapping(value = "/signUp", method = RequestMethod.POST)
-	public ResponseEntity<CommonResponse<UserResponse>> createUser(@RequestBody CreateUserRequest createUserRequest) {
+	@RequestMapping(value = "/sign-up", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<CommonResponse<UserResponse>> createUser(
+		@ModelAttribute CreateUserRequest createUserRequest) {
 		//나중에 JPA를 적용하여 UserStatus -> User로의 단방향 연관관계를 맺게 된다면 똑같이 생성을 해야겠다...
 		User newUser = userService.createUser(createUserRequest);
 		UserStatus userStatus = userStatusService.find(newUser.getId());
@@ -48,9 +54,11 @@ public class UserController {
 	}
 
 	//특정 사용자 조회
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/find/{id}", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("id") UUID userId) {
+		log.info("user생성중");
 		User existUser = userService.findUser(userId);
+		log.info("user생성완료");
 		UserStatus userStatus = userStatusService.find(existUser.getId());
 
 		//mapper를 통한 dto로 변환
@@ -59,7 +67,7 @@ public class UserController {
 	}
 
 	//전체 사용자 조회
-	@RequestMapping(value = "", method = RequestMethod.GET)
+	@RequestMapping(value = "/all-users", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse<List<UserResponse>>> getAllUsers() {
 		List<User> users = userService.findAllUsers();
 		List<UserStatus> userStatuses = userStatusService.findAll();
@@ -69,9 +77,9 @@ public class UserController {
 	}
 
 	//사용자 수정
-	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
+	@RequestMapping(value = "/update-user/{id}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<CommonResponse<UserResponse>> updateUser(@PathVariable("id") UUID userId,
-		UpdateUserRequest request) {
+		@ModelAttribute UpdateUserRequest request) {
 		User updatedUser = userService.updateUser(userId, request);
 		UserStatus userStatus = userStatusService.updateByUserId(
 			new UpdateUserStatusRequest(updatedUser.getId(), request.requestAt()));

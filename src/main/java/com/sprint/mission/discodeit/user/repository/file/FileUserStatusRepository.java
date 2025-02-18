@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.sprint.mission.discodeit.user.entity.UserStatus;
 import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
+import com.sprint.mission.discodeit.user.entity.UserStatus;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,24 +20,25 @@ import lombok.extern.slf4j.Slf4j;
 public class FileUserStatusRepository implements UserStatusRepository {
 
 	private final Path rootDir;
-	private static final String USERSTATUS_FILE = "userstatus.ser";
+	private static final String USERSTATUS_FILE = "userstatus.json";
 	private final FileStorage<UserStatus> fileStorage;
 
 	public FileUserStatusRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(UserStatus.class);
+		this.fileStorage = new JsonFileStorage<>(UserStatus.class);
 		fileStorage.init(rootDir);
 	}
 
 	/**
 	 * 내부적으로 파일에서 전체 UserStatus 목록을 가져옴.
 	 */
-	private List<UserStatus> findAll() {
+	@Override
+	public List<UserStatus> findAll() {
 		Path filePath = rootDir.resolve(USERSTATUS_FILE);
 
 		// 파일이 디렉토리인지 체크 후 삭제
 		if (Files.exists(filePath) && Files.isDirectory(filePath)) {
-			log.error("🚨 오류: userstatus.ser가 디렉토리로 생성됨. 삭제 후 재생성합니다.");
+			log.error("🚨 오류: userstatus.json이 디렉토리로 생성됨. 삭제 후 재생성합니다.");
 			try {
 				Files.delete(filePath);
 			} catch (IOException e) {

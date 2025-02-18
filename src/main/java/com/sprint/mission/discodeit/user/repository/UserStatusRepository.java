@@ -14,6 +14,8 @@ public interface UserStatusRepository {
 	//사용자의 현재 접속 상태 조회
 	Optional<UserStatus> findByUserId(UUID userId);
 
+	List<UserStatus> findAll();
+	
 	//현재 접속 중인 모든 사용자 목록 조회
 	List<UserStatus> findAllOnlineUsers();
 

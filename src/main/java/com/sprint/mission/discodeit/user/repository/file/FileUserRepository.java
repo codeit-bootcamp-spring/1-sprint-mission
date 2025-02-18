@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
+import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,23 +16,31 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileUserRepository implements UserRepository {
 	private final Path rootDir;
-	private static final String USER_FILE = "user.ser";
+	private static final String USER_FILE = "users.json";
 	private final FileStorage<User> fileStorage;
 
 	public FileUserRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(User.class);
+		this.fileStorage = new JsonFileStorage<>(User.class);
 		fileStorage.init(rootDir);
 	}
 
 	@Override
 	public User save(User user) {
 		List<User> users = findAll();
+		// 기존 사용자가 있다면 제거
+		users.removeIf(existingUser -> existingUser.getId().equals(user.getId()));
+
+		// 새 사용자 추가
 		users.add(user);
+
+		// 저장
 		fileStorage.save(rootDir.resolve(USER_FILE), users);
-		// 강제로 다시 로드해보기
+
+		// 검증을 위한 리로드
 		List<User> reloadedUsers = fileStorage.load(rootDir.resolve(USER_FILE));
-		log.info("Loaded {} users", reloadedUsers);
+		log.info("Saved and reloaded {} users", reloadedUsers.size());
+
 		return user;
 	}
 
@@ -73,7 +81,7 @@ public class FileUserRepository implements UserRepository {
 	public Optional<User> findByUsername(String username) {
 		List<User> users = findAll();
 		for (User u : users) {
-			if (u.getUserid().equals(username)) {
+			if (u.getUsername().equals(username)) {
 				return Optional.of(u);
 			}
 		}

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.message.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,10 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sprint.mission.discodeit.global.dto.CommonResponse;
 import com.sprint.mission.discodeit.message.dto.request.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.message.dto.request.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.message.dto.response.message.MessageResponse;
-import com.sprint.mission.discodeit.global.dto.CommonResponse;
+import com.sprint.mission.discodeit.message.entity.BinaryContent;
+import com.sprint.mission.discodeit.message.entity.Message;
+import com.sprint.mission.discodeit.message.mapper.MessageMapper;
+import com.sprint.mission.discodeit.message.service.BinaryContentService;
 import com.sprint.mission.discodeit.message.service.MessageService;
 
 @RestController
@@ -22,15 +27,22 @@ import com.sprint.mission.discodeit.message.service.MessageService;
 public class MessageController {
 
 	private final MessageService messageService;
+	private final BinaryContentService binaryContentService;
+	private final MessageMapper messageMapper;
 
-	public MessageController(MessageService messageService) {
+	public MessageController(MessageService messageService, BinaryContentService binaryContentService,
+		MessageMapper messageMapper) {
 		this.messageService = messageService;
+		this.binaryContentService = binaryContentService;
+		this.messageMapper = messageMapper;
 	}
 
 	//메시지 보내기
 	@RequestMapping(name = "/create", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse<MessageResponse>> createMessage(@RequestBody CreateMessageRequest request) {
-		MessageResponse response = messageService.create(request);
+		Message newMessage = messageService.create(request);
+		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(newMessage.getId());
+		MessageResponse response = messageMapper.messageToMessageResponse(newMessage, attachments);
 		return new ResponseEntity<>(CommonResponse.success("Message created successfully", response), HttpStatus.OK);
 	}
 
@@ -38,7 +50,9 @@ public class MessageController {
 	@RequestMapping(name = "/update/{id}", method = RequestMethod.PATCH)
 	public ResponseEntity<CommonResponse<MessageResponse>> updateMessage(@PathVariable("id") UUID messageId,
 		@RequestBody UpdateMessageRequest request) {
-		MessageResponse response = messageService.update(messageId, request);
+		Message updatedMessage = messageService.update(messageId, request);
+		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(updatedMessage.getId());
+		MessageResponse response = messageMapper.messageToMessageResponse(updatedMessage, attachments);
 		return new ResponseEntity<>(CommonResponse.success("Message updated successfully", response), HttpStatus.OK);
 	}
 
@@ -46,8 +60,14 @@ public class MessageController {
 	@RequestMapping(name = "/find-messages/{id}", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse<List<MessageResponse>>> findAllMessagesByChannel(
 		@PathVariable("id") UUID channelId) {
-		List<MessageResponse> messages = messageService.findAllByChannelId(channelId);
-		return new ResponseEntity<>(CommonResponse.success("Find Messages By Channel successfully", messages),
+		List<Message> messages = messageService.findAllByChannelId(channelId);
+		List<BinaryContent> attachments = new ArrayList<>();
+		for (Message message : messages) {
+			// 각 메시지에 연결된 첨부파일을 binaryContentService를 통해 조회
+			attachments = binaryContentService.findAllByMessageId(message.getId());
+		}
+		List<MessageResponse> responses = messageMapper.messageListToMessageResponseList(messages, attachments);
+		return new ResponseEntity<>(CommonResponse.success("Find Messages By Channel successfully", responses),
 			HttpStatus.OK);
 	}
 

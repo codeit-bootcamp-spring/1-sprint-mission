@@ -35,6 +35,9 @@ public class BasicUserService implements UserService {
 	@Override
 	public User createUser(CreateUserRequest request) {
 		// 중복 체크
+		if (userRepository.findByUserid(request.userid()).isPresent()) {
+			throw new IllegalArgumentException("User already exists: " + request.userid());
+		}
 		if (userRepository.findByUsername(request.username()).isPresent()) {
 			throw new IllegalArgumentException("Username already exists: " + request.username());
 		}
@@ -43,7 +46,7 @@ public class BasicUserService implements UserService {
 		}
 
 		// user 생성
-		User user = new User(request.userid(), request.username(), request.email(), request.password());
+		User user = new User(request.userid(), request.password(), request.username(), request.email());
 		user = userRepository.save(user);
 
 		// userstatus 생성
@@ -113,7 +116,6 @@ public class BasicUserService implements UserService {
 			}
 		}
 
-		user.updateUserid(request.userid());
 		user.updateUsername(request.username());
 		user.updateUserEmail(request.email());
 		userRepository.save(user);
@@ -131,7 +133,9 @@ public class BasicUserService implements UserService {
 
 		// 관련 도메인 삭제
 		userStatusService.deleteByUserId(userId);
-		binaryContentService.delete(userId);
+
+		//프로필 사진이 있는경우에만 삭제
+		binaryContentService.deleteProfileImageByAuthorId(userId);
 
 		userRepository.delete(existUser.getId());
 	}

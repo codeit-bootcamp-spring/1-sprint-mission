@@ -1,28 +1,28 @@
 package com.sprint.mission.discodeit.message.entity;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class BinaryContent implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private final UUID id;
-	private final Instant createdAt;
-	private final UUID authorId;
+@NoArgsConstructor
+public class BinaryContent {
+	private UUID id;
+	private Instant createdAt;
+	private UUID authorId;
 	//message없이 프로필 이미지만 저장하는 경우 때문에 optional로 처리해야될까...?
-	private final UUID messageId;
-	private final byte[] content;
-	private final String contentType;
+	private UUID messageId;
+	private byte[] content;
+	private String contentType;
 	//파일 이름, 파일 크기 추가
-	private final String fileName;
-	private final long fileSize;
-	private final BinaryContentType binaryContentType;
+	private String fileName;
+	private long fileSize;
+	private BinaryContentType binaryContentType;
 
 	// 프로필 이미지용 생성자
 	public static BinaryContent createProfileImage(UUID authorId, MultipartFile file) throws IOException {

@@ -9,10 +9,8 @@ import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.user.entity.User;
 
-public record ChannelResponse(
+public record PrivateChannelResponse(
 	UUID id,
-	String name,
-	String description,
 	Map<UUID, User> participants,
 	Instant lastMessageAt,
 	List<Message> messageList,
