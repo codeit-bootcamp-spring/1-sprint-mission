@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.UserBaseDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -15,14 +16,14 @@ import java.util.*;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     @Override
-    public User createUser(UserCreateDTO userCreateDTO) {
+    public UserBaseDTO createUser(UserCreateDTO userCreateDTO) {
         if(checkEmailDuplicate(userCreateDTO.getUserEmail())){
             throw new IllegalArgumentException(userCreateDTO.getUserEmail() + "이미 가입한 적이 있는 email 입니다.");}
         if(checkNameDuplicate(userCreateDTO.getUserName())) {
             throw new IllegalArgumentException(userCreateDTO.getUserName() + "이미 존재하는 닉네임입니다."); }
         User user = new User(userCreateDTO);
         userRepository.save(user);
-        return user;
+        return new UserBaseDTO(user.getId(), user.getUserName(), user.getUserEmail());
     }
 
     @Override
@@ -74,9 +75,9 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean checkEmailDuplicate(String userEmail) {
-        Map<UUID,User> userMap = userRepository.findAll();
-        if(userMap == null || userMap.isEmpty()) return false;
-        userMap.values().stream().anyMatch(user -> user.getUserEmail().equals(userEmail));
-        return false;
+        Map<UUID, User> userMap = userRepository.findAll();
+        if (userMap == null || userMap.isEmpty()) return false;
+        return userMap.values().stream().anyMatch(user -> user.getUserEmail().equals(userEmail));
     }
+
 }

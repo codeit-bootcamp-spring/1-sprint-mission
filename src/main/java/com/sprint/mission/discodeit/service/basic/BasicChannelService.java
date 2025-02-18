@@ -8,10 +8,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,8 +16,14 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     @Override
-    public Channel createChannel(ChannelDTO channelDTO) {
+    public Channel createChannelPublic(ChannelDTO channelDTO) { //public 채널
         Channel channel = new Channel(channelDTO, ChannelType.PUBLIC);
+        channelRepository.save(channel);
+        return channel;
+    }
+    @Override
+    public Channel createChannelPrivate(ChannelDTO channelDTO) { //private 채널
+        Channel channel = new Channel(channelDTO, ChannelType.PRIVATE);
         channelRepository.save(channel);
         return channel;
     }
@@ -31,8 +34,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll(UUID userId) {
+    public List<Channel> findAll() {
         Map<UUID, Channel> data = channelRepository.findAll();
+        if(data.isEmpty()) return new ArrayList<>();
         return data.values().stream().collect(Collectors.toList());
     }
 

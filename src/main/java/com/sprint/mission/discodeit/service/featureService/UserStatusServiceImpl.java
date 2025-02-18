@@ -78,10 +78,10 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
-    public void deleteByUserId(UUID userId) {
+    public void deleteByUserId(UUID userStatusId) {
         Map<UUID,UserStatus> userStatusMap = userStatusRepository.findAll();
         UserStatus userStatus = userStatusMap.values().stream().filter(value ->
-                value.getUserId().equals(userId)).findAny().orElseThrow(()-> new NoSuchElementException("찾을 수 없습니다."));
+                value.getUserId().equals(userStatusId)).findAny().orElseThrow(()-> new NoSuchElementException("찾을 수 없습니다."));
         delete(userStatus.getId());
 
     }

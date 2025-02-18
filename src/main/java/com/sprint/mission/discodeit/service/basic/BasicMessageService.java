@@ -29,14 +29,17 @@ public class BasicMessageService implements MessageService {
     @Override
     public List<Message> findAllMessage() {
         Map<UUID, Message> data = messageRepository.findAll();
+        if(data.isEmpty()) return new ArrayList<>();
         return data.values().stream().sorted(Comparator.comparing(message -> message.getCreatedAt())).collect(Collectors.toList());
     }
 
     @Override
-    public void update(UUID messageId, MessageDTO messageDTO) {
-        Message message = messageRepository.findById(messageId).orElseThrow(()-> new NoSuchElementException("MessageId : " + messageId + "를 찾을 수 없습니다."));
+    public Message update(UUID messageId, MessageDTO messageDTO) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(()-> new NoSuchElementException("MessageId : " + messageId + "를 찾을 수 없습니다."));
         message.update(messageDTO);
         messageRepository.save(message);
+        return message;
     }
 
     @Override
