@@ -31,6 +31,14 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public User findByName(String name) {
+        return data.values().stream()
+                .filter(u -> u.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다. name: " + name));
+    }
+
+    @Override
     public List<User> findAll() {
         return new ArrayList<>(data.values());
     }

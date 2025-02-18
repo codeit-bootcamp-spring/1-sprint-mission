@@ -60,6 +60,24 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public User findByName(String name) {
+        File[] files = directoryPath.toFile().listFiles();
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                User user = (User) ois.readObject();
+                if (user.getName().equals(name)) {
+                    return user;
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("users 읽기 실패");
+            }
+        }
+
+        throw new NotFoundException("등록되지 않은 user입니다. name: " + name);
+    }
+
+    @Override
     public List<User> findAll() {
         File[] files = directoryPath.toFile().listFiles();
         List<User> users = new ArrayList<>(100);
