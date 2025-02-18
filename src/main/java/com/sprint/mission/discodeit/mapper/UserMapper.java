@@ -34,4 +34,5 @@ public interface UserMapper {
   @Mapping(target = "profilePictureBase64", expression = "java(BinaryContentUtil.convertToBase64(profile))")
   UserResponseDto toDto(User user, UserStatus userStatus, BinaryContent profile);
 
+
 }

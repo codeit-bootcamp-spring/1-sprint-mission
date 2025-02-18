@@ -45,9 +45,12 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
 
     List<MultipartFile> incomingFiles = messageDto.getBinaryContent();
 
-    List<BinaryContent> savedFiles = incomingFiles == null || incomingFiles.isEmpty() ? Collections.emptyList() : binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
+    List<BinaryContent> savedFiles = incomingFiles == null
+        || incomingFiles.isEmpty()
+        ? Collections.emptyList()
+        : binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
 
-    message.setBinaryContents(savedFiles);
+    message.addBinaryContents(savedFiles);
 
     messageService.updateMessage(message, messageDto.getContent());
 

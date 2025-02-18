@@ -11,7 +11,12 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = BinaryContentUtil.class)
+@Mapper(
+    componentModel = "spring",
+    uses = BinaryContentMapper.class,
+    imports = BinaryContentUtil.class,
+    builder = @Builder(disableBuilder = false)
+)
 public interface MessageMapper {
 
   @Mapping(target = "UUID", ignore = true)
@@ -20,7 +25,7 @@ public interface MessageMapper {
   @Mapping(target = "updatedAt", ignore = true)
   @Mapping(target = "channelId", source = "channelId")
   @Mapping(target = "binaryContents", ignore = true)
-  Message toEntity(CreateMessageDto dto, String channelId);
+  Message toEntity(CreateMessageDto dto, String channelId, @Context BinaryContentMapper binaryContentMapper);
 
   @Mapping(target = "messageId", source = "UUID")
   @Mapping(target = "userId", source = "userId")
@@ -31,22 +36,21 @@ public interface MessageMapper {
   MessageResponseDto toResponseDto(Message message);
 
   @AfterMapping
-  default void mapBinaryContents(@MappingTarget Message message, CreateMessageDto dto, String channelId, BinaryContentMapper binaryContentMapper){
-    if(dto.getMultipart() != null && dto.getMultipart().isEmpty()){
-      List<BinaryContent> binaryContents = binaryContentMapper.fromMessageFiles(
-          dto.getMultipart(),
-          dto.getUserId(),
-          channelId,
-          message.getUUID()
-      );
-      message.setBinaryContents(binaryContents);
-    }else{
-      message.setBinaryContents(Collections.emptyList());
-    }
+  default void mapBinaryContents(
+      @MappingTarget Message.MessageBuilder messageBuilder,
+      CreateMessageDto dto,
+      String channelId,
+      @Context BinaryContentMapper binaryContentMapper) {
+
+    List<BinaryContent> binaryContents = (dto.getMultipart() != null && !dto.getMultipart().isEmpty())
+        ? binaryContentMapper.fromMessageFiles(dto.getMultipart(), dto.getUserId(), channelId, messageBuilder.getUUID())
+        : Collections.emptyList();
+
+    messageBuilder.binaryContents(binaryContents);
   }
 
   @Named("convertToBase64")
-  default List<String> convertToBase64(List<BinaryContent> binaryContents){
+  default List<String> convertToBase64(List<BinaryContent> binaryContents) {
     return binaryContents == null || binaryContents.isEmpty()
         ? Collections.emptyList()
         : binaryContents.stream()
