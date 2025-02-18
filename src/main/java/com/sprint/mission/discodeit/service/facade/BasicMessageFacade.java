@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.facade.message.CreateMessageFacade;
+import com.sprint.mission.discodeit.service.facade.message.FindMessageFacade;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -40,6 +41,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
   private final EntityValidator validator;
 
   private final CreateMessageFacade createMessageFacade;
+  private final FindMessageFacade findMessageFacade;
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
@@ -48,16 +50,12 @@ public class BasicMessageFacade implements MessageMasterFacade {
 
   @Override
   public MessageResponseDto findMessageById(String id) {
-    Message message = messageService.getMessageById(id);
-    return messageMapper.toResponseDto(message);
+    return findMessageFacade.findMessageById(id);
   }
 
   @Override
   public List<MessageResponseDto> findMessagesByChannel(String channelId) {
-    List<Message> channelMessages = messageService.getMessagesByChannel(channelId);
-    return channelMessages.stream()
-        .map(messageMapper::toResponseDto)
-        .toList();
+    return findMessageFacade.findMessagesByChannel(channelId);
   }
 
   @Override
