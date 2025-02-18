@@ -33,7 +33,7 @@ public class BasicChannelFacade implements ChannelMasterFacade {
 
   private final CreateChannelFacade createChannelFacade;
   private final FindChannelFacade findChannelFacade;
-
+  private final UpdateChannelFacade updateChannelFacade;
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
     return createChannelFacade.createPrivateChannel(channelDto);
@@ -56,18 +56,7 @@ public class BasicChannelFacade implements ChannelMasterFacade {
 
   @Override
   public FindChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
-    Channel channel = channelService.updateChannel(channelId, channelUpdateDto.getChannelName(), channelUpdateDto.getMaxNumberOfPeople());
-    Instant lastMessageTime = Optional.ofNullable(
-            messageService.getLatestMessageByChannel(channel.getUUID())
-        )
-        .map(Message::getCreatedAt)
-        .orElse(Instant.EPOCH);
-    List<String> userIds = channel.getParticipatingUsers();
-    return channelMapper.toFindChannelDto(
-        channel,
-        lastMessageTime,
-        userIds
-    );
+    return updateChannelFacade.updateChannel(channelId, channelUpdateDto);
 
   }
 
