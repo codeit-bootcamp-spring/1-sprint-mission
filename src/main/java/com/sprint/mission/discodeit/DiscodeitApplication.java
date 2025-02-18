@@ -39,7 +39,9 @@ public class DiscodeitApplication {
 	static MessageRepository messageRepository = new JCFMessageRepository();
 
 	static User setupUser(UserService userService) {
-		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath"));
+		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath_gildong"));
+		User user2 = userService.createUser(new UserCreateDTO("김이박", "5678", "dis2@code.it", "filePath_kim"));
+
 		return user;
 	}
 
@@ -70,20 +72,20 @@ public class DiscodeitApplication {
 		//셋업
 		User user = setupUser(userService);
 
-		System.out.println(userService.findUserDTO(user.getId()));
-		System.out.println(userService.isNameExist(user.getUserName()));
-
-		List<UUID> userList = new ArrayList<>();
-		userList.add(user.getId());
-
-		//Channel channel = setupChannel(channelService);
-		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널",userList), ChannelType.PUBLIC);
-		System.out.println(channelService.readChannel(channel.getId()) + " " + channel.getChannelName());
-
-		System.out.println(channelService.findDTO(channel.getId()) + " " + channel.getChannelName());
-
-		channelService.deleteChannel(channel.getId());
-		System.out.println(channelService.readAllChannel());
+//		System.out.println(userService.findUserDTO(user.getId()));
+//		System.out.println(userService.isNameExist(user.getUserName()));
+//
+//		List<UUID> userList = new ArrayList<>();
+//		userList.add(user.getId());
+//
+//		//Channel channel = setupChannel(channelService);
+//		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널",userList), ChannelType.PUBLIC);
+//		System.out.println(channelService.readChannel(channel.getId()) + " " + channel.getChannelName());
+//
+//		System.out.println(channelService.findDTO(channel.getId()) + " " + channel.getChannelName());
+//
+//		channelService.deleteChannel(channel.getId());
+//		System.out.println(channelService.readAllChannel());
 
 
 	}
