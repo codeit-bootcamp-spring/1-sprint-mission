@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.users.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.users.create.UserCreateRequestWrapper;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.users.create.UserCreateRequest;
@@ -39,14 +39,16 @@ public class UserController {
         URI location = URI.create("/users/" + createUser.getId());
         return ResponseEntity.created(location).body(userService.find(createUser.getId()));
     }
+
     @RequestMapping(method = RequestMethod.PUT, value = "/update/{userId}")
     public ResponseEntity<UserDto> update(@PathVariable UUID userId,@RequestBody UserUpdateRequestWrapper userUpdateRequestWrapper){
         UserUpdateRequest userUpdateRequest = userUpdateRequestWrapper.userUpdateRequest();
         Optional<BinaryContentCreateRequest> binaryContentCreateRequest = userUpdateRequestWrapper.profileCreateRequest();
 
-        User updateUser = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
+        userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
         return ResponseEntity.ok(userService.find(userId));
     }
+
     @RequestMapping(method = RequestMethod.DELETE,value = "/delete/{userId}")
     public ResponseEntity<Void> delete(@PathVariable UUID userId){
         try {
@@ -62,6 +64,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @RequestMapping(method = RequestMethod.GET, value = "/findAll")
     public ResponseEntity<List<UserDto>> findAll(){
         return ResponseEntity.ok(userService.findAll());
