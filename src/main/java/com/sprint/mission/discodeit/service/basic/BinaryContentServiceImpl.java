@@ -154,11 +154,12 @@ public class BinaryContentServiceImpl implements BinaryContentService {
    * @param channelId 채널 ID
    * @return messageId를 키로 하고, 해당하는 BinaryContent 목록을 값으로 갖는 Map
    */
+  // TODO : null 처리
   @Override
   public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
     return binaryContentRepository.findByChannel(channelId).stream()
-        .collect(Collectors.groupingBy(
-            BinaryContent::getMessageId,
+        .collect(Collectors.groupingBy( content ->
+            content.getMessageId() != null ? content.getMessageId() : "",
             Collectors.toList()
         ));
   }

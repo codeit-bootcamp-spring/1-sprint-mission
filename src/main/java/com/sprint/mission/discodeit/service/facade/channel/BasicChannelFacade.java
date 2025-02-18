@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.facade;
+package com.sprint.mission.discodeit.service.facade.channel;
 
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,24 +31,16 @@ public class BasicChannelFacade implements ChannelMasterFacade {
   private final ChannelMapper channelMapper;
   private final EntityValidator validator;
 
+  private final CreateChannelFacade createChannelFacade;
+
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
-
-    channelDto.userIds().forEach(
-        id -> validator.findOrThrow(User.class, id, new UserNotFoundException())
-    );
-
-    Channel channel = channelService.createPrivateChannel(channelMapper.toEntity(channelDto));
-
-    readStatusService.createMultipleReadStatus(channelDto.userIds(), channel.getUUID());
-
-    return channelMapper.toPrivateDto(channel);
+    return createChannelFacade.createPrivateChannel(channelDto);
   }
 
   @Override
   public PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
-    Channel channel = channelService.createPublicChannel(channelMapper.toEntity(channelDto));
-    return channelMapper.toPublicDto(channel);
+    return createChannelFacade.createPublicChannel(channelDto);
   }
 
   @Override

@@ -58,7 +58,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
       if(contents.contains(content)) contents.remove(content);
     }
 
-    binaryContents.stream().forEach(content -> contents.add(content));
+    contents.addAll(binaryContents);
 
     List<BinaryContent> contentList = contents.stream().toList();
     writeToFile(contentList);
