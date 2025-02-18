@@ -45,6 +45,12 @@ public class ReadStatusService {
         return readStatusRepository.findByUserId(userId);
     }
 
+    public void update(UUID id) {
+        ReadStatus readStatus = readStatusRepository.findById(id);
+        readStatus.update();
+        readStatusRepository.save(readStatus);
+    }
+
     public void delete(UUID id) {
         readStatusRepository.delete(id);
     }

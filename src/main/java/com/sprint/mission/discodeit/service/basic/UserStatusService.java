@@ -34,6 +34,7 @@ public class UserStatusService {
     public void update(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id);
         userStatus.setUpdateAt();
+        userStatusRepository.save(userStatus);
     }
 
     public UserStatus findById(UUID userId) {
