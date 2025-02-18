@@ -1,0 +1,14 @@
+{
+  "406f1fc0-aa11-4e3b-ae04-f140d4979e18" : {
+    "createdAt" : 1739772040504,
+    "isOnline" : true,
+    "updatedAt" : null,
+    "userId" : "7d9bc3c0-d255-4450-94bd-3e275b307c9e"
+  },
+  "4aa5cfc9-ef42-4d32-bcde-98d057dff35b" : {
+    "createdAt" : 1739773831469,
+    "isOnline" : false,
+    "updatedAt" : null,
+    "userId" : "e5acfce4-2f8b-4a39-b7a2-5e588184aeed"
+  }
+}

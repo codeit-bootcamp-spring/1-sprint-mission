@@ -7,6 +7,6 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    public Map<UUID, User> loadUserTxt();
-    public void saveUserTxt();
+    public Map<UUID, User> loadUserText();
+    public void saveUserText();
 }
