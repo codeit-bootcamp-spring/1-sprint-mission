@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.facade.message.CreateMessageFacade;
 import com.sprint.mission.discodeit.service.facade.message.FindMessageFacade;
+import com.sprint.mission.discodeit.service.facade.message.UpdateMessageFacade;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
 
   private final CreateMessageFacade createMessageFacade;
   private final FindMessageFacade findMessageFacade;
+  private final UpdateMessageFacade updateMessageFacade;
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
@@ -60,23 +62,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
 
   @Override
   public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
-
-    User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
-    Message message = validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
-
-    if (!message.getUserId().equals(user.getUUID())) {
-      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
-    }
-
-    List<MultipartFile> incomingFiles = messageDto.getBinaryContent();
-
-    List<BinaryContent> savedFiles = incomingFiles == null || incomingFiles.isEmpty() ? Collections.emptyList() : binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incomingFiles);
-
-    message.setBinaryContents(savedFiles);
-
-    messageService.updateMessage(message, messageDto.getContent());
-
-    return messageMapper.toResponseDto(message);
+    return updateMessageFacade.updateMessage(messageId, messageDto);
   }
 
   @Override
