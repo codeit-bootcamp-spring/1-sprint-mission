@@ -21,8 +21,8 @@ public class ReadStatusService {
     private final ChannelRepository channelRepository;
 
     public ReadStatus create(ReadStatusDto dto) {
-        UUID userId = dto.getUserId();
-        UUID channelId = dto.getChannelId();
+        UUID userId = dto.userId();
+        UUID channelId = dto.channelId();
 
         userRepository.findById(userId);
         channelRepository.findById(channelId);

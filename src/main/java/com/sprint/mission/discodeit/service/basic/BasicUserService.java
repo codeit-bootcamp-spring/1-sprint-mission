@@ -36,14 +36,14 @@ public class BasicUserService implements UserService {
     public User createUser(UserDto userDto) {
         List<User> users = userRepository.findAll();
         for (User user : users) {
-            if (user.getName().equals(userDto.getName())
-                    || user.getEmail().equals(userDto.getEmail())) {
+            if (user.getName().equals(userDto.name())
+                    || user.getEmail().equals(userDto.email())) {
                 throw new DuplicateException("중복된 이름 혹은 이메일 입니다.");
             }
         }
 
-        String password = generatePassword(userDto.getPassword());
-        User newUser = User.of(userDto.getName(), userDto.getEmail(), password);
+        String password = generatePassword(userDto.password());
+        User newUser = User.of(userDto.name(), userDto.email(), password);
 
         userStatusRepository.save(UserStatus.from(newUser.getId()));
         return userRepository.save(newUser);
@@ -53,7 +53,7 @@ public class BasicUserService implements UserService {
     public UserInfoDto readUser(UUID userId) {
         User user = userRepository.findById(userId);
         UserStatus userStatus = userStatusRepository.findById(user.getId());
-        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus);
+        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
     }
 
     @Override
@@ -62,7 +62,7 @@ public class BasicUserService implements UserService {
         List<UserInfoDto> userInfoDtos = new ArrayList<>(100);
         for (User user : users) {
             UserStatus userStatus = userStatusRepository.findById(user.getId());
-            UserInfoDto userInfoDto = UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus);
+            UserInfoDto userInfoDto = UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
             userInfoDtos.add(userInfoDto);
         }
         return userInfoDtos;
@@ -71,9 +71,9 @@ public class BasicUserService implements UserService {
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
         User user = userRepository.findById(userId);
-        user.updateName(userDto.getName());
-        user.updateEmail(userDto.getEmail());
-        user.updatePassword(generatePassword(userDto.getPassword()));
+        user.updateName(userDto.name());
+        user.updateEmail(userDto.email());
+        user.updatePassword(generatePassword(userDto.password()));
 
         userRepository.updateUser(user);
     }

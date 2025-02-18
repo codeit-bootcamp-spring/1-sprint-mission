@@ -28,9 +28,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message createMessage(MessageDto messageDto) {
-        Channel channel = channelRepository.findById(messageDto.getChannel().getId());
-        User user = channel.getUser(messageDto.getWriter().getId());
-        Message message = Message.of(user, messageDto.getContent(), channel);
+        Channel channel = channelRepository.findById(messageDto.channel().getId());
+        User user = channel.getUser(messageDto.writer().getId());
+        Message message = Message.of(user, messageDto.content(), channel);
         return messageRepository.save(message);
     }
 

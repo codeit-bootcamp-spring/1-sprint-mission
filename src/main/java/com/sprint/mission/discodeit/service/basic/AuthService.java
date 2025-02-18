@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.LoginDto;
 import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserLoginDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.AuthenticationException;
@@ -19,17 +19,16 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
 
-    public UserInfoDto login(LoginDto dto) {
-        User user = userRepository.findByName(dto.getName());
+    public UserInfoDto login(UserLoginDto dto) {
+        User user = userRepository.findByName(dto.name());
 
-        String password = generatePassword(dto.getPassword());
-        if (!user.getName().equals(dto.getName()) || !user.getPassword().equals(password)) {
+        String password = generatePassword(dto.password());
+        if (!user.getName().equals(dto.name()) || !user.getPassword().equals(password)) {
             throw new AuthenticationException("로그인 실패");
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
-        return UserInfoDto.of(user.getId(), user.getCreatedAt(),
-                user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus);
+        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
     }
 
     public String generatePassword(String password) {

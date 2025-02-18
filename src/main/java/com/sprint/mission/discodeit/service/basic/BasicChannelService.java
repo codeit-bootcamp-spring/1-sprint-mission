@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -34,23 +35,24 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublicChannel(ChannelDto channelDto) {
-        return channelRepository.save(Channel.of(ChannelType.PUBLIC, channelDto.getName(), channelDto.getDescription()));
+        return channelRepository.save(Channel.of(ChannelType.PUBLIC, channelDto.name(), channelDto.description()));
     }
 
     @Override
     public ChannelInfoDto readChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId);
         List<Message> messages = messageRepository.findByChannelId(channelId);
-        Optional<Message> message = messages.stream()
-                .max(Comparator.comparing(Message::getCreatedAt));
+        Instant latestMessageTime = messages.stream()
+                .max(Comparator.comparing(Message::getCreatedAt))
+                .map(Message::getCreatedAt)
+                .orElse(channel.getCreatedAt());
 
         List<UUID> userIdList = channel.getUsers().values().stream()
                 .map(User::getId)
                 .toList();
 
         return ChannelInfoDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getType(), channel.getName(), channel.getDescription(), message.isEmpty() ? channel.getCreatedAt() : message.get().getCreatedAt(), userIdList);
-
+                channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList);
     }
 
     @Override
@@ -79,8 +81,8 @@ public class BasicChannelService implements ChannelService {
             throw new UnsupportedOperationException("private 채널은 수정할 수 없습니다.");
         }
 
-        channel.updateName(channelDto.getName());
-        channel.updateDescription(channelDto.getDescription());
+        channel.updateName(channelDto.name());
+        channel.updateDescription(channelDto.description());
         channelRepository.updateChannel(channel);
     }
 
@@ -101,6 +103,5 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteChannel(UUID channelId) {
         channelRepository.deleteChannel(channelId);
-
     }
 }
