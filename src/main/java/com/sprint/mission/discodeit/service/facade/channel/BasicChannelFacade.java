@@ -32,6 +32,7 @@ public class BasicChannelFacade implements ChannelMasterFacade {
   private final EntityValidator validator;
 
   private final CreateChannelFacade createChannelFacade;
+  private final FindChannelFacade findChannelFacade;
 
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
@@ -45,35 +46,19 @@ public class BasicChannelFacade implements ChannelMasterFacade {
 
   @Override
   public FindChannelResponseDto getChannelById(String channelId) {
-    Channel channel = channelService.getChannelById(channelId);
-    List<String> userIds = channel.getParticipatingUsers();
-    Instant lastMessageTime = messageService.getLatestMessageByChannel(channelId).getCreatedAt();
-    return channelMapper.toFindChannelDto(channel, lastMessageTime, userIds);
+    return findChannelFacade.findChannelById(channelId);
   }
 
   @Override
   public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
-    // user 에게 할당된 모든 ReadStatus
-    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
-    // user 가 조회할 수 있는 모든 Channel
-    List<Channel> channels = channelService.findAllChannelsByUserId(userId, statuses);
-
-    Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
-    Map<String, List<String>> channelReadStatuses = readStatusService.getUserIdsForChannelReadStatuses(channels);
-
-    return channels.stream()
-        .map(channel -> channelMapper.toFindChannelDto(
-            channel,
-            latestMessagesByChannel.getOrDefault(channel.getUUID(), Instant.EPOCH),
-            channelReadStatuses.getOrDefault(channel.getUUID(), List.of())
-        )).toList();
+    return findChannelFacade.findAllChannelsByUserId(userId);
   }
 
   @Override
   public FindChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
     Channel channel = channelService.updateChannel(channelId, channelUpdateDto.getChannelName(), channelUpdateDto.getMaxNumberOfPeople());
     Instant lastMessageTime = Optional.ofNullable(
-        messageService.getLatestMessageByChannel(channel.getUUID())
+            messageService.getLatestMessageByChannel(channel.getUUID())
         )
         .map(Message::getCreatedAt)
         .orElse(Instant.EPOCH);
@@ -87,7 +72,7 @@ public class BasicChannelFacade implements ChannelMasterFacade {
   }
 
   @Override
-  public void deleteChannel(String channelId){
+  public void deleteChannel(String channelId) {
     channelService.deleteChannel(channelId);
     readStatusService.deleteByChannel(channelId);
     //TODO : 한번에 삭제 메서드 생성
