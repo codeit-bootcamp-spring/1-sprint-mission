@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.facade.message.CreateMessageFacade;
+import com.sprint.mission.discodeit.service.facade.message.DeleteMessageFacade;
 import com.sprint.mission.discodeit.service.facade.message.FindMessageFacade;
 import com.sprint.mission.discodeit.service.facade.message.UpdateMessageFacade;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -44,6 +45,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
   private final CreateMessageFacade createMessageFacade;
   private final FindMessageFacade findMessageFacade;
   private final UpdateMessageFacade updateMessageFacade;
+  private final DeleteMessageFacade deleteMessageFacade;
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
@@ -67,8 +69,7 @@ public class BasicMessageFacade implements MessageMasterFacade {
 
   @Override
   public void deleteMessage(String messageId) {
-    binaryContentService.deleteByMessageId(messageId);
-    messageService.deleteMessage(messageId);
+    deleteMessageFacade.deleteMessage(messageId);
   }
 
 }
