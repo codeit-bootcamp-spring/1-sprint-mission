@@ -13,14 +13,16 @@ public class BinaryContent implements Serializable {
     private final UUID userId;
     private final UUID messageId;
     private final byte[] data;
-    private final Instant creatAt;
+    private final String contentType;
+    private final Instant createAt;
 
-    public BinaryContent(UUID userId, UUID messageId, byte[] data) {
+    public BinaryContent(UUID userId, UUID messageId, byte[] data, String contentType) {
         this.messageId = messageId;
+        this.contentType = contentType;
         this.id = UUID.randomUUID();
         this.userId = userId;
         this.data = data;
-        this.creatAt = getCurrentTime();
+        this.createAt = getCurrentTime();
     }
     protected Instant getCurrentTime() {
         return Instant.now();

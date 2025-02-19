@@ -11,7 +11,7 @@ public class BinaryContentCreateRequestDto {
     private UUID messageId;
     private MultipartFile multipartFile;
 
-    public BinaryContentCreateRequestDto(UUID userId, UUID messageId, MultipartFile multipartFile) throws  Exception {
+    public BinaryContentCreateRequestDto(UUID userId, UUID messageId, MultipartFile multipartFile)  {
         this.userId = userId;
         this.messageId = messageId;
         this.multipartFile = multipartFile;

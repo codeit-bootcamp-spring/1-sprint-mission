@@ -73,6 +73,11 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         saveDataToFile();
     }
 
+    @Override
+    public ArrayList<BinaryContent> findAll() {
+        return new ArrayList<>(data.values());
+    }
+
     // 데이터를 파일에 저장
     private void saveDataToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH.toFile()))) {

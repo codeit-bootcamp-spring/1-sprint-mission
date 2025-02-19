@@ -31,11 +31,10 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public void saveReadStatus(List<ReadStatus> readStatuses) {
-        for (ReadStatus readStatus : readStatuses) {
-            data.put(UUID.randomUUID(), readStatus);
-            saveDataToFile();
-        }
+    public ReadStatus save(ReadStatus readStatus) {
+        data.put(readStatus.getId(), readStatus);
+        saveDataToFile();
+        return readStatus;
     }
 
     @Override
@@ -78,9 +77,25 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> result = new ArrayList<>();
+        for (ReadStatus readStatus : data.values()) {
+            if (readStatus.getChannelId().equals(channelId)) {
+                result.add(readStatus);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void deleteById(UUID id) {
         data.remove(id);
         saveDataToFile();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     // 데이터를 파일에 저장

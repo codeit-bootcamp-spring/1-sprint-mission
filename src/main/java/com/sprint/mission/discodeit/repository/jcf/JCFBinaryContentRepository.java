@@ -51,4 +51,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     public void deleteByMessageId(UUID id) {
         data.values().removeIf(message -> message.getMessageId().equals(id));
     }
+
+    @Override
+    public ArrayList<BinaryContent> findAll() {
+
+        return null;
+    }
 }

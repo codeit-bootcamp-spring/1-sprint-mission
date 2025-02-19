@@ -10,18 +10,18 @@ import java.util.UUID;
 @Getter
 @Setter
 public class UserStatus extends BaseEntity{
+    private static final long serialVersionUID = 1L;
     private UUID userId;
-    private static Instant lastSeenAt;
-    private String userStatus;
+    private Instant lastSeenAt;
 
-    public UserStatus(UUID userId,String userStatus) {
+
+    public UserStatus(UUID userId,Instant lastSeenAt) {
         super();
         this.userId = userId;
-        lastSeenAt = super.getCurrentTime();
-        this.userStatus = userStatus;
+        this.lastSeenAt = lastSeenAt;
     }
 
-    public static boolean isOnline() {
+    public  boolean isOnline() {
         return Duration.between(lastSeenAt, Instant.now()).toMinutes() < 5;
     }
     public void updateLastSeenAt() {
