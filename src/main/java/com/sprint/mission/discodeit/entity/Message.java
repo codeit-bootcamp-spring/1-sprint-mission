@@ -1,37 +1,63 @@
 package com.sprint.mission.discodeit.entity;
 
-// 채팅 메시지 엔티티
-public class Message extends BaseEntity {
-    private String content; // 메시지 내용
-    private final User user; // 메시지를 보낸 사용자
-    private final Channel channel; // 메시지가 속한 채널
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-    // 메시지 내용, 사용자, 채널을 초기화하는 생성자
-    public Message(String content, User user, Channel channel) {
-        super();
+public class Message implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Long createdAt;
+    private Long updatedAt;
+    //
+    private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+
+    public Message(String content, UUID channelId, UUID authorId) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now().getEpochSecond();
+        //
         this.content = content;
-        this.user = user;
-        this.channel = channel;
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
-    // 메시지 내용을 반환
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
     public String getContent() {
         return content;
     }
 
-    // 메시지 내용을 설정하고 수정 시간을 업데이트
-    public void setContent(String content) {
-        this.content = content;
-        updateTimestamp();
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    // 메시지를 보낸 사용자를 반환
-    public User getUser() {
-        return user;
+    public UUID getAuthorId() {
+        return authorId;
     }
 
-    // 메시지가 속한 채널을 반환
-    public Channel getChannel() {
-        return channel;
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 }
