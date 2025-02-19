@@ -1,82 +1,57 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private long createdAt;
-    private long updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String name;
     private String email;
     private transient String password;
-    private List<Channel> channelList;
 
-    public User(String name, String email, String password) {
-        id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        channelList = new ArrayList<>();
+    public static User createUser(String name, String email, String password) {
+        return new User(name, email, password);
+    }
+
+    private User(String name, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
+    public void update(String newName, String newEmail, String newPassword) {
+        boolean isChanged = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            isChanged = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            isChanged = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            isChanged = true;
+        }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public List<Channel> getChannelList() {
-        return channelList;
-    }
-
-    private void updateUpdatedAt() {
-        updatedAt = System.currentTimeMillis();
-    }
-
-    public void updateName(String name) {
-        this.name = name;
-        updateUpdatedAt();
-    }
-
-    public void updateEmail(String email) {
-        this.email = email;
-        updateUpdatedAt();
-    }
-
-    public void updatePassword(String password) {
-        this.password = password;
-        updateUpdatedAt();
-    }
-
-    public void addChannel(Channel newChannel) {
-        channelList.add(newChannel);
-    }
-
-    public void removeChannel(Channel removeChannel) {
-        channelList.remove(removeChannel);
+        if (isChanged) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     @Override
     public String toString() {
-        return "User{id:" + id + ",name:" + name + ",email:" + email + ",channelList:" + channelList + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
+        return "User{id:" + id + ",name:" + name + ",email:" + email + ",createdAt:" + createdAt + ",updateAt:" + updatedAt + "}";
     }
 }

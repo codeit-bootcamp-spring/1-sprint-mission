@@ -2,14 +2,18 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private static final String FILEPATH = "tmp/channel.ser";
-    private final FileManager<Channel> fileManager =  new FileManager<>(FILEPATH);
+    private static final String FILE_PATH = "channel.ser";
+    private final FileManager<Channel> fileManager =  new FileManager<>(FILE_PATH);
 
     @Override
     public Channel save(Channel channel) {
@@ -20,34 +24,30 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID channelId) {
+    public Optional<Channel> findById(UUID id) {
         Map<UUID, Channel> savedChannelMap = loadChannelMapToFile();
-        return Optional.ofNullable(savedChannelMap.get(channelId));
+        return Optional.ofNullable(savedChannelMap.get(id));
     }
 
     @Override
     public List<Channel> findAll() {
-        return loadChannelListToFile();
+        return fileManager.loadListToFile();
     }
 
     @Override
-    public void delete(UUID channelId) {
+    public void deleteById(UUID id) {
         Map<UUID, Channel> savedChannelMap = loadChannelMapToFile();
-        savedChannelMap.remove(channelId);
+        savedChannelMap.remove(id);
         saveChannelMapToFile(savedChannelMap);
     }
 
     private void saveChannelMapToFile(Map<UUID, Channel> saveChannelMap) {
-        List<Channel> saveChannelList = saveChannelMap.values().stream().toList();
+        List<Channel> saveChannelList = saveChannelMap.values().stream().collect(Collectors.toList());
         fileManager.saveListToFile(saveChannelList);
     }
 
-    private List<Channel> loadChannelListToFile() {
-        return fileManager.loadListToFile();
-    }
-
     private Map<UUID, Channel> loadChannelMapToFile() {
-        List<Channel> loadChannelList = loadChannelListToFile();
+        List<Channel> loadChannelList = fileManager.loadListToFile();
         if (loadChannelList.isEmpty()) {
             return new HashMap<>();
         }

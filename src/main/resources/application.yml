@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: Discodeit
+
+server:
+  port: 8080
+
+discodeit:
+  repository:
+    type: jcf
+    file-directory: tmp
+
+logging:
+#  file:
+#    name: ${user.dir}/log/test.log
+  level:
+    com.sprint.mission.discodeit : info
+

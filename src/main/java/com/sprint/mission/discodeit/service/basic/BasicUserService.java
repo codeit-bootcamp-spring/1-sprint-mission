@@ -1,64 +1,106 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserRequest;
+import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validation.UserValidator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
+@Slf4j
 public class BasicUserService implements UserService {
+
     private final UserRepository userRepository;
     private final UserValidator userValidator;
-
-    public BasicUserService(UserRepository userRepository) {
-        this.userValidator = new UserValidator();
-        this.userRepository = userRepository;
-    }
+    private final UserStatusService userStatusService;
+    private final BinaryContentService binaryContentService;
 
     @Override
-    public User createUser(String name, String email, String password) {
-        if (userValidator.isValidName(name) && userValidator.isValidEmail(email)) {
-            User newUser = new User(name, email, password);
+    public UserResponse createUser(UserRequest request) {
+        if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email()) && userValidator.isValidPassword(request.password())) {
+
+            User newUser = User.createUser(request.name(), request.email(), request.password());
             userRepository.save(newUser);
-            System.out.println("create user: " + newUser.getName());
-            return newUser;
+
+            UserStatus newUserStatus = userStatusService.create(newUser.getId());
+
+            MultipartFile userProfileImg = request.file();
+            if (userProfileImg != null) {
+                binaryContentService.createUserProfileFile(userProfileImg, newUser.getId());
+            }
+
+            log.info("Create User: {}", newUser);
+            return UserResponse.entityToDto(newUser, newUserStatus);
         }
         return null;
     }
 
     @Override
-    public List<User> getAllUserList() {
-        return userRepository.findAll();
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream()
+                .map(user -> UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId())))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User searchById(UUID userId) {
-        return userRepository.findById(userId) // Optional 을 받아서 처리
-                .orElseThrow(() -> new NoSuchElementException("user does not exist"));
+    public UserResponse findById(UUID id) {
+        User user = findByIdOrThrow(id);
+        return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
     }
 
     @Override
-    public void deleteUser(UUID userId) {
-        userRepository.delete(userId);
-    }
+    public void update(UUID id, UserRequest request) {
+        User user = findByIdOrThrow(id);
+        String newName = null;
+        String newEmail = null;
+        String newPassword = null;
 
-    @Override
-    public void updateUserName(UUID userId, String newName) {
-        User user = searchById(userId);
-        if (userValidator.isValidName(newName)) {
-            user.updateName(newName);
-            userRepository.save(user);
-            System.out.println("success update");
+        if (request.name() != null && userValidator.isValidName(request.name())) {
+            newName = request.name();
         }
+        if (request.email() != null && userValidator.isValidEmail(request.name())) {
+            newEmail = request.email();
+        }
+        if (request.password() != null && userValidator.isValidPassword(request.name())) {
+            newPassword = request.password();
+        }
+        user.update(newName, newEmail, newPassword);
+        userRepository.save(user);
+
+        MultipartFile userProfileImg = request.file();
+        if (userProfileImg != null) {
+            binaryContentService.updateUserProfileFile(userProfileImg, id);
+        }
+        log.info("Update User :{}", user);
     }
 
     @Override
-    public void updateUserEmail(UUID userId, String newEmail) {
-        User user = searchById(userId);
-        if (userValidator.isValidEmail(newEmail)) {
-            searchById(userId).updateEmail(newEmail);
-            System.out.println("success update");
-        }
+    public void deleteById(UUID id) {
+        findByIdOrThrow(id);
+        binaryContentService.deleteByUserId(id);
+        userStatusService.deleteByUserId(id);
+        userRepository.deleteById(id);
     }
+
+    @Override
+    public User findByIdOrThrow(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User does not exist"));
+    }
+
 }
