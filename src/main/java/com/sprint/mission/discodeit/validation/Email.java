@@ -68,7 +68,7 @@ public class Email implements Serializable {
 
     // 이메일 형식 확인
     public boolean matchEmail(String email) {
-        
+
         // 이메일 정규식 충족하지 않을 때 true 리턴
         return !email.matches(EMAIL_REGEX);
     }
@@ -81,7 +81,7 @@ public class Email implements Serializable {
                 return true;
             }
         }
-        
+
         // 미가입된 경우 false 반환
         return false;
     }

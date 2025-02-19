@@ -1,128 +1,54 @@
 package com.sprint.mission.discodeit.test;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.userDto.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.view.DisplayUser;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.UUID;
 
 public class UserTest {
 
+    // 유저 생성 시 자동으로 이메일, 이름, 닉네임을 다르게 하기 위한 필드
+    private static int userIndex = 1;
+
     // 유저 생성
-    public static User setUpUser(UserService userService, UserRepository userRepository) throws IOException {
+    public static UUID setUpUser(UserService userService) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String email = "test" + userIndex + "@email.com";
+        String password = "PWpw11!!";
+        String name = "test_name" + userIndex;
+        String nickname = "test_nickname" + (userIndex++);
+        String phoneNumber = "010-0000-0000";
+        MultipartFile profileImage = null;
 
-            System.out.println("이메일 입력 :");
-            String email = br.readLine();
+        CreateUserRequestDto user = new CreateUserRequestDto(email, password, name, nickname, phoneNumber, profileImage);
 
-            System.out.println("비밀번호 입력 :");
-            String password = br.readLine();
-
-            System.out.println("이름 입력 :");
-            String name = br.readLine();
-
-            System.out.println("닉네임 입력 :");
-            String nickname = br.readLine();
-
-            System.out.println("전화번호 입력 :");
-            String phoneNumber = br.readLine();
-
-//        String email = "test@email.com";
-//        String password = "PWpw11!!";
-//        String name = "test_name";
-//        String nickname = "test_nickname";
-//        String phoneNumber = "010-0000-0000";
-
-        User user = new User(email, password, name, nickname, phoneNumber, userRepository);
-
-        userService.create(user);
+        UUID id = userService.create(user);
 
         System.out.println("================================================================================");
         System.out.println("유저 생성 결과 : ");
         DisplayUser.displayUserInfo(user);
         System.out.println("================================================================================");
 
-        return user;
+        return id;
     }
 
     // 유저 정보 변경
     public static void updateUser(UUID id, UserService userService) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String email = "update@email.com";
+        String password = null;
+        String name = "updateName";
+        String nickname = "update_nickname";
+        String phoneNumber = "010-1111-0000";
+        MultipartFile profileImageFile = null;
 
-        loopOut:
-        while (true) {
-            System.out.println("================================================================================");
-            System.out.println("1. 현재 유저 정보 확인");
-            System.out.println("2. 이메일 변경");
-            System.out.println("3. 비밀번호 변경");
-            System.out.println("4. 이름 변경");
-            System.out.println("5. 닉네임 변경");
-            System.out.println("6. 전화번호 변경");
-            System.out.println("7. 종료");
-            System.out.println("================================================================================");
+        UpdateUserRequestDto updateUser = new UpdateUserRequestDto(email, password, name, nickname, phoneNumber, profileImageFile);
 
-            String menu = br.readLine();
-
-            User user = userService.read(id);
-
-            try {
-
-                switch (menu) {
-
-                    case "1":
-                        System.out.println("================================================================================");
-                        System.out.println("현재 정보 : ");
-                        DisplayUser.displayUserInfo(user);
-                        System.out.println("================================================================================");
-                        break;
-
-                    case "2":
-                        System.out.println("이메일 입력 :");
-                        String email = br.readLine();
-                        userService.updateEmail(id, email);
-                        break;
-
-                    case "3":
-                        System.out.println("비밀번호 입력 :");
-                        String password = br.readLine();
-                        userService.updatePassword(id, password);
-                        break;
-
-                    case "4":
-                        System.out.println("이름 입력 :");
-                        String name = br.readLine();
-                        userService.updateName(id, name);
-                        break;
-
-                    case "5":
-                        System.out.println("닉네임 입력 :");
-                        String nickname = br.readLine();
-                        userService.updateNickname(id, nickname);
-                        break;
-
-                    case "6":
-                        System.out.println("전화번호 입력 :");
-                        String phoneNumber = br.readLine();
-                        userService.updatePhoneNumber(id, phoneNumber);
-                        break;
-
-                    case "7":
-                        System.out.println("종료합니다.");
-                        break loopOut;
-
-                    default:
-                        System.out.println("1 ~ 7 중 하나를 선택해주세요.");
-                }
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
+        userService.updateUser(id, updateUser);
     }
 
     // 유저 삭제
@@ -130,14 +56,14 @@ public class UserTest {
 
         System.out.println("================================================================================");
         System.out.println("유저 삭제 전 목록 :");
-        DisplayUser.displayAllUserInfo(userService.readAll());
+        DisplayUser.displayAllUserInfo(userService.findAll());
         System.out.println("================================================================================");
 
         userService.delete(id);
 
         System.out.println("================================================================================");
         System.out.println("유저 삭제 후 목록 :");
-        DisplayUser.displayAllUserInfo(userService.readAll());
+        DisplayUser.displayAllUserInfo(userService.findAll());
         System.out.println("================================================================================");
     }
 }

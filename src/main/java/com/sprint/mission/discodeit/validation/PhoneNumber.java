@@ -37,7 +37,7 @@ public class PhoneNumber implements Serializable {
 
     // 전화번호가 null인지 확인하고 아니라면 trim()하여 반환
     public String checkNull(String phoneNumber) {
-        if (phoneNumber == null || phoneNumber.isBlank()){
+        if (phoneNumber == null || phoneNumber.isBlank()) {
             throw new IllegalArgumentException("전화번호를 입력해주세요.");
         }
 
@@ -53,7 +53,7 @@ public class PhoneNumber implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return phoneNumber;
     }
 }
