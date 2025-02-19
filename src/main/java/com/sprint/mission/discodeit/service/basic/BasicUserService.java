@@ -43,18 +43,19 @@ public class BasicUserService implements UserService {
         if(userRepository.existsByName(request.getName())){
             throw new IllegalArgumentException("Name already in use");
         }
-        UUID profileId=null;
-        if(request.getProfileImage() != null) {
-            BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(null,null, request.getProfileImage());
-            BinaryContent binaryContent = binaryContentService.createProfile(binaryRequest);
-            profileId=binaryContent.getId();
-        }
 
-        User user = new User(request.getName(),request.getEmail(),request.getPassword());
+        User user = new User(request.getName(), request.getEmail(), request.getPassword());
         userRepository.save(user);
 
+
+        if(request.getProfileImage() != null) {
+            BinaryContentCreateRequestDto binaryRequest = new BinaryContentCreateRequestDto(user.getId(), null, request.getProfileImage());
+            BinaryContent binaryContent = binaryContentService.createProfile(binaryRequest);
+            user.setProfileId(binaryContent.getId());
+        }
+
         Instant now = Instant.now();
-        UserStatusCreateRequestDto userStatusCreateRequestDto =new UserStatusCreateRequestDto(user.getId(),now);
+        UserStatusCreateRequestDto userStatusCreateRequestDto = new UserStatusCreateRequestDto(user.getId(), now);
         userStatusService.create(userStatusCreateRequestDto);
 
         return toDto(user);

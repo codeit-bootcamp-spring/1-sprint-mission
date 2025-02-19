@@ -129,9 +129,10 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(id)) {
             throw new NoSuchElementException("Channel not found");
         }
+        channelRepository.deleteChannel(id);
         messageService.deleteByChannelId(id);
         readStatusService.deleteByChannelId(id);
-        channelRepository.deleteChannel(id);
+
     }
     private ChannelDto toDto(Channel channel) {
         Instant lastMessageAt = messageService.findAllByChannelId(channel.getId())

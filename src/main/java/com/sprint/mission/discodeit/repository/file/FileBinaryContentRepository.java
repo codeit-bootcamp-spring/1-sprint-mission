@@ -69,7 +69,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void deleteByMessageId(UUID id) {
-        data.values().removeIf(message -> message.getMessageId().equals(id));
+        data.values().removeIf(message -> Objects.equals(message.getMessageId(),id));
         saveDataToFile();
     }
 
