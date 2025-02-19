@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ResultDTO;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -18,9 +18,9 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @PostMapping("/message")
-    public ResultDTO<UUID> sendMessage(@RequestBody MessageCreateDTO request){
-        return ResultDTO.<UUID>builder()
+    @PostMapping("/messages")
+    public ResponseDTO<UUID> sendMessage(@ModelAttribute MessageCreateDTO request){
+        return ResponseDTO.<UUID>builder()
                 .code(HttpStatus.OK.value())
                 .message("메시지가 생성 완료")
                 .data(messageService.create(request))
@@ -28,28 +28,28 @@ public class MessageController {
     }
 
     @PutMapping("/messages/{messageId}")
-    public ResultDTO updateMessage(@PathVariable UUID messageId, @RequestBody MessageUpdateDTO request){
+    public ResponseDTO updateMessage(@PathVariable UUID messageId, @RequestBody MessageUpdateDTO request){
         messageService.update(messageId, request);
-        return ResultDTO.<UUID>builder()
+        return ResponseDTO.<UUID>builder()
                 .code(HttpStatus.OK.value())
                 .message("메시지 수정 완료")
                 .build();
     }
 
     @DeleteMapping("/messages/{messageId}")
-    public ResultDTO<UUID> deleteMessage(@PathVariable UUID messageId){
-        return ResultDTO.<UUID>builder()
+    public ResponseDTO<UUID> deleteMessage(@PathVariable UUID messageId){
+        return ResponseDTO.<UUID>builder()
                 .code(HttpStatus.OK.value())
-                .message("메시지가 생성 완료")
+                .message("메시지가 삭제 완료")
                 .data(messageService.delete(messageId))
                 .build();
     }
 
     @GetMapping("/messages/{channelId}")
-    public ResultDTO<List<Message>> getMessageByChannel(@PathVariable UUID channelId){
-        return ResultDTO.<List<Message>>builder()
+    public ResponseDTO<List<Message>> getMessageByChannel(@PathVariable UUID channelId){
+        return ResponseDTO.<List<Message>>builder()
                 .code(HttpStatus.OK.value())
-                .message("메시지가 생성 완료")
+                .message("특정 채널 메시지 조회")
                 .data(messageService.findAllByChannelId(channelId))
                 .build();
     }

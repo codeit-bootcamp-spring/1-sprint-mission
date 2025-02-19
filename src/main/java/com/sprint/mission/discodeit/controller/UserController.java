@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.ResultDTO;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
@@ -25,8 +25,8 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @PostMapping("/users")
-    public ResultDTO<UUID> joinUser(@RequestBody UserCreateDTO requset){
-        return ResultDTO.<UUID>builder()
+    public ResponseDTO<UUID> joinUser(@ModelAttribute UserCreateDTO requset){
+        return ResponseDTO.<UUID>builder()
                 .code(HttpStatus.OK.value())
                 .message("사용자 등록 완료")
                 .data(userService.create(requset))
@@ -34,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResultDTO<List<UserFindDTO>> getAllUsers(){
-        return ResultDTO.<List<UserFindDTO>>builder()
+    public ResponseDTO<List<UserFindDTO>> getAllUsers(){
+        return ResponseDTO.<List<UserFindDTO>>builder()
                 .code(HttpStatus.OK.value())
                 .message("모든 사용자 조회")
                 .data(userService.findAll())
@@ -43,17 +43,17 @@ public class UserController {
     }
 
     @PutMapping("/users/{userId}")
-    public ResultDTO updateUser(@PathVariable UUID userId, @RequestBody UserUpdateDTO request){
-        User update = userService.update(userId, request);
-        return ResultDTO.builder()
+    public ResponseDTO updateUser(@PathVariable UUID userId, @RequestBody UserUpdateDTO request){
+        userService.update(userId, request);
+        return ResponseDTO.builder()
                 .code(HttpStatus.OK.value())
                 .message("사용자 수정 완료")
                 .build();
     }
 
     @DeleteMapping("/users/{userId}")
-    public ResultDTO<UUID> deleteUser(@PathVariable UUID userId){
-        return ResultDTO.<UUID>builder()
+    public ResponseDTO<UUID> deleteUser(@PathVariable UUID userId){
+        return ResponseDTO.<UUID>builder()
                 .code(HttpStatus.OK.value())
                 .message("사용자 삭제 완료")
                 .data(userService.delete(userId))
@@ -61,9 +61,9 @@ public class UserController {
     }
 
     @PutMapping("/users/{userId}/status")
-    public ResultDTO updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateDTO request){
+    public ResponseDTO updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdateDTO request){
         userStatusService.update(userId, request);
-        return ResultDTO.builder()
+        return ResponseDTO.builder()
                 .code(HttpStatus.OK.value())
                 .message("사용자 온라인 상태 업데이트 완료")
                 .build();

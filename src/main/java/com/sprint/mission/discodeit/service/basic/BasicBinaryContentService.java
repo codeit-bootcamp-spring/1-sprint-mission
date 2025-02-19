@@ -50,7 +50,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent find(UUID id) {
-
         BinaryContent findBinaryContent = binaryContentRepository.findOne(id);
         Optional.ofNullable(findBinaryContent)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
