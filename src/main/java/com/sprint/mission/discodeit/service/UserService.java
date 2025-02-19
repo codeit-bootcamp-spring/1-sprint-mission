@@ -1,25 +1,27 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UUID createUser(String userName);
 
-    HashMap<UUID, User> getUsersMap();
+    UUID createUser(String userName, String email,String password);
 
-    User getUserById(UUID id);
+    UUID createUser(String userName, String email,String password, String profilePicturePath);
 
-    String getUserNameById(UUID id);
+    UserDto findUserById(UUID id);
+
+    List<UserDto> findAllUsers();
 
     boolean deleteUser(UUID userId);
 
     boolean changeUserName(UUID userId, String newName);
 
-    boolean isUserExist(UUID userId);
+    boolean changeProfilePicture(UUID userId, String profilePicturePath);
+
+    boolean deleteProfilePicture(UUID userId);
+
 }
 

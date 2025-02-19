@@ -1,24 +1,27 @@
 package com.sprint.mission.discodeit.service;
+import com.sprint.mission.discodeit.entity.Dto.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 
 public interface MessageService {
-    HashMap<UUID, Message> getMessagesMap();
+    HashMap<UUID, Message> getChannelMessagesMap(UUID channelId);
 
-    UUID createMessage(UUID fromUserId, UUID channelId, String content);
+    List<MessageDto> findAllMessagesByChannelId(UUID channelId);
 
-    Message getMessageById(UUID messageId);
+    UUID createMessageWithBinaryContents(UUID authorId, UUID channelId, String content, String ...attachmentsPaths);
 
-    boolean reviseMessageContent(UUID messageId, String content);
+    UUID createMessage(UUID authorId, UUID channelId, String content);
 
-    boolean deleteMessage(UUID messageId);
+    MessageDto findMessageById(UUID channelId, UUID messageId);
 
-    boolean isMessageExist(UUID messageId);
+    boolean reviseMessageContent(UUID channelId, UUID messageId, String content);
 
-    String getMessageContent(UUID messageId);
+    boolean deleteMessage(UUID channelId, UUID messageId);
 
-    boolean printMessageDetails(UUID messageId);
+    boolean isMessageExist(UUID channelId, UUID messageId);
+
 }

@@ -1,72 +1,64 @@
 package com.sprint.mission;
 
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.file.*;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.basic.*;
 
-import java.util.ArrayList;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class JavaApplication {
+
+    //todo 전체적으로해야할것 1 : 검증코드 try catch로 변경
+    //todo 전체적으로해야할것 2 : 레포지토리 업데이트 코드 보완
+    //todo 핸들러 호출방식 변경. 싱글톤->빈 주입
+
+    static UserDto setupUser(UserService userService) {
+        UUID user1 = userService.createUser("woody", "woody@codeit.com", "woody1234");
+        return userService.findUserById(user1);
+    }
+
+    static ChannelDto setupChannel(ChannelService channelService) {
+        UUID channel1 = channelService.createPublicChannel("공지", "공지 채널입니다.");
+        return channelService.findChannelById(channel1);
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        UUID message1 = messageService.createMessage(author.getId(), channel.getId(),"안녕하세요.");
+        System.out.println("메시지 생성: " + message1);
+    }
+
     public static void main(String[] args) {
 
-        JCFUserService JCFUserServiceInstance = JCFUserService.getInstance();
-        JCFChannelService JCFChannelServiceInstance = JCFChannelService.getInstance();
-        FileUserService FileUserServiceInstance = FileUserService.getInstance();
-        FileChannelService FileChannelServiceInstance = FileChannelService.getInstance();
-        FileMessageService FileMessageServiceInstance = FileMessageService.getInstance();
-        JCFMessageService JCFMessageServiceInstance = JCFMessageService.getInstance();
 
-        //JCF 유저 생성
-        UUID JCFuser1 = JCFUserServiceInstance.createUser("Kaya");
-        UUID JCFuser2 = JCFUserServiceInstance.createUser("Ayden");
-        UUID JCFuser3 = JCFUserServiceInstance.createUser("Sia");
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+        ReadStatusRepository readStatusRepository = new FileReadStatusRepository();
+        BinaryContentRepository binaryContentRepository = new FileBinaryContentRepository();
+        UserStatusRepository userStatusRepository = new FileUserStatusRepository();
+        UserStatusService userStatusService = new BasicUserStatusService(userStatusRepository, userRepository);
+        FileIOHandler fileIOHandler = FileIOHandler.getInstance();
 
-        //JCF채널 생성
-        UUID JCFchannel1 = JCFChannelServiceInstance.createChannel("Kaya's Channel");
+        BinaryContentService binaryContentService = new BasicBinaryContentService();
+        MessageService messageService = new BasicMessageService(messageRepository,userRepository, channelRepository, binaryContentRepository, binaryContentService);
+        ChannelService channelService = new BasicChannelService(channelRepository,userRepository, readStatusRepository, messageRepository, binaryContentRepository);
+        UserService userService = new BasicUserService(userRepository, fileIOHandler, binaryContentRepository, userStatusService, channelService);
+        ReadStatusService readStatusService = new BasicReadStatusService(readStatusRepository, userRepository, messageRepository, channelService, channelRepository);
 
-        //JCF채널1에 생성한 모든 유저 추가
-        JCFUserServiceInstance.getUsersMap().keySet().stream().forEach(userId -> {JCFChannelServiceInstance.addChannelMember(JCFchannel1, userId);});
 
-        //JCF채널1에 속한 유저 이름 출력
-        JCFChannelServiceInstance.printAllMemberNames(JCFchannel1);
 
-        //직접 생성한 JCF 유저들을 모두 직렬화
-        JCFUserServiceInstance.exportUsersMap("JCFUsersMap");
 
-        //직렬화했던 JCF 유저들을 File 클래스를 이용해 관리할 수 있도록 역직렬화
-        FileUserServiceInstance.importUserMap("JCFUsersMap");
-
-        //FileUserService를 이용해서 불러온 유저들 출력
-        System.out.println("역직렬화로 불러온 파일클래스 유저들 : " + FileUserServiceInstance.getUsersMap().keySet().stream().map((userId) -> FileUserServiceInstance.getUserNameById(userId)).collect(Collectors.joining(", ")));
-
-        //메세지 생성
-        UUID JCFmessage1 = JCFMessageServiceInstance.createMessage(JCFuser2, JCFchannel1, "Hello World");
-        UUID JCFmessage2 = JCFMessageServiceInstance.createMessage(JCFuser1, JCFchannel1, "It's hard to debug... Hey java.. just work al jal ddak ggal sen please.. ");
-
-        //메세지 내용 및 상세정보 출력
-        JCFMessageServiceInstance.printMessageDetails(JCFmessage1);
-
-        //생성한 채널 직렬화
-        JCFChannelServiceInstance.exportChannelMap("JCFChannelMap");
-        //생성한 메세지들 직렬화
-        JCFMessageServiceInstance.exportMessagesMap("JCFMessagesMap");
-        //생성한 채널 역직렬화
-        FileChannelServiceInstance.importChannelMap("JCFChannelMap");
-        //생성한 메세지들 역직렬화
-        FileMessageServiceInstance.importMessageMap("JCFMessagesMap");
-
-        //JCF로 생성하고 직렬화했던 메세지들 역직렬화하여 상세정보 출력
-        UUID FileMessage1 = JCFmessage1;
-        UUID FileMessage2 = JCFmessage2;
-
-        FileMessageServiceInstance.reviseMessageContent(JCFmessage2, "Bye World");
-        FileMessageServiceInstance.printMessageDetails(JCFmessage2);
+        //셋업
+        UserDto user = setupUser(userService);
+        ChannelDto channel = setupChannel(channelService);
+        // 테스트
+        //messageCreateTest(messageService, channel, user);
 
 
     }

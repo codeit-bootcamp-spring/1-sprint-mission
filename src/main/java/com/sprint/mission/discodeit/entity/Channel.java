@@ -1,57 +1,56 @@
 package com.sprint.mission.discodeit.entity;
+import com.sprint.mission.discodeit.entity.Type.ChannelType;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
-
+@Getter
 public class Channel implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private UUID id;
     private String channelName;
-    private ArrayList<User> members;
+    private ArrayList<UUID> members;
+    private ChannelType type;
+    private String description;
 
-    public Channel(String channelName) {
+    public Channel(ChannelType type, String channelName, String description) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.channelName = channelName;
-        this.members = new ArrayList<>();
+        this.members = new ArrayList<UUID>();
+        this.type = type;
+        this.description = description;
     }
-    //생성시간 리턴
-    public long getCreatedAt(){return this.createdAt;}
-    //업데이트시간 리턴
-    public long getUpdatedAt(){return this.updatedAt;}
+
     //업데이트시간 변경
-    public void setUpdatedAt(){this.updatedAt = System.currentTimeMillis();}
-    //채널 uuid 리턴
-    public UUID getId(){return this.id;}
-    // 채널이름 리턴
-    public String getChannelName(){
-        return this.channelName;
-    }
+    public void setUpdatedAt(){this.updatedAt = Instant.now();}
+
     //채널이름 변경
     public void setChannelName(String channelName){
         this.channelName = channelName;
         this.setUpdatedAt();
     }
-    //채널에 속한 멤버 리스트 반환
-    public ArrayList<User> getMembers(){
-        return this.members;
-    }
 
     //채널에 속한 멤버 리스트 교체
-    public void setMembers(ArrayList<User> members){
+    public void setMembers(ArrayList<UUID> members){
         this.members = members;
         this.setUpdatedAt();
     }
-    //채널에 멤버 한명 추가
-    public void addMember(User user){
-        this.members.add(user);
+
+    //채널소개 변경
+    public void setDescription(String description){
+        this.description = description;
         this.setUpdatedAt();
     }
 
+    //
 
 }

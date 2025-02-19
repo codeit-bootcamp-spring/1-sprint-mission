@@ -1,0 +1,12 @@
+spring:
+    application:
+        name: discodeit
+app:
+    user-repository: file
+    userStatus-repository: file
+    message-repository: file
+    binaryContent-repository: file
+    channel-repository: file
+    readStatus-repository: file
+
+

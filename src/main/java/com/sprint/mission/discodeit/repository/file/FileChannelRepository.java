@@ -2,78 +2,86 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+@ConditionalOnProperty(name = "app.channel-repository", havingValue = "file")
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
-    // I/O로 생성된 모든 채널 객체가 담기는 해쉬맵
-    private static final HashMap<UUID, Channel> channelsMap = new HashMap<UUID, Channel>();
-
-    // 외부에서 생성자 접근 불가
-    private FileChannelRepository() {}
-
-    // 레포지토리 객체 LazyHolder 싱글톤 구현.
-    private static class FileChannelRepositoryHolder {
-        private static final FileChannelRepository INSTANCE = new FileChannelRepository();
-    }
-
-    // 외부에서 호출 가능한 싱글톤 인스턴스.
-    public static FileChannelRepository getInstance() {
-        return FileChannelRepository.FileChannelRepositoryHolder.INSTANCE;
-    }
+    FileIOHandler fileIOHandler = FileIOHandler.getInstance();
+    String mainChannelRepository = "Channel\\mainOIChannelRepository";
 
     // I/O로 생성된 모든 채널 객체가 담기는 해쉬맵 반환
     @Override
     public HashMap<UUID, Channel> getChannelsMap() {
-        return channelsMap;
+        return (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
     }
 
     // 특정 채널객체 여부에 따라 객체 혹은 null 반환.
     @Override
-    public Channel getChannel(UUID channelId) {
-        if (channelId==null) {
-            return null;
-        }
+    public Channel getChannel(UUID channelId){
+        HashMap<UUID, Channel> channelsMap = getChannelsMap();
         return channelsMap.get(channelId);
     }
 
-    // 특정 채널객체 여부 확인 후 삭제
+    // 특정 채널객체 삭제
     @Override
-    public boolean deleteChannel(UUID channelId) {
-        if (channelId==null) {
+    public boolean deleteChannel(UUID channelId){
+        HashMap<UUID, Channel> channelsMap = getChannelsMap();
+        //해시맵은 존재하는 key를 삭제하면 삭제한 요소를 반환하지만 없는 key를 삭제하면 null 반환.
+        if (channelsMap.remove(channelId)==null){
             return false;
-        }
-        channelsMap.remove(channelId);
-        return true;
+        };
+        return fileIOHandler.serializeHashMap(channelsMap, mainChannelRepository);
     }
 
-    // 전달받은 채널객체 null 여부 확인 후 채널 해쉬맵에 추가.
+    // 전달받은 채널객체 채널 해쉬맵에 추가.
     @Override
-    public boolean addChannel(Channel channel) {
+    public boolean saveChannel(Channel channel){
         if (channel == null) {
-            return false;
+            System.out.println("addChannel()의 파라미터에 전달된 유저가 null인 상태입니다. ");
         }
+        HashMap<UUID, Channel> channelsMap = (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
         channelsMap.put(channel.getId(), channel);
-        return true;
+        return fileIOHandler.serializeHashMap(channelsMap, mainChannelRepository);
     }
 
-    //채널 존재여부 반환
+    // 채널 존재여부 반환
     @Override
     public boolean isChannelExist(UUID channelId) {
-        if (channelId==null || channelsMap.containsKey(channelId) == false) {
-            return false;
-        }
-        return true;
+        HashMap<UUID, Channel> channelsMap = (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
+        return channelsMap.containsKey(channelId);
     }
 
-    // 전달받은 채널맵 null 여부 확인 후 기존 채널맵에 추가.
-    public boolean addChannels(HashMap<UUID, Channel> channels) {
-        if (channels == null) {
+    // 채널 객체에 멤버 추가
+    @Override
+    public boolean addChannelMember(UUID channelId, UUID memberId){
+        HashMap<UUID, Channel> channelsMap = (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
+        Channel channel = channelsMap.get(channelId);
+        ArrayList<UUID> membersId = channel.getMembers();
+        if (membersId.contains(membersId)==true){
+            System.out.println("해당 멤버는 이미 존재합니다.");
             return false;
         }
-        channelsMap.putAll(channels);
-        return true;
+        channel.getMembers().add(memberId);
+        return fileIOHandler.serializeHashMap(channelsMap, mainChannelRepository);
     }
+
+
+    //멤버 삭제
+    @Override
+    public boolean removeChannelMember(UUID channelId, UUID memberId) {
+        HashMap<UUID, Channel> channelsMap = (HashMap<UUID, Channel>) fileIOHandler.deserializeHashMap(mainChannelRepository);
+        if (channelsMap==null||isChannelExist(channelId)==false||channelsMap.get(memberId)==null){
+            return false;
+        }
+        channelsMap.get(channelId).getMembers().remove(memberId);
+        return fileIOHandler.serializeHashMap(channelsMap, mainChannelRepository);
+    }
+
+
 }

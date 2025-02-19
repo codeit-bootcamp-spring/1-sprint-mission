@@ -1,40 +1,49 @@
 package com.sprint.mission.discodeit.entity;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Message implements Serializable, Entity {
     private static final long serialVersionUID = 1L;
 
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private UUID id;
-    private User fromUser;
+    private User author;
     private Channel channel;
     private String content;
+    private List<UUID> binaryContentsId;
 
 
-    public Message(User fromUser, Channel channel, String content){
+    public Message(User User, Channel channel, String content){
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.fromUser = fromUser;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.author = User;
         this.channel = channel;
+        this.content = content;
     }
 
-    //생성시간 리턴
-    public long getCreatedAt(){return this.createdAt;}
-    //업데이트시간 리턴
-    public long getUpdatedAt(){return this.updatedAt;}
+    public Message(User User, Channel channel, String content, List<UUID> binaryContentsId){
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        this.author = User;
+        this.channel = channel;
+        this.content = content;
+        this.binaryContentsId = binaryContentsId;
+    }
+
+
+
     //업데이트시간 변경
-    public void setUpdatedAt(){this.updatedAt = System.currentTimeMillis();}
+    public void setUpdatedAt(){this.updatedAt = Instant.now();}
     //id 리턴
-    public UUID getId(){return this.id;}
-    //메세지 보낸이 리턴
-    public User getFromUser(){return this.fromUser;}
-    //메세지가 보여질 채널 리턴
-    public Channel getChannel(){return this.channel;}
-    //메세지 내용 리턴
-    public String getContent(){return this.content;}
-    //메세지 내용 변경 후 업데이트시간 변경
+
     public void setContent(String content){
         this.content = content;
         this.setUpdatedAt();

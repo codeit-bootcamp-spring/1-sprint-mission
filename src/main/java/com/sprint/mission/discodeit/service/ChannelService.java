@@ -1,34 +1,31 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Dto.UserDto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    UUID createChannel(String channelName);
+    UUID createPrivateChannel(String channelName, String description, UUID[] membersId);
 
-    HashMap<UUID, Channel> getChannelsMap();
+    UUID createPublicChannel(String channelName, String description);
 
-    Channel getChannelById(UUID channelId);
+    ChannelDto findChannelById(UUID channelId);
+
+    List<ChannelDto> findAllByUserId(UUID userId);
 
     boolean deleteChannel(UUID channelId);
 
-    boolean changeChannelName(UUID channelId, String newName);
-
-    boolean changeChannelMembers(UUID channelId, ArrayList<User> members);
+    boolean changeChannelDescription(UUID channelId, String newName);
 
     boolean addChannelMember(UUID channelID, UUID memberID);
 
-    boolean isChannelExist(UUID channelId);
-
-    ArrayList<User> getAllMembers(UUID channelId);
-
     String getChannelNameById(UUID userId);
 
-    boolean printAllMemberNames(UUID channelId);
+    List<UserDto> findAllMembers(UUID channelId);
+
+    boolean deleteMember(UUID channelId, UUID memberId);
 
 
 }
