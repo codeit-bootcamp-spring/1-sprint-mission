@@ -24,14 +24,6 @@ public class UserStatus extends BaseEntity implements Serializable {
         this.userstatusType = dto.type();
         this.lastActiveAt = dto.lastActiveAt();
     }
-
-    public boolean isOnline() {
-        if (lastActiveAt == null) {
-            return false; //접속한 적이 없다 -> 오프라인
-        }
-        Instant fiveMinutesAgo = Instant.now().minus(5, ChronoUnit.MINUTES);
-        return lastActiveAt.isAfter(fiveMinutesAgo); //접속이 5분 이내면 온라인
-    }
     public void update(UserStatusUpdate dto) {
         if(dto.type() == null&& isOnline()){
             this.lastActiveAt = dto.lastActiveAt();
