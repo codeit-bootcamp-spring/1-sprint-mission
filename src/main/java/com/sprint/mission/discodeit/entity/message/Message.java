@@ -1,24 +1,54 @@
-package com.sprint.mission.discodeit.entity;
+package com.sprint.mission.discodeit.entity.message;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
+import com.sprint.mission.discodeit.entity.BaseObject;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.message.NullMessageContentException;
 import com.sprint.mission.discodeit.exception.message.NullMessageTitleException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import lombok.Getter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Getter
+@JsonRootName("message")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Message extends BaseObject implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    @JsonProperty(value = "messageTitle", required = true)
     private String messageTitle;
+
+    @JsonProperty("messageContent")
     private String messageContent;
+
+    @JsonProperty("messageSendUser")
     private User messageSendUser;
+
+    @JsonProperty("messageReceiveUser")
     private User messageReceiveUser;
+
+    public Message(UUID uuid) {}
+
+    public Message() {
+    }
+
 
     public Message(String title, String messageContent, User messageSendUser, User messageReceiveUser) {
         super();
+        setMessageTitle(title);
+        setMessageContent(messageContent);
+        setSenderAndReceiver(messageSendUser, messageReceiveUser);
+    }
+
+    public Message(UUID messageId, String title, String messageContent, User messageSendUser, User messageReceiveUser) {
+        super(messageId);
         setMessageTitle(title);
         setMessageContent(messageContent);
         setSenderAndReceiver(messageSendUser, messageReceiveUser);
@@ -112,34 +142,6 @@ public class Message extends BaseObject implements Serializable {
     public User updateReceiveUser(User updateReceiveUser) {
         setReceiver(updateReceiveUser);
         return this.messageReceiveUser;
-    }
-
-    public String getMessageTitle() {
-        return messageTitle;
-    }
-
-    public UUID getMessageId() {
-        return getId();
-    }
-
-    public String getMessageContent() {
-        return messageContent;
-    }
-
-    public User getMessageSendUser() {
-        return messageSendUser;
-    }
-
-    public User getMessageReceiveUser() {
-        return messageReceiveUser;
-    }
-
-    public Long getCreatedAt() {
-        return getCreatedAtBaseObject();
-    }
-
-    public Long getUpdatedAt() {
-        return getUpdatedAtBaseObject();
     }
 
     @Override

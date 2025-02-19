@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.validate;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 
 import java.util.Optional;

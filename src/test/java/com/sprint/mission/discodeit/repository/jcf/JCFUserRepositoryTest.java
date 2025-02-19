@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +26,7 @@ class JCFUserRepositoryTest {
 
         userRepository.userSave(user1);
 
-        Assertions.assertEquals(user1, userRepository.findUserById(user1.getUserId()));
+        Assertions.assertEquals(user1, userRepository.findUserById(user1.getId()));
     }
 
     @Test
@@ -35,8 +35,8 @@ class JCFUserRepositoryTest {
         User user1 = userRepository.userSave(new User("kim", "dwqdwq@tss.com", "passwoooord"));
         User user2 = userRepository.userSave(new User("lee", "zkzkzk@nave.com", "pppppwwww"));
         Map<UUID, User> testMap = new HashMap<>();
-        testMap.put(user1.getUserId(), user1);
-        testMap.put(user2.getUserId(), user2);
+        testMap.put(user1.getId(), user1);
+        testMap.put(user2.getId(), user2);
 
         Map<UUID, User> userMap = userRepository.findAllUser();
 
@@ -50,8 +50,8 @@ class JCFUserRepositoryTest {
         User user1 = userRepository.userSave(new User("kim", "dwqdwq@tss.com", "passwoooord"));
         User user2 = userRepository.userSave(new User("lee", "zkzkzk@nave.com", "pppppwwww"));
 
-        userRepository.removeUserById(user1.getUserId());
+        userRepository.removeUserById(user1.getId());
 
-        Assertions.assertNull(userRepository.findUserById(user1.getUserId()));
+        Assertions.assertNull(userRepository.findUserById(user1.getId()));
     }
 }

@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.file.serial;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.channel.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 
@@ -15,11 +15,11 @@ public class FileChannelRepository implements ChannelRepository, FileService<Cha
 
     @Override
     public Channel saveChannel(Channel channel) {
-        Channel saveChannel = channelMap.put(channel.getChannelId(), channel);
+        Channel saveChannel = channelMap.put(channel.getId(), channel);
 
         save(CHANNEL_PATH, channelMap);
 
-        return channelMap.get(channel.getChannelId());
+        return channelMap.get(channel.getId());
     }
 
     @Override

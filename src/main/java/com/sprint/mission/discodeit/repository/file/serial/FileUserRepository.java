@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.file.serial;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 
@@ -15,11 +15,11 @@ public class FileUserRepository implements UserRepository, FileService<User> {
 
     @Override
     public User userSave(User user) {
-        userMap.put(user.getUserId(), user);
+        userMap.put(user.getId(), user);
 
         save(USER_PATH, userMap);
 
-        return userMap.get(user.getUserId());
+        return userMap.get(user.getId());
     }
 
     @Override

@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.repository.file;
+package com.sprint.mission.discodeit.repository.file.serial;
 
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.message.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 
@@ -17,7 +17,7 @@ public class FileMessageRepository implements MessageRepository, FileService<Mes
     @Override
     public Message saveMessage(Message message) {
         Map<UUID, Message> messages = findAllMessage();
-        messages.put(message.getMessageId(), message);
+        messages.put(message.getId(), message);
         save(MESSAGE_PATH, messages);
         return message;
     }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.validate;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 
 import java.util.Optional;

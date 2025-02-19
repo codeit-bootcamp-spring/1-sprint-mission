@@ -1,47 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public abstract class BaseObject implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
 
-    public BaseObject(UUID id, Long createdAt, Long updatedAt) {
+    @NotNull
+    @JsonProperty("userId")
+    private final UUID id;
+
+    @JsonProperty("createdAt")
+    private Instant createdAt;
+
+    @JsonProperty("updatedAt")
+    private Instant updatedAt;
+
+    public BaseObject(UUID id, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
     public BaseObject(UUID id) {
-        this(id, System.currentTimeMillis(), System.currentTimeMillis());
+        this.id = id;
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
     }
 
     public BaseObject() {
-        this(UUID.randomUUID(), System.currentTimeMillis(), System.currentTimeMillis());
+        this(UUID.randomUUID(), Instant.now(), Instant.now());
     }
 
-    public BaseObject createBaseObject(UUID id) {
-        return this;
-    }
-
-    public long setUpdatedAt() {
-        return this.updatedAt = System.currentTimeMillis();
+    public Instant setUpdatedAt() {
+        return Instant.now();
     }
 
     public UUID getId() {
         return id;
     }
 
-    public Long getCreatedAtBaseObject() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAtBaseObject() {
-        return updatedAt;
-    }
 }

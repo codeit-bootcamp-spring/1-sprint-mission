@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.user.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.serial.FileUserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class FileUserRepositoryTest {
 
@@ -40,8 +39,8 @@ class FileUserRepositoryTest {
         userRepository.userSave(user1);
         userRepository.userSave(user2);
 
-        User findUser1 = userRepository.findUserById(user1.getUserId());
-        User findUser2 = userRepository.findUserById(user2.getUserId());
+        User findUser1 = userRepository.findUserById(user1.getId());
+        User findUser2 = userRepository.findUserById(user2.getId());
 
         Assertions.assertEquals(user1, findUser1);
         Assertions.assertEquals(user2, findUser2);
@@ -54,8 +53,8 @@ class FileUserRepositoryTest {
         User user2 = new User("user2", "user2@test.com", "user1234");
         Map<UUID, User> testMap = new HashMap<>();
 
-        testMap.put(user1.getUserId(), user1);
-        testMap.put(user2.getUserId(), user2);
+        testMap.put(user1.getId(), user1);
+        testMap.put(user2.getId(), user2);
 
         userRepository.userSave(user1);
         userRepository.userSave(user2);
@@ -73,9 +72,9 @@ class FileUserRepositoryTest {
         userRepository.userSave(user1);
         userRepository.userSave(user2);
 
-        userRepository.removeUserById(user1.getUserId());
+        userRepository.removeUserById(user1.getId());
 
-        Assertions.assertEquals(null, userRepository.findUserById(user1.getUserId()));
+        Assertions.assertEquals(null, userRepository.findUserById(user1.getId()));
     }
 
 }
