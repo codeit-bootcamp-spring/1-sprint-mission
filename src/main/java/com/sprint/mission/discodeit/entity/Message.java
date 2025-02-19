@@ -1,56 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    private String content;
-    private User author;   // 메시지를 작성한 사용자 ID
-    private Channel channel; // 메시지가 속한 채널 ID
+import lombok.Getter;
 
-    public Message(String content, User author, Channel channel) {
-        super();
-        this.content = content;
-        this.author = author;
-        this.channel = channel;
-    }
+@Getter
+public class Message extends BaseEntity implements Serializable {
+	private static final long serialVersionUID = 1L;
+	private String content;
+	private UUID authorId;   // User 객체 대신 ID 참조
+	private UUID channelId;  // Channel 객체 대신 ID 참조
 
-    public String getContent() {
-        return content;
-    }
+	public Message(String content, UUID authorId, UUID channelId) {
+		super();
+		this.content = content;
+		this.authorId = authorId;
+		this.channelId = channelId;
+	}
 
-    public void updateContent(String content) {
-        this.content = content;
-        updateTime();
-    }
+	public void updateContent(String content) {
+		this.content = content;
+		updateTime();
+	}
 
-    public User getAuthor() {
-        return author;
-    }
+	public void updateAuthor(UUID userId) {
+		this.authorId = userId;
+		updateTime();
+	}
 
-    public void updateAuthor(User author) {
-        this.author = author;
-        updateTime();
-    }
+	public void updateChannel(UUID channelId) {
+		this.channelId = channelId;
+		updateTime();
+	}
 
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void updateChannel(Channel channel) {
-        this.channel = channel;
-        updateTime();
-    }
-
-    @Override
-    public String toString() {
-        String authorName = (author != null) ? author.getUsername() : "Unknown";
-        String channelName = (channel != null) ? channel.getName() : "Unknown";
-
-        return "Message{" +
-                "id='" + getId() + '\'' +
-                "content='" + content + '\'' +
-                ", author='" + authorName + '\'' +
-                ", channel='" + channelName + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Message{" +
+			"id='" + getId() + '\'' +
+			"content='" + content + '\'' +
+			", author='" + authorId + '\'' +
+			", channel='" + channelId + '\'' +
+			'}';
+	}
 }

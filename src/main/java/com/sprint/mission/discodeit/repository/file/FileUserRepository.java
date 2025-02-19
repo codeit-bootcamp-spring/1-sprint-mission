@@ -1,50 +1,96 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.FileStorage;
-import com.sprint.mission.discodeit.service.file.SerializableFileStorage;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.FileStorage;
+import com.sprint.mission.discodeit.service.basic.SerializableFileStorage;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FileUserRepository implements UserRepository {
-    private static final Path ROOT_DIR = Paths.get(System.getProperty("user.dir"), "tmp");
-    private static final String USER_FILE = "user.ser";
-    private final FileStorage<User> fileStorage;
+	private final Path rootDir;
+	private static final String USER_FILE = "user.ser";
+	private final FileStorage<User> fileStorage;
 
-    public FileUserRepository() {
-        this.fileStorage = new SerializableFileStorage<>(User.class);
-        fileStorage.init(ROOT_DIR);
-    }
+	public FileUserRepository(String fileDirectory) {
+		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
+		this.fileStorage = new SerializableFileStorage<>(User.class);
+		fileStorage.init(rootDir);
+	}
 
-    @Override
-    public User save(User user) {
-        List<User> users = findAll();
-        users.add(user);
-        fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
-        return user;
-    }
+	@Override
+	public User save(User user) {
+		List<User> users = findAll();
+		users.add(user);
+		fileStorage.save(rootDir.resolve(USER_FILE), users);
+		// 강제로 다시 로드해보기
+		List<User> reloadedUsers = fileStorage.load(rootDir.resolve(USER_FILE));
+		log.info("Loaded {} users", reloadedUsers);
+		return user;
+	}
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return findAll().stream()
-                .filter(u -> u.getId().equals(id))
-                .findFirst();
-    }
+	@Override
+	public Optional<User> findById(UUID id) {
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getId().equals(id)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
+	}
 
-    @Override
-    public List<User> findAll() {
-        return fileStorage.load(ROOT_DIR);
-    }
+	@Override
+	public Optional<User> findByUserid(String userid) {
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getUserid().equals(userid)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
+	}
 
-    @Override
-    public void delete(UUID id) {
-        List<User> users = findAll();
-        users.removeIf(u -> u.getId().equals(id));
-        fileStorage.save(ROOT_DIR.resolve(USER_FILE), users);
-    }
+	@Override
+	public Optional<User> findByEmail(String email) {
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getEmail().equals(email)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<User> findByUsername(String username) {
+		List<User> users = findAll();
+		for (User u : users) {
+			if (u.getUserid().equals(username)) {
+				return Optional.of(u);
+			}
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public List<User> findAll() {
+		List<User> users = fileStorage.load(rootDir.resolve(USER_FILE));
+		log.info("Loaded users: " + users);
+		return users;
+	}
+
+	@Override
+	public void delete(UUID id) {
+		List<User> users = findAll();
+		users.removeIf(u -> u.getId().equals(id));
+		fileStorage.save(rootDir.resolve(USER_FILE), users);
+	}
 }

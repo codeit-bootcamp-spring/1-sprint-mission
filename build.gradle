@@ -1,20 +1,43 @@
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.sprint.mission'
-version = '1.0-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
+
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.1'
+    runtimeOnly 'com.h2database:h2:2.1.214'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 }
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
