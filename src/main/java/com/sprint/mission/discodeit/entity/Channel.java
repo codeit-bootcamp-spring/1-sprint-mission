@@ -1,69 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.*;
+import lombok.Getter;
 
-public class Channel extends BaseEntity {
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private ChannelType type;
     private String name;
     private String description;
-    private boolean isPrivate;
-    private List<User> members;
+    private String password;
 
-    public Channel(String name, String description, boolean isPrivate, List<User> members) {
+    public Channel(ChannelType type, String name, String description, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.type = type;
         this.name = name;
         this.description = description;
-        this.isPrivate = isPrivate;
-        this.members = members;
+        this.password = password;
     }
 
-    //getter
-    public String getName() {
-        return name;
-    }
-    public String getDescription() {
-        return description;
-    }
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-    public List<User> getMembers() {
-        return members;
-    }
-    // update
-    public void updateName(String Name) {
-        this.name = Name;
-        update();
-    }
-    public void updateDescription(String Description) {
-        this.description = Description;
-        update();
-    }
-    public void updateIsPrivate(boolean IsPrivate) {
-        this.isPrivate = IsPrivate;
-        update();
-    }
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
 
-    //member 메소드 구현
-    public void addMember (User member) {
-        if (!members.contains(member)) {
-            members.add(member);
-            update();
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
         }
     }
-    public void removeMember (User member) {
-        if(members.contains(member)) {
-            members.remove(member);
-            update();
-        }
-    }
-    @Override
-    public String toString() {
-        return "Channel = [" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", isPrivate=" + isPrivate +
-                ", members=" + members +
-                ']';
-    }
-
-
 }

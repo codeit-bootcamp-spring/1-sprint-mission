@@ -1,92 +1,46 @@
-# 스프린트 미션 1
+Spring 핵심 개념 이해하기
+[ ] JavaApplication과 DiscodeitApplication에서 Service를 초기화하는 방식의 차이에 대해 다음의 키워드를 중심으로 정리해보세요.
 
-## 🚀 목표
+**JavaApplication의 초기화 방식**
+public static void main(String[] args) {
+    // 직접 객체를 생성하는 방식
+    UserRepository userRepository = new FileUserRepository();
+    ChannelRepository channelRepository = new FileChannelRepository();
+    MessageRepository messageRepository = new FileMessageRepository();
 
-1. Git과 GitHub을 통해 프로젝트를 관리할 수 있다.
-2. 채팅 서비스의 도메인 모델을 설계하고, Java로 구현할 수 있다.
-3. 인터페이스를 설계하고 구현체를 구현할 수 있다.
-4. 싱글톤 패턴을 구현할 수 있다.
-5. Java Collections Framework에 데이터를 생성/수정/삭제할 수 있다.
-6. Stream API를 통해 JCF의 데이터를 조회할 수 있다.
-7. [심화] 모듈 간 의존 관계를 이해하고 팩토리 패턴을 활용해 의존성을 관리할 수 있다.
+    // Service 객체를 직접 생성
+    UserService userService = new BasicUserService(userRepository);
+    ChannelService channelService = new BasicChannelService(channelRepository);
+    MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+}
 
-## 프로젝트 마일스톤
 
-- 프로젝트 초기화
-- 도메인 모델 구현
-- 서비스 인터페이스 설계 및 구현
-    - 각 도메인 모델별 CRUD
-    - JCF 메모리 기반
-- 의존성 주입
+**DiscodeitApplication의 초기화 방식**
+public static void main(String[] args) {
+// Spring IoC 컨테이너에서 Bean을 가져옴
+ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-## ⭐ 요구사항
+    // Spring이 관리하는 객체를 가져옴 (Dependency Injection)
+    UserService userService = context.getBean(UserService.class);
+    ChannelService channelService = context.getBean(ChannelService.class);
+    MessageService messageService = context.getBean(MessageService.class);
+}
 
-### 기본 요구사항
 
-**1️⃣ 프로젝트 초기화**
 
-- [x] IntelliJ를 통해 다음의 조건으로 Java 프로젝트를 생성합니다.
-    - [x]  IntelliJ에서 제공하는 프로젝트 템플릿 중 Java를 선택합니다.
-    - [x]  프로젝트의 경로는 스프린트 미션 리포지토리의 경로와 같게 설정합니다.
-    - [x]  Create Git Repository 옵션은 체크하지 않습니다.
-    - [x]  Build system은 Gradle을 사용합니다. Gradle DSL은 Groovy를 사용합니다.
-    - [x]  JDK 17을 선택합니다.
-    - [x]  GroupId는 com.sprint.mission로 설정합니다.
-    - [x]  ArtifactId는 수정하지 않습니다.
-    - [x]  .gitignore에 IntelliJ와 관련된 파일이 형상관리 되지 않도록 .idea디렉토리를 추가합니다.
+**IoC Container(제어의 역전)**
 
-**2️⃣ 도메인 모델링**
+기존에는 개발자가 new 키워드를 사용해서 객체를 직접 생성하고 관리했다. 그렇지만 spring 방식으로 했을 때
+spring의 IoC 컨테이너가 객체의 생성 및 의존성 주입을 담당하게 된다. 개발자는 context.getBean()을 사용해서 필요할 때
+객체를 가져오기만 하면 된다
 
-- [ ] 디스코드 서비스를 활용해보면서 각 도메인 모델에 필요한 정보를 도출하고, Java Class로 구현하세요.
-    - [x] 패키지명: `com.sprint.mission.discodeit.entity`
-    - [ ] 도메인 모델 정의
-        - [x] 공통
-            - [x] `id`: 객체를 식별하기 위한 id로 UUID 타입으로 선언합니다.
-            - [x] `createdAt`, `updatedAt`: 각각 객체의 생성, 수정 시간을 유닉스 타임스탬프로 나타내기 위한 필드로 Long 타입으로 선언합니다.
-        -[ ] User
-        - [ ] Channel
-        - [ ] Message
-        -[ ] 생성자
-            - [x] `id`는 생성자에서 초기화하세요.
-            - [x] `createdAt`는 생성자에서 초기화하세요.
-            - [ ] `id`, `createdAt`, `updatedAt`을 제외한 필드는 생성자의 파라미터를 통해 초기화하세요.
-        - [ ] 메소드
-            - [ ] 각 필드를 반환하는 `Getter` 함수를 정의하세요.
-            - [ ] 필드를 수정하는 `update` 함수를 정의하세요.
+**Dependency Injection**
 
-**3️⃣ 서비스 설계 및 구현**
+기존에는 UserRepository 객체를 먼저 만들고, BasicUserService에 직접 주입해야 한다.
+Spring방식은 Spring이 자동으로 필요한 객체에 찾아서 넣어준다
 
-- [ ] 도메인 모델 별 CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 인터페이스로 선언하세요.
-    - [ ] 인터페이스 패키지명: `com.sprint.mission.discodeit.service`
-    - [ ] 인터페이스 네이밍 규칙: `[도메인 모델 이름]Service`
-- [ ] 다음의 조건을 만족하는 서비스 인터페이스의 구현체를 작성하세요.
-    - [ ] 클래스 패키지명: `com.sprint.mission.discodeit.service.jcf`
-    - [ ] 클래스 네이밍 규칙: `JCF[인터페이스 이름]`
-    - [ ] Java Collections Framework를 활용하여 데이터를 저장할 수 있는 필드(data)를 final로 선언하고 생성자에서 초기화하세요.
-    - [ ] `data` 필드를 활용해 생성, 조회, 수정, 삭제하는 메소드를 구현하세요.
+**Bean**
 
-**4️⃣ 메인 클래스 구현**
-
-- [ ] 메인 메소드가 선언된 `JavaApplication` 클래스를 선언하고, 도메인 별 서비스 구현체를 테스트해보세요.
-    - [ ] 등록
-    - [ ] 조회(단건, 다건)
-    - [ ] 수정
-    - [ ] 수정된 데이터 조회
-    - [ ] 삭제
-    - [ ] 조회를 통해 삭제되었는지 확인
-
-** 5️⃣기본 요구사항 커밋 태그**
-
-- [ ] 여기까지 진행 후 반드시 커밋해주세요. 그리고 `sprint1-basic` 태그를 생성해주세요.
-
-### 심화 요구사항
-
-**서비스 간 의존성 주입**
-
-- [ ] 도메인 모델 간 관계를 고려해서 검증하는 로직을 추가하고, 테스트해보세요.
-    - 힌트: Message를 생성할 때 연관된 도메인 모델 데이터 확인하기
-
-스크린샷
-![메시지캡처.png](data/%EB%A9%94%EC%8B%9C%EC%A7%80%EC%BA%A1%EC%B2%98.png)
-![진짜사용자.png](data/%EC%A7%84%EC%A7%9C%EC%82%AC%EC%9A%A9%EC%9E%90.png)
-![채널캡처.png](data/%EC%B1%84%EB%84%90%EC%BA%A1%EC%B2%98.png)
+기존에는 new로 생성하는 일반적인 Java 객체이며 필요할 때마다 직접 생성해야 한다.
+Spring 방식은 @Service, @Repository, @Component 등의 어노테이션을 사용하면 Spring이 자동으로 Bean으로 등록한다
+필요할 때마다 Spring Context에서 Bean을 가져오기만 하면된다.

@@ -1,0 +1,18 @@
+server:
+  port: 8080  # 서버 포트 설정 (필요하면 변경 가능)
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb  # H2 데이터베이스 (테스트용)
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update  # 자동 테이블 생성 (create, update, validate, none 가능)
+    show-sql: true  # SQL 쿼리 로그 출력 활성화
+
+discodeit:
+  repository:
+    type: jcf  # jcf | file (이 값을 변경하면 자동으로 Repository가 변경됨)
