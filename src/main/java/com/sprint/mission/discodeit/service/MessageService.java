@@ -12,7 +12,7 @@ public interface MessageService {
 
     Message readMessage(UUID messageId);
 
-    List<Message> readAll();
+    List<Message> readAllByChannelId(UUID channelId);
 
     void updateMessage(UUID messageId, String content);
 

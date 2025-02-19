@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
@@ -10,7 +9,7 @@ public interface UserRepository {
 
     User save(User user);
 
-    User findUser(UUID userId);
+    User findById(UUID userId);
 
     List<User> findAll();
 

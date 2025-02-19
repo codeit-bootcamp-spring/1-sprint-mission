@@ -3,37 +3,42 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
 
-    private static final FileMessageRepository fileMessageRepository = new FileMessageRepository();
-    private static final Path filePath;
-    private final ChannelRepository channelRepository;
+    @Value("${discodeit.repository.file-directory}")
+    private String directory;
 
-    static {
-        filePath = Path.of(System.getProperty("user.dir"), "messages");
-        FileManager.createDirectory(filePath);
-    }
+    private Path directoryPath;
+    private final String FILE_EXTENSION = ".ser";
 
-    private FileMessageRepository() {
-        channelRepository = FileChannelRepository.getInstance();
-    }
+    private final FileManager fileManager;
 
-    public static FileMessageRepository getInstance() {
-        return fileMessageRepository;
+    @PostConstruct
+    private void init() {
+        directoryPath = Path.of(System.getProperty("user.dir"), directory, "messages");
+        fileManager.createDirectory(directoryPath);
     }
 
     @Override
     public Message save(Message message) {
-        Path path = filePath.resolve(message.getId().toString().concat(".ser"));
+        Path path = directoryPath.resolve(message.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(message);
@@ -44,8 +49,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findMessage(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(".ser"));
+    public Message findById(UUID messageId) {
+        Path path = directoryPath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (Message) ois.readObject();
@@ -55,21 +60,25 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        try {
-            return Files.list(filePath)
-                    .map(path -> {
-                        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-                            Object data = ois.readObject();
-                            return (Message) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new FileIOException("messages 읽기 실패");
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new FileIOException("messages 읽기 실패");
+    public List<Message> findByChannelId(UUID channelId) {
+        File[] files = directoryPath.toFile().listFiles();
+        List<Message> messages = new ArrayList<>(100);
+
+        if (files == null) {
+            return messages;
         }
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                Message message = (Message) ois.readObject();
+                if (message.getChannel().getId().equals(channelId)) {
+                    messages.add(message);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("messages 읽기 실패");
+            }
+        }
+        return messages;
     }
 
     @Override
@@ -79,7 +88,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void deleteMessage(UUID messageId) {
-        Path path = filePath.resolve(messageId.toString().concat(".ser"));
+        Path path = directoryPath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

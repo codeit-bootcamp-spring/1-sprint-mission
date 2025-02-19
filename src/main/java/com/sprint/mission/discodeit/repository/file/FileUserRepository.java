@@ -4,33 +4,41 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
 
-    private static final FileUserRepository fileUserRepository = new FileUserRepository();
-    private static final Path filePath;
+    @Value("${discodeit.repository.file-directory}")
+    private String directory;
 
-    static {
-        filePath = Paths.get(System.getProperty("user.dir"), "users");
-        FileManager.createDirectory(filePath);
-    }
+    private Path directoryPath;
+    private final String FILE_EXTENSION = ".ser";
 
-    private FileUserRepository() {}
+    private final FileManager fileManager;
 
-    public static FileUserRepository getInstance() {
-        return fileUserRepository;
+    @PostConstruct
+    private void init() {
+        directoryPath = Path.of(System.getProperty("user.dir"), directory, "users");
+        fileManager.createDirectory(directoryPath);
     }
 
     @Override
     public User save(User user) {
-        Path path = filePath.resolve(user.getId().toString().concat(".ser"));
+        Path path = directoryPath.resolve(user.getId().toString().concat(FILE_EXTENSION));
 
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path.toFile()))) {
             oos.writeObject(user);
@@ -41,8 +49,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findUser(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(".ser"));
+    public User findById(UUID userId) {
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
             return (User)ois.readObject();
@@ -53,20 +61,22 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        try {
-            return Files.list(filePath)
-                    .map(path -> {
-                        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-                            Object data = ois.readObject();
-                            return (User) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new FileIOException("users 읽기 실패");
-                        }
-                    })
-                    .toList();
-        } catch (IOException e) {
-            throw new FileIOException("users 읽기 실패");
+        File[] files = directoryPath.toFile().listFiles();
+        List<User> users = new ArrayList<>(100);
+
+        if (files == null) {
+            return users;
         }
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                User user = (User) ois.readObject();
+                users.add(user);
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("users 읽기 실패");
+            }
+        }
+        return users;
     }
 
     @Override
@@ -76,7 +86,7 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public void deleteUser(UUID userId) {
-        Path path = filePath.resolve(userId.toString().concat(".ser"));
+        Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         if (Files.exists(path)) {
             try {

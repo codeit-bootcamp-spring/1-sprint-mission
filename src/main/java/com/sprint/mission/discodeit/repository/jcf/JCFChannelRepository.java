@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
 
-    private static final JCFChannelRepository jcfChannelRepository = new JCFChannelRepository();
     private final Map<UUID, Channel> data;
 
-    private JCFChannelRepository() {
+    public JCFChannelRepository() {
         data = new HashMap<>(100);
-    }
-
-    public static JCFChannelRepository getInstance() {
-        return jcfChannelRepository;
     }
 
     @Override
@@ -27,14 +27,22 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findChannel(UUID channelId) {
+    public Channel findById(UUID channelId) {
         return Optional.ofNullable(data.get(channelId))
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
     }
 
     @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+    public List<Channel> findAllByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(c -> {
+                    try {
+                        return c.getType() == ChannelType.PUBLIC || c.getUser(userId) != null;
+                    } catch (NotFoundException e) {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

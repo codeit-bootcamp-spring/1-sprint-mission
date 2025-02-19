@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.*;
 
 
@@ -14,45 +15,53 @@ public class Channel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    private final UUID id;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
+    private ChannelType type;
     private String name;
     private String description;
+
     private Map<UUID, User> users;
 
-    private Channel(String name, String description) {
+    private Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
+        this.type = type;
         this.name = name;
         this.description = description;
         users = new HashMap<>(100);
     }
 
-    public static Channel of(String name, String description) {
-        return new Channel(name, description);
+    public static Channel of(ChannelType type, String name, String description) {
+        return new Channel(type, name, description);
+    }
+
+    public void updateType(ChannelType type) {
+        this.type = type;
+        updatedAt = Instant.now();
     }
 
     public void updateName(String name) {
         this.name = name;
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     public void updateDescription(String description) {
         this.description = description;
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     public void addUser(User user) {
         users.put(user.getId(), user);
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     public void deleteUser(UUID id) {
         users.remove(id);
-        updatedAt = System.currentTimeMillis();
+        updatedAt = Instant.now();
     }
 
     public User getUser(UUID userId) {
