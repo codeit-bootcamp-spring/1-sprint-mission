@@ -3,9 +3,13 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(name="repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
@@ -15,7 +19,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public boolean save(Channel channel) {
         data.put(channel.getId(), channel);
-        System.out.println(channel.getName() + " 채널이 오픈되었습니다.");
+        System.out.println(channel.getChannelType() + " 채널이 오픈되었습니다.");
         return true;
     }
 
