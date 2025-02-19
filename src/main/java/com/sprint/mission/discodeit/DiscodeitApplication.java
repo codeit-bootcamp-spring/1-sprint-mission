@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
@@ -15,6 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -53,8 +56,8 @@ public class DiscodeitApplication {
         System.out.println("\n\nChannel Test");
 
         //채널생성(private, public)
-        UUID publicChannelId1 = channelService.createPublic("privateChannel1", "공개채널1");
-        UUID privateChannelId1 = channelService.createPrivate(user2Id);
+        UUID publicChannelId1 = channelService.create(new ChannelCreatePublicDTO("privateChannel1", "공개채널1"));
+        UUID privateChannelId1 = channelService.create(new ChannelCreatePrivateDTO(List.of(user2Id)));
 
         //채널 단건조회
         System.out.println("Channel 단건 조회 - public, private");
@@ -87,6 +90,7 @@ public class DiscodeitApplication {
 
         System.out.println("ReadStatus 조회");
         for(ReadStatus readStatus : readStatusService.findAll()) System.out.println(readStatus);
+
     }
 }
 

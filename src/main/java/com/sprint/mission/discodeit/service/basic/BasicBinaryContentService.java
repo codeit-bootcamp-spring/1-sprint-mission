@@ -2,16 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.validator.BinaryContentValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent findBinaryContent = binaryContentRepository.findOne(id);
         Optional.ofNullable(findBinaryContent)
-                .orElseThrow(() -> new NoSuchElementException("해당 BinaryContent 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
         return findBinaryContent;
     }
 

@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserStatusValidator;
@@ -34,7 +36,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus find(UUID id) {
         UserStatus findUserStatus = userStatusRepository.find(id);
         Optional.ofNullable(findUserStatus)
-                .orElseThrow(() -> new NoSuchElementException("해당 UserStatus 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         //접속시간 업데이트하고 > 사용자가 접속했다는 것을 어떻게 아냐?
         //UserService의 updateUserOnline로 상태 업데이트
@@ -52,7 +54,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus update(UUID userId, UserStatusUpdateDTO userStatusUpdateDTO) {
         UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 userid:" + userId + "의 UserStatus 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
         findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getTime());
         userStatusRepository.update(findUserStatus);
         return findUserStatus;
@@ -61,7 +63,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus updateByUserId(UUID userId,  Instant time) {
         UserStatus finduserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 userid:" + userId + "의 UserStatus 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
         finduserStatus.updateLastActiveAt(time);
         userStatusRepository.update(finduserStatus);

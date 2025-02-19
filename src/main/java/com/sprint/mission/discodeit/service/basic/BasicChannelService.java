@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelFindAllByUserIdDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -26,7 +27,6 @@ import java.util.*;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageRepository messageRepository;
 
@@ -34,21 +34,19 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public UUID createPublic(String name, String description) {
-        channelValidator.validateChannel(name, description);
-        return channelRepository.save(new Channel(name, description, ChannelType.PUBLIC));
+    public UUID create(ChannelCreatePublicDTO dto) {
+        channelValidator.validateChannel(dto.getName(), dto.getDescription());
+        return channelRepository.save(new Channel(dto.getName(), dto.getDescription(), ChannelType.PUBLIC));
     }
 
     @Override
-    public UUID createPrivate(UUID userId){
+    public UUID create(ChannelCreatePrivateDTO dto){
         Channel channel = new Channel(null, null, ChannelType.PRIVATE);
         channelRepository.save(channel);
 
-        User findUser = userRepository.findOne(userId);
-        Optional.ofNullable(findUser).orElseThrow(() -> new NoSuchElementException("사용자가 없습니다"));
-
-        ReadStatus readStatus = new ReadStatus(findUser.getId(), channel.getId());
-        readStatusRepository.save(readStatus);
+        dto.getIds().stream()
+                .map(userId -> new ReadStatus(userId, channel.getId()))
+                        .forEach(readStatusRepository::save);
 
         return channel.getId();
     }
@@ -57,7 +55,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelFindDTO find(UUID id) {
         Channel findChannel = channelRepository.findOne(id);
         Optional.ofNullable(findChannel)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
         return toDTO(findChannel);
     }
@@ -77,9 +75,9 @@ public class BasicChannelService implements ChannelService {
     public Channel update(UUID id, ChannelUpdateDTO dto){
         Channel findChannel = channelRepository.findOne(id);
         Optional.ofNullable(findChannel)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
         if(findChannel.getType() == ChannelType.PRIVATE){
-            throw new IllegalStateException("PRIVATE 채널은 수정 불가능 합니다.");
+            throw new BadRequestException(ErrorCode.PRIVATE_CHANNEL_IMMUTABLE);
         }
         findChannel.setChannel(dto.getName(), dto.getDescription());
         channelRepository.update(findChannel);
@@ -90,7 +88,7 @@ public class BasicChannelService implements ChannelService {
     public UUID delete(UUID id) {
         Channel findChannel = channelRepository.findOne(id);
         Optional.ofNullable(findChannel)
-                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
         readStatusRepository.deleteByChannelId(findChannel.getId());
         messageRepository.deleteByChannelId(findChannel.getId());
