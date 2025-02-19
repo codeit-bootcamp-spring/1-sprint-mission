@@ -3,8 +3,10 @@ package com.sprint.mission.discodeit.collection;
 import com.sprint.mission.discodeit.entity.Channel;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +54,10 @@ public class Channels implements Serializable {
             return Optional.of(channel);
         }
         return Optional.empty();
+    }
+
+    public List<Channel> getChannelsList() {
+        return new ArrayList<>(channels.values());
     }
 }
 

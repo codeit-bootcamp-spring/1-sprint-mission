@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: 1-sprint-mission
+
+file:
+  path:
+    user: data/users.dat
+    channel: data/channels.dat
+    message: data/messages.dat

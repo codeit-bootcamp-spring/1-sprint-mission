@@ -1,117 +1,259 @@
 package com.sprint.mission.discodeit.service.file;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Status;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.io.File;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 class FileUserServiceTest {
-    private static final String TEST_FILE_PATH = "data/test_users.dat";
-    private UserService userService;
+    @Mock
+    private FileUserRepository userRepository;
+
+    @Mock
+    private BinaryContentRepository binaryContentRepository;
+
+    @Mock
+    private UserStatusRepository userStatusRepository;
+
+    @InjectMocks
+    private FileUserService userService;
 
     @BeforeEach
     void setUp() {
-        // 기존 파일 삭제 및 새로운 파일 생성
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            assertTrue(file.delete(), "테스트 파일 삭제 실패");
-        }
-        userService = new FileUserService(TEST_FILE_PATH);
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     @DisplayName("유저를 생성한다.")
     void testCreateUser() {
         // given
-        User user = userService.createUser("testUser");
+        // Set user
+        String userName1 = "username1";
+        String userName2 = "username2";
+        String userEmail1 = "email1@email.com";
+        String userEmail2 = "email2@email.com";
+        User user1 = new User(userName1, userEmail1);
+        User user2 = new User(userName2, userEmail2);
+
+        // Set binaryContent
+        String fileName1 = "filename1";
+        String fileName2 = "filename2";
+        String fileMimeType1 = "mimetype1";
+        String fileMimeType2 = "mimetype2";
+        String filePath1 = "filePath1";
+        String filePath2 = "filePath2";
+        BinaryContent binaryContent1 = new BinaryContent(fileName1, fileMimeType1, filePath1);
+        BinaryContent binaryContent2 = new BinaryContent(fileName2, fileMimeType2, filePath2);
+
+        CreateUserRequest request1 = new CreateUserRequest(userName1, userEmail1, binaryContent1);
+        CreateUserRequest request2 = new CreateUserRequest(userName2, userEmail2, binaryContent2);
 
         // when
+        UserResponse savedUser1 = userService.createUser(request1);
+        UserResponse savedUser2 = userService.createUser(request2);
 
         // then
-        assertNotNull(user);
-        assertEquals("testUser", user.getUsername());
+        assertThat(savedUser1).isNotNull();
+        assertThat(savedUser1.username()).isEqualTo(userName1);
+        assertThat(savedUser1.email()).isEqualTo(userEmail1);
+        assertThat(savedUser1.profileImage()).isEqualTo(binaryContent1);
 
-        Map<UUID, User> users = userService.getUsers();
-        assertEquals(1, users.size());
-        assertTrue(users.containsKey(user.getId()));
+        assertThat(savedUser2).isNotNull();
+        assertThat(savedUser2.username()).isEqualTo(userName2);
+        assertThat(savedUser2.email()).isEqualTo(userEmail2);
+        assertThat(savedUser2.profileImage()).isEqualTo(binaryContent2);
+
+        assertThat(savedUser1.status()).isNotNull();
+        assertThat(savedUser2.status()).isNotNull();
+
+        verify(userRepository, times(2)).save(any(User.class));
     }
 
     @Test
     @DisplayName("유저를 생성하고 단일 조회를 한다")
-    void testGetUser() {
+    void testGetUserById() {
         // given
-        User user = userService.createUser("testUser");
+        // set user
+        String userName1 = "username1";
+        String userEmail1 = "email1@email.com";
+        User user1 = new User(userName1, userEmail1);
+
+        // Set binaryContent
+        String fileName1 = "filename1";
+        String fileMimeType1 = "mimetype1";
+        String filePath1 = "filePath1";
+        BinaryContent binaryContent1 = new BinaryContent(fileName1, fileMimeType1, filePath1);
+        user1.updateProfileImage(binaryContent1);
+
+        CreateUserRequest request1 = new CreateUserRequest(userName1, userEmail1, binaryContent1);
 
         // when
-        Optional<User> foundUser = userService.getUser(user.getId());
+        when(userRepository.existsByUsername(userName1)).thenReturn(false);
+        when(userRepository.existsByEmail(userEmail1)).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user1);
+        when(userRepository.getUserById(user1.getId())).thenReturn(user1);
+
+        UserResponse savedUser1 = userService.createUser(request1);
+        Optional<UserResponse> findUser1 = userService.findUserById(user1.getId());
 
         // then
-        assertTrue(foundUser.isPresent());
-        assertEquals("testUser", foundUser.get().getUsername());
+        assertThat(findUser1).isPresent();
+        assertThat(findUser1.get().username()).isEqualTo(userName1);
+        assertThat(findUser1.get().email()).isEqualTo(userEmail1);
+        assertThat(findUser1.get().profileImage()).isEqualTo(binaryContent1);
     }
 
     @Test
     @DisplayName("유저를 생성하고 업데이트한 후 조회한다")
     void testUpdateUser() {
         // given
-        User user = userService.createUser("testUser");
+        // set user
+        String userName1 = "username1";
+        String userEmail1 = "email1@email.com";
+        User user1 = new User(userName1, userEmail1);
+
+        // Set binaryContent
+        String fileName1 = "filename1";
+        String fileMimeType1 = "mimetype1";
+        String filePath1 = "filePath1";
+        BinaryContent binaryContent1 = new BinaryContent(fileName1, fileMimeType1, filePath1);
+        user1.updateProfileImage(binaryContent1);
+
+        CreateUserRequest request1 = new CreateUserRequest(userName1, userEmail1, binaryContent1);
+
+        // set updateUser
+        String updateUsername1 = "updateUsername1";
+        String UpdateFilename1 = "UpdateFilename1";
+        BinaryContent updateBinaryContent1 = new BinaryContent(UpdateFilename1, fileMimeType1, filePath1);
+
+        UpdateUserRequest request2 = new UpdateUserRequest(user1.getId(), updateUsername1, updateBinaryContent1);
 
         // when
-        Optional<User> updatedUser = userService.updateUser(user.getId(), "updatedUser");
+        when(userRepository.existsByUsername(userName1)).thenReturn(false);
+        when(userRepository.existsByEmail(userEmail1)).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user1);
+        when(userRepository.getUserById(user1.getId())).thenReturn(user1);
+
+        UserResponse savedUser1 = userService.createUser(request1);
+        Optional<UserResponse> updatedUser1 = userService.updateUser(request2);
+        Optional<UserResponse> findUser1 = userService.findUserById(user1.getId());
 
         // then
-        assertTrue(updatedUser.isPresent());
-        assertEquals("updatedUser", updatedUser.get().getUsername());
-
-        Optional<User> foundUser = userService.getUser(user.getId());
-        assertTrue(foundUser.isPresent());
-        assertEquals("updatedUser", foundUser.get().getUsername());
+        assertThat(findUser1).isPresent();
+        assertThat(findUser1.get().username()).isEqualTo(updateUsername1);
+        assertThat(findUser1.get().profileImage()).isEqualTo(updateBinaryContent1);
     }
 
     @Test
-    @DisplayName("유저를 생성하고 삭제한후 확인한다")
+    @DisplayName("유저를 생성하고 삭제한 후 확인한다")
     void testDeleteUser() {
         // given
-        User user = userService.createUser("testUser");
+        // set user
+        String userName1 = "username1";
+        String userEmail1 = "email1@email.com";
+        User user1 = new User(userName1, userEmail1);
 
-        // when
-        Optional<User> deletedUser = userService.deleteUser(user.getId());
+        // Set binaryContent
+        String fileName1 = "filename1";
+        String fileMimeType1 = "mimetype1";
+        String filePath1 = "filePath1";
+        BinaryContent binaryContent1 = new BinaryContent(fileName1, fileMimeType1, filePath1);
+        user1.updateProfileImage(binaryContent1);
 
-        // then
-        assertTrue(deletedUser.isPresent());
-        assertEquals("testUser", deletedUser.get().getUsername());
+        // Set UserStatus
+        UserStatus userStatus = new UserStatus(user1.getId());
+        userStatus.updateStatus(Status.CONNECTED);
+        user1.updateUserStatus(userStatus);
 
-        Optional<User> foundUser = userService.getUser(user.getId());
-        assertFalse(foundUser.isPresent());
+        CreateUserRequest request1 = new CreateUserRequest(userName1, userEmail1, binaryContent1);
 
-        Map<UUID, User> users = userService.getUsers();
-        assertTrue(users.isEmpty());
+        // when - 유저 생성 후 조회
+        when(userRepository.existsByUsername(userName1)).thenReturn(false);
+        when(userRepository.existsByEmail(userEmail1)).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(user1);
+        when(userRepository.getUserById(user1.getId())).thenReturn(user1);
+        UserResponse savedUser1 = userService.createUser(request1);
+        Optional<UserResponse> findUser1 = userService.findUserById(user1.getId());
+
+        // then - 유저가 정상적으로 생성되었는지 확인
+        assertThat(findUser1).isPresent();
+        assertThat(findUser1.get().username()).isEqualTo(userName1);
+        assertThat(findUser1.get().email()).isEqualTo(userEmail1);
+        assertThat(findUser1.get().profileImage()).isEqualTo(binaryContent1);
+        assertThat(findUser1.get().status()).isNotNull();
+
+        // when - 유저 삭제 수행
+        userService.deleteUser(user1.getId());
+        when(userRepository.getUserById(user1.getId())).thenReturn(null); // 삭제 후 조회 시 null 반환
+
+        // then - 유저가 삭제되었는지 확인
+        Optional<UserResponse> deletedUser = userService.findUserById(user1.getId());
+        assertThat(deletedUser).isEmpty();
+
+        // then - 연관 데이터도 삭제되었는지 검증
+        verify(userRepository, times(1)).delete(user1.getId());
+        verify(binaryContentRepository, times(1)).delete(user1.getProfileImage());
+        verify(userStatusRepository, times(1)).deleteByUserId(user1.getId());
     }
 
     @Test
-    @DisplayName("유저를 생성하고 새로운 서비스를 만들때 로드가 되는지 확인한다")
-    void testPersistenceAcrossInstances() {
+    @DisplayName("유저를 생성하는데 중복된 이름이 들어온다")
+    void testCreateUserByDuplicateName() {
         // given
-        User user = userService.createUser("persistentUser");
+        // set user
+        String userName1 = "username1";
+        String userEmail1 = "email1@email.com";
+        User user1 = new User(userName1, userEmail1);
+
+        // Set binaryContent
+        String fileName1 = "filename1";
+        String fileMimeType1 = "mimetype1";
+        String filePath1 = "filePath1";
+        BinaryContent binaryContent1 = new BinaryContent(fileName1, fileMimeType1, filePath1);
+        user1.updateProfileImage(binaryContent1);
+
+        // Set UserStatus
+        UserStatus userStatus = new UserStatus(user1.getId());
+        userStatus.updateStatus(Status.CONNECTED);
+        user1.updateUserStatus(userStatus);
+
+        CreateUserRequest request1 = new CreateUserRequest(userName1, userEmail1, binaryContent1);
 
         // when
-        UserService newServiceInstance = new FileUserService(TEST_FILE_PATH);
+        when(userRepository.existsByUsername(userName1)).thenReturn(true);
+        when(userRepository.existsByEmail(userEmail1)).thenReturn(true);
 
         // then
-        Optional<User> foundUser = newServiceInstance.getUser(user.getId());
-        assertTrue(foundUser.isPresent());
-        assertEquals("persistentUser", foundUser.get().getUsername());
+        IllegalArgumentException exception = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> userService.createUser(request1)
+        );
+        assertThat(exception.getMessage()).isEqualTo("이미 사용 중인 username 또는 email입니다.");
+        verify(userRepository, never()).save(any(User.class));
     }
 }

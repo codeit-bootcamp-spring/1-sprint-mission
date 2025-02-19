@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.collection;
 
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,5 +51,9 @@ public class Messages implements Serializable {
     // 읽기 전용 맵 반환
     public Map<UUID, Message> asReadOnly() {
         return Collections.unmodifiableMap(messages);
+    }
+
+    public List<Message> getMessagesList() {
+        return new ArrayList<>(messages.values());
     }
 }

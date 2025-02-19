@@ -8,8 +8,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.io.File;
@@ -23,24 +28,19 @@ import java.util.UUID;
 
 class FileMessageServiceTest {
     private static final String TEST_FILE_PATH = "data/test_messages.dat";
-    private FileMessageService messageService;
 
     @Mock
-    private ChannelService mockChannelService;
+    private FileMessageRepository messageRepository;
+
+    @Mock
+    private ChannelService channelService;
+
+    @InjectMocks
+    private FileMessageService messageService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // TODO anyString()일 경우 create와 get이 성공하게 해둠
-        when(mockChannelService.createChannel(anyString())).thenReturn(new Channel("Return Channel"));
-        when(mockChannelService.getChannel(any())).thenReturn(Optional.of(new Channel("Return Channel")));
-
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            assertTrue(file.delete(), "테스트 파일 삭제 실패");
-        }
-        messageService = new FileMessageService(TEST_FILE_PATH, mockChannelService);
     }
 
     @Test
@@ -48,18 +48,21 @@ class FileMessageServiceTest {
     void testCreateMessage() {
         // given
         UUID authorID = UUID.randomUUID();
-        UUID channelID = mockChannelService.createChannel("Test Channel").getId();
-        String text = "Hello, world!";
+        String channelName = "test_channel";
+        Channel channel1 = new Channel(channelName);
+        String text = "text";
+
+        CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        Optional<Message> message = messageService.createMessage(authorID, channelID, text);
+        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        Optional<MessageResponse> message = Optional.ofNullable(messageService.createMessage(request));
 
         // then
         assertNotNull(message);
-        assertEquals(text, message.orElseThrow().getText());
-        assertEquals(authorID, message.orElseThrow().getAuthorId());
-        assertEquals(channelID, message.orElseThrow().getChannelId());
-        assertTrue(messageService.getMessages().containsKey(message.orElseThrow().getId()));
+        assertEquals(text, message.orElseThrow().text());
+        assertEquals(authorID, message.orElseThrow().authorId());
+        assertEquals(channel1.getId(), message.orElseThrow().channelId());
     }
 
     @Test
@@ -67,15 +70,24 @@ class FileMessageServiceTest {
     void testGetMessage() {
         // given
         UUID authorID = UUID.randomUUID();
-        UUID channelID = mockChannelService.createChannel("Test Channel").getId();
-        Optional<Message> message = messageService.createMessage(authorID, channelID, "Hello, world!");
+        String channelName = "test_channel";
+        Channel channel1 = new Channel(channelName);
+        String text = "text";
+
+        Message message1 = new Message(text, authorID, channel1.getId());
+        CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        Optional<Message> foundMessage = messageService.getMessage(message.orElseThrow().getId());
+        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        MessageResponse message = messageService.createMessage(request);
+        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
-        assertTrue(foundMessage.isPresent());
-        assertEquals(message.orElseThrow().getId(), foundMessage.get().getId());
+        assertTrue(response.isPresent());
+        assertEquals(text, response.get().text());
+        assertEquals(authorID, response.get().authorId());
+        assertEquals(channel1.getId(), response.get().channelId());
     }
 
     @Test
@@ -83,20 +95,37 @@ class FileMessageServiceTest {
     void testUpdateMessage() {
         // given
         UUID authorID = UUID.randomUUID();
-        UUID channelID = mockChannelService.createChannel("Test Channel").getId();
-        Optional<Message> message = messageService.createMessage(authorID, channelID, "Hello, world!");
-        String updatedText = "Updated";
+        String channelName = "test_channel";
+        Channel channel1 = new Channel(channelName);
+        String text = "text";
+
+        Message message1 = new Message(text, authorID, channel1.getId());
+        CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        Optional<Message> updatedMessage = messageService.updateMessage(message.orElseThrow().getId(), updatedText);
+        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        MessageResponse message = messageService.createMessage(request);
+        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
-        assertTrue(updatedMessage.isPresent());
-        assertEquals(updatedText, updatedMessage.get().getText());
+        assertTrue(response.isPresent());
+        assertEquals(text, response.get().text());
+        assertEquals(authorID, response.get().authorId());
+        assertEquals(channel1.getId(), response.get().channelId());
 
-        Optional<Message> foundMessage = messageService.getMessage(message.orElseThrow().getId());
-        assertTrue(foundMessage.isPresent());
-        assertEquals(updatedText, foundMessage.get().getText());
+        // when
+        String updatedText = "updated";
+        UpdateMessageRequest request1 = new UpdateMessageRequest(message.id(), updatedText);
+        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        Optional<MessageResponse> updatedResponse = messageService.updateMessage(request1);
+
+        // then
+        assertTrue(updatedResponse.isPresent());
+        assertEquals(updatedText, updatedResponse.get().text());
+        assertEquals(authorID, updatedResponse.get().authorId());
+        assertEquals(channel1.getId(), updatedResponse.get().channelId());
     }
 
     @Test
@@ -104,32 +133,31 @@ class FileMessageServiceTest {
     void testDeleteMessage() {
         // given
         UUID authorID = UUID.randomUUID();
-        UUID channelID = mockChannelService.createChannel("Test Channel").getId();
-        Optional<Message> message = messageService.createMessage(authorID, channelID, "Hello, world!");
+        String channelName = "test_channel";
+        Channel channel1 = new Channel(channelName);
+        String text = "text";
+
+        Message message1 = new Message(text, authorID, channel1.getId());
+        CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        Optional<Message> deletedMessage = messageService.deleteMessage(message.orElseThrow().getId());
+        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        MessageResponse message = messageService.createMessage(request);
+        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
-        assertTrue(deletedMessage.isPresent());
-        assertEquals(message.orElseThrow().getId(), deletedMessage.get().getId());
-        assertFalse(messageService.getMessage(message.orElseThrow().getId()).isPresent());
-    }
-
-    @Test
-    @DisplayName("메시지를 생성하고 새로운 인스턴스에서 로드가 되는지 확인한다")
-    void testPersistenceAcrossInstances() {
-        // given
-        UUID authorID = UUID.randomUUID();
-        UUID channelID = mockChannelService.createChannel("Persistent Channel").getId();
-        Optional<Message> message = messageService.createMessage(authorID, channelID, "Persistent message");
+        assertTrue(response.isPresent());
+        assertEquals(text, response.get().text());
+        assertEquals(authorID, response.get().authorId());
+        assertEquals(channel1.getId(), response.get().channelId());
 
         // when
-        MessageService newServiceInstance = new FileMessageService(TEST_FILE_PATH, mockChannelService);
+        messageService.deleteMessage(message.id());
+        when(messageRepository.getMessageById(any())).thenReturn(Optional.empty());
+        response = messageService.getMessage(message.id());
 
         // then
-        Optional<Message> foundMessage = newServiceInstance.getMessage(message.orElseThrow().getId());
-        assertTrue(foundMessage.isPresent());
-        assertEquals(message.orElseThrow().getText(), foundMessage.get().getText());
+        assertFalse(response.isPresent());
     }
 }
