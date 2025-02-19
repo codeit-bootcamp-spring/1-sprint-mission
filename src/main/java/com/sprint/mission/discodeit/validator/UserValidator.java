@@ -43,7 +43,7 @@ public class UserValidator {
         if (username == null || username.trim().isEmpty() ) {
             throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
         }
-        if (!username.matches("^[a-zA-Z0-9_]{3,20}$")) {
+        if (!username.matches("^[a-zA-Z0-9_]{1,20}$")) {
             throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
         }
     }
@@ -52,7 +52,7 @@ public class UserValidator {
         if (email == null || email.trim().isEmpty()) {
             throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
         }
-        if (!email.matches("^[\\w.-]+@[\\w-]+\\.[a-zA-Z]{2,6}$")) {
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
             throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
         }
     }

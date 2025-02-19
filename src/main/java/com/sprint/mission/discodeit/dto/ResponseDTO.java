@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class ResultDTO <T>{
+public class ResponseDTO<T>{
     private Integer code;
     private String message;
     private T data;

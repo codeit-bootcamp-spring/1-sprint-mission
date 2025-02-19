@@ -31,7 +31,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UUID create(UserCreateDTO dto) {
-        userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.password);
+        userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
         User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
         if (dto.getFile() != null) {

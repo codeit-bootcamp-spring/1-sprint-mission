@@ -24,9 +24,12 @@ import java.util.UUID;
 @SpringBootApplication
 public class DiscodeitApplication {
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class);
+        SpringApplication.run(DiscodeitApplication.class, args);
 
-        UserService userService = context.getBean(UserService.class);
+
+        //ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class);
+
+/*        UserService userService = context.getBean(UserService.class);
         UserStatusService userStatusService = context.getBean(UserStatusService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
         MessageService messageService = context.getBean(MessageService.class);
@@ -89,7 +92,7 @@ public class DiscodeitApplication {
         System.out.println();
 
         System.out.println("ReadStatus 조회");
-        for(ReadStatus readStatus : readStatusService.findAll()) System.out.println(readStatus);
+        for(ReadStatus readStatus : readStatusService.findAll()) System.out.println(readStatus);*/
 
     }
 }
