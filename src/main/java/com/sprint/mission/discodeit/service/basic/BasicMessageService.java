@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -44,7 +46,7 @@ public class BasicMessageService implements MessageService {
     public Message find(UUID id) {
         Message findMessage = messageRepository.findOne(id);
         return Optional.ofNullable(findMessage)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시지가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
     }
 
     @Override

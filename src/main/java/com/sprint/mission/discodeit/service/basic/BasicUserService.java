@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -47,7 +49,7 @@ public class BasicUserService implements UserService {
     public UserFindDTO find(UUID id) {
         User findUser = userRepository.findOne(id);
         Optional.ofNullable(findUser)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         return toDTO(findUser);
     }
 
@@ -80,7 +82,7 @@ public class BasicUserService implements UserService {
     public UUID delete(UUID id) {
         User findUser = userRepository.findOne(id);
         Optional.ofNullable(findUser)
-                        .orElseThrow(() -> new NoSuchElementException("해당 유저가 없습니다."));
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
         userStatusRepository.deleteByUserId(id);
 

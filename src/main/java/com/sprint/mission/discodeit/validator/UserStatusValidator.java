@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.validator;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +28,12 @@ public class UserStatusValidator {
     public void validateUserId(UUID userId){
         User findUser = userRepository.findOne(userId);
         Optional.ofNullable(findUser)
-                .orElseThrow(() -> new NoSuchElementException("해당 User 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private void checkDuplicateUserStatus(UUID userId) {
         if (userStatusRepository.findByUserId(userId).isPresent()) {
-            throw new IllegalArgumentException("중복된 UserStatus 가 존재합니다. Userid: " + userId);
+            throw new BadRequestException(ErrorCode.USER_STATUS_DUPLICATE);
         }
 
     }

@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.validator;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -29,18 +32,18 @@ public class ReadStatusValidator {
     public void validateUserId(UUID userId){
         User findUser = userRepository.findOne(userId);
         Optional.ofNullable(findUser)
-                .orElseThrow(() -> new NoSuchElementException("해당 User 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     public void validateChannelId(UUID channelId){
         Channel findChannel = channelRepository.findOne(channelId);
         Optional.ofNullable(findChannel)
-                .orElseThrow(() -> new NoSuchElementException("해당 Channel 이 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
     }
 
     private void checkDuplicateReadStatus(UUID userId, UUID channelId) {
         if (readStatusRepository.findByUserIdAndChannlId(userId, channelId).isPresent()) {
-            throw new IllegalArgumentException("중복된 ReadStatus 가 존재합니다. userid: " + userId+" channelId :"+channelId);
+            throw new BadRequestException(ErrorCode.READ_STATUS_DUPLICATE);
         }
     }
 
