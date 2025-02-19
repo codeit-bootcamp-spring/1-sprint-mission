@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB # 요청 파일 하나당 허용 사이즈
+      max-request-size: 100MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
+      file-size-threshold: 20KB
+      location: C:\uploadfile
+
+discodeit:
+  repository:
+    type: jcf
+
+
+server:
+  port: 8081
+
+logging:
+  level:
+    com.sprint: TRACE
