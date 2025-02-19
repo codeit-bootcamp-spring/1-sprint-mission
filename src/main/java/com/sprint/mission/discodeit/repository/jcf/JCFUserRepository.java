@@ -2,12 +2,20 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
+@Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
-    public JCFUserRepository(){
+
+    private final Map<UUID, User> data ;
+    public JCFUserRepository() {
         this.data = new HashMap<>();
     }
 
@@ -17,9 +25,13 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
-        User user = this.data.get(userId);
-        return Optional.ofNullable(user).orElseThrow(() -> new NoSuchElementException(userId + "를 찾을 수 없습니다."));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(this.data.get(userId));
+    }
+
+    @Override
+    public Map<UUID, User> findAll() {
+        return new HashMap<>(data);
     }
 
     @Override
@@ -28,7 +40,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Map<UUID, User> findAll() {
-        return new HashMap<>(data);
+    public boolean existsById(UUID userId) {
+        return data.containsKey(userId);
     }
 }

@@ -1,52 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.message.MessageDTO;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
+@Getter
+@Setter
+@ToString
+public class Message extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String content;
-    private UUID channelId; //메세지가 작성된 채널의 ID
-    private UUID authorId; //메시지를 작성한 사용자의 ID
+    private UUID authorId;
+    private  UUID channelId;
 
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(MessageDTO dto) {
         super();
+        this.content = dto.getContent();
+        this.authorId = dto.getUserId();
+        this.channelId = dto.getChannelId();
+    }
+    public void updateMessage(String content) {
+        if(content == null || content.equals(this.content)) return;
         this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
+        updateTime(Instant.now());
     }
+    public void update(MessageDTO dto) {
+        if(dto.getContent() != null && !dto.getContent().equals(this.content)) {
+            this.content = dto.getContent();
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(UUID channelId) {
-        this.channelId = channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(UUID authorId) {
-        this.authorId = authorId;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "messageId=" + getId() +
-                ", content='" + content + '\'' +
-                ", channelId=" + channelId +
-                ", authorId=" + authorId +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                '}';
+        }
     }
 }

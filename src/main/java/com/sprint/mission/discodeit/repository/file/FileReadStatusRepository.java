@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -15,49 +15,45 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileMessageRepository extends FileRepository implements MessageRepository {
-
-    public FileMessageRepository(@Value("${discodeit.repository.message}") String fileDirectory) {
+public class FileReadStatusRepository extends FileRepository implements ReadStatusRepository {
+    public FileReadStatusRepository(@Value("${discodeit.repository.readStatus}") String fileDirectory){
         super(fileDirectory);
     }
+
     @Override
-    public void save(Message message) {
-        Path path = resolvePath(message.getId());
-        saveToFile(path,message);
+    public void save(ReadStatus readStatus) {
+        Path path = resolvePath(readStatus.getId());
+        saveToFile(path,readStatus);
 
     }
 
     @Override
-    public Optional<Message> findById(UUID messageId) {
-        Path path = resolvePath(messageId);
+    public Optional<ReadStatus> findById(UUID id) {
+        Path path = resolvePath(id);
         return loadFromFile(path);
     }
 
     @Override
-    public Map<UUID, Message> findAll() {
-        Map<UUID, Message> messageMap = new HashMap<>();
+    public Map<UUID, ReadStatus> findAll() {
+        Map<UUID, ReadStatus> readStatusMap = new HashMap<>();
         try (Stream<Path> pathStream = Files.walk(getDIRECTORY())) {
             pathStream.filter(path -> path.toString().endsWith(".ser"))
                     .forEach(path -> {
-                        Optional<Message> message = loadFromFile(path);
-                        message.ifPresent(msg -> messageMap.put(msg.getId(), msg));
+                        Optional<ReadStatus>readStatus = loadFromFile(path);
+                        readStatus.ifPresent(rs -> readStatusMap.put(rs.getId(), rs));
                     });
-        } catch (IOException e) {
+        }catch (IOException e) {
             System.out.println("파일을 읽을 수 없습니다." + e.getMessage());
         }
-        return messageMap;
+        return readStatusMap;
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public void delete(UUID id) {
+        Path path = resolvePath(id);
+        deleteFile(path);
 
-    }
-
-    @Override
-    public boolean existsById(UUID messageId) {
-        return false;
     }
 }
