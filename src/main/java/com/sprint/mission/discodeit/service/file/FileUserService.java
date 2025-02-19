@@ -1,78 +1,121 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.collection.Users;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.Status;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Service
+@RequiredArgsConstructor
+@ConditionalOnProperty(name = "feature.service", havingValue = "file")
 public class FileUserService implements UserService {
-    private final String filePath;
-    private final Users users;
-
-    public FileUserService(String filePath) {
-        this.filePath = filePath;
-        this.users = loadFromFile().orElseGet(Users::new);
-    }
+    private final FileUserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User createUser(String username) {
-        User newUser = new User(username);
-        users.add(newUser.getId(), newUser);
-        saveToFile();
-        return newUser;
-    }
-
-    @Override
-    public Map<UUID, User> getUsers() {
-        return users.asReadOnly();
-    }
-
-    @Override
-    public Optional<User> getUser(UUID id) {
-        return users.get(id);
-    }
-
-    @Override
-    public Optional<User> updateUser(UUID id, String newUsername) {
-        Optional<User> updatedUser = users.update(id, newUsername);
-        if (updatedUser.isPresent()) {
-            saveToFile();
+    public UserResponse createUser(CreateUserRequest request) {
+        if (userRepository.existsByUsername(request.username()) || userRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
         }
-        return updatedUser;
+
+        User user = new User(request.username(), request.email());
+        if (request.profileImage() != null) {
+            user.updateProfileImage(request.profileImage());
+        }
+
+        UserStatus userStatus = new UserStatus(user.getId());
+        userStatus.updateStatus(Status.CONNECTED);
+        user.updateUserStatus(userStatus);
+
+        userRepository.save(user);
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getStatus(), user.getProfileImage());
     }
 
     @Override
-    public Optional<User> deleteUser(UUID id) {
-        Optional<User> removedUser = users.remove(id);
-        if (removedUser.isPresent()) {
-            saveToFile();
-        }
-        return removedUser;
+    public List<UserResponse> findAllUsers() {
+        return userRepository.getAllUsers().stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getStatus(),
+                        user.getProfileImage()
+                ))
+                .collect(Collectors.toList());
     }
 
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(users);
-        } catch (IOException e) {
-            throw new RuntimeException("유저를 저장하는데 실패", e);
-        }
+    @Override
+    public Optional<UserResponse> findUserById(UUID userId) {
+        return Optional.ofNullable(userRepository.getUserById(userId))
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getStatus(),
+                        user.getProfileImage()
+                ));
     }
 
-    private Optional<Users> loadFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return Optional.of((Users) ois.readObject());
-        } catch (FileNotFoundException e) {
-            return Optional.empty();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("유저를 불러오는데 실패", e);
-        }
+    @Override
+    public Optional<UserResponse> updateUser(UpdateUserRequest request) {
+        return Optional.ofNullable(userRepository.getUserById(request.id()))
+                .map(user -> {
+                    if (request.username() != null) {
+                        user.updateUsername(request.username());
+                    }
+                    if (request.profileImage() != null) {
+                        user.updateProfileImage(request.profileImage());
+                    }
+
+                    userRepository.save(user);
+
+                    return new UserResponse(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getStatus(),
+                            user.getProfileImage()
+                    );
+                });
+    }
+
+    @Override
+    public void deleteUser(UUID userId) {
+        Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
+            binaryContentRepository.delete(user.getProfileImage());
+            userStatusRepository.deleteByUserId(user.getId());
+            userRepository.delete(user.getId());
+        });
+    }
+
+    @Override
+    public synchronized void updateReadStatus(UUID userId, UUID channelId) {
+        User user = userRepository.getUserById(userId);
+        if (user == null) throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
+
+        user.getReadStatuses().compute(channelId, (key, status) -> {
+            if (status == null) return new ReadStatus(userId, channelId);
+            status.setUpdatedAt(Instant.now().toEpochMilli());
+            return status;
+        });
+
+        userRepository.save(user);
     }
 }
