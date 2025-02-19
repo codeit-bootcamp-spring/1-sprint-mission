@@ -2,14 +2,20 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import java.io.*;
-
-import java.util.ArrayList;
+import org.springframework.stereotype.Repository;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
+import java.util.ArrayList;
+
 import java.util.UUID;
 
+@Repository
 public class FileChannelRepository implements ChannelRepository {
-    private static final String FILE_PATH = "/Users/parkjihyun/Desktop/CodeitProjects/Codeit/1-sprint-mission/files/channels.ser";
+    private static final String FILE_PATH = "files/channels.ser";
 
     private List<Channel> channels;
 
@@ -23,6 +29,7 @@ public class FileChannelRepository implements ChannelRepository {
         saveToFile();
     }
 
+
     @Override
     public Channel findByChannelname(String channelname) {
         for (Channel channel : channels) {
@@ -30,11 +37,11 @@ public class FileChannelRepository implements ChannelRepository {
                 return channel;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Channel not found with name: " + channelname);
     }
 
     @Override
-    public Channel findById(UUID id){
+    public Channel findByChannelId(UUID id){
         for (Channel channel : channels) {
             if (channel.getId().equals(id)){
                 return channel;
@@ -45,7 +52,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public List<Channel> findAll() {
-        return channels;
+        return new ArrayList<>(channels);
     }
 
     @Override
@@ -53,12 +60,11 @@ public class FileChannelRepository implements ChannelRepository {
         for (int i = 0; i < channels.size(); i++) {
             if (channels.get(i).getId().equals(id)) {
                 channels.remove(i);
-                saveToFile();
-                return;
+                break;
             }
         }
+        saveToFile();
     }
-
 
 
     private void saveToFile() {
@@ -76,5 +82,4 @@ public class FileChannelRepository implements ChannelRepository {
             return new ArrayList<>();
         }
     }
-
 }

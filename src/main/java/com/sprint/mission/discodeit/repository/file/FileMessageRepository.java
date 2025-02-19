@@ -1,17 +1,21 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
+import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
+@Repository
 public class FileMessageRepository  implements MessageRepository {
-    private static final String FILE_PATH = "/Users/parkjihyun/Desktop/CodeitProjects/Codeit/1-sprint-mission/files/messages.ser";
+    private static final String FILE_PATH = "files/messages.ser";
     private List<Message> messages;
 
     public FileMessageRepository() {
@@ -35,10 +39,21 @@ public class FileMessageRepository  implements MessageRepository {
     }
 
     @Override
-    public List<Message> findbyUsername(String username) { // 수정: 메서드 이름 대소문자 일치
+    public List<Message> findBySenderId(UUID senderId) {
         List<Message> result = new ArrayList<>();
         for (Message message : messages) {
-            if (message.getUsername().equals(username)) {
+            if (message.getSenderId().equals(senderId)) {
+                result.add(message);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        List<Message> result = new ArrayList<>();
+        for (Message message : messages) {
+            if (message.getChannelId().equals(channelId)) {
                 result.add(message);
             }
         }
@@ -47,7 +62,7 @@ public class FileMessageRepository  implements MessageRepository {
 
     @Override
     public List<Message> findAll() {
-        return messages;
+        return new ArrayList<>(messages);
     }
 
     @Override
@@ -55,11 +70,12 @@ public class FileMessageRepository  implements MessageRepository {
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).getId().equals(messageId)) {
                 messages.remove(i);
-                saveToFile();
-                return;
+                break;
             }
         }
+        saveToFile();
     }
+
 
     private void saveToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
