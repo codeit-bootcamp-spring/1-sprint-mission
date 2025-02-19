@@ -1,31 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User extends BaseEntity {
-    @Serial
+@Getter
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String username;
+    private String email;
+    private String password;
 
-    public User(UUID id, String username, String mail, String woody1234) {
-        super();
-        this.id = id;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
         this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    public void setUsername(String username) {
-        this.username = username;
-        update();
-    }
-
-    @Override
-    public String toString() {
-        return "User{id=" + id + ", username='" + username + '\'' + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }

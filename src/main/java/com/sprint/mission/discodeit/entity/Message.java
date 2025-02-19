@@ -1,44 +1,36 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends BaseEntity {
-    @Serial
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String content;
-    private final UUID userId;
-    private final UUID channelId;
+    private UUID channelId;
+    private UUID authorId;
 
-    public Message(UUID id, String content, UUID userId, UUID channelId) {
-        super();
-        this.id = id;
+    public Message(String content, UUID channel, UUID author) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
+        this.channelId = channel;
+        this.authorId = author;
     }
 
-    public String getContent() {
-        return content;
+    public void update(String newContent) {
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void setContent(String content) {
-        this.content = content;
-        update();
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    @Override
-    public String toString() {
-        return "Message{id=" + id + ", content='" + content + '\'' + ", userId=" + userId + ", channelId=" + channelId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
-    }
 }
