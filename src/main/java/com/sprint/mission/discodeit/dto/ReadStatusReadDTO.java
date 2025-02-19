@@ -15,6 +15,6 @@ import java.util.UUID;
 public class ReadStatusReadDTO {
     private UUID id;
     private UUID userId;
-    private UUID channelId;
-    private Instant lastReadAt;
+    private UUID messageId;
+    private Instant readAt;
 }

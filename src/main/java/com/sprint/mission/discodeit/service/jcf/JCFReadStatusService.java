@@ -1,55 +1,53 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.ReadStatusReadDTO;
+import com.sprint.mission.discodeit.dto.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.*;
 
 @Service("jcfReadStatusService")
 @RequiredArgsConstructor
 public class JCFReadStatusService implements ReadStatusService {
 
-    private final Map<UUID, ReadStatus> data = new HashMap<>();
+    private final Map<UUID, ReadStatusReadDTO> readStatusStorage = new HashMap<>();
 
     @Override
-    public void markAsRead(UUID userId, UUID channelId, Instant timestamp) {
-        ReadStatus status = new ReadStatus(userId, channelId, timestamp);
-        data.put(UUID.randomUUID(), status);
+    public void create(ReadStatusCreateDTO readStatusCreateDTO) {
+        ReadStatusReadDTO readStatus = new ReadStatusReadDTO(
+                UUID.randomUUID(),
+                readStatusCreateDTO.getUserId(),
+                readStatusCreateDTO.getMessageId(),
+                readStatusCreateDTO.getReadAt()
+        );
+        readStatusStorage.put(readStatus.getId(), readStatus);
     }
 
     @Override
-    public Optional<ReadStatus> getLastRead(UUID userId, UUID channelId) {
-        return data.values().stream()
-                .filter(status -> status.getUserId().equals(userId) && status.getChannelId().equals(channelId))
-                .findFirst();
+    public void update(UUID id, ReadStatusUpdateDTO readStatusUpdateDTO) {
+        ReadStatusReadDTO readStatus = readStatusStorage.get(id);
+        if (readStatus != null) {
+            readStatus.setReadAt(readStatusUpdateDTO.getReadAt());
+        }
     }
 
     @Override
-    public List<ReadStatus> getUserReadStatuses(UUID userId) {
-        return new ArrayList<>(data.values());
+    public void delete(UUID id) {
+        readStatusStorage.remove(id);
     }
 
+    // ✅ `readByUserId(UUID userId)` 메서드 구현 (오류 해결)
     @Override
-    public List<ReadStatus> getChannelReadStatuses(UUID channelId) {
-        List<ReadStatus> channelStatuses = new ArrayList<>();
-        for (ReadStatus status : data.values()) {
-            if (status.getChannelId().equals(channelId)) {
-                channelStatuses.add(status);
+    public List<ReadStatusReadDTO> readByUserId(UUID userId) {
+        List<ReadStatusReadDTO> result = new ArrayList<>();
+        for (ReadStatusReadDTO readStatus : readStatusStorage.values()) {
+            if (readStatus.getUserId().equals(userId)) {
+                result.add(readStatus);
             }
         }
-        return channelStatuses;
-    }
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        data.values().removeIf(status -> status.getUserId().equals(userId));
-    }
-
-    @Override
-    public void deleteByChannelId(UUID channelId) {
-        data.values().removeIf(status -> status.getChannelId().equals(channelId));
+        return result;
     }
 }

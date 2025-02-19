@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -13,8 +12,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MessageCreateDTO {
-    private UUID senderId;       // 메시지를 보낸 사용자 ID
-    private UUID channelId;      // 메시지가 속한 채널 ID
-    private String content;      // 메시지 내용
-    private List<UUID> attachmentIds; // 첨부파일 ID 목록 (BinaryContent)
+    private UUID senderId;
+    private UUID channelId;
+    private String content;
+    private UUID attachmentId;
+
+    public MessageCreateDTO(UUID senderId, UUID channelId, String content) {
+        this.senderId = senderId;
+        this.channelId = channelId;
+        this.content = content;
+        this.attachmentId = null;
+    }
 }
