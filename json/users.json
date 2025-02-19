@@ -1,10 +1,42 @@
 {
-  "89f18c5c-e7bf-47b3-8399-bdda8f3ecc8f" : {
-    "id" : "89f18c5c-e7bf-47b3-8399-bdda8f3ecc8f",
-    "createdAt" : 1737766782116,
-    "updatedAt" : null,
-    "name" : "woody",
-    "phone" : "010-9218-1188",
-    "password" : "Abcdefgh12312!"
+  "16038eba-e395-4179-b84e-b15e5176bb70" : {
+    "id" : "16038eba-e395-4179-b84e-b15e5176bb70",
+    "createdAt" : 1739523025.035552000,
+    "updatedAt" : 1739523025.035553000,
+    "name" : "테스트유저2",
+    "phone" : "010-2222-1111",
+    "password" : "Abcdefg1234!!",
+    "profileImageId" : null,
+    "userStatusId" : "27a24815-9453-46a2-bc73-4b29c43dfa98"
+  },
+  "8af8b386-9c5b-4aad-8b98-b54dccfd3a88" : {
+    "id" : "8af8b386-9c5b-4aad-8b98-b54dccfd3a88",
+    "createdAt" : 1739523025.037423000,
+    "updatedAt" : 1739523025.037424000,
+    "name" : "테스트유저4",
+    "phone" : "010-4444-1111",
+    "password" : "Abcdefg1234!!",
+    "profileImageId" : null,
+    "userStatusId" : null
+  },
+  "25c9fe38-de4a-48d6-80ca-d51ddee201e6" : {
+    "id" : "25c9fe38-de4a-48d6-80ca-d51ddee201e6",
+    "createdAt" : 1739523025.030502000,
+    "updatedAt" : 1739523025.030503000,
+    "name" : "테스트유저1",
+    "phone" : "010-1111-1111",
+    "password" : "Abcdefg1234!!",
+    "profileImageId" : null,
+    "userStatusId" : "79fd43ab-4520-4acb-a704-86c6dabdabe8"
+  },
+  "920454f2-f5c9-409a-bfc7-a0d75dadc697" : {
+    "id" : "920454f2-f5c9-409a-bfc7-a0d75dadc697",
+    "createdAt" : 1739523025.036256000,
+    "updatedAt" : 1739523025.036257000,
+    "name" : "테스트유저3",
+    "phone" : "010-3333-1111",
+    "password" : "Abcdefg1234!!",
+    "profileImageId" : null,
+    "userStatusId" : "c5284c01-df30-4d19-a856-3af835249c9d"
   }
 }

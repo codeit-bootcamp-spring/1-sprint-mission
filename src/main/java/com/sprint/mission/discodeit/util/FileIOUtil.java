@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 
 public class FileIOUtil {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.registerModule(new JavaTimeModule()); // Instant, UUID 변환 지원
+    }
 
     public static <T> Map<UUID, T> loadFromFile(Path filePath) {
         if (!Files.exists(filePath)) {
@@ -21,29 +21,44 @@ public class FileIOUtil {
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
             return (Map<UUID, T>) ois.readObject();
         } catch (EOFException e) {
-            return new HashMap<>();
+            return new HashMap<>(); // 파일이 비어 있을 경우 빈 맵 반환
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("파일을 읽어오는 도중 문제가 발생하였습니다.", e);
+            throw new RuntimeException("❌ 파일을 읽는 도중 오류 발생 (" + filePath + "): " + e.getMessage(), e);
         }
     }
 
     public static <T> void saveToFile(Map<UUID, T> data, Path filePath) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            oos.writeObject(data);
+        try {
+            Files.createDirectories(filePath.getParent()); // 디렉토리 없으면 생성
+            try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+                oos.writeObject(data);
+            }
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 도중 문제가 발생하였습니다.", e);
+            throw new RuntimeException("❌ 파일 저장 중 오류 발생 (" + filePath + "): " + e.getMessage(), e);
         }
     }
 
-    //.dat 파일을 읽기 쉬운 Json 파일로 변환하는 메서드
-    public static void convertDSerToJson(Path datFilePath, Path jsonFilePath) {
-        Map<UUID, Object> data = loadFromFile(datFilePath);
-
-        ObjectMapper objectMapper = new ObjectMapper();
+    // `.dat` 파일을 읽기 쉬운 JSON 파일로 변환
+    public static <T> void convertSerToJson(Path datFilePath, Path jsonFilePath, Class<T> valueType) {
+        Map<UUID, T> data = loadFromFile(datFilePath);
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValue(jsonFilePath.toFile(), data);
         } catch (IOException e) {
-            throw new RuntimeException("JSON 파일로 변환하는 도중 문제가 발생하였습니다.", e);
+            throw new RuntimeException("❌ JSON 변환 중 오류 발생 (" + jsonFilePath + "): " + e.getMessage(), e);
+        }
+    }
+
+    // 파일 초기화 및 새로 생성
+    public static void initializeFiles() {
+        String[] fileNames = { "users.ser", "messages.ser", "channels.ser", "binarycontent.ser", "userstatus.ser" };
+        for (String fileName : fileNames) {
+            Path filePath = Paths.get("./result/" + fileName);
+            try {
+                Files.deleteIfExists(filePath);
+                Files.createFile(filePath);
+            } catch (IOException e) {
+                System.err.println("⚠️ 파일 초기화 중 오류 발생 (" + filePath + "): " + e.getMessage());
+            }
         }
     }
 }

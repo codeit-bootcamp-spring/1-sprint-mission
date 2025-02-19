@@ -1,0 +1,34 @@
+{
+  "4a21c5be-89cd-42f5-b924-549be7cc9a00" : {
+    "id" : "4a21c5be-89cd-42f5-b924-549be7cc9a00",
+    "createdAt" : 1739523025.038580000,
+    "updateAt" : 1739523025.038580000,
+    "lastActiveAt" : 1739523025.038534000,
+    "userId" : "8af8b386-9c5b-4aad-8b98-b54dccfd3a88",
+    "onlineStatusType" : "ACTIVE"
+  },
+  "c5284c01-df30-4d19-a856-3af835249c9d" : {
+    "id" : "c5284c01-df30-4d19-a856-3af835249c9d",
+    "createdAt" : 1739523025.036702000,
+    "updateAt" : 1739523025.036702000,
+    "lastActiveAt" : 1739523025.036698000,
+    "userId" : "920454f2-f5c9-409a-bfc7-a0d75dadc697",
+    "onlineStatusType" : "ACTIVE"
+  },
+  "27a24815-9453-46a2-bc73-4b29c43dfa98" : {
+    "id" : "27a24815-9453-46a2-bc73-4b29c43dfa98",
+    "createdAt" : 1739523025.035871000,
+    "updateAt" : 1739523025.035871000,
+    "lastActiveAt" : 1739523025.035848000,
+    "userId" : "16038eba-e395-4179-b84e-b15e5176bb70",
+    "onlineStatusType" : "ACTIVE"
+  },
+  "79fd43ab-4520-4acb-a704-86c6dabdabe8" : {
+    "id" : "79fd43ab-4520-4acb-a704-86c6dabdabe8",
+    "createdAt" : 1739523025.032042000,
+    "updateAt" : 1739523025.061759000,
+    "lastActiveAt" : 1739523025.061479000,
+    "userId" : "25c9fe38-de4a-48d6-80ca-d51ddee201e6",
+    "onlineStatusType" : "ACTIVE"
+  }
+}

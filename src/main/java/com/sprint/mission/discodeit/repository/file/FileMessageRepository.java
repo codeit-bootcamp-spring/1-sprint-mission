@@ -1,24 +1,27 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.Message;
-import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.util.FileIOUtil.*;
 import static com.sprint.mission.discodeit.util.FileIOUtil.saveToFile;
 
+@Profile("file")
+@Repository
 public class FileMessageRepository implements MessageRepository {
-    private final Path filePath = Path.of("./result/messages.ser");
+    private final Path filePath;
     private final Map<UUID, Message> messageMap;
 
-    public FileMessageRepository() {
+    public FileMessageRepository(@Value("${discodeit.repository.message-file-path}") Path filePath) {
+        this.filePath = filePath;
         if (!Files.exists(this.filePath)) {
             try {
                 Files.createFile(this.filePath);
@@ -43,23 +46,8 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByUser(User user) {
-        return messageMap.values().stream()
-                .filter(message -> message.getWriter().getPhone().equals(user.getPhone()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> findByChannel(Channel channel) {
-        return messageMap.values().stream()
-                .filter(message -> message.getChannel().getName().equals(channel.getName()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Message> findAll() {
-        return messageMap.values().stream()
-                .collect(Collectors.toList());
+        return messageMap.values().stream().toList();
     }
 
     @Override

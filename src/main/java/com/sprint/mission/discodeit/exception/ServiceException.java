@@ -1,19 +1,14 @@
 package com.sprint.mission.discodeit.exception;
 
-import com.sprint.mission.discodeit.error.ErrorCode;
-import lombok.*;
+import lombok.Getter;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ServiceException extends RuntimeException{
-    private ErrorCode errorCode;
-    private String errorMessage;
+public class ServiceException extends RuntimeException {
+    private final ErrorCode errorCode;
 
     public ServiceException(ErrorCode errorCode) {
+        super(errorCode.getDescription());
         this.errorCode = errorCode;
-        this.errorMessage = errorCode.getDescription();
     }
 }
+

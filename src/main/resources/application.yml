@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: file
+
+discodeit:
+  repository:
+    user-status-file-path: ./result/userstatus.ser
+    channel-file-path: ./result/channels.ser
+    binarycontent-file-path: ./result/binarycontent.ser
+    user-file-path: ./result/users.ser
+    read-status-file-path: ./result/readstatus.ser
+    message-file-path: ./result/messages.ser

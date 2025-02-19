@@ -1,36 +1,42 @@
 package com.sprint.mission.discodeit.domain;
 
 import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class User implements Serializable {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String name;
     private String phone;
     private String password;
+    private UUID profileImageId;
+    private UUID userStatusId;
 
-    public User(String name, String phone, String password) {
+    public User(String name, String phone, String password, UUID profileImageId, UUID userStatusId) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = null;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.name = name;
         this.phone = phone;
         this.password = password;
+        this.profileImageId = profileImageId;
+        this.userStatusId = userStatusId;
     }
 
     public void update(String password) {
         this.password = password;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
     //8자리 이상 15자리 이하 대문자 및 특수문자 하나 이상 포함해야 한다
@@ -45,35 +51,26 @@ public class User implements Serializable {
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object == null || getClass() != object.getClass()) return false;
-        User user = (User) object;
-        return Objects.equals(phone, user.phone);
+    public boolean equals(Object o) { // User 객체는 UUID, name, phone 3개의 필드가 동일하면 같은 유저라고 판단한다.
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(phone, user.phone);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(phone);
+        return Objects.hash(id, name, phone);
     }
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        String createdAtFormatted = createdAt != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(createdAt), ZoneId.systemDefault()).format(formatter)
-                : "N/A";
-        String updatedAtFormatted = updatedAt != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(updatedAt), ZoneId.systemDefault()).format(formatter)
-                : "N/A";
-
         return "User {\n" +
                 "  id=" + id + ",\n" +
                 "  name='" + name + "',\n" +
                 "  phone='" + phone + "',\n" +
                 "  password='" + password + "',\n" +
-                "  createdAt=" + createdAtFormatted + ",\n" +
-                "  updatedAt=" + updatedAtFormatted + "\n" +
+                "  createdAt=" + createdAt + ",\n" +
+                "  updatedAt=" + updatedAt + "\n" +
                 "}";
     }
 }

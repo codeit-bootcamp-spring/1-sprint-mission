@@ -1,58 +1,54 @@
 package com.sprint.mission.discodeit.domain;
 
 import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 public class Message implements Serializable {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
+    @Serial
+    private static final long serialVersionUID = 1L;
+    private final UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
     private String content;
-    private User writer;
-    private Channel channel;
+    private UUID writerID;
+    private UUID channelID;
+    private List<UUID> attachmentsID;
 
-    public Message(String content, User writer, Channel channel) {
+    public Message(String content, UUID writerID, UUID channelID, List<UUID> attachmentsID) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = null;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
         this.content = content;
-        this.writer = writer;
-        this.channel = channel;
+        this.writerID = writerID;
+        this.channelID = channelID;
+        this.attachmentsID = attachmentsID;
     }
 
-    public void update(String content) {
+    public void update(String content, UUID newAttachment) {
         this.content = content;
-        this.updatedAt = System.currentTimeMillis();
+        this.attachmentsID.add(newAttachment);
+        this.updatedAt = Instant.now();
     }
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        String createdAtFormatted = createdAt != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(createdAt), ZoneId.systemDefault()).format(formatter)
-                : "N/A";
-        String updatedAtFormatted = updatedAt != null
-                ? LocalDateTime.ofInstant(Instant.ofEpochMilli(updatedAt), ZoneId.systemDefault()).format(formatter)
-                : "N/A";
-
-        String writerUserName = writer != null ? writer.getName() : "Unknown";
-        String useChannelName = channel != null ? channel.getName() : "Unknown";
-
         return "Message{" +
                 "id=" + id +
-                ", createdAt=" + createdAtFormatted +
-                ", updatedAt=" + updatedAtFormatted +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 ", content='" + content + '\'' +
-                ", writer='" + writerUserName + '\'' +
-                ", channel='" + useChannelName + '\'' +
+                ", writer='" + writerID + '\'' +
+                ", channel='" + channelID + '\'' +
                 '}';
     }
 }

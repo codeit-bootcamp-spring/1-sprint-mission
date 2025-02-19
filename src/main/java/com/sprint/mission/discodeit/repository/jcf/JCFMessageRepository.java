@@ -1,13 +1,15 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.domain.Channel;
 import com.sprint.mission.discodeit.domain.Message;
-import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
+
 
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Profile("jcf")
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageMap;
 
@@ -29,23 +31,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByUser(User user) {
-        return messageMap.values().stream()
-                .filter(message -> message.getWriter().getPhone().equals(user.getPhone()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> findByChannel(Channel channel) {
-        return messageMap.values().stream()
-                .filter(message -> message.getChannel().getName().equals(channel.getName()))
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Message> findAll() {
-        return messageMap.values().stream()
-                .collect(Collectors.toList());
+        return messageMap.values().stream().toList();
     }
 
     @Override

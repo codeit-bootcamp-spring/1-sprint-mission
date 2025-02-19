@@ -1,0 +1,226 @@
+{
+  "5a787883-82ef-4a60-af22-1f3b5d000b68" : {
+    "id" : "5a787883-82ef-4a60-af22-1f3b5d000b68",
+    "createdAt" : 1739522820.430950000,
+    "updateAt" : 1739522820.430950000,
+    "userId" : "2ce0519c-fdbc-4915-8003-c61aae9d2a9e",
+    "channelId" : "a011080c-970b-4779-b360-18564bab3c18",
+    "lastReadAt" : 1739522820.430947000
+  },
+  "cb139a4d-8156-4ea3-bbd3-573f6c5c16de" : {
+    "id" : "cb139a4d-8156-4ea3-bbd3-573f6c5c16de",
+    "createdAt" : 1739522820.433360000,
+    "updateAt" : 1739522820.433360000,
+    "userId" : "cf470c9e-291b-455d-b070-910a7c4558c6",
+    "channelId" : "06eacbe5-90e6-43cd-a06a-40cea725edbf",
+    "lastReadAt" : 1739522820.433327000
+  },
+  "ff5b5779-78eb-4c74-8921-d31fd07d27b9" : {
+    "id" : "ff5b5779-78eb-4c74-8921-d31fd07d27b9",
+    "createdAt" : 1739523025.051612000,
+    "updateAt" : 1739523025.051613000,
+    "userId" : "16038eba-e395-4179-b84e-b15e5176bb70",
+    "channelId" : "808ee585-d924-4942-b818-0f0fb9009172",
+    "lastReadAt" : 1739523025.051595000
+  },
+  "418814f4-abfb-489f-8b81-efc65ae62fb7" : {
+    "id" : "418814f4-abfb-489f-8b81-efc65ae62fb7",
+    "createdAt" : 1739522820.425426000,
+    "updateAt" : 1739522820.425427000,
+    "userId" : "cf470c9e-291b-455d-b070-910a7c4558c6",
+    "channelId" : "0bf7c0c9-7331-4076-9061-535d9164833f",
+    "lastReadAt" : 1739522820.425378000
+  },
+  "9a0402dd-d18f-46f6-bdb3-d8b32d5ec831" : {
+    "id" : "9a0402dd-d18f-46f6-bdb3-d8b32d5ec831",
+    "createdAt" : 1739522467.047077000,
+    "updateAt" : 1739522467.047077000,
+    "userId" : "3ab84f3b-b964-4db3-b753-d260fefbcc94",
+    "channelId" : "f8a0d3d3-f2be-48f8-b547-d39590a4e70b",
+    "lastReadAt" : 1739522467.047056000
+  },
+  "3aaf1816-bbab-4075-88ea-6f6621ea404e" : {
+    "id" : "3aaf1816-bbab-4075-88ea-6f6621ea404e",
+    "createdAt" : 1739523025.056255000,
+    "updateAt" : 1739523025.056255000,
+    "userId" : "8af8b386-9c5b-4aad-8b98-b54dccfd3a88",
+    "channelId" : "439655ab-aa4c-496a-9ccb-4b6ffb156c70",
+    "lastReadAt" : 1739523025.056157000
+  },
+  "13318767-6db0-4ff8-92b5-b28a014cbffe" : {
+    "id" : "13318767-6db0-4ff8-92b5-b28a014cbffe",
+    "createdAt" : 1739521662.474076000,
+    "updateAt" : 1739521662.474076000,
+    "userId" : "19bbec7c-6fa0-42dd-b83f-a5ce2a011554",
+    "channelId" : "8e01056e-4b07-4f8b-bc6f-a1fc337c76bc",
+    "lastReadAt" : 1739521662.474052000
+  },
+  "2fc1cce9-a8ae-4354-9338-c2c2505f6461" : {
+    "id" : "2fc1cce9-a8ae-4354-9338-c2c2505f6461",
+    "createdAt" : 1739523025.057830000,
+    "updateAt" : 1739523025.057830000,
+    "userId" : "25c9fe38-de4a-48d6-80ca-d51ddee201e6",
+    "channelId" : "a6d47dd2-b23c-4157-b965-165a810707a4",
+    "lastReadAt" : 1739523025.057814000
+  },
+  "6a50c3d5-8034-48a3-b7bf-1a4670bda48f" : {
+    "id" : "6a50c3d5-8034-48a3-b7bf-1a4670bda48f",
+    "createdAt" : 1739522820.428922000,
+    "updateAt" : 1739522820.428922000,
+    "userId" : "15bbd349-93b6-449b-8110-10481f71b18e",
+    "channelId" : "9c74b565-453d-4dcb-8ef7-89b7b0b2b38c",
+    "lastReadAt" : 1739522820.428883000
+  },
+  "67dc242a-2170-49c1-a4d1-13a93668c44d" : {
+    "id" : "67dc242a-2170-49c1-a4d1-13a93668c44d",
+    "createdAt" : 1739523025.052784000,
+    "updateAt" : 1739523025.052784000,
+    "userId" : "920454f2-f5c9-409a-bfc7-a0d75dadc697",
+    "channelId" : "808ee585-d924-4942-b818-0f0fb9009172",
+    "lastReadAt" : 1739523025.052765000
+  },
+  "d29fdf7f-e681-4362-9f1e-f3e38bdb60fe" : {
+    "id" : "d29fdf7f-e681-4362-9f1e-f3e38bdb60fe",
+    "createdAt" : 1739522467.046292000,
+    "updateAt" : 1739522467.046292000,
+    "userId" : "2b41ba68-ef5f-450c-9c11-6f4210929780",
+    "channelId" : "f8a0d3d3-f2be-48f8-b547-d39590a4e70b",
+    "lastReadAt" : 1739522467.046251000
+  },
+  "c72490ab-84bf-446a-bbeb-0be9569c2264" : {
+    "id" : "c72490ab-84bf-446a-bbeb-0be9569c2264",
+    "createdAt" : 1739521581.413754000,
+    "updateAt" : 1739521581.413754000,
+    "userId" : "cc203d11-2d76-481e-99e8-1e54047e5ae8",
+    "channelId" : "a675f52a-bd81-4060-8cbc-1c8520211cea",
+    "lastReadAt" : 1739521581.413672000
+  },
+  "82f555f7-5659-4df9-b390-01fb371b4a76" : {
+    "id" : "82f555f7-5659-4df9-b390-01fb371b4a76",
+    "createdAt" : 1739522820.427187000,
+    "updateAt" : 1739522820.427188000,
+    "userId" : "15bbd349-93b6-449b-8110-10481f71b18e",
+    "channelId" : "0bf7c0c9-7331-4076-9061-535d9164833f",
+    "lastReadAt" : 1739522820.427164000
+  },
+  "317352bf-5179-4557-ac9b-390296f3bf2c" : {
+    "id" : "317352bf-5179-4557-ac9b-390296f3bf2c",
+    "createdAt" : 1739522820.434459000,
+    "updateAt" : 1739522820.434459000,
+    "userId" : "b5f44c73-aae9-4752-a518-e8da6ed1b664",
+    "channelId" : "06eacbe5-90e6-43cd-a06a-40cea725edbf",
+    "lastReadAt" : 1739522820.434432000
+  },
+  "1f98073a-7286-4e5b-a0c5-441c721ff390" : {
+    "id" : "1f98073a-7286-4e5b-a0c5-441c721ff390",
+    "createdAt" : 1739522820.429771000,
+    "updateAt" : 1739522820.429771000,
+    "userId" : "2ce0519c-fdbc-4915-8003-c61aae9d2a9e",
+    "channelId" : "9c74b565-453d-4dcb-8ef7-89b7b0b2b38c",
+    "lastReadAt" : 1739522820.429751000
+  },
+  "09a974bf-119f-4093-b820-c5b549875b22" : {
+    "id" : "09a974bf-119f-4093-b820-c5b549875b22",
+    "createdAt" : 1739521662.476633000,
+    "updateAt" : 1739521662.476633000,
+    "userId" : "6638f1b4-92c2-4666-b82e-f77af7230dd3",
+    "channelId" : "8e01056e-4b07-4f8b-bc6f-a1fc337c76bc",
+    "lastReadAt" : 1739521662.476611000
+  },
+  "d79ffea8-1c73-44ce-8235-1b6f95e5f31e" : {
+    "id" : "d79ffea8-1c73-44ce-8235-1b6f95e5f31e",
+    "createdAt" : 1739521581.412811000,
+    "updateAt" : 1739521581.412811000,
+    "userId" : "ed838bc5-35af-4a37-a46d-1205e65e2c69",
+    "channelId" : "a675f52a-bd81-4060-8cbc-1c8520211cea",
+    "lastReadAt" : 1739521581.412779000
+  },
+  "f287b530-8f88-41eb-9b1f-695828be3480" : {
+    "id" : "f287b530-8f88-41eb-9b1f-695828be3480",
+    "createdAt" : 1739521581.411408000,
+    "updateAt" : 1739521581.411408000,
+    "userId" : "ef786d73-0345-49c0-93c2-638457c5dd42",
+    "channelId" : "a675f52a-bd81-4060-8cbc-1c8520211cea",
+    "lastReadAt" : 1739521581.411330000
+  },
+  "9f67a420-3935-4f69-9104-432b2c100b0b" : {
+    "id" : "9f67a420-3935-4f69-9104-432b2c100b0b",
+    "createdAt" : 1739521581.412439000,
+    "updateAt" : 1739521581.412439000,
+    "userId" : "b4107df1-3525-4f8a-a4d0-5923a85e97a3",
+    "channelId" : "a675f52a-bd81-4060-8cbc-1c8520211cea",
+    "lastReadAt" : 1739521581.412306000
+  },
+  "bd86849f-1a54-42eb-9197-3e1cec3d787f" : {
+    "id" : "bd86849f-1a54-42eb-9197-3e1cec3d787f",
+    "createdAt" : 1739521662.472656000,
+    "updateAt" : 1739521662.472656000,
+    "userId" : "2d27f294-2b2c-425f-84f9-e8396d83cfb0",
+    "channelId" : "8e01056e-4b07-4f8b-bc6f-a1fc337c76bc",
+    "lastReadAt" : 1739521662.472651000
+  },
+  "52dd3949-ef69-4f73-8a4e-1a94ac09026f" : {
+    "id" : "52dd3949-ef69-4f73-8a4e-1a94ac09026f",
+    "createdAt" : 1739522467.042969000,
+    "updateAt" : 1739522467.042969000,
+    "userId" : "53a43047-7d6d-4e95-ae47-1d84fa582c7c",
+    "channelId" : "f8a0d3d3-f2be-48f8-b547-d39590a4e70b",
+    "lastReadAt" : 1739522467.042939000
+  },
+  "055e4201-2822-4cc5-901c-317d8d22838f" : {
+    "id" : "055e4201-2822-4cc5-901c-317d8d22838f",
+    "createdAt" : 1739522820.432075000,
+    "updateAt" : 1739522820.432075000,
+    "userId" : "b5f44c73-aae9-4752-a518-e8da6ed1b664",
+    "channelId" : "a011080c-970b-4779-b360-18564bab3c18",
+    "lastReadAt" : 1739522820.432045000
+  },
+  "ad9a5847-f840-40f4-b227-6240f3c4c3bc" : {
+    "id" : "ad9a5847-f840-40f4-b227-6240f3c4c3bc",
+    "createdAt" : 1739521662.472040000,
+    "updateAt" : 1739521662.472041000,
+    "userId" : "b31d9b03-95c1-4aa4-adbc-c2cbaa0960b9",
+    "channelId" : "8e01056e-4b07-4f8b-bc6f-a1fc337c76bc",
+    "lastReadAt" : 1739521662.472010000
+  },
+  "78c14b89-75eb-4f62-8a82-333a16186cd7" : {
+    "id" : "78c14b89-75eb-4f62-8a82-333a16186cd7",
+    "createdAt" : 1739523025.054885000,
+    "updateAt" : 1739523025.054885000,
+    "userId" : "920454f2-f5c9-409a-bfc7-a0d75dadc697",
+    "channelId" : "439655ab-aa4c-496a-9ccb-4b6ffb156c70",
+    "lastReadAt" : 1739523025.054881000
+  },
+  "9df46df3-d08b-4e41-887f-f0eccfd358fb" : {
+    "id" : "9df46df3-d08b-4e41-887f-f0eccfd358fb",
+    "createdAt" : 1739523025.058979000,
+    "updateAt" : 1739523025.058979000,
+    "userId" : "8af8b386-9c5b-4aad-8b98-b54dccfd3a88",
+    "channelId" : "a6d47dd2-b23c-4157-b965-165a810707a4",
+    "lastReadAt" : 1739523025.058963000
+  },
+  "6516ab64-858e-4618-b969-781f9bfdd758" : {
+    "id" : "6516ab64-858e-4618-b969-781f9bfdd758",
+    "createdAt" : 1739522467.045483000,
+    "updateAt" : 1739522467.045483000,
+    "userId" : "4680ce8e-55ab-408b-b6a6-019965c0d93c",
+    "channelId" : "f8a0d3d3-f2be-48f8-b547-d39590a4e70b",
+    "lastReadAt" : 1739522467.045476000
+  },
+  "71f1d690-bf16-456c-af67-92b62f582da8" : {
+    "id" : "71f1d690-bf16-456c-af67-92b62f582da8",
+    "createdAt" : 1739523025.044957000,
+    "updateAt" : 1739523025.044957000,
+    "userId" : "25c9fe38-de4a-48d6-80ca-d51ddee201e6",
+    "channelId" : "4c6c3101-21b0-4dcc-a209-c81bfd02c0c2",
+    "lastReadAt" : 1739523025.044911000
+  },
+  "b56b6114-96c3-4497-90ca-d0c323d5a848" : {
+    "id" : "b56b6114-96c3-4497-90ca-d0c323d5a848",
+    "createdAt" : 1739523025.048757000,
+    "updateAt" : 1739523025.048757000,
+    "userId" : "16038eba-e395-4179-b84e-b15e5176bb70",
+    "channelId" : "4c6c3101-21b0-4dcc-a209-c81bfd02c0c2",
+    "lastReadAt" : 1739523025.048723000
+  }
+}

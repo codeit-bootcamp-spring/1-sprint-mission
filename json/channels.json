@@ -1,10 +1,34 @@
 {
-  "e8671ec5-5555-4c80-835c-642788d4be12" : {
-    "id" : "e8671ec5-5555-4c80-835c-642788d4be12",
-    "createdAt" : 1737766782118,
-    "updatedAt" : null,
-    "name" : "코드잇 공지 채널",
-    "description" : "공지 채널입니다",
-    "channelType" : "VOICE"
+  "a6d47dd2-b23c-4157-b965-165a810707a4" : {
+    "id" : "a6d47dd2-b23c-4157-b965-165a810707a4",
+    "createdAt" : 1739523025.057472000,
+    "updatedAt" : 1739523025.057472000,
+    "joinMembers" : [ "25c9fe38-de4a-48d6-80ca-d51ddee201e6", "8af8b386-9c5b-4aad-8b98-b54dccfd3a88" ],
+    "channelFormat" : "TEXT",
+    "channelType" : "PRIVATE"
+  },
+  "4c6c3101-21b0-4dcc-a209-c81bfd02c0c2" : {
+    "id" : "4c6c3101-21b0-4dcc-a209-c81bfd02c0c2",
+    "createdAt" : 1739523025.041896000,
+    "updatedAt" : 1739523025.041897000,
+    "joinMembers" : [ "25c9fe38-de4a-48d6-80ca-d51ddee201e6", "16038eba-e395-4179-b84e-b15e5176bb70" ],
+    "channelFormat" : "TEXT",
+    "channelType" : "PRIVATE"
+  },
+  "808ee585-d924-4942-b818-0f0fb9009172" : {
+    "id" : "808ee585-d924-4942-b818-0f0fb9009172",
+    "createdAt" : 1739523025.051266000,
+    "updatedAt" : 1739523025.051266000,
+    "joinMembers" : [ "16038eba-e395-4179-b84e-b15e5176bb70", "920454f2-f5c9-409a-bfc7-a0d75dadc697" ],
+    "channelFormat" : "TEXT",
+    "channelType" : "PRIVATE"
+  },
+  "439655ab-aa4c-496a-9ccb-4b6ffb156c70" : {
+    "id" : "439655ab-aa4c-496a-9ccb-4b6ffb156c70",
+    "createdAt" : 1739523025.054514000,
+    "updatedAt" : 1739523025.054514000,
+    "joinMembers" : [ "920454f2-f5c9-409a-bfc7-a0d75dadc697", "8af8b386-9c5b-4aad-8b98-b54dccfd3a88" ],
+    "channelFormat" : "TEXT",
+    "channelType" : "PRIVATE"
   }
 }

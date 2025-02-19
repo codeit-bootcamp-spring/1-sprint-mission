@@ -13,10 +13,6 @@ public interface MessageRepository {
 
     Optional<Message> findById(UUID uuid);
 
-    List<Message> findByUser(User user);
-
-    List<Message> findByChannel(Channel channel);
-
     List<Message> findAll();
 
     Message delete(Message message);
