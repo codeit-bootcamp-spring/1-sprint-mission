@@ -1,34 +1,54 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-public class JCFUserRepository {
-    private final List<User> users;
+public class JCFUserRepository implements UserRepository {
+    private final Map<UUID, User> users;
 
     public JCFUserRepository(){
-        this.users = new ArrayList<>();
+        this.users = new HashMap<>();
     }
 
-    public void save(User user){
-        users.add(user);
+    @Override
+    public User save(User user){
+        this.users.put(user.getId(), user);
+        return user;
     }
 
-    public void delete(User user){
-        users.remove(user);
+    @Override
+    public void delete(UUID id){
+        this.users.remove(id);
     }
 
-    public List<User> load(){
-        return users;
+    @Override
+    public List<User> findAll(){
+        return this.users.values().stream()
+                .toList();
     }
 
-    public Optional<User> findById(UUID userId) {
-        return users.stream()
-                .filter(user-> user.getId().equals(userId))
-                .findFirst();
+
+    @Override
+    public boolean existsName(String userName) {
+        return this.users.values().stream()
+                .anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsEmail(String email) {
+        return this.users.values().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsId(UUID id) {
+        return this.users.containsKey(id);
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.users.get(id));
     }
 }

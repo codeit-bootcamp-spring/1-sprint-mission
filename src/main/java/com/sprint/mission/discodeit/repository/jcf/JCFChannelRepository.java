@@ -1,47 +1,51 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
-public class JCFChannelRepository {
+public class JCFChannelRepository implements ChannelRepository {
     private static JCFChannelRepository instance;
-    private final List<Channel> channels;
+    private final Map<UUID, Channel> channels;
 
     private JCFChannelRepository(){
-        this.channels = new ArrayList<>();
+        this.channels = new HashMap<>();
     }
 
-    public static synchronized JCFChannelRepository getInstance() {
+    public static JCFChannelRepository getInstance() {
         if (instance == null) {
             instance = new JCFChannelRepository();
         }
         return instance;
     }
 
-    public void save(Channel channel){
-        channels.add(channel);
+    @Override
+    public Channel save(Channel channel){
+        this.channels.put(channel.getId(), channel);
+        return channel;
     }
 
-    public void delete(Channel channel){
-        channels.remove(channel);
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.channels.get(id));
     }
 
-    public List<Channel> load() {
-        return new ArrayList<>(channels);
+    @Override
+    public List<Channel> findAll() {
+        return this.channels.values().stream()
+                .toList();
     }
 
-    public boolean exists(Channel channel) {
-        return channels.contains(channel);
+    @Override
+    public boolean existsId(UUID channelId) {
+        return this.channels.containsKey(channelId);
     }
 
-    public void update(Channel channel) {
-        int index = channels.indexOf(channel);
-        if (index != -1) {
-            channels.set(index, channel);
-        }
+    @Override
+    public void delete(UUID channelId){
+        this.channels.remove(channelId);
     }
 
 }
