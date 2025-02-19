@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter' // 추가 ✅
+    implementation 'org.springframework.boot:spring-boot-starter' 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     compileOnly 'org.projectlombok:lombok'
