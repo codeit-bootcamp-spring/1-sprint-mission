@@ -1,5 +1,7 @@
 package some_path._1sprintmission.discodeit.service;
 
+import some_path._1sprintmission.discodeit.dto.MessageCreateRequestDTO;
+import some_path._1sprintmission.discodeit.dto.MessageUpdateRequestDTO;
 import some_path._1sprintmission.discodeit.entiry.Channel;
 import some_path._1sprintmission.discodeit.entiry.Message;
 import some_path._1sprintmission.discodeit.entiry.User;
@@ -9,10 +11,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void create(Channel channel, User sender,Message message);
-    Optional<Message> read(UUID id);
-    List<Message> readAll();
+    Message create(MessageCreateRequestDTO request);
+    Message update(MessageUpdateRequestDTO request);
+    Message find(UUID messageId);
+    List<Message> findAllByChannelId(UUID channelId);
 
-    void update(UUID id, Message updatedMessage);
-    void delete(UUID id);
+    void delete(UUID messageId);
 }

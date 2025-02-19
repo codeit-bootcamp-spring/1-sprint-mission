@@ -1,39 +1,46 @@
 package some_path._1sprintmission.discodeit.repository.jcf;
 import some_path._1sprintmission.discodeit.entiry.User;
+import some_path._1sprintmission.discodeit.repository.UserRepository;
 
 import java.util.*;
 
-public class JCFUserRepository {
-    private final Map<UUID, User> data = new HashMap<>();
+public class JCFUserRepository implements UserRepository {
+    private final Map<UUID, User> data;
 
-    // Save a user
-    public void save(User user) {
-        data.put(user.getId(), user);
+    public JCFUserRepository() {
+        this.data = new HashMap<>();
     }
 
-    // Find a user by ID
+    @Override
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
     public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
-    // Find all users
+    @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
+        return this.data.values().stream().toList();
     }
 
-    // Update a user
-    public void update(UUID id, User updatedUser) {
-        data.put(id, updatedUser);
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
-    // Delete a user
-    public void delete(UUID id) {
-        data.remove(id);
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 
     // Check if a discriminator is duplicate
-    public boolean isDiscriminatorDuplicate(int discriminator) {
-        return data.values().stream()
+    @Override
+    public boolean isDiscriminatorDuplicate(String username, int discriminator) {
+        return this.data.values().stream()
                 .anyMatch(user -> Objects.equals(user.getDiscriminator(), discriminator));
     }
 }

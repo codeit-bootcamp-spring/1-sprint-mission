@@ -1,127 +1,188 @@
 package some_path._1sprintmission.discodeit.repository.file;
 
-import some_path._1sprintmission.discodeit.entiry.Channel;
+import org.springframework.stereotype.Repository;
+import some_path._1sprintmission.discodeit.dto.MessageUpdateRequestDTO;
+import some_path._1sprintmission.discodeit.entiry.BaseEntity;
 import some_path._1sprintmission.discodeit.entiry.Message;
-import some_path._1sprintmission.discodeit.entiry.User;
+import some_path._1sprintmission.discodeit.repository.MessageRepository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class FileMessageRepository {
+@Repository
+public class FileMessageRepository implements MessageRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    private final String filePath;
-
-    public FileMessageRepository(String filePath) {
-        this.filePath = filePath;
-    }
-
-    // Save a message to a file
-    public void saveMessage(Channel channel, Message message) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(serializeMessage(channel, message));
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Find all messages for a specific channel
-    public List<Message> findMessagesByChannel(Channel channel) {
-        List<Message> messages = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Message message = parseMessage(line, channel);
-                if (message != null) {
-                    messages.add(message);
-                }
+    public FileMessageRepository() {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return messages;
-    }
-
-    // Update a message content
-    public void updateMessage(Channel channel, Message oldMessage, String newContent) {
-        List<String> updatedLines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Message message = parseMessage(line, channel);
-                if (message != null && message.equals(oldMessage)) {
-                    updatedLines.add(serializeMessage(channel, message));
-                } else {
-                    updatedLines.add(line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String updatedLine : updatedLines) {
-                writer.write(updatedLine);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
-
-    // Delete a specific message
-    public void deleteMessage(Channel channel, Message messageToDelete) {
-        List<String> updatedLines = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Message message = parseMessage(line, channel);
-                if (message != null && !message.equals(messageToDelete)) {
-                    updatedLines.add(line);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String updatedLine : updatedLines) {
-                writer.write(updatedLine);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
-    // Serialize a message to a string for file storage
-    private String serializeMessage(Channel channel, Message message) {
-        return channel.getName() + "|" +
-                message.getSender().getUsername() + "," +
-                message.getSender().getUserEmail() + "," +
-                message.getSender().getUserPhone() + "|" +
-                message.getContent() + "|" +
-                message.getSentAt();
-    }
-
-    // Parse a message string back to a Message object
-    private Message parseMessage(String line, Channel channel) {
-        String[] parts = line.split("\\|");
-        if (parts.length < 4) return null;
-
-        String channelName = parts[0];
-        if (!channel.getName().equals(channelName)) return null;
-
-        String[] senderParts = parts[1].split(",");
-        if (senderParts.length < 3) return null;
-
-        User sender = new User(senderParts[0], senderParts[1], senderParts[2]);
-        String content = parts[2];
-        long sentAt = Long.parseLong(parts[3]);
-
-        Message message = new Message(sender, content);
+    @Override
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(message);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return message;
+    }
+
+    @Override
+    public Message update(MessageUpdateRequestDTO request) {
+        Optional<Message> existingMessageOpt = findById(request.getMessageId());
+        if (existingMessageOpt.isEmpty()) {
+            throw new IllegalArgumentException("Message not found");
+        }
+
+        Message existingMessage = existingMessageOpt.get();
+
+        // 새로운 Message 객체로 갱신
+        Message updatedMessage = new Message(
+                existingMessage.getChannel(),
+                existingMessage.getSender(),
+                request.getContent()
+        );
+
+        // 기존 ID 유지
+        Field idField;
+        try {
+            idField = BaseEntity.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(updatedMessage, existingMessage.getId());
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to update message ID", e);
+        }
+
+        // 저장
+        return save(updatedMessage);
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(messageNullable);
+    }
+
+    @Override
+    public List<Message> findAll() {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
+        Path path = resolvePath(messageId);
+        if (Files.exists(path)) {
+            try {
+                Files.delete(path);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to delete Message", e);
+            }
+        }
+    }
+
+    @Override
+    public void deleteBySender(UUID senderId) {
+        try (Stream<Path> files = Files.list(DIRECTORY)) {
+            files.filter(path -> {
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
+                    Message message = (Message) ois.readObject();
+                    return message.getSender().equals(senderId);
+                } catch (IOException | ClassNotFoundException e) {
+                    return false;
+                }
+            }).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        Path path = resolvePath(channelId);
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            throw new RuntimeException("메시지 삭제 실패", e);
+        }
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try (Stream<Path> files = Files.list(DIRECTORY)) {
+            return files.map(path -> {
+                try (
+                        FileInputStream fis = new FileInputStream(path.toFile());
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                ) {
+                    Message message = (Message) ois.readObject();
+                    return message.getChannel().equals(channelId) ? message : null;
+                } catch (IOException | ClassNotFoundException e) {
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to list Message files", e);
+        }
     }
 }
 

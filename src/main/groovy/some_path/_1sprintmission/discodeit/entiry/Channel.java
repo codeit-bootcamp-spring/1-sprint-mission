@@ -1,36 +1,37 @@
 package some_path._1sprintmission.discodeit.entiry;
 
+import lombok.Getter;
+import lombok.Setter;
+import some_path._1sprintmission.discodeit.entiry.enums.ChannelType;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
-public class Channel extends BaseEntity {
+@Getter
+@Setter
+public class Channel extends BaseEntity implements Serializable {
     private String name;
-    private Integer limitPerson; //최대 인원 제한
+    private Integer maxPerson; //최대 인원 제한
     private Set<User> users; // 채널에 속한 유저 목록
-    private List<Message> messages;        // 채널 내 메시지 목록
+    private ChannelType type;
+    private List<Message> messages; // 채널 내 메시지 목록
+    private String inviteCode;
 
-    public Channel(String name) {
+    public Channel(String name, ChannelType type) {
         super();
         this.name = name;
-        this.limitPerson = 3;
+        this.maxPerson = 3;
+        this.type = type;
         this.users = new HashSet<>();
         this.messages = new ArrayList<>();
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public Set<User> getMembers() {
-        return users;
-    }
-
-    public List<Message> getMessages() {
-        return Collections.unmodifiableList(messages); // 읽기 전용 리스트 반환
+        this.inviteCode = UUID.randomUUID().toString();
     }
 
     public void addMember(User user) {
-        if (users.size() >= limitPerson) {
+        if (users.size() >= maxPerson) {
             throw new IllegalStateException("Maximum number of members reached. Cannot add more members.");
         }
         if (!users.contains(user)) {
@@ -48,8 +49,15 @@ public class Channel extends BaseEntity {
         }
     }
 
-    public void addMessage(Message message) {
-        messages.add(message); // 메시지를 저장
+    public void update(String newName) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            super.setUpdatedAt(Instant.from(LocalDateTime.now()));
+        }
     }
 
     @Override
@@ -58,11 +66,7 @@ public class Channel extends BaseEntity {
                 "id=" + getId().toString() +
                 ", name='" + name + '\'' +
                 ", users=" + users.stream().map(User::getUsername).toList() +
-                ", limitPerson='" + limitPerson + '\'' +
+                ", maxPerson='" + maxPerson + '\'' +
                 '}';
-    }
-
-    public void updateName(String newName) {
-        this.name = newName;
     }
 }

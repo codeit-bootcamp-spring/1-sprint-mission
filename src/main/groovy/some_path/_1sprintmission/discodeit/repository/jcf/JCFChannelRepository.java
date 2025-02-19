@@ -1,29 +1,50 @@
 package some_path._1sprintmission.discodeit.repository.jcf;
 
 import some_path._1sprintmission.discodeit.entiry.Channel;
+import some_path._1sprintmission.discodeit.entiry.User;
+import some_path._1sprintmission.discodeit.repository.ChannelRepository;
 
 import java.util.*;
 
-public class JCFChannelRepository {
-    private final Map<UUID, Channel> data = new HashMap<>();
+public class JCFChannelRepository implements ChannelRepository {
+    private final Map<UUID, Channel> data;
+
+    public JCFChannelRepository() { this.data = new HashMap<>(); }
 
     // 채널 저장
-    public void save(Channel channel) {
-        data.put(channel.getId(), channel);
+    @Override
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
     }
 
-    // ID로 채널 찾기
+    @Override
     public Optional<Channel> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(this.data.get(id));
     }
 
-    // 모든 채널 가져오기
+    @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+        return this.data.values().stream().toList();
     }
 
-    // 채널 삭제
-    public void delete(UUID id) {
-        data.remove(id);
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
+    }
+
+    @Override
+    public Optional<Channel> findByInviteCode(String inviteCode) {
+        return Optional.ofNullable(this.data.get(inviteCode));
+    }
+
+    @Override
+    public List<Channel> findAllByUsersContaining(User user) {
+        return null;
     }
 }
