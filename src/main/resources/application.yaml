@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file
+    file:
+      path: "file-data-map/"
