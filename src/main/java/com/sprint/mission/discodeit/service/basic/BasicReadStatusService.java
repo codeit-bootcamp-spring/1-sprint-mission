@@ -58,10 +58,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatus update(UUID readStatusId,UpdateReadStatusRequestDto request) {
-        Instant now=Instant.now();
-        ReadStatus readStatus=readStatusRepository.findById(request.getId())
+        ReadStatus readStatus=readStatusRepository.findById(readStatusId)
                 .orElseThrow(()->new NoSuchElementException("ReadStatus id not found"));
-        readStatus.getLastReadAt();
+        readStatus.setLastReadAt(readStatus.getLastReadAt());
         return readStatusRepository.save(readStatus);
     }
 

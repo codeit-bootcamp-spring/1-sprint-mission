@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -91,6 +92,10 @@ public class BasicUserService implements UserService {
             BinaryContentCreateRequestDto binaryRequest=new BinaryContentCreateRequestDto(user.getId(), null,request.getNewProfileImage());
             binaryContentService.createProfile(binaryRequest);
         }
+
+        Instant now = Instant.now();
+        UserStatusUpdateRequest statusUpdateRequest=new UserStatusUpdateRequest(now);
+        userStatusService.updateByUserId(userId,statusUpdateRequest);
 
         return toDto(user);
     }

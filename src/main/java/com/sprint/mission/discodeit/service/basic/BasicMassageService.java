@@ -3,18 +3,21 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
+import com.sprint.mission.discodeit.service.Interface.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,7 @@ public class BasicMassageService implements MessageService {
     private final UserRepository userRepository;
     @Autowired
     private final ChannelRepository channelRepository;
+    private final ReadStatusService readStatusService;
 
 
     @Override
@@ -77,6 +81,9 @@ public class BasicMassageService implements MessageService {
         Message message = messageRepository.getMessageById(id)
                 .orElseThrow(() -> new NoSuchElementException("Message with id " + id + " not found"));
         message.update(request.getNewContent());
+        Instant now=Instant.now();
+        UpdateReadStatusRequestDto updateReadStatus=new UpdateReadStatusRequestDto(now);
+        readStatusService.update(id,updateReadStatus);
         return messageRepository.save(message);
     }
 
