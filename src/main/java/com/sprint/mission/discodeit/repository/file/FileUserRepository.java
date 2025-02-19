@@ -1,17 +1,22 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-
-import java.io.*;
+import org.springframework.stereotype.Repository;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import java.util.UUID;
 
+@Repository
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "/Users/parkjihyun/Desktop/CodeitProjects/Codeit/1-sprint-mission/files/users.ser";
 
+    private static final String FILE_PATH = "files/users.ser";
     private List<User> users;
 
     public FileUserRepository() {
@@ -27,7 +32,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User findByUsername(String username){
         for (User user : users) {
-            if(user.getUsername().equals(username)){
+            if (user.getUsername().equals(username)) {
                 return user;
             }
         }
@@ -35,9 +40,9 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID id){
+    public User findByUserId(UUID id){
         for (User user : users) {
-            if (user.getId().equals(id)){
+            if (user.getId().equals(id)) {
                 return user;
             }
         }
@@ -46,18 +51,18 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll(){
-        return users;
+        return new ArrayList<>(users);
     }
 
     @Override
-    public void deleteById(UUID id){
+    public void deleteById(UUID id) {
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getId().equals(id)){
+            if (users.get(i).getId().equals(id)) {
                 users.remove(i);
-                saveToFile();
-                return;
+                break;
             }
         }
+        saveToFile();
     }
 
     private void saveToFile() {

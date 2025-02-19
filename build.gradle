@@ -1,19 +1,54 @@
 plugins {
     id 'java'
+    id 'application'  // 일반 자바 애플리케이션 실행을 위해 추가
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.sprint.mission'
-version = '1.0-SNAPSHOT'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Spring Boot Starter
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Test dependencies
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-test {
+// 일반 자바 애플리케이션 메인 클래스 지정
+application {
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+}
+
+// 일반 자바 애플리케이션으로 실행하기 위한 task
+task runAsJava(type: JavaExec) {
+    group = "application"
+    description = "Run the application as a plain Java application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+}
+
+tasks.named('test') {
     useJUnitPlatform()
 }

@@ -1,58 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-// //JCF 테스트 시
-//public class User  {
 
-// //File 테스트시
+@Getter
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private String username;
+    private String email;
     private String password;
-    private final long createdAt;
-    private long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
-    public User(String username, String password) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.username = username;
+        this.email = email;
         this.password = password;
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void updateUsername(String newUsername) {
         this.username = newUsername;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
+    }
+
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
+        this.updatedAt = Instant.now();
     }
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 
 }
