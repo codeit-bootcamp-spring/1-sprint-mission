@@ -6,9 +6,9 @@ import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.entity.AccountStatus;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -37,9 +37,9 @@ public class BasicUserService implements UserService {
         User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
         userRepository.save(user);
 
-        UserStatus userStatus = userStatusService.create(new CreateUserStatusDto(user.getId()));
+        UserStatusResponseDto userStatusDto = userStatusService.create(new CreateUserStatusDto(user.getId()));
 
-        return UserResponseDto.from(user, userStatus.isActive());
+        return UserResponseDto.from(user, userStatusDto.isOnline());
     }
 
     public UserResponseDto create(CreateUserDto createUserDto, String profileImageId) {
@@ -48,13 +48,13 @@ public class BasicUserService implements UserService {
         user.setProfileImageId(profileImageId);
         userRepository.save(user);
 
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
 
     }
 
     @Override
     public List<UserResponseDto> findAll() {
-        return userRepository.findAll().stream().map( u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isActive())).toList();
+        return userRepository.findAll().stream().map( u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isOnline())).toList();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
     }
 
     @Override
@@ -72,14 +72,14 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with email %s not found", email));
         }
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
     }
 
     @Override
     public List<UserResponseDto> findAllContainsNickname(String nickname) {
         return userRepository.findAll().stream()
                 .filter(user -> user.getNickname().contains(nickname))
-                .map(user->UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()))
+                .map(user->UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
                 .toList();
     }
 
@@ -87,7 +87,7 @@ public class BasicUserService implements UserService {
     public List<UserResponseDto> findAllByAccountStatus(AccountStatus accountStatus) {
         return userRepository.findAll().stream()
                 .filter(user -> user.getAccountStatus().equals(accountStatus))
-                .map(user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()))
+                .map(user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
                 .toList();
     }
 
@@ -115,7 +115,7 @@ public class BasicUserService implements UserService {
             user.setUpdatedAt(updateUserDto.updatedAt());
         }
 
-        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isOnline());
     }
 
     // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
@@ -132,7 +132,7 @@ public class BasicUserService implements UserService {
 
         user.setProfileImageId(binaryContentService.create(createBinaryContentDto).id());
 
-        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isOnline());
     }
 
 
@@ -143,6 +143,10 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
+
+        //todo - userStatus가 삭제되지 않았다면?
+        userStatusService.delete(user.getId());
+
         return userRepository.delete(user);
     }
 }

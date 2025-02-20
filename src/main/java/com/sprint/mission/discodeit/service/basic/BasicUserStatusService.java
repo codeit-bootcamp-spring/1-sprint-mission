@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -21,17 +22,17 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus findById(String userStatusId) {
-        return userStatusRepository.findById(userStatusId);
+    public UserStatusResponseDto findById(String userStatusId) {
+        return UserStatusResponseDto.from(userStatusRepository.findById(userStatusId));
     }
 
     @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll();
+    public List<UserStatusResponseDto> findAll() {
+        return userStatusRepository.findAll().stream().map(UserStatusResponseDto::from).toList();
     }
 
     @Override
-    public UserStatus create(CreateUserStatusDto createUserStatusDto) throws CustomException {
+    public UserStatusResponseDto create(CreateUserStatusDto createUserStatusDto) throws CustomException {
         if (userRepository.findById(createUserStatusDto.userId()) == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
@@ -40,11 +41,11 @@ public class BasicUserStatusService implements UserStatusService {
         }
         UserStatus userStatus = new UserStatus(createUserStatusDto.userId());
 
-        return userStatusRepository.save(userStatus);
+        return UserStatusResponseDto.from(userStatusRepository.save(userStatus));
     }
 
     @Override
-    public UserStatus updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
+    public UserStatusResponseDto updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
 
         if (userRepository.findById(id) == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -54,9 +55,9 @@ public class BasicUserStatusService implements UserStatusService {
             throw new IllegalArgumentException("userStatus not found");
         }
         if (userStatus.isUpdated(updateUserStatusDto.updateAt())) {
-            return userStatusRepository.save(userStatus);
+            return UserStatusResponseDto.from(userStatusRepository.save(userStatus));
         }
-        return userStatus;
+        return UserStatusResponseDto.from(userStatus);
     }
 
     @Override
