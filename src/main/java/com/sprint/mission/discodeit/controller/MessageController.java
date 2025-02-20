@@ -34,4 +34,13 @@ public class MessageController {
     public List<MessageResponseDto> getMessages(@PathVariable String userId) {
         return messageService.findAllBySenderId(userId);
     }
+
+    //메세지 삭제
+    @DeleteMapping("/{messageId}")
+    public String  deleteMessage(@PathVariable String messageId) {
+        if (messageService.delete(messageId)) {
+            return "Message deleted successfully";
+        }
+        return "Message not found";
+    }
 }
