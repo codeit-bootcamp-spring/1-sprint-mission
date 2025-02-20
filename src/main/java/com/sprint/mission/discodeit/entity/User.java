@@ -112,6 +112,11 @@ public class User implements Serializable {
             setAccountStatus(updateUserDto.accountStatus());
             isUpdated = true;
         }
+
+        if (updateUserDto.profileImageId() != null && !updateUserDto.profileImageId().equals(this.profileImageId)) {
+            this.profileImageId = updateUserDto.profileImageId();
+            isUpdated = true;
+        }
         return isUpdated;
     }
 }
