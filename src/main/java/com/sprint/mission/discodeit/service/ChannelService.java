@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -13,7 +14,7 @@ public interface ChannelService {
     //생성
     ChannelResponseDto create(CreateChannelDto createChannelDto);
 
-    ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds);
+    ChannelResponseDto create(CreatePrivateChannelDTo createPrivateChannelDTo);
 
     //모두 읽기
     List<ChannelResponseDto> findAllByUserId(String userId);

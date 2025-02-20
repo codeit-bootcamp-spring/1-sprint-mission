@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,12 +46,12 @@ public class BasicChannelService implements ChannelService {
         return ChannelResponseDto.from(channel, null, null);
     }
 
-    //private 인 경우, userId 리스트 매개변수 필요
     @Override
-    public ChannelResponseDto create(CreateChannelDto createChannelDto, List<String> userIds) {
-        Channel channel = new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null);
+    public ChannelResponseDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
+        CreateChannelDto createChannelDto = createPrivateChannelDTo.createChannelDto();
+        Channel channel = channelRepository.save(new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null));
 
-        for (String userId : userIds) {
+        for (String userId : createPrivateChannelDTo.userIds()) {
             User user = userRepository.findById(userId);
             readStatusService.create(new CreateReadStatusDto(channel.getId(), userId));
             channel.getUserSet().add(user.getId());
@@ -143,6 +143,8 @@ public class BasicChannelService implements ChannelService {
             throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
         }
 
+        //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을끼?
+        //대용량 서비스라면? -> 삭제 완료될 때까지 기다려야함
         messageRepository.findAllByChannelId(channelId).forEach(m-> messageRepository.delete(m.getId()));
         readStatusService.findAllByChannelId(channelId).forEach(rs -> readStatusService.delete(rs.getId()));
 
