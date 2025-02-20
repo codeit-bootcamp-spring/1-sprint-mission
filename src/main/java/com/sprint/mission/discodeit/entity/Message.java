@@ -1,46 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message {
-  private UUID id;
-  private Long createdAt;
-  private Long updatedAt;
+@Getter
+@RequiredArgsConstructor
+public class Message implements Serializable {
+  private static final long serialVersionUID = 1L;
+
+  private final UUID id = UUID.randomUUID();
+  private final Instant createdAt = Instant.now();
+  private Instant updatedAt = null;
+  @NonNull
   private String content;
-  private UUID authorId;
+  private final UUID authorId;
 
-  public Message(String content, UUID authorId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = System.currentTimeMillis();
-    this.updatedAt = this.createdAt;
+
+  public void update(String content) {
     this.content = content;
-    this.authorId = authorId;
-  }
-
-  public UUID getId() {
-    return id;
-  }
-
-  public Long getCreatedAt() {
-    return createdAt;
-  }
-
-  public Long getUpdatedAt() {
-    return updatedAt;
-  }
-
-  public String getContent() {
-    return content;
-  }
-
-  public UUID getAuthorId() {
-    return authorId;
-  }
-
-  public void update(String content, UUID authorId) {
-    this.content = content;
-    this.authorId = authorId;
-    this.updatedAt = System.currentTimeMillis();
+    this.updatedAt = Instant.now();
   }
 
   @Override

@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-  void createMessage(Message message);
+  boolean createMessage(Message message);
 
   Optional<Message> readMessage(UUID id);
 
@@ -16,4 +16,6 @@ public interface MessageService {
   void updateMessage(UUID id, String content, UUID authorId);
 
   void deleteMessage(UUID id);
+
+  List<Message> getAllMessages();
 }
