@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users/status")
+@RequestMapping("/user-status")
 @RequiredArgsConstructor
 public class UserStatusController {
 
