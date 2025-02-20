@@ -21,8 +21,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정
                 .csrf(csrf -> csrf.disable()) // ✅ CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // ✅ 모든 요청을 허용 (테스트 목적)
-                        .anyRequest().permitAll() // ✅ 모든 요청 허용
+                        .requestMatchers("/", "/user-list.html", "/styles.css", "/script.js").permitAll() // ✅ 정적 리소스 허용
+                        .requestMatchers("/api/users/**").permitAll() // ✅ 사용자 API 인증 없이 허용
+                        .requestMatchers("/api/messages/**").authenticated() // ✅ 메시지 API는 인증 필요
+                        .anyRequest().authenticated() // ✅ 나머지 요청은 인증 필요
                 )
                 .formLogin(form -> form.disable()) // ✅ 기본 로그인 페이지 비활성화
                 .httpBasic(basic -> basic.disable()); // ✅ 기본 인증 비활성화

@@ -49,7 +49,7 @@ public class UserController {
     }
 
     // ✅ 4. 모든 사용자 조회
-    @GetMapping
+    @GetMapping//✅ "/api/users" 로 호출
     public ResponseEntity<List<UserReadDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.readAll());
     }
