@@ -37,12 +37,11 @@ public class MessageController {
     }
 
     @RequestMapping(
-            method = RequestMethod.POST, consumes = {MediaType.APPLICATION_JSON_VALUE,
-            MediaType.MULTIPART_FORM_DATA_VALUE}
+            method = RequestMethod.POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<Void> createMessage(
             @RequestPart(name = "messageCreateRequest") MessageCreateRequest messageCreateRequest,
-            @RequestPart(required = false, name = "binaryContentCreateRequest") List<MultipartFile> binaryContentCreateRequest
+            @RequestPart(name = "binary-content-create-request", required = false) List<MultipartFile> binaryContentCreateRequest
     ) {
         List<BinaryContentCreateRequest> binaryContents = binaryContentCreateRequest.stream()
                 .map(file -> {

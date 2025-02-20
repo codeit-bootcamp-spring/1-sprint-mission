@@ -46,7 +46,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
         Path path = resolvePath(binaryContent.getId());
-        SERIALIZATION.serialize(DIRECTORY, binaryContent);
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(binaryContent);
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        }
         return binaryContent;
     }
 
@@ -55,7 +62,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         BinaryContent binaryContentNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            binaryContentNullable = SERIALIZATION.deserialize(path);
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                binaryContentNullable = (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException exception) {
+                throw new RuntimeException(exception);
+            }
         }
         return Optional.ofNullable(binaryContentNullable);
     }
@@ -65,7 +79,16 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         try (Stream<Path> paths = Files.list(DIRECTORY)) {
             return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(SERIALIZATION::deserialize)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (BinaryContent) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
                     .filter(content -> ids.contains(content.getId()))
                     .toList();
         } catch (IOException e) {
