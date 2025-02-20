@@ -2,45 +2,48 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
-
-import java.util.*;
 
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    private final Map<UUID, BinaryContent> store;
-    
-    public JCFBinaryContentRepository(){
-        this.store = new HashMap<>();
-    }
+  private final Map<UUID, BinaryContent> store;
 
-    @Override
-    public BinaryContent save(BinaryContent binaryContent) {
-        store.put(binaryContent.getId(), binaryContent);
-        return binaryContent;
-    }
+  public JCFBinaryContentRepository() {
+    this.store = new HashMap<>();
+  }
 
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(this.store.get(id));
-    }
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    store.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return this.store.values().stream()
-                .filter(content -> ids.contains(content.getId()))
-                .toList();
-    }
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(this.store.get(id));
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return this.store.containsKey(id);
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return this.store.values().stream()
+        .filter(content -> ids.contains(content.getId()))
+        .toList();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        this.store.remove(id);
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.store.containsKey(id);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    this.store.remove(id);
+  }
 }
 

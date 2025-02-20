@@ -12,83 +12,85 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
-    private final MessageRepository messageRepository;
-    private final BinaryContentRepository binaryContentRepository;
-    private final MessageValidator messageValidator;
-    private final MessageMapper messageMapper;
 
-    @Override
-    public MessageDto create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
-        String content = messageCreateRequest.message();
-        UUID channelId = messageCreateRequest.channelId();
-        UUID authorId = messageCreateRequest.authorId();
+  private final MessageRepository messageRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final MessageValidator messageValidator;
+  private final MessageMapper messageMapper;
 
-        messageValidator.validateMessage(content);
-        messageValidator.validateUserId(authorId);
-        messageValidator.validateChannelId(channelId);
+  @Override
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    String content = messageCreateRequest.message();
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
 
-        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
-                .map(request -> {
-                    String fileName = request.fileName();
-                    String contentType = request.contentType();
-                    byte[] bytes = request.bytes();
+    messageValidator.validateMessage(content);
+    messageValidator.validateUserId(authorId);
+    messageValidator.validateChannelId(channelId);
 
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    BinaryContent createdbinaryContent = binaryContentRepository.save(binaryContent);
-                    return  createdbinaryContent.getId();
-                })
-                .toList();
+    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+        .map(request -> {
+          String fileName = request.fileName();
+          String contentType = request.contentType();
+          byte[] bytes = request.bytes();
 
-        Message message = new Message(content, channelId, authorId, attachmentIds);
-        Message createdMessage = messageRepository.save(message);
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+              contentType, bytes);
+          BinaryContent createdbinaryContent = binaryContentRepository.save(binaryContent);
+          return createdbinaryContent.getId();
+        })
+        .toList();
 
-        return messageMapper.messageEntityToDto(createdMessage);
-    }
+    Message message = new Message(content, channelId, authorId, attachmentIds);
+    Message createdMessage = messageRepository.save(message);
 
-    @Override
-    public MessageDto findById(UUID messageId){
-        return messageRepository.findById(messageId)
-                .map(messageMapper::messageEntityToDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
-    }
+    return messageMapper.messageEntityToDto(createdMessage);
+  }
 
-    @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .map(messageMapper::messageEntityToDto)
-                .toList();
-    }
+  @Override
+  public MessageDto findById(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .map(messageMapper::messageEntityToDto)
+        .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
+  }
 
-    @Override
-    public MessageDto update(UUID messageId, MessageUpdateRequest request) {
-        String newContent = request.newMessage();
+  @Override
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId).stream()
+        .map(messageMapper::messageEntityToDto)
+        .toList();
+  }
 
-        messageValidator.validateMessage(newContent);
+  @Override
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    String newContent = request.newMessage();
 
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
+    messageValidator.validateMessage(newContent);
 
-        message.update(request.newMessage());
-        Message updatedMessage = messageRepository.save(message);
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
 
-        return messageMapper.messageEntityToDto(updatedMessage);
-    }
+    message.update(request.newMessage());
+    Message updatedMessage = messageRepository.save(message);
 
-    @Override
-    public void delete(UUID messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
-        message.getAttachmentIds()
-                .forEach(binaryContentRepository::deleteById);
-        messageRepository.deleteById(messageId);
-    }
+    return messageMapper.messageEntityToDto(updatedMessage);
+  }
+
+  @Override
+  public void delete(UUID messageId) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
+    message.getAttachmentIds()
+        .forEach(binaryContentRepository::deleteById);
+    messageRepository.deleteById(messageId);
+  }
 }

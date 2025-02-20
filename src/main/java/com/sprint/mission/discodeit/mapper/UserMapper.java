@@ -6,16 +6,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserMapper {
-    public UserDto userEntityToDto(User user, boolean isOnline){
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getProfileId(),
-                isOnline,
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
-    }
+
+  public UserDto userEntityToDto(User user, boolean isOnline) {
+    return new UserDto(
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getPhoneNumber(),
+        user.getProfileId(),
+        isOnline,
+        user.getCreatedAt(),
+        user.getUpdatedAt()
+    );
+  }
 }

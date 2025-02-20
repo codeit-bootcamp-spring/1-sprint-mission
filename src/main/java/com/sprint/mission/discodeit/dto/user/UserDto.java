@@ -4,15 +4,16 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserDto(
-        UUID userId,
-        String username,
-        String email,
-        String phoneNumber,
+    UUID userId,
+    String username,
+    String email,
+    String phoneNumber,
 
-        UUID profileId,
-        boolean isOnline,
+    UUID profileId,
+    boolean isOnline,
 
-        Instant createdAt,
-        Instant updatedAt
+    Instant createdAt,
+    Instant updatedAt
 ) {
+
 }

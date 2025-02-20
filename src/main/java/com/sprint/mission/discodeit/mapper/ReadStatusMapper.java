@@ -7,14 +7,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadStatusMapper {
 
-    public ReadStatusDto readStatusEntityToDto(ReadStatus readStatus) {
-        return new ReadStatusDto(
-                readStatus.getId(),
-                readStatus.getUserId(),
-                readStatus.getChannelId(),
-                readStatus.getLastReadAt(),
-                readStatus.getCreatedAt(),
-                readStatus.getUpdatedAt()
-        );
-    }
+  public ReadStatusDto readStatusEntityToDto(ReadStatus readStatus) {
+    return new ReadStatusDto(
+        readStatus.getId(),
+        readStatus.getUserId(),
+        readStatus.getChannelId(),
+        readStatus.getLastReadAt(),
+        readStatus.getCreatedAt(),
+        readStatus.getUpdatedAt()
+    );
+  }
 }

@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class FileConfig {
 
-    private String type;
-    private String fileDirectory = ".discodeit";
+  private String type;
+  private String fileDirectory = ".discodeit";
 
-    private String binaryContentJsonPath;
-    private String channelJsonPath;
-    private String messageJsonPath;
-    private String readStatusJsonPath;
-    private String userJsonPath;
-    private String userStatusJsonPath;
+  private String binaryContentJsonPath;
+  private String channelJsonPath;
+  private String messageJsonPath;
+  private String readStatusJsonPath;
+  private String userJsonPath;
+  private String userStatusJsonPath;
 }
 
 

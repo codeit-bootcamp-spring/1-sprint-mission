@@ -13,24 +13,25 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BasicAuthLoginService implements AuthLoginService {
-    private final AuthLoginValidator authLoginValidator;
-    private final UserMapper userMapper;
 
-    @Override
-    public UserDto login(AuthLoginRequest request) {
-        String username = request.username();
-        String password = request.password();
+  private final AuthLoginValidator authLoginValidator;
+  private final UserMapper userMapper;
 
-        // 사용자 조회
-        User user = authLoginValidator.findUserByUsername(username);
+  @Override
+  public UserDto login(AuthLoginRequest request) {
+    String username = request.username();
+    String password = request.password();
 
-        // 비밀번호 일치 확인
-        authLoginValidator.validatePassword(user, password);
+    // 사용자 조회
+    User user = authLoginValidator.findUserByUsername(username);
 
-        // 사용자 상태 조회
-        UserStatus userStatus = authLoginValidator.findUserStatusByUserId(user.getId());
-        boolean isOnline = userStatus.isOnline();
-        // UserDto 변환 후 반환
-        return userMapper.userEntityToDto(user, isOnline);
-    }
+    // 비밀번호 일치 확인
+    authLoginValidator.validatePassword(user, password);
+
+    // 사용자 상태 조회
+    UserStatus userStatus = authLoginValidator.findUserStatusByUserId(user.getId());
+    boolean isOnline = userStatus.isOnline();
+    // UserDto 변환 후 반환
+    return userMapper.userEntityToDto(user, isOnline);
+  }
 }

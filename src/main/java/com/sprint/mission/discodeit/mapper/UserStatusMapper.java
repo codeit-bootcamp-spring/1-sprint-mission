@@ -6,13 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserStatusMapper {
-    public UserStatusDto userStatusEntityToDto(UserStatus userStatus) {
-        return new UserStatusDto(
-                userStatus.getId(),
-                userStatus.getUserId(),
-                userStatus.getLastActiveAt(),
-                userStatus.getCreatedAt(),
-                userStatus.getUpdatedAt()
-        );
-    }
+
+  public UserStatusDto userStatusEntityToDto(UserStatus userStatus) {
+    return new UserStatusDto(
+        userStatus.getId(),
+        userStatus.getUserId(),
+        userStatus.getLastActiveAt(),
+        userStatus.getCreatedAt(),
+        userStatus.getUpdatedAt()
+    );
+  }
 }
