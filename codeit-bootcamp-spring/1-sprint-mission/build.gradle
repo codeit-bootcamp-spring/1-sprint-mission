@@ -25,17 +25,10 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    compileOnly 'org.projectlombok:lombok'
-//    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
-    implementation 'org.hibernate.validator:hibernate-validator:8.0.2.Final'
-
-    // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
-    implementation 'org.mindrot:jbcrypt:0.4'
-
 }
 
 tasks.named('test') {
