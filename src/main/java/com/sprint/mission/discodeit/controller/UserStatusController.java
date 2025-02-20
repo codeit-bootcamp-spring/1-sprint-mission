@@ -8,23 +8,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 public class UserStatusController {
 
   private final UserStatusService userStatusService;
 
-  @RequestMapping(value = "/user/{id}/status", method = RequestMethod.PUT)
-  public ResponseEntity<String> updateUserStatus(@PathVariable String id, @RequestBody UpdateUserStatusDto userStatusDto){
+  @PatchMapping("/users/{userId}/statuses")
+  public ResponseEntity<String> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto userStatusDto){
 
-    UserStatus status = userStatusService.updateByUserId(id, userStatusDto);
+    UserStatus status = userStatusService.updateByUserId(userId, userStatusDto);
 
     return ResponseEntity.ok("update successful : " + status.getUserStatus());
   }
