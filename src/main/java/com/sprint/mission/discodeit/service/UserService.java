@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.entity.AccountStatus;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.status.AccountStatus;
 
 import java.util.List;
 
