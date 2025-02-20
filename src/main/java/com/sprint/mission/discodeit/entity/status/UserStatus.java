@@ -7,6 +7,7 @@ import java.time.Instant;
 
 @Getter
 public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     //UserStatus의 id는 User의 식별자와 같습니다.
     private String id;
     private Instant createdAt;
