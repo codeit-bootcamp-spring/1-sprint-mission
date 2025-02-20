@@ -88,9 +88,11 @@ public class BasicReadStatusService implements ReadStatusService {
 	 * @throws IllegalArgumentException 읽음 상태가 존재하지 않는 경우
 	 */
 	@Override
-	public ReadStatus update(UpdateReadStatusRequest request) {
+	public ReadStatus update(UUID readStatusId, UpdateReadStatusRequest request) {
 		// 읽음 상태 조회 및 업데이트
-		ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
+		/*ReadStatus readStatus = readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
+			.orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));*/
+		ReadStatus readStatus = readStatusRepository.findById(readStatusId)
 			.orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 
 		messageRepository.findById(request.messageId())

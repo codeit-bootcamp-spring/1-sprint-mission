@@ -23,7 +23,7 @@ import com.sprint.mission.discodeit.message.service.BinaryContentService;
 import com.sprint.mission.discodeit.message.service.MessageService;
 
 @RestController
-@RequestMapping("api/message")
+@RequestMapping("api/messages")
 public class MessageController {
 
 	private final MessageService messageService;
@@ -38,7 +38,7 @@ public class MessageController {
 	}
 
 	//메시지 보내기
-	@RequestMapping(name = "/create", method = RequestMethod.POST)
+	@RequestMapping(name = "", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse<MessageResponse>> createMessage(@RequestBody CreateMessageRequest request) {
 		Message newMessage = messageService.create(request);
 		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(newMessage.getId());
@@ -47,8 +47,8 @@ public class MessageController {
 	}
 
 	//메시지 수정
-	@RequestMapping(name = "/update/{id}", method = RequestMethod.PATCH)
-	public ResponseEntity<CommonResponse<MessageResponse>> updateMessage(@PathVariable("id") UUID messageId,
+	@RequestMapping(name = "/{messageId}", method = RequestMethod.PATCH)
+	public ResponseEntity<CommonResponse<MessageResponse>> updateMessage(@PathVariable("messageId") UUID messageId,
 		@RequestBody UpdateMessageRequest request) {
 		Message updatedMessage = messageService.update(messageId, request);
 		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(updatedMessage.getId());
@@ -57,7 +57,7 @@ public class MessageController {
 	}
 
 	//특정 채널의 메시지 목록
-	@RequestMapping(name = "/find-messages/{id}", method = RequestMethod.GET)
+	@RequestMapping(name = "", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse<List<MessageResponse>>> findAllMessagesByChannel(
 		@PathVariable("id") UUID channelId) {
 		List<Message> messages = messageService.findAllByChannelId(channelId);
@@ -72,8 +72,8 @@ public class MessageController {
 	}
 
 	//메시지 삭제
-	@RequestMapping(name = "/delete/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<CommonResponse<Void>> deleteMessage(@PathVariable("id") UUID messageId) {
+	@RequestMapping(name = "/{messageId}", method = RequestMethod.DELETE)
+	public ResponseEntity<CommonResponse<Void>> deleteMessage(@PathVariable("messageId") UUID messageId) {
 		messageService.delete(messageId);
 		return new ResponseEntity<>(CommonResponse.success("Message deleted successfully"), HttpStatus.OK);
 	}

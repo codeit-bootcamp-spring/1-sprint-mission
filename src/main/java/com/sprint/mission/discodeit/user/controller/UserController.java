@@ -41,7 +41,7 @@ public class UserController {
 	}
 
 	//사용자 등록
-	@RequestMapping(value = "/sign-up", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<CommonResponse<UserResponse>> createUser(
 		@ModelAttribute CreateUserRequest createUserRequest) {
 		//나중에 JPA를 적용하여 UserStatus -> User로의 단방향 연관관계를 맺게 된다면 똑같이 생성을 해야겠다...
@@ -54,8 +54,8 @@ public class UserController {
 	}
 
 	//특정 사용자 조회
-	@RequestMapping(value = "/find/{id}", method = RequestMethod.GET)
-	public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("id") UUID userId) {
+	@RequestMapping(value = "/{userid}", method = RequestMethod.GET)
+	public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("userid") UUID userId) {
 		log.info("user생성중");
 		User existUser = userService.findUser(userId);
 		log.info("user생성완료");
@@ -77,8 +77,8 @@ public class UserController {
 	}
 
 	//사용자 수정
-	@RequestMapping(value = "/update-user/{id}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<CommonResponse<UserResponse>> updateUser(@PathVariable("id") UUID userId,
+	@RequestMapping(value = "/{userid}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<CommonResponse<UserResponse>> updateUser(@PathVariable("userid") UUID userId,
 		@ModelAttribute UpdateUserRequest request) {
 		User updatedUser = userService.updateUser(userId, request);
 		UserStatus userStatus = userStatusService.updateByUserId(
@@ -89,14 +89,14 @@ public class UserController {
 	}
 
 	//사용자 삭제
-	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("id") UUID userId) {
+	@RequestMapping(value = "/{userid}", method = RequestMethod.DELETE)
+	public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("userid") UUID userId) {
 		userService.deleteUser(userId);
 		return new ResponseEntity<>(CommonResponse.success("User deleted successfully", null), HttpStatus.OK);
 	}
 
 	//사용자 온라인 상태 업데이트
-	@RequestMapping(value = "/update-status", method = RequestMethod.PATCH)
+	@RequestMapping(value = "", method = RequestMethod.PATCH)
 	public ResponseEntity<CommonResponse<Void>> updateUserStatus(
 		@RequestBody UpdateUserStatusRequest request) {
 		userStatusService.update(request);

@@ -24,7 +24,7 @@ import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.service.MessageService;
 
 @RestController
-@RequestMapping("api/channel")
+@RequestMapping("api/channels")
 public class ChannelController {
 
 	private final ChannelService channelService;
@@ -38,7 +38,7 @@ public class ChannelController {
 		this.channelMapper = channelMapper;
 	}
 
-	@RequestMapping(value = "/create-privateChannel", method = RequestMethod.POST)
+	@RequestMapping(value = "/private", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse<PrivateChannelResponse>> createPrivateChannel(@RequestBody
 	CreateMessageRequest request) {
 		Message messageResponse = messageService.create(request);
@@ -48,7 +48,7 @@ public class ChannelController {
 	}
 
 	//public Channel 생성
-	@RequestMapping(value = "/create-publicChannel", method = RequestMethod.POST)
+	@RequestMapping(value = "/public", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse<ChannelResponse>> createPrivateChannel(@RequestBody
 	CreatePublicChannelRequest request) {
 		Channel channelResponse = channelService.createPublicChannel(request);
@@ -58,8 +58,9 @@ public class ChannelController {
 	}
 
 	//공개 채널 정보 수정
-	@RequestMapping(value = "/update/{id}", method = RequestMethod.PATCH)
-	public ResponseEntity<CommonResponse<ChannelResponse>> updatePublicChannel(@PathVariable("id") UUID channelId,
+	@RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
+	public ResponseEntity<CommonResponse<ChannelResponse>> updatePublicChannel(
+		@PathVariable("channelId") UUID channelId,
 		UpdateChannelRequest request) {
 		Channel updatedChannel = channelService.updateChannel(channelId, request);
 		ChannelResponse response = channelMapper.channelToChannelResponse(updatedChannel);
@@ -69,9 +70,9 @@ public class ChannelController {
 	}
 
 	//특정 사용자가 볼 수 있는 모든 채널 목록을 조회
-	@RequestMapping(value = "/find-all/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
 	public ResponseEntity<CommonResponse<List<ChannelResponse>>> getAllChannelsByUser(
-		@PathVariable("id") UUID userId) {
+		@PathVariable("channelId") UUID userId) {
 		List<Channel> channels = channelService.findAllByUserId(userId);
 		List<ChannelResponse> responses = channelMapper.channelListToChannelResponseList(channels);
 		return new ResponseEntity<>(CommonResponse.success("User's channels get successfully", responses),
@@ -79,8 +80,8 @@ public class ChannelController {
 	}
 
 	//채널 삭제
-	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<CommonResponse<Void>> deleteChannel(@PathVariable("id") UUID channelId) {
+	@RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)
+	public ResponseEntity<CommonResponse<Void>> deleteChannel(@PathVariable("channelId") UUID channelId) {
 		channelService.deleteChannel(channelId);
 		return new ResponseEntity<>(CommonResponse.success("Channel deleted successfully"), HttpStatus.OK);
 	}

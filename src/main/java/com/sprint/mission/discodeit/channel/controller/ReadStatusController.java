@@ -18,7 +18,7 @@ import com.sprint.mission.discodeit.channel.service.ReadStatusService;
 import com.sprint.mission.discodeit.global.dto.CommonResponse;
 
 @RestController
-@RequestMapping("api/readStatus")
+@RequestMapping("api/readStatuses")
 public class ReadStatusController {
 
 	private final ReadStatusService readStatusService;
@@ -28,7 +28,7 @@ public class ReadStatusController {
 	}
 
 	//특정 채널의 메시지 수신 정보 생성(message,lastreadat = null로 처리)
-	@RequestMapping(name = "/createReadStatus", method = RequestMethod.POST)
+	@RequestMapping(name = "", method = RequestMethod.POST)
 	public ResponseEntity<CommonResponse<ReadStatus>> createReadStatus(@RequestBody CreateReadStatusRequest request) {
 		ReadStatus createdStatus = readStatusService.create(request);
 		return new ResponseEntity<>(
@@ -36,9 +36,10 @@ public class ReadStatusController {
 				createdStatus), HttpStatus.OK);
 	}
 
-	@RequestMapping(name = "/updateReadStatus", method = RequestMethod.PUT)
-	public ResponseEntity<CommonResponse<ReadStatus>> updateReadStatus(@RequestBody UpdateReadStatusRequest request) {
-		ReadStatus updatedStatus = readStatusService.update(request);
+	@RequestMapping(name = "/{readStatusId}", method = RequestMethod.PATCH)
+	public ResponseEntity<CommonResponse<ReadStatus>> updateReadStatus(@PathVariable("readStatusId") UUID readStatusId,
+		@RequestBody UpdateReadStatusRequest request) {
+		ReadStatus updatedStatus = readStatusService.update(readStatusId, request);
 		return ResponseEntity.ok(CommonResponse.success("ReadStatus updated successfully", updatedStatus));
 	}
 

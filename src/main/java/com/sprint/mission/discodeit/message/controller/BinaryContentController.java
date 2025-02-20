@@ -17,7 +17,7 @@ import com.sprint.mission.discodeit.message.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.message.service.BinaryContentService;
 
 @RestController
-@RequestMapping("api/binary-content")
+@RequestMapping("api/binaryContents")
 public class BinaryContentController {
 
 	private final BinaryContentService binaryContentService;
@@ -28,14 +28,15 @@ public class BinaryContentController {
 		this.binaryContentMapper = binaryContentMapper;
 	}
 
-	@GetMapping("/get/{id}")
-	public ResponseEntity<CommonResponse<BinaryContentResponse>> getBinaryContentById(@PathVariable("id") UUID id) {
+	@GetMapping("/{binaryContentId}")
+	public ResponseEntity<CommonResponse<BinaryContentResponse>> getBinaryContentById(
+		@PathVariable("binaryContentId") UUID id) {
 		BinaryContent content = binaryContentService.find(id);
 		return ResponseEntity.ok(
 			CommonResponse.success("Binary content retrieved successfully", binaryContentMapper.toResponse(content)));
 	}
 
-	@GetMapping("/get")
+	@GetMapping("")
 	public ResponseEntity<CommonResponse<List<BinaryContentResponse>>> getBinaryContentsByIds(
 		@RequestParam("ids") List<UUID> ids) {
 		List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);
