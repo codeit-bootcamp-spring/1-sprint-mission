@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import com.sprint.mission.discodeit.entity.Message;
-
 import java.time.Instant;
-import java.util.Base64;
 import java.util.List;
 
 public record MessageResponseDto(
