@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
+import org.springframework.stereotype.Service;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,7 +10,24 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class FileService {
+@Service
+public class FileService {
+
+    public static Object read(Path filePath) {
+        if(Files.exists(filePath)) {
+            try(
+                    FileInputStream fis = new FileInputStream(filePath.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                return ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            return null;
+        }
+    }
 
     public static <T> List<T> load(Path directory) {
         if (Files.exists(directory)) {
@@ -69,7 +88,7 @@ public abstract class FileService {
     }
 
     public static void deleteDataDirectory() {
-        Path dataDir = Paths.get(System.getProperty("user.dir")).resolve("data");
+        Path dataDir = Paths.get(System.getProperty("user.dir")).resolve(".discord/data");
         try {
             if (Files.exists(dataDir)) {
                 Files.walk(dataDir)

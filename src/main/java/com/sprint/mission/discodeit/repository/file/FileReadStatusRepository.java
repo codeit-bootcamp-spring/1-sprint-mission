@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
@@ -12,43 +14,42 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 @Repository
+@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private final Path readStatusDirectory;
-    private final String extension = ".ser";
+    private final Path directory;
+    private final String extension;
 
-    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory}") String fileDirectory) {
-        this.readStatusDirectory = Paths.get(fileDirectory).resolve("read-status");
-        FileService.init(readStatusDirectory);
+    public FileReadStatusRepository(RepositoryProperties properties) {
+        this.directory = Paths.get(System.getProperty(properties.getBaseDirectory()))
+                .resolve(properties.getFileDirectory())
+                .resolve("read-status");
+        this.extension = properties.getExtension();
+        FileService.init(this.directory);
     }
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        Path readStatusPath = readStatusDirectory.resolve(readStatus.getId().concat(extension));
+        Path readStatusPath = directory.resolve(readStatus.getId().concat(extension));
         FileService.save(readStatusPath, readStatus);
         return null;
     }
 
     @Override
     public ReadStatus findById(String id) {
-        Path readStatusPath = readStatusDirectory.resolve(id.concat(extension));
-        List<ReadStatus> load = FileService.load(readStatusPath);
-        if (load == null || load.isEmpty()) {
-            return null;
-        }
-        return load.get(0);
+        Path readStatusPath = directory.resolve(id.concat(extension));
+        return (ReadStatus) FileService.read(readStatusPath);
     }
 
     @Override
     public List<ReadStatus> findAll() {
-        return FileService.load(readStatusDirectory);
+        return FileService.load(directory);
     }
 
     @Override
     public boolean delete(String id) {
-        Path readStatusPath = readStatusDirectory.resolve(id.concat(extension));
+        Path readStatusPath = directory.resolve(id.concat(extension));
         return FileService.delete(readStatusPath);
     }
 
