@@ -1,57 +1,55 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
-@ToString
-public class User extends BaseEntity implements Serializable {
-    private String userName;
+@RequiredArgsConstructor
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private UUID userId;
+    private Instant createdAt;
+    private Instant updatedAt;
+    private String username;
     private String userEmail;
-    private List<Channel> channelList; // 유저가 소유하고 있는 ChannelList
     private String password;
+    private UUID profileId;
 
-    public User(UserCreateDTO dto) {
-        super();
-        this.userName = dto.getUserName();
-        this.userEmail = dto.getUserEmail();
-        this.password = dto.getPassword();
-    }
-
-    public void updateName(String userName) {
-        if(userName == null || userName.equals(this.userName)) return;
-        this.userName = userName;
-        updateTime(Instant.now());
-    }
-    public void updateEmail(String userEmail) {
-        if(userEmail == null || userEmail.equals(this.userEmail))return;
+    public User(String username, String userEmail, String password, UUID profileId) {
+        this.username = username;
         this.userEmail = userEmail;
-        updateTime(Instant.now());
-    }
-    public void updatePassword(String password) {
-        if(password == null || password.equals(this.password))return;
         this.password = password;
-        updateTime(Instant.now());
-    }
-    public void update(UserUpdateDTO dto) {
-        if(dto.getUserName() != null && !dto.getUserName().equals(this.userName)){
-            this.userName = dto.getUserName();
-        }
-        if(dto.getUserEmail() != null && !dto.getUserEmail().equals(this.userEmail)){
-            this.userEmail = dto.getUserEmail();
-        }
-        if(dto.getPassword() != null && !dto.getPassword().equals(this.password)) {
-            this.password =dto.getPassword();
-        }
-        updateTime(Instant.now());
+        this.profileId = profileId;
     }
 
+    public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.userEmail)) {
+            this.userEmail = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+            this.profileId = newProfileId;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
 }

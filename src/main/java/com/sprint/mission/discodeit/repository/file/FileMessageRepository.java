@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
+import java.util.*;
 
 
 @Repository
@@ -24,10 +22,10 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
         super(fileDirectory);
     }
     @Override
-    public void save(Message message) {
+    public Message save(Message message) {
         Path path = resolvePath(message.getId());
         saveToFile(path,message);
-
+        return message;
     }
 
     @Override
@@ -37,27 +35,46 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
     }
 
     @Override
-    public Map<UUID, Message> findAll() {
-        Map<UUID, Message> messageMap = new HashMap<>();
-        try (Stream<Path> pathStream = Files.walk(getDIRECTORY())) {
-            pathStream.filter(path -> path.toString().endsWith(".ser"))
-                    .forEach(path -> {
-                        Optional<Message> message = loadFromFile(path);
-                        message.ifPresent(msg -> messageMap.put(msg.getId(), msg));
-                    });
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try {
+            return Files.list(getDIRECTORY())
+                    .filter(path -> path.toString().endsWith(".ser"))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Message) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(message -> message.getChannelId().equals(channelId))
+                    .toList();
         } catch (IOException e) {
-            System.out.println("파일을 읽을 수 없습니다." + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return messageMap;
     }
 
     @Override
-    public void delete(UUID messageId) {
-
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean existsById(UUID messageId) {
-        return false;
+        Path path = resolvePath(messageId);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
     }
 }

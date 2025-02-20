@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,7 +10,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
@@ -22,9 +20,10 @@ public class FileChannelRepository extends FileRepository implements ChannelRepo
         super(fileDirectory);
     }
     @Override
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         saveToFile(resolvePath(channel.getId()), channel);
 
+        return channel;
     }
 
     @Override
@@ -50,13 +49,19 @@ public class FileChannelRepository extends FileRepository implements ChannelRepo
 
 
     @Override
-    public void delete(UUID channelId) {
-        deleteFile(resolvePath(channelId));
+    public void deleteById(UUID channelId) {
+        Path path = resolvePath(channelId);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     @Override
     public boolean existsById(UUID channelId) {
-        return Files.exists(resolvePath(channelId));
+        Path path = resolvePath(channelId);
+        return Files.exists(path);
     }
 }

@@ -1,38 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.message.MessageDTO;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
-@ToString
-public class Message extends BaseEntity implements Serializable {
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
     private String content;
+    //
+    private UUID channelId;
     private UUID authorId;
-    private  UUID channelId;
+    private List<UUID> attachmentIds;
 
-    public Message(MessageDTO dto) {
-        super();
-        this.content = dto.getContent();
-        this.authorId = dto.getUserId();
-        this.channelId = dto.getChannelId();
-    }
-    public void updateMessage(String content) {
-        if(content == null || content.equals(this.content)) return;
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.content = content;
-        updateTime(Instant.now());
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
-    public void update(MessageDTO dto) {
-        if(dto.getContent() != null && !dto.getContent().equals(this.content)) {
-            this.content = dto.getContent();
 
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
         }
     }
 }

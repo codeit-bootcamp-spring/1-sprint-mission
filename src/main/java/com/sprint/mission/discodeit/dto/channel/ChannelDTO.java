@@ -1,15 +1,10 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-public class ChannelDTO extends ChannelBaseDTO {
-    private List<UUID> userId;
-    public ChannelDTO(String channelName, String description, List<UUID> users) {
-        super(channelName,description);
-        this.userId = users;
-    }
+public record ChannelDto(UUID id, ChannelType type, String name, String description, List<UUID> participantIds, Instant lastMessageAt) {
 }

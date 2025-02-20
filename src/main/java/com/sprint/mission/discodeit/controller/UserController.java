@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.UserBaseDTO;
-import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserStatusUpdate;
-import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserCreate;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdate;
+import com.sprint.mission.discodeit.dto.user.userStatus.UserStatusCreate;
+import com.sprint.mission.discodeit.dto.user.userStatus.UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -13,40 +15,66 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
     @PostMapping
-    public ResponseEntity<UserBaseDTO> createUser(@RequestBody UserCreateDTO createDTO) {
-        UserBaseDTO userBase = userService.createUser(createDTO);
-        return ResponseEntity.ok(userBase);
+    public ResponseEntity<User> createUser(@RequestBody UserCreate userCreate, @RequestBody(required = false)BinaryContentCreateDto profileCreateDto) {
+        User user = userService.createUser(userCreate, Optional.ofNullable(profileCreateDto));
+        return ResponseEntity.ok(user);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody UserUpdateDTO updateDTO){
-        return ResponseEntity.ok(userService.update(id,updateDTO));
-    }
-
-    @DeleteMapping("/{id}")
-    public  ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
-        userService.delete(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
+        UserDto userDto = userService.findById(userId);
+        return ResponseEntity.ok(userDto);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.findAll());
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID id, @RequestBody UserStatusUpdate statusUpdateDTO) {
-        UserStatus updatedUserStatus = userStatusService.update(id, statusUpdateDTO);
-        return ResponseEntity.ok(updatedUserStatus);
+    @PutMapping("/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody UserUpdate userUpdate, @RequestBody(required = false) BinaryContentCreateDto profileCreateDto) {
+        User updateUser = userService.update(userId, userUpdate, Optional.ofNullable(profileCreateDto));
+        return ResponseEntity.ok(updateUser);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
+        userService.delete(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    //UserStatus
+    @PostMapping("/{userId}/status")
+    public ResponseEntity<UserStatus> createUserStatus(@PathVariable UUID userId, @RequestBody UserStatusCreate userStatusCreate) {
+        UserStatus userStatus = userStatusService.create(userStatusCreate);
+        return ResponseEntity.ok(userStatus);
+    }
+    @GetMapping("/{userId}/status")
+    public ResponseEntity<UserStatus> getUserStatus(@PathVariable UUID userId) {
+        UserStatus userStatus = userStatusService.updateByUserId(userId, new UserStatusUpdate(null, null));
+        return ResponseEntity.ok(userStatus);
+    }
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdate userStatusUpdate) {
+        UserStatus updateStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
+        return ResponseEntity.ok(updateStatus);
+    }
+    @DeleteMapping("/{userId}/status")
+    public ResponseEntity<Void> deleteUserStatus(@PathVariable UUID userId) {
+        UserStatus userStatus = userStatusService.updateByUserId(userId, new UserStatusUpdate(null, null));
+        userStatusService.delete(userStatus.getId());
+        return ResponseEntity.noContent().build();
     }
 }

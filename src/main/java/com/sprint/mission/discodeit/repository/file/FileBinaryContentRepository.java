@@ -1,18 +1,18 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Repository
@@ -23,9 +23,10 @@ public class FileBinaryContentRepository extends FileRepository implements Binar
        super(fileDirectory);
    }
     @Override
-    public void save(BinaryContent binaryContent) {
+    public BinaryContent save(BinaryContent binaryContent) {
         Path path = resolvePath(binaryContent.getId());
         saveToFile(path,binaryContent);
+        return binaryContent;
     }
 
     @Override
@@ -35,24 +36,35 @@ public class FileBinaryContentRepository extends FileRepository implements Binar
     }
 
     @Override
-    public Map<UUID, BinaryContent> findAll() {
-        Map<UUID, BinaryContent> binaryContentMap = new HashMap<>();
-        try (Stream<Path> pathStream = Files.walk(this.getDIRECTORY())) {
-            pathStream.filter(path -> path.toString().endsWith(".ser")).forEach(path -> {
-                Optional<BinaryContent> binaryContent = loadFromFile(path);
-                binaryContent.ifPresent(bc -> binaryContentMap.put(bc.getId(), bc));
-            });
+    public List<BinaryContent>findAllByIdIn(List<UUID> ids) {
+        try {
+            return Files.list(getDIRECTORY())
+                    .filter(path -> path.toString().endsWith(".ser"))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (BinaryContent) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(content -> ids.contains(content.getId()))
+                    .toList();
         } catch (IOException e) {
-            System.out.println("파일을 읽을 수 없습니다." + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return binaryContentMap;
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         Path path = resolvePath(id);
-        deleteFile(path);
-
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
