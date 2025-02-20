@@ -1,48 +1,86 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final List<Message>messageList = new ArrayList<>();
+    private final Map<User, List<Message>> messageData;;
 
-    @Override
-    public void save(Message message) {
-        if(message == null || message.getUserId() == null){
-            throw new IllegalArgumentException(" Message cannot be null. ");
-        }
-        messageList.add(message);
-        System.out.println("<<< Message saved successfully >>>");
+    public JCFMessageRepository() {
+        this.messageData = new HashMap<>();
     }
 
     @Override
-    public Message findByUuid(String messageUuid) {
-        if(messageUuid == null || messageUuid.isEmpty()){
-            throw new IllegalArgumentException(" Channel cannot be null or empty. ");
-        }
-        return messageList.stream()
-                .filter(message -> message.getMessageUuid().equals(messageUuid))
+    public Message save(Message message) {
+        messageData.computeIfAbsent(message.getUser(), k -> new ArrayList<>()).add(message);
+        return message;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messageData.values().stream()
+                .flatMap(List::stream)
+                .filter(message -> message.getId().equals(id))
                 .findFirst()
-                .orElseThrow(()->new IllegalArgumentException("Message with UUID " +messageUuid + " not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Not found Message")));
     }
 
     @Override
     public List<Message> findAll() {
-        return new ArrayList<>(messageList);
+        List<Message> allMessages = new ArrayList<>();
+        messageData.values().forEach(allMessages::addAll);
+        return allMessages;
     }
 
     @Override
-    public void delete(String messageUuid) {
-        boolean removed = messageList.removeIf(channel ->
-                channel.getMessageUuid().equals(messageUuid));
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageData.values().stream()
+                .flatMap(List::stream)
+                .filter(message -> message.getChannel().getId().equals(channelId))
+                .collect(Collectors.toList());
+    }
 
-        if (removed) {
-            System.out.println("Message with UUID " + messageUuid + " was deleted.");
-        } else {
-            System.out.println("Message with UUID " + messageUuid + " not found.");
+    @Override
+    public void deleteByMessage(Message message) {
+        List<Message> messages = messageData.get(message.getUser());
+        if(messages != null) {
+            messages.remove(message);
+            if(messages.isEmpty()) {
+                messageData.remove(message.getUser());
+            }
         }
+    }
+
+    @Override
+    public void deleteByChannel(Channel channel) {
+        messageData.values()
+                .forEach(allMessages -> allMessages.removeIf(message -> message.getChannel().equals(channel)));
+    }
+
+    @Override
+    public void deleteById(UUID messageId) {
+        messageData.values()
+                .forEach(messages
+                        -> messages.removeIf(message -> message.getId().equals(messageId)));
+    }
+
+    @Override
+    public boolean existsByChannel(Channel channel) {
+        return messageData.values().stream()
+                .flatMap(List::stream)
+                .anyMatch(m -> m.getChannel().equals(channel));
+
+    }
+
+    @Override
+    public boolean existsByUser(User user) {
+        return messageData.values().stream()
+                .flatMap(List::stream)
+                .anyMatch(m -> m.getUser().equals(user));
     }
 }

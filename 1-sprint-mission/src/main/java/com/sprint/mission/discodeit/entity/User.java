@@ -1,53 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.*;
+import lombok.Getter;
 
-public class User extends BaseEntity implements Serializable {
-    @Serial
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
+
+@Getter
+public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID userUuid;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String userName;
-    private String userId;
+    private UUID id;
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
 
-
-    public User(String userName, String userId){
-
-        userUuid = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
-        this.userName = userName;
-        this.userId = userId;
-    }
-
-    //Getter
-
-
-    public String getUserUuid() {
-        return userUuid.toString();
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getUserName() {
-        return userName;
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        //
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
 
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    //Updated 메소드
-    public void setUserId(String userId) {
-        this.userId = userId;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-
 }

@@ -1,0 +1,14 @@
+
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file  #jcf | file
+    file-directory: /Users/kbh/1-sprint-mission/1-sprint-mission/tmp
+
+
+logging:
+  level:
+    org.springframework: info

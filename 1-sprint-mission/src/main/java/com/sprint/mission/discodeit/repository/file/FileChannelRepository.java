@@ -1,79 +1,122 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FileChannelRepository implements ChannelRepository {
-    private final static String FILE_PATH = "tmp/channel.ser";
 
-    @Override
-    public void save(Channel channel) {
-        List<Channel>channelList = loadFromFile();
-        //중복 확인
-        if(channelList.stream().anyMatch(c -> c.getChannelUuid().equals(channel.getChannelUuid()))){
-            throw new IllegalArgumentException("Duplicate Channel UUID: " + channel.getChannelUuid());
-        }
-        channelList.add(channel);
-        saveToFile(channelList);
+    private static final String FILE_PATH = "tmp/entity/channel.ser";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<User, List<Channel>> channelData;
+
+
+
+    public FileChannelRepository() {
+        this.channelData = loadFromFile();
     }
 
     @Override
-    public Channel findByUuid(String channelUuid) {
-        List<Channel> channelList = loadFromFile();
-        return channelList.stream()
-                .filter(channel -> channel.getChannelUuid().equals(channelUuid))
+    public Channel save(Channel channel) {
+        List<Channel> channels = new ArrayList<>();
+        channels.add(channel);
+        channelData.put(channel.getOwner(), channels);
+        saveToFile();
+        return channel;
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(channelData.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getId().equals(id))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Channel with UUID " + channelUuid + " not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Not found Channel ")));
     }
 
     @Override
     public List<Channel> findAll() {
-        return loadFromFile();
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void delete(String channelUuid) {
-        List<Channel>channelList = loadFromFile();
-        boolean removed = channelList.removeIf(channel -> channel.getChannelUuid().equals(channelUuid));
-        if(!removed){
-            throw new IllegalArgumentException("Channel with UUID " + channelUuid + " not found.");
-        }
-        saveToFile(channelList);
+    public List<Channel> findAllByType(ChannelType type) {
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getType() ==type)
+                .collect(Collectors.toList());
     }
 
-    private List<Channel>loadFromFile(){
+    @Override
+    public void deleteByChannel(Channel channel) {
+        List<Channel> channels = channelData.get(channel.getOwner());
+        if(channels != null) {
+            channels.remove(channel);
+            if(channels.isEmpty()) {
+                channelData.remove(channel.getOwner());
+            }
+            saveToFile();
+        }
+    }
+
+
+    @Override
+    public boolean existsByUser(User user) {
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .anyMatch(channel -> channel.getOwner().equals(user));
+    }
+
+
+    @Override
+    public List<Channel> findAllByOwnerAndType(User owner, ChannelType type) {
+        return channelData.getOrDefault(owner, new ArrayList<>())
+                .stream()
+                .filter(channel -> channel.getType() == type)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        return channelData.values().stream()
+                .flatMap(List::stream)
+                .filter(channel -> channel.getOwner().getId().equals(userId) ||
+                        (channel.getType() == ChannelType.PRIVATE))
+                .collect(Collectors.toList());
+    }
+
+    private Map<User, List<Channel>> loadFromFile() {
         File file = new File(FILE_PATH);
-        if (!file.exists() || file.length() == 0) {
-            return new ArrayList<>();
+        if (!file.exists()) {
+            return new HashMap<>();
         }
-        try (ObjectInputStream ois =
-                     new ObjectInputStream(new FileInputStream(file))) {
-            return (List<Channel>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Initializing empty list.");
-            return new ArrayList<>();
-        }catch (EOFException e){
-            System.out.println("EOFException: File is empty or corrupted. Initializing empty list.");
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+        try {
+            return objectMapper.readValue(file, new TypeReference<Map<User, List<Channel>>>(){});
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return new HashMap<>();
         }
     }
 
-    private void saveToFile(List<Channel>channelList){
-        try(ObjectOutputStream oos
-                    = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channelList);
-        }catch (IOException e){
-
-            throw new RuntimeException("Failed to save channels to file.", e);
+    private void saveToFile() {
+        try (ObjectOutputStream oos
+                     = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+            oos.writeObject(channelData);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save channel to file.", e);
         }
+
     }
+
 
 }

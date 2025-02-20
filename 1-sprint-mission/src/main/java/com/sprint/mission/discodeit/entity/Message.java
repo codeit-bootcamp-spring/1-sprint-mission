@@ -1,52 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serial;
+import lombok.Getter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Message extends BaseEntity implements Serializable {
-    @Serial
+@Getter
+public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID messageUuid;
-    private final Long createdAt;
-    private Long updatedAt;
-    private final String userId;
-    private String messageText;
+    private UUID id;
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt;
+    //
+    private User user;
+    private Channel channel;
+    private String content;
 
 
-    public Message(String userId, String messageText) {
-        this.messageUuid = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.userId = userId;
-        this.messageText = messageText;
+    public Message(User user, Channel channel, String content) {
+        this.user = user;
+        this.channel = channel;
+        this.content = content;
+        this.id = UUID.randomUUID();
     }
 
-    // Getters
-    public String getMessageUuid() {
-        return messageUuid.toString();
-    }
-
-
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getMessageText() {
-        return messageText;
-    }
-
-    // Setters
-
-
-    public void setMessageText(String messageText) {
-        if(messageText == null || messageText.isEmpty()){
-            throw new IllegalArgumentException("messageText cannot be null or empty");
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
         }
-        this.messageText = messageText;
-        updateUpdatedAt();
-    }
 
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
+    }
 }
