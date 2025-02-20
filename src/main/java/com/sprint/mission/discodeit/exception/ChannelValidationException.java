@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.constant.ChannelConstant;
 
-public class ChannelValidationException extends IllegalArgumentException {
+public class ChannelValidationException extends ValidationException {
   public ChannelValidationException() {
     super(ChannelConstant.CHANNEL_VALIDATION_EXCEPTION_MESSAGE_BASIC);
   }

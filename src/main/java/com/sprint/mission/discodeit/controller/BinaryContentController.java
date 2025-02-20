@@ -7,26 +7,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/binary-contents")
 public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
-  @RequestMapping(value = "/binary-content/{binaryContentId}", method = RequestMethod.GET)
+  @GetMapping("/{binaryContentId}")
   public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable String binaryContentId){
     BinaryContent content = binaryContentService.find(binaryContentId);
     return ResponseEntity.ok(content);
   }
 
-  @RequestMapping(value = "/binary-content", method = RequestMethod.GET)
+  @GetMapping
   public ResponseEntity<List<BinaryContent>> getAllBinaryContent(){
     List<BinaryContent> contents = binaryContentService.findAll();
     return ResponseEntity.ok(contents);
