@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.exception.ConnectException;
 import com.sprint.mission.discodeit.exception.SendException;
 
 public class NetworkClient {
-    private final String address="https://discodeit.com";;//디스코드 앱에도 주소가 있을까요..?ㅎㅎㅎ
+    private final String address="discodeit";;//편의상 discodeit으로 변경
     public boolean connectError;
     public boolean sendError;
 

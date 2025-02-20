@@ -1,31 +1,47 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.entity.Channel;
+import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
+
+
+@Slf4j
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "temp/channels-obj.dat";
     private final Map<UUID, Channel> data=new HashMap<>();
 
     @Override
-    public void createChannel(UUID id, Channel channel) {
+    public Channel createChannel(UUID id, Channel channel) {
         data.put(id, channel);
         save();
+        return channel;
     }
 
     @Override
-    public void updateChannelName(UUID id, String name) {
-        data.get(id).updateChannelName(name);
-        save();
-    }
-
-    @Override
-    public void updateDescript(UUID id, String descript) {
-        data.get(id).updateDescription(descript);
-        save();
+    public void updateChannel(UUID id, ChannelUpdateDto channelUpdateDto) {
+        Channel findChannel = data.get(id);
+        if(findChannel.getChannelGroup().equals("PUBLIC")) {
+            findChannel.setDescription(channelUpdateDto.getDescription());
+            findChannel.setChannelName(channelUpdateDto.getChannelName());
+            log.info("PUBLIC 채널 수정완료");
+        }
+        log.info("PRIVATE는 채널 수정 불가입니다.");
     }
 
     @Override
@@ -38,6 +54,11 @@ public class FileChannelRepository implements ChannelRepository {
     public Optional<Channel> findById(UUID id) {
         Map<UUID, Channel> loadChannels = load();
         return Optional.ofNullable(loadChannels.get(id));
+    }
+
+    @Override
+    public Optional<Channel> findByChannelName(String channelName) {
+        return Optional.empty();
     }
 
     @Override
