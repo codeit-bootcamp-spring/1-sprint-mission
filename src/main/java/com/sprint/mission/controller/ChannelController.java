@@ -41,21 +41,20 @@ public class ChannelController {
                 .body("Channel created successfully");
     }
 
-    @GetMapping("/{channelId}")
-    public ResponseEntity<FindChannelDto> findById(@PathVariable UUID channelId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<FindChannelDto> findById(@PathVariable("id") UUID channelId) {
         Channel findChannel = channelService.findById(channelId);
         return ResponseEntity.status(HttpStatus.OK).body(getFindChannelDto(findChannel));
     }
 
-
-    @GetMapping(value = "/{usersId}/channels")
-    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable UUID userId) {
-        List<Channel> findAllChannel = channelService.findAllByUserId(userId);
-        List<FindChannelDto> findChannelDtoList = findAllChannel.stream()
-                .map(this::getFindChannelDto).collect(Collectors.toCollection(ArrayList::new));
-
-        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
-    }
+//    @GetMapping(value = "/{usersId}/channels")
+//    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable UUID userId) {
+//        List<Channel> findAllChannel = channelService.findAllByUserId(userId);
+//        List<FindChannelDto> findChannelDtoList = findAllChannel.stream()
+//                .map(this::getFindChannelDto).collect(Collectors.toCollection(ArrayList::new));
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
+//    }
 
     @PatchMapping("/{channelId}")
     public ResponseEntity<String> update(@PathVariable UUID channelId, @RequestBody ChannelDtoForRequest requestDTO) {

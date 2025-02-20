@@ -14,6 +14,7 @@ import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,9 +24,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/messages")
+//@RequestMapping("/messages")
 public class MessageController {
 
 
@@ -34,14 +36,15 @@ public class MessageController {
     private final JCFUserService userService;
     private final BinaryMessageService binaryMessageService;
 
-    @PostMapping
+    @PostMapping("/messages")
     public ResponseEntity<String> save(@RequestBody MessageDtoForCreate requestDTO) {
         messageService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("M created successfully");
     }
 
-    @GetMapping("/{channelId}")
+    // @GetMapping("/messages}") << body에 channelId 껴 넣는 방법
+    @GetMapping("/channels/{channelId}/messages")
     public ResponseEntity<List<FindMessageDto>> findByChannelId(@PathVariable UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         List<FindMessageDto> messageDtoList = messageList.stream()
@@ -50,8 +53,8 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(messageDtoList);
     }
 
-    @PatchMapping("/{messageId}")
-    public ResponseEntity<String> update(@PathVariable UUID messageId,
+    @PatchMapping("/messages/{id}")
+    public ResponseEntity<String> update(@PathVariable("id") UUID messageId,
                                          @RequestBody MessageDtoForUpdate requestDTO) {
         requestDTO.setMessageId(messageId);
         messageService.update(requestDTO);
@@ -59,8 +62,8 @@ public class MessageController {
     }
 
 
-    @DeleteMapping("/{messageId}")
-    public ResponseEntity<String> delete(@PathVariable UUID messageId) {
+    @DeleteMapping("/messages/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.ok("Successfully deleted");
     }

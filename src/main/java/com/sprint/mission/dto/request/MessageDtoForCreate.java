@@ -13,5 +13,4 @@ public class MessageDtoForCreate {
     private UUID userId;
     private String content;
     private List<byte[]> attachments;
-
 }

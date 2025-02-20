@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.dto.request.UserDtoForRequest;
 import com.sprint.mission.dto.request.UserDtoForRequest2;
 import com.sprint.mission.dto.response.FindChannelDto;
+import com.sprint.mission.dto.response.FindPrivateChannelDto;
+import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
@@ -40,21 +43,30 @@ public class UserController {
 
 
     //@ModelAttribute UserDtoForRequest requestDTO << 이거 써도 되지만 PUT, PATCH에서는 못 쓰기에 일관성 있게 RequestPart
-    @PostMapping(consumes = {"multipart/form-data"})
-    public ResponseEntity<String> create(@RequestPart(value = "dto") UserDtoForRequest requestDTO,
-                                         @RequestPart(value = "profileImg") MultipartFile profile) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> create(@RequestPart("dto") UserDtoForRequest requestDTO,
+                                         @RequestPart("profileImg") MultipartFile profile) {
         requestDTO.setProfileImg(profile);
         userService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("User created successfully");
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<FindUserDto> findById(@PathVariable UUID userId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<FindUserDto> findById(@PathVariable("id") UUID userId) {
         User findUser = userService.findById(userId);
         BinaryProfileContent profile = binaryProfileService.findById(userId);
         boolean isOnline = userStatusService.findById(userId).isOnline();
         return ResponseEntity.status(HttpStatus.OK).body(new FindUserDto(findUser, profile.getBytes(), isOnline));
+    }
+
+    @GetMapping("/{id}/channels")
+    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable("id") UUID userId) {
+        User user = userService.findById(userId);
+        List<FindChannelDto> findChannelDtoList = user.getChannels().stream()
+                .map(this::getFindChannelDto).collect(Collectors.toCollection(ArrayList::new));
+
+        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
     }
 
     @GetMapping
@@ -69,19 +81,26 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userListDTO);
     }
 
-    @PatchMapping(path = "/{userId}", consumes = {"multipart/form-data"})
-    public ResponseEntity<String> update(@PathVariable UUID userId,
-                                         @RequestPart(value = "dto") UserDtoForRequest requestDTO,
-                                         @RequestPart(value = "profileImg") MultipartFile changedImage) {
+    @PatchMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> update(@PathVariable("id") UUID userId,
+                                         @RequestPart("dto") UserDtoForRequest requestDTO,
+                                         @RequestPart("profileImg") MultipartFile changedImage) {
         requestDTO.setProfileImg(changedImage);
+        // 수정할 것
         userService.update(userId, requestDTO);
         return ResponseEntity.ok("Successfully updated");
     }
 
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<String> delete(@PathVariable UUID userId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.ok("Successfully deleted");
+    }
+
+    private FindChannelDto getFindChannelDto(Channel findedChannel) {
+        return (findedChannel.getChannelType().equals(ChannelType.PRIVATE)
+                ? new FindPrivateChannelDto(findedChannel)
+                : new FindPublicChannelDto(findedChannel));
     }
 }

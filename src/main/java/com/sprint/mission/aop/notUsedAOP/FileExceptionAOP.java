@@ -11,7 +11,7 @@ import java.nio.file.NoSuchFileException;
 //@Component
 @Slf4j
 //@Aspect
-public class FileIOEx_AOP {
+public class FileExceptionAOP {
 
     @Pointcut("execution(* com.sprint.mission.repository.file.*(..))")
     public void repositoryFile(){}
