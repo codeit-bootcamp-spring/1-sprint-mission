@@ -10,13 +10,13 @@ import java.util.UUID;
 public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
 
-    private final UUID channelId;
-    private final UUID userId;
+    private UUID channelId;
+    private UUID userId;
+    private Instant lastReadAt;
 
     public ReadStatus(UUID channelId, UUID userId) {
         this.id = UUID.randomUUID();
@@ -24,10 +24,23 @@ public class ReadStatus implements Serializable {
 
         this.channelId = channelId;
         this.userId = userId;
+        this.lastReadAt = Instant.now();
     }
 
     public void updateUpdatedAt() {
         this.updatedAt = Instant.now();
+    }
+
+    public void update(Instant lastReadAt) {
+        boolean updated = false;
+        if (lastReadAt != null && !lastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = lastReadAt;
+            updated = true;
+        }
+
+        if (updated) {
+            updateUpdatedAt();
+        }
     }
 
     public boolean isSameChannelId(UUID channelId) {

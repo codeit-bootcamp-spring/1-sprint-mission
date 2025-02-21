@@ -159,7 +159,7 @@ public class DiscodeitApplication {
 		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "introduction",
 				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
 	}
-	
+
 	 */
 
 	public static void main(String[] args) {
