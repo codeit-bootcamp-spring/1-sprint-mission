@@ -6,14 +6,11 @@ import java.time.Instant;
 import java.util.List;
 
 public record FindChannelResponseDto(
-    String channelId,
-    String channelName,
-    String serverId,
-    Channel.ChannelType channelType,
-    boolean isPrivate,
-    Instant createdAt,
-    Instant lastMessagedAt,
-    List<String> userIds,
-    int maxNumberOfPeople
+    String id,
+    Channel.ChannelType type,
+    String name,
+    String description,
+    List<String> participantIds,
+    Instant lastMessagedAt
 ) {
 }

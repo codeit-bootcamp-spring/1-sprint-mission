@@ -46,9 +46,9 @@ public class ChannelController {
   }
 
 
-  @GetMapping("/users/{id}")
-  public ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@PathVariable String id){
-    List<FindChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(id);
+  @GetMapping
+  public ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@RequestParam String userId){
+    List<FindChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(userId);
     return ResponseEntity.ok(channels);
   }
 }

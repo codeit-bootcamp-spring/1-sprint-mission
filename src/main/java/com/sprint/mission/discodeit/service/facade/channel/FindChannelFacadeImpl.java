@@ -31,24 +31,18 @@ public class FindChannelFacadeImpl implements FindChannelFacade{
     Channel channel = channelService.getChannelById(channelId);
     List<String> userIds = channel.getParticipatingUsers();
     Instant lastMessageTime = messageService.getLatestMessageByChannel(channelId).getCreatedAt();
-    return channelMapper.toFindChannelDto(channel, lastMessageTime, userIds);
+    return channelMapper.toFindChannelDto(channel, lastMessageTime);
   }
+  
+    @Override
+    public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
+      List<Channel> channels = channelService.findAllChannelsByUserId(userId);
+      Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
 
-  @Override
-  public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
-    // user 에게 할당된 모든 ReadStatus
-    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
-    // user 가 조회할 수 있는 모든 Channel
-    List<Channel> channels = channelService.findAllChannelsByUserId(userId, statuses);
-
-    Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
-    Map<String, List<String>> channelReadStatuses = readStatusService.getUserIdsForChannelReadStatuses(channels);
-
-    return channels.stream()
-        .map(channel -> channelMapper.toFindChannelDto(
-            channel,
-            latestMessagesByChannel.getOrDefault(channel.getUUID(), Instant.EPOCH),
-            channelReadStatuses.getOrDefault(channel.getUUID(), List.of())
-        )).toList();
-  }
+      return channels.stream()
+          .map(channel -> channelMapper.toFindChannelDto(
+              channel,
+              latestMessagesByChannel.getOrDefault(channel.getUUID(), Instant.EPOCH)
+          )).toList();
+    }
 }

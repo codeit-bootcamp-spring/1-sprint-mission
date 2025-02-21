@@ -12,7 +12,7 @@ public interface ChannelService {
   void validateUserAccess(Channel channel, String userId);
   Channel getChannelById(String channelId);
 
-  List<Channel> findAllChannelsByUserId(String userId, List<ReadStatus> statuses);
+  List<Channel> findAllChannelsByUserId(String userId);
 
   Channel updateChannel(String channelId, String channelName, int maxNumberOfPeople);
 

@@ -67,19 +67,17 @@ public class BasicChannelService implements ChannelService {
    * @return
    */
   @Override
-  public List<Channel> findAllChannelsByUserId(String userId, List<ReadStatus> participatingChannels) {
-    // 모든 Channel 조회
+  public List<Channel> findAllChannelsByUserId(String userId) {
+
     List<Channel> allChannels = channelRepository.findAll();
 
-    // userId 를 가지는 모든 read status
-    Set<String> accessibleChannelIds = participatingChannels.stream()
-            .map(ReadStatus::getChannelId)
-                .collect(Collectors.toSet());
-
-    // public 이거나 set 에 포함되어 있거나 (set 에 포함되었다 = 해당 private channel 에 user가 참여 중이다)
     return  allChannels.stream()
-        .filter(channel -> !Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ||
-            accessibleChannelIds.contains(channel.getUUID())).toList();
+        .filter(channel -> !Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
+            ||
+            (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
+            && channel.getParticipatingUsers().contains(userId)))
+        .toList();
+
   }
 
   /**

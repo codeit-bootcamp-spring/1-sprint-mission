@@ -33,8 +33,7 @@ public class UpdateChannelFacadeImpl implements UpdateChannelFacade{
     List<String> userIds = channel.getParticipatingUsers();
     return channelMapper.toFindChannelDto(
         channel,
-        lastMessageTime,
-        userIds
+        lastMessageTime
     );
   }
 }

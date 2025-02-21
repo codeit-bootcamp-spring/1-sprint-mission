@@ -41,25 +41,14 @@ public interface ChannelMapper {
   @Mapping(source = "participatingUsers", target = "participantIds")
   PrivateChannelResponseDto toPrivateDto(Channel channel);
 
-  @Mapping(source = "UUID", target = "channelId")
-  @Mapping(source = "channelType", target = "channelType")
-  @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(target = "channelName", expression = "java(Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ? null : channel.getChannelName())")
-  FindChannelResponseDto toFindChannelDto(Channel channel);
-
-  default FindChannelResponseDto toFindChannelDto(Channel channel,  Instant lastMessagedAt, List<String> userIds) {
-    FindChannelResponseDto dto = toFindChannelDto(channel);
-    return new FindChannelResponseDto(
-        dto.channelId(),
-        dto.channelName(),
-        dto.serverId(),
-        dto.channelType(),
-        dto.isPrivate(),
-        dto.createdAt(),
-        lastMessagedAt,
-        userIds,
-        dto.maxNumberOfPeople()
-    );
-  }
+  @Mapping(source = "channel.UUID", target = "id")
+  @Mapping(source = "channel.channelType", target = "type")
+  @Mapping(target = "name", expression = "java(Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ? null : channel.getChannelName())")
+  @Mapping(target = "description", source = "channel.description")
+  @Mapping(target = "participantIds", source = "channel.participatingUsers")
+  @Mapping(target = "lastMessagedAt", source = "lastMessagedAt")
+  FindChannelResponseDto toFindChannelDto(Channel channel, Instant lastMessagedAt);
 
 }
+
+
