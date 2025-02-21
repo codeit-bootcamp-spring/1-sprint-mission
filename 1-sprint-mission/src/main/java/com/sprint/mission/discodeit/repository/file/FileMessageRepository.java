@@ -20,128 +20,105 @@ import java.util.stream.Collectors;
 public class FileMessageRepository implements MessageRepository {
 
 
-    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private final String filePath;
-    private final Map<UUID, List<Message>> messageData;
+  private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(
+      new JavaTimeModule());
+  private final String filePath;
+  private final Map<UUID, List<Message>> messageData;
 
-    public FileMessageRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
-        if (!fileDirectory.endsWith("/")) {
-            fileDirectory += "/";
-        }
-        this.filePath = fileDirectory + "message.json";
-        log.info("***** FileMessageRepository CONSTRUCTOR CALLED *****"); // 활성화 됐는지 확인
-        ensureDirectoryExists(this.filePath);
-        this.messageData = loadFromFile();
+  public FileMessageRepository(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+    if (!fileDirectory.endsWith("/")) {
+      fileDirectory += "/";
     }
+    this.filePath = fileDirectory + "message.json";
+    log.info("***** FileMessageRepository CONSTRUCTOR CALLED *****"); // 활성화 됐는지 확인
+    ensureDirectoryExists(this.filePath);
+    this.messageData = loadFromFile();
+  }
 
-    @Override
-    public Message save(Message message) {
-        UUID userId = message.getUser().getId();
-        List<Message> messages = messageData.computeIfAbsent(userId, k -> new ArrayList<>());
-        messages.removeIf(m->m.getId().equals(message.getId()));
+  @Override
+  public Message save(Message message) {
+    UUID userId = message.getUser().getId();
+    List<Message> messages = messageData.computeIfAbsent(userId, k -> new ArrayList<>());
+    messages.removeIf(m -> m.getId().equals(message.getId()));
 
-        messages.add(message);
-        saveToFile();
-        return message;
+    messages.add(message);
+    saveToFile();
+    return message;
+  }
+
+  @Override
+  public Optional<Message> findById(UUID id) {
+    return messageData.values().stream()
+        .flatMap(List::stream)
+        .filter(msg -> msg.getId().equals(id))
+        .findFirst();
+
+  }
+
+  @Override
+  public List<Message> findAll() {
+    return messageData.values().stream()
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageData.values().stream()
+        .flatMap(List::stream)
+        .filter(message -> message.getChannel().getId().equals(channelId))
+        .collect(Collectors.toList());
+  }
+
+
+  @Override
+  public void deleteByChannel(Channel channel) {
+    messageData.values().forEach(messages ->
+        messages.removeIf(message -> message.getChannel().equals(channel)));
+    saveToFile();
+  }
+
+  @Override
+  public void deleteById(UUID messageId) {
+    messageData.values().forEach(messages ->
+        messages.removeIf(message -> message.getId().equals(messageId)));
+    saveToFile();
+  }
+
+
+  private void ensureDirectoryExists(String fileDirectory) {
+    File directory = new File(fileDirectory);
+    File parentDir = directory.getParentFile();
+    if (!parentDir.exists()) {
+      parentDir.mkdirs();
     }
+  }
 
-    @Override
-    public Optional<Message> findById(UUID id) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .filter(msg -> msg.getId().equals(id))
-                .findFirst();
-
+  private Map<UUID, List<Message>> loadFromFile() {
+    File file = new File(filePath);
+    if (!file.exists()) {
+      return new ConcurrentHashMap<>();
     }
-
-    @Override
-    public List<Message> findAll() {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+    try {
+      return objectMapper.readValue(
+          file,
+          new TypeReference<Map<UUID, List<Message>>>() {
+          }
+      );
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+      return new ConcurrentHashMap<>();
     }
+  }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
+  private void saveToFile() {
+    File file = new File(filePath);
+    try {
+      objectMapper.writeValue(file, messageData);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to save message to file.", e);
     }
-
-    @Override
-    public void deleteByMessage(Message message) {
-        UUID userId = message.getUser().getId();
-        List<Message> messages = messageData.get(userId);
-        if (messages != null) {
-            messages.remove(message);
-            if (messages.isEmpty()) {
-                messageData.remove(userId);
-            }
-            saveToFile();
-        }
-    }
-
-    @Override
-    public void deleteByChannel(Channel channel) {
-        messageData.values().forEach(messages ->
-                messages.removeIf(message -> message.getChannel().equals(channel)));
-        saveToFile();
-    }
-
-    @Override
-    public void deleteById(UUID messageId) {
-        messageData.values().forEach(messages ->
-                messages.removeIf(message -> message.getId().equals(messageId)));
-        saveToFile();
-    }
-
-    @Override
-    public boolean existsByChannel(Channel channel) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(m -> m.getChannel().equals(channel));
-    }
-
-    @Override
-    public boolean existsByUser(User user) {
-        UUID userId = user.getId();
-        return messageData.containsKey(userId);
-    }
-
-
-
-    private void ensureDirectoryExists(String fileDirectory) {
-        File directory = new File(fileDirectory);
-        File parentDir = directory.getParentFile();
-        if (!parentDir.exists()) {
-            parentDir.mkdirs();
-        }
-    }
-
-    private Map<UUID, List<Message>> loadFromFile() {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            return new ConcurrentHashMap<>();
-        }
-        try {
-            return objectMapper.readValue(
-                    file,
-                    new TypeReference<Map<UUID, List<Message>>>() {}
-            );
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return new ConcurrentHashMap<>();
-        }
-    }
-
-    private void saveToFile() {
-        File file = new File(filePath);
-        try {
-            objectMapper.writeValue(file, messageData);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save message to file.", e);
-        }
-    }
+  }
 
 }

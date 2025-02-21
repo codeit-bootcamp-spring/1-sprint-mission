@@ -9,16 +9,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
-    Message save(Message message);
-    //
-    Optional<Message> findById(UUID id);
-    List<Message> findAll();
-    List<Message> findAllByChannelId(UUID channelId);   //특정채널 메세지 전부 찾기
-    //
-    boolean existsByUser(User user);
-    boolean existsByChannel(Channel channel);
-    //
-    void deleteByMessage(Message message);
-    void deleteByChannel(Channel channel);
-    void deleteById(UUID messageId);
+
+  Message save(Message message);
+
+  //
+  Optional<Message> findById(UUID id);
+
+  List<Message> findAll();
+
+  List<Message> findAllByChannelId(UUID channelId);   //특정채널 메세지 전부 찾기
+  //
+
+  void deleteByChannel(Channel channel);
+
+  void deleteById(UUID messageId);
 }
