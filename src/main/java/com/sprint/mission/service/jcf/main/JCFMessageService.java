@@ -71,8 +71,11 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return channelRepository.findById(channelId).map(messageRepository::findAllByChannel)
-                .orElseGet(ArrayList::new);
+        if (channelRepository.existsById(channelId)){
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
+
+        return messageRepository.findAllByChannel(channelId);
     }
 
     @Override

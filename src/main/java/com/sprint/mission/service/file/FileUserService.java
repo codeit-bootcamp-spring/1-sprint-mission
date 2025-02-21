@@ -7,7 +7,7 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.file.main.FileChannelRepository;
 import com.sprint.mission.repository.file.main.FileUserRepository;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -29,7 +29,7 @@ public class FileUserService implements UserService{
 
     @Override
     @SneakyThrows
-    public void create(UserDtoForRequest userDto) {
+    public void create(UserDtoForCreate userDto) {
         isDuplicateNameEmail(userDto.getUsername(), userDto.getEmail());
 
         User user = User.createUserByRequestDto(userDto);
@@ -46,7 +46,7 @@ public class FileUserService implements UserService{
 
     @SneakyThrows
     @Override
-    public void update(UUID userId, UserDtoForRequest updateDto)  {
+    public void update(UUID userId, UserDtoForCreate updateDto)  {
         isDuplicateNameEmail(updateDto.getUsername(), updateDto.getEmail());
 
         User updatingUser = fileUserRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));

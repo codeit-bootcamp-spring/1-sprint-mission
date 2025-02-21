@@ -20,6 +20,7 @@ public enum ErrorCode {
     NO_SUCH_BINARY_MATCHING_MESSAGE(HttpStatus.NOT_FOUND, "메세지 id에 맞는 Binary 데이터가 존재하지 않습니다"),
 
     CANNOT_REQUEST_LAST_READ_TIME(HttpStatus.FORBIDDEN, "Public 채널은 유저별 lastReadTime 호출 불가"),
+    CANNOT_UPDATE_PRIVATE_CHANNEL(HttpStatus.FORBIDDEN, "Private 채널은 수정 불가능입니다."),
     ALREADY_EXIST_USER_STATUS(HttpStatus.CONFLICT, "이미 존재하는 유저 상태입니다"),
     ALREADY_EXIST_READ_STATUS(HttpStatus.CONFLICT, "이미 존재하는 READ 상태입니다"),
 

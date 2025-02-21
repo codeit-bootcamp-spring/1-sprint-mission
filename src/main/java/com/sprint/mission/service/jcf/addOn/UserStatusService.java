@@ -46,10 +46,12 @@ public class UserStatusService {
     //[ ] userId 로 특정 User의 객체를 업데이트합니다.
     // ??? 오타인걸로 생각 userstatus 업데이트
     public void updateByUserId(UUID userId){
-        UserStatus updatingUserStatus = userStatusRepository.findByUserId(userId).orElseThrow(()
-                -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
-        updatingUserStatus.update();
-        userStatusRepository.save(updatingUserStatus);
+        userStatusRepository.findByUserId(userId)
+            .ifPresentOrElse((updatingUserStatus) -> {
+                updatingUserStatus.update();
+                userStatusRepository.save(updatingUserStatus);
+            }, () ->
+                new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
     }
 
     public void delete(UUID statusId) {
@@ -57,5 +59,8 @@ public class UserStatusService {
         else userStatusRepository.deleteById(statusId);
     }
 
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
+    }
 };
 

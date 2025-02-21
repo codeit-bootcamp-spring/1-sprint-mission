@@ -36,13 +36,13 @@ public class JCFChannelService implements ChannelService {
     private final JCFMessageService messageService;
 
     @Override
-    public void create(ChannelDtoForRequest requestDTO) {
+    public Channel create(ChannelDtoForRequest requestDTO) {
         /**
          * 요구사항 : PRIVATE 채널을 생성할 때, 채널에 참여하는 User의 정보를 받아 User 별 ReadStatus 정보를 생성합니다.
          * 의문점 : ????? 채널을 생성했는데 어떻게 바로 User가 있지???
          * 이런 부분 떔에 PUBLIC-PRIVATE 분리해야 될 이유를 찾지 못했다.
          */
-        channelRepository.save(Channel.createChannelByRequestDto(requestDTO));
+        return channelRepository.save(Channel.createChannelByRequestDto(requestDTO));
     }
 
     @Override
@@ -52,7 +52,6 @@ public class JCFChannelService implements ChannelService {
         updatingChannel.updateByDTO(dto);
         channelRepository.save(updatingChannel);
     }
-
 
     /**
      * [ ] 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가하고, 메소드 명을 변경합니다. findAllByUserId

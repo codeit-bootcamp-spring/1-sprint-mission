@@ -1,8 +1,10 @@
 package com.sprint.mission.entity.main;
 
 
-import com.sprint.mission.dto.request.UserDtoForRequest;
+import com.sprint.mission.dto.request.UserDtoForCreate;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
@@ -34,14 +36,8 @@ public class User implements Serializable {
         this.profileImgId = profileImgId;
     }
 
-    public static User createUserByRequestDto(UserDtoForRequest dto, UUID profileImgId){
-        return new User(dto.getUsername(), dto.getPassword(), dto.getEmail(), profileImgId);
-    }
-
-    public void updateByRequestDTO(UserDtoForRequest requestDTO){
-        this.name = requestDTO.getUsername();
-        this.password = requestDTO.getPassword();
-        this.email = requestDTO.getEmail();
+    public static User createUserByRequestDto(UserDtoForCreate dto) {
+        return new User(dto.username(), dto.password(), dto.email(), null);
     }
 
     @Override

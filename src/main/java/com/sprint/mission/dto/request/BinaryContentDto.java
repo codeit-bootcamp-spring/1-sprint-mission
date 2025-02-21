@@ -1,11 +1,11 @@
 package com.sprint.mission.dto.request;
 
+import java.util.Optional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,9 +20,14 @@ public class BinaryContentDto {
         this.bytes = bytes;
     }
 
-    public static BinaryContentDto filetoBinaryContentDto(MultipartFile file) {
+    public static Optional<BinaryContentDto> fileToBinaryContentDto(MultipartFile file) {
+        if (file.isEmpty()) {
+            return Optional.empty();
+        }
         try {
-            return new BinaryContentDto(file.getName(), file.getContentType(), file.getBytes());
+            BinaryContentDto binaryContentDto = new BinaryContentDto(file.getName(),
+                file.getContentType(), file.getBytes());
+            return Optional.of(binaryContentDto);
         } catch (IOException e) {
             // 나중에 커스텀 에러처리하기
             throw new RuntimeException(e);

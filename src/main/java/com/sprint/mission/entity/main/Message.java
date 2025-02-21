@@ -20,8 +20,8 @@ public class Message implements Serializable, Comparable<Message> {
     private final Instant createAt;
     private Instant updateAt;
 
-    private UUID channelId;
     private UUID writerId;
+    private UUID channelId;
     private List<UUID> attachmentIdList;
     private String content;
 

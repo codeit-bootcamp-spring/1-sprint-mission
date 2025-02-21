@@ -4,7 +4,6 @@ import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @SneakyThrows
     @Override
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         Path channelPath = getChannelDirectPath(channel.getId());
 
         if (!Files.exists(channelPath)) {
@@ -32,6 +31,7 @@ public class FileChannelRepository implements ChannelRepository {
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(channelPath))) {
             oos.writeObject(channel);
         }
+      return channel;
     }
 
 

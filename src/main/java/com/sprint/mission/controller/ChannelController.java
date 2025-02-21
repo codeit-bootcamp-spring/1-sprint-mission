@@ -1,6 +1,8 @@
 package com.sprint.mission.controller;
 
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
@@ -8,6 +10,8 @@ import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
+import com.sprint.mission.service.jcf.main.JCFUserService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,22 +23,63 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/channels")
+@RequestMapping("/api/channels")
 public class ChannelController {
 
     private final JCFChannelService channelService;
+    private final JCFUserService userService;
 
     @PostMapping
-    public ResponseEntity<String> save(@RequestBody ChannelDtoForRequest requestDTO) {
-        channelService.create(requestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Channel created successfully");
+    public ResponseEntity<FindChannelDto> create(@RequestBody ChannelDtoForRequest requestDTO) {
+        Channel createdChannel = channelService.create(requestDTO);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(getFindChannelDto(createdChannel));
+        //dto?
+    }
+
+
+    @PatchMapping("/{channelId}")
+    public ResponseEntity<String> update(@PathVariable UUID channelId
+        , @RequestBody ChannelDtoForRequest requestDTO) {
+
+        if (requestDTO.getChannelType().equals(ChannelType.PRIVATE)){
+            throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
+        }
+
+        channelService.update(channelId, requestDTO);
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("수정 완료");
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") UUID channelId) {
+        channelService.delete(channelId);
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+        List<Channel> channelList = channelService.findAllByUserId(userId);
+        List<FindChannelDto> channelDtoList = channelList.stream()
+            .map(this::getFindChannelDto).toList();
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(channelDtoList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<FindChannelDto> findById(@PathVariable("id") UUID channelId) {
         Channel findChannel = channelService.findById(channelId);
-        return ResponseEntity.status(HttpStatus.OK).body(getFindChannelDto(findChannel));
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(getFindChannelDto(findChannel));
     }
 
 //    @GetMapping(value = "/{usersId}/channels")
@@ -45,22 +90,6 @@ public class ChannelController {
 //
 //        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
 //    }
-
-    @PatchMapping("/{channelId}")
-    public ResponseEntity<String> update(@PathVariable UUID channelId, @RequestBody ChannelDtoForRequest requestDTO) {
-        if (requestDTO.getChannelType().equals(ChannelType.PRIVATE)){
-            return ResponseEntity.badRequest().body("PRIVATE 채널은 수정 불가능입니다.");
-        }
-        channelService.update(channelId, requestDTO);
-        return ResponseEntity.ok("Successfully updated");
-    }
-
-
-    @DeleteMapping("/{channelId}")
-    public ResponseEntity<String> delete(@PathVariable UUID channelId) {
-        channelService.delete(channelId);
-        return ResponseEntity.ok("Successfully deleted");
-    }
 
 
     /**

@@ -1,6 +1,5 @@
 package com.sprint.mission.repository.jcf.main;
 
-import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.repository.MessageRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +30,9 @@ public class JCFMessageRepository implements MessageRepository{
     }
 
 
-    public List<Message> findAllByChannel(Channel channel){
+    public List<Message> findAllByChannel(UUID channelId){
         return data.values().stream()
-                .filter(message -> message.getChannelId().equals(channel.getId()))
+                .filter(message -> message.getChannelId().equals(channelId))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 

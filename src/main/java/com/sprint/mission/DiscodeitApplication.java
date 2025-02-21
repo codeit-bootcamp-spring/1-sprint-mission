@@ -1,14 +1,8 @@
 package com.sprint.mission;
 
-import com.sprint.mission.entity.main.User;
-import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.service.jcf.main.JCFUserService;
-import jakarta.annotation.PostConstruct;
-import lombok.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 public class DiscodeitApplication {

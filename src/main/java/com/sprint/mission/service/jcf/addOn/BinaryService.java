@@ -3,6 +3,7 @@ package com.sprint.mission.service.jcf.addOn;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.jcf.addOn.JCFBinaryContentRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,8 @@ public class BinaryService {
         return binaryContentRepository.save(binaryContent);
     }
 
-    public BinaryContent findById(UUID id){
-        return binaryContentRepository.findById(id).orElseThrow();
+    public Optional<BinaryContent> findById(UUID id){
+        return binaryContentRepository.findById(id);
     }
 
     public List<BinaryContent> findAllByIdList(List<UUID> idList) {

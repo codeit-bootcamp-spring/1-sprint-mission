@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-//@RequestMapping("/messages")
+@RequestMapping("/api")
 public class MessageController {
 
 
@@ -34,13 +32,13 @@ public class MessageController {
     private final JCFUserService userService;
     private final BinaryService binaryService;
 
-    @PostMapping("/messages")
+    @PostMapping("messages")
     public ResponseEntity<String> save(@RequestPart("dto") MessageDtoForCreate requestDTO,
                                        @RequestPart("attachments") List<MultipartFile> attachments) {
 
 
         Optional<List<BinaryContentDto>> binaryContentDtoList = attachments.isEmpty()
-                ? Optional.of(attachments.stream().map(BinaryContentDto::filetoBinaryContentDto).toList())
+                ? Optional.of(attachments.stream().map(BinaryContentDto::fileToBinaryContentDto).toList())
                 : Optional.empty();
 
         messageService.create(requestDTO, binaryContentDtoList);
@@ -49,16 +47,16 @@ public class MessageController {
     }
 
     // @GetMapping("/messages}") << body에 channelId 껴 넣는 방법
-    @GetMapping("/channels/{channelId}/messages")
+    @GetMapping("channels/{channelId}/messages")
     public ResponseEntity<List<FindMessageDto>> findInChannel(@PathVariable UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
-        List<FindMessageDto> messageDtoList = messageList.stream()
-                .map((FindMessageDto::new))
-                .toList();
-        return ResponseEntity.status(HttpStatus.OK).body(messageDtoList);
+        List<FindMessageDto> dtoList = messageList.stream()
+            .map(FindMessageDto::fromEntity).toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(dtoList);
     }
 
-    @PatchMapping("/messages/{id}")
+    @PatchMapping("messages/{id}")
     public ResponseEntity<String> update(@PathVariable("id") UUID messageId,
                                          @RequestBody MessageDtoForUpdate requestDTO) {
         messageService.update(messageId, requestDTO);
@@ -66,7 +64,7 @@ public class MessageController {
     }
 
 
-    @DeleteMapping("/messages/{id}")
+    @DeleteMapping("messages/{id}")
     public ResponseEntity<String> delete(@PathVariable("id") UUID messageId) {
         messageService.delete(messageId);
         return ResponseEntity.ok("Successfully deleted");

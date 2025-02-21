@@ -33,9 +33,10 @@ public class FileChannelService implements ChannelService {
     private final UserStatusService userStatusService;
 
     @Override
-    public void create(ChannelDtoForRequest dto) {
+    public Channel create(ChannelDtoForRequest dto) {
         //validateDuplicateName(channel.getName());
         fileChannelRepository.save(Channel.createChannelByRequestDto(dto));
+      return null;
     }
 
     @Override
