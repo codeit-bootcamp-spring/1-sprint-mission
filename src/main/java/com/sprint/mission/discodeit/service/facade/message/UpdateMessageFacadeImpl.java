@@ -36,22 +36,9 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
   @Override
   public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
 
-    User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
     Message message = validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
 
-    if (!message.getAuthorId().equals(user.getUUID())) {
-      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
-    }
-
-    if(messageDto.getBinaryContent() != null && !messageDto.getBinaryContent().isEmpty()) {
-      log.info("[Update Message] : 바이너리 업데이트 시작");
-      List<BinaryContent> incoming = binaryContentMapper.fromMessageFiles(messageDto.getBinaryContent(), message.getAuthorId(), message.getChannelId(), message.getUUID());
-      incoming = binaryContentService.updateBinaryContentForMessage(message, user.getUUID(), incoming);
-      List<String> contentIds = incoming.stream().map(BinaryContent::getUUID).toList();
-      message.addBinaryContents(contentIds);
-    }
-
-    messageService.updateMessage(message, messageDto.getContent());
+    messageService.updateMessage(message, messageDto.newContent());
 
     return messageMapper.toResponseDto(message);
   }

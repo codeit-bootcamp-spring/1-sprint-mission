@@ -31,15 +31,15 @@ public class MessageController {
 
 
   @PatchMapping("/messages/{messageId}")
-  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId, @ModelAttribute MessageUpdateDto messageDto){
-    MessageResponseDto message = messageMasterFacade.updateMessage(messageId, messageDto  );
+  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId, @RequestBody MessageUpdateDto messageDto){
+    MessageResponseDto message = messageMasterFacade.updateMessage(messageId, messageDto);
     return ResponseEntity.ok(message);
   }
 
   @DeleteMapping("/messages/{messageId}")
-  public ResponseEntity<String> deleteMessage(@PathVariable String messageId){
+  public ResponseEntity<Void> deleteMessage(@PathVariable String messageId){
     messageMasterFacade.deleteMessage(messageId);
-    return ResponseEntity.ok("successfully deleted");
+    return ResponseEntity.status(204).build();
   }
 
   @GetMapping("/messages")

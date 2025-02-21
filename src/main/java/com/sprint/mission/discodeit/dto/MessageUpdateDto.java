@@ -8,15 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Getter
-@Setter
-public class MessageUpdateDto {
 
-    @NotNull
-    private String userId;
-    @NotBlank
-    private String content;
-    private List<MultipartFile> binaryContent;
-
-    public MessageUpdateDto(){}
+public record MessageUpdateDto(String newContent) {
 }
