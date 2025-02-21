@@ -1,5 +1,7 @@
 package com.sprint.mission.service.jcf.main;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
@@ -10,7 +12,6 @@ import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.common.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +33,9 @@ public class JCFMessageService implements MessageService {
     @Override
     public void create(MessageDtoForCreate responseDto) {
         Channel writtenChannel = channelRepository.findById(responseDto.getChannelId())
-                .orElseThrow(() -> new NotFoundId("wrong channelId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
         User writer = userRepository.findById(responseDto.getUserId())
-                .orElseThrow(() -> new NotFoundId("wrong userId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
         // 첨부파일 미포함 메시지
         Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent());
@@ -54,7 +55,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void update(MessageDtoForUpdate updateDto) {
         Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
-                .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
 
         updatingMessage.setContent(updateDto.getChangeContent());
         // 메시지 binary data는 수정 불가
@@ -72,11 +73,12 @@ public class JCFMessageService implements MessageService {
     public void delete(UUID messageId) {
         binaryMessageService.delete(messageId);
         if (messageRepository.existsById(messageId)) messageRepository.delete(messageId);
-        else throw new NotFoundId("message 삭제 실패 : wrong id");
+        else throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
     }
 
     @Override
     public Message findById(UUID channelId) {
-        return messageRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        return messageRepository.findById(channelId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 }

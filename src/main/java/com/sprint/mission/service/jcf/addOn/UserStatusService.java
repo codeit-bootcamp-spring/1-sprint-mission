@@ -1,7 +1,7 @@
 package com.sprint.mission.service.jcf.addOn;
 
-import com.sprint.mission.common.CustomException;
-import com.sprint.mission.common.ErrorCode;
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;

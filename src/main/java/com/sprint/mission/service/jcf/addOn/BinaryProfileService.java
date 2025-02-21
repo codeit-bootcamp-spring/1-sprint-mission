@@ -1,7 +1,7 @@
 package com.sprint.mission.service.jcf.addOn;
 
-import com.sprint.mission.common.CustomException;
-import com.sprint.mission.common.ErrorCode;
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryProfileRepository;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;

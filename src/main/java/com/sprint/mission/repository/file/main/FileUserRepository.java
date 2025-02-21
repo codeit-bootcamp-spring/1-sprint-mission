@@ -1,5 +1,7 @@
 package com.sprint.mission.repository.file.main;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import lombok.SneakyThrows;
@@ -50,9 +52,7 @@ public class FileUserRepository implements UserRepository {
         Path userFilePath = getUserFilePath(userId);
 
         // 2. 1에서 얻은 filePath가 유효한지 테스트
-        if (!Files.exists(userFilePath)) {
-            throw new NotFoundId();
-        }
+        if (!Files.exists(userFilePath)) throw new CustomException(ErrorCode.NO_SUCH_USER);
 
         // 3. 읽기
         try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(userFilePath))) {

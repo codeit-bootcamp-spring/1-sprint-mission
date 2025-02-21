@@ -1,6 +1,8 @@
 package com.sprint.mission.service.jcf.main;
 
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
@@ -13,8 +15,6 @@ import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.common.DuplicateName;
-import com.sprint.mission.common.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +48,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(UUID channelId, ChannelDtoForRequest dto) {
-        Channel updatingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        Channel updatingChannel = channelRepository.findById(channelId)
+                .orElseThrow(()-> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
         updatingChannel.updateByDTO(dto);
         channelRepository.save(updatingChannel);
     }
@@ -61,7 +62,8 @@ public class JCFChannelService implements ChannelService {
      */
     @Override
     public Channel findById(UUID channelId) {
-        return channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
     }
 
     @Override
@@ -88,7 +90,8 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void delete(UUID channelId) {
-        Channel deletingChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        Channel deletingChannel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
         deletingChannel.getMessageList().forEach((message) -> {
             messageService.delete(message.getId());
@@ -104,9 +107,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     public Map<FindUserDto, Instant> lastReadTimeListInChannel(UUID channelId) {
-        Channel inChannel = channelRepository.findById(channelId).orElseThrow(NotFoundId::new);
+        Channel inChannel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
         if (inChannel.getChannelType().equals(ChannelType.PUBLIC)) {
-            throw new RuntimeException("Public 채널은 유저별 lastReadTime 호출 불가");
+            throw new CustomException(ErrorCode.CANNOT_REQUEST_LAST_READ_TIME);
         }
 
         // 유저별 이 채널 마지막 readTime
@@ -126,10 +130,7 @@ public class JCFChannelService implements ChannelService {
     public void validateDuplicateName(String name) {
         boolean isDuplicate = channelRepository.findAll().stream()
                 .anyMatch(channel -> channel.getName().equals(name));
-        if (isDuplicate) {
-            throw new DuplicateName(
-                    String.format("%s는 이미 존재하는 이름의 채널명입니다", name));
-        }
+        if (isDuplicate) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
     }
 
     /**

@@ -1,13 +1,14 @@
 package com.sprint.mission.service.file;
 
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.file.main.FileChannelRepository;
 import com.sprint.mission.repository.file.main.FileUserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.common.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class FileUserService implements UserService{
     public void update(UUID userId, UserDtoForRequest updateDto)  {
         isDuplicateNameEmail(updateDto.getUsername(), updateDto.getEmail());
 
-        User updatingUser = fileUserRepository.findById(userId).orElseThrow(NotFoundId::new);
+        User updatingUser = fileUserRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         updatingUser.updateByRequestDTO(updateDto);
 
         byte[] profileImg = updateDto.getProfileImgAsByte();
@@ -64,7 +65,8 @@ public class FileUserService implements UserService{
 
     @Override
     public User findById(UUID userId){
-        return fileUserRepository.findById(userId).orElseThrow(NotFoundId::new);
+        return fileUserRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
 
@@ -79,7 +81,8 @@ public class FileUserService implements UserService{
     public void delete(UUID userId) {
         //if (!fileUserRepository.existsById(userId)) throw new NotFoundId();
 
-        User deletingUser = fileUserRepository.findById(userId).orElseThrow(NotFoundId::new);
+        User deletingUser = fileUserRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         deletingUser.getChannels().forEach((channel) -> {
             channel.removeUser(deletingUser);
             fileChannelRepository.save(channel);
@@ -97,12 +100,10 @@ public class FileUserService implements UserService{
     public void isDuplicateNameEmail(String username, String email) {
         List<User> allUser = fileUserRepository.findAll();
         boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(username));
-        if (isDuplicateName)
-            throw new IllegalStateException(String.format("Duplicate Name: %s", username));
+        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
         boolean isDuplicateEmail = allUser.stream().anyMatch(user -> user.getEmail().equals(email));
-        if (isDuplicateEmail)
-            throw new IllegalStateException(String.format("Duplicate Email: %s", email));
+        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 
     // 디렉토리 생성

@@ -1,7 +1,5 @@
 package com.sprint.mission.common.exception;
 
-import com.sprint.mission.common.CustomException;
-import com.sprint.mission.common.DuplicateName;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,32 +24,6 @@ public class ControllerAdvice {
     }
 
 
-
-//    @ExceptionHandler(value = NotFoundId.class)
-//    public ResponseEntity<Map<String, String>> notFoundExHandler(NotFoundId e){
-//        HttpStatus status = HttpStatus.NOT_FOUND;
-//
-//        Map<String, String> map = new HashMap<>();
-//        map.put("code", "404");
-//        map.put("error type",status.getReasonPhrase());
-//        if (e.getMessage().isBlank()) map.put("message", "Not Found ID");
-//        else map.put("message", e.getMessage());
-//
-//        return new ResponseEntity<>(map, status);
-//    }
-
-    @ExceptionHandler(DuplicateName.class)
-    public ResponseEntity<Map<String, String>> duplicateExHandler(DuplicateName e){
-
-        HttpStatus status = HttpStatus.CONFLICT;
-
-        HashMap<String, String> map = new HashMap<>();
-        map.put("code", "409");
-        map.put("error type", status.getReasonPhrase()); // 결과 예시 : 409 Conflict
-        if (e.getMessage().isBlank()) map.put("message", "Duplicate");
-        else map.put("message", e.getMessage());
-        return new ResponseEntity<>(map, status);
-    }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class, MethodArgumentNotValidException.class})
     public ResponseEntity<Map<String, String>> argsMissMatchHandler(MethodArgumentTypeMismatchException e){

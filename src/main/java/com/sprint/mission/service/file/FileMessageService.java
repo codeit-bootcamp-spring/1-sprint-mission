@@ -1,5 +1,7 @@
 package com.sprint.mission.service.file;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
@@ -31,9 +33,9 @@ public class FileMessageService implements MessageService{
     @Override
     public void create(MessageDtoForCreate responseDto) {
         Channel writtenChannel = fileChannelRepository.findById(responseDto.getChannelId())
-                .orElseThrow(() -> new NotFoundId("wrong channelId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
         User writer = fileUserRepository.findById(responseDto.getUserId())
-                .orElseThrow(() -> new NotFoundId("wrong userId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
         // 첨부파일 미포함 메시지
         Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent());
@@ -54,7 +56,7 @@ public class FileMessageService implements MessageService{
     @Override
     public void update(MessageDtoForUpdate updateDto) {
         Message updatingMessage = fileMessageRepository.findById(updateDto.getMessageId())
-                .orElseThrow(() -> new NotFoundId("Fail to update : wrong messageId"));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
 
         updatingMessage.setContent(updateDto.getChangeContent());
         // 메시지 binary data는 수정 불가
@@ -71,12 +73,13 @@ public class FileMessageService implements MessageService{
     public void delete(UUID messageId) {
         binaryMessageService.delete(messageId);
         if (fileMessageRepository.existsById(messageId)) fileMessageRepository.delete(messageId);
-        else throw new NotFoundId("message 삭제 실패 : wrong id");
+        else throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
     }
 
     @Override
     public Message findById(UUID messageId) {
-        return fileMessageRepository.findById(messageId).orElseThrow(NotFoundId::new);
+        return fileMessageRepository.findById(messageId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 
     /**

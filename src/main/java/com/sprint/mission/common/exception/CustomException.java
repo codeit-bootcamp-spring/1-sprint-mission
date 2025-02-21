@@ -1,4 +1,4 @@
-package com.sprint.mission.common;
+package com.sprint.mission.common.exception;
 
 
 import lombok.AllArgsConstructor;
