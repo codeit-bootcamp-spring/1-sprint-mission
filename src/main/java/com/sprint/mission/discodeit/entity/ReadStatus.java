@@ -3,12 +3,14 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
 @Getter
+@Setter
 public class ReadStatus implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -28,9 +30,14 @@ public class ReadStatus implements Serializable {
     this.lastReadAt = Instant.now();
   }
 
-  public void updateLastReadAt(){
+  public void updateLastReadAtToCurrentTime(){
     updatedAt = Instant.now();
     lastReadAt = Instant.now();
+  }
+
+  public void updateLastReadAt(Instant time){
+    lastReadAt = time;
+    updatedAt = time; // Instant.now()?
   }
 
   @Override

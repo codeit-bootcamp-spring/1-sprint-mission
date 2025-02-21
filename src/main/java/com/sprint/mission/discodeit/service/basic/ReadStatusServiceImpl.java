@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -38,7 +40,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
 
-    return readStatusRepository.save(new ReadStatus(dto.channelId(), dto.userId()));
+    ReadStatus status = new ReadStatus(dto.channelId(), dto.userId());
+    status.setLastReadAt(dto.lastReadAt());
+
+    return readStatusRepository.save(status);
   }
 
   // TODO : repository 에 saveAll(), 필요시 validation 추가
@@ -62,8 +67,6 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
   }
 
-
-
   @Override
   public ReadStatus find(String id) {
     return readStatusRepository.findById(id).orElseThrow( () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
@@ -72,6 +75,15 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public List<ReadStatus> findAllByUserId(String userId) {
     return readStatusRepository.findByUserId(userId);
+  }
+
+  @Override
+  public ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id) {
+    ReadStatus status = readStatusRepository.findById(id).orElseThrow(() -> new NotFoundException(DEFAULT_ERROR_MESSAGE));
+    status.updateLastReadAt(readStatusDto.newLastReadAt());
+    readStatusRepository.save(status);
+
+    return status;
   }
 
   @Override
@@ -94,7 +106,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus update(CreateReadStatusDto dto) {
     ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(dto.channelId(), dto.userId()).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
 
-    readStatus.updateLastReadAt();
+    readStatus.updateLastReadAtToCurrentTime();
     readStatusRepository.save(readStatus);
 
     return readStatus;

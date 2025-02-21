@@ -19,8 +19,13 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(er);
   }
 
-  @ExceptionHandler({ValidationException.class, InvalidOperationException.class})
+  @ExceptionHandler({ValidationException.class,  IllegalAccessException.class})
   public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex){
+    ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
+  }
+  @ExceptionHandler(InvalidOperationException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidOperationException(InvalidOperationException ex) {
     ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
   }
