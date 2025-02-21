@@ -33,6 +33,7 @@ public class UserFindFacadeImpl implements UserFindFacade {
   @Override
   public UserResponseDto findUserById(String id) {
     User user = userService.findUserById(id);
+
     return userMapper.toDto(user, user.getStatus(), user.getProfileImage());
   }
 

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.handler;
 
+import com.sprint.mission.discodeit.error.ErrorDetail;
+import com.sprint.mission.discodeit.error.ErrorResponse;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -11,12 +13,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<String> handleNotFoundException(NotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
+    ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(er);
   }
 
   @ExceptionHandler(ValidationException.class)
-  public ResponseEntity<String> handleValidationException(ValidationException ex){
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+  public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex){
+    ErrorResponse er = new ErrorResponse(new ErrorDetail( HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
   }
 }

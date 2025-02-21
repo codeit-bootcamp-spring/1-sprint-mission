@@ -39,6 +39,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
   @Override
   public Optional<User> findByUsername(String username) {
     List<User> users = loadAll(User.class);
+
     return users.stream().filter(u -> u.getUsername().equals(username)).findAny();
   }
 

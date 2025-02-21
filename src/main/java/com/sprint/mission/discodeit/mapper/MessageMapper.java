@@ -44,7 +44,7 @@ public interface MessageMapper {
 
     List<BinaryContent> binaryContents = (dto.getMultipart() != null && !dto.getMultipart().isEmpty())
         ? binaryContentMapper.fromMessageFiles(dto.getMultipart(), dto.getUserId(), channelId, messageBuilder.getUUID())
-        : Collections.emptyList();
+        : null;
 
     messageBuilder.binaryContents(binaryContents);
   }
@@ -52,7 +52,7 @@ public interface MessageMapper {
   @Named("convertToBase64")
   default List<String> convertToBase64(List<BinaryContent> binaryContents) {
     return binaryContents == null || binaryContents.isEmpty()
-        ? Collections.emptyList()
+        ? null
         : binaryContents.stream()
         .map(content -> Base64.getEncoder().encodeToString(content.getData()))
         .toList();

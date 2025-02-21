@@ -32,6 +32,7 @@ public interface UserMapper {
   @Mapping(target = "nickname", source = "user.nickname")
   @Mapping(target = "phoneNumber", source = "user.phoneNumber")
   @Mapping(target = "createdAt", source = "user.createdAt")
+  @Mapping(target = "userStatus", source = "userStatus.userStatus")
   @Mapping(target = "lastOnlineAt", source = "userStatus.lastOnlineAt")
   @Mapping(target = "description", source = "user.description")
   @Mapping(target = "profilePictureBase64", expression = "java(BinaryContentUtil.convertToBase64(profile))")

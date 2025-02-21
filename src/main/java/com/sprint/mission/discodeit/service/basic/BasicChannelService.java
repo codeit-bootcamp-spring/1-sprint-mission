@@ -28,11 +28,8 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-  private final ReadStatusService readStatusService;
-
   private final EntityValidator validator;
   private final ChannelRepository channelRepository;
-  private final MessageRepository messageRepository;
 
   @Override
   public Channel createPrivateChannel(Channel channel) {

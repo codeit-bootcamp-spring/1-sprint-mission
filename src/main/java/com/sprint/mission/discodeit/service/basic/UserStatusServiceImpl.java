@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -25,16 +26,20 @@ import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_
 public class UserStatusServiceImpl implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
   private final EntityValidator validator;
 
   @Override
   public UserStatus create(UserStatus status) {
 
-    validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
+    User user = validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
+
 
     if (userStatusRepository.findByUserId(status.getUserId()).isPresent()) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
+
+
 
     return userStatusRepository.save(status);
   }
@@ -59,7 +64,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatus updateByUserId(String userId, UpdateUserStatusDto dto) {
 
-    validator.findOrThrow(User.class, userId, new UserNotFoundException());
+    User user = validator.findOrThrow(User.class, userId, new UserNotFoundException());
 
     UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
         () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
@@ -68,6 +73,10 @@ public class UserStatusServiceImpl implements UserStatusService {
     status.setUserStatus(dto.status());
 
     userStatusRepository.save(status);
+
+    user.updateStatus(status);
+    userRepository.update(user);
+
 
     return status;
   }

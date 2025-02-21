@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.UserApiDocs;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
@@ -20,11 +21,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
-public class UserController {
+public class UserController implements UserApiDocs {
 
   private final UserMasterFacade userFacade;
 
   @GetMapping("/users/{id}")
+  @Override
   public ResponseEntity<UserResponseDto> getUser(@PathVariable String id) {
     UserResponseDto user = userFacade.findUserById(id);
     return ResponseEntity.ok(user);

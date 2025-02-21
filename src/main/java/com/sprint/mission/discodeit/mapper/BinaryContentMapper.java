@@ -5,13 +5,15 @@ import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", imports = BinaryContentUtil.class, builder = @Builder(disableBuilder = false))
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL
+    ,imports = BinaryContentUtil.class, builder = @Builder(disableBuilder = false))
 public interface BinaryContentMapper {
 
   @Mapping(source = "file.originalFilename", target = "fileName")
