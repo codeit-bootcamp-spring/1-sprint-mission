@@ -17,6 +17,7 @@ public class UserFindDTO {
     private String username;
     private String email;
     private boolean online;
+    private UUID profileId;
     private Instant createAt;
     private Instant updateAt;
 }
