@@ -1,17 +1,14 @@
 package com.sprint.mission.service.jcf.main;
 
 
-import com.sprint.mission.entity.addOn.BinaryProfileContent;
-import com.sprint.mission.entity.addOn.UserStatus;
+import com.sprint.mission.common.CustomException;
+import com.sprint.mission.common.ErrorCode;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -49,14 +46,13 @@ public class JCFUserService implements UserService {
         userRepository.save(user);
     }
 
-
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
     // 패스워드 정보 제외
     @Override
     public void update(UUID userId, UserDtoForRequest updateDto) {
         isDuplicateNameEmail(updateDto.getUsername(), updateDto.getEmail());
 
-        User updatingUser = userRepository.findById(userId).orElseThrow(NotFoundId::new);
+        User updatingUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         updatingUser.updateByRequestDTO(updateDto);
 
         byte[] profileImg = updateDto.getProfileImgAsByte();
@@ -69,7 +65,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findById(UUID userId) {
-        return userRepository.findById(userId).orElseThrow(NotFoundId::new);
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
     @Override
@@ -82,7 +78,7 @@ public class JCFUserService implements UserService {
     public void delete(UUID userId) {
         //if (!userRepository.existsById(userId)) throw new NotFoundId();
 
-        User deletingUser = userRepository.findById(userId).orElseThrow(NotFoundId::new);
+        User deletingUser = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         deletingUser.getChannels().forEach(channel -> {
             channel.removeUser(deletingUser);
             channelRepository.save(channel);
@@ -110,11 +106,9 @@ public class JCFUserService implements UserService {
     public void isDuplicateNameEmail(String name, String email) {
         List<User> allUser = userRepository.findAll();
         boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(name));
-        if (isDuplicateName)
-            throw new IllegalStateException(String.format("Duplicate Name: %s", name));
+        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
         boolean isDuplicateEmail = allUser.stream().anyMatch(user -> user.getEmail().equals(email));
-        if (isDuplicateEmail)
-            throw new IllegalStateException(String.format("Duplicate Email: %s", name));
+        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 }

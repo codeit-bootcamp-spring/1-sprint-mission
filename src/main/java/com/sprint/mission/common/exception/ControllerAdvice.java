@@ -1,18 +1,16 @@
-package com.sprint.mission.controller.advice;
+package com.sprint.mission.common.exception;
 
-import com.sprint.mission.service.exception.DuplicateName;
-import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.common.CustomException;
+import com.sprint.mission.common.DuplicateName;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,18 +19,26 @@ import java.util.Map;
 public class ControllerAdvice {
 
     // 나중에 에러 반환 클래스만들어서 객체로 전달하기
-    @ExceptionHandler(value = NotFoundId.class)
-    public ResponseEntity<Map<String, String>> notFoundExHandler(NotFoundId e){
-        HttpStatus status = HttpStatus.NOT_FOUND;
 
-        Map<String, String> map = new HashMap<>();
-        map.put("code", "404");
-        map.put("error type",status.getReasonPhrase());
-        if (e.getMessage().isBlank()) map.put("message", "Not Found ID");
-        else map.put("message", e.getMessage());
-
-        return new ResponseEntity<>(map, status);
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletRequest request){
+        return ErrorResponse.toResponseEntity(e.getErrorCode(), request.getRequestURI());
     }
+
+
+
+//    @ExceptionHandler(value = NotFoundId.class)
+//    public ResponseEntity<Map<String, String>> notFoundExHandler(NotFoundId e){
+//        HttpStatus status = HttpStatus.NOT_FOUND;
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("code", "404");
+//        map.put("error type",status.getReasonPhrase());
+//        if (e.getMessage().isBlank()) map.put("message", "Not Found ID");
+//        else map.put("message", e.getMessage());
+//
+//        return new ResponseEntity<>(map, status);
+//    }
 
     @ExceptionHandler(DuplicateName.class)
     public ResponseEntity<Map<String, String>> duplicateExHandler(DuplicateName e){
@@ -41,10 +47,9 @@ public class ControllerAdvice {
 
         HashMap<String, String> map = new HashMap<>();
         map.put("code", "409");
-        map.put("error type", status.getReasonPhrase());
+        map.put("error type", status.getReasonPhrase()); // 결과 예시 : 409 Conflict
         if (e.getMessage().isBlank()) map.put("message", "Duplicate");
         else map.put("message", e.getMessage());
-
         return new ResponseEntity<>(map, status);
     }
 

@@ -10,7 +10,6 @@ import com.sprint.mission.repository.file.main.FileChannelRepository;
 import com.sprint.mission.repository.file.main.FileMessageRepository;
 import com.sprint.mission.repository.file.main.FileUserRepository;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.exception.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

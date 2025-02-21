@@ -3,14 +3,13 @@ package com.sprint.mission.service.jcf.addOn;
 import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import com.sprint.mission.repository.jcf.addOn.BinaryMessageRepository;
 import com.sprint.mission.dto.request.BinaryMessageContentDto;
-import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.common.NotFoundId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

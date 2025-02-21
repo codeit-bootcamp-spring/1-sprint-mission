@@ -2,9 +2,7 @@ package com.sprint.mission.repository.jcf.main;
 
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.repository.ChannelRepository;
-import com.sprint.mission.service.exception.NotFoundId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

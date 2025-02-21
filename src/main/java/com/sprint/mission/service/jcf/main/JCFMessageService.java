@@ -1,6 +1,5 @@
 package com.sprint.mission.service.jcf.main;
 
-import com.sprint.mission.entity.addOn.BinaryMessageContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
@@ -11,7 +10,7 @@ import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.common.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

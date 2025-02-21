@@ -7,7 +7,7 @@ import com.sprint.mission.repository.file.main.FileUserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.BinaryProfileContentDto;
 import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.service.exception.NotFoundId;
+import com.sprint.mission.common.NotFoundId;
 import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
