@@ -63,4 +63,4 @@ HELP.md
 out/
 *.ser
 
-application.yml
+application.yaml
