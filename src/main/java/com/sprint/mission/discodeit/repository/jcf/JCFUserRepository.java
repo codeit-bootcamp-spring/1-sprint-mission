@@ -1,34 +1,36 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.entity.User;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Primary
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private final Map<String, User> userData = new HashMap<>();
+    private final Map<String, User> dataStore = new ConcurrentHashMap<>();
 
     @Override
-    public User saveUser(User user) {
-        userData.put(user.getEmail(), user);
+    public User save(User user) {
+        dataStore.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public void deleteUser(User user) {
-        userData.remove(user.getEmail());
+    public void deleteById(String id) {
+        dataStore.remove(id);
     }
 
     @Override
-    public User findById(String email) {
-        return userData.get(email);
+    public Optional<User> findById(String id) {
+        return Optional.ofNullable(dataStore.get(id));
     }
 
     @Override
-    public List<User> printAllUser() {
-        return new ArrayList<>(userData.values());
+    public List<User> findAll() {
+        return new ArrayList<>(dataStore.values());
     }
 }

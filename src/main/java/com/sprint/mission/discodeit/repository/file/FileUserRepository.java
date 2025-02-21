@@ -1,64 +1,56 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.entity.User;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Repository
 public class FileUserRepository implements UserRepository {
-    private static final String FILE_PATH = "src/main/resources/users.ser";
-    private Map<String, User> userData;
-
-    public FileUserRepository() {
-        this.userData = loadData();
-    }
+    private final String filePath = "users.dat";
 
     @Override
-    public User saveUser(User user) {
-        userData.put(user.getEmail(), user);
-        saveData();
+    public User save(User user) {
+        Map<String, User> users = readFromFile();
+        users.put(user.getId(), user);
+        writeToFile(users);
         return user;
     }
 
     @Override
-    public void deleteUser(User user) {
-        userData.remove(user.getEmail());
-        saveData();
+    public void deleteById(String id) {
+        Map<String, User> users = readFromFile();
+        users.remove(id);
+        writeToFile(users);
     }
 
     @Override
-    public User findById(String email) {
-        return userData.get(email);
+    public Optional<User> findById(String id) {
+        Map<String, User> users = readFromFile();
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public List<User> printAllUser() {
-        return new ArrayList<>(userData.values());
+    public List<User> findAll() {
+        return new ArrayList<>(readFromFile().values());
     }
 
-    private void saveData() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(userData);
-        } catch (IOException e) {
-            System.err.println("===데이터 저장 중 오류 발생: " + e.getMessage() + "===");
-        }
-    }
-
-
-    private Map<String, User> loadData() {
-        File file = new File(FILE_PATH);
-        if (!file.exists()) {
-            return new HashMap<>();
-        }
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+    private Map<String, User> readFromFile() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
             return (Map<String, User>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            System.err.println("===데이터 로드 중 오류 발생: " + e.getMessage() + "===");
             return new HashMap<>();
+        }
+    }
+
+    private void writeToFile(Map<String, User> users) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+            oos.writeObject(users);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

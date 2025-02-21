@@ -1,46 +1,36 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+@Primary
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<User, List<Channel>> channelData = new HashMap<>();
+    private final Map<String, Channel> dataStore = new ConcurrentHashMap<>();
 
     @Override
-    public Channel saveChannel(Channel channel) {
-        channelData.computeIfAbsent(channel.getUser(), k -> new ArrayList<>()).add(channel);
+    public Channel save(Channel channel) {
+        dataStore.put(channel.getId(), channel);
         return channel;
     }
 
     @Override
-    public void deleteChannel(Channel channel) {
-        List<Channel> userChannels = channelData.get(channel.getUser());
-        if (userChannels != null) {
-            userChannels.remove(channel);
-            if (userChannels.isEmpty()) {
-                channelData.remove(channel.getUser());
-            }
-        }
+    public void deleteById(String id) {
+        dataStore.remove(id);
     }
 
     @Override
-    public List<Channel> printUser(User user) {
-        return channelData.getOrDefault(user, new ArrayList<>());
+    public Optional<Channel> findById(String id) {
+        return Optional.ofNullable(dataStore.get(id));
     }
 
     @Override
-    public List<Channel> printAllChannel() {
-        List<Channel> Channels = new ArrayList<>();
-        for (List<Channel> userChannels : channelData.values()) {
-            Channels.addAll(userChannels);
-        }
-        return Channels;
+    public List<Channel> findAll() {
+        return new ArrayList<>(dataStore.values());
     }
-
 }

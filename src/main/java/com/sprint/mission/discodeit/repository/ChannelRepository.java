@@ -1,17 +1,13 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.entity.Channel;
-import com.sprint.mission.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ChannelRepository {
-
-    Channel saveChannel(Channel channel); // 채널 저장
-
-    void deleteChannel(Channel channel); // 채널 삭제
-
-    List<Channel> printUser(User user); // 특정 유저의 채널 조회
-
-    List<Channel> printAllChannel(); // 전체 채널 조회
+    Channel save(Channel channel);
+    void deleteById(String id);
+    Optional<Channel> findById(String id);
+    List<Channel> findAll();
 }
