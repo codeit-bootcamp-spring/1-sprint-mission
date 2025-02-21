@@ -51,12 +51,7 @@ public class BasicMessageService implements MessageService {
                 .toList();
 
         String content = messageCreateDto.content();
-        Message message = new Message(
-                content,
-                channelId,
-                authorId,
-                attachmentIds
-        );
+        Message message = new Message(content, channelId,authorId, attachmentIds);
         return messageRepository.save(message);
     }
 

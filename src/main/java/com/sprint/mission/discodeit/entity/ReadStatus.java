@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Setter
 public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;
+
     private Instant createdAt;
     private Instant updatedAt;
     private UUID userId;
@@ -19,10 +21,12 @@ public class ReadStatus implements Serializable {
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        //
+
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = createdAt;
     }
 
     public ReadStatus(UUID id, Instant lastReadAt) {
