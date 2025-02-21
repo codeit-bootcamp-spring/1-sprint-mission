@@ -3,48 +3,63 @@ package com.sprint.mission.discodeit.service.file;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FileMessageService implements MessageService {
-    private final MessageRepository messageRepository;
+    private final FileMessageRepository fileMessageRepository;
+    private final FileChannelRepository fileChannelRepository;
+    private final FileUserRepository fileUserRepository;
 
-    public FileMessageService(File filePath) {
-        this.messageRepository = new FileMessageRepository(filePath);
+    public FileMessageService(FileMessageRepository fileMessageRepository,FileChannelRepository fileChannelRepository,FileUserRepository fileUserRepository) {
+        this.fileMessageRepository = fileMessageRepository;
+        this.fileChannelRepository = fileChannelRepository;
+        this.fileUserRepository = fileUserRepository;
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        Message message = new Message(content, channelId, authorId);
-        return messageRepository.create(message);
+    public Message create(String content, UUID channelId, UUID userId) {
+        if(fileChannelRepository.findById(channelId).isEmpty()) {
+            throw new NoSuchElementException("ChannelId not found");
+        }
+        if(fileUserRepository.findById(userId).isEmpty()) {
+            throw new NoSuchElementException("UserId not found");
+        }
+        Message message = new Message(content,channelId,userId);
+        return null;
     }
 
     @Override
-    public Message find(UUID messageId) {
-        Message message = messageRepository.findById(messageId);
-        if (message == null) throw new NoSuchElementException("Message not found with ID: " + messageId);
-        return message;
+    public Message findById(UUID messageId) {
+        return fileMessageRepository.findById(messageId)
+                .orElseThrow(()->new NoSuchElementException("Message not found"));
     }
+
 
     @Override
     public List<Message> findAll() {
-        return messageRepository.findAll();
+        return fileMessageRepository.findAll();
     }
 
     @Override
     public Message update(UUID messageId, String newContent) {
-        Message message = find(messageId);
+        Message message = fileMessageRepository.findById(messageId)
+                .orElseThrow(()->new NoSuchElementException("Message not found"));
         message.updateContent(newContent);
-        return messageRepository.create(message);
+        return fileMessageRepository.create(message);
     }
 
     @Override
     public void delete(UUID messageId) {
-        messageRepository.delete(messageId);
+        fileMessageRepository.delete(messageId);
     }
 }

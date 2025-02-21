@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/1-sprint-mission.iml" filepath="$PROJECT_DIR$/.idea/1-sprint-mission.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/discodeit.main.iml" filepath="$PROJECT_DIR$/.idea/modules/discodeit.main.iml" />
     </modules>
   </component>
 </project>

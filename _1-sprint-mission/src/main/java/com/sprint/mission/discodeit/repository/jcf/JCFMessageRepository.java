@@ -20,15 +20,15 @@ public class JCFMessageRepository implements MessageRepository {
     }
     //생성,수정
     @Override
-    public Message create(Message message) {
+    public Message save(Message message) {
         messageData.put(message.getId(),message);
         return message;
     }
 
     //단일조회
     @Override
-    public Message findById(UUID messageId) {
-        return messageData.get(messageId);
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(this.messageData.get(messageId));
     }
 
     //다중조회
@@ -36,12 +36,17 @@ public class JCFMessageRepository implements MessageRepository {
     public List<Message> findAll() {
         return new ArrayList<>(messageData.values());
     }
+
+    @Override
+    public boolean existsById(UUID messageId) {
+        return messageData.containsKey(messageId);
+    }
+
     //삭제
     @Override
-    public void delete(UUID messageId) {
-        if (!messageData.containsKey(messageId)) {
-            throw new NoSuchElementException("Message with ID " + messageId + " not found");
-        }
+    public void deleteById(UUID messageId) {
         messageData.remove(messageId);
     }
+
+
 }

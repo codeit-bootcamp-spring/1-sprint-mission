@@ -18,26 +18,28 @@ public class JCFChannelRepository implements ChannelRepository {
     }
     //생성
     @Override
-    public Channel create(Channel channel) {
+    public Channel save(Channel channel) {
         channelData.put(channel.getId(), channel);
         return channel;
     }
     //단일조회
     @Override
-    public Channel findById(UUID channelId) {
-        return channelData.get(channelId);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(this.channelData.get(channelId));
     }
     //다중조회
     @Override
     public List<Channel> findAll() {
         return new ArrayList<>(channelData.values());
     }
+    @Override
+    public boolean existsById(UUID channelId) {
+        return channelData.containsKey(channelId);
+    }
+
     //삭제
     @Override
-    public void delete(UUID channelId) {
-        if(!channelData.containsKey(channelId)){
-            throw new NoSuchElementException("UserId not found");
-        }
+    public void deleteById(UUID channelId) {
         channelData.remove(channelId);
     }
 }

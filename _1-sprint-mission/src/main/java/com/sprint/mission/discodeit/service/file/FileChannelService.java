@@ -10,39 +10,53 @@ import java.io.*;
 import java.util.*;
 
 public class FileChannelService implements ChannelService {
-    private final ChannelRepository channelRepository;
+    private final FileChannelRepository fileChannelRepository;
 
-    public FileChannelService(File filePath) {
-        this.channelRepository = new FileChannelRepository(filePath);
+    public FileChannelService(FileChannelRepository fileChannelRepository) {
+        this.fileChannelRepository = fileChannelRepository;
     }
+
 
     @Override
     public Channel create(Channel.ChannelType channelType, String channelName, String description) {
         Channel channel = new Channel(channelType, channelName, description);
-        return channelRepository.create(channel);
+        return fileChannelRepository.create(channel);
     }
 
     @Override
-    public Channel find(UUID channelId) {
-        Channel channel = channelRepository.findById(channelId);
-        if (channel == null) throw new NoSuchElementException("Channel not found with ID: " + channelId);
-        return channel;
+    public Channel findById(UUID channelId) {
+        return fileChannelRepository.findById(channelId)
+                .orElseThrow(()-> new NoSuchElementException("Channel with id "+channelId+" not found"));
     }
 
     @Override
     public List<Channel> findAll() {
-        return channelRepository.findAll();
+        return fileChannelRepository.findAll();
     }
 
     @Override
-    public Channel update(UUID channelId, String newChannelDescription) {
-        Channel channel = find(channelId);
-        channel.updateDescription(newChannelDescription);
-        return channelRepository.create(channel);
+    public Channel update(UUID channelId, String field, Object value) {
+        Optional<Channel> optionalChannel = fileChannelRepository.findById(channelId);
+        if (optionalChannel.isPresent()) {
+            Channel channel = optionalChannel.get();
+            switch (field) {
+                case "channelName":
+                    channel.setChannelName((String) value);
+                    break;
+                case "description":
+                    channel.setDescription((String) value);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid field: " + field);
+            }
+            return fileChannelRepository.create(channel);
+        }
+        return null;
     }
+
 
     @Override
     public void delete(UUID channelId) {
-        channelRepository.delete(channelId);
+        fileChannelRepository.delete(channelId);
     }
 }

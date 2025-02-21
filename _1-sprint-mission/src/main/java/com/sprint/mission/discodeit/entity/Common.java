@@ -1,38 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
-
+@MappedSuperclass // 이 클래스를 직접 Entity로 사용하지 않음
+@Getter
 public abstract class Common implements Serializable {
     private static final long serialVersionUID = 1L; //직렬화 버전
     //필드
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-
-    //생성자
-    public Common(){
-        this.id=UUID.randomUUID();
-        this.createdAt= Instant.now().getEpochSecond();
-        this.updatedAt = this.createdAt;  // 생성 시점과 동일하게 초기화
-    }
-    //Getter
-    public UUID getId(){
-        return id;
-    }
-    public Long getCreatedAt(){
-        return createdAt;
-    }
-    public Long getUpdatedAt(){
-        return updatedAt;
-    }
+    @Transient //JPA가 관리하는 필드가 아님
+    private final UUID id = UUID.randomUUID();
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt = createdAt;
 
     //update 메소드
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updateTimestamp() {
+        this.updatedAt = Instant.now();
     }
 }
