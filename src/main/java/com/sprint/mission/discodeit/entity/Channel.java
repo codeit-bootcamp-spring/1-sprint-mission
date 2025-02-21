@@ -11,15 +11,13 @@ import java.util.UUID;
 public class Channel implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
 
-    private final ChannelType type;
+    private ChannelType type;
     private String name;
     private String introduction;
-
-    private List<UUID> participants;
 
     public Channel(ChannelType type, String name, String introduction) {
         this.id = UUID.randomUUID();
@@ -28,14 +26,6 @@ public class Channel implements Serializable {
         this.type = type;
         this.name = name;
         this.introduction = introduction;
-    }
-
-    public Channel(ChannelType type, List<UUID> participants) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-
-        this.type = type;
-        this.participants = participants;
     }
 
     public void updateUpdatedAt() {
@@ -70,10 +60,6 @@ public class Channel implements Serializable {
         }
         this.introduction = introduction;
         return true;
-    }
-
-    public boolean containsUser(UUID userId) {
-        return this.participants.contains(userId);
     }
 
     @Override

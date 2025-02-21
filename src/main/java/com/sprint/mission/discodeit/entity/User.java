@@ -11,22 +11,20 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
-    private UUID binaryContentId;
 
+    private UUID binaryContentId;
     private String name;
     private String email;
-    private transient String password;
+    private String password;
 
     public User(UUID binaryContentId, String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.binaryContentId = binaryContentId;
-
         this.name = name;
         this.email = email;
         this.password = BCrypt.hashpw(password, BCrypt.gensalt());
