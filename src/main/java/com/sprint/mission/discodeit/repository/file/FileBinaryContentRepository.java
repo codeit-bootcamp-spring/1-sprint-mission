@@ -29,6 +29,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    public Optional<BinaryContent> findByUserId(UUID userId) {
+        return fileManager.loadListToFile().stream()
+                        .filter(binaryContent -> binaryContent.getUserId().equals(userId))
+                        .findAny();
+    }
+
+    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         return fileManager.loadListToFile().stream()
                 .filter(binaryContent -> ids.contains(binaryContent.getId()))

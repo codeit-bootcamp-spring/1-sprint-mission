@@ -2,10 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import java.util.NoSuchElementException;
 public class BasicAuthService implements AuthService {
 
     private final UserRepository userRepository;
+    private final BinaryContentService binaryContentService;
     private final UserStatusService userStatusService;
 
     public UserResponse login(UserRequest.Login request) {
@@ -29,7 +33,7 @@ public class BasicAuthService implements AuthService {
         }
         log.info("user login : {}", findUser.getId());
         UserStatus loginUserStatus = userStatusService.findByUserId(findUser.getId());
-        loginUserStatus.updateStatus();
-        return UserResponse.entityToDto(findUser, loginUserStatus);
+        BinaryContent loginUserProfile = binaryContentService.findByUserIdOrThrow(findUser.getId());
+        return UserResponse.entityToDto(findUser, loginUserStatus.getStatus(), loginUserProfile.getId());
     }
 }

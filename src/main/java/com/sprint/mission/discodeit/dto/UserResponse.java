@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
@@ -12,16 +13,18 @@ public record UserResponse(
         Instant updatedAt,
         String name,
         String email,
-        UserStatus.Status status
+        UserStatus.Status status,
+        UUID profileId
 ) {
-    public static UserResponse entityToDto(User user, UserStatus userStatus) {
+    public static UserResponse entityToDto(User user, UserStatus.Status userStatus, UUID binaryContentId) {
         return new UserResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getName(),
                 user.getEmail(),
-                userStatus.getStatus()
+                userStatus,
+                binaryContentId
         );
     }
 }

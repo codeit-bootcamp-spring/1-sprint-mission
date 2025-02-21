@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -38,12 +39,14 @@ public class BasicUserService implements UserService {
 
             UserStatus newUserStatus = userStatusService.create(newUser.getId());
 
+            UUID newBinaryContentId = null;
             if (userProfileImage != null) {
-                binaryContentService.createUserProfileFile(userProfileImage, newUser.getId());
+                BinaryContent newBinaryContent = binaryContentService.createUserProfileFile(userProfileImage, newUser.getId());
+                newBinaryContentId = newBinaryContent.getId();
             }
 
             log.info("Create User: {}", newUser);
-            return UserResponse.entityToDto(newUser, newUserStatus);
+            return UserResponse.entityToDto(newUser, newUserStatus.getStatus(),newBinaryContentId);
         }
         return null;
     }
@@ -51,14 +54,21 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId())))
+                .map(user -> UserResponse.entityToDto(
+                        user,
+                        userStatusService.findByUserId(user.getId()).getStatus(),
+                        binaryContentService.findByUserIdOrThrow(user.getId()).getId())
+                )
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserResponse findById(UUID id) {
         User user = findByIdOrThrow(id);
-        return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
+        return UserResponse.entityToDto(user,
+                userStatusService.findByUserId(user.getId()).getStatus(),
+                binaryContentService.findByUserIdOrThrow(user.getId()).getId()
+        );
     }
 
     @Override
@@ -83,8 +93,13 @@ public class BasicUserService implements UserService {
         if (userProfileImage != null) {
             binaryContentService.updateUserProfileFile(userProfileImage, id);
         }
+
         log.info("Update User :{}", user);
-        return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
+        return UserResponse.entityToDto(
+                user,
+                userStatusService.findByUserId(user.getId()).getStatus(),
+                binaryContentService.findByUserIdOrThrow(user.getId()).getId()
+        );
     }
 
     @Override

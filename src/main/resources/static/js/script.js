@@ -1,8 +1,8 @@
 // API endpoints
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/api/user`,
-    BINARY_CONTENT: `${API_BASE_URL}/api/file`
+    USERS: `${API_BASE_URL}/user`,
+    BINARY_CONTENT: `${API_BASE_URL}/file`
 };
 
 // Initialize the application
@@ -57,8 +57,8 @@ async function renderUserList(users) {
                 <div class="user-name">${user.name}</div>
                 <div class="user-email">${user.email}</div>
             </div>
-            <div class="status-badge ${user.status ? 'ONLINE' : 'OFFLINE'}">
-                ${user.status ? '온라인' : '오프라인'}
+            <div class="status-badge ${user.status === "ONLINE" ? 'online' : 'offline'}">
+                ${user.status === "ONLINE" ? '온라인' : '오프라인'}
             </div>
         `;
 

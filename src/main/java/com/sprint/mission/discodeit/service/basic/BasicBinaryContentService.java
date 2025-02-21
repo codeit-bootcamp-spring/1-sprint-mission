@@ -54,6 +54,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
+    public BinaryContent findByUserIdOrThrow(UUID userId) {
+        return binaryContentRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("File does not exists"));
+    }
+
+    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         return ids.stream().map(this::findByIdOrThrow).collect(Collectors.toList());
     }
