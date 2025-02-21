@@ -42,7 +42,7 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
   }
 
   @Override
-  public void deleteUser(String id, String password) {
-    userDeleteFacade.delete(id, password);
+  public void deleteUser(String id) {
+    userDeleteFacade.delete(id);
   }
 }

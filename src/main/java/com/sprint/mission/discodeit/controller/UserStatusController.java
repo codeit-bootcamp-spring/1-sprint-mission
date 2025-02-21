@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -13,16 +15,16 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class UserStatusController {
 
   private final UserStatusService userStatusService;
 
-  @PatchMapping("/users/{userId}/statuses")
-  public ResponseEntity<String> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto userStatusDto){
+  @PatchMapping("/users/{userId}/userStatus")
+  public ResponseEntity<UserStatusResponseDto> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto userStatusDto){
 
-    UserStatus status = userStatusService.updateByUserId(userId, userStatusDto);
+    UserStatusResponseDto status = userStatusService.updateByUserId(userId, userStatusDto);
 
-    return ResponseEntity.ok("update successful : " + status.getUserStatus());
+    return ResponseEntity.ok(status);
   }
 }

@@ -1,17 +1,21 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
+import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.util.UserStatusType;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +32,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
   private final EntityValidator validator;
+  private final UserMapper userMapper;
 
   @Override
   public UserStatus create(UserStatus status) {
@@ -62,7 +67,7 @@ public class UserStatusServiceImpl implements UserStatusService {
 
 
   @Override
-  public UserStatus updateByUserId(String userId, UpdateUserStatusDto dto) {
+  public UserStatusResponseDto updateByUserId(String userId, UpdateUserStatusDto dto) {
 
     User user = validator.findOrThrow(User.class, userId, new UserNotFoundException());
 
@@ -70,15 +75,27 @@ public class UserStatusServiceImpl implements UserStatusService {
         () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
     );
 
-    status.setUserStatus(dto.status());
+    status.updateLastOnline(dto.newLastActiveAt());
+
+
+    Instant now = Instant.now();
+    long minutes = Duration.between(dto.newLastActiveAt(), now).toMinutes();
+
+    if (minutes < 10) {
+      status.setUserStatus(UserStatusType.ONLINE);
+    } else if (minutes <= 60) {
+      status.setUserStatus(UserStatusType.IDLE);
+    } else {
+      status.setUserStatus(UserStatusType.OFFLINE);
+    }
+
 
     userStatusRepository.save(status);
 
     user.updateStatus(status);
     userRepository.update(user);
 
-
-    return status;
+    return userMapper.withStatus(user);
   }
 
   @Override

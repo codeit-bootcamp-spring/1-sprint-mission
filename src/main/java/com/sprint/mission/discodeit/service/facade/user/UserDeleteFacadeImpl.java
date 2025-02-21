@@ -18,12 +18,12 @@ public class UserDeleteFacadeImpl implements UserDeleteFacade {
   private final BinaryContentService binaryContentService;
 
   @Override
-  public void delete(String userId, String password) {
+  public void delete(String userId) {
     User user = userService.findUserById(userId);
 
-    log.info("[User Delete] : 요청 시작 id={} , pwd={}", userId, password);
+    log.info("[User Delete] : 요청 시작 id={}", userId);
 
-    userService.deleteUser(userId, password);
+    userService.deleteUser(userId);
     log.info("[User Delete] : 사용자 삭제 성공");
 
     userStatusService.deleteByUserId(userId);

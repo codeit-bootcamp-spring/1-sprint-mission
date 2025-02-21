@@ -132,18 +132,9 @@ public class BasicUserService implements UserService {
 
   }
 
-  /**
-   * 사용자를 조회하여 비밀번호 검증 후 삭제
-   * 관련된 {@link UserStatus} {@link BinaryContent} 도 같이 삭제
-   *
-   * @param id
-   * @param password
-   */
   @Override
-  public void deleteUser(String id, String password) {
+  public void deleteUser(String id) {
     User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
-
-    checkPasswordIsCorrect(password, user.getPassword());
 
     userRepository.delete(id);
   }

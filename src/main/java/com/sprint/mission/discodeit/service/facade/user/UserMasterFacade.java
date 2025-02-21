@@ -13,5 +13,5 @@ public interface UserMasterFacade {
   CreateUserResponse updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto);
   UserResponseDto findUserById(String id);
   List<UserResponseDto> findAllUsers();
-  void deleteUser(String id, String password);
+  void deleteUser(String id);
 }

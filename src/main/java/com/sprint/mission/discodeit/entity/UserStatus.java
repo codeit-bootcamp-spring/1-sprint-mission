@@ -43,11 +43,9 @@ public class UserStatus implements Serializable {
     return Objects.hash(UUID);
   }
 
-  public void updateLastOnline() {
-    Instant now = Instant.now();
+  public void updateLastOnline(Instant now) {
     updatedAt = now;
     lastOnlineAt = now;
-
   }
 
 

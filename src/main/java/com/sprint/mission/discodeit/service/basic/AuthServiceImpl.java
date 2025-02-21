@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
     UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getUUID(),Instant.now())));
     log.info("[Login Request] : 사용자 상태 성공");
 
-    userStatus.updateLastOnline();
+    userStatus.updateLastOnline(Instant.now());
 
     userStatusRepository.save(userStatus);
 

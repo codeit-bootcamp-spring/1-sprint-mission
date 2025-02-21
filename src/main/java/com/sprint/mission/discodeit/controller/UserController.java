@@ -66,13 +66,9 @@ public class UserController implements UserApiDocs {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteUser(@PathVariable String id, @RequestParam String password) {
-    try {
-      userFacade.deleteUser(id, password);
-      return ResponseEntity.ok("Successfully Deleted");
-    } catch (UserValidationException e) {
-      return ResponseEntity.badRequest().body("Failed To Delete");
-    }
+  public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    userFacade.deleteUser(id);
+    return ResponseEntity.ok("Successfully Deleted");
   }
 
 }
