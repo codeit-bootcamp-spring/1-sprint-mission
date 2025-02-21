@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -20,7 +21,6 @@ public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
 
-    // login
     public UserResponse login(UserRequest.Login request) {
         User findUser = userRepository.findByName(request.name())
                 .orElseThrow(() -> new NoSuchElementException("User does not exist, or entered the wrong ID"));
@@ -28,6 +28,8 @@ public class BasicAuthService implements AuthService {
             throw new NoSuchElementException("Entered the wrong password.");
         }
         log.info("user login : {}", findUser.getId());
-        return UserResponse.entityToDto(findUser, userStatusService.findByUserId(findUser.getId()));
+        UserStatus loginUserStatus = userStatusService.findByUserId(findUser.getId());
+        loginUserStatus.updateStatus();
+        return UserResponse.entityToDto(findUser, loginUserStatus);
     }
 }

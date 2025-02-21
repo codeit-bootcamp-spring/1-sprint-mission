@@ -15,6 +15,13 @@ public record UserResponse(
         UserStatus.Status status
 ) {
     public static UserResponse entityToDto(User user, UserStatus userStatus) {
-        return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.getStatus());
+        return new UserResponse(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getName(),
+                user.getEmail(),
+                userStatus.getStatus()
+        );
     }
 }

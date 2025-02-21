@@ -29,6 +29,7 @@ public class UserStatus implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
+        this.userId = userId;
         this.status = Status.ONLINE;
     }
 

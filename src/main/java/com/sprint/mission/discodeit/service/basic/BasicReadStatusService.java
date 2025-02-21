@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,39 +27,48 @@ public class BasicReadStatusService implements ReadStatusService {
 //    private final ChannelService channelService;
 
     @Override
-    public ReadStatus create(UUID userId, UUID channelId) {
-        User user = userService.findByIdOrThrow(userId);
+    public ReadStatusResponse create(ReadStatusRequest request) {
+        User user = userService.findByIdOrThrow(request.userId());
 //        Channel channel = channelService.findByIdOrThrow(channelId);
-        if (readStatusRepository.existsByUserIdAndChannelId(userId, channelId)) {
+        if (readStatusRepository.existsByUserIdAndChannelId(request.userId(), request.channelId())) {
             throw new DuplicateRequestException("ReadStatus already exists");
         }
-        ReadStatus newReadStatus = ReadStatus.createReadStatus(userId, channelId);
+        ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId());
         readStatusRepository.save(newReadStatus);
         log.info("Create Read Status : {}", newReadStatus);
-        return newReadStatus;
+        return ReadStatusResponse.EntityToDto(newReadStatus);
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
+    public ReadStatusResponse findById(UUID id) {
+        return ReadStatusResponse.EntityToDto(findByIdOrThrow(id));
+    }
+
+    @Override
+    public ReadStatus findByIdOrThrow(UUID id) {
         return readStatusRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Read Status does not exist"));
     }
 
     @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllUserId(userId);
+    public List<ReadStatusResponse> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllUserId(userId).stream()
+                .map(ReadStatusResponse::EntityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return readStatusRepository.findAllChannelId(channelId);
+    public List<ReadStatusResponse> findAllByChannelId(UUID channelId) {
+        return readStatusRepository.findAllChannelId(channelId).stream()
+                .map(ReadStatusResponse::EntityToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public ReadStatus update(UUID id) {
-        ReadStatus readStatus = findById(id);
+    public ReadStatusResponse update(UUID id) {
+        ReadStatus readStatus = findByIdOrThrow(id);
         readStatus.updateUpdateAt();
-        return readStatusRepository.save(readStatus);
+        return ReadStatusResponse.EntityToDto(readStatusRepository.save(readStatus));
     }
 
     @Override

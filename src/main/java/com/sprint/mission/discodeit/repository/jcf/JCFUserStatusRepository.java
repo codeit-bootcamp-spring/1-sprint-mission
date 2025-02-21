@@ -32,7 +32,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     public Optional<UserStatus> findByUserId(UUID userId) {
         return data.values().stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findAny();
+                .findFirst();
     }
 
     @Override

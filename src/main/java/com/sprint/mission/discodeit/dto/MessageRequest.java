@@ -9,12 +9,10 @@ public record MessageRequest() {
     public record Create(
             String content,
             UUID channelId,
-            UUID userId,
-            List<MultipartFile> files
+            UUID userId
     ) {}
 
     public record Update(
-            String content,
-            List<MultipartFile> files
+            String content
     ) {}
 }
