@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void validateUserAccess(Channel channel, String userId) {
-    if (channel.getIsPrivate()) {
+    if (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)) {
       channel.getParticipatingUsers().stream().filter(id -> id.equals(userId)).findAny().orElseThrow(
           () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
       );
@@ -77,7 +78,7 @@ public class BasicChannelService implements ChannelService {
 
     // public 이거나 set 에 포함되어 있거나 (set 에 포함되었다 = 해당 private channel 에 user가 참여 중이다)
     return  allChannels.stream()
-        .filter(channel -> !channel.getIsPrivate() ||
+        .filter(channel -> !Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ||
             accessibleChannelIds.contains(channel.getUUID())).toList();
   }
 
@@ -96,14 +97,12 @@ public class BasicChannelService implements ChannelService {
 
     Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
 
-    if (channel.getIsPrivate()) {
+    if (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)) {
       throw new InvalidOperationException(PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
     }
 
     synchronized (channel) {
       channel.updateChannelName(channelName);
-
-      channel.updateMaxNumberOfPeople(maxNumberOfPeople);
 
       channel.updateUpdatedAt();
     }

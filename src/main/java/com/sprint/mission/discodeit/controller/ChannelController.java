@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/channels")
+@RequestMapping("/api/channels")
 public class ChannelController {
 
   private final ChannelMasterFacade channelMasterFacade;
@@ -22,14 +22,14 @@ public class ChannelController {
   @PostMapping("/private")
   public ResponseEntity<PrivateChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto channelDto) {
     PrivateChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
-    return ResponseEntity.ok(channel);
+    return ResponseEntity.status(201).body(channel);
   }
 
 
   @PostMapping("/public")
   public ResponseEntity<PublicChannelResponseDto> createPublicChannel(@RequestBody CreateChannelDto channelDto) {
     PublicChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
-    return ResponseEntity.ok(channel);
+    return ResponseEntity.status(201).body(channel);
   }
 
   @PatchMapping("/{id}")

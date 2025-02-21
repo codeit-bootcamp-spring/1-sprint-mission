@@ -6,12 +6,8 @@ import java.time.Instant;
 import java.util.List;
 
 public record PrivateChannelResponseDto(
-    String channelId,
-    String serverId,
-    Channel.ChannelType channelType,
-    Instant createdAt,
-    boolean isPrivate,
-    List<String> participants
-
+    String id,
+    Channel.ChannelType type,
+    List<String> participantIds
 ){
 }

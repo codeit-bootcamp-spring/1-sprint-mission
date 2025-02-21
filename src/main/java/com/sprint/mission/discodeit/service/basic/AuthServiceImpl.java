@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+import static com.sprint.mission.discodeit.constant.ErrorConstant.PASSWORD_MATCH_ERROR;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,14 +32,14 @@ public class AuthServiceImpl implements AuthService {
   private final UserMapper userMapper;
 
   @Override
-  public UserResponseDto login(String username, String password) {
+  public LoginResponseDto login(String username, String password) {
 
     log.info("[Login Request] : 요청 수신");
     User targetUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
     if(!PasswordEncryptor.checkPassword(password, targetUser.getPassword())){
       log.info("[Login Request] : 비밀번호 검증 실패");
-      throw new UserValidationException();
+      throw new UserValidationException(PASSWORD_MATCH_ERROR);
     }
 
     UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getUUID(),Instant.now())));
@@ -46,8 +49,6 @@ public class AuthServiceImpl implements AuthService {
 
     userStatusRepository.save(userStatus);
 
-
-
-    return userMapper.toDto(targetUser);
+    return userMapper.toLoginResponse(targetUser);
   }
 }

@@ -5,12 +5,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import java.time.Instant;
 
 public record PublicChannelResponseDto(
-    String channelId,
-    String serverId,
-    Channel.ChannelType channelType,
-    String channelName,
+    String id,
     Instant createdAt,
-    int maxNumberOfPeople,
-    boolean isPrivate
+    Instant updatedAt,
+    Channel.ChannelType type,
+    String name,
+    String description
 ) {
 }

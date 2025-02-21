@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
+import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -46,7 +47,8 @@ public interface UserMapper {
   @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
   UserStatusResponseDto withStatus(User user);
 
-
+  @Mapping(target = "id", source = "UUID")
+  LoginResponseDto toLoginResponse(User user);
   @Named("userStatusSetter")
   default boolean userStatusToBoolean(UserStatus status){
 

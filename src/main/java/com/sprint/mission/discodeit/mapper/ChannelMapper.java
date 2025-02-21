@@ -9,50 +9,42 @@ import org.mapstruct.Mapping;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false))
+@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false), imports = Objects.class)
 public interface ChannelMapper {
   @Mapping(target = "UUID", ignore = true)
-  @Mapping(target = "isPrivate", constant = "false")
-  @Mapping(source = "serverId", target = "serverUUID")
+  @Mapping(target = "channelName", source = "name")
+  @Mapping(target = "channelType", constant = "PUBLIC")
   @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())")
   @Mapping(target = "createdAt", expression = "java(Instant.now())")
   @Mapping(target = "updatedAt", expression = "java(Instant.now())")
   Channel toEntity(CreateChannelDto dto);
 
   @Mapping(target = "UUID", ignore = true)
-  @Mapping(source = "channelType", target = "channelType")
-  @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
-  @Mapping(target = "isPrivate", constant = "true")
-  @Mapping(source = "serverId", target = "serverUUID")
-  @Mapping(source = "userIds", target = "participatingUsers")
+  @Mapping(target = "channelType", constant = "PRIVATE")
+  @Mapping(source = "participantIds", target = "participatingUsers")
   @Mapping(target = "createdAt", expression = "java(Instant.now())")
   @Mapping(target = "updatedAt", expression = "java(Instant.now())")
   Channel toEntity(CreatePrivateChannelDto dto);
 
-  @Mapping(source = "UUID", target = "channelId")
-  @Mapping(source = "serverUUID", target = "serverId")
-  @Mapping(source = "channelType", target = "channelType")
-  @Mapping(source = "channelName", target = "channelName")
+  @Mapping(source = "UUID", target = "id")
+  @Mapping(source = "channelType", target = "type")
+  @Mapping(source = "channelName", target = "name")
   @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
-  @Mapping(target = "isPrivate", constant = "false") // 공개 채널이므로 false
+  @Mapping(source = "updatedAt", target = "updatedAt")
+  @Mapping(source = "description", target = "description")
   PublicChannelResponseDto toPublicDto(Channel channel);
 
-  @Mapping(source = "UUID", target = "channelId")
-  @Mapping(source = "serverUUID", target = "serverId")
-  @Mapping(source = "channelType", target = "channelType")
-  @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(source = "isPrivate", target = "isPrivate")
-  @Mapping(source = "participatingUsers", target = "participants")
+  @Mapping(source = "UUID", target = "id")
+  @Mapping(source = "channelType", target = "type")
+  @Mapping(source = "participatingUsers", target = "participantIds")
   PrivateChannelResponseDto toPrivateDto(Channel channel);
 
   @Mapping(source = "UUID", target = "channelId")
-  @Mapping(source = "serverUUID", target = "serverId")
   @Mapping(source = "channelType", target = "channelType")
   @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(source = "maxNumberOfPeople", target = "maxNumberOfPeople")
-  @Mapping(target = "channelName", expression = "java(channel.getIsPrivate() ? null : channel.getChannelName())")
+  @Mapping(target = "channelName", expression = "java(Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ? null : channel.getChannelName())")
   FindChannelResponseDto toFindChannelDto(Channel channel);
 
   default FindChannelResponseDto toFindChannelDto(Channel channel,  Instant lastMessagedAt, List<String> userIds) {
@@ -64,8 +56,8 @@ public interface ChannelMapper {
         dto.channelType(),
         dto.isPrivate(),
         dto.createdAt(),
-        lastMessagedAt,  // lastMessagedAt 추가
-        userIds,  // userIds 추가
+        lastMessagedAt,
+        userIds,
         dto.maxNumberOfPeople()
     );
   }

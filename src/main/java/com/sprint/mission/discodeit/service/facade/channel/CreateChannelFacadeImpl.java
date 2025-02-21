@@ -28,13 +28,13 @@ public class CreateChannelFacadeImpl implements CreateChannelFacade{
 
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
-    channelDto.userIds().forEach(
+    channelDto.participantIds().forEach(
         id -> validator.findOrThrow(User.class, id, new UserNotFoundException())
     );
 
     Channel channel = channelService.createPrivateChannel(channelMapper.toEntity(channelDto));
 
-    readStatusService.createMultipleReadStatus(channelDto.userIds(), channel.getUUID());
+    readStatusService.createMultipleReadStatus(channelDto.participantIds(), channel.getUUID());
 
     return channelMapper.toPrivateDto(channel);
   }

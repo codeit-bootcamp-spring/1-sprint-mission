@@ -17,23 +17,20 @@ public class Channel implements Serializable {
   private static final long serialVersionUID = 1L;
 
   public enum ChannelType {
-    CHAT, VOICE
+    PRIVATE, PUBLIC
   }
 
   private String UUID;
-  private String serverUUID;
   private ChannelType channelType;
   private String channelName;
-  private int maxNumberOfPeople;
+  private String description;
   private Instant createdAt;
   private Instant updatedAt;
-  private Boolean isPrivate;
   private List<String> participatingUsers;
 
 
   public static class ChannelBuilder{
     private String UUID = UuidGenerator.generateUUID();
-    private String serverUUID = "none";
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
   }
@@ -43,10 +40,6 @@ public class Channel implements Serializable {
     updateUpdatedAt();
   }
 
-  public void updateMaxNumberOfPeople(int maxNumberOfPeople){
-    this.maxNumberOfPeople = maxNumberOfPeople;
-    updateUpdatedAt();
-  }
 
 
   public void updateUpdatedAt() {
@@ -57,13 +50,10 @@ public class Channel implements Serializable {
   public String toString() {
     return "Channel{" +
         "UUID='" + UUID + '\'' +
-        ", serverUUID='" + serverUUID + '\'' +
         ", channelType=" + channelType +
         ", channelName='" + channelName + '\'' +
-        ", maxNumberOfPeople=" + maxNumberOfPeople +
         ", createdAt=" + createdAt +
         ", updatedAt=" + updatedAt +
-        ", isPrivate=" + isPrivate +
         '}';
   }
 
