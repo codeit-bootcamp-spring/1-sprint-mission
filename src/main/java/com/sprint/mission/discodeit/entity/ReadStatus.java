@@ -4,23 +4,30 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
-public class ReadStatus extends BaseEntity implements Serializable {
+public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
-    private final String userId;
-    private final String channelId;
-    private Instant lastReadAt;
+    private final UUID id;
+    private final UUID userId;
+    private final UUID channelId;
+    private final UUID messageId;
+    private boolean isRead;
+    private Instant readAt;
 
-    public ReadStatus(String userId, String channelId, Instant lastReadAt) {
-        super();
+    public ReadStatus(UUID userId, UUID channelId, UUID messageId) {
+        this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
+        this.messageId  = messageId;
+        this.isRead = false;
+        this.readAt = null;
     }
 
-    public void updateLastRead(Instant timestamp) {
-        this.lastReadAt = timestamp;
-        update();
+    public void markAsRead() {
+        this.isRead = true;
+        this.readAt = Instant.ofEpochMilli(System.currentTimeMillis());
     }
 }

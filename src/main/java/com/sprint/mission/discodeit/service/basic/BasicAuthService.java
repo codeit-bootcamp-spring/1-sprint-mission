@@ -19,8 +19,8 @@ public class BasicAuthService implements AuthService {
         List<User> users = userRepository.readAll();
 
         boolean login = users.stream()
-                        .anyMatch(user -> user.getEmail().equals(email)
-                        && user.getPassword().equals(password));
+                        .anyMatch(user -> user.getEmail().equals(email) && user.getPassword().equals(password));
+
         if (!login) System.out.println("로그인정보가 틀립니다.");
         else System.out.println("로그인이 완료되었습니다.");
 
