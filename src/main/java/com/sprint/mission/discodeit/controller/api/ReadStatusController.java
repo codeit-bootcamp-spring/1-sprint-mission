@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusResponse;

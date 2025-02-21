@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -26,7 +26,7 @@ public class BinaryContentController {
     }
 
     @GetMapping
-    public List<BinaryContent> getFile(@RequestParam("ids") List<UUID> fileIds) {
+    public List<BinaryContent> getFileList(@RequestParam("ids") List<UUID> fileIds) {
         return binaryContentService.findAllByIdIn(fileIds);
     }
 }
