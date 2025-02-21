@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -30,34 +30,34 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public Message create(MessageCreateRequestDto messageCreateRequestDto) {
-        if (!userRepository.existsById(messageCreateRequestDto.authorId())) {
+    public Message create(MessageCreateRequest messageCreateRequest) {
+        if (!userRepository.existsById(messageCreateRequest.authorId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
-        if (!channelRepository.existsById(messageCreateRequestDto.channelId())) {
+        if (!channelRepository.existsById(messageCreateRequest.channelId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
-        validator.validate(messageCreateRequestDto.content());
+        validator.validate(messageCreateRequest.content());
 
-        List<UUID> binaryContentData = messageCreateRequestDto.binaryContentData().stream()
-                .map(binaryContentRequestDto -> binaryContentService.create(binaryContentRequestDto).getId())
+        List<UUID> binaryContentData = messageCreateRequest.binaryContentData().stream()
+                .map(binaryContentRequest -> binaryContentService.create(binaryContentRequest).getId())
                 .toList();
 
-        return messageRepository.save(new Message(messageCreateRequestDto.content(),
-                messageCreateRequestDto.authorId(),
-                messageCreateRequestDto.channelId(),
+        return messageRepository.save(new Message(messageCreateRequest.content(),
+                messageCreateRequest.authorId(),
+                messageCreateRequest.channelId(),
                 binaryContentData));
     }
 
     @Override
-    public MessageResponseDto find(UUID messageId) {
+    public MessageResponse find(UUID messageId) {
         Message message = Optional.ofNullable(messageRepository.find(messageId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
         return getMessageInfo(message);
     }
 
     @Override
-    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
+    public List<MessageResponse> findAllByChannelId(UUID channelId) {
         List<Message> messages = messageRepository.findAll();
 
         if (channelId == null) {
@@ -73,17 +73,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto getMessageInfo(Message message) {
+    public MessageResponse getMessageInfo(Message message) {
         List<byte[]> binaryContentData = message.getBinaryContentData().stream()
                 .map(binaryContentId -> binaryContentService.find(binaryContentId).getData())
                 .toList();
-        return MessageResponseDto.from(message.getId(), message.getContent(), message.getAuthorId(), message.getChannelId(), binaryContentData);
+        return MessageResponse.from(message.getId(), message.getContent(), message.getAuthorId(), message.getChannelId(), binaryContentData);
     }
 
     @Override
-    public Message update(MessageUpdateRequestDto messageUpdateRequestDto) {
-        Message message = messageRepository.find(messageUpdateRequestDto.id());
-        message.updateContent(messageUpdateRequestDto.content());
+    public Message update(MessageUpdateRequest messageUpdateRequest) {
+        Message message = messageRepository.find(messageUpdateRequest.id());
+        message.updateContent(messageUpdateRequest.content());
 
         return messageRepository.save(message);
     }

@@ -6,14 +6,14 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 
-public record UserResponseDto(
+public record UserResponse(
         UUID id,
         String name,
         String email,
         byte[] binaryContentData,
         OnlineStatus onlineStatus
 ) {
-    public static UserResponseDto from(User user, BinaryContent binaryContent, OnlineStatus onlineStatus) {
-        return new UserResponseDto(user.getId(), user.getName(), user.getEmail(), binaryContent.getData(), onlineStatus);
+    public static UserResponse from(User user, BinaryContent binaryContent, OnlineStatus onlineStatus) {
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), binaryContent.getData(), onlineStatus);
     }
 }

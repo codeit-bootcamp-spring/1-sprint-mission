@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResponseDto(
+public record ChannelResponse(
         UUID id,
         ChannelType type,
         String name,
@@ -14,7 +14,7 @@ public record ChannelResponseDto(
         Instant lastMessageTime,
         List<UUID> participantIds
 ) {
-    public static ChannelResponseDto from(UUID id, ChannelType type, String name, String introduction, Instant lastMessageTime, List<UUID> participantIds) {
-        return new ChannelResponseDto(id, type, name, introduction, lastMessageTime, participantIds);
+    public static ChannelResponse from(UUID id, ChannelType type, String name, String introduction, Instant lastMessageTime, List<UUID> participantIds) {
+        return new ChannelResponse(id, type, name, introduction, lastMessageTime, participantIds);
     }
 }

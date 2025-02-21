@@ -2,9 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -30,8 +29,8 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
 
     @Override
-    public Channel create(PublicChannelCreateRequest channelCreateRequestDto) {
-        Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequestDto.name(), channelCreateRequestDto.introduction());
+    public Channel create(PublicChannelCreateRequest channelCreateRequest) {
+        Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequest.name(), channelCreateRequest.introduction());
 
         return channelRepository.save(channel);
     }
@@ -44,7 +43,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto find(UUID channelId) {
+    public ChannelResponse find(UUID channelId) {
         Channel channel = Optional.ofNullable(channelRepository.find(channelId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
@@ -52,7 +51,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponseDto> findAllByUserId(UUID userId) {
+    public List<ChannelResponse> findAllByUserId(UUID userId) {
         List<UUID> joinedChannels = readStatusService.findAllByUserId(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .toList();
@@ -85,20 +84,20 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantIds) {
+    public ChannelResponse getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantIds) {
 
 
-        return ChannelResponseDto.from(channel.getId(), channel.getType(),
+        return ChannelResponse.from(channel.getId(), channel.getType(),
                 channel.getName(), channel.getIntroduction(), lastMessageTime, participantIds);
     }
 
     @Override
-    public Channel update(PublicChannelUpdateRequest channelUpdateRequestDto) {
-        validator.validate(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
-        Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequestDto.id()))
+    public Channel update(PublicChannelUpdateRequest channelUpdateRequest) {
+        validator.validate(channelUpdateRequest.name(), channelUpdateRequest.introduction());
+        Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequest.id()))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
-        channel.update(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
+        channel.update(channelUpdateRequest.name(), channelUpdateRequest.introduction());
         return channelRepository.save(channel);
     }
 

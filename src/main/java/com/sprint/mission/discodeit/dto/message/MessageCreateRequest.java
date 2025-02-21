@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto.message;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.BinaryContentRequest;
 
 import java.util.List;
 import java.util.UUID;
 
-public record MessageCreateRequestDto(
+public record MessageCreateRequest(
         String content,
         UUID authorId,
         UUID channelId,
-        List<BinaryContentRequestDto> binaryContentData
+        List<BinaryContentRequest> binaryContentData
 ) {
 }

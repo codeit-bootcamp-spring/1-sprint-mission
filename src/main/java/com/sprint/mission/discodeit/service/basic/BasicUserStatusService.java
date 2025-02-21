@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserIdDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreate;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateByUserId;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,18 +24,18 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public UserStatus create(UserStatusCreateDto userStatusCreateDto) {
-        if (!userRepository.existsById(userStatusCreateDto.userId())) {
+    public UserStatus create(UserStatusCreate userStatusCreate) {
+        if (!userRepository.existsById(userStatusCreate.userId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
 
         findAll().forEach(userStatus -> {
-                    if (userStatus.isSameUserId(userStatusCreateDto.userId())) {
+                    if (userStatus.isSameUserId(userStatusCreate.userId())) {
                         throw new IllegalArgumentException("[ERROR] 이미 존재하는 데이터입니다.");
                     }
                 });
 
-        return userStatusRepository.save(new UserStatus(userStatusCreateDto.userId()));
+        return userStatusRepository.save(new UserStatus(userStatusCreate.userId()));
     }
 
     @Override
@@ -64,15 +64,15 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UserStatusUpdateDto userStatusUpdateDto) {
-        UserStatus userStatus = find(userStatusUpdateDto.id());
+    public UserStatus update(UserStatusUpdate userStatusUpdate) {
+        UserStatus userStatus = find(userStatusUpdate.id());
         userStatus.update();
         return userStatus;
     }
 
     @Override
-    public UserStatus updateByUserUd(UserStatusUpdateByUserIdDto userStatusUpdateByUserIdDto) {
-        UserStatus userStatus = findByUserId(userStatusUpdateByUserIdDto.userId());
+    public UserStatus updateByUserUd(UserStatusUpdateByUserId userStatusUpdateByUserId) {
+        UserStatus userStatus = findByUserId(userStatusUpdateByUserId.userId());
         userStatus.update();
         return userStatus;
     }
