@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -38,13 +39,11 @@ public class DiscodeitApplication {
 	static ChannelRepository channelRepository = new JCFChannelRepository();
 	static MessageRepository messageRepository = new JCFMessageRepository();
 
-	static User setupUser(UserService userService) {
-		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath_gildong"));
-		User user2 = userService.createUser(new UserCreateDTO("김이박", "5678", "dis2@code.it", "filePath_kim"));
-
-		return user;
-	}
-
+//	static User setupUser(UserService userService) {
+//
+//		return user;
+//	}
+//
 
 
 //	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
@@ -67,28 +66,21 @@ public class DiscodeitApplication {
 
 
 		//셋업
-		User user = setupUser(userService);
+		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath_gildong"));
+		User user2 = userService.createUser(new UserCreateDTO("김이박", "5678", "dis2@code.it", "filePath_kim"));
 
 
-		List<UUID> publicUserList =	new ArrayList<>();
-		List<UUID> privateUserList =	new ArrayList<>();
+		List<String > privateUserList =	new ArrayList<>();
 
-		publicUserList = userRepository.load().values()
-				.stream()
-				.map(user1 -> user1
-						.getId())
-				.toList();
+		privateUserList.add(user2.getId().toString());
 
-		privateUserList = userRepository.load().values()
-				.stream()
-				.filter(u->u.getUserName().equals("김이박"))
-				.map(user1 -> user1
-						.getId())
-				.toList();
+		Channel PBChannel = channelService.createPublicChannel(new ChannelCreateDTO("공개 채널"));
+		Channel PVChannel = channelService.createPrivateChannel(new PrivateChannelCreateDTO("비공개 채널", privateUserList));
 
-		Channel PBChannel = new Channel(new ChannelCreateDTO("공개 채널", publicUserList), ChannelType.PUBLIC);
-		Channel PVChannel = new Channel(new ChannelCreateDTO("비공개 채널", privateUserList), ChannelType.PRIVATE);
-
+		System.out.println(PBChannel.getId());
+		System.out.println(PVChannel.getId());
+		System.out.println(user.getId());
+		System.out.println(user2.getId());
 
 
 	}

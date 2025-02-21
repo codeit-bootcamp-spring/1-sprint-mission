@@ -67,12 +67,12 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public Instant findLatestTimeByChannelId(UUID channeId) {
-            return
-                    readStatusMap.values().stream()
-                    .filter(readStatus -> readStatus.getChannelId().equals(channeId))
-                    .map(ReadStatus::getChannelLastReadTimes)
-                    .max(Comparator.naturalOrder()) //가장 최신 시간
-                    .orElseThrow(()-> new IllegalArgumentException("해당 객체를 찾을 수 없습니다."));
+        return
+            readStatusMap.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channeId))
+                .map(ReadStatus::getChannelLastReadTimes)
+                .max(Comparator.naturalOrder()) //가장 최신 시간
+                .orElseThrow(() -> new IllegalArgumentException("해당 객체를 찾을 수 없습니다."));
 
     }
 
@@ -94,6 +94,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public void deleteByChannelId(UUID channelId) {
+
         boolean removed = readStatusMap.values().removeIf(readStatus -> readStatus.getChannelId().equals(channelId));
         if (!removed) {
             throw new IllegalArgumentException("해당 채널 ID에 해당하는 객체를 삭제할 수 없습니다.");
