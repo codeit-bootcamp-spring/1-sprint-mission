@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -78,9 +79,12 @@ public class DiscodeitApplication {
 		Channel PVChannel = channelService.createPrivateChannel(new PrivateChannelCreateDTO("비공개 채널", privateUserList));
 
 		System.out.println(PBChannel.getId());
-		System.out.println(PVChannel.getId());
-		System.out.println(user.getId());
 		System.out.println(user2.getId());
+
+		Message message = messageService.createMessage(
+				new MessageCreateDTO(user.getId(), PBChannel.getId(), "hello", null));
+		Message message2 = messageService.createMessage(
+				new MessageCreateDTO(user2.getId(), PBChannel.getId(), "what up", null));
 
 
 	}

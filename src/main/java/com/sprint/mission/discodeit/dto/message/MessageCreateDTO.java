@@ -9,6 +9,6 @@ public record MessageCreateDTO(
         UUID userId,
         UUID channelId,
         String content,
-        List<BinaryContent>binaryContentList
+        List<BinaryContent> binaryContentList
 ) {
 }
