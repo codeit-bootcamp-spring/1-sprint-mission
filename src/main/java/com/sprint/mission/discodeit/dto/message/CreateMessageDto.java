@@ -8,12 +8,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Getter
-@Setter
-public class CreateMessageDto {
-    @NotBlank private String userId;
-    @NotBlank @Size(min = 1, max = 1000) private String content;
-    private List<MultipartFile> multipart;
 
-    public CreateMessageDto() {}
+public record CreateMessageDto(
+    String content,
+    String channelId,
+    String authorId
+) {
 }

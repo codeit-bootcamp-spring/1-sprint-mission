@@ -4,11 +4,12 @@ import java.time.Instant;
 import java.util.List;
 
 public record MessageResponseDto(
-    String messageId,
-    String userId,
-    String channelId,
-    String content,
+    String id, // messageId
     Instant createdAt,
-    List<String> base64Data
+    Instant updatedAt,
+    String content,
+    String channelId,
+    String authorId,
+    List<String> attachmentIds
 ) {
 }

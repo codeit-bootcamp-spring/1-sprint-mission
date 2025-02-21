@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.facade.message;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -16,6 +17,9 @@ import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -30,18 +34,20 @@ public class CreateMessageFacadeImpl implements CreateMessageFacade{
   private final ChannelService channelService;
   private final EntityValidator validator;
   @Override
-  public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
-    User user = validator.findOrThrow(User.class, messageDto.getUserId(), new UserNotFoundException());
-    Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
+  public MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
+
+    User user = validator.findOrThrow(User.class, messageDto.authorId(), new UserNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
 
     channelService.validateUserAccess(channel, user.getUUID());
+    Message message = messageMapper.toEntity(messageDto, messageDto.channelId(), binaryContentMapper);
 
-    Message message = messageMapper.toEntity(messageDto, channelId, binaryContentMapper);
+    List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files, user.getUUID(), channel.getUUID(), message.getUUID());
+    List<String> ids = contents.stream().map(BinaryContent::getUUID).toList();
+    message.addBinaryContents(ids);
 
     messageService.createMessage(message);
-
-    binaryContentService.saveBinaryContentsForMessage(message.getUUID(), message.getBinaryContents());
-
+    binaryContentService.saveBinaryContentsForMessage(message.getUUID(), contents);
     return messageMapper.toResponseDto(message);
   }
 }

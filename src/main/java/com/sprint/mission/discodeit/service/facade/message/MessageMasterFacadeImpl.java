@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class MessageMasterFacadeImpl implements MessageMasterFacade {
   private final DeleteMessageFacade deleteMessageFacade;
 
   @Override
-  public MessageResponseDto createMessage(CreateMessageDto messageDto, String channelId) {
-    return createMessageFacade.createMessage(messageDto, channelId);
+  public MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
+    return createMessageFacade.createMessage(messageDto, files);
   }
 
   @Override

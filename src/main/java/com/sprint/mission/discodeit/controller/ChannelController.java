@@ -40,9 +40,9 @@ public class ChannelController {
 
 
   @DeleteMapping("/{channelId}")
-  public ResponseEntity<String> deleteChannel(@PathVariable String channelId) {
+  public ResponseEntity<Void> deleteChannel(@PathVariable String channelId) {
     channelMasterFacade.deleteChannel(channelId);
-    return ResponseEntity.ok("successfully deleted");
+    return ResponseEntity.status(204).build();
   }
 
 

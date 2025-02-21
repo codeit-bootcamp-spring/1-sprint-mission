@@ -9,20 +9,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class MessageController {
 
   private final MessageMasterFacade messageMasterFacade;
 
-  @PostMapping("/channels/{channelId}/messages")
-  public ResponseEntity<MessageResponseDto> sendMessage(@PathVariable String channelId, @ModelAttribute CreateMessageDto messageDto){
-    MessageResponseDto message = messageMasterFacade.createMessage(messageDto, channelId);
+  @PostMapping("/messages")
+  public ResponseEntity<MessageResponseDto> sendMessage(
+      @RequestPart(value = "messageCreateRequest") CreateMessageDto messageDto,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> files){
+    MessageResponseDto message = messageMasterFacade.createMessage(messageDto, files);
     return ResponseEntity.ok(message);
   }
 
@@ -39,8 +42,8 @@ public class MessageController {
     return ResponseEntity.ok("successfully deleted");
   }
 
-  @GetMapping("/channels/{channelId}/messages")
-  public ResponseEntity<List<MessageResponseDto>> getChannelMessages(@PathVariable String channelId){
+  @GetMapping("/messages")
+  public ResponseEntity<List<MessageResponseDto>> getChannelMessages(@RequestParam String channelId){
     List<MessageResponseDto> messages = messageMasterFacade.findMessagesByChannel(channelId);
     return ResponseEntity.ok(messages);
   }

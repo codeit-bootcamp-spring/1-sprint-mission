@@ -23,31 +23,11 @@ public interface MessageMapper {
   @Mapping(target = "isEdited", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
-  @Mapping(target = "channelId", source = "channelId")
-  @Mapping(target = "binaryContents", ignore = true)
   Message toEntity(CreateMessageDto dto, String channelId, @Context BinaryContentMapper binaryContentMapper);
 
-  @Mapping(target = "messageId", source = "UUID")
-  @Mapping(target = "userId", source = "userId")
-  @Mapping(target = "channelId", source = "channelId")
-  @Mapping(target = "content", source = "content")
-  @Mapping(target = "createdAt", source = "createdAt")
-  @Mapping(target = "base64Data", source = "binaryContents", qualifiedByName = "convertToBase64")
+  @Mapping(target = "id", source = "UUID")
   MessageResponseDto toResponseDto(Message message);
 
-  @AfterMapping
-  default void mapBinaryContents(
-      @MappingTarget Message.MessageBuilder messageBuilder,
-      CreateMessageDto dto,
-      String channelId,
-      @Context BinaryContentMapper binaryContentMapper) {
-
-    List<BinaryContent> binaryContents = (dto.getMultipart() != null && !dto.getMultipart().isEmpty())
-        ? binaryContentMapper.fromMessageFiles(dto.getMultipart(), dto.getUserId(), channelId, messageBuilder.getUUID())
-        : null;
-
-    messageBuilder.binaryContents(binaryContents);
-  }
 
   @Named("convertToBase64")
   default List<String> convertToBase64(List<BinaryContent> binaryContents) {

@@ -16,15 +16,14 @@ import java.util.Objects;
 public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
 
-
   private String UUID;
-  private String userId;
+  private String authorId;
   private String channelId;
   private String content;
   private Boolean isEdited;
   private Instant createdAt;
   private Instant updatedAt;
-  private List<BinaryContent> binaryContents;
+  private List<String> attachmentIds;
 
   public static class MessageBuilder{
     private String UUID =  UuidGenerator.generateUUID();
@@ -42,18 +41,18 @@ public class Message implements Serializable {
     this.updatedAt = Instant.now();
   }
 
-  public void addBinaryContents(List<BinaryContent> binaryContents){
-    this.binaryContents = binaryContents;
+  public void addBinaryContents(List<String> binaryContents){
+    this.attachmentIds = binaryContents;
     updatedAt = Instant.now();
   }
 
-  public void addBinaryContent(BinaryContent binaryContent) {
-    this.binaryContents.add(binaryContent);
+  public void addBinaryContent(String binaryContent) {
+    this.attachmentIds.add(binaryContent);
     updatedAt = Instant.now();
   }
 
-  public void removeBinaryContent(BinaryContent binaryContent) {
-    this.binaryContents.remove(binaryContent);
+  public void removeBinaryContent(String  binaryContent) {
+    this.attachmentIds.remove(binaryContent);
     updatedAt = Instant.now();
   }
 
@@ -65,7 +64,7 @@ public class Message implements Serializable {
   public String toString() {
     return "Message{"
         + "UUID='" + UUID + '\''
-        + ", userUUID='" + userId + '\''
+        + ", userUUID='" + authorId + '\''
         + ", channelUUID='" + channelId + '\''
         + ", content='" + content + '\''
         + '}';
