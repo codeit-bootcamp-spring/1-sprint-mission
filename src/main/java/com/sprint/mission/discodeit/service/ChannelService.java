@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
@@ -14,7 +15,7 @@ public interface ChannelService {
 
   List<Channel> findAllChannelsByUserId(String userId);
 
-  Channel updateChannel(String channelId, String channelName, int maxNumberOfPeople);
+  Channel updateChannel(String channelId, ChannelUpdateDto dto);
 
   void deleteChannel(String channelId);
 

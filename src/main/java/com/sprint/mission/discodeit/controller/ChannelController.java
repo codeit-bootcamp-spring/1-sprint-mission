@@ -32,16 +32,16 @@ public class ChannelController {
     return ResponseEntity.status(201).body(channel);
   }
 
-  @PatchMapping("/{id}")
-  public ResponseEntity<FindChannelResponseDto> updateChannel(@PathVariable String id, @RequestBody ChannelUpdateDto channelDto) {
-    FindChannelResponseDto channel = channelMasterFacade.updateChannel(id, channelDto);
+  @PatchMapping("/{channelId}")
+  public ResponseEntity<UpdateChannelResponseDto> updateChannel(@PathVariable String channelId, @RequestBody ChannelUpdateDto channelDto) {
+    UpdateChannelResponseDto channel = channelMasterFacade.updateChannel(channelId, channelDto);
     return ResponseEntity.ok(channel);
   }
 
 
-  @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteChannel(@PathVariable String id) {
-    channelMasterFacade.deleteChannel(id);
+  @DeleteMapping("/{channelId}")
+  public ResponseEntity<String> deleteChannel(@PathVariable String channelId) {
+    channelMasterFacade.deleteChannel(channelId);
     return ResponseEntity.ok("successfully deleted");
   }
 

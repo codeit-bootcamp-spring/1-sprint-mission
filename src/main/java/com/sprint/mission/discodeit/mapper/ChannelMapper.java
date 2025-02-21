@@ -49,6 +49,12 @@ public interface ChannelMapper {
   @Mapping(target = "lastMessagedAt", source = "lastMessagedAt")
   FindChannelResponseDto toFindChannelDto(Channel channel, Instant lastMessagedAt);
 
+
+  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "type", source = "channelType")
+  @Mapping(target = "name", source = "channelName")
+  UpdateChannelResponseDto toUpdateResponse(Channel channel);
+
 }
 
 

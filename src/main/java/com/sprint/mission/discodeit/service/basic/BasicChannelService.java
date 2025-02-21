@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel createPrivateChannel(Channel channel) {
     return channelRepository.save(channel);
-   }
+  }
 
 
   @Override
@@ -71,11 +71,11 @@ public class BasicChannelService implements ChannelService {
 
     List<Channel> allChannels = channelRepository.findAll();
 
-    return  allChannels.stream()
+    return allChannels.stream()
         .filter(channel -> !Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
             ||
             (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
-            && channel.getParticipatingUsers().contains(userId)))
+                && channel.getParticipatingUsers().contains(userId)))
         .toList();
 
   }
@@ -87,11 +87,10 @@ public class BasicChannelService implements ChannelService {
    *
    * @param channelId
    * @param channelName
-   * @param maxNumberOfPeople
    * @return
    */
   @Override
-  public Channel updateChannel(String channelId, String channelName, int maxNumberOfPeople) {
+  public Channel updateChannel(String channelId, ChannelUpdateDto dto) {
 
     Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
 
@@ -99,11 +98,9 @@ public class BasicChannelService implements ChannelService {
       throw new InvalidOperationException(PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
     }
 
-    synchronized (channel) {
-      channel.updateChannelName(channelName);
-
-      channel.updateUpdatedAt();
-    }
+    channel.updateChannelName(dto.newName());
+    channel.updateDescription(dto.newDescription());
+    channel.updateUpdatedAt();
 
     return channelRepository.update(channel);
   }

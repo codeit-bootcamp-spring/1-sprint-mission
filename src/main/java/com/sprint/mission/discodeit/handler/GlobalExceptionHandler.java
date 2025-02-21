@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.handler;
 
 import com.sprint.mission.discodeit.error.ErrorDetail;
 import com.sprint.mission.discodeit.error.ErrorResponse;
+import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,10 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(er);
   }
 
-  @ExceptionHandler(ValidationException.class)
+  @ExceptionHandler({ValidationException.class, InvalidOperationException.class})
   public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex){
     ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
   }
+
 }

@@ -40,6 +40,11 @@ public class Channel implements Serializable {
     updateUpdatedAt();
   }
 
+  public void updateDescription(String description){
+    this.description = description;
+    updateUpdatedAt();
+  }
+
 
 
   public void updateUpdatedAt() {

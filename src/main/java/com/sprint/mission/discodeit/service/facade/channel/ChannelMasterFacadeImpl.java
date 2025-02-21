@@ -36,7 +36,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   }
 
   @Override
-  public FindChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
+  public UpdateChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
     return updateChannelFacade.updateChannel(channelId, channelUpdateDto);
 
   }
