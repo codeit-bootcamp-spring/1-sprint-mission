@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
@@ -17,5 +18,9 @@ public record UserDto(UUID id,String password, Instant createdAt, Instant update
     }
     public UserDto(String userName, String password, String email, BinaryContentDto binaryContentDto) {
         this(null,password,  null, null, userName, email,  binaryContentDto,null);
+    }
+
+    public UserDto(User user, BinaryContentDto binaryContentDto) {
+        this(user.getId(),null, user.getCreatedAt(), user.getUpdatedAt(), user.getUserName(), user.getEmail(), binaryContentDto, user.getHashedPassword());
     }
 }

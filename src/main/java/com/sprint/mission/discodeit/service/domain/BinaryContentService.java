@@ -21,7 +21,7 @@ public class BinaryContentService {
     private final MessageRepository messageRepository;
 
     public BinaryContentDto save(BinaryContentDto binaryContentDto) {
-        if (binaryContentDto.domainId() == null || binaryContentDto.file() == null) {
+        if (binaryContentDto.domainId() == null || binaryContentDto.multipartFile() == null) {
             throw new IllegalStateException("도메인 아이디 혹은 파일이 잘못되었습니다.");
         }
         return new BinaryContentDto(binaryContentRepository.save(binaryContentDto));
@@ -40,24 +40,6 @@ public class BinaryContentService {
             }
             return binaryContentDtos;
         }
-        /*if (userRepository.findUserById(domainId) != null) {
-            //Domain -> User
-            List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
-            List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
-            for (BinaryContent binaryContent : binaryContents) {
-                binaryContentDtos.add(new BinaryContentDto(binaryContent));
-            }
-            return binaryContentDtos;
-        }
-        if (messageRepository.findMessagesById(domainId) != null) {
-            //Domain -> Message
-            List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
-            List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
-            for (BinaryContent binaryContent : binaryContents) {
-                binaryContentDtos.add(new BinaryContentDto(binaryContent));
-            }
-            return binaryContentDtos;
-        }*/
         throw new IllegalStateException("도메인을 찾을 수 없습니다.");
     }
 

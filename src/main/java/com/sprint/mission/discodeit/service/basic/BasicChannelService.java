@@ -78,6 +78,7 @@ public class BasicChannelService implements ChannelService {
         List<List<UUID>> userList = new ArrayList<>();
         for (Channel channel : channels) {
             if (channel.getType() == ChannelType.PRIVATE) {
+                if(readStatusRepository.findAllByChannelId(channel.getId())==null) { continue; }
                 //Private 채널에 참여한 User의 ID 정보 포함
                 List<ReadStatus> privateChannelUsers = readStatusRepository.findAllByChannelId(channel.getId());
                 userList.add(privateChannelUsers.stream().map(ReadStatus::getUserId).toList());

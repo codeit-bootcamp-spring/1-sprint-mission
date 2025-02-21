@@ -22,7 +22,7 @@ public class BinaryContentJcfRepositoryImpl implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContentDto binaryContentDto) {
-        BinaryContent binaryContent = new BinaryContent(binaryContentDto.domainId(), binaryContentDto.file());
+        BinaryContent binaryContent = new BinaryContent(binaryContentDto.domainId(), binaryContentDto.multipartFile());
         binaryContentMap.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
@@ -59,8 +59,8 @@ public class BinaryContentJcfRepositoryImpl implements BinaryContentRepository {
     public void update(UUID id, BinaryContentDto binaryContentDto) {
         //프로필 업데이트에 사용됨
         BinaryContent existBinaryContent = binaryContentMap.get(id);
-        if (existBinaryContent.getFile() != null) {
-            existBinaryContent = existBinaryContent.update(binaryContentDto.file());
+        if (existBinaryContent.getMultipartFile() != null) {
+            existBinaryContent = existBinaryContent.update(binaryContentDto.multipartFile());
         }
         binaryContentMap.replace(id, existBinaryContent);
     }

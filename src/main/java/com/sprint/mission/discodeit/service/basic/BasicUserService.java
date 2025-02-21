@@ -30,7 +30,8 @@ public class BasicUserService implements UserService {
         User savedUser = repository.save(paramUserDto.userName(), paramUserDto.password(), paramUserDto.email());
         UserStatus savedUserStatus = userStatusRepository.save(new UserStatusDto(savedUser.getId()));
         if( paramUserDto.binaryContentDto() != null ) { //User 당 하나의 프로필 가짐
-            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContentDto(savedUser.getId(), paramUserDto.binaryContentDto().file()));
+            BinaryContent savedBinaryContent = binaryContentRepository.save(new BinaryContentDto(savedUser.getId(), paramUserDto.binaryContentDto().multipartFile()));
+            return new UserDto(savedUser, new BinaryContentDto(savedBinaryContent.getId()));
         }
         return new UserDto(savedUser);
     }

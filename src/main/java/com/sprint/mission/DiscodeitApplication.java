@@ -21,10 +21,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class DiscodeitApplication {
 
-    public static void main(String[] args) throws InterruptedException {
+    /*public static void main(String[] args) throws InterruptedException {
         // 서비스 초기화
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
@@ -165,7 +165,7 @@ public class DiscodeitApplication {
         System.out.println("update readStatus : 메시지를 유저 아이디를 통해 찾을 떄 UserStatus 업데이트 ");
         messageService.findAllByUserId(user3).forEach(System.out::println);
         System.out.println("====================================================");
-        System.out.println("두 값의 ID값은 변하지 않고 나머지는 바뀔 수 있는데 위 예시는 ChannelId가 가장 먼저 확인할 수 있다.");
+        System.out.println("두 값의 ID 값은 변하지 않고 나머지는 바뀔 수 있는데 위 예시는 ChannelId가 가장 먼저 확인할 수 있다.");
         System.out.println("readStatusByUserId = " + readStatusByUserId);
         System.out.println("readStatusByUserId.size() = " + readStatusByUserId.size());
         System.out.println("====================================================");
@@ -232,6 +232,6 @@ public class DiscodeitApplication {
         } catch (IOException e) {
             System.err.println("❌ 파일 초기화 중 오류 발생: " + e.getMessage());
         }
-    }
+    }*/
 }
 
