@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -28,26 +29,17 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
 
     @Override
-    public ChannelResponseDto create(ChannelCreateRequestDto channelCreateRequestDto) {
-        if (channelCreateRequestDto.type() == ChannelType.PUBLIC) {
-            return createPublicChannel(channelCreateRequestDto);
-        }
-        return createPrivateChannel(channelCreateRequestDto);
+    public Channel create(PublicChannelCreateRequest channelCreateRequestDto) {
+        Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequestDto.name(), channelCreateRequestDto.introduction());
+
+        return channelRepository.save(channel);
     }
 
     @Override
-    public ChannelResponseDto createPublicChannel(ChannelCreateRequestDto channelCreateRequestDto) {
-        validator.validate(channelCreateRequestDto.name(), channelCreateRequestDto.introduction());
-        Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, channelCreateRequestDto.name(),channelCreateRequestDto.introduction()));
-        return getChannelInfo(channel, Instant.EPOCH);
-    }
+    public Channel create(PrivateChannelCreateRequest privateChannelCreateRequest) {
+        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
 
-    @Override
-    public ChannelResponseDto createPrivateChannel(ChannelCreateRequestDto channelCreateRequestDto) {
-        Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, channelCreateRequestDto.users()));
-        channelCreateRequestDto.users()
-                .forEach(user -> readStatusService.create(ReadStatusCreateDto.from(channel.getId(), user)));
-        return getChannelInfo(channel, Instant.EPOCH);
+        return channelRepository.save(channel);
     }
 
     @Override
@@ -93,7 +85,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(ChannelUpdateRequestDto channelUpdateRequestDto) {
+    public ChannelResponseDto update(PublicChannelUpdateRequest channelUpdateRequestDto) {
         validator.validate(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
         Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequestDto.id()))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));

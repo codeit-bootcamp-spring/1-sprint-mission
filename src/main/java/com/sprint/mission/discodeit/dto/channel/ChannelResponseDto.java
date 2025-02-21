@@ -12,9 +12,9 @@ public record ChannelResponseDto(
         String name,
         String introduction,
         Instant lastMessageTime,
-        List<UUID> users
+        List<UUID> participantIds
 ) {
-    public static ChannelResponseDto from(UUID id, ChannelType type, String name, String introduction, Instant lastMessageTime, List<UUID> users) {
-        return new ChannelResponseDto(id, type, name, introduction, lastMessageTime, users);
+    public static ChannelResponseDto from(UUID id, ChannelType type, String name, String introduction, Instant lastMessageTime, List<UUID> participantIds) {
+        return new ChannelResponseDto(id, type, name, introduction, lastMessageTime, participantIds);
     }
 }
