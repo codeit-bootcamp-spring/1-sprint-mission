@@ -14,10 +14,10 @@ public interface ChannelService {
     Channel create(PublicChannelCreateRequest publicChannelCreateRequest);
     Channel create(PrivateChannelCreateRequest privateChannelCreateRequest);
     ChannelResponseDto find(UUID channelId);
-    List<ChannelResponseDto> findAll();
     List<ChannelResponseDto> findAllByUserId(UUID userId);
     Instant findLastMessageTime(UUID channelId);
-    ChannelResponseDto getChannelInfo(Channel channel, Instant lastMessageTime);
+    List<UUID> findParticipantsIds(Channel channel);
+    ChannelResponseDto getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantsIds);
     ChannelResponseDto update(PublicChannelUpdateRequest channelUpdateRequestDto);
     void delete(UUID channelId);
 }
