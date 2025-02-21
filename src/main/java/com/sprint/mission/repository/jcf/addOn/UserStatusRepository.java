@@ -1,40 +1,23 @@
 package com.sprint.mission.repository.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.UserStatus;
-import com.sprint.mission.entity.main.User;
-import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@Repository
-public class UserStatusRepository {
+public interface UserStatusRepository {
+    UserStatus save(UserStatus userStatus);
 
-    private final Map<UUID, UserStatus> statusMap = new HashMap<>();
+    Optional<UserStatus> findById(UUID id);
 
-    public void save(UserStatus userStatus) {
-        statusMap.put(userStatus.getUserId(), userStatus);
-    }
+    Optional<UserStatus> findByUserId(UUID userId);
 
-    public Optional<UserStatus> findById(UUID userId) {
-        return Optional.of(statusMap.get(userId));
-    }
+    List<UserStatus> findAll();
 
-    public List<UserStatus> findAll() {
-        return new ArrayList<>(statusMap.values());
-    }
+    boolean existsById(UUID id);
 
-    public Boolean isExistById(UUID userId) {
-        return statusMap.get(userId) != null;
-    }
+    void deleteById(UUID id);
 
-    public void delete(UUID userId) {
-        statusMap.remove(userId);
-    }
-
-    public Map<User, UserStatus> findStatusMapByUser(List<User> userList) {
-        Map<User, UserStatus> userStatusMap = new HashMap<>();
-        userList.forEach(user ->
-                userStatusMap.put(user, statusMap.getOrDefault(user.getId(), null)));
-        return userStatusMap;
-    }
+    void deleteByUserId(UUID userId);
 }

@@ -2,25 +2,17 @@ package com.sprint.mission.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.dto.request.UserDtoForRequest;
-import com.sprint.mission.dto.request.UserDtoForRequest2;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.entity.addOn.BinaryProfileContent;
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.jcf.addOn.BinaryProfileService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
-import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
-import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,6 +89,13 @@ public class UserController {
         userService.delete(userId);
         return ResponseEntity.ok("Successfully deleted");
     }
+
+    //  사용자의 온라인 상태를 업데이트할 수 있다.
+    public ResponseEntity<String> updateStatus(@PathVariable("id") UUID userId) {
+        userStatusService.update(userId);
+        return ResponseEntity.ok("Successfully updated");
+    }
+
 
     private FindChannelDto getFindChannelDto(Channel findedChannel) {
         return (findedChannel.getChannelType().equals(ChannelType.PRIVATE)

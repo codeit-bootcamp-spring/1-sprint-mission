@@ -3,7 +3,6 @@ package com.sprint.mission.service.file;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.User;

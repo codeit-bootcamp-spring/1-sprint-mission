@@ -2,7 +2,6 @@ package com.sprint.mission.service.file;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.entity.main.Channel;
@@ -12,10 +11,10 @@ import com.sprint.mission.repository.file.main.FileChannelRepository;
 import com.sprint.mission.repository.file.main.FileMessageRepository;
 import com.sprint.mission.repository.file.main.FileUserRepository;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class FileMessageService implements MessageService{
     private final BinaryMessageService binaryMessageService;
 
     @Override
-    public void create(MessageDtoForCreate responseDto) {
+    public void create(MessageDtoForCreate responseDto, List<MultipartFile> attachments) {
         Channel writtenChannel = fileChannelRepository.findById(responseDto.getChannelId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
         User writer = fileUserRepository.findById(responseDto.getUserId())
@@ -54,7 +53,7 @@ public class FileMessageService implements MessageService{
     }
 
     @Override
-    public void update(MessageDtoForUpdate updateDto) {
+    public void update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = fileMessageRepository.findById(updateDto.getMessageId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
 

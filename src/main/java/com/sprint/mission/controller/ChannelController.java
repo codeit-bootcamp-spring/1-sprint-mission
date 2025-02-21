@@ -2,17 +2,11 @@ package com.sprint.mission.controller;
 
 
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
-import com.sprint.mission.dto.request.UserDtoForRequest;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
-import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
-import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.ChannelRepository;
-import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor

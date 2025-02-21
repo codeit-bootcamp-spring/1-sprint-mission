@@ -24,8 +24,10 @@ public class AuthService {
     //private final UserService userService; 나중에 ㄱ
     private final JCFUserRepository repository;
 
-    public FindUserDto isExistUserByNamePassword(LoginDtoForRequest dto) {
+    public FindUserDto login(LoginDtoForRequest dto) {
         List<User> allUser = repository.findAll();
+
+        // 예외처리 나중에
         return allUser.stream()
                 .filter((user) -> Objects.equals(dto.getName(), user.getName()) && Objects.equals(dto.getPassword(), user.getPassword()))
                 .findFirst()

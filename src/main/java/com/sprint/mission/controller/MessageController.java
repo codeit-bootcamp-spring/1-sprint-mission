@@ -1,15 +1,11 @@
 package com.sprint.mission.controller;
 
-import com.sprint.mission.dto.request.BinaryMessageContentDto;
-import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
-import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindMessageDto;
-import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
+import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
@@ -18,11 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -34,18 +32,25 @@ public class MessageController {
     private final JCFChannelService channelService;
     private final JCFMessageService messageService;
     private final JCFUserService userService;
-    private final BinaryMessageService binaryMessageService;
+    private final BinaryService binaryService;
 
     @PostMapping("/messages")
-    public ResponseEntity<String> save(@RequestBody MessageDtoForCreate requestDTO) {
-        messageService.create(requestDTO);
+    public ResponseEntity<String> save(@RequestPart("dto") MessageDtoForCreate requestDTO,
+                                       @RequestPart("attachments") List<MultipartFile> attachments) {
+
+
+        Optional<List<BinaryContentDto>> binaryContentDtoList = attachments.isEmpty()
+                ? Optional.of(attachments.stream().map(BinaryContentDto::filetoBinaryContentDto).toList())
+                : Optional.empty();
+
+        messageService.create(requestDTO, binaryContentDtoList);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("M created successfully");
     }
 
     // @GetMapping("/messages}") << body에 channelId 껴 넣는 방법
     @GetMapping("/channels/{channelId}/messages")
-    public ResponseEntity<List<FindMessageDto>> findByChannelId(@PathVariable UUID channelId) {
+    public ResponseEntity<List<FindMessageDto>> findInChannel(@PathVariable UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         List<FindMessageDto> messageDtoList = messageList.stream()
                 .map((FindMessageDto::new))
@@ -56,8 +61,7 @@ public class MessageController {
     @PatchMapping("/messages/{id}")
     public ResponseEntity<String> update(@PathVariable("id") UUID messageId,
                                          @RequestBody MessageDtoForUpdate requestDTO) {
-        requestDTO.setMessageId(messageId);
-        messageService.update(requestDTO);
+        messageService.update(messageId, requestDTO);
         return ResponseEntity.ok("Successfully updated");
     }
 

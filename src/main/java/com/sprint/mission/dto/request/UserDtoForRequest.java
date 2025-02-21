@@ -1,11 +1,9 @@
 package com.sprint.mission.dto.request;
 
-import com.sprint.mission.entity.addOn.BinaryProfileContent;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Data
 public class UserDtoForRequest {

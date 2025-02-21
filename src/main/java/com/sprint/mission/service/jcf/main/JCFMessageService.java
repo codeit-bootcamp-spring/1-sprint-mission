@@ -2,17 +2,16 @@ package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
-import com.sprint.mission.dto.request.BinaryMessageContentDto;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.BinaryMessageService;
+import com.sprint.mission.service.jcf.addOn.BinaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,38 +26,45 @@ public class JCFMessageService implements MessageService {
     private final JCFMessageRepository messageRepository;
     private final JCFChannelRepository channelRepository;
     private final JCFUserRepository userRepository;
-    private final BinaryMessageService binaryMessageService;
-
+    private final BinaryService binaryService;
 
     @Override
-    public void create(MessageDtoForCreate responseDto) {
-        Channel writtenChannel = channelRepository.findById(responseDto.getChannelId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
-        User writer = userRepository.findById(responseDto.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-
-        // 첨부파일 미포함 메시지
-        Message createdMessage = Message.createMessage(writtenChannel, writer, responseDto.getContent());
-
-        // 첨부파일 적용
-        List<byte[]> bmc = responseDto.getAttachments();
-        if (!bmc.isEmpty()) {
-            createdMessage.setAttachments(bmc);
-            binaryMessageService.create(new BinaryMessageContentDto(createdMessage.getId(), bmc));
+    public void create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
+        UUID channelId = responseDto.getChannelId();
+        UUID userId = responseDto.getUserId();
+        if(!channelRepository.existsById(channelId)){
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        writtenChannel.updateLastMessageTime();
-        channelRepository.save(writtenChannel);
 
+        if(!userRepository.existsById(userId)){
+            throw new CustomException(ErrorCode.NO_SUCH_USER);
+        }
+
+        Message createdMessage = Message.createMessage(channelId, userId, responseDto.getContent());
+
+        if (!attachmentsDto.isEmpty()) {
+            List<BinaryContentDto> binaryContentDtoList = attachmentsDto.get();
+            for (BinaryContentDto binaryContentDto : binaryContentDtoList) {
+                BinaryContent createdBinaryContent = binaryService.create(binaryContentDto);
+                createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
+            }
+        }
+        //writtenChannel.updateLastMessageTime();
+        //channelRepository.save(writtenChannel);
         messageRepository.save(createdMessage);
     }
 
     @Override
-    public void update(MessageDtoForUpdate updateDto) {
-        Message updatingMessage = messageRepository.findById(updateDto.getMessageId())
+    public void update(UUID messageId, MessageDtoForUpdate updateDto) {
+        binaryMessageService.delete(messageId);
+
+        Message updatingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
 
-        updatingMessage.setContent(updateDto.getChangeContent());
-        // 메시지 binary data는 수정 불가
+        updatingMessage.setContent(updateDto.getContent());
+        updatingMessage.setAttachments(updateDto.getBinaryContentList());
+        binaryMessageService.create(new BinaryMessageContentDto(messageId, updateDto.getBinaryContentList()));
+
         // 수정해도 채널의 lastMessageTime은 불변?
         messageRepository.save(updatingMessage);
     }

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.time.Instant;
 
+// DTO
 @Data
 @Builder
 public class ErrorResponse {
