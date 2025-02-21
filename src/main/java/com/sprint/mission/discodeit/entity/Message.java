@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,18 +33,17 @@ public class Message implements Serializable {
   private String channelUUID;
   private String content;
   private Boolean isEdited;
-  private Long createdAt;
-  private Long updatedAt;
-  private String contentImage;
+  private final Instant createdAt;
+  private Instant updatedAt;
+  private String binaryContentId; // TODO: 삭제
   private String threadUUID;
-  private Map<String, Reactions> messageReactions;
 
   private Message(MessageBuilder builder) {
     this.UUID = builder.UUID;
     this.userUUID = builder.userUUID;
     this.channelUUID = builder.channelUUID;
     this.content = builder.content;
-    this.contentImage = builder.contentImage;
+    this.binaryContentId = builder.binaryContentId;
     this.threadUUID = builder.threadUUID;
     this.isEdited = builder.isEdited;
     this.createdAt = builder.createdAt;
@@ -56,10 +56,10 @@ public class Message implements Serializable {
     private final String channelUUID;
     private final String content;
     private Boolean isEdited = false;
-    private String contentImage = "";
+    private String binaryContentId = "";
     private String threadUUID = "";
-    private Long createdAt = System.currentTimeMillis();
-    private Long updatedAt = System.currentTimeMillis();
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
 
     public MessageBuilder(String userUUID, String channelUUID, String content) throws MessageValidationException {
       if (userUUID == null || channelUUID == null || content == null) {
@@ -71,8 +71,8 @@ public class Message implements Serializable {
       this.content = content;
     }
 
-    public MessageBuilder contentImage(String contentImage) {
-      this.contentImage = contentImage == null ? "" : contentImage;
+    public MessageBuilder binaryContentId(String binaryContentId) {
+      this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
       return this;
     }
 
@@ -89,11 +89,11 @@ public class Message implements Serializable {
   public void setContent(String content) {
     this.content = content;
     this.isEdited = true;
-    this.updatedAt = System.currentTimeMillis();
+    this.updatedAt = Instant.now();
   }
 
-  public void setContentImage(String contentImage) {
-    this.contentImage = contentImage == null ? "" : contentImage;
+  public void setContentImage(String binaryContentId) {
+    this.binaryContentId = binaryContentId == null ? "" : binaryContentId;
   }
 
   public void setIsEdited() {
@@ -107,7 +107,7 @@ public class Message implements Serializable {
         ", userUUID='" + userUUID + '\'' +
         ", channelUUID='" + channelUUID + '\'' +
         ", content='" + content + '\'' +
-        ", contentImage='" + contentImage + '\'' +
+        ", contentImage='" + binaryContentId + '\'' +
         '}';
   }
 }

@@ -1,9 +1,15 @@
-# Spring 백엔드 트랙 1기 스프린트 미션 제출 리포지토리
+## Spring 핵심 개념 이해하기
 
-### User
+JavaApplication: 기존의 수동 객체 생성 방식
 
-- [ ] 사용자를 생성할 수 있다
-- [ ] 사용자를 저장하고 불러올 수 있다
-- [ ] 사용자의 이메일 중복을 검증할 수 있다
-- [ ] 사용자의 전화번호 중복을 검증할 수 있다
+- 기존의 JavaApplication 은 객체를 직접 생성하거나, 팩토리를 활용하여 수동으로 생성및 의존성 주입을 해주었다
+- 객체간의 의존성을 직접 관리해야 하는 불편함이 있었다. 
+
+DiscodeitApplication: Spring의 IoC 컨테이너 & DI 활용 방식
+
+- Spring 이 객체를 Bean 으로 등록
+- Spring IoC 컨테이너가 객체를 자동으로 관리
+- DI 를 활용하여 개발자가 의존성을 직접 주입하는 것이 아닌 Spring 의 autowired 혹은 RequiredArgsConstructor 를 사용하여 자동 주입
+- application.yaml 과 @ConditionalOnProperty 를 사용하여 자동으로 구현체를 환경에 맞게 변경
+- 
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.constant;
 
 public class UserConstant {
+  public static final String DEFAULT_PROFILE_PICTURE = "https://default-profile-pic.com";
   public static final int USERNAME_MIN_LENGTH = 2;
   public static final int USERNAME_MAX_LENGTH = 100;
   public static final int PASSWORD_MIN_LENGTH = 5;
@@ -16,4 +17,5 @@ public class UserConstant {
   public static final String PASSWORD_MATCH_ERROR = "비밀번호가 일치하지 않습니다.";
   public static final String DUPLICATE_EMAIL = "중복된 이메일 입니다.";
   public static final String DUPLICATE_PHONE = "중복된 번호입니다.";
+  public static final String DUPLICATE_NICKNAME = "중복된 nickname 입니다.";
 }

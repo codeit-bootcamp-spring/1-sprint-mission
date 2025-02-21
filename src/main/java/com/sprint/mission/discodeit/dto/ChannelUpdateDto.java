@@ -1,36 +1,25 @@
 package com.sprint.mission.discodeit.dto;
 
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+
 import java.util.Optional;
 
+@Getter
 public class ChannelUpdateDto {
-  private Optional<String> channelName = Optional.empty();
-  private Optional<Integer> maxNumberOfPeople = Optional.empty();
-  private Optional<String> tag = Optional.empty();
-  private Optional<Boolean> isPrivate = Optional.empty();
+  @NotNull
+  private String channelId;
+  @NotBlank
+  @Size(min = 2, max = 10)
+  private String channelName;
+  @Min(1)
+  @Max(50)
+  private Integer maxNumberOfPeople;
 
-  public ChannelUpdateDto(Optional<String> channelName,
-                          Optional<Integer> maxNumberOfPeople,
-                          Optional<String> tag,
-                          Optional<Boolean> isPrivate) {
+
+  public ChannelUpdateDto(String channelId, String channelName, Integer maxNumberOfPeople) {
+    this.channelId = channelId;
     this.channelName = channelName;
     this.maxNumberOfPeople = maxNumberOfPeople;
-    this.tag = tag;
-    this.isPrivate = isPrivate;
-  }
-
-  public Optional<String> getChannelName() {
-    return channelName;
-  }
-
-  public Optional<Integer> getMaxNumberOfPeople() {
-    return maxNumberOfPeople;
-  }
-
-  public Optional<String> getTag() {
-    return tag;
-  }
-
-  public Optional<Boolean> getIsPrivate() {
-    return isPrivate;
   }
 }

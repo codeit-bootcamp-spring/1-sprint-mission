@@ -1,6 +1,9 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.FileException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
@@ -8,9 +11,9 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 
 import java.io.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
@@ -47,29 +50,41 @@ public class FileUserService implements UserService {
   }
 
   @Override
-  public User createUser(User user) {
+  public User createUser(CreateUserDto userDto) {
 
-    if (!validateUser(user)) {
+    User user = null;
+    if (!validateUserDuplicateField(userDto.username(), userDto.email(), userDto.phoneNumber())) {
       throw new UserValidationException();
     }
 
     try {
-      user.setPassword(PasswordEncryptor.hashPassword(user.getPassword()));
+
+      user = new User.UserBuilder(
+          userDto.username(),
+          PasswordEncryptor.hashPassword(userDto.password()),
+          userDto.email(),
+          userDto.phoneNumber()
+      )
+          .nickname(userDto.nickname())
+          .binaryContentId(userDto.binaryContentId())
+          .description(userDto.description())
+          .build();
+
       saveUserToFile(user);
     } catch (FileException e) {
-      e.printStackTrace();
+      throw new UserValidationException();
     }
 
     return user;
   }
 
   @Override
-  public Optional<User> readUserById(String id) {
+  public UserResponseDto findUserById(String id) {
     return loadAllUser().stream().filter(u -> u.getUUID().equals(id)).findAny();
   }
 
   @Override
-  public List<User> readAllUsers() {
+  public List<UserResponseDto> findAllUsers() {
     return loadAllUser();
   }
 
@@ -86,15 +101,16 @@ public class FileUserService implements UserService {
     }
 
     synchronized (targetUser) {
+
       updatedUser.getUsername().ifPresent(targetUser::setUsername);
       updatedUser.getPassword().map(PasswordEncryptor::hashPassword).ifPresent(targetUser::setPassword);
       updatedUser.getEmail().ifPresent(targetUser::setEmail);
       updatedUser.getNickname().ifPresent(targetUser::setNickname);
       updatedUser.getPhoneNumber().ifPresent(targetUser::setPhoneNumber);
-      updatedUser.getProfilePictureURL().ifPresent(targetUser::setProfilePictureURL);
+      updatedUser.getProfileBinaryContentId().ifPresent(targetUser::setBinaryContentId);
       updatedUser.getDescription().ifPresent(targetUser::setDescription);
 
-      targetUser.setUpdatedAt(System.currentTimeMillis());
+      targetUser.setUpdatedAt(Instant.now());
     }
     saveUserToFile(users);
   }
@@ -115,12 +131,12 @@ public class FileUserService implements UserService {
     }
   }
 
-  private boolean validateUser(User user) {
+  private boolean validateUserDuplicateField(String username, String email, String phoneNumber) {
     List<User> users = loadAllUser();
     return users.stream().noneMatch(existingUser ->
-        existingUser.getUsername().equals(user.getUsername())
-            || existingUser.getEmail().equals(user.getEmail())
-            || existingUser.getPhoneNumber().equals(user.getPhoneNumber())
+        existingUser.getUsername().equals(username)
+            || existingUser.getEmail().equals(email)
+            || existingUser.getPhoneNumber().equals(phoneNumber)
     );
   }
 
@@ -167,3 +183,4 @@ public class FileUserService implements UserService {
   }
 
 }
+*/

@@ -1,32 +1,22 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class JCFMessageRepository implements MessageRepository {
+@Repository
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
+public class JCFMessageRepository implements MessageRepository{
 
-  private static volatile JCFMessageRepository instance;
+  private final Map<String, Message> data = new ConcurrentHashMap<>();
 
-  private final Map<String, Message> data;
-
-  private JCFMessageRepository() {
-    this.data = new ConcurrentHashMap<>();
-  }
-
-  public static JCFMessageRepository getInstance() {
-    if (instance == null) {
-      synchronized (JCFMessageRepository.class) {
-        if (instance == null) {
-          instance = new JCFMessageRepository();
-        }
-      }
-    }
-    return instance;
-  }
 
   @Override
   public Message create(Message message) {
@@ -61,6 +51,19 @@ public class JCFMessageRepository implements MessageRepository {
   @Override
   public void delete(String id) {
     data.remove(id);
+  }
+
+  @Override
+  public void deleteByChannel(String channelId) {
+    data.values().removeIf(message -> message.getChannelUUID().equals(channelId));
+  }
+
+  @Override
+  public Message findLatestChannelMessage(String channelId){
+    return data.values().stream()
+        .filter(m -> m.getChannelUUID().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt))
+        .orElse(null);
   }
 
   @Override

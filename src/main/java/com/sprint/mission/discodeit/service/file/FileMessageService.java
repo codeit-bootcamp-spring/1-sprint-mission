@@ -1,12 +1,13 @@
+/*
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.dto.MessageUpdateDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChatChannel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.MessageValidationException;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageServiceV2;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
@@ -15,9 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
-import static com.sprint.mission.discodeit.constant.FileConstant.USER_FILE;
 
-public class FileMessageService implements MessageServiceV2<ChatChannel> {
+public class FileMessageService implements MessageService {
   private static volatile FileMessageService messageRepository;
   private UserService userService;
   private ChannelService channelService;
@@ -59,8 +59,8 @@ public class FileMessageService implements MessageServiceV2<ChatChannel> {
     return message;
   }
 
-  private boolean checkChannelExists(ChatChannel channel){
-    return channelService.getChannelById(channel.getUUID()).isPresent();
+  private boolean checkChannelExists(Channel channel){
+    return channelService.getChannelById(channel.getUUID()).;
   }
 
   @Override
@@ -97,7 +97,7 @@ public class FileMessageService implements MessageServiceV2<ChatChannel> {
   }
 
   private boolean checkUserExists(String userId) {
-    return userService.readUserById(userId).isPresent();
+    return userService.findUserById(userId).isPresent();
   }
   private void saveMessageToFile(Message message){
     List<Message> messages = loadAllMessages();
@@ -137,3 +137,4 @@ public class FileMessageService implements MessageServiceV2<ChatChannel> {
     }
   }
 }
+*/
