@@ -102,6 +102,7 @@ public class BasicUserService implements UserService {
                 user.getUsername(),
                 user.getEmail(),
                 online,
+                user.getBinaryContentId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
