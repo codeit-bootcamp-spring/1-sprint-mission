@@ -29,14 +29,14 @@ public class ChannelController {
     //공개 채널 생성
     @PostMapping
     public String createPublicChannel(@RequestBody ChannelCreateDTO channelCreateDTO) {
-        channelService.createPublicChannel(channelCreateDTO, ChannelType.PUBLIC);
+        channelService.createPublicChannel(channelCreateDTO);
         return "Public channel created";
     }
     
     //비공개 채널 생성
     @PostMapping("/private")
     public String createPrivateChannel(@RequestBody ChannelCreateDTO channelCreateDTO) {
-        channelService.createPublicChannel(channelCreateDTO, ChannelType.PRIVATE);
+        channelService.createPublicChannel(channelCreateDTO);
         return "Private channel created";
     }
 

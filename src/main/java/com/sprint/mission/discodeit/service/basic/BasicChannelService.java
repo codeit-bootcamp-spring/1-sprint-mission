@@ -37,7 +37,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
 
     @Override
-    public Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
+    public Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO) {
         Channel channel = new Channel(channelCreateDTO, ChannelType.PRIVATE);
 
         createReadStatus(channel, channelCreateDTO);
@@ -46,10 +46,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
+    public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO) {
         Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
-
-        createReadStatus(channel, channelCreateDTO);
         return channelRepository.save(channel);
     }
 
@@ -58,7 +56,7 @@ public class BasicChannelService implements ChannelService {
         List<UUID> userIDList = channelCreateDTO.userList();
         for(UUID uuid :userIDList){
             System.out.println("ReadStatus created");
-            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid ), isChannelExist(channel.getId()));
+            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid ));
         }
     }
 

@@ -34,6 +34,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return userStatus;
     }
 
+    
+    //TODO Sprint 3 null 예외 사항 처리하기
     @Override
     public UserStatus findByUserId(UUID userId) {
         if (userId == null) {

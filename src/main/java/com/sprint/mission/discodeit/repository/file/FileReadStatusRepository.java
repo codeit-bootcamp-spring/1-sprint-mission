@@ -29,6 +29,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     }
 
+
     @Override
     public List<UUID> findAllUserIdByChannelId(UUID uuid) {
         return List.of();
@@ -43,6 +44,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public Instant findLatestTimeByChannelId(UUID channeId) {
         return null;
     }
+
+    @Override
+    public boolean existByChannelId(UUID uuid) {
+        return false;
+    }
+
 
     @Override
     public void deleteByChannelId(UUID id) {

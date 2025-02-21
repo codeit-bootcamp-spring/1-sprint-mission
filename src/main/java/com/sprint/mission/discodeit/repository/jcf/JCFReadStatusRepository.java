@@ -76,6 +76,13 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     }
 
+    @Override
+    public boolean existByChannelId(UUID uuid) {
+        return readStatusMap.values().stream()
+            .anyMatch(readStatus -> readStatus.getChannelId().equals(uuid));
+    }
+
+
     //delete
     @Override
     public void delete(UUID id) {

@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +12,10 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class UserStatus {
+public class UserStatus implements Serializable {
+
+    private static final Long serialVersionUID = 1L;
+
     //사용자의 마지막 접속 시간 표현-> 온라인 상태 확인
     private UUID id;
     private final Instant createdAt;
@@ -19,14 +23,12 @@ public class UserStatus {
 
     private final UUID userId;
     private Instant lastAccessedAt;
-    private Boolean onlineStatus;
 
     public UserStatus(UUID userId){
         this.id=UUID.randomUUID();
         this.userId=userId;
         this.createdAt = Instant.now();
         this.lastAccessedAt=Instant.now();
-        this.onlineStatus=isOnline();
     }
 
     public UserStatus(UserStatusCreateDTO userStatusCreateDTO) {
@@ -36,19 +38,17 @@ public class UserStatus {
 
         this.userId=userStatusCreateDTO.userId();
         this.lastAccessedAt=userStatusCreateDTO.lastAccessedAt();
-        this.onlineStatus=isOnline();
     }
 
-    //유저 온라인 상태 반환. 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 판별하는 메서드.
+    //유저 온라인 상태를 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 검증하고 반환하는 메서드.
     public Boolean isOnline(){
         if (lastAccessedAt != null) {
             Duration duration = Duration.between(lastAccessedAt, Instant.now());
             if (duration.toMinutes() <= 5){
-                onlineStatus=true;
+                return true;
             }
-            else onlineStatus=false;
         }
-        return onlineStatus;
+        return false;
     }
 
     public void update(UserStatusUpdateDTO userStatusUpdateDTO) {

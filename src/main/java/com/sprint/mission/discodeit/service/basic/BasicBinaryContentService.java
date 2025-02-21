@@ -13,7 +13,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
 public class BasicBinaryContentService implements BinaryContentService {
-    final private BinaryContentRepository binaryContentRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public BinaryContent create(BinaryContentCreateDTO binaryContentCreateDTO) {
