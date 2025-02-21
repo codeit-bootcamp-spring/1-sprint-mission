@@ -14,7 +14,6 @@ import java.util.UUID;
  User 마다 여러 개의 ReadStatus를 가질 수 있다고 상정합니다.
  하나의 채널에 하나의 ReadStatus를 가집니다.
 
-
  ! ReadStatus lastMessageReadTime 시간 이후의 createdAt된 Messages 는 읽지 않은 메세지이다. !
 
  **/
@@ -24,20 +23,18 @@ public class ReadStatus extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private UUID id;
     private UUID userId;
     private UUID channelId;
-    private Instant lastMessageReadTime; // 마지막으로 읽은 메시지의 시각
+    private Instant lastMessageReadAt; // 마지막으로 읽은 메시지의 시각
 
     public ReadStatus(UUID userId, UUID channelId){
-        this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
-        this.lastMessageReadTime = Instant.now();
+        this.lastMessageReadAt = Instant.now();
     }
 
-    public void refrashLastMessageReadTime(){
-        this.lastMessageReadTime = Instant.now();
+    public void refreshLastMessageReadTime(){
+        this.lastMessageReadAt = Instant.now();
     }
 
 }

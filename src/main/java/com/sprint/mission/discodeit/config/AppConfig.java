@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     // UserRepository Bean 등록
+    // 현업에서는 환경별(profile - test,dev,prod,local 등)로 빈주입
+
     @Bean
     // matchIfMissing : 설정이 없거나
     @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
@@ -77,12 +79,12 @@ public class AppConfig {
     //BinaryContentRepository Bean 등록
     @Bean
     @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
-    public BinaryContentRepository BinaryContentRepositoryJcf(){
+    public BinaryContentRepository binaryContentRepositoryJcf(){
         return new JCFBinaryContentRepository();
     }
     @Bean
     @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-    public BinaryContentRepository BinaryContentRepositoryFile(){
+    public BinaryContentRepository binaryContentRepositoryFile(){
         return new FileBinaryContentRepository();
     }
 

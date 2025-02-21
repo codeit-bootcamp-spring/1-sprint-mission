@@ -19,9 +19,10 @@ public class UserStatus extends BaseEntity implements Serializable {
     private Instant now;
     private Instant lastConnectTime;
 
-    public UserStatus(Instant lastConnectTime){
+    public UserStatus(UUID userId, Instant lastConnectTime){
         this.isOnline = false;
         this.now = Instant.now();
+        this.userId = userId;
         this.lastConnectTime = lastConnectTime;
     }
 

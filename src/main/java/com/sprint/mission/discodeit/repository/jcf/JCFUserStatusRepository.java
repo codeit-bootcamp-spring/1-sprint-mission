@@ -31,7 +31,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
         return userStatuses.values().stream()
-                .filter( userStatus -> userStatus.equals(userId) )
+                .filter( userStatus -> userStatus.getUserId().equals(userId) )
                 .findFirst();
     }
 
@@ -43,5 +43,12 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     @Override
     public void deleteById(UUID userStatusId) {
         userStatuses.remove(userStatusId);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .forEach(userStatus -> deleteByUserId(userStatus.getId()));
     }
 }

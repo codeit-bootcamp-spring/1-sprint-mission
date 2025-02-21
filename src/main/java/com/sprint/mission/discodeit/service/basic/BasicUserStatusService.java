@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserStatusUpdateByUserIdRequest;
+import com.sprint.mission.discodeit.dto.user.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -11,26 +11,30 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserStatusServiceImpl implements UserStatusService {
+public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserStatus createUserStatus(UserStatusCreateRequest userStatusCreateRequest) {
-        UserStatus userStatus = new UserStatus(userStatusCreateRequest.lastConnectTime());
+    public UserStatus createUserStatus(UserStatusCreateRequest request) {
+        UserStatus userStatus = new UserStatus(request.userId(), request.lastConnectAt());
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus findUserStatusById(UUID userStatusId) {
         return userStatusRepository.findById(userStatusId)
-                .orElseGet(() -> {
-                    System.out.println("No " + userStatusId + " UserStatus");
-                    return null;
-                });
+                .orElseThrow(()->new NoSuchElementException("UserStatus가 존재하지 않습니다."));
+    }
+
+    @Override
+    public UserStatus findUserStatusByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(()->new NoSuchElementException("userId가 " + userId + " 인 UserStatus가 존재하지 않습니다."));
     }
 
     @Override
@@ -55,15 +59,12 @@ public class UserStatusServiceImpl implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateUserStatusByUserId(UUID userId, Instant lastConnectTime) {
+    public UserStatus updateUserStatusByUserId(UUID userId, UserStatusUpdateByUserIdRequest userStatusUpdateByUserIdRequest) {
         UserStatus userStatus =
                 userStatusRepository.findByUserId(userId)
-                .orElseGet(()->{
-                    System.out.println("No " + userId + " UserStatus");
-                    return null;
-                });
+                .orElseThrow(() -> new NoSuchElementException("userStatus가 존재하지 않습니다."));
 
-        userStatus.refreshLastConnectTime(lastConnectTime);
+        userStatus.refreshLastConnectTime(userStatusUpdateByUserIdRequest.lastConnectTime());
         userStatus.refreshNow();
         userStatus.refreshUpdateAt();
         return userStatus;
@@ -72,5 +73,10 @@ public class UserStatusServiceImpl implements UserStatusService {
     @Override
     public void deleteUserStatusById(UUID userStatusId) {
         userStatusRepository.deleteById(userStatusId);
+    }
+
+    @Override
+    public void delteUserStatusByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
     }
 }

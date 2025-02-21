@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -27,7 +27,8 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public UUID createPublicChannel(ChannelPublicRequest channelPublicRequest) {
+    public ChannelPublicResponse createPublicChannel(ChannelPublicRequest channelPublicRequest) {
+
         Channel channel = new Channel(channelPublicRequest.type(),
                 channelPublicRequest.ownerId(),
                 channelPublicRequest.channelName(),
@@ -36,12 +37,20 @@ public class BasicChannelService implements ChannelService {
 
         ChannelUser channelUser = new ChannelUser(channel.getId(), channelPublicRequest.ownerId());
         channelUserService.addUserToChannel(channelUser);  // owner channel의 사용자로 추가
-        
-        return channel.getId();
+
+        // channel에서 찾아오는 게 순서적으로 맞을까 고민했는데,
+        // 그러면 다시 한번 찾는 작업을 해야하니 바로 request로
+        ChannelPublicResponse channelPublicResponse = new ChannelPublicResponse(
+                channelPublicRequest.type(),
+                channelPublicRequest.ownerId(),
+                channelPublicRequest.channelName(),
+                channelPublicRequest.description());
+
+        return channelPublicResponse;
     }
 
     @Override
-    public UUID createPrivateChannel(ChannelPrivateRequest channelPrivateRequest) {
+    public ChannelPrivateResponse createPrivateChannel(ChannelPrivateRequest channelPrivateRequest) {
         Channel channel = new Channel(
                 channelPrivateRequest.type(),
                 channelPrivateRequest.ownerId(),
@@ -59,64 +68,68 @@ public class BasicChannelService implements ChannelService {
         ChannelUser channelUser = new ChannelUser(channel.getId(), channelPrivateRequest.ownerId());
         channelUserService.addUserToChannel(channelUser);  // owner channel의 사용자로 추가
 
-        return channel.getId();
+        ChannelPrivateResponse channelPrivateResponse = new ChannelPrivateResponse(
+                channelPrivateRequest.type(),
+                channelPrivateRequest.ownerId()
+        );
+        return channelPrivateResponse;
     }
 
     @Override
-    public Collection<ChannelFindAllResponse> findAllByUserId(UUID userId){
-            // 너무 복잡한가요?
-            // 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가
+    public Collection<ChannelFindAllResponse> findAllByUserId(UUID userId) {
+        // 너무 복잡한가요?
+        // 특정 User가 볼 수 있는 Channel 목록을 조회하도록 조회 조건을 추가
 
-            List<ChannelFindAllResponse> responseChannels;
+        List<ChannelFindAllResponse> responseChannels;
 
-            // (1) User 가 포함돼 있는 PRIVATE 타입의 채널이 있다면
-            // (2) PRIVATE 채널을 보여준다
+        // (1) User 가 포함돼 있는 PRIVATE 타입의 채널이 있다면
+        // (2) PRIVATE 채널을 보여준다
 
-            List<Channel> channels =
-            channelUserService.findChannelByUserId(userId).stream()
-                    .map(channelRepository::findChannelById)
-                    .flatMap(Optional::stream)
-                    .toList();
-            List<Channel> privateChannels =
-            channels.stream()
-                    .filter(channel -> channel.getType().equals(ChannelType.PRIVATE))
-                    .toList();
+        List<Channel> channels =
+                channelUserService.findChannelByUserId(userId).stream()
+                        .map(channelRepository::findChannelById)
+                        .flatMap(Optional::stream)
+                        .toList();
+        List<Channel> privateChannels =
+                channels.stream()
+                        .filter(channel -> channel.getType().equals(ChannelType.PRIVATE))
+                        .toList();
 
-            responseChannels =
-                    privateChannels.stream().map( channel -> new ChannelFindAllResponse(
-                            channel,
+        responseChannels =
+                privateChannels.stream().map(channel -> new ChannelFindAllResponse(
+                        channel,
 
-                            channelUserService.findUserByChannelId(channel.getId()),
+                        channelUserService.findUserByChannelId(channel.getId()),
 
-                            messageRepository.findMessagesByChannelId(channel.getId()).stream()
-                                    .max(Comparator.comparing(Message::getCreatedAt))
-                                    .map(Message::getCreatedAt)
-                                    .orElse(null)
-                    )).toList();
+                        messageRepository.findMessagesByChannelId(channel.getId()).stream()
+                                .max(Comparator.comparing(Message::getCreatedAt))
+                                .map(Message::getCreatedAt)
+                                .orElse(null)
+                )).toList();
 
-            // (3) PUBLIC 채널을 전부 보여주는 메서드
+        // (3) PUBLIC 채널을 전부 보여주는 메서드
 
-            List<ChannelFindAllResponse> publicChannels =
-                    channelRepository.getAllChannels().stream()
-                            .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
-                            .map(channel -> new ChannelFindAllResponse(
-                                    channel,
-                                    null,
-                                    messageRepository.findMessagesByChannelId(channel.getId()).stream()
-                                            .max(Comparator.comparing(Message::getCreatedAt))
-                                            .map(Message::getCreatedAt)
-                                            .orElse(null)
-                            )).toList();
+        List<ChannelFindAllResponse> publicChannels =
+                channelRepository.getAllChannels().stream()
+                        .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
+                        .map(channel -> new ChannelFindAllResponse(
+                                channel,
+                                null,
+                                messageRepository.findMessagesByChannelId(channel.getId()).stream()
+                                        .max(Comparator.comparing(Message::getCreatedAt))
+                                        .map(Message::getCreatedAt)
+                                        .orElse(null)
+                        )).toList();
 
 
-            return Stream.concat(responseChannels.stream(), publicChannels.stream()).toList();
+        return Stream.concat(responseChannels.stream(), publicChannels.stream()).toList();
     }
 
     @Override
     public ChannelFindResponse getChannelById(UUID id) {
         // 특정 채널을 불러오기
         Channel channel = channelRepository.findChannelById(id)
-                .orElseThrow(()-> new NoSuchElementException("해당 채널이 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("해당 채널이 없습니다."));
 
         Optional<Message> latestMessage = messageRepository.findMessagesByChannelId(id).stream()
                 .max(Comparator.comparing(Message::getCreatedAt));
@@ -134,20 +147,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void updateChannel(ChannelUpdateRequest channelUpdateRequest) {
-        Optional<Channel> channelOptional = channelRepository.findChannelById(channelUpdateRequest.id());
+    public void updateChannel(UUID id, ChannelUpdateRequest channelUpdateRequest) {
+        Optional<Channel> channelOptional = channelRepository.findChannelById(id);
 
-        Channel channel = channelOptional.orElseThrow( () -> new NoSuchElementException("채널을 찾을 수 없습니다."));
+        Channel channel = channelOptional.orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다."));
 
-        if(channel.getType() == ChannelType.PRIVATE){
+        if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalStateException("PRIVATE 채널은 수정할 수 없습니다.");
         } // 예외 종류 좀 더 알아보기
 
         // mock은 일단 제거
 
-        System.out.println("new ChannelName :");
         channel.setChannelName(channelUpdateRequest.newName());
-        System.out.println("new Description :");
         channel.setDescription(channelUpdateRequest.newDescription());
 
         // 수정 시간 업데이트
@@ -159,7 +170,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteChannelById(UUID id) {
         String keyword = inputHandler.getYesNOInput().toLowerCase();
-        if(keyword.equals("y")){
+        if (keyword.equals("y")) {
             // 메시지 관리를 별도 서비스로 분리해보는 건 어떻겠냐 리뷰를 받았었는데,
             // 당장은 이렇게 findMessagesByChannelId() 를 messageRepository 에 추가해 해결해봤습니다.
             // Channel-User 처럼 도메인을 만들 생각을 하니까,
@@ -167,7 +178,7 @@ public class BasicChannelService implements ChannelService {
             // 더 좋은 방법이 있을까요?
 
             List<UUID> messageIds =
-            messageRepository.findMessagesByChannelId(id).stream()
+                    messageRepository.findMessagesByChannelId(id).stream()
                             .map(BaseEntity::getId)
                             .toList();
 
@@ -175,9 +186,9 @@ public class BasicChannelService implements ChannelService {
             messageIds.forEach(messageRepository::deleteMessageById);
 
             List<UUID> readStatuseIds =
-            readStatusService.findAllByChannelId(id).stream()
-                    .map(ReadStatus::getId)
-                    .toList();
+                    readStatusService.findAllByChannelId(id).stream()
+                            .map(ReadStatus::getId)
+                            .toList();
 
             readStatuseIds.forEach(readStatusService::deleteReadStatusById);
 

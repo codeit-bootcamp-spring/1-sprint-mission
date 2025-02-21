@@ -70,30 +70,6 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        try{
-            return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map( path -> {
-                        try(
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                                ){
-                            return (BinaryContent) ois.readObject();
-                        }catch (IOException | ClassNotFoundException e){
-                            throw new RuntimeException("Error reading BinaryContent : " + path, e);
-                        }
-                    })
-                    // binaryContent가 null이 아니고, binaryContent의 userId가 null이 아니며,
-                    // binaryContent의 userId가 현재 찾고 있는 userId와 동일할 때
-                    .filter(binaryContent -> binaryContent != null && binaryContent.getUserId() != null && binaryContent.getUserId().equals(userId))
-                    .findFirst();
-        }catch (IOException e){
-            throw new RuntimeException("Error Directroy : " + DIRECTORY, e);
-        }
-    }
-
-    @Override
     public List<BinaryContent> findAll() {
         try{
             return Files.list(DIRECTORY)

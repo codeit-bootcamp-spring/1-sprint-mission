@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,7 +18,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     // 폴더 주소
     private final Path CHANNELS_PATH;
-    private final String EXETENSION = ".ser";
+    private final String EXTENSION = ".ser";
 
     public FileChannelRepository(){
         this.CHANNELS_PATH = Paths.get(System.getProperty("user.dir"), "file-data-map", "crs",Channel.class.getSimpleName());
@@ -33,7 +32,7 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    private Path resolvePath(UUID id) {return CHANNELS_PATH.resolve(id + EXETENSION);}
+    private Path resolvePath(UUID id) {return CHANNELS_PATH.resolve(id + EXTENSION);}
 
     public Channel saveFile(Path path, Channel channel){
         try(
@@ -74,7 +73,7 @@ public class FileChannelRepository implements ChannelRepository {
     public Collection<Channel> getAllChannels(){
         try{
             return Files.list(CHANNELS_PATH)
-                    .filter(path -> path.toString().endsWith(EXETENSION))
+                    .filter(path -> path.toString().endsWith(EXTENSION))
                     // 람다 표현식 -> 메서드 참조
                     .map(this::loadFile)
                     .toList();
