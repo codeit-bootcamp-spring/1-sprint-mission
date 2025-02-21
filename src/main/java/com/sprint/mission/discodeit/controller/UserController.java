@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.api.UserAPI;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserCreate;
 import com.sprint.mission.discodeit.dto.user.UserDto;
@@ -14,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,51 +22,71 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@RestController
-@RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController implements UserAPI {
+@Controller
+@ResponseBody
+@RequestMapping("/api/user")
+public class UserController {
+
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<User> createUser(@RequestPart UserCreate userCreate, @RequestPart(value = "profile", required = false)MultipartFile multipartFile) {
-       Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(multipartFile).flatMap(this::resolveProfileRequest);
-       User createUser = userService.createUser(userCreate, profileRequest);
-       return ResponseEntity.status(HttpStatus.CREATED).body(createUser);
+    @RequestMapping(
+            path = "create",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public ResponseEntity<User> createUser(
+            @RequestPart("userCreateRequest") UserCreate userCreate,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
+        Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
+                .flatMap(this::resolveProfileRequest);
+        User createdUser = userService.createUser(userCreate, profileRequest);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(createdUser);
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUserById(@PathVariable UUID userId) {
-        UserDto userDto = userService.findById(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(userDto);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.findAll();
-        return ResponseEntity.status(HttpStatus.OK).body(users);
-    }
-
-    @PatchMapping(value = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<User> updateUser(@PathVariable UUID userId, @RequestBody UserUpdate userUpdate, @RequestBody(required = false) MultipartFile profile) {
+    @RequestMapping(
+            path = "update",
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    public ResponseEntity<User> updateUser(
+            @RequestParam("userId") UUID userId,
+            @RequestPart("userUpdateRequest") UserUpdate userUpdate,
+            @RequestPart(value = "profile", required = false) MultipartFile profile
+    ) {
         Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
                 .flatMap(this::resolveProfileRequest);
         User updatedUser = userService.update(userId, userUpdate, profileRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUser);
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId){
+    @RequestMapping(path = "delete")
+    public ResponseEntity<Void> deleteUser(@RequestParam("userId") UUID userId) {
         userService.delete(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
-    //userStatus
-    @PutMapping("/{userId}/status")
-    public ResponseEntity<UserStatus> updateUserStatus(@PathVariable UUID userId, @RequestBody UserStatusUpdate userStatusUpdate) {
-        UserStatus updateStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
-        return ResponseEntity.status(HttpStatus.OK).body(updateStatus);
+    @RequestMapping(path = "findAll")
+    public ResponseEntity<List<UserDto>> findAll() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(users);
+    }
+
+    @RequestMapping(path = "updateUserStatusByUserId")
+    public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
+                                                               @RequestBody UserStatusUpdate userStatusUpdate) {
+        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(updatedUserStatus);
     }
 
     private Optional<BinaryContentCreateDto> resolveProfileRequest(MultipartFile profileFile) {
@@ -74,12 +94,12 @@ public class UserController implements UserAPI {
             return Optional.empty();
         } else {
             try {
-                BinaryContentCreateDto binaryContentCreateDto = new BinaryContentCreateDto(
+                BinaryContentCreateDto binaryContentCreateRequest = new BinaryContentCreateDto(
                         profileFile.getOriginalFilename(),
                         profileFile.getContentType(),
                         profileFile.getBytes()
                 );
-                return Optional.of(binaryContentCreateDto);
+                return Optional.of(binaryContentCreateRequest);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
