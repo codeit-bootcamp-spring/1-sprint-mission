@@ -23,7 +23,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/user-list.html", "/styles.css", "/script.js").permitAll() // ✅ 정적 리소스 허용
                         .requestMatchers("/api/users/**").permitAll() // ✅ 사용자 API 인증 없이 허용
-                        .requestMatchers("/api/messages/**").authenticated() // ✅ 메시지 API는 인증 필요
+                        .requestMatchers("/api/channels/**").permitAll() // ✅ 채널 API 인증 없이 허용
+                        .requestMatchers("/api/messages/**").permitAll() // ✅ 메시지 API 인증 없이 허용 (수정됨)
                         .anyRequest().authenticated() // ✅ 나머지 요청은 인증 필요
                 )
                 .formLogin(form -> form.disable()) // ✅ 기본 로그인 페이지 비활성화

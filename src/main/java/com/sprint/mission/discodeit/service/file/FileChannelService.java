@@ -45,7 +45,8 @@ public class FileChannelService implements ChannelService {
 
     @Override
     public List<ChannelDTO> readAll() {
-        return channelRepository.findAll().stream()
+        List<Channel> channels = channelRepository.findAll();
+        return channels.stream()
                 .map(channel -> new ChannelDTO(
                         channel.getId(),
                         channel.getName(),
@@ -77,7 +78,7 @@ public class FileChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
     }
 
-    // ✅ 채널 정보 수정 메서드 추가
+    // ✅ 채널 정보 수정 메서드 수정
     @Override
     public void update(UUID channelId, ChannelUpdateDTO channelUpdateDTO) {
         Optional<Channel> optionalChannel = channelRepository.findById(channelId);
@@ -98,7 +99,7 @@ public class FileChannelService implements ChannelService {
         }
     }
 
-    // ✅ 특정 사용자가 볼 수 있는 채널 목록 조회 메서드 추가
+    // ✅ 특정 사용자가 볼 수 있는 채널 목록 조회 메서드 수정
     @Override
     public List<ChannelDTO> getChannelsForUser(UUID userId) {
         return channelRepository.findAll().stream()
