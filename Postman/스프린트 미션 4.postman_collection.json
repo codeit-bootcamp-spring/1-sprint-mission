@@ -1,0 +1,1349 @@
+{
+	"info": {
+		"_postman_id": "705ea16e-6f15-40d9-8850-8ce30c342f80",
+		"name": "스프린트 미션 4",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29695569"
+	},
+	"item": [
+		{
+			"name": "사용자 등록",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"user\",\n  \"email\": \"test@test.com\",\n  \"password\": \"test1234\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"testUser\",\n  \"email\": \"test@example.com\",\n  \"profileId\": null,\n  \"online\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"register"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 07:58:11 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": \"5943d53a-c4a8-4d24-aa99-553226bc1c08\",\n    \"username\": \"testUser\",\n    \"email\": \"test@example.com\",\n    \"profileId\": null,\n    \"online\": true,\n    \"createdAt\": \"2025-02-20T07:58:11.169791Z\",\n    \"updatedAt\": \"2025-02-20T07:58:11.169803Z\"\n}"
+				}
+			]
+		},
+		{
+			"name": "모든 사용자 조회",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 07:59:56 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": \"5943d53a-c4a8-4d24-aa99-553226bc1c08\",\n        \"username\": \"testUser\",\n        \"email\": \"test@example.com\",\n        \"profileId\": null,\n        \"online\": true,\n        \"createdAt\": \"2025-02-20T07:58:11.169791Z\",\n        \"updatedAt\": \"2025-02-20T07:58:11.169803Z\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "특정 사용자 조회",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "id",
+						"value": "5943d53a-c4a8-4d24-aa99-553226bc1c08",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8080/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "id",
+								"value": "5943d53a-c4a8-4d24-aa99-553226bc1c08",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://localhost:8080/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:02:24 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": \"5943d53a-c4a8-4d24-aa99-553226bc1c08\",\n        \"username\": \"testUser\",\n        \"email\": \"test@example.com\",\n        \"profileId\": null,\n        \"online\": true,\n        \"createdAt\": \"2025-02-20T07:58:11.169791Z\",\n        \"updatedAt\": \"2025-02-20T07:58:11.169803Z\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "사용자 정보 수정",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"username\": \"updatedUser\",\n  \"email\": \"updated@example.com\",\n  \"profileId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"online\": false\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/5943d53a-c4a8-4d24-aa99-553226bc1c08",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"5943d53a-c4a8-4d24-aa99-553226bc1c08"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "id",
+								"value": "5943d53a-c4a8-4d24-aa99-553226bc1c08",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"updatedUser\",\n  \"email\": \"updated@example.com\",\n  \"profileId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"online\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/users/5943d53a-c4a8-4d24-aa99-553226bc1c08",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"5943d53a-c4a8-4d24-aa99-553226bc1c08"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:04:06 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": \"5943d53a-c4a8-4d24-aa99-553226bc1c08\",\n    \"username\": \"updatedUser\",\n    \"email\": \"updated@example.com\",\n    \"profileId\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"online\": false,\n    \"createdAt\": \"2025-02-20T07:58:11.169791Z\",\n    \"updatedAt\": \"2025-02-20T08:04:06.576411Z\"\n}"
+				}
+			]
+		},
+		{
+			"name": "온라인 상태 업데이트",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/5943d53a-c4a8-4d24-aa99-553226bc1c08/status?status=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"5943d53a-c4a8-4d24-aa99-553226bc1c08",
+						"status"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "204 No Content",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/5943d53a-c4a8-4d24-aa99-553226bc1c08/status?status=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"5943d53a-c4a8-4d24-aa99-553226bc1c08",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:05:59 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "사용자 삭제",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/123e4567-e89b-12d3-a456-426614174000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"123e4567-e89b-12d3-a456-426614174000"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "204 No Content",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/users/123e4567-e89b-12d3-a456-426614174000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"users",
+								"123e4567-e89b-12d3-a456-426614174000"
+							]
+						}
+					},
+					"status": "No Content",
+					"code": 204,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:06:49 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "메시지 전송",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"content\": \"Hello, this is a test message!\",\n  \"channel\": {\n    \"id\": 2\n  },\n  \"user\": {\n    \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\"\n  }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Hello, this is a test message!\",\n  \"channel\": {\n    \"id\": 2\n  },\n  \"user\": {\n    \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\"\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/messages",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"messages"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:51:23 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"content\": \"Hello, this is a test message!\",\n    \"channel\": {\n        \"id\": 2,\n        \"name\": null,\n        \"user\": null,\n        \"private\": false\n    },\n    \"user\": {\n        \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n        \"username\": null,\n        \"email\": null,\n        \"profileId\": null,\n        \"online\": false,\n        \"createdAt\": null,\n        \"updatedAt\": null\n    },\n    \"createdAt\": \"2025-02-20T09:51:23.905277Z\"\n}"
+				}
+			]
+		},
+		{
+			"name": "특정 채널의 메시지 목록 조회",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/messages/channel/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"messages",
+						"channel",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/messages/channel/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"messages",
+								"channel",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:52:20 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 2,\n        \"content\": \"Hello, this is a test message!\",\n        \"channel\": {\n            \"id\": 2,\n            \"name\": \"general\",\n            \"user\": {\n                \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n                \"username\": \"testUser\",\n                \"email\": \"test@example.com\",\n                \"profileId\": null,\n                \"online\": true,\n                \"createdAt\": \"2025-02-20T09:50:13.018048Z\",\n                \"updatedAt\": \"2025-02-20T09:50:13.018059Z\"\n            },\n            \"private\": false\n        },\n        \"user\": {\n            \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n            \"username\": \"testUser\",\n            \"email\": \"test@example.com\",\n            \"profileId\": null,\n            \"online\": true,\n            \"createdAt\": \"2025-02-20T09:50:13.018048Z\",\n            \"updatedAt\": \"2025-02-20T09:50:13.018059Z\"\n        },\n        \"createdAt\": \"2025-02-20T09:51:23.905277Z\"\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "메시지 수정",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"Updated message content\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/messages/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"messages",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"Updated message content\"",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/messages/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"messages",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:53:49 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"content\": \"\\\"Updated message content\\\"\",\n    \"channel\": {\n        \"id\": 2,\n        \"name\": \"general\",\n        \"user\": {\n            \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n            \"username\": \"testUser\",\n            \"email\": \"test@example.com\",\n            \"profileId\": null,\n            \"online\": true,\n            \"createdAt\": \"2025-02-20T09:50:13.018048Z\",\n            \"updatedAt\": \"2025-02-20T09:50:13.018059Z\"\n        },\n        \"private\": false\n    },\n    \"user\": {\n        \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n        \"username\": \"testUser\",\n        \"email\": \"test@example.com\",\n        \"profileId\": null,\n        \"online\": true,\n        \"createdAt\": \"2025-02-20T09:50:13.018048Z\",\n        \"updatedAt\": \"2025-02-20T09:50:13.018059Z\"\n    },\n    \"createdAt\": \"2025-02-20T09:51:23.905277Z\"\n}"
+				}
+			]
+		},
+		{
+			"name": "메세지 삭제",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/messages/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"messages",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/messages/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"messages",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Content-Length",
+							"value": "0"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:54:33 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "메시지 수신 정보 생성",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"message\": {\n    \"id\": 4\n  },\n  \"user\": {\n    \"id\": \"e2a9b4da-4e64-43b5-b53d-766077eb64ef\"\n  },\n  \"received\": true\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/receipts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"receipts"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"message\": {\n    \"id\": 4\n  },\n  \"user\": {\n    \"id\": \"e2a9b4da-4e64-43b5-b53d-766077eb64ef\"\n  },\n  \"received\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/receipts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"receipts"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:56:51 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"message\": {\n        \"id\": 4,\n        \"content\": null,\n        \"channel\": null,\n        \"user\": null,\n        \"createdAt\": null\n    },\n    \"user\": {\n        \"id\": \"e2a9b4da-4e64-43b5-b53d-766077eb64ef\",\n        \"username\": null,\n        \"email\": null,\n        \"profileId\": null,\n        \"online\": false,\n        \"createdAt\": null,\n        \"updatedAt\": null\n    },\n    \"received\": true\n}"
+				}
+			]
+		},
+		{
+			"name": "특정 사용자의 메시지 수신 정보 조회",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/receipts/user/e2a9b4da-4e64-43b5-b53d-766077eb64ef",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"receipts",
+								"user",
+								"e2a9b4da-4e64-43b5-b53d-766077eb64ef"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 09:58:07 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 2,\n        \"message\": {\n            \"id\": 4,\n            \"content\": \"Hello, this is a test message!\",\n            \"channel\": {\n                \"id\": 2,\n                \"name\": \"general\",\n                \"user\": {\n                    \"id\": \"030409b7-f966-4895-93ba-3a9eb9af030a\",\n                    \"username\": \"testUser\",\n                    \"email\": \"test@example.com\",\n                    \"profileId\": null,\n                    \"online\": true,\n                    \"createdAt\": \"2025-02-20T09:50:13.018048Z\",\n                    \"updatedAt\": \"2025-02-20T09:50:13.018059Z\"\n                },\n                \"private\": false\n            },\n            \"user\": {\n                \"id\": \"e2a9b4da-4e64-43b5-b53d-766077eb64ef\",\n                \"username\": \"testUser1\",\n                \"email\": \"test1@example.com\",\n                \"profileId\": null,\n                \"online\": true,\n                \"createdAt\": \"2025-02-20T09:56:18.812909Z\",\n                \"updatedAt\": \"2025-02-20T09:56:18.812915Z\"\n            },\n            \"createdAt\": \"2025-02-20T09:56:44.472798Z\"\n        },\n        \"user\": {\n            \"id\": \"e2a9b4da-4e64-43b5-b53d-766077eb64ef\",\n            \"username\": \"testUser1\",\n            \"email\": \"test1@example.com\",\n            \"profileId\": null,\n            \"online\": true,\n            \"createdAt\": \"2025-02-20T09:56:18.812909Z\",\n            \"updatedAt\": \"2025-02-20T09:56:18.812915Z\"\n        },\n        \"received\": true\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "채널 생성",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"general\",\n  \"isPrivate\": false,\n  \"user\": {\n    \"id\": \"a82db833-878c-4959-88f1-2fea8ac62908\"\n  }\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/channels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"channels"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"general\",\n  \"isPrivate\": false,\n  \"user\": {\n    \"id\": \"a82db833-878c-4959-88f1-2fea8ac62908\"\n  }\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/channels",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channels"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:39:08 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"name\": \"general\",\n    \"user\": {\n        \"id\": \"a82db833-878c-4959-88f1-2fea8ac62908\",\n        \"username\": null,\n        \"email\": null,\n        \"profileId\": null,\n        \"online\": false,\n        \"createdAt\": null,\n        \"updatedAt\": null\n    },\n    \"private\": false\n}"
+				}
+			]
+		},
+		{
+			"name": "모든 채널 조회",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/channels",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"channels"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/channels",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channels"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:40:28 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"id\": 2,\n        \"name\": \"general\",\n        \"user\": {\n            \"id\": \"a82db833-878c-4959-88f1-2fea8ac62908\",\n            \"username\": \"testUser\",\n            \"email\": \"test@example.com\",\n            \"profileId\": null,\n            \"online\": true,\n            \"createdAt\": \"2025-02-20T08:38:49.651634Z\",\n            \"updatedAt\": \"2025-02-20T08:38:49.651658Z\"\n        },\n        \"private\": false\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "채널 수정",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"updated_channel\",\n  \"isPrivate\": true\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/channels/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"channels",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"updated_channel\",\n  \"isPrivate\": true\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/channels/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channels",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:42:08 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"id\": 2,\n    \"name\": \"updated_channel\",\n    \"user\": {\n        \"id\": \"a82db833-878c-4959-88f1-2fea8ac62908\",\n        \"username\": \"testUser\",\n        \"email\": \"test@example.com\",\n        \"profileId\": null,\n        \"online\": true,\n        \"createdAt\": \"2025-02-20T08:38:49.651634Z\",\n        \"updatedAt\": \"2025-02-20T08:38:49.651658Z\"\n    },\n    \"private\": false\n}"
+				}
+			]
+		},
+		{
+			"name": "채널 삭제",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/channels/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"channels",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/channels/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"channels",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Content-Length",
+							"value": "0"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 20 Feb 2025 08:42:51 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": null
+				}
+			]
+		},
+		{
+			"name": "파일 다운로드",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/files/ee7ec40f-ea90-4c71-a00b-e17c613dd5e2_진이.jpeg",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"files",
+						"ee7ec40f-ea90-4c71-a00b-e17c613dd5e2_진이.jpeg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "파일 업로드",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "postman-cloud:///1eff017a-8a69-4c20-96f2-47f33ceafb5d"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/files/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"files",
+						"upload"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 OK",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1eff017a-8a69-4c20-96f2-47f33ceafb5d"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/files/upload",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"files",
+								"upload"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "text/plain;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "48"
+						},
+						{
+							"key": "Date",
+							"value": "Fri, 21 Feb 2025 06:35:44 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "File uploaded successfully: 진이.jpeg"
+				}
+			]
+		}
+	]
+}

@@ -1,43 +1,66 @@
-.gradle
+# 빌드 폴더
+.gradle/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!src/main/main/**/build/
-!**/src/test/**/build/
 
-### IntelliJ IDEA ###
-.idea
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+# IDE 설정 파일
+.idea/
 *.iws
 *.iml
 *.ipr
-out/
-!src/main/main/**/out/
-!**/src/test/**/out/
-
-### Eclipse ###
-.apt_generated
 .classpath
-.factorypath
 .project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!src/main/main/**/bin/
-!**/src/test/**/bin/
+.settings/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
+# OS 및 에디터 관련 파일
+.DS_Store
+Thumbs.db
 .vscode/
 
-### Mac OS ###
-.DS_Store
+# 환경설정 파일 (비밀정보)
+application.yaml
+application.properties
+.env
+config.json
+
+# 데이터베이스 및 로그
+*.db
+*.sqlite
+logs/
+*.log
+
+# 업로드 및 캐시 파일
+#uploads/
+temp/
+
+# 패키지 매니저
+node_modules/
+package-lock.json
+yarn.lock
+__pycache__/
+*.pyc
+
+# 실행 파일
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.out
+*.exe
+*.dll
+*.bat
+
+
+bin/
+
+gradlew/
+gradlew
+gradlew.*
+settings.gradle
+gradle/
+build.gradle
+HELP.md
+
+out/
+*.ser
+
+application.yml
