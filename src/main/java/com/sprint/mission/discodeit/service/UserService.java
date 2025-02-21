@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponseDto create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto);
+    User create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto);
     UserResponseDto find(UUID userId);
     List<UserResponseDto> findAll();
     UserResponseDto getUserInfo(User user);
-    UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto);
+    User update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto);
     void delete(UUID userId);
     void validateDuplicateName(String name);
     void validateDuplicateEmail(String email);

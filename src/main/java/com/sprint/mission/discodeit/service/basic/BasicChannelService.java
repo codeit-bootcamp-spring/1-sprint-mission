@@ -93,15 +93,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(PublicChannelUpdateRequest channelUpdateRequestDto) {
+    public Channel update(PublicChannelUpdateRequest channelUpdateRequestDto) {
         validator.validate(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
         Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequestDto.id()))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         channel.update(channelUpdateRequestDto.name(), channelUpdateRequestDto.introduction());
-        channelRepository.save(channel);
-
-        return getChannelInfo(channel, findLastMessageTime(channel.getId()));
+        return channelRepository.save(channel);
     }
 
     @Override

@@ -32,16 +32,16 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
-    public UserResponseDto create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+    public User create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userRequestDto.name(), userRequestDto.email());
         validateDuplicateName(userRequestDto.name());
         validateDuplicateEmail(userRequestDto.email());
 
         BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
         User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
-        UserStatus userStatus = userStatusService.create(UserStatusCreateDto.from(user.getId()));
+        userStatusService.create(UserStatusCreateDto.from(user.getId()));
 
-        return UserResponseDto.from(user, binaryContent, userStatus.calculateOnlineStatus());
+        return user;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
+    public User update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
         validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());
         User user = Optional.ofNullable(userRepository.find(userUpdateRequestDto.userId()))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
@@ -82,7 +82,7 @@ public class BasicUserService implements UserService {
         user.update(userUpdateRequestDto.name(), userUpdateRequestDto.email(), userUpdateRequestDto.password());
         userRepository.save(user);
 
-        return UserResponseDto.from(user, binaryContentService.find(user.getBinaryContentId()), userStatusService.findByUserId(user.getId()).calculateOnlineStatus());
+        return user;
     }
 
     @Override

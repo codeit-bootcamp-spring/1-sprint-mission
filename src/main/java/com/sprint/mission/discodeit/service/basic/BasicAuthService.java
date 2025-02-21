@@ -14,16 +14,15 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserService userService;
     private final UserRepository userRepository;
 
     @Override
-    public UserResponseDto login(LoginDto loginDto) {
+    public User login(LoginDto loginDto) {
         User user = userRepository.findByName(loginDto.name());
         if (user == null || !user.isSamePassword(loginDto.password())) {
             throw new NoSuchElementException("[ERROR] 잘못된 정보입니다.");
         }
 
-        return userService.getUserInfo(user);
+        return user;
     }
 }

@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto) {
+    public Message create(MessageCreateRequestDto messageCreateRequestDto) {
         if (!userRepository.existsById(messageCreateRequestDto.authorId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
@@ -42,12 +42,11 @@ public class BasicMessageService implements MessageService {
         List<UUID> binaryContentData = messageCreateRequestDto.binaryContentData().stream()
                 .map(binaryContentRequestDto -> binaryContentService.create(binaryContentRequestDto).getId())
                 .toList();
-        Message message = messageRepository.save(new Message(messageCreateRequestDto.content(),
+
+        return messageRepository.save(new Message(messageCreateRequestDto.content(),
                 messageCreateRequestDto.authorId(),
                 messageCreateRequestDto.channelId(),
                 binaryContentData));
-
-        return getMessageInfo(message);
     }
 
     @Override
@@ -82,13 +81,11 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponseDto update(MessageUpdateRequestDto messageUpdateRequestDto) {
+    public Message update(MessageUpdateRequestDto messageUpdateRequestDto) {
         Message message = messageRepository.find(messageUpdateRequestDto.id());
-
         message.updateContent(messageUpdateRequestDto.content());
-        messageRepository.save(message);
 
-        return getMessageInfo(message);
+        return messageRepository.save(message);
     }
 
     @Override
