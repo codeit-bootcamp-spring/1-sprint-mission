@@ -1,0 +1,20 @@
+{
+  "db728265-89ac-45bf-bff3-ebf89ce43a82": {
+    "id": "db728265-89ac-45bf-bff3-ebf89ce43a82",
+    "createdAt": 1740109755.072125900,
+    "updatedAt": null,
+    "username": "test",
+    "email": "test@gmail.com",
+    "password": "qwer1234!",
+    "profileId": "edfbd0f6-c2ae-49dc-951f-2788d85357fc"
+  },
+  "48433220-4b3e-42ea-8ee5-59366c524681": {
+    "id": "48433220-4b3e-42ea-8ee5-59366c524681",
+    "createdAt": 1740114626.772652800,
+    "updatedAt": null,
+    "username": "test2",
+    "email": "test2@gmail.com",
+    "password": "qwer1234!",
+    "profileId": "2dd3eb55-0db2-4398-b1ac-6f86ed16d485"
+  }
+}

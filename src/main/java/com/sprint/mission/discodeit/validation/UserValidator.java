@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.validation;
 
 import static com.sprint.mission.discodeit.util.UserRegex.EMAIL_REGEX;
 import static com.sprint.mission.discodeit.util.UserRegex.PASSWORD_REGEX;
-import static com.sprint.mission.discodeit.util.UserRegex.PHONE_NUMBER_REGEX;
 import static com.sprint.mission.discodeit.util.UserRegex.USERNAME_REGEX;
 
 import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
