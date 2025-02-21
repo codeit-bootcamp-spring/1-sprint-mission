@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ValidationException.class)
   public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex){
-    ErrorResponse er = new ErrorResponse(new ErrorDetail( HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);
   }
 }

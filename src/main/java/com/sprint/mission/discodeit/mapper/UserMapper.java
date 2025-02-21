@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
+import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
+import com.sprint.mission.discodeit.util.UserStatusType;
 import org.mapstruct.*;
 
 import java.time.Instant;
@@ -18,34 +20,26 @@ public interface UserMapper {
   @Mapping(target = "username", source = "dto.username")
   @Mapping(target = "password", expression = "java(PasswordEncryptor.hashPassword(dto.password()))")
   @Mapping(target = "email", source = "dto.email")
-  @Mapping(target = "nickname", source = "dto.nickname")
-  @Mapping(target = "phoneNumber", source = "dto.phoneNumber")
-  @Mapping(target = "description", source = "dto.description")
-  @Mapping(target = "profileImage", ignore = true)
+  @Mapping(target = "profileId", ignore = true)
   @Mapping(target = "status", ignore = true)
-  User toEntity(CreateUserRequest dto, @Context BinaryContentMapper binaryContentMapper);
+  User toEntity(CreateUserRequest dto);
 
 
-  @Mapping(target = "userId", source = "user.UUID")
-  @Mapping(target = "username", source = "user.username")
-  @Mapping(target = "email", source = "user.email")
-  @Mapping(target = "nickname", source = "user.nickname")
-  @Mapping(target = "phoneNumber", source = "user.phoneNumber")
-  @Mapping(target = "createdAt", source = "user.createdAt")
-  @Mapping(target = "userStatus", source = "userStatus.userStatus")
-  @Mapping(target = "lastOnlineAt", source = "userStatus.lastOnlineAt")
-  @Mapping(target = "description", source = "user.description")
-  @Mapping(target = "profilePictureBase64", expression = "java(BinaryContentUtil.convertToBase64(profile))")
-  UserResponseDto toDto(User user, UserStatus userStatus, BinaryContent profile);
+  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "createdAt", source = "createdAt")
+  @Mapping(target = "updatedAt", source = "updatedAt")
+  @Mapping(target = "username", source = "username")
+  @Mapping(target = "email", source = "email")
+  @Mapping(target = "profileId", source = "profileId")
+  @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
+  UserResponseDto toDto(User user);
 
-  @AfterMapping
-  default void mapProfilePicture(
-      @MappingTarget User.UserBuilder userBuilder,
-      CreateUserRequest dto,
-      @Context BinaryContentMapper binaryContentMapper
-  ){
-    BinaryContent profile = binaryContentMapper.toProfileBinaryContent(dto.profileImage(), userBuilder.getUUID());
-    userBuilder.status(new UserStatus(userBuilder.getUUID(), Instant.now()));
-    userBuilder.profileImage(profile);
+  @Mapping(target = "id", source = "UUID")
+  CreateUserResponse toCreateUserResponse(User user);
+
+  @Named("userStatusSetter")
+  default boolean userStatusToBoolean(UserStatus status){
+    if(status.equals(UserStatusType.ONLINE)) return true;
+    return false;
   }
 }

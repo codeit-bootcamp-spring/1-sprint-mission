@@ -34,7 +34,7 @@ public class UserFindFacadeImpl implements UserFindFacade {
   public UserResponseDto findUserById(String id) {
     User user = userService.findUserById(id);
 
-    return userMapper.toDto(user, user.getStatus(), user.getProfileImage());
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -62,10 +62,6 @@ public class UserFindFacadeImpl implements UserFindFacade {
       Map<String, BinaryContent> binaryContentMap
   ) {
     return users.stream()
-        .map(user -> {
-          UserStatus userStatus = userStatusMap.get(user.getUUID());
-          BinaryContent profilePicture = binaryContentMap.getOrDefault(user.getUUID(), null);
-          return userMapper.toDto(user, userStatus, profilePicture);
-        }).toList();
+        .map(userMapper::toDto).toList();
   }
 }

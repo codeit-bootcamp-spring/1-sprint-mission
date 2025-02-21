@@ -30,11 +30,12 @@ public class UserUpdateFacadeImpl implements UserUpdateFacade {
 
     log.info("[User Update] : 기본 정보 업데이트 완료.");
 
+    BinaryContent profile = null;
     if(updateDto.profileImage() != null && !updateDto.profileImage().isEmpty()){
 
       log.info("[User Update] : 프로필 업데이트 시작");
-      BinaryContent profile = binaryContentMapper.toProfileBinaryContent(updateDto.profileImage(), userId);
-      user.updateProfileImage(profile);
+      profile = binaryContentMapper.toProfileBinaryContent(updateDto.profileImage(), userId);
+      user.updateProfileImage(profile.getUUID());
       binaryContentService.updateProfile(userId, profile);
 
       log.info("[User Update] : BinaryContent 저장 성공 = {}", profile);
@@ -45,6 +46,6 @@ public class UserUpdateFacadeImpl implements UserUpdateFacade {
     }
 
     log.info("[User Update] : user 업데이트 완료");
-    return userMapper.toDto(user, user.getStatus(), user.getProfileImage());
+    return userMapper.toDto(user);
   }
 }

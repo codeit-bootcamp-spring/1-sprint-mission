@@ -48,8 +48,7 @@ public class BasicUserService implements UserService {
   private void validateUserInformationWhenCreate(User user, String userId) {
     List<User> users = userRepository.findAll();
     validEmail(user.getEmail(), userId, users);
-    validNickname(user.getNickname(), userId, users);
-    validPhone(user.getPhoneNumber(), userId, users);
+
   }
 
   private void validEmail(String email, String id, List<User> users) {
@@ -59,22 +58,7 @@ public class BasicUserService implements UserService {
       throw new UserValidationException(DUPLICATE_EMAIL);
   }
 
-  private void validPhone(String phoneNumber, String id, List<User> users) {
-    if (!phoneNumber.matches(PHONE_REGEX)) throw new UserValidationException(ERROR_INVALID_PHONE);
-    if (users.stream()
-        .anyMatch(u -> u.getPhoneNumber().equals(phoneNumber) && !u.getUUID().equals(id)))
-      throw new UserValidationException(DUPLICATE_PHONE);
-  }
 
-  private void validNickname(String nickname, String id, List<User> users) {
-    if (nickname.length() <= UserConstant.USERNAME_MIN_LENGTH
-        || nickname.length() > UserConstant.USERNAME_MAX_LENGTH) {
-      throw new UserValidationException(UserConstant.ERROR_USERNAME_LENGTH);
-    }
-    if (users.stream()
-        .anyMatch(u -> u.getNickname().equals(nickname) && !u.getUUID().equals(id)))
-      throw new UserValidationException(DUPLICATE_NICKNAME);
-  }
 
   /**
    * 사용자를 찾아서 반환
@@ -153,22 +137,14 @@ public class BasicUserService implements UserService {
   private void updateFields(User originalUser, UserUpdateDto updatedUser) {
     List<User> users = userRepository.findAll();
 
-    if (updatedUser.nickname() != null) {
-      validNickname(updatedUser.nickname(), originalUser.getUUID(), users);
-    }
     if (updatedUser.email() != null) {
       validEmail(updatedUser.email(), originalUser.getUUID(), users);
     }
-    if (updatedUser.phoneNumber() != null) {
-      validPhone(updatedUser.phoneNumber(), originalUser.getUUID(), users);
-    }
+
 
     originalUser.updateProfile(
         updatedUser.username(),
         updatedUser.email(),
-        updatedUser.nickname(),
-        updatedUser.phoneNumber(),
-        updatedUser.description(),
         updatedUser.password() == null ? null : PasswordEncryptor.hashPassword(updatedUser.password())
     );
 

@@ -46,8 +46,8 @@ public class AuthServiceImpl implements AuthService {
 
     userStatusRepository.save(userStatus);
 
-    BinaryContent content = targetUser.getProfileImage();
 
-    return userMapper.toDto(targetUser, userStatus, content);
+
+    return userMapper.toDto(targetUser);
   }
 }

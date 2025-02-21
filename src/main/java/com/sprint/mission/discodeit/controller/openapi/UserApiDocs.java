@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.openapi;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,8 +21,15 @@ public interface UserApiDocs {
       @ApiResponse(
           responseCode = "404",
           description = "No such user of userId found",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+          content = @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = ErrorResponse.class)
+          )
       )
   })
-  ResponseEntity<UserResponseDto> getUser(String id);
+  ResponseEntity<UserResponseDto> getUser(
+      @Parameter(description = "User ID", required = true)
+      String id
+  );
+
 }

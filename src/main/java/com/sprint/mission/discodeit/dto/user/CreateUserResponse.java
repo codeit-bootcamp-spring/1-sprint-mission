@@ -1,17 +1,14 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 
-public record UserResponseDto(
-
+public record CreateUserResponse(
     String id,
     Instant createdAt,
     Instant updatedAt,
     String username,
     String email,
-    String profileId,
-    String online
+    String password,
+    String profileId
 ) {
 }

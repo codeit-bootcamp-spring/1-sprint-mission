@@ -16,18 +16,7 @@ public record CreateUserRequest(
     String password,
     @NotBlank
     @Pattern(regexp = EMAIL_REGEX)
-    String email,
-    @NotBlank
-    @Size(
-        min = NICKNAME_MIN_LENGTH,
-        max = NICKNAME_MAX_LENGTH
-    )
-    String nickname,
-    @NotBlank
-    @Pattern(regexp = PHONE_REGEX)
-    String phoneNumber,
-    MultipartFile profileImage,
-    String description
+    String email
 ) {
 
 }

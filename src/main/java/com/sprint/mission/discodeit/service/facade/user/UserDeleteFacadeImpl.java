@@ -29,8 +29,8 @@ public class UserDeleteFacadeImpl implements UserDeleteFacade {
     userStatusService.deleteByUserId(userId);
     log.info("[User Delete] : 사용자 상태 삭제 성공");
 
-    if(user.getProfileImage()!=null){
-      binaryContentService.delete(user.getProfileImage().getUUID());
+    if(user.getProfileId() != null){
+      binaryContentService.delete(user.getProfileId());
     }
   }
 }
