@@ -1,49 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.io.Serializable;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@Entity
-@Table(name = "user_status")
-@NoArgsConstructor
-public class UserStatus {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     private UUID id;
-
-    private UUID userId;  // 사용자 ID
-    private Instant lastActiveAt;  // 마지막 접속 시간
     private Instant createdAt;
-    private boolean isActive;
+    private Instant updatedAt;
+    //
+    private UUID userId;
+    private Instant lastActiveAt;
 
-    public boolean isCurrentlyActive() {
-        // 5분 이내에 접속했으면 현재 접속 중인 유저로 간주
-        return lastActiveAt != null && lastActiveAt.isAfter(Instant.now());
-    }
-
-    public UserStatus(UUID userId, Instant lastActiveAt, boolean isActive) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
-        this.isActive = isActive;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void update(Instant lastActiveAt) {
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public void setLastActiveAt(Instant lastActiveAt) {
-        this.lastActiveAt = lastActiveAt;
-    }
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public void setIsActive(boolean isActive) {  // ✅ 직접 추가
-        this.isActive = isActive;
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
-
 }

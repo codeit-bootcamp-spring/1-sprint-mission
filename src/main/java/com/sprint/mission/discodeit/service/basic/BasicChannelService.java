@@ -27,16 +27,16 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel create(PublicChannelCreateRequest request) {
+    public ChannelDto create(PublicChannelCreateRequest request) {
         String name = request.name();
         String description = request.description();
         Channel channel = new Channel(ChannelType.PUBLIC, name, description);
 
-        return channelRepository.save(channel);
+        return toDto(channel);
     }
 
     @Override
-    public Channel create(PrivateChannelCreateRequest request) {
+    public ChannelDto create(PrivateChannelCreateRequest request) {
         Channel channel = new Channel(ChannelType.PRIVATE, null, null);
         Channel createdChannel = channelRepository.save(channel);
 
@@ -44,7 +44,7 @@ public class BasicChannelService implements ChannelService {
                 .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
                 .forEach(readStatusRepository::save);
 
-        return createdChannel;
+        return toDto(createdChannel);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(UUID channelId, PublicChannelUpdateRequest request) {
+    public ChannelDto update(UUID channelId, PublicChannelUpdateRequest request) {
         String newName = request.newName();
         String newDescription = request.newDescription();
         Channel channel = channelRepository.findById(channelId)
@@ -79,7 +79,7 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("Private channel cannot be updated");
         }
         channel.update(newName, newDescription);
-        return channelRepository.save(channel);
+        return toDto(channel);
     }
 
     @Override

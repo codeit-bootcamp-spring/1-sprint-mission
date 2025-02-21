@@ -77,4 +77,14 @@ public class BasicUserStatusService implements UserStatusService {
         }
         userStatusRepository.deleteById(userStatusId);
     }
+
+    @Override
+    public UserStatus updateLastActiveAt(UUID userId, Instant lastActiveAt) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User status not found"));
+
+        userStatus.update(lastActiveAt);
+        return userStatusRepository.save(userStatus);
+    }
+
 }
