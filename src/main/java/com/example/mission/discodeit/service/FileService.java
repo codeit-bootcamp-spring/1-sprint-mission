@@ -16,25 +16,19 @@ import java.nio.file.Paths;
 public class FileService {
     private static final String UPLOAD_DIR = "uploads/";
 
-    /**
-     * 파일 저장 메서드 (업로드)
-     */
+
     public String storeFile(org.springframework.web.multipart.MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
         Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName).normalize();
 
-        // 디렉토리가 없으면 생성
         java.nio.file.Files.createDirectories(filePath.getParent());
 
-        // 파일 저장
         java.nio.file.Files.write(filePath, file.getBytes());
 
-        return fileName; // 저장된 파일 이름 반환
+        return fileName;
     }
 
-    /**
-     * 파일 다운로드 메서드
-     */
+
     public Resource loadFileAsResource(String fileName) {
         try {
             Path filePath = Paths.get(UPLOAD_DIR).resolve(fileName).normalize();
