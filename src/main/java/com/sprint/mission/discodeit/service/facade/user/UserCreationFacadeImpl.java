@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.facade.user;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -33,16 +32,21 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
   public CreateUserResponse createUser(CreateUserRequest userDto, MultipartFile profile) {
 
     User user = userMapper.toEntity(userDto);
-
+    System.out.println(profile.getContentType());
     BinaryContent profileBinary = null;
 
     if(profile != null && !profile.isEmpty()) {
       profileBinary = binaryContentMapper.toProfileBinaryContent(profile, user.getUUID());
+
     }
 
     user.setProfileId(profileBinary == null ? "" : profileBinary.getUUID());
     user.updateStatus(new UserStatus(user.getUUID(), Instant.now()));
     userService.saveUser(user);
+
+    if(profileBinary != null) {
+      binaryContentService.create(profileBinary);
+    }
 
     userStatusService.create(user.getStatus());
 

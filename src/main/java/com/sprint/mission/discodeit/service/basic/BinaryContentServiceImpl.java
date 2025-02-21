@@ -54,6 +54,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
+
     List<BinaryContent> contents = ids.stream().map(
         id -> binaryContentRepository.findById(id).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE))
     ).toList();

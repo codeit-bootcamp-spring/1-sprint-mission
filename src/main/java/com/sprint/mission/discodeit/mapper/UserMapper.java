@@ -5,15 +5,15 @@ import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import com.sprint.mission.discodeit.util.UserStatusType;
-import org.mapstruct.*;
-
-import java.time.Instant;
+import org.mapstruct.Builder;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {PasswordEncryptor.class, BinaryContentUtil.class}, builder = @Builder(disableBuilder = false))
 public interface UserMapper {

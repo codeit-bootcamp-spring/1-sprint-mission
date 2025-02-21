@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.facade.channel;
 
 import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -33,7 +32,7 @@ public class FindChannelFacadeImpl implements FindChannelFacade{
     Instant lastMessageTime = messageService.getLatestMessageByChannel(channelId).getCreatedAt();
     return channelMapper.toFindChannelDto(channel, lastMessageTime);
   }
-  
+
     @Override
     public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
       List<Channel> channels = channelService.findAllChannelsByUserId(userId);

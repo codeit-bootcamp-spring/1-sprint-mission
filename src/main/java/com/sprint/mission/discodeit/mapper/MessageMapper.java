@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import org.mapstruct.*;
 
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 
 @Mapper(

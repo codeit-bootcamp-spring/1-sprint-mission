@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.time.Instant;
 
 public record UserResponseDto(

@@ -8,7 +8,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false), imports = Objects.class)

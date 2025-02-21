@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import org.mapstruct.Builder;
@@ -42,4 +43,13 @@ public interface BinaryContentMapper {
         .map(file -> toMessageBinaryContent(file, userId, channelId, messageId))
         .collect(Collectors.toList());
   }
+
+
+  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "size", source = "fileSize")
+  @Mapping(target = "contentType", source = "fileType")
+  @Mapping(target = "bytes", expression = "java(BinaryContentUtil.convertToBase64(content))")
+  BinaryContentDto toDto(BinaryContent content);
+
+  List<BinaryContentDto> toDtoList(List<BinaryContent> contents);
 }

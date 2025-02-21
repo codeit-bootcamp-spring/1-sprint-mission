@@ -16,6 +16,7 @@ app:
 springdoc:
   default-flat-param-object: true
   api-docs:
-    path: /api-docs  # OpenAPI 문서에 접근할 경로
+    path: /api-docs  # OpenAPI 문서 접근 경로
   swagger-ui:
-    path: /swagger-ui.html # Swagger UI에 접근할 경로
+    path: /swagger-ui.html  # Swagger UI 경로 (기본값)
+    url: /api-docs.json  # JSON 문서를 Swagger UI에서 불러오기

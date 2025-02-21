@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(er);
   }
 
-  @ExceptionHandler({ValidationException.class,  IllegalAccessException.class})
+  @ExceptionHandler(ValidationException.class)
   public ResponseEntity<ErrorResponse> handleValidationException(ValidationException ex){
     ErrorResponse er = new ErrorResponse(new ErrorDetail(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(er);

@@ -23,15 +23,15 @@ public class BinaryContentUtil {
     }
   }
 
-  public static String convertToBase64(BinaryContent binaryContent){
-    if(binaryContent == null || binaryContent.getData() == null){
+  public static String convertToBase64(BinaryContent binaryContent) {
+    if (binaryContent == null || binaryContent.getData() == null) {
       return null;
     }
     return Base64.getEncoder().encodeToString(binaryContent.getData());
   }
 
-  public static List<String> convertMultipleBinaryContentToBase64(List<BinaryContent> contents){
-    if(contents == null || contents.isEmpty()){
+  public static List<String> convertMultipleBinaryContentToBase64(List<BinaryContent> contents) {
+    if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();
     }
 

@@ -1,21 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.controller.openapi.UserApiDocs;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.service.facade.user.UserMasterFacade;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,7 +32,7 @@ public class UserController implements UserApiDocs {
   @PostMapping
   public ResponseEntity<CreateUserResponse> createUser(
       @RequestPart("userCreateRequest") CreateUserRequest createUserRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) throws JsonProcessingException {
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
 
     CreateUserResponse user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(201).body(user);
