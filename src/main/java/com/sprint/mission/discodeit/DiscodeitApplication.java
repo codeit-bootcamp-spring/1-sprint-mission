@@ -42,6 +42,7 @@ import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {
+	/*
 	static void userCRUDTest(UserService userService) {
 		// 생성
 		UserResponseDto userResponseDto = userService.create(new UserCreateRequestDto("user1", "user1@codeit.kr", "1234", null),
@@ -158,10 +159,12 @@ public class DiscodeitApplication {
 		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "introduction",
 				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
 	}
+	
+	 */
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-
+/*
 		// 서비스 초기화
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
@@ -181,6 +184,7 @@ public class DiscodeitApplication {
 		// 파일 지우기
 //        userService.delete(user.getId());
 //        channelService.delete(channel.getId());
+ */
 	}
 
 }
