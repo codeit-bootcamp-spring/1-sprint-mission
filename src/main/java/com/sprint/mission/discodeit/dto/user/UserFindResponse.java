@@ -11,5 +11,6 @@ public record UserFindResponse(
         String email,
         Instant createdAt,
         Instant updatedAt,
-        UUID userStatusId
+        UUID profileId,
+        boolean isConnected
 ) { }

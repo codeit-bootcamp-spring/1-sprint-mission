@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateResponse;
 import com.sprint.mission.discodeit.dto.user.UserFindResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.io.InputHandler;
@@ -17,10 +17,8 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 //
-import java.io.FileNotFoundException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,7 +34,7 @@ public class BasicUserService implements UserService {
     private final InputHandler inputHandler;
 
     @Override
-    public UUID createUser(UserCreateRequest userCreateRequest) {
+    public UserCreateResponse createUser(UserCreateRequest userCreateRequest, BinaryContentCreateRequest binaryContentCreateRequest) {
         // username과 email이 다른 유저와 같이 겹치는지 검증
         for(User user : userRepository.getAllUsers()){
             if(userCreateRequest.username().equals(user.getUsername())){
@@ -47,27 +45,33 @@ public class BasicUserService implements UserService {
             }
         }
 
-        UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(Instant.now());
+        // binaryContentService를 통해 binaryContent 도메인 객체 생성
+        UUID profileImgId = null;
+        if(binaryContentCreateRequest != null) {
+            profileImgId = binaryContentService.createBinaryContent(binaryContentCreateRequest).getId();
+        }
+
+        // user 도메인 객체 생성
+        User user = new User(
+                userCreateRequest.username(),
+                userCreateRequest.email(),
+                userCreateRequest.password(),
+                profileImgId);
+        userRepository.saveUser(user);
+
+        UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(user.getId(), Instant.now());
         // UserStatus 도메인 객체 생성
         UserStatus userStatus = userStatusService.createUserStatus(userStatusCreateRequest);
 
-        // user 도메인 객체 생성
-        User user = new User(userCreateRequest.username(), userCreateRequest.email(), userCreateRequest.password(), userStatus.getId());
-        userRepository.saveUser(user);
-
-        // UserStatus 에 userId 넣기
-        userStatus.setUserId(user.getId());
-
-        //  UserStatus 도메인 객체 생성 -> user 도메인 객체 생성(UserStatus 객체 주입) ->  UserStatus 에 userId 넣기
-        // : 이 단계를 거치는 데 괜찮은건지 모르겠습니다
-
-        // binaryContentService를 통해 binaryContent 도메인 객체 생성
-        String keyword = inputHandler.getYesNOInput();
-        if(keyword.equalsIgnoreCase("y")) {
-            BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(user.getId(), null);
-            binaryContentService.createBinaryContent(binaryContentCreateRequest);
-        }
-        return user.getId();
+        // 객체 -> DTO 변환, 사용자에게 보여줄 것만
+        return new UserCreateResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getCreatedAt(),
+                userStatus.getId(),
+                profileImgId
+        );
     }
 
     @Override
@@ -84,9 +88,9 @@ public class BasicUserService implements UserService {
                             user.getEmail(),
                             user.getCreatedAt(),
                             user.getUpdatedAt(),
-                            user.getUserStatusId()
-                    ))
-                    .collect(Collectors.toList());
+                            user.getProfileId(),
+                            userStatusService.findUserStatusById(user.getId()).isConnectedNow()
+                    )).collect(Collectors.toList());
         }
     }
 
@@ -101,38 +105,39 @@ public class BasicUserService implements UserService {
                 user.getEmail(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
-                user.getUserStatusId()
+                user.getProfileId(),
+                userStatusService.findUserStatusByUserId(user.getId()).isConnectedNow()
         );
     }
 
+    // Entity 속성값을 바꾸기 위해 검증할 땐 서비스 레이어에서 검증하는 게 일반적인가요,
+    // 아니면 Entity에서 검증하는게 더 일반적인가요?
+    // 지금은 이중으로 검증이 구현돼 있습니다.
     @Override
-    public void updateUserInfo(UserUpdateRequest userUpdateRequest) {
+    public void updateUserInfo(UUID userId, UserUpdateRequest userUpdateRequest) {
         boolean isUpdated = false;
-        User user = userRepository.findUserById(userUpdateRequest.userId())
+        User user = userRepository.findUserById(userId)
                 .orElseThrow(() -> new NoSuchElementException("유저를 찾지 못했습니다."));
-        // 예외 종류 좀 더 알아보기
 
         if(userUpdateRequest.newUsername() != null){
-            user.setUsername(userUpdateRequest.newUsername());
+            user.updateUsername(userUpdateRequest.newUsername());
             isUpdated = true;
         }
         if(userUpdateRequest.newEmail() != null){
-            user.setUserEmail(userUpdateRequest.newEmail());
+            user.updateUserEmail(userUpdateRequest.newEmail());
             isUpdated = true;
         }
         if(userUpdateRequest.newPassword() != null){
-            user.setUserPassword(userUpdateRequest.newPassword());
+            user.updateUserPassword(userUpdateRequest.newPassword());
             isUpdated = true;
         }
 
         if (userUpdateRequest.binaryContent() != null) {
-            userUpdateRequest.binaryContent().saveUserProfileImage(user.getId());
+            user.updateProfileId(userUpdateRequest.binaryContent().getId());
             isUpdated = true;
         }
 
-        // 수정 시간 업데이트를 위해
         if(isUpdated) {
-            user.refreshUpdateAt();
             userRepository.saveUser(user);
         }
     }
@@ -144,12 +149,9 @@ public class BasicUserService implements UserService {
             // userStatus 를 불러오기 위해 user 을 불러온다. -비효율적인가?
             User user = userRepository.findUserById(id)
                             .orElseThrow(()-> new NoSuchElementException("유저가 없습니다,"));
-            // UserStatus 삭제
-            userStatusService.deleteUserStatusById(user.getUserStatusId());
-            // User 삭제
+            userStatusService.delteUserStatusByUserId(user.getId());
+            binaryContentService.deleteBinaryContentById(user.getProfileId());
             userRepository.deleteUserById(id);
-            // BinaryContent(프로필) 삭제
-            binaryContentService.deleteBinaryContentByUserId(user.getId());
         }
     }
 }

@@ -1,15 +1,21 @@
 package com.sprint.mission.discodeit.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.UUID;
 
 public record BinaryContentCreateRequest (
-        UUID userId,
-        UUID messageId
+        String fileName,
+        Long size,
+        String contentType,
+        byte[] bytes
 ){
-    public void validate(UUID userId,
-                         UUID messageId){
-        if(userId == null && messageId == null){
-            throw new IllegalArgumentException("userId, messageId 둘 중 하나는 추가되어야 합니다.");
-        }
+    public BinaryContentCreateRequest(MultipartFile file) throws Exception{
+        this(
+                file.getOriginalFilename(),
+                file.getSize(),
+                file.getContentType(),
+                file.getBytes()
+        );
     }
 }
