@@ -79,7 +79,7 @@ public class DiscodeitApplication {
     User createdUser2 = userService.createUser(user2);
 
     // 유저 조회
-    String userId = createdUser.getUUID();
+    String userId = createdUser.getId();
     UserResponseDto fetchedUser = userService.findUserById(userId);
 
     System.out.println(fetchedUser);
@@ -142,8 +142,8 @@ public class DiscodeitApplication {
 
     try {
       chatChannel = channelFactory.createChatChannel(
-          "server-uuid-1",
-          "category-uuid-1",
+          "server-id-1",
+          "category-id-1",
           "exampleChatName",
           100
       );
@@ -156,8 +156,8 @@ public class DiscodeitApplication {
 
     try {
       voiceChannel = channelFactory.createVoiceChannel(
-          "server-uuid-1",
-          "category-uuid-1",
+          "server-id-1",
+          "category-id-1",
           "exampleVoiceName",
           false
       );
@@ -166,8 +166,8 @@ public class DiscodeitApplication {
     }
 
 
-    String chatChannelId = chatChannel.getUUID();
-    String voiceChannelId = voiceChannel.getUUID();
+    String chatChannelId = chatChannel.getId();
+    String voiceChannelId = voiceChannel.getId();
 
     channelService.createChannel(chatChannel);
     channelService.createChannel(voiceChannel);
@@ -223,8 +223,8 @@ public class DiscodeitApplication {
     ChatChannel chatChannel = null;
     try {
       chatChannel = channelFactory.createChatChannel(
-          "server-uuid-2",
-          "category-uuid-2",
+          "server-id-2",
+          "category-id-2",
           "exampleChannelName",
           100
       );
@@ -236,8 +236,8 @@ public class DiscodeitApplication {
 
     try {
       chatChannel2 = channelFactory.createChatChannel(
-          "server-uuid-22",
-          "category-uuid-22",
+          "server-id-22",
+          "category-id-22",
           "exampleChannelName2",
           100
       );
@@ -252,8 +252,8 @@ public class DiscodeitApplication {
 
     try {
       message = new Message.MessageBuilder(
-          createdUser.getUUID(),
-          chatChannel.getUUID(),
+          createdUser.getId(),
+          chatChannel.getId(),
           "this is first Chat"
       ).build();
     } catch (MessageValidationException e) {
@@ -262,10 +262,10 @@ public class DiscodeitApplication {
 
 
     try {
-      messageServiceV2.createMessage(createdUser.getUUID(), message, chatChannel);
-      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
-          createdUser.getUUID(),
-          chatChannel.getUUID(),
+      messageServiceV2.createMessage(createdUser.getId(), message, chatChannel);
+      messageServiceV2.createMessage(createdUser.getId(), new Message.MessageBuilder(
+          createdUser.getId(),
+          chatChannel.getId(),
           "this is second Chat"
       ).build(), chatChannel);
     } catch (MessageValidationException e) {
@@ -273,9 +273,9 @@ public class DiscodeitApplication {
     }
 
     try {
-      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
-          createdUser.getUUID(),
-          chatChannel.getUUID(),
+      messageServiceV2.createMessage(createdUser.getId(), new Message.MessageBuilder(
+          createdUser.getId(),
+          chatChannel.getId(),
           "this is third Chat"
       ).build(), chatChannel);
     } catch (MessageValidationException e) {
@@ -283,16 +283,16 @@ public class DiscodeitApplication {
     }
 
     try {
-      messageServiceV2.createMessage(createdUser.getUUID(), new Message.MessageBuilder(
-          createdUser.getUUID(),
-          chatChannel2.getUUID(),
+      messageServiceV2.createMessage(createdUser.getId(), new Message.MessageBuilder(
+          createdUser.getId(),
+          chatChannel2.getId(),
           "this is second channel first Chat"
       ).build(), chatChannel2);
     } catch (MessageValidationException e) {
       System.out.println(e.getMessage());
     }
 
-    Optional<Message> optionalMessage = messageServiceV2.getMessageById(message.getUUID(), chatChannel);
+    Optional<Message> optionalMessage = messageServiceV2.getMessageById(message.getId(), chatChannel);
     Message m = optionalMessage.orElseThrow(() -> new NoSuchElementException("Message not found"));
     System.out.println(m);
 
@@ -304,23 +304,23 @@ public class DiscodeitApplication {
 
     System.out.println("\n=== 메시지 업데이트 ===");
     MessageUpdateDto updateMessage = new MessageUpdateDto(Optional.of("this is updated content"), Optional.empty());
-    messageServiceV2.updateMessage(chatChannel, message.getUUID(), updateMessage);
-    System.out.println(messageServiceV2.getMessageById(message.getUUID(), chatChannel));
+    messageServiceV2.updateMessage(chatChannel, message.getId(), updateMessage);
+    System.out.println(messageServiceV2.getMessageById(message.getId(), chatChannel));
 
     System.out.println("\n=== 1번 채널 채팅 삭제 ===");
-    messageServiceV2.deleteMessage(message.getUUID(), chatChannel);
+    messageServiceV2.deleteMessage(message.getId(), chatChannel);
     messageServiceV2.getMessagesByChannel(chatChannel).stream().forEach(System.out::println);
 
     System.out.println("\n=== 존재하지 않는 유저의 메시지 생성 ===");
 
     try {
-      String falseUserUUID = "false-id";
+      String falseUserid = "false-id";
       Message falseUserMessage = new Message.MessageBuilder(
-          "false-user-uuid",
-          chatChannel.getUUID(),
+          "false-user-id",
+          chatChannel.getId(),
           "false"
       ).build();
-      messageServiceV2.createMessage(falseUserUUID, falseUserMessage, chatChannel);
+      messageServiceV2.createMessage(falseUserid, falseUserMessage, chatChannel);
     } catch (MessageValidationException e) {
       System.out.println(e.getMessage());
     }

@@ -31,7 +31,7 @@ public class BasicUserService implements UserService {
   public User saveUser(User user) {
 
     // email, nickname, phone number 검증
-    validateUserInformationWhenCreate(user, user.getUUID());
+    validateUserInformationWhenCreate(user, user.getId());
 
     // user 생성
     return userRepository.create(user);
@@ -51,7 +51,7 @@ public class BasicUserService implements UserService {
   private void validEmail(String email, String id, List<User> users) {
     if (!email.matches(EMAIL_REGEX)) throw new UserValidationException(ERROR_INVALID_EMAIL);
     if (users.stream()
-        .anyMatch(u -> u.getEmail().equals(email) && !u.getUUID().equals(id)))
+        .anyMatch(u -> u.getEmail().equals(email) && !u.getId().equals(id)))
       throw new UserValidationException(DUPLICATE_EMAIL);
   }
 
@@ -118,7 +118,7 @@ public class BasicUserService implements UserService {
     List<User> users = userRepository.findAll();
 
     if (updatedUser.newEmail() != null) {
-      validEmail(updatedUser.newEmail(), originalUser.getUUID(), users);
+      validEmail(updatedUser.newEmail(), originalUser.getId(), users);
     }
 
     originalUser.updateProfile(

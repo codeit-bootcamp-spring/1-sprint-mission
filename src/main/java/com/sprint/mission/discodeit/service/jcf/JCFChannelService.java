@@ -34,7 +34,7 @@ public class JCFChannelService implements ChannelService {
     if (!checkIfChannelNameIsEmpty(channel.getChannelName())) {
       throw new IllegalArgumentException("채널명은 비어있을 수 없습니다.");
     }
-    data.put(channel.getUUID(), channel);
+    data.put(channel.getId(), channel);
     return channel;
   }
 

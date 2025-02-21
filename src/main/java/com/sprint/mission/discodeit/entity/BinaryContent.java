@@ -17,7 +17,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class BinaryContent implements Serializable {
   private static final long serialVersionUID = 1L;
-  private final String UUID;
+  private final String id;
   @Nullable
   private String channelId;
   private final String userId;
@@ -31,7 +31,7 @@ public class BinaryContent implements Serializable {
   private final Instant createdAt;
 
   public static class BinaryContentBuilder{
-    private String UUID = UuidGenerator.generateUUID();
+    private String id = UuidGenerator.generateid();
     private Instant createdAt = Instant.now();
   }
 
@@ -40,12 +40,12 @@ public class BinaryContent implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     BinaryContent content = (BinaryContent) o;
-    return Objects.equals(UUID, content.UUID);
+    return Objects.equals(id, content.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(UUID);
+    return Objects.hash(id);
   }
 
   @Override

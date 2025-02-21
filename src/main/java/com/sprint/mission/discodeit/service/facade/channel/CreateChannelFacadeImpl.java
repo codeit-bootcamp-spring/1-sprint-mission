@@ -34,7 +34,7 @@ public class CreateChannelFacadeImpl implements CreateChannelFacade{
 
     Channel channel = channelService.createPrivateChannel(channelMapper.toEntity(channelDto));
 
-    readStatusService.createMultipleReadStatus(channelDto.participantIds(), channel.getUUID());
+    readStatusService.createMultipleReadStatus(channelDto.participantIds(), channel.getId());
 
     return channelMapper.toPrivateDto(channel);
   }

@@ -62,7 +62,7 @@ public class FileChannelService implements ChannelService {
   public FindChannelResponseDto getChannelById(String channelId){
     List<Channel> channels = loadAllChannel();
     for(Channel bc : channels){
-      if(bc.getUUID().equals(channelId)) return Optional.of(bc);
+      if(bc.getId().equals(channelId)) return Optional.of(bc);
     }
     return Optional.empty();
   }
@@ -81,7 +81,7 @@ public class FileChannelService implements ChannelService {
   public void updateChannel(ChannelUpdateDto updatedChannel) {
     List<Channel> channels = loadAllChannel();
 
-    Channel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
+    Channel channel = channels.stream().filter(c -> c.getId().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
 
     synchronized (channel) {
       updatedChannel.getChannelName().ifPresent(channel::setChannelName);
@@ -95,7 +95,7 @@ public class FileChannelService implements ChannelService {
   @Override
   public void deleteChannel(String channelId) {
     List<Channel> channels = loadAllChannel();
-    Channel channel = channels.stream().filter(c -> c.getUUID().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
+    Channel channel = channels.stream().filter(c -> c.getId().equals(channelId)).findAny().orElseThrow(() -> new ChannelValidationException());
 
     channels.remove(channel);
     saveChannelToFile(channels);

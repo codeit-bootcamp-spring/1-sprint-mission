@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String UUID;
+  private String id;
   private String authorId;
   private String channelId;
   private String content;
@@ -26,12 +26,12 @@ public class Message implements Serializable {
   private List<String> attachmentIds;
 
   public static class MessageBuilder{
-    private String UUID =  UuidGenerator.generateUUID();
+    private String id =  UuidGenerator.generateid();
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
     private boolean isEdited = false;
-    public String getUUID(){
-      return UUID;
+    public String getId(){
+      return id;
     }
   }
 
@@ -63,9 +63,9 @@ public class Message implements Serializable {
   @Override
   public String toString() {
     return "Message{"
-        + "UUID='" + UUID + '\''
-        + ", userUUID='" + authorId + '\''
-        + ", channelUUID='" + channelId + '\''
+        + "id='" + id + '\''
+        + ", userid='" + authorId + '\''
+        + ", channelid='" + channelId + '\''
         + ", content='" + content + '\''
         + '}';
   }
@@ -75,11 +75,11 @@ public class Message implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Message message = (Message) o;
-    return Objects.equals(UUID, message.UUID);
+    return Objects.equals(id, message.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(UUID);
+    return Objects.hash(id);
   }
 }

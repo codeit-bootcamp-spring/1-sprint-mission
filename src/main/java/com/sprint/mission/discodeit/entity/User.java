@@ -17,7 +17,7 @@ import java.util.Objects;
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String UUID;
+  private String id = UuidGenerator.generateid();
   private String username;
   private String password;
   private String email;
@@ -28,20 +28,20 @@ public class User implements Serializable {
   private UserStatus status;
 
   public static class UserBuilder{
-    private String UUID = UuidGenerator.generateUUID();
+    private String id = UuidGenerator.generateid();
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
     private String profileId = "";
     private UserStatus status = null;
-    public String getUUID(){
-      return this.UUID;
+    public String getId(){
+      return this.id;
     }
   }
 
   @Override
   public String toString() {
     return "User{"
-        + "UUID='" + UUID + '\''
+        + "id='" + id + '\''
         + ", username='" + username + '\''
         + ", createdAt=" + createdAt
         + ", updatedAt=" + updatedAt
@@ -74,11 +74,11 @@ public class User implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     User user = (User) o;
-    return Objects.equals(UUID, user.UUID);
+    return Objects.equals(id, user.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(UUID);
+    return Objects.hash(id);
   }
 }

@@ -56,7 +56,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Map<String, Instant> getLatestMessageForChannels(List<Channel> channels) {
-    List<String> channelIds = channels.stream().map(Channel::getUUID).toList();
+    List<String> channelIds = channels.stream().map(Channel::getId).toList();
     return channelIds.stream()
         .collect(Collectors.toMap(
             id -> id,

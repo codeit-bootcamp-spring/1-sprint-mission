@@ -80,7 +80,7 @@ public class FileUserService implements UserService {
 
   @Override
   public UserResponseDto findUserById(String id) {
-    return loadAllUser().stream().filter(u -> u.getUUID().equals(id)).findAny();
+    return loadAllUser().stream().filter(u -> u.getId().equals(id)).findAny();
   }
 
   @Override
@@ -92,7 +92,7 @@ public class FileUserService implements UserService {
   public void updateUser(String id, UserUpdateDto updatedUser, String originalPassword) {
     List<User> users = loadAllUser();
     User targetUser = users.stream()
-        .filter(u -> u.getUUID().equals(id)).findAny().orElseThrow(() ->
+        .filter(u -> u.getId().equals(id)).findAny().orElseThrow(() ->
             new UserValidationException(NO_MATCHING_USER)
         );
 
@@ -118,7 +118,7 @@ public class FileUserService implements UserService {
   @Override
   public void deleteUser(String id, String password) {
     List<User> users = loadAllUser();
-    User user = users.stream().filter(u -> u.getUUID().equals(id)).findFirst()
+    User user = users.stream().filter(u -> u.getId().equals(id)).findFirst()
         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 ID 입니다."));
     users.remove(user);
     saveUserToFile(users);

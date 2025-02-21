@@ -18,13 +18,13 @@ import java.util.List;
 )
 public interface MessageMapper {
 
-  @Mapping(target = "UUID", ignore = true)
+  @Mapping(target = "id", ignore = true)
   @Mapping(target = "isEdited", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
   Message toEntity(CreateMessageDto dto, String channelId, @Context BinaryContentMapper binaryContentMapper);
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   MessageResponseDto toResponseDto(Message message);
 
 

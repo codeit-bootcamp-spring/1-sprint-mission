@@ -32,7 +32,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   @Override
   public Optional<Message> findById(String id) {
     List<Message> messages = loadAll(Message.class);
-    return messages.stream().filter(m -> m.getUUID().equals(id)).findAny();
+    return messages.stream().filter(m -> m.getId().equals(id)).findAny();
   }
 
   @Override
@@ -57,7 +57,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   public Message update(Message message) {
     List<Message> messages = loadAll(Message.class);
     Message targetMessage = messages.stream()
-        .filter(m -> m.getUUID().equals(message.getUUID()))
+        .filter(m -> m.getId().equals(message.getId()))
         .findAny()
         .orElseThrow(() -> new MessageNotFoundException());
     messages.remove(targetMessage);
@@ -70,7 +70,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   public void delete(String id) {
     List<Message> messages = loadAll(Message.class);
     Message targetMessage = messages.stream()
-        .filter(m -> m.getUUID().equals(id))
+        .filter(m -> m.getId().equals(id))
         .findAny()
         .orElseThrow(() -> new MessageNotFoundException());
     messages.remove(targetMessage);

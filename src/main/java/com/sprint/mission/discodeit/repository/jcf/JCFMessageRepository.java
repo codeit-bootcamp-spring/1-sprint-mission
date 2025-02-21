@@ -17,7 +17,7 @@ public class JCFMessageRepository implements MessageRepository{
 
   @Override
   public Message create(Message message) {
-    data.put(message.getUUID(), message);
+    data.put(message.getId(), message);
     return message;
   }
 
@@ -41,7 +41,7 @@ public class JCFMessageRepository implements MessageRepository{
 
   @Override
   public Message update(Message message) {
-    data.put(message.getUUID(), message);
+    data.put(message.getId(), message);
     return message;
   }
 

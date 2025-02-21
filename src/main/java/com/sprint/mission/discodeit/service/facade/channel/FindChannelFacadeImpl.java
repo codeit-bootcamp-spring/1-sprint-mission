@@ -41,7 +41,7 @@ public class FindChannelFacadeImpl implements FindChannelFacade{
       return channels.stream()
           .map(channel -> channelMapper.toFindChannelDto(
               channel,
-              latestMessagesByChannel.getOrDefault(channel.getUUID(), Instant.EPOCH)
+              latestMessagesByChannel.getOrDefault(channel.getId(), Instant.EPOCH)
           )).toList();
     }
 }

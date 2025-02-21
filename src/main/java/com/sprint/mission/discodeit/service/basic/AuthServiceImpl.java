@@ -40,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
       throw new UserValidationException(PASSWORD_MATCH_ERROR);
     }
 
-    UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getUUID()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getUUID(),Instant.now())));
+    UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getId()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getId(),Instant.now())));
     log.info("[Login Request] : 사용자 상태 성공");
 
     userStatus.updateLastOnline(Instant.now());

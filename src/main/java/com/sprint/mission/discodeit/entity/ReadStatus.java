@@ -14,7 +14,7 @@ import java.util.Objects;
 public class ReadStatus implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final String UUID;
+  private final String id;
   private final String channelId;
   private final String userId;
   private final Instant createdAt;
@@ -22,7 +22,7 @@ public class ReadStatus implements Serializable {
   private Instant updatedAt;
 
   public ReadStatus(String channelId, String userId){
-    this.UUID = UuidGenerator.generateUUID();
+    this.id = UuidGenerator.generateid();
     this.channelId = channelId;
     this.userId = userId;
     this.createdAt = Instant.now();
@@ -45,11 +45,11 @@ public class ReadStatus implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ReadStatus status = (ReadStatus) o;
-    return Objects.equals(UUID, status.UUID);
+    return Objects.equals(id, status.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(UUID);
+    return Objects.hash(id);
   }
 }

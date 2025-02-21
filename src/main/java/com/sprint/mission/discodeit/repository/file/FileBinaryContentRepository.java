@@ -35,7 +35,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
 
     List<BinaryContent> contents = getFromFile();
 
-    contents.removeIf(content -> content.getUUID().equals(binaryContent.getUUID()));
+    contents.removeIf(content -> content.getId().equals(binaryContent.getId()));
     contents.add(binaryContent);
 
     writeToFile(contents);
@@ -60,7 +60,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
 
   @Override
   public Optional<BinaryContent> findById(String id) {
-    return getFromFile().stream().filter(content -> content.getUUID().equals(id)).findAny();
+    return getFromFile().stream().filter(content -> content.getId().equals(id)).findAny();
   }
 
   @Override
@@ -126,7 +126,7 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
   @Override
   public void deleteById(String id) {
     List<BinaryContent> contents = getFromFile();
-    contents.removeIf(content -> content.getUUID().equals(id));
+    contents.removeIf(content -> content.getId().equals(id));
     writeToFile(contents);
   }
 

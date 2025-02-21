@@ -39,7 +39,7 @@ public class UserUpdateFacadeImpl implements UserUpdateFacade {
 
       profile = binaryContentMapper.toProfileBinaryContent(newProfile, userId);
 
-      user.updateProfileImage(profile.getUUID());
+      user.updateProfileImage(profile.getId());
       binaryContentService.updateProfile(userId, profile);
 
       log.info("[User Update] : BinaryContent 저장 성공 ");

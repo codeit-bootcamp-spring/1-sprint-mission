@@ -44,16 +44,16 @@ public class UserFindFacadeImpl implements UserFindFacade {
 
 
     // jpa 사용시 아래 삭제
-    Set<String> userIdSt = mapToUserUuids(users);
+    Set<String> userIdSt = mapToUserids(users);
     Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSt);
     Map<String, BinaryContent> binaryContentMap = binaryContentService.mapUserToBinaryContent(userIdSt);
 
     return createMultipleUserResponses(users, userStatusMap, binaryContentMap);
   }
 
-  private Set<String> mapToUserUuids(List<User> users) {
+  private Set<String> mapToUserids(List<User> users) {
     return users.stream()
-        .map(User::getUUID)
+        .map(User::getId)
         .collect(Collectors.toSet());
   }
 

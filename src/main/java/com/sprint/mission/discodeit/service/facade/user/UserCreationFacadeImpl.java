@@ -32,16 +32,16 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
   public CreateUserResponse createUser(CreateUserRequest userDto, MultipartFile profile) {
 
     User user = userMapper.toEntity(userDto);
-    System.out.println(profile.getContentType());
+
     BinaryContent profileBinary = null;
 
     if(profile != null && !profile.isEmpty()) {
-      profileBinary = binaryContentMapper.toProfileBinaryContent(profile, user.getUUID());
+      profileBinary = binaryContentMapper.toProfileBinaryContent(profile, user.getId());
 
     }
 
-    user.setProfileId(profileBinary == null ? "" : profileBinary.getUUID());
-    user.updateStatus(new UserStatus(user.getUUID(), Instant.now()));
+    user.setProfileId(profileBinary == null ? "" : profileBinary.getId());
+    user.updateStatus(new UserStatus(user.getId(), Instant.now()));
     userService.saveUser(user);
 
     if(profileBinary != null) {

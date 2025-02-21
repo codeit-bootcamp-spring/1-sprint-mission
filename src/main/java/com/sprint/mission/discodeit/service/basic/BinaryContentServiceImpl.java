@@ -33,7 +33,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     if (content.isProfilePicture()) {
       BinaryContent originalProfile = binaryContentRepository.findByUserId(content.getUserId()).stream().filter(BinaryContent::isProfilePicture).findFirst().orElse(null);
       if (originalProfile != null) {
-        binaryContentRepository.deleteById(originalProfile.getUUID());
+        binaryContentRepository.deleteById(originalProfile.getId());
       }
     }
 
@@ -99,7 +99,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> newFiles) {
 
-    List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getUUID());
+    List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getId());
 
     Set<String> newFileNames = newFiles.stream()
         .map(BinaryContent::getFileName)
@@ -110,7 +110,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         .toList();
 
     // 기존 파일 삭제
-    filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getUUID()));
+    filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getId()));
 
     return binaryContentRepository.saveMultipleBinaryContent(newFiles);
   }
@@ -121,7 +121,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     return Optional.ofNullable(originalProfile)
         .map(profile -> {
-          binaryContentRepository.deleteById(profile.getUUID());
+          binaryContentRepository.deleteById(profile.getId());
           return binaryContentRepository.save(profileImage);
         })
         .orElseGet(() -> binaryContentRepository.save(profileImage));

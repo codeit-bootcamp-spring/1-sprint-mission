@@ -20,7 +20,7 @@ public class JCFChannelRepository implements ChannelRepository{
 
   @Override
   public Channel save(Channel channel) {
-    data.put(channel.getUUID(), channel);
+    data.put(channel.getId(), channel);
     return channel;
   }
 
@@ -36,7 +36,7 @@ public class JCFChannelRepository implements ChannelRepository{
 
   @Override
   public Channel update(Channel channel) {
-    data.put(channel.getUUID(), channel);
+    data.put(channel.getId(), channel);
     return channel;
   }
 

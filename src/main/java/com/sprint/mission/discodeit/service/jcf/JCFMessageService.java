@@ -42,13 +42,13 @@ public class JCFMessageService implements MessageService {
   public MessageResponseDto createMessage(CreateMessageDto messageDto) {
     if (!checkUserExists(userId)) throw new MessageValidationException();
     if (!checkChannelExists(chatChannel)) throw new MessageValidationException();
-    data.putIfAbsent(chatChannel.getUUID(), new ArrayList<>());
-    data.get(chatChannel.getUUID()).add(message);
+    data.putIfAbsent(chatChannel.getId(), new ArrayList<>());
+    data.get(chatChannel.getId()).add(message);
     return message;
   }
 
   private boolean checkChannelExists(Channel chatChannel){
-    return channelService.getChannelById(chatChannel.getUUID()) != null;
+    return channelService.getChannelById(chatChannel.getId()) != null;
   }
 
   private boolean checkUserExists(String userId) {
@@ -57,23 +57,23 @@ public class JCFMessageService implements MessageService {
 
   @Override
   public Optional<Message> getMessageById(String messageId, ChatChannel chatChannel) {
-    return data.get(chatChannel.getUUID())
+    return data.get(chatChannel.getId())
         .stream()
-        .filter(m -> m.getUUID().equals(messageId))
+        .filter(m -> m.getId().equals(messageId))
         .findFirst();
   }
 
   @Override
   public List<Message> getMessagesByChannel(ChatChannel chatChannel) {
-    if (!data.containsKey(chatChannel.getUUID())) throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-    return Collections.unmodifiableList(new ArrayList<>(data.get(chatChannel.getUUID())));
+    if (!data.containsKey(chatChannel.getId())) throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+    return Collections.unmodifiableList(new ArrayList<>(data.get(chatChannel.getId())));
   }
 
   @Override
   public Message updateMessage(ChatChannel chatChannel, String messageId, MessageUpdateDto updatedMessage) {
-    return data.get(chatChannel.getUUID())
+    return data.get(chatChannel.getId())
         .stream()
-        .filter(m -> m.getUUID().equals(messageId))
+        .filter(m -> m.getId().equals(messageId))
         .findFirst()
         .map(m -> {
           synchronized (m) {
@@ -87,9 +87,9 @@ public class JCFMessageService implements MessageService {
 
   @Override
   public boolean deleteMessage(String messageId, ChatChannel chatChannel) {
-    List<Message> messages = data.get(chatChannel.getUUID());
+    List<Message> messages = data.get(chatChannel.getId());
     if (messages != null) {
-      return messages.removeIf(m -> m.getUUID().equals(messageId));
+      return messages.removeIf(m -> m.getId().equals(messageId));
     }
     return false;
   }

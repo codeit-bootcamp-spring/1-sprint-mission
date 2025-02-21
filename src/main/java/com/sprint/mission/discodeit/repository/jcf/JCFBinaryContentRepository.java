@@ -16,7 +16,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository{
 
   @Override
   public BinaryContent save(BinaryContent binaryContent) {
-    data.put(binaryContent.getUUID(), binaryContent);
+    data.put(binaryContent.getId(), binaryContent);
     return binaryContent;
   }
 
@@ -24,7 +24,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository{
   @Override
   public List<BinaryContent> saveMultipleBinaryContent(List<BinaryContent> binaryContents) {
     binaryContents.stream()
-        .forEach(binaryContent -> data.put(binaryContent.getUUID(), binaryContent));
+        .forEach(binaryContent -> data.put(binaryContent.getId(), binaryContent));
     return binaryContents;
   }
 

@@ -15,10 +15,12 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {PasswordEncryptor.class, BinaryContentUtil.class}, builder = @Builder(disableBuilder = false))
+import java.util.UUID;
+
+@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class}, builder = @Builder(disableBuilder = false))
 public interface UserMapper {
 
-  @Mapping(target = "UUID", ignore = true)
+  @Mapping(target = "id", expression = "java(UUID.randomUUID().toString())")
   @Mapping(target = "username", source = "dto.username")
   @Mapping(target = "password", expression = "java(PasswordEncryptor.hashPassword(dto.password()))")
   @Mapping(target = "email", source = "dto.email")
@@ -27,7 +29,7 @@ public interface UserMapper {
   User toEntity(CreateUserRequest dto);
 
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   @Mapping(target = "createdAt", source = "createdAt")
   @Mapping(target = "updatedAt", source = "updatedAt")
   @Mapping(target = "username", source = "username")
@@ -36,18 +38,18 @@ public interface UserMapper {
   @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
   UserResponseDto toDto(User user);
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   CreateUserResponse toCreateUserResponse(User user);
 
-  @Mapping(target = "id", source = "status.UUID")
+  @Mapping(target = "id", source = "status.id")
   @Mapping(target = "createdAt", source = "status.createdAt")
   @Mapping(target = "updatedAt", source = "status.updatedAt")
-  @Mapping(target = "userId", source = "UUID")
+  @Mapping(target = "userId", source = "id")
   @Mapping(target = "lastActivityAt", source = "status.lastOnlineAt")
   @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
   UserStatusResponseDto withStatus(User user);
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   LoginResponseDto toLoginResponse(User user);
   @Named("userStatusSetter")
   default boolean userStatusToBoolean(UserStatus status){

@@ -27,7 +27,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
   public UserStatus save(UserStatus userStatus) {
     List<UserStatus> statuses = loadAll(UserStatus.class);
 
-    statuses.removeIf(status -> status.getUUID().equals(userStatus.getUUID()));
+    statuses.removeIf(status -> status.getId().equals(userStatus.getId()));
     statuses.add(userStatus);
 
     saveAll(statuses);
@@ -39,7 +39,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
     List<UserStatus> statuses = loadAll(UserStatus.class);
 
     return statuses.stream()
-        .filter(status -> status.getUUID().equals(id))
+        .filter(status -> status.getId().equals(id))
         .findFirst();
   }
 
@@ -72,7 +72,7 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
   @Override
   public void deleteById(String id) {
     List<UserStatus> statuses = loadAll(UserStatus.class);
-    statuses.removeIf(status -> status.getUUID().equals(id));
+    statuses.removeIf(status -> status.getId().equals(id));
     saveAll(statuses);
   }
 

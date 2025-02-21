@@ -21,6 +21,6 @@ public class DeleteChannelFacadeImpl implements DeleteChannelFacade{
     readStatusService.deleteByChannel(channelId);
     //TODO : 한번에 삭제 메서드 생성
     messageService.getMessagesByChannel(channelId).stream()
-        .forEach(message -> messageService.deleteMessage(message.getUUID()));
+        .forEach(message -> messageService.deleteMessage(message.getId()));
   }
 }

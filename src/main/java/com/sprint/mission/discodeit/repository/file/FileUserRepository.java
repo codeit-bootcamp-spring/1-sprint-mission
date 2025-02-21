@@ -33,7 +33,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
   @Override
   public Optional<User> findById(String id) {
     List<User> users = loadAll(User.class);
-    return users.stream().filter(u -> u.getUUID().equals(id)).findAny();
+    return users.stream().filter(u -> u.getId().equals(id)).findAny();
   }
 
   @Override
@@ -53,7 +53,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     List<User> users = loadAll(User.class);
 
     User targetUser = users.stream()
-        .filter(u -> u.getUUID().equals(user.getUUID()))
+        .filter(u -> u.getId().equals(user.getId()))
         .findAny()
         .orElseThrow(() -> new UserNotFoundException());
 
@@ -68,7 +68,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
   public void delete(String userId) {
     List<User> users = loadAll(User.class);
     User targetUser = users.stream()
-        .filter(u -> u.getUUID().equals(userId))
+        .filter(u -> u.getId().equals(userId))
         .findAny()
         .orElseThrow(() -> new UserNotFoundException());
     users.remove(targetUser);

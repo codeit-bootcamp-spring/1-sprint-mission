@@ -39,15 +39,15 @@ public class CreateMessageFacadeImpl implements CreateMessageFacade{
     User user = validator.findOrThrow(User.class, messageDto.authorId(), new UserNotFoundException());
     Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
 
-    channelService.validateUserAccess(channel, user.getUUID());
+    channelService.validateUserAccess(channel, user.getId());
     Message message = messageMapper.toEntity(messageDto, messageDto.channelId(), binaryContentMapper);
 
-    List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files, user.getUUID(), channel.getUUID(), message.getUUID());
-    List<String> ids = contents.stream().map(BinaryContent::getUUID).toList();
+    List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files, user.getId(), channel.getId(), message.getId());
+    List<String> ids = contents.stream().map(BinaryContent::getId).toList();
     message.addBinaryContents(ids);
 
     messageService.createMessage(message);
-    binaryContentService.saveBinaryContentsForMessage(message.getUUID(), contents);
+    binaryContentService.saveBinaryContentsForMessage(message.getId(), contents);
     return messageMapper.toResponseDto(message);
   }
 }

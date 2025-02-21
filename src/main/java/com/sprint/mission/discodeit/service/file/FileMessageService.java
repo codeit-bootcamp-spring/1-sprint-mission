@@ -54,30 +54,30 @@ public class FileMessageService implements MessageService {
   public Message createMessage(String userId, Message message, ChatChannel channel) throws MessageValidationException {
     if(!checkUserExists(userId)) throw new MessageValidationException();
     if(!checkChannelExists(channel)) throw new MessageValidationException();
-    message.setChannelUUID(channel.getUUID());
+    message.setChannelid(channel.getId());
     saveMessageToFile(message);
     return message;
   }
 
   private boolean checkChannelExists(Channel channel){
-    return channelService.getChannelById(channel.getUUID()).;
+    return channelService.getChannelById(channel.getId()).;
   }
 
   @Override
   public Optional<Message> getMessageById(String messageId, ChatChannel channel) {
     System.out.println(loadAllMessages());
-    return loadAllMessages().stream().filter(m -> m.getUUID().equals(messageId)).findFirst();
+    return loadAllMessages().stream().filter(m -> m.getId().equals(messageId)).findFirst();
   }
 
   @Override
   public List<Message> getMessagesByChannel(ChatChannel channel) {
-    return loadAllMessages().stream().filter(message -> message.getChannelUUID().equals(channel.getUUID())).toList();
+    return loadAllMessages().stream().filter(message -> message.getChannelid().equals(channel.getId())).toList();
   }
 
   @Override
   public Message updateMessage(ChatChannel channel, String messageId, MessageUpdateDto updatedMessage) {
     List<Message> messages = loadAllMessages();
-    Message message = messages.stream().filter(m -> m.getUUID().equals(messageId)).findFirst().get();
+    Message message = messages.stream().filter(m -> m.getId().equals(messageId)).findFirst().get();
 
     synchronized (message) {
       updatedMessage.getContentUrl().ifPresent(message::setContentImage);
@@ -91,7 +91,7 @@ public class FileMessageService implements MessageService {
   @Override
   public boolean deleteMessage(String messageId, ChatChannel channel) {
     List<Message> messages = loadAllMessages();
-    Message message = messages.stream().filter(m -> m.getUUID().equals(messageId)).findFirst().get();
+    Message message = messages.stream().filter(m -> m.getId().equals(messageId)).findFirst().get();
     messages.remove(message);
     return true;
   }

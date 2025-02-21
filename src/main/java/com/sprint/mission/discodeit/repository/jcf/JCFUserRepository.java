@@ -19,7 +19,7 @@ public class JCFUserRepository implements UserRepository{
 
   @Override
   public User create(User user) {
-    data.put(user.getUUID(), user);
+    data.put(user.getId(), user);
     return user;
   }
 
@@ -40,7 +40,7 @@ public class JCFUserRepository implements UserRepository{
 
   @Override
   public User update(User user) {
-    data.put(user.getUUID(), user);
+    data.put(user.getId(), user);
     return user;
   }
 

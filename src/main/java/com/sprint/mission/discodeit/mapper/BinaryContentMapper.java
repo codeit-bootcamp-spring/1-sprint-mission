@@ -45,7 +45,7 @@ public interface BinaryContentMapper {
   }
 
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   @Mapping(target = "size", source = "fileSize")
   @Mapping(target = "contentType", source = "fileType")
   @Mapping(target = "bytes", expression = "java(BinaryContentUtil.convertToBase64(content))")

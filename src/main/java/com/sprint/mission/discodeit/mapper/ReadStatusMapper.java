@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ReadStatusMapper {
 
-  @Mapping(target = "id", source = "UUID")
+  @Mapping(target = "id", source = "id")
   ReadStatusResponseDto toReadStatusResponseDto(ReadStatus status);
 }

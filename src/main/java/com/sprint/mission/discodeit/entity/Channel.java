@@ -20,7 +20,7 @@ public class Channel implements Serializable {
     PRIVATE, PUBLIC
   }
 
-  private String UUID;
+  private String id;
   private ChannelType channelType;
   private String channelName;
   private String description;
@@ -30,7 +30,7 @@ public class Channel implements Serializable {
 
 
   public static class ChannelBuilder{
-    private String UUID = UuidGenerator.generateUUID();
+    private String id = UuidGenerator.generateid();
     private Instant createdAt = Instant.now();
     private Instant updatedAt = Instant.now();
   }
@@ -54,7 +54,7 @@ public class Channel implements Serializable {
   @Override
   public String toString() {
     return "Channel{" +
-        "UUID='" + UUID + '\'' +
+        "id='" + id + '\'' +
         ", channelType=" + channelType +
         ", channelName='" + channelName + '\'' +
         ", createdAt=" + createdAt +
@@ -67,11 +67,11 @@ public class Channel implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Channel channel = (Channel) o;
-    return Objects.equals(UUID, channel.UUID);
+    return Objects.equals(id, channel.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(UUID);
+    return Objects.hash(id);
   }
 }

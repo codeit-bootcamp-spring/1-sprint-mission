@@ -52,7 +52,7 @@ public class JCFUserService implements UserService {
 
 
 
-    data.put(user.getUUID(), user);
+    data.put(user.getId(), user);
 
     return user;
   }

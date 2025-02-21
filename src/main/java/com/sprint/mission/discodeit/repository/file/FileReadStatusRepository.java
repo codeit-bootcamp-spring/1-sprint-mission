@@ -28,7 +28,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
   @Override
   public ReadStatus save(ReadStatus status) {
     List<ReadStatus> statuses = loadAll(ReadStatus.class);
-    statuses.removeIf(s -> s.getUUID().equals(status.getUUID()));
+    statuses.removeIf(s -> s.getId().equals(status.getId()));
     statuses.add(status);
     saveAll(statuses);
     return status;
@@ -39,7 +39,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     List<ReadStatus> statuses = loadAll(ReadStatus.class);
 
     return statuses.stream()
-        .filter(status -> status.getUUID().equals(id))
+        .filter(status -> status.getId().equals(id))
         .findAny();
   }
 

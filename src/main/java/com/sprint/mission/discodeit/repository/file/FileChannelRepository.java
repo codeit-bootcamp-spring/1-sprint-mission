@@ -31,7 +31,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
   @Override
   public Optional<Channel> findById(String id) {
     List<Channel> channels = loadAll(Channel.class);
-    return channels.stream().filter(c -> c.getUUID().equals(id)).findAny();
+    return channels.stream().filter(c -> c.getId().equals(id)).findAny();
   }
 
   @Override
@@ -43,7 +43,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
   public Channel update(Channel channel) {
     List<Channel> channels = loadAll(Channel.class);
     Channel targetChannel = channels.stream()
-        .filter(c -> c.getUUID().equals(channel.getUUID()))
+        .filter(c -> c.getId().equals(channel.getId()))
         .findAny()
         .orElseThrow(() -> new ChannelNotFoundException());
     channels.remove(targetChannel);
@@ -56,7 +56,7 @@ public class FileChannelRepository extends AbstractFileRepository<Channel> imple
   public void delete(String id) {
     List<Channel> channels = loadAll(Channel.class);
     Channel targetChannel = channels.stream()
-        .filter(c -> c.getUUID().equals(id))
+        .filter(c -> c.getId().equals(id))
         .findAny()
         .orElseThrow(() -> new ChannelNotFoundException());
     channels.remove(targetChannel);
