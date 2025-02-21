@@ -26,11 +26,11 @@ public class Message implements Serializable {                  // 메시지 (�
 
 
     // 생성자
-    public Message(Channel channel, String context, UUID writerId){
+    public Message(UUID channelId, UUID writerId, String context, List<UUID> imagesId){
         id = UUID.randomUUID();
-        createdAt = System.currentTimeMillis();
+        createdAt = Instant.now();
 
-        this.channelId = channel.getId();
+        this.channelId = channelId;
         validationAndSetContext(context);
         this.writerId = writerId;
         this.imagesId = imagesId;
@@ -43,8 +43,8 @@ public class Message implements Serializable {                  // 메시지 (�
         updateUpdateAt();
     }
 
-    public void updateAttachedImageId(List<UUID> attachedImagesId) {
-        this.imagesId = attachedImagesId;
+    public void updateImagesId(List<UUID> imagesId) {
+        this.imagesId = this.imagesId;
     }
 
     public void updateUpdateAt(){
