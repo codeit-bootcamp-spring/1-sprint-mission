@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -30,7 +32,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public Message create(MessageCreateRequest messageCreateRequest) {
+    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
         if (!userRepository.existsById(messageCreateRequest.authorId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
@@ -39,14 +41,14 @@ public class BasicMessageService implements MessageService {
         }
         validator.validate(messageCreateRequest.content());
 
-        List<UUID> binaryContentData = messageCreateRequest.binaryContentData().stream()
+        List<UUID> binaryContentIds = binaryContentRequests.stream()
                 .map(binaryContentRequest -> binaryContentService.create(binaryContentRequest).getId())
                 .toList();
 
         return messageRepository.save(new Message(messageCreateRequest.content(),
                 messageCreateRequest.authorId(),
                 messageCreateRequest.channelId(),
-                binaryContentData));
+                binaryContentIds));
     }
 
     @Override

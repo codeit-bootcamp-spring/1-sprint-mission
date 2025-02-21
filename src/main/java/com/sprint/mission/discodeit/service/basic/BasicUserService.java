@@ -31,13 +31,16 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
-    public User create(UserCreateRequest userRequest, BinaryContentRequest binaryContentRequest) {
+    public User create(UserCreateRequest userRequest, Optional<BinaryContentRequest> binaryContentRequest) {
         validator.validate(userRequest.name(), userRequest.email());
         validateDuplicateName(userRequest.name());
         validateDuplicateEmail(userRequest.email());
 
-        BinaryContent binaryContent = binaryContentService.create(binaryContentRequest);
-        User user = userRepository.save(new User(binaryContent.getId(), userRequest.name(), userRequest.email(), userRequest.password()));
+        UUID binaryContentId = binaryContentRequest
+                .map(binaryContentService::create)
+                .map(BinaryContent::getId)
+                .orElse(null);
+        User user = userRepository.save(new User(binaryContentId, userRequest.name(), userRequest.email(), userRequest.password()));
         userStatusService.create(UserStatusCreate.from(user.getId()));
 
         return user;

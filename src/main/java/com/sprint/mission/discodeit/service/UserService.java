@@ -7,10 +7,11 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateRequest userRequest, BinaryContentRequest binaryContentRequest);
+    User create(UserCreateRequest userRequest, Optional<BinaryContentRequest> binaryContentRequest);
     UserResponse find(UUID userId);
     List<UserResponse> findAll();
     UserResponse getUserInfo(User user);

@@ -19,7 +19,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent create(BinaryContentRequest binaryContentRequest) {
-        return binaryContentRepository.save(new BinaryContent(binaryContentRequest.data()));
+        return binaryContentRepository.save(new BinaryContent(
+                binaryContentRequest.fileName(),
+                (long) binaryContentRequest.data().length,
+                binaryContentRequest.contentType(),
+                binaryContentRequest.data()
+                ));
     }
 
     @Override
@@ -35,7 +40,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return Optional.ofNullable(findAll().stream()
+        return Optional.of(findAll().stream()
                 .filter(binaryContent -> binaryContent.containsId(binaryContentIds))
                 .toList())
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 상태입니다."));
