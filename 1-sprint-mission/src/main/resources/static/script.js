@@ -1,62 +1,57 @@
 // API endpoints
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-  USERS: `${API_BASE_URL}/user/findAll`,
-  BINARY_CONTENT: `${API_BASE_URL}/binaryContents`
+    USERS: `${API_BASE_URL}/user/findAll`,
+    BINARY_CONTENT: `${API_BASE_URL}/binaryContent`
 };
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-  fetchAndRenderUsers();
+    fetchAndRenderUsers();
 });
 
 // Fetch users from the API
 async function fetchAndRenderUsers() {
-  try {
-    const response = await fetch(ENDPOINTS.USERS);
-    if (!response.ok) {
-      throw new Error('Failed to fetch users');
+    try {
+        const response = await fetch(ENDPOINTS.USERS);
+        if (!response.ok) throw new Error('Failed to fetch users');
+        const users = await response.json();
+        renderUserList(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
     }
-    const users = await response.json();
-    renderUserList(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
 }
 
 // Fetch user profile image
 async function fetchUserProfile(profileId) {
-  try {
-    const response = await fetch(
-        `${ENDPOINTS.BINARY_CONTENT}/find?binaryContentId=${profileId}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch profile');
-    }
-    const profile = await response.json();
+    try {
+        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}/find?binaryContentId=${profileId}`);
+        if (!response.ok) throw new Error('Failed to fetch profile');
+        const profile = await response.json();
 
-    // Convert base64 encoded bytes to data URL
-    return `data:${profile.contentType};base64,${profile.bytes}`;
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    return '/default-avatar.png'; // Fallback to default avatar
-  }
+        // Convert base64 encoded bytes to data URL
+        return `data:${profile.contentType};base64,${profile.bytes}`;
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        return '/default-avatar.png'; // Fallback to default avatar
+    }
 }
 
 // Render user list
 async function renderUserList(users) {
-  const userListElement = document.getElementById('userList');
-  userListElement.innerHTML = ''; // Clear existing content
+    const userListElement = document.getElementById('userList');
+    userListElement.innerHTML = ''; // Clear existing content
 
-  for (const user of users) {
-    const userElement = document.createElement('div');
-    userElement.className = 'user-item';
+    for (const user of users) {
+        const userElement = document.createElement('div');
+        userElement.className = 'user-item';
 
-    // Get profile image URL
-    const profileUrl = user.profileId ?
-        await fetchUserProfile(user.profileId) :
-        '/default-avatar.png';
+        // Get profile image URL
+        const profileUrl = user.profileId ?
+            await fetchUserProfile(user.profileId) :
+            '/default-avatar.png';
 
-    userElement.innerHTML = `
+        userElement.innerHTML = `
             <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
             <div class="user-info">
                 <div class="user-name">${user.username}</div>
@@ -67,6 +62,6 @@ async function renderUserList(users) {
             </div>
         `;
 
-    userListElement.appendChild(userElement);
-  }
+        userListElement.appendChild(userElement);
+    }
 }

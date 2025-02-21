@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: discodeit
@@ -14,9 +15,3 @@ logging:
 
 server:
   port: 9090
-
-springdoc:
-  api-docs:
-    path: /v3/api-docs
-  swagger-ui:
-    path: /swagger-ui.html
