@@ -32,8 +32,8 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
   }
 
   @Override
-  public UserResponseDto updateUser(String userId, UserUpdateDto updateDto) {
-    return userUpdateFacade.updateUser(userId, updateDto);
+  public CreateUserResponse updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
+    return userUpdateFacade.updateUser(userId, profile, updateDto);
   }
 
   @Override

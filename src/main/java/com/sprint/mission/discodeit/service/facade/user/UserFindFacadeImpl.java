@@ -42,6 +42,7 @@ public class UserFindFacadeImpl implements UserFindFacade {
 
     List<User> users = userService.findAllUsers();
 
+
     // jpa 사용시 아래 삭제
     Set<String> userIdSt = mapToUserUuids(users);
     Map<String, UserStatus> userStatusMap = userStatusService.mapUserToUserStatus(userIdSt);

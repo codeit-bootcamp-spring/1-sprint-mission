@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserMasterFacade {
   CreateUserResponse createUser(CreateUserRequest request, MultipartFile profile);
-  UserResponseDto updateUser(String userId, UserUpdateDto updateDto);
+  CreateUserResponse updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto);
   UserResponseDto findUserById(String id);
   List<UserResponseDto> findAllUsers();
   void deleteUser(String id, String password);

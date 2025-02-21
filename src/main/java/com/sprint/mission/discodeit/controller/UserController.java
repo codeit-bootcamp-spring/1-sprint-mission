@@ -38,14 +38,11 @@ public class UserController implements UserApiDocs {
 
   @PostMapping
   public ResponseEntity<CreateUserResponse> createUser(
-      @RequestPart("userCreateRequest") String userDtoJson,
+      @RequestPart("userCreateRequest") CreateUserRequest createUserRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile) throws JsonProcessingException {
 
-    ObjectMapper objectMapper = new ObjectMapper();
-    CreateUserRequest userDto = objectMapper.readValue(userDtoJson, CreateUserRequest.class);
-
-    CreateUserResponse user = userFacade.createUser(userDto, profile);
-    return ResponseEntity.ok(user);
+    CreateUserResponse user = userFacade.createUser(createUserRequest, profile);
+    return ResponseEntity.status(201).body(user);
   }
 
 
@@ -57,8 +54,14 @@ public class UserController implements UserApiDocs {
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<UserResponseDto> updateUser(@PathVariable String id, @Valid @ModelAttribute UserUpdateDto userDto) {
-    UserResponseDto user = userFacade.updateUser(id, userDto);
+  public ResponseEntity<CreateUserResponse> updateUser(
+      @PathVariable String id,
+      @RequestPart(value = "profile", required = false) MultipartFile profile,
+      @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto
+
+  ) {
+
+    CreateUserResponse user = userFacade.updateUser(id, profile, updateDto);
     return ResponseEntity.ok(user);
   }
 

@@ -76,27 +76,10 @@ public class BasicUserService implements UserService {
   }
 
 
-  /**
-   * 사용자 정보를 업데이트 한다
-   * <p>
-   *   <ul>
-   *     <li>id로 사용자를 찾는다. 없을 경우 {@link UserNotFoundException}</li>
-   *     <li>입력받은 비밀번호와 기존 비빌번호를 비교</li>
-   *     <li>사용자의 필드를 업데이트</li>
-   *     <li>프로필 이미지 업데이트 및 사용자 레포지토리 반영</li>
-   *   </ul>
-   * </p>
-   *
-   * @param id            업데이트 할 사용자 id
-   * @param updatedUser   업데이트 정보가 담긴 DTO
-   * @param plainPassword 사용자가 입력한 비밀번호
-   */
   @Override
-  public User updateUser(String id, UserUpdateDto updatedUser, String plainPassword) {
+  public User updateUser(String id, UserUpdateDto updatedUser) {
 
     User originalUser = validator.findOrThrow(User.class, id, new UserNotFoundException());
-
-    checkPasswordIsCorrect(plainPassword, originalUser.getPassword());
 
     synchronized (originalUser) {
       updateFields(originalUser, updatedUser);
@@ -137,15 +120,14 @@ public class BasicUserService implements UserService {
   private void updateFields(User originalUser, UserUpdateDto updatedUser) {
     List<User> users = userRepository.findAll();
 
-    if (updatedUser.email() != null) {
-      validEmail(updatedUser.email(), originalUser.getUUID(), users);
+    if (updatedUser.newEmail() != null) {
+      validEmail(updatedUser.newEmail(), originalUser.getUUID(), users);
     }
 
-
     originalUser.updateProfile(
-        updatedUser.username(),
-        updatedUser.email(),
-        updatedUser.password() == null ? null : PasswordEncryptor.hashPassword(updatedUser.password())
+        updatedUser.newUsername(),
+        updatedUser.newEmail(),
+        updatedUser.newPassword() == null ? null : PasswordEncryptor.hashPassword(updatedUser.newPassword())
     );
 
   }

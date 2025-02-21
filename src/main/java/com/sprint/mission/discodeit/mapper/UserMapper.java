@@ -39,7 +39,8 @@ public interface UserMapper {
 
   @Named("userStatusSetter")
   default boolean userStatusToBoolean(UserStatus status){
-    if(status.equals(UserStatusType.ONLINE)) return true;
+
+    if(status.getUserStatus().equals(UserStatusType.ONLINE)) return true;
     return false;
   }
 }

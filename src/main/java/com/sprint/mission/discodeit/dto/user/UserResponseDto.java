@@ -12,6 +12,6 @@ public record UserResponseDto(
     String username,
     String email,
     String profileId,
-    String online
+    boolean online
 ) {
 }
