@@ -61,5 +61,5 @@ public class JCFMessageRepository implements MessageRepository {
         .forEach(messages
             -> messages.removeIf(message -> message.getId().equals(messageId)));
   }
-    
+
 }

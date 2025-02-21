@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponseDTO;
+import com.sprint.mission.discodeit.dto.response.binary.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseData;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
@@ -19,63 +19,63 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
-    private final UserRepository userRepository;
 
-    public BinaryContentResponseDTO create(BinaryContentCreateDTO createDTO){
-        // 관련된 유저 확인
-        User user = userRepository.findById(createDTO.userId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserRepository userRepository;
 
-        //새로운 binaryContent 생성, 저장
-        BinaryContent binaryContent = new BinaryContent(
-                UUID.randomUUID(),
-                user.getId(),
-                createDTO.messageId(),
-                createDTO.filename(),
-                "application/octet-stream",
-                createDTO.bytes()
-        );
-        binaryContentRepository.save(binaryContent);
+  public BinaryContentResponseData create(BinaryContentCreateDTO createDTO) {
+    // 관련된 유저 확인
+    User user = userRepository.findById(createDTO.userId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // DTO 변환 반환
-        return BinaryContentResponseDTO.fromEntity(binaryContent);
+    //새로운 binaryContent 생성, 저장
+    BinaryContent binaryContent = new BinaryContent(
+        UUID.randomUUID(),
+        user.getId(),
+        createDTO.messageId(),
+        createDTO.filename(),
+        "application/octet-stream",
+        createDTO.bytes()
+    );
+    binaryContentRepository.save(binaryContent);
+
+    // DTO 변환 반환
+    return BinaryContentResponseData.fromEntity(binaryContent);
+  }
+
+  public BinaryContentDTO find(UUID binaryContentId) {
+    // ID 기준으로 조회
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
+    //DTO 변환 반환
+    return BinaryContentDTO.fromEntity(binaryContent);
+  }
+
+
+  public List<BinaryContentResponseData> findAllByIdIn(List<UUID> binaryContentIds) {
+    if (binaryContentIds.isEmpty()) {
+      return List.of();
     }
+    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        .map(BinaryContentResponseData::fromEntity)
+        .toList();
+  }
 
-    public BinaryContentDTO find(UUID binaryContentId){
-        // ID 기준으로 조회
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
-        //DTO 변환 반환
-        return BinaryContentDTO.fromEntity(binaryContent);
-    }
-
-
-
-    public List<BinaryContentResponseDTO> findAllByIdIn(List<UUID> binaryContentIds){
-        if(binaryContentIds.isEmpty()){
-            return List.of();
-        }
-        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-                .map(BinaryContentResponseDTO::fromEntity)
-                .toList();
-    }
-
-    public List<BinaryContentResponseDTO> findAllByUserId(UUID userId){
-        return binaryContentRepository.findAllByUserId(userId).stream()
-                .map(BinaryContentResponseDTO::fromEntity)
-                .toList();
-    }
+  public List<BinaryContentResponseData> findAllByUserId(UUID userId) {
+    return binaryContentRepository.findAllByUserId(userId).stream()
+        .map(BinaryContentResponseData::fromEntity)
+        .toList();
+  }
 
 
-    public void delete(UUID binaryContentId){
-        // id 기준 으로 조회
-        BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
-        //파일 삭제
-        binaryContentRepository.delete(binaryContent);
+  public void delete(UUID binaryContentId) {
+    // id 기준 으로 조회
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new IllegalArgumentException("BinaryContent not found"));
+    //파일 삭제
+    binaryContentRepository.delete(binaryContent);
 
-        System.out.println("BinaryContent deleted: " + binaryContentId);
-        log.error("BinaryContent deleted: {}", binaryContentId);
-    }
+    System.out.println("BinaryContent deleted: " + binaryContentId);
+    log.error("BinaryContent deleted: {}", binaryContentId);
+  }
 }
