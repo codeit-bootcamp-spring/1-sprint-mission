@@ -1,31 +1,21 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 
-@Entity
 @Getter
 public class ReadStatus implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
-  @Id
-  private final UUID id;
-  private final Instant createdAt;
+  private UUID id;
+  private Instant createdAt;
   private Instant updatedAt;
-
+  //
   private UUID userId;
   private UUID channelId;
   private Instant lastReadAt;
-
-  public ReadStatus() {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-  }
 
   public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
     this.id = UUID.randomUUID();
@@ -36,6 +26,8 @@ public class ReadStatus implements Serializable {
     this.lastReadAt = lastReadAt;
   }
 
+  public ReadStatus() {
+  }
 
   public void update(Instant newLastReadAt) {
     boolean anyValueUpdated = false;

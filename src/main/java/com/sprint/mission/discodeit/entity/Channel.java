@@ -1,39 +1,32 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
 
-@Entity
 @Getter
 public class Channel implements Serializable {
 
   private static final long serialVersionUID = 1L;
-
-  @Id
-  private final UUID id;
-  private final Instant createdAt;
+  private UUID id;
+  private Instant createdAt;
   private Instant updatedAt;
-
+  //
+  private ChannelType type;
   private String name;
   private String description;
-  private ChannelType channelType;
 
-  public Channel() {
+  public Channel(ChannelType type, String name, String description) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
-  }
-
-  public Channel(String name, String description, ChannelType channelType) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-
+    //
+    this.type = type;
     this.name = name;
     this.description = description;
-    this.channelType = channelType;
+  }
+
+  public Channel() {
   }
 
   public void update(String newName, String newDescription) {

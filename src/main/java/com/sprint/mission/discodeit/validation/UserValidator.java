@@ -17,7 +17,7 @@ public class UserValidator {
 
   private final UserRepository userRepository;
 
-  public void validateDuplicateUser(String username, String phoneNumber, String email) {
+  public void validateDuplicateUser(String username, String email) {
     if (userRepository.existsByUsername(username)) {
       throw new DuplicateResourceException("Username already exists: " + username);
     }
@@ -25,19 +25,11 @@ public class UserValidator {
     if (userRepository.existsByEmail(email)) {
       throw new DuplicateResourceException("Email already exists: " + email);
     }
-
-    if (userRepository.existsByPhoneNumber(phoneNumber)) {
-      throw new DuplicateResourceException("Phone number already exists: " + phoneNumber);
-    }
   }
 
-  public void validateUser(String username, String phoneNumber, String email, String password) {
+  public void validateUser(String username, String email, String password) {
     if (!username.matches(USERNAME_REGEX)) {
       throw new InvalidResourceException("Invalid username: " + username);
-    }
-
-    if (!phoneNumber.matches(PHONE_NUMBER_REGEX)) {
-      throw new InvalidResourceException("Invalid phoneNumber: " + phoneNumber);
     }
 
     if (!email.matches(EMAIL_REGEX)) {
