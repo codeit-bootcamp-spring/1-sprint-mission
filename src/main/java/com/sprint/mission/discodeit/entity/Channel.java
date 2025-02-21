@@ -1,11 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {      // 채널 (게시판)
 
     @Serial
@@ -13,24 +19,27 @@ public class Channel implements Serializable {      // 채널 (게시판)
 
     // 공통 필드
     private final UUID id;            // pk
-    private final Long createdAt;     // 생성 시간
-    private Long updatedAt;           // 수정 시간
+    private final Instant createdAt;  // 생성 시간
+    private Instant updatedAt;        // 수정 시간
 
     private final UUID ownerId;       // 채널 주인
-    private final Category category;  // 채널 카테고리
+    private String category;          // 채널 카테고리
     private String name;              // 채널 이름
     private String explanation;       // 채널 설명
-    private final List<UUID> members;       // 멤버 목록
-
+    private final List<UUID> members; // 멤버 목록
+    private final Map<UUID, ReadStatus> readStatuses;    // 멤버별 읽음 상태
+    private Instant lastMessageTime;
 
     // 생성자
-    public Channel(User user, String name, String explanation) {
+    // public 채널
+    public Channel(UUID ownerId, String name, String explanation) {
         // 공통 필드 초기화
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
 
         // Channel 필드
-        this.ownerId = user.getId();
+        this.ownerId = ownerId;
+        this.category = null;                       // 카테고리는 기본적으로 null로 설정
         validationAndSetName(name);
         this.explanation = explanation.trim();      // 앞뒤 공백 제거 후 저장
 
@@ -38,58 +47,54 @@ public class Channel implements Serializable {      // 채널 (게시판)
         this.members = new ArrayList<>();           // 텅빈 ArrayList로 초기화
         members.add(ownerId);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
 
-        this.category = new Category(this);  // 카테고리는 기본적으로 null로 설정
+        // readStatus
+        this.readStatuses = new HashMap<>();
+        readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
     }
 
+    // private 채널
+    public Channel(User user) {
+        // 공통 필드 초기화
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
 
-    // Getter 함수
-    public UUID getId() {
-        return id;
+        // Channel 필드
+        this.ownerId = user.getId();
+        this.category = null;                       // 카테고리는 기본적으로 null로 설정
+        this.name = null;
+        this.explanation = null;
+
+        // member
+        this.members = new ArrayList<>();           // 텅빈 ArrayList로 초기화
+        members.add(user.getId());                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
+
+        // readStatus
+        this.readStatuses = new HashMap<>();
+        readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
     }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public UUID getOwnerId() {
-        return ownerId;
-    }
-
-    public String getCategory() {
-        return category.toString();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getExplanation() {
-        return explanation;
-    }
-
-    public List<UUID> getMembers() {
-        return members;
-    }
 
 
     // update 함수
     public void updateCategory(String category) {
-        this.category.updateCategory(category);
-        updateUpdateAt();
+        if (category != null){
+            validationAndSetCategory(category);
+            updateUpdateAt();
+        }
     }
 
     public void updateName(String name) {
-        validationAndSetName(name);
-        updateUpdateAt();
+        if (name != null){
+            validationAndSetName(name);
+            updateUpdateAt();
+        }
     }
 
     public void updateExplanation(String explanation) {
-        this.explanation = explanation;
-        updateUpdateAt();
+        if (explanation != null){
+            this.explanation = explanation;
+            updateUpdateAt();
+        }
     }
 
     public void addMember(UUID memberId) {
@@ -102,8 +107,28 @@ public class Channel implements Serializable {      // 채널 (게시판)
         updateUpdateAt();
     }
 
+    public void updateReadStatus(UUID memberId) {
+        if (members.contains(memberId)) {
+            this.readStatuses.get(memberId).updateLastReadTime();
+        } else {
+            this.readStatuses.put(memberId, new ReadStatus(memberId, this.id));
+        }
+        updateUpdateAt();
+    }
+
+    public void updateLastMessageTime(Instant lastMessageTime) {
+        this.lastMessageTime = lastMessageTime;
+        updateUpdateAt();
+    }
+
     public void updateUpdateAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
+    }
+
+    // 이름이 null이면 private - true
+    // 이름이 null이 아니면 public - false
+    public boolean isPublic() {
+        return name != null;
     }
 
 
@@ -117,6 +142,18 @@ public class Channel implements Serializable {      // 채널 (게시판)
         name = name.trim();
 
         this.name = name;
+    }
+
+    // 카테고리 유효성 검사 및 세팅
+    private void validationAndSetCategory(String category) {
+
+        if (category == null || category.isBlank()) {
+            throw new IllegalArgumentException("채널명을 입력해주세요.");
+        }
+
+        category = category.trim();
+
+        this.category = category;
     }
 
     @Override

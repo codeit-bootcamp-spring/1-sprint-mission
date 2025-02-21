@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,12 +20,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Repository
 public class FileMessageRepository implements MessageRepository, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private final Path messageDirectory = Paths.get(System.getProperty("user.dir"), "message");
+    private final Path messageDirectory = Paths.get(System.getProperty("user.dir"), "/data/message");
 
     public FileMessageRepository() {
         init();
