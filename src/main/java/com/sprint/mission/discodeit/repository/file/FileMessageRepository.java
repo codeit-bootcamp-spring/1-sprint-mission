@@ -2,20 +2,32 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sprint.mission.discodeit.config.FileConfig;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+@Repository
 public class FileMessageRepository implements MessageRepository {
-    private static final String MESSAGE_JSON_FILE = "tmp/messages.json";
+    private final String messageJsonFile;
     private final ObjectMapper mapper;
     private Map<UUID, Message> messageMap;
 
-    public FileMessageRepository() {
+    @Autowired
+    public FileMessageRepository(FileConfig fileConfig) {
+        String fileDirectory = fileConfig.getFileDirectory();
+        String fileName = fileConfig.getMessageJsonPath();
+        this.messageJsonFile = fileDirectory + "/" + fileName;
         mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         messageMap = new HashMap<>();
     }
 
@@ -28,17 +40,19 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return loadMessageFromJson().get(messageId);
+    public Optional<Message> findByMessageId(UUID messageId) {
+        return Optional.ofNullable(loadMessageFromJson().get(messageId));
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(loadMessageFromJson().values());
+    public List<Message> findByChannelId(UUID channelId) {
+        return new ArrayList<>(loadMessageFromJson().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList());
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public void deleteByMessageId(UUID messageId) {
         messageMap = loadMessageFromJson();
         if (messageMap.containsKey(messageId)) {
             messageMap.remove(messageId);
@@ -46,9 +60,16 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        Map<UUID, Message> messageMap = loadMessageFromJson();
+        messageMap.values().removeIf(message -> message.getChannelId().equals(channelId));
+        saveMessageToJson(messageMap);
+    }
+
     private Map<UUID, Message> loadMessageFromJson() {
         Map<UUID, Message> map = new HashMap<>();
-        File file = new File(MESSAGE_JSON_FILE);
+        File file = new File(messageJsonFile);
         if (!file.exists()) {
             return map;
         }
@@ -56,16 +77,16 @@ public class FileMessageRepository implements MessageRepository {
             map = mapper.readValue(file, new TypeReference<Map<UUID, Message>>() {
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
         return map;
     }
 
     private void saveMessageToJson(Map<UUID, Message> messageMap) {
         try {
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(MESSAGE_JSON_FILE), messageMap);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(messageJsonFile), messageMap);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to save read statuses to JSON file.", e);
         }
     }
 }

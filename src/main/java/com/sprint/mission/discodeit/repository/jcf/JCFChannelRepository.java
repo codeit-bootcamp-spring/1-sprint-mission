@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
     Map<UUID, Channel> channelMap = new HashMap<>();
 
@@ -15,8 +17,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return channelMap.get(channelId);
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(channelMap.get(channelId));
     }
 
     @Override
@@ -25,7 +27,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID channelId) {
+    public void deleteByChannelId(UUID channelId) {
         channelMap.remove(channelId);
     }
 }
