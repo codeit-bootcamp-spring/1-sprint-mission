@@ -13,9 +13,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -38,7 +36,9 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Author with id " + authorId + " does not exist");
         }
 
-        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+        List<UUID> attachmentIds = Optional.ofNullable(binaryContentCreateRequests)
+                .orElse(Collections.emptyList())  // null이면 빈 리스트로 처리
+                .stream()
                 .map(attachmentRequest -> {
                     String fileName = attachmentRequest.fileName();
                     String contentType = attachmentRequest.contentType();

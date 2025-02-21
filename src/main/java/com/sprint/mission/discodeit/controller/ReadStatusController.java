@@ -25,7 +25,7 @@ public class ReadStatusController {
         return new ResponseEntity<>(createdStatus, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    @RequestMapping(method = RequestMethod.PUT, value = "/update/{readStatusId}")
     public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
         ReadStatus updatedStatus = readStatusService.update(readStatusId, request);
         return ResponseEntity.ok(updatedStatus);  // 수정된 정보 반환
