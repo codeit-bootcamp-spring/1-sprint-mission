@@ -1,66 +1,101 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.logger.service.ServiceLogger;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-public class BasicMessageService {
+@RequiredArgsConstructor
+@Service
+public class BasicMessageService implements MessageService {
 
-    private static final ServiceLogger logger = ServiceLogger.getInstance();
+    private final MessageRepository messageRepository;
+    //
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public static Message setupMessage(MessageService messageService, Message messageInfoToCreate) {
-        printStartInfo("setupMessage(MessageService, Message)");
+    @Override
+    public Message create(MessageCreateRequest messageCreateRequest,
+        List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+        UUID channelId = messageCreateRequest.channelId();
+        UUID authorId = messageCreateRequest.authorId();
 
-        Message message = messageService.registerMessage(messageInfoToCreate);
-
-        printArgsAndMessageInfo(messageInfoToCreate.getId(), message, "Already exist!");
-
-        return message;
-    }
-
-    public static Message updateMessage(MessageService messageService, UUID key,
-        Message messageInfoToUpdate) {
-        printStartInfo("updateMessage(MessageService, UUID, Message)");
-
-        Message message = messageService.updateMessageById(key, messageInfoToUpdate);
-
-        printArgsAndMessageInfo(key, message, "Not exist!");
-
-        return message;
-    }
-
-    public static Message searchMessage(MessageService messageService, UUID key) {
-        printStartInfo("searchMessage(MessageService, UUID)");
-
-        Message message = messageService.searchMessageById(key);
-
-        printArgsAndMessageInfo(key, message, "Not exist!");
-
-        return message;
-    }
-
-    public static Message removeMessage(MessageService messageService, UUID key) {
-        printStartInfo("removeMessage(MessageService, UUID)");
-
-        Message message = messageService.deleteMessageById(key);
-
-        printArgsAndMessageInfo(key, message, "Not exist!");
-
-        return message;
-    }
-
-    private static void printStartInfo(String startInfo) {
-        logger.info("---------------------------------");
-        logger.info(startInfo);
-    }
-
-    private static void printArgsAndMessageInfo(UUID key, Message message,
-        String messageWhenEmpty) {
-        logger.info("pass UUID '" + key + "'! ");
-        if (message == Message.EMPTY_MESSAGE) {
-            logger.info(messageWhenEmpty);
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
         }
-        logger.info("Message info: " + message);
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("Author with id " + authorId + " does not exist");
+        }
+
+        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+            .map(attachmentRequest -> {
+                BinaryContent binaryContent = getBinaryContent(attachmentRequest);
+                return binaryContentRepository.save(binaryContent).getId();
+            })
+            .toList();
+
+        String content = messageCreateRequest.content();
+        Message message = Message.createMessage(
+            content,
+            channelId,
+            authorId,
+            attachmentIds
+        );
+        return messageRepository.save(message);
+    }
+
+    private static BinaryContent getBinaryContent(BinaryContentCreateRequest attachmentRequest) {
+        String fileName = attachmentRequest.fileName();
+        String contentType = attachmentRequest.contentType();
+        byte[] bytes = attachmentRequest.bytes();
+        return BinaryContent.createBinaryContent(
+            fileName, (long) bytes.length, contentType, bytes);
+    }
+
+    @Override
+    public Message find(UUID messageId) {
+        return messageRepository.findById(messageId)
+            .orElseThrow(
+                () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId).stream()
+            .toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, MessageUpdateRequest request) {
+        String newContent = request.content();
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(
+                () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        Message updatedMessage = message.update(newContent);
+        return messageRepository.save(updatedMessage);
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+            .orElseThrow(
+                () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+
+        message.getAttachmentIds()
+            .forEach(binaryContentRepository::deleteById);
+
+        messageRepository.deleteById(messageId);
     }
 }

@@ -1,62 +1,48 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_STRING;
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_TIME;
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@EqualsAndHashCode(of = "id")
-@ToString
-@Accessors(fluent = true)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Channel implements Serializable {
 
-    @Getter(AccessLevel.NONE)
     @Serial
-    private static final long serialVersionUID = 5112808545762685190L;
+    private static final long serialVersionUID = 5914585350032631538L;
 
-    /**
-     * Field: {@code EMPTY_CHANNEL} is literally empty static Channel object
-     */
-    public static final Channel EMPTY_CHANNEL;
     private final UUID id;
-    private final Instant createAt;
-    private final Instant updateAt;
+    private final Instant createdAt;
+    private final Instant updatedAt;
+    //
+    private final ChannelType type;
     private final String name;
+    private final String description;
 
-    static {
-        EMPTY_CHANNEL = createChannel(
-            UUID.fromString(EMPTY_UUID.getValue()),
-            Instant.parse(EMPTY_TIME.getValue()),
-            Instant.parse(EMPTY_TIME.getValue()),
-            EMPTY_STRING.getValue()
+    public static Channel createChannel(ChannelType type, String name, String description) {
+        return new Channel(UUID.randomUUID(), Instant.now(), null, type, name, description);
+    }
+
+    public Channel update(String name, String description) {
+        if (name == null || description == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (name.equals(this.name) && description.equals(this.description)) {
+            return this;
+        }
+
+        return new Channel(
+            this.id,
+            this.createdAt,
+            Instant.now(),
+            this.type,
+            name,
+            description
         );
-    }
-
-    public static Channel createChannel(String name) {
-        return new Channel(UUID.randomUUID(), Instant.now(), Instant.now(), name);
-    }
-
-    public static Channel createChannel(UUID id, String name) {
-        return new Channel(id, Instant.now(), Instant.now(), name);
-    }
-
-    public static Channel createChannel(UUID id, Instant createAt, String name) {
-        return new Channel(id, createAt, Instant.now(), name);
-    }
-
-    public static Channel createChannel(UUID id, Instant createAt, Instant updateAt, String name) {
-        return new Channel(id, createAt, updateAt, name);
     }
 }

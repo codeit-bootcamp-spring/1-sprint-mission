@@ -1,45 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_TIME;
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
-
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Accessors(fluent = true)
-public class ReadStatus {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class ReadStatus implements Serializable {
 
-    /**
-     * Field: {@code EMPTY_READ_STATUS} is literally empty static ReadStatus object
-     */
-    public static final ReadStatus EMPTY_READ_STATUS;
+    @Serial
+    private static final long serialVersionUID = 3735382067812923186L;
+
+    private final UUID id;
+    private final Instant createdAt;
+    private final Instant updatedAt;
+    //
     private final UUID userId;
-    private final Instant createAt;
-    private final Instant updateAt;
+    private final UUID channelId;
+    private final Instant lastReadAt;
 
-    static {
-        EMPTY_READ_STATUS = new ReadStatus(
-            UUID.fromString(EMPTY_UUID.getValue()),
-            Instant.parse(EMPTY_TIME.getValue()),
-            Instant.parse(EMPTY_TIME.getValue())
+    public static ReadStatus createReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+        return new ReadStatus(UUID.randomUUID(), Instant.now(), null, userId, channelId,
+            lastReadAt);
+    }
+
+    public ReadStatus update(Instant lastReadAt) {
+        if (lastReadAt == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (lastReadAt.equals(this.lastReadAt)) {
+            return this;
+        }
+
+        return new ReadStatus(
+            this.id,
+            this.createdAt,
+            Instant.now(),
+            this.userId,
+            this.channelId,
+            lastReadAt
         );
-    }
-
-    public static ReadStatus createReadStatus() {
-        return new ReadStatus(UUID.randomUUID(), Instant.now(), Instant.now());
-    }
-
-    public static ReadStatus createReadStatus(UUID id) {
-        return new ReadStatus(id, Instant.now(), Instant.now());
-    }
-
-    public static ReadStatus createReadStatus(UUID id, Instant createAt, Instant updateAt) {
-        return new ReadStatus(id, createAt, updateAt);
     }
 }

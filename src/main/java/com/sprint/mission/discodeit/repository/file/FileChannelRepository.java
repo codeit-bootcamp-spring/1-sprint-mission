@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.ExitStatus.DIR_CREATION_ERROR;
-
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,130 +10,104 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final RepositoryLogger logger = RepositoryLogger.getInstance();
-    private static final Path FILE_DIR = Paths.get(System.getProperty("user.dir"), "file",
-        "channel");
-    private static final String FILE_EXT = ".ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    static {
-        if (!Files.exists(FILE_DIR)) {
+    public FileChannelRepository(
+        @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+            Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(FILE_DIR);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
-                System.err.println("Failed to mkdir: " + e.getMessage());
-                System.exit(DIR_CREATION_ERROR.ordinal());
+                throw new RuntimeException(e);
             }
         }
     }
 
-    /**
-     * Create the Channel while ignoring the {@code createAt} and {@code updateAt} fields from
-     * {@code channelInfoToCreate}
-     */
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
     @Override
-    public Channel createChannel(Channel channelInfoToCreate) {
-        Path filePath = getFilePath(channelInfoToCreate.getId());
-        if (Files.exists(filePath)) {
-            return Channel.EMPTY_CHANNEL;
-        }
-
+    public Channel save(Channel channel) {
+        Path path = resolvePath(channel.getId());
         try (
-            FileOutputStream fos = new FileOutputStream(filePath.toFile());
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(path.toFile());
+            ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            Channel channelToCreate = Channel.createChannel(
-                channelInfoToCreate.getId(),
-                channelInfoToCreate.getName()
-            );
-
-            oos.writeObject(channelToCreate);
-            return channelToCreate;
+            oos.writeObject(channel);
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Channel.EMPTY_CHANNEL;
+        return channel;
     }
 
     @Override
-    public Channel findChannelById(UUID key) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Channel.EMPTY_CHANNEL;
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-        try (
-            FileInputStream fis = new FileInputStream(filePath.toFile());
-            ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            return (Channel) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            logger.severe(e);
-
-        }
-
-        return Channel.EMPTY_CHANNEL;
+        return Optional.ofNullable(channelNullable);
     }
 
-    /**
-     * Update the Channel while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields
-     * from {@code channelInfoToUpdate}
-     */
     @Override
-    public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Channel.EMPTY_CHANNEL;
-        }
-
-        Channel existingChannel = findChannelById(key);
-        try (
-            FileOutputStream fis = new FileOutputStream(filePath.toFile());
-            ObjectOutputStream ois = new ObjectOutputStream(fis);
-        ) {
-            Channel channelToUpdate = Channel.createChannel(
-                key,
-                existingChannel.getCreateAt(),
-                channelInfoToUpdate.getName()
-            );
-
-            ois.writeObject(channelToUpdate);
-            return channelToUpdate;
+    public List<Channel> findAll() {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                .filter(path -> path.toString().endsWith(EXTENSION))
+                .map(path -> {
+                    try (
+                        FileInputStream fis = new FileInputStream(path.toFile());
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                    ) {
+                        return (Channel) ois.readObject();
+                    } catch (IOException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Channel.EMPTY_CHANNEL;
     }
 
     @Override
-    public Channel deleteChannelById(UUID key) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Channel.EMPTY_CHANNEL;
-        }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
 
-        Channel exsitingChannel = findChannelById(key);
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
-            Files.delete(filePath);
-            return exsitingChannel;
+            Files.delete(path);
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Channel.EMPTY_CHANNEL;
-    }
-
-    private Path getFilePath(UUID key) {
-        return FILE_DIR.resolve(key.toString().concat(FILE_EXT));
     }
 }

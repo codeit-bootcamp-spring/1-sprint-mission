@@ -2,60 +2,44 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
 
     public JCFChannelRepository() {
-        data = new HashMap<>();
-    }
-
-    /**
-     * Create the Channel while ignoring the {@code createAt} and {@code updateAt} fields from {@code channelInfoToCreate}
-     */
-    @Override
-    public Channel createChannel(Channel channelInfoToCreate) {
-        Channel channelToCreate = Channel.createChannel(
-                channelInfoToCreate.getId(),
-                channelInfoToCreate.getName()
-        );
-
-        return Optional.ofNullable(data.putIfAbsent(channelToCreate.getId(), channelToCreate))
-                .map(existingChannel -> Channel.createEmptyChannel())
-                .orElse(channelToCreate);
+        this.data = new ConcurrentHashMap<>();
     }
 
     @Override
-    public Channel findChannelById(UUID key) {
-        return Optional.ofNullable(data.get(key))
-                .orElse(Channel.createEmptyChannel());
-    }
-
-    /**
-     * Update the Channel while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code channelInfoToUpdate}
-     */
-    @Override
-    public Channel updateChannelById(UUID key, Channel channelInfoToUpdate) {
-        Channel existingChannel = findChannelById(key);
-        Channel channelToUpdate = Channel.createChannel(
-                key,
-                existingChannel.getCreateAt(),
-                channelInfoToUpdate.getName()
-        );
-
-        return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, channel) -> channelToUpdate))
-                .orElse(Channel.createEmptyChannel());
+    public Channel save(Channel channel) {
+        this.data.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
-    public Channel deleteChannelById(UUID key) {
-        return Optional.ofNullable(data.remove(key))
-                .orElse(Channel.createEmptyChannel());
+    public Optional<Channel> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
+    }
+
+    @Override
+    public List<Channel> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
     }
 }
