@@ -54,10 +54,10 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateRequest readStatusUpdateRequest) {
-        ReadStatus readStatus = find(readStatusUpdateRequest.id());
-        readStatus.updateUpdatedAt();
-        return readStatus;
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
+        ReadStatus readStatus = find(readStatusId);
+        readStatus.update(readStatusUpdateRequest.lastReadAt());
+        return readStatusRepository.save(readStatus);
     }
 
     @Override

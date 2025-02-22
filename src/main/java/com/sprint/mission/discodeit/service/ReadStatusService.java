@@ -11,7 +11,7 @@ public interface ReadStatusService {
     ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest);
     ReadStatus find(UUID readStatusId);
     List<ReadStatus> findAllByUserId(UUID userId);
-    ReadStatus update(ReadStatusUpdateRequest readStatusUpdateRequest);
+    ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest);
     void delete(UUID readStatusId);
     void deleteByChannelId(UUID channelId);
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
@@ -14,6 +14,6 @@ public interface MessageService {
     MessageResponse find(UUID messageId);
     List<MessageResponse> findAllByChannelId(UUID channelId);
     MessageResponse getMessageInfo(Message message);
-    Message update(MessageUpdateRequest messageUpdateRequest);
+    Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest);
     void delete(UUID messageId);
 }

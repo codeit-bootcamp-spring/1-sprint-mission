@@ -18,6 +18,6 @@ public interface ChannelService {
     Instant findLastMessageTime(UUID channelId);
     List<UUID> findParticipantsIds(Channel channel);
     ChannelResponse getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantsIds);
-    Channel update(PublicChannelUpdateRequest channelUpdateRequest);
+    Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest);
     void delete(UUID channelId);
 }

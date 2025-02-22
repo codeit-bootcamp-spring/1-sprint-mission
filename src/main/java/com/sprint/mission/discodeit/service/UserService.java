@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
@@ -15,7 +15,7 @@ public interface UserService {
     UserResponse find(UUID userId);
     List<UserResponse> findAll();
     UserResponse getUserInfo(User user);
-    User update(UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest);
+    User update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest);
     void delete(UUID userId);
     void validateDuplicateName(String name);
     void validateDuplicateEmail(String email);

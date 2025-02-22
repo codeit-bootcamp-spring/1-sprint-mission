@@ -92,9 +92,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(PublicChannelUpdateRequest channelUpdateRequest) {
+    public Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest) {
         validator.validate(channelUpdateRequest.name(), channelUpdateRequest.introduction());
-        Channel channel = Optional.ofNullable(channelRepository.find(channelUpdateRequest.id()))
+        Channel channel = Optional.ofNullable(channelRepository.find(channelId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
         channel.update(channelUpdateRequest.name(), channelUpdateRequest.introduction());

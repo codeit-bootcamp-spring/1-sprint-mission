@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreate;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
                 .map(BinaryContent::getId)
                 .orElse(null);
         User user = userRepository.save(new User(binaryContentId, userRequest.name(), userRequest.email(), userRequest.password()));
-        userStatusService.create(UserStatusCreate.from(user.getId()));
+        userStatusService.create(UserStatusCreateRequest.from(user.getId()));
 
         return user;
     }
@@ -72,9 +72,9 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
         validator.validate(userUpdateRequest.name(), userUpdateRequest.email());
-        User user = Optional.ofNullable(userRepository.find(userUpdateRequest.userId()))
+        User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
         if (binaryContentRequest != null) {
