@@ -29,7 +29,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
                 .toList();
     }
 
-    // TODO : 채널과의 관계 공부 (채널 파인드, 채널 딜리트)
+    // TODO : 채널과의 관계 공부 (채널 find, 채널 delete)
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
         return this.data.values().stream()
