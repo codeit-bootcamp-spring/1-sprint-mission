@@ -39,7 +39,7 @@ public class ChannelController {
     }
 
 
-    @PatchMapping("/{channelId}")
+    @PatchMapping("{id}")
     public ResponseEntity<String> update(@PathVariable UUID channelId
         , @RequestBody ChannelDtoForRequest requestDTO) {
 
@@ -53,8 +53,7 @@ public class ChannelController {
             .body("수정 완료");
     }
 
-
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity
@@ -74,7 +73,7 @@ public class ChannelController {
             .body(channelDtoList);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<FindChannelDto> findById(@PathVariable("id") UUID channelId) {
         Channel findChannel = channelService.findById(channelId);
         return ResponseEntity
