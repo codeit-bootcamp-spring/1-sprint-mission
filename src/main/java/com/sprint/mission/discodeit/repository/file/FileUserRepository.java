@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
@@ -78,8 +77,8 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
+        try {
+            return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
