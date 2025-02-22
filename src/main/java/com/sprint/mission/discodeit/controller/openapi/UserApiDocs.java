@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 
-@Tag(name = "USER API", description = "User 작업")
+@Tag(name = "User API", description = "User 작업")
 public interface UserApiDocs {
 
   @Operation(summary = "User 조회", description = "Find single user using userId")

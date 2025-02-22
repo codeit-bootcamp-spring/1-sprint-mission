@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -43,7 +44,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent find(String id) {
     return binaryContentRepository.findById(id).orElseThrow(
-        () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+        () -> new NotFoundException(DEFAULT_ERROR_MESSAGE)
     );
   }
 
@@ -55,7 +56,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
     return ids.stream().map(
-        id -> binaryContentRepository.findById(id).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE))
+        id -> binaryContentRepository.findById(id).orElseThrow(() -> new NotFoundException(DEFAULT_ERROR_MESSAGE))
     ).toList();
   }
 
