@@ -33,27 +33,25 @@ public class UserController {
 
     private final JCFUserService userService;
     private final UserStatusService userStatusService;
-    private final BinaryService binaryProfileService;
 
-    @PostMapping(MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> create(@RequestPart("dto") UserDtoForCreate requestDTO,
+    @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
                                          @RequestPart("profile") MultipartFile profile) {
-
         Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
-
         userService.create(requestDTO, binaryContentDto);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("User created successfully");
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body("User created successfully");
     }
-
-
 
     @PatchMapping(path = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> update(@PathVariable("id") UUID userId,
                                          @RequestPart("dto") UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
-        return ResponseEntity.ok("Successfully updated");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("Successfully updated");
     }
 
 
@@ -70,7 +68,9 @@ public class UserController {
     @PatchMapping("{id}/status")
     public ResponseEntity<String> updateStatusByUserId(@PathVariable("id") UUID userId) {
         userStatusService.updateByUserId(userId);
-        return ResponseEntity.ok("Successfully updated");
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body("Successfully updated");
     }
 
 //

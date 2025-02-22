@@ -29,7 +29,8 @@ public enum ErrorCode {
     ALREADY_EXIST_READ_STATUS(HttpStatus.CONFLICT, "이미 존재하는 READ 상태입니다"),
 
     ALREADY_EXIST_NAME(HttpStatus.CONFLICT, "이미 존재하는 이름입니다"),
-    ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다");
+    ALREADY_EXIST_EMAIL(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다"),
+    FILE_CONVERT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 변환 중 오류가 발생했습니다."),;
     private final HttpStatus status;
     private final String message;
 }

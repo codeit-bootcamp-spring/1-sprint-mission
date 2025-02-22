@@ -35,17 +35,17 @@ public class JCFUserService implements UserService {
 
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
 
-        User user = User.createUserByRequestDto(requestDTO);
+        User createdUser = requestDTO.toEntity();
         // 선택적 프로필 생성
         if (profileDTO.isPresent()){
             BinaryContent binaryContent = profileService.create(profileDTO.get());
-            user.setProfileImgId(binaryContent.getId());
+            createdUser.setProfileImgId(binaryContent.getId());
         }
 
         // UserStatus 생성
-        userStatusService.create(user.getId());
+        userStatusService.create(createdUser.getId());
 
-        return userRepository.save(user);
+        return userRepository.save(createdUser);
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
@@ -62,7 +62,8 @@ public class JCFUserService implements UserService {
 
     @Override
     public User findById(UUID userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
     @Override
@@ -78,9 +79,9 @@ public class JCFUserService implements UserService {
         userRepository.findById(userId)
             .map(user -> {
                 userRepository.delete(userId);
-                profileService.delete(user.getProfileImgId());
+                profileService.deleteById(user.getProfileImgId());
                 userStatusService.deleteByUserId(userId);
-                return user;
+                return null;
             }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 

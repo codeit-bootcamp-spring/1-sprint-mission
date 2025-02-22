@@ -177,5 +177,4 @@ public class JCFChannelService implements ChannelService {
 //            return readTimeMap;
 //        }
 }
-    }
 

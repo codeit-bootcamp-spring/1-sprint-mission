@@ -6,6 +6,7 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
+import com.sprint.mission.dto.response.FindChannelAllDto;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
@@ -75,10 +76,8 @@ public class ChannelController {
 
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @GetMapping
-    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
-        List<Channel> channelList = channelService.findAllByUserId(userId);
-        List<FindChannelDto> channelDtoList = channelList.stream()
-            .map(this::getFindChannelDto).toList();
+    public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+        List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -111,5 +110,4 @@ public class ChannelController {
                 ? new FindPrivateChannelDto(findedChannel)
                 : new FindPublicChannelDto(findedChannel));
     }
-
 }

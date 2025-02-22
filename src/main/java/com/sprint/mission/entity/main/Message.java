@@ -25,8 +25,7 @@ public class Message implements Serializable, Comparable<Message> {
     private List<UUID> attachmentIdList;
     private String content;
 
-    // 무조건 메시지는 CREATE로 생성하도록
-    private Message(UUID channelId, UUID userId, String content) {
+    public Message(UUID channelId, UUID userId, String content) {
         this.id = UUID.randomUUID();
         this.channelId = channelId;
         this.writerId = userId;

@@ -6,6 +6,10 @@ public record UserDtoForCreate(
     String username,
     String password,
     String email) {
+
+  public User toEntity() {
+    return new User(username, password, email, null);
+  }
 }
   ;
   // 프로필 이미지

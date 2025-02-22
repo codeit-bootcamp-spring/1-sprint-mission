@@ -30,25 +30,26 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
-        UUID channelId = responseDto.getChannelId();
-        UUID userId = responseDto.getUserId();
-        if(!channelRepository.existsById(channelId)){
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
+        UUID userId = responseDto.userId();
+        UUID channelId = responseDto.channelId();
 
         if(!userRepository.existsById(userId)){
             throw new CustomException(ErrorCode.NO_SUCH_USER);
         }
+        if(!channelRepository.existsById(channelId)){
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
 
-        Message createdMessage = Message.createMessage(channelId, userId, responseDto.getContent());
+        Message createdMessage = responseDto.toEntity();
 
         if (!attachmentsDto.isEmpty()) {
             List<BinaryContentDto> binaryContentDtoList = attachmentsDto.get();
-            for (BinaryContentDto binaryContentDto : binaryContentDtoList) {
-                BinaryContent createdBinaryContent = binaryService.create(binaryContentDto);
+            for (BinaryContentDto bcd : binaryContentDtoList) {
+                BinaryContent createdBinaryContent = binaryService.create(bcd);
                 createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
             }
         }
+
         //writtenChannel.updateLastMessageTime();
         //channelRepository.save(writtenChannel);
         messageRepository.save(createdMessage);
@@ -56,17 +57,17 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void update(UUID messageId, MessageDtoForUpdate updateDto) {
-        binaryMessageService.delete(messageId);
-
         Message updatingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
-
-        updatingMessage.setContent(updateDto.getContent());
-        updatingMessage.setAttachments(updateDto.getBinaryContentList());
-        binaryMessageService.create(new BinaryMessageContentDto(messageId, updateDto.getBinaryContentList()));
-
-        // 수정해도 채널의 lastMessageTime은 불변?
+        updatingMessage.setContent(updateDto.newContent());
         messageRepository.save(updatingMessage);
+    }
+
+
+    @Override
+    public Message findById(UUID channelId) {
+        return messageRepository.findById(channelId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 
     @Override
@@ -80,16 +81,15 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        binaryMessageService.delete(messageId);
-        if (messageRepository.existsById(messageId)) messageRepository.delete(messageId);
-        else throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
+        Message deletingMessage = messageRepository.findById(messageId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+
+        deletingMessage.getAttachmentIdList()
+            .forEach(binaryService::deleteById);
+
+        messageRepository.delete(deletingMessage.getId());
     }
 
-    @Override
-    public Message findById(UUID channelId) {
-        return messageRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
-    }
 
     public void deleteAllByChannelId(UUID channelId) {
         messageRepository.deleteAllByChannelId(channelId);

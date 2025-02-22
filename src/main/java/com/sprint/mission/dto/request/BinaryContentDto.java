@@ -1,5 +1,7 @@
 package com.sprint.mission.dto.request;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 import lombok.Data;
@@ -8,18 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@Data
-@NoArgsConstructor
-public class BinaryContentDto {
-    String fileName;
-    String contentType;
-    byte[] bytes;
 
-    public BinaryContentDto(String fileName, String contentType, byte[] bytes) {
-        this.fileName = fileName;
-        this.contentType = contentType;
-        this.bytes = bytes;
-    }
+public record BinaryContentDto (
+    String fileName,
+    String contentType,
+    byte[] bytes){
 
     public BinaryContent toEntity() {
         return new BinaryContent(fileName, contentType, bytes);
@@ -34,8 +29,7 @@ public class BinaryContentDto {
                 file.getContentType(), file.getBytes());
             return Optional.of(binaryContentDto);
         } catch (IOException e) {
-            // 나중에 커스텀 에러처리하기
-            throw new RuntimeException(e);
+            throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
         }
     }
 }

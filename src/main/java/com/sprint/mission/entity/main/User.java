@@ -36,10 +36,6 @@ public class User implements Serializable {
         this.profileImgId = profileImgId;
     }
 
-    public static User createUserByRequestDto(UserDtoForCreate dto) {
-        return new User(dto.username(), dto.password(), dto.email(), null);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

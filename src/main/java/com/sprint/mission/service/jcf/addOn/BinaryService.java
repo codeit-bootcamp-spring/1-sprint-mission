@@ -5,7 +5,6 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.jcf.addOn.JCFBinaryContentRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,9 +30,9 @@ public class BinaryService {
         return binaryContentRepository.findAllByIdIn(idList);
     }
 
-    public void delete(UUID id) {
-        if (!binaryContentRepository.existsById(id)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
-        else binaryContentRepository.delete(id);
+    public void deleteById(UUID binaryId) {
+        if (!binaryContentRepository.existsById(binaryId)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
+        else binaryContentRepository.delete(binaryId);
     }
 
     public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
