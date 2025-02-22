@@ -19,4 +19,3 @@ springdoc:
     path: /api-docs  # OpenAPI 문서 접근 경로
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI 경로 (기본값)
-
