@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository{
 
   public FileChannelRepository(@Value("${app.file.channel-file}") String filePath) {

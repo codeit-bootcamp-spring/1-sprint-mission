@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileUserStatusRepository extends AbstractFileRepository<UserStatus> implements UserStatusRepository{
 
 

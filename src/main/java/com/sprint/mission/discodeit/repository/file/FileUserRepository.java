@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository{
 
   public FileUserRepository(@Value("${app.file.user-file}") String filePath) {

@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 public class JCFBinaryContentRepository implements BinaryContentRepository{
 
   private final Map<String, BinaryContent> data = new ConcurrentHashMap<>();

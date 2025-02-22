@@ -17,7 +17,7 @@ import java.util.Optional;
 
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository {
 
 

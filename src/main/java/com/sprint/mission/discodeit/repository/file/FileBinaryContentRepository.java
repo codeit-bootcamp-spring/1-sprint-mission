@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileBinaryContentRepository extends AbstractFileRepository<BinaryContent> implements BinaryContentRepository{
 
   public FileBinaryContentRepository(@Value("${app.file.binary-content-file}") String filePath) {

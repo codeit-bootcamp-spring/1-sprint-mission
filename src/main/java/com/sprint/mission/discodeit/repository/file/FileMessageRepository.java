@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
 public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository{
 
   public FileMessageRepository(@Value("${app.file.message-file}") String filePath) {

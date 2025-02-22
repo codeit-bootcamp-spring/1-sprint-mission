@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 @Repository
-@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf",  matchIfMissing = true)
+@ConditionalOnProperty(name = "app.repository.type", havingValue = "jcf")
 
 public class JCFUserRepository implements UserRepository{
 
