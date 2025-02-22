@@ -59,9 +59,4 @@ public class UserStatus implements Serializable {
         return "UserStatus{active =" + isActive + "}";
     }
 
-
-
-    // TODO : 이게 있어야 userController의 이 메서드 부분이 실행되는데.. 왜,,,?
-    public void updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
-    }
 }
