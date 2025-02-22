@@ -2,7 +2,6 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.dto.request.LoginDtoForRequest;
 import com.sprint.mission.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

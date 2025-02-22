@@ -77,31 +77,15 @@ public class ChannelController {
 
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @GetMapping
-    public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(
+        @RequestParam("userId") UUID userId) {
+
         List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
 
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(channelDtoList);
     }
-
-    @GetMapping("{id}")
-    public ResponseEntity<FindChannelDto> findById(@PathVariable("id") UUID channelId) {
-        Channel findChannel = channelService.findById(channelId);
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(getFindChannelDto(findChannel));
-    }
-
-//    @GetMapping(value = "/{usersId}/channels")
-//    public ResponseEntity<List<FindChannelDto>> findAllByUserId(@PathVariable UUID userId) {
-//        List<Channel> findAllChannel = channelService.findAllByUserId(userId);
-//        List<FindChannelDto> findChannelDtoList = findAllChannel.stream()
-//                .map(this::getFindChannelDto).collect(Collectors.toCollection(ArrayList::new));
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(findChannelDtoList);
-//    }
-
 
     /**
      * 응답 DTO (타입별)

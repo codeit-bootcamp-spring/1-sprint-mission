@@ -16,7 +16,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class ControllerAdvice {
 
-    // 나중에 에러 반환 클래스만들어서 객체로 전달하기
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException e, HttpServletRequest request){

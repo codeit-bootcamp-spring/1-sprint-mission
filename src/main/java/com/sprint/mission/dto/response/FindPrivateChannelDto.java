@@ -23,5 +23,6 @@ public class FindPrivateChannelDto implements FindChannelDto {
         this.channelType = channel.getChannelType();
         this.description = channel.getDescription();
         this.name = channel.getName();
+
     }
 }

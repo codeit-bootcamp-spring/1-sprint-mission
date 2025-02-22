@@ -12,16 +12,11 @@ public class FindPublicChannelDto implements FindChannelDto {
     private ChannelType channelType;
     private String description;
     private String name;
-    private Instant lastMessageTime;
 
     public FindPublicChannelDto(Channel channel) {
         this.channelType = channel.getChannelType();
         this.description = channel.getDescription();
         this.name = channel.getName();
-        this.lastMessageTime = channel.getLastMessageTime();
     }
-
     public FindPublicChannelDto() {}
-
-
 }
