@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.ReadStatusApiDocs;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponseDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
@@ -17,23 +18,26 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ReadStatusController {
+public class ReadStatusController implements ReadStatusApiDocs {
 
   private final ReadStatusService readStatusService;
   private final ReadStatusMapper readStatusMapper;
 
-  @PostMapping("/read-statuses")
+  @Override
+  @PostMapping("/readStatuses")
   public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody CreateReadStatusDto dto){
     ReadStatusResponseDto status = readStatusMapper.toReadStatusResponseDto(readStatusService.create(dto, false));
-    return ResponseEntity.ok(status);
+    return ResponseEntity.status(201).body(status);
   }
 
-  @PatchMapping("/read-statuses/{id}")  // 이거 해야함
+  @Override
+  @PatchMapping("/readStatuses/{id}")
   public ResponseEntity<ReadStatusResponseDto> updateReadStatus(@PathVariable String id, @RequestBody UpdateReadStatusDto dto){
     ReadStatus status = readStatusService.updateById(dto, id);
     return ResponseEntity.ok(readStatusMapper.toReadStatusResponseDto(status));
   }
 
+  @Override
   @GetMapping("/readStatuses")
   public ResponseEntity<List<ReadStatusResponseDto>> getUserReadStatus(@RequestParam String userId){
     List<ReadStatusResponseDto> status = readStatusService.findAllByUserId(userId).stream().map(readStatusMapper::toReadStatusResponseDto).toList();
