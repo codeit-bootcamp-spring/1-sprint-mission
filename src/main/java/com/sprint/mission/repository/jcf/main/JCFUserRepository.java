@@ -40,4 +40,10 @@ public class JCFUserRepository implements UserRepository {
     public boolean existsById(UUID id){
         return data.containsKey(id);
     }
+
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getName().equals(username))
+                .findFirst();
+    }
 }
