@@ -98,8 +98,10 @@ public class FileReadStatusRepository implements ReadStatusRepository {
           .map(path -> {
             try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
               return (ReadStatus) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-              throw new RuntimeException(e);
+            } catch (IOException e) {
+              throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
+            } catch (ClassNotFoundException e) {
+              throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS_FILE);
             }
           })
           .filter(readStatus -> readStatus.getChannelId().equals(channelId))
@@ -119,7 +121,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     try {
       Files.delete(resolvePath(id));
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new CustomException(ErrorCode.FILE_DELETE_ERROR);
     }
   }
 

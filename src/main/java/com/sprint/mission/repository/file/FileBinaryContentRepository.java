@@ -3,6 +3,7 @@ package com.sprint.mission.repository.file;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.repository.jcf.BinarycontentRepository;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-public class FileBinaryContentRepository implements BinaryContentRepository {
+public class FileBinaryContentRepository implements BinarycontentRepository {
 
   private final Path DIRECTORY;
   private final String EXTENSION = ".ser";
@@ -92,7 +93,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
   }
 
   @Override
-  public void deleteById(UUID id) {
+  public void delete(UUID id) {
     try {
       Files.delete(resolvePath(id));
     } catch (IOException e) {

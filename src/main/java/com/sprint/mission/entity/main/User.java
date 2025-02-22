@@ -35,21 +35,4 @@ public class User implements Serializable {
         this.email = email;
         this.profileImgId = profileImgId;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(password, user.password) ;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, password);
-    }
-
-    @Override
-    public String toString() {
-        return "[" + name + "]" + " => email: " + email + ", password: " + password;
-    }
 }

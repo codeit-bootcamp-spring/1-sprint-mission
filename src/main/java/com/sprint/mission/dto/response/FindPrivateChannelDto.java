@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 public class FindPrivateChannelDto implements FindChannelDto {

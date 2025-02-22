@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Message implements Serializable, Comparable<Message> {
+public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,10 +34,6 @@ public class Message implements Serializable, Comparable<Message> {
         this.attachmentIdList = new ArrayList<>();
     }
 
-    public static Message createMessage(UUID channelId, UUID userId, String content) {
-        return new Message(channelId, userId, content);
-    }
-
     public void update(String newContent) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
@@ -48,13 +44,5 @@ public class Message implements Serializable, Comparable<Message> {
         if (anyValueUpdated) {
             this.updateAt = Instant.now();
         }
-    }
-
-    // 나중에, equals hashcode
-
-    @Override
-    public int compareTo(Message otherMessage) {
-        // createdAt기준으로 정렬
-        return this.createAt.compareTo(otherMessage.createAt);
     }
 }

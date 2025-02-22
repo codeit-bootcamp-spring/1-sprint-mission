@@ -30,10 +30,6 @@ public class Channel implements Serializable {
         this.createdAt = Instant.now();
     }
 
-//    public static Channel createChannelByRequestDto(ChannelDtoForRequest dto) {
-//        return new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
-//    }
-
     public void updateByDTO(ChannelDtoForRequest dto){
         this.name = dto.newName();
         this.description = dto.newDescription();

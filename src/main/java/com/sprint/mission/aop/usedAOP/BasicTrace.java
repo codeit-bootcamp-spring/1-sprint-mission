@@ -18,16 +18,19 @@ public class BasicTrace {
 
     private final TraceDevice trace;
 
+    @Pointcut("execution(* com.sprint.mission.controller..*(..))")
+    public void controllerMethod(){}
+
     @Pointcut("execution(* com.sprint.mission.service.jcf..*(..))")
     public void serviceMethod(){}
 
     @Pointcut("execution(* com.sprint.mission.repository.jcf..*(..))")
     public void repositoryMethod(){}
 
-    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
-    public void jcfCreateMethod(){} // 테스트 1회성
+//    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
+//    public void jcfCreateMethod(){} // 테스트 1회성
 
-    @Around("serviceMethod() || repositoryMethod()")
+    @Around("serviceMethod() || repositoryMethod() || controllerMethod()")
     public Object doTrace(ProceedingJoinPoint joinPoint){
 
         TraceStatus status = null;
