@@ -1,11 +1,10 @@
-package com.sprint.mission.service;
+package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

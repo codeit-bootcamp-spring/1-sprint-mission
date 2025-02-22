@@ -4,7 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.jcf.addOn.UserStatusRepository;
+import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

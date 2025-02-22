@@ -1,6 +1,7 @@
 package com.sprint.mission.repository.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +9,7 @@ import java.util.*;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-public class JCFReadStatusRepository implements com.sprint.mission.repository.jcf.addOn.ReadStatusRepository {
+public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> data;
 
     public JCFReadStatusRepository() {

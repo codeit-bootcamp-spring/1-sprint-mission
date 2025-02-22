@@ -34,12 +34,11 @@ public class MessageController {
       @RequestPart("attachments") List<MultipartFile> attachments) {
 
     Optional<List<BinaryContentDto>> binaryContentDtoList = attachments.isEmpty()
-        ? Optional.of(attachments.stream()
-        .map(BinaryContentDto::fileToBinaryContentDto)
-        .flatMap(Optional::stream)
-        .toList())
-
-        : Optional.empty();
+        ? Optional.empty()
+        : Optional.of(attachments.stream()
+            .map(BinaryContentDto::fileToBinaryContentDto)
+            .flatMap(Optional::stream)
+            .toList());
 
     messageService.create(requestDTO, binaryContentDtoList);
     return ResponseEntity
@@ -49,7 +48,8 @@ public class MessageController {
 
   // @GetMapping("/messages}")
   @RequestMapping("findInChannel")
-  public ResponseEntity<List<FindMessageDto>> findInChannel(@RequestParam("channelId") UUID channelId) {
+  public ResponseEntity<List<FindMessageDto>> findInChannel(
+      @RequestParam("channelId") UUID channelId) {
     List<Message> messageList = messageService.findAllByChannelId(channelId);
     List<FindMessageDto> dtoList = messageList.stream()
         .map(FindMessageDto::fromEntity).toList();

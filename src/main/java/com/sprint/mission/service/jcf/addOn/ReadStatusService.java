@@ -6,7 +6,7 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.entity.addOn.ReadStatus;
-import com.sprint.mission.repository.jcf.addOn.ReadStatusRepository;
+import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;

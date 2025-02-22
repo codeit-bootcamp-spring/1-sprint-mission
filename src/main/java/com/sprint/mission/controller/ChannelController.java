@@ -51,9 +51,8 @@ public class ChannelController {
         //dto?
     }
 
-
-    @PatchMapping("{id}")
-    public ResponseEntity<String> update(@PathVariable("id") UUID channelId,
+    @RequestMapping(path = "update")
+    public ResponseEntity<String> update(@RequestParam("channelId") UUID channelId,
         @RequestBody ChannelDtoForRequest requestDTO) {
 
         if (requestDTO.channelType().equals(ChannelType.PRIVATE)){
@@ -66,8 +65,8 @@ public class ChannelController {
             .body("수정 완료");
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") UUID channelId) {
+    @RequestMapping(path = "find")
+    public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
@@ -76,7 +75,7 @@ public class ChannelController {
 
 
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-    @GetMapping
+    @RequestMapping(path = "findAllByUserId")
     public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(
         @RequestParam("userId") UUID userId) {
 

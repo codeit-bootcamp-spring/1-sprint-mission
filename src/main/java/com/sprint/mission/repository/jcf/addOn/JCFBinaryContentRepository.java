@@ -1,6 +1,7 @@
 package com.sprint.mission.repository.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.repository.jcf.BinarycontentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;

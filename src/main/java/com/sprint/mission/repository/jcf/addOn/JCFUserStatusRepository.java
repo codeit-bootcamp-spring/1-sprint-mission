@@ -2,6 +2,7 @@ package com.sprint.mission.repository.jcf.addOn;
 
 
 import com.sprint.mission.entity.addOn.UserStatus;
+import com.sprint.mission.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 

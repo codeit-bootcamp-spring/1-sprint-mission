@@ -1,4 +1,4 @@
-package com.sprint.mission.repository.jcf.addOn;
+package com.sprint.mission.repository;
 
 import com.sprint.mission.entity.addOn.UserStatus;
 

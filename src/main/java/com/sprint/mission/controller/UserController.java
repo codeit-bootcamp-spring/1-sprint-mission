@@ -37,8 +37,8 @@ public class UserController {
         .body("User created successfully");
   }
 
-  @PatchMapping(path = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> update(@PathVariable("id") UUID userId,
+  @RequestMapping(path = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<String> update(@RequestParam("userId") UUID userId,
       @RequestPart("dto") UserDtoForUpdate requestDTO) {
 
     userService.update(userId, requestDTO);
@@ -48,16 +48,16 @@ public class UserController {
   }
 
 
-  @DeleteMapping("{id}")
-  public ResponseEntity<Void> delete(@PathVariable("id") UUID userId) {
+  @RequestMapping("userId")
+  public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
     userService.delete(userId);
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
   }
 
-  @PatchMapping("{id}/status")
-  public ResponseEntity<String> updateStatusByUserId(@PathVariable("id") UUID userId) {
+  @RequestMapping("updateStatusByUserId")
+  public ResponseEntity<String> updateStatusByUserId(@RequestParam("userId") UUID userId) {
     userStatusService.updateByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)
@@ -65,7 +65,7 @@ public class UserController {
   }
 
 
-  @GetMapping
+  @RequestMapping("findAll")
   public ResponseEntity<List<FindUserDto>> findAll() {
     Map<User, UserStatus> statusMapByUser = userStatusService.findStatusMapByUserList();
 
