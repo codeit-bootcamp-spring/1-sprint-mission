@@ -1,54 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public class Message {
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
-    private String content;
-    private UUID authorId;
+@Getter
+@RequiredArgsConstructor
+public class Message implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-    public Message(String content, UUID authorId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.content = content;
-        this.authorId = authorId;
+  private final UUID id = UUID.randomUUID();
+  private final Instant createdAt = Instant.now();
+  private Instant updatedAt = null;
+  @NonNull
+  private String content;
+  private final UUID authorId;
+  private final UUID channelId;
+  private final List<UUID> attachmentIds;
+
+
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
     }
 
-    public UUID getId() {
-        return id;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public void update(String content, UUID authorId) {
-        this.content = content;
-        this.authorId = authorId;
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", content='" + content + '\'' +
-                ", authorId=" + authorId +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Message{" +
+        "id=" + id +
+        ", content='" + content + '\'' +
+        ", authorId=" + authorId +
+        '}';
+  }
 }
