@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.util;
 
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.util.HashMap;
 
-
+@Component
 public class SerializationUtil<K, V> {
   private static final String FILE_PATH = "record.ser";
   // Java에서는 기본 생성자를 명시적으로 작성해주지 않아도 자동으로 제공함

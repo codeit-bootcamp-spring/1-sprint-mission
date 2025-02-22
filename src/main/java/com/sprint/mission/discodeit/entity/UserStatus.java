@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -56,5 +57,11 @@ public class UserStatus implements Serializable {
     @Override
     public String toString() {
         return "UserStatus{active =" + isActive + "}";
+    }
+
+
+
+    // TODO : 이게 있어야 userController의 이 메서드 부분이 실행되는데.. 왜,,,?
+    public void updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
     }
 }

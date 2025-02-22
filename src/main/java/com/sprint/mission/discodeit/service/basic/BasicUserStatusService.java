@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,6 +16,7 @@ import java.util.UUID;
 
 @Service
 public class BasicUserStatusService implements UserStatusService {
+    @Autowired
     UserStatusRepository userStatusRepository;
     UserRepository userRepository;
 

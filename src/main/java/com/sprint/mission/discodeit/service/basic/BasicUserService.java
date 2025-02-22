@@ -122,8 +122,6 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(userId);
     }
 
-    // TODO : LoginDto로 AuthService 구현
-
     // password를 제외한 Dto 생성
     private UserDto toDto(User user) {
         Boolean online = userStatusRepository.findByUserId(user.getId())
