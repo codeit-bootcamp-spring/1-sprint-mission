@@ -3,7 +3,8 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.ReadStatusRequest;
+import com.sprint.mission.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.repository.jcf.addOn.ReadStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
@@ -22,16 +23,16 @@ public class ReadStatusService {
     private final JCFUserRepository userRepository;
     private final JCFChannelRepository channelRepository;
 
-    public ReadStatus create(ReadStatusRequest request){
-        if (!userRepository.existsById(request.getUserId())) {
+    public ReadStatus create(ReadStatusCreateRequest request){
+        if (!userRepository.existsById(request.userId())) {
             throw new CustomException(ErrorCode.NO_SUCH_USER);
         }
 
-        if (!channelRepository.existsById(request.getUserId())) {
+        if (!channelRepository.existsById(request.userId())) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
 
-        if (readStatusRepository.existsById(request.getUserId())) {
+        if (readStatusRepository.existsById(request.userId())) {
             throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
         }
 
@@ -51,11 +52,11 @@ public class ReadStatusService {
         return readStatusRepository.findAllByChannelId(channelId);
     }
 
-    public ReadStatus update(UUID readStatusId, ReadStatusRequest request) {
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
 
-        readStatus.update(request.getLastReadAt());
+        readStatus.update(request.newLastReadAt());
         return readStatusRepository.save(readStatus);
     }
 

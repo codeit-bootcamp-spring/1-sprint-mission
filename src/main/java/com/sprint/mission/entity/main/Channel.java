@@ -30,35 +30,12 @@ public class Channel implements Serializable {
         this.createdAt = Instant.now();
     }
 
-    public static Channel createChannelByRequestDto(ChannelDtoForRequest dto) {
-        return new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
-    }
+//    public static Channel createChannelByRequestDto(ChannelDtoForRequest dto) {
+//        return new Channel(dto.getName(), dto.getDescription(), dto.getChannelType());
+//    }
 
     public void updateByDTO(ChannelDtoForRequest dto){
-        this.channelType = dto.getChannelType();
-        this.description = dto.getDescription();
-        this.name = dto.getName();
+        this.name = dto.newName();
+        this.description = dto.newDescription();
     }
-//
-//    // 양방향은 channel에서만
-//    public void addUser(User user) {
-//        //if (!userList.contains(user))
-//        userList.add(user);
-//        user.getChannels().add(this);
-//        user.changeReadStatus(id); // 흠 등록과 동시에 넣는게 흠
-//    }
-//
-//    public void removeUser(User user) {
-//        //if (userList.contains(user))
-//        userList.remove(user);
-//        user.getChannels().remove(this);
-//    }
-//
-//    public int countUser() {
-//        return userList.size();
-//    }
-//
-//    public void updateLastMessageTime() {
-//        lastMessageTime = Instant.now();
-//    }
 }

@@ -3,6 +3,7 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
+//import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
@@ -55,7 +56,7 @@ public class ChannelController {
     public ResponseEntity<String> update(@PathVariable("id") UUID channelId,
         @RequestBody ChannelDtoForRequest requestDTO) {
 
-        if (requestDTO.getChannelType().equals(ChannelType.PRIVATE)){
+        if (requestDTO.channelType().equals(ChannelType.PRIVATE)){
             throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
         }
 

@@ -5,11 +5,8 @@ import lombok.Getter;
 
 import java.util.UUID;
 
-@Getter
-public class ChannelDtoForRequest {
-
-    //private UUID channelId;
-    private ChannelType channelType;
-    private String description;
-    private String name;
+public record ChannelDtoForRequest (
+    ChannelType channelType,
+    String newName,
+    String newDescription){
 }
