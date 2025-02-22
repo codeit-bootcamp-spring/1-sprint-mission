@@ -60,22 +60,12 @@ public class BasicChannelService implements ChannelService {
 
     return allChannels.stream()
         .filter(channel -> !Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
-            ||
-            (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
+            || (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)
                 && channel.getParticipatingUsers().contains(userId)))
         .toList();
 
   }
 
-  /**
-   * {@link ChannelUpdateDto}
-   * channelId 로 channel 검색 후 없다면 {@link ChannelNotFoundException}
-   * channel 이 private 이라면 {@link InvalidOperationException}
-   *
-   * @param channelId
-   * @param channelName
-   * @return
-   */
   @Override
   public Channel updateChannel(String channelId, ChannelUpdateDto dto) {
 

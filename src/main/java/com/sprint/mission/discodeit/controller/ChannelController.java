@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.ChannelApiDocs;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
@@ -15,10 +16,11 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/channels")
-public class ChannelController {
+public class ChannelController implements ChannelApiDocs {
 
   private final ChannelMasterFacade channelMasterFacade;
 
+  @Override
   @PostMapping("/private")
   public ResponseEntity<PrivateChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto channelDto) {
     PrivateChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
@@ -26,12 +28,14 @@ public class ChannelController {
   }
 
 
+  @Override
   @PostMapping("/public")
   public ResponseEntity<PublicChannelResponseDto> createPublicChannel(@RequestBody CreateChannelDto channelDto) {
     PublicChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
     return ResponseEntity.status(201).body(channel);
   }
 
+  @Override
   @PatchMapping("/{channelId}")
   public ResponseEntity<UpdateChannelResponseDto> updateChannel(@PathVariable String channelId, @RequestBody ChannelUpdateDto channelDto) {
     UpdateChannelResponseDto channel = channelMasterFacade.updateChannel(channelId, channelDto);
@@ -39,6 +43,7 @@ public class ChannelController {
   }
 
 
+  @Override
   @DeleteMapping("/{channelId}")
   public ResponseEntity<Void> deleteChannel(@PathVariable String channelId) {
     channelMasterFacade.deleteChannel(channelId);
@@ -46,6 +51,7 @@ public class ChannelController {
   }
 
 
+  @Override
   @GetMapping
   public ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@RequestParam String userId){
     List<FindChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(userId);

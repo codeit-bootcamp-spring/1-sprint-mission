@@ -41,8 +41,8 @@ public class UserController implements UserApiDocs {
       CreateUserRequest createUserRequest,
 
       @RequestPart(value = "profile", required = false)
-      MultipartFile profile) {
-
+      MultipartFile profile)
+  {
     CreateUserResponse user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(201).body(user);
   }

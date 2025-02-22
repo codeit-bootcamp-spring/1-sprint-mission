@@ -8,7 +8,6 @@ import java.util.List;
 public interface ChannelMasterFacade {
   PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto);
   PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto);
-
   FindChannelResponseDto getChannelById(String channelId);
   List<FindChannelResponseDto> findAllChannelsByUserId(String userId);
 
