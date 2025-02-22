@@ -16,15 +16,24 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
-    private final Path directory;
+    private final Path DIRECTORY;
 
-    public FileMessageRepository(@Value("${discodeit.repository.file-directories.messages}") String directory) {
-        this.directory = Paths.get(directory);
+    public FileMessageRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public Message save(Message message) {
-        Path filePath = directory.resolve(message.getId() + ".ser");
+        Path filePath = DIRECTORY.resolve(message.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -38,7 +47,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message find(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
+        Path filePath = DIRECTORY.resolve(messageId + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis);
@@ -53,7 +62,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         try {
-            List<Message> messages = Files.list(directory)
+            List<Message> messages = Files.list(DIRECTORY)
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
@@ -74,7 +83,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public void delete(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
+        Path filePath = DIRECTORY.resolve(messageId + ".ser");
 
         try {
             Files.delete(filePath);
@@ -85,7 +94,7 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public boolean existsById(UUID messageId) {
-        Path filePath = directory.resolve(messageId + ".ser");
+        Path filePath = DIRECTORY.resolve(messageId + ".ser");
         return Files.exists(filePath);
     }
 }

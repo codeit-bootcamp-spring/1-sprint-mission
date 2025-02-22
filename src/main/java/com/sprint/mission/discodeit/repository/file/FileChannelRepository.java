@@ -16,15 +16,24 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private final Path directory;
+    private final Path DIRECTORY;
 
-    public FileChannelRepository(@Value("${discodeit.repository.file-directories.channels}") String directory) {
-        this.directory = Paths.get(directory);
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public Channel save(Channel channel) {
-        Path filePath = directory.resolve(channel.getId() + ".ser");
+        Path filePath = DIRECTORY.resolve(channel.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -38,7 +47,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel find(UUID channelId) {
-        Path filePath = directory.resolve(channelId + ".ser");
+        Path filePath = DIRECTORY.resolve(channelId + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis);
@@ -53,7 +62,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAll() {
         try {
-            List<Channel> channels = Files.list(directory)
+            List<Channel> channels = Files.list(DIRECTORY)
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
@@ -74,7 +83,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public void delete(UUID channelId) {
-        Path filePath = directory.resolve(channelId + ".ser");
+        Path filePath = DIRECTORY.resolve(channelId + ".ser");
 
         try {
             Files.delete(filePath);
@@ -85,7 +94,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public boolean existsById(UUID channelId) {
-        Path filePath = directory.resolve(channelId + ".ser");
+        Path filePath = DIRECTORY.resolve(channelId + ".ser");
         return Files.exists(filePath);
     }
 }
