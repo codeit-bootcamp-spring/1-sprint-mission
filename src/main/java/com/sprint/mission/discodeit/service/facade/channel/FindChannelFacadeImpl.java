@@ -18,30 +18,30 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class FindChannelFacadeImpl implements FindChannelFacade{
+public class FindChannelFacadeImpl implements FindChannelFacade {
 
   private final ChannelService channelService;
   private final ReadStatusService readStatusService;
   private final MessageService messageService;
   private final ChannelMapper channelMapper;
   private final EntityValidator validator;
+
   @Override
   public FindChannelResponseDto findChannelById(String channelId) {
     Channel channel = channelService.getChannelById(channelId);
-    List<String> userIds = channel.getParticipatingUsers();
     Instant lastMessageTime = messageService.getLatestMessageByChannel(channelId).getCreatedAt();
     return channelMapper.toFindChannelDto(channel, lastMessageTime);
   }
 
-    @Override
-    public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
-      List<Channel> channels = channelService.findAllChannelsByUserId(userId);
-      Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
+  @Override
+  public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
+    List<Channel> channels = channelService.findAllChannelsByUserId(userId);
+    Map<String, Instant> latestMessagesByChannel = messageService.getLatestMessageForChannels(channels);
 
-      return channels.stream()
-          .map(channel -> channelMapper.toFindChannelDto(
-              channel,
-              latestMessagesByChannel.getOrDefault(channel.getId(), Instant.EPOCH)
-          )).toList();
-    }
+    return channels.stream()
+        .map(channel -> channelMapper.toFindChannelDto(
+            channel,
+            latestMessagesByChannel.getOrDefault(channel.getId(), Instant.EPOCH)
+        )).toList();
+  }
 }

@@ -54,12 +54,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
-
-    List<BinaryContent> contents = ids.stream().map(
+    return ids.stream().map(
         id -> binaryContentRepository.findById(id).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE))
     ).toList();
-
-    return contents;
   }
 
   @Override
@@ -127,13 +124,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         .orElseGet(() -> binaryContentRepository.save(profileImage));
   }
 
-  /**
-   * 채널 내 모든 BinaryContent를 조회하고, 메시지 ID 기준으로 그룹화
-   *
-   * @param channelId 채널 ID
-   * @return messageId를 키로 하고, 해당하는 BinaryContent 목록을 값으로 갖는 Map
-   */
-  // TODO : null 처리
   @Override
   public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
     return binaryContentRepository.findByChannel(channelId).stream()

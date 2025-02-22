@@ -66,7 +66,6 @@ public class BasicMessageService implements MessageService {
         ));
   }
 
-
   @Override
   public void deleteMessage(String messageId) {
     messageRepository.delete(messageId);

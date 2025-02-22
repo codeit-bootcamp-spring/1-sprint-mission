@@ -30,10 +30,8 @@ public class BasicUserService implements UserService {
   @Override
   public User saveUser(User user) {
 
-    // email, nickname, phone number 검증
     validateUserInformationWhenCreate(user, user.getId());
 
-    // user 생성
     return userRepository.create(user);
   }
 
@@ -56,12 +54,6 @@ public class BasicUserService implements UserService {
   }
 
 
-
-  /**
-   * 사용자를 찾아서 반환
-   * id 에 해당하는 사용자가 없다면 UserNotFoundException
-   * id 에 해당하는 status 가 없다면 새로운 status 생성
-   */
   @Override
   public User findUserById(String id) {
     return validator.findOrThrow(User.class, id, new UserNotFoundException());
@@ -85,35 +77,6 @@ public class BasicUserService implements UserService {
     return userRepository.update(originalUser);
   }
 
-  /**
-   * 비밀번호에 대한 검증
-   * 일치하지 않을 경우 {@link UserValidationException}
-   *
-   * @param plain  사용자가 입력한 비밀번호
-   * @param hashed 기존에 저장되어 있던 비밀번호
-   */
-  private void checkPasswordIsCorrect(String plain, String hashed) {
-    log.info("[Password Check] : 비밀번호 검증 시작 plain={}, hashed={}, plainHashed={}", plain, hashed, PasswordEncryptor.hashPassword(plain));
-    if (!PasswordEncryptor.checkPassword(plain, hashed)) {
-      log.info("[Password Check] : 비밀번호 검증 실패");
-      throw new UserValidationException(PASSWORD_MATCH_ERROR);
-    }
-    log.info("[Password Check] : 비밀번호 검증 성공");
-  }
-
-  /**
-   * {@link UserUpdateDto} 기반으로 사용자 필드를 업데이트
-   * <p>
-   *   <ul>
-   *     <li>사용자 전체 목록 조회 후, nickname, email, phonenumber 중복 여부 검증</li>
-   *     <li>각 필드가 null 이 아닌 경우만 update</li>
-   *     <li>비밀번호는 해시화 하여 저장</li>
-   *   </ul>
-   * </p>
-   *
-   * @param originalUser 업데이트 대상 User
-   * @param updatedUser  업데이트 될 정보
-   */
   private void updateFields(User originalUser, UserUpdateDto updatedUser) {
     List<User> users = userRepository.findAll();
 
@@ -131,7 +94,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void deleteUser(String id) {
-    User user = validator.findOrThrow(User.class, id, new UserNotFoundException());
+    validator.findOrThrow(User.class, id, new UserNotFoundException());
 
     userRepository.delete(id);
   }

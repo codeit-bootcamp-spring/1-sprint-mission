@@ -36,15 +36,11 @@ public class UserStatusServiceImpl implements UserStatusService {
 
   @Override
   public UserStatus create(UserStatus status) {
-
-    User user = validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
-
+    validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
 
     if (userStatusRepository.findByUserId(status.getUserId()).isPresent()) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
-
-
 
     return userStatusRepository.save(status);
   }

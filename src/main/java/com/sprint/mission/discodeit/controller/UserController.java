@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserMasterFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,24 +30,36 @@ public class UserController implements UserApiDocs {
     return ResponseEntity.ok(user);
   }
 
-  @PostMapping
+  @Override
+  @PostMapping(
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<CreateUserResponse> createUser(
-      @RequestPart("userCreateRequest") CreateUserRequest createUserRequest,
-      @RequestPart(value = "profile", required = false) MultipartFile profile) {
+
+      @RequestPart("userCreateRequest")
+      CreateUserRequest createUserRequest,
+
+      @RequestPart(value = "profile", required = false)
+      MultipartFile profile) {
 
     CreateUserResponse user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(201).body(user);
   }
 
-
-
+  @Override
   @GetMapping
   public ResponseEntity<List<UserResponseDto>> getUsers() {
     List<UserResponseDto> users = userFacade.findAllUsers();
     return ResponseEntity.ok(users);
   }
 
-  @PatchMapping("/{id}")
+  @Override
+  @PatchMapping(
+      value = "/{id}",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
   public ResponseEntity<CreateUserResponse> updateUser(
       @PathVariable String id,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
@@ -58,10 +71,11 @@ public class UserController implements UserApiDocs {
     return ResponseEntity.ok(user);
   }
 
+  @Override
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteUser(@PathVariable String id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable String id) {
     userFacade.deleteUser(id);
-    return ResponseEntity.ok("Successfully Deleted");
+    return ResponseEntity.status(204).build();
   }
 
 }

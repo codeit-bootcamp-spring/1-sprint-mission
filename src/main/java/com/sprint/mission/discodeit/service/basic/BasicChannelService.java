@@ -35,7 +35,6 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(Channel channel) {
-    // TODO : 검증
     return channelRepository.save(channel);
   }
 
@@ -54,13 +53,6 @@ public class BasicChannelService implements ChannelService {
   }
 
 
-  /**
-   * 모든 Channel 을 조회,
-   * accessibleChannelIds -> private 채널 중,
-   *
-   * @param userId
-   * @return
-   */
   @Override
   public List<Channel> findAllChannelsByUserId(String userId) {
 

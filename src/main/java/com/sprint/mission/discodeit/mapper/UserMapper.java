@@ -55,6 +55,6 @@ public interface UserMapper {
   default boolean userStatusToBoolean(UserStatus status){
 
     if(status.getUserStatus().equals(UserStatusType.ONLINE)) return true;
-    return false;
+    else return false;
   }
 }
