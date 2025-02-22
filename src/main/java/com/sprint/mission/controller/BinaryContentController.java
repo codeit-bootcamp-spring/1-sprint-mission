@@ -1,5 +1,6 @@
 package com.sprint.mission.controller;
 
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 import java.util.List;
 import java.util.UUID;
@@ -21,8 +22,8 @@ public class BinaryContentController {
   private final BinaryService binaryContentService;
 
   @RequestMapping(path = "find")
-  public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
-    BinaryContent binaryContent = binaryContentService.find(binaryContentId);
+  public ResponseEntity<BinaryContent> find(@RequestParam("id") UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(binaryContent);
@@ -30,7 +31,7 @@ public class BinaryContentController {
 
   @RequestMapping(path = "findAllByIdIn")
   public ResponseEntity<List<BinaryContent>> findAllByIdIn(
-      @RequestParam("binaryContentIds") List<UUID> binaryContentIds) {
+      @RequestParam("ids") List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)

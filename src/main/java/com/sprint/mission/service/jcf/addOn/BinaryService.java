@@ -1,5 +1,7 @@
 package com.sprint.mission.service.jcf.addOn;
 
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.jcf.addOn.JCFBinaryContentRepository;
@@ -17,12 +19,12 @@ public class BinaryService {
     private final JCFBinaryContentRepository binaryContentRepository;
 
     public BinaryContent create(BinaryContentDto request){
-        BinaryContent binaryContent = BinaryContent.CreateBinaryContentByDTO(request);
-        return binaryContentRepository.save(binaryContent);
+        return binaryContentRepository.save(request.toEntity());
     }
 
-    public Optional<BinaryContent> findById(UUID id){
-        return binaryContentRepository.findById(id);
+    public BinaryContent findById(UUID id){
+        return binaryContentRepository.findById(id)
+            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
     }
 
     public List<BinaryContent> findAllByIdList(List<UUID> idList) {
@@ -30,7 +32,11 @@ public class BinaryService {
     }
 
     public void delete(UUID id) {
-        if (!binaryContentRepository.existsById(id)) throw new RuntimeException();
+        if (!binaryContentRepository.existsById(id)) throw new CustomException(ErrorCode.NO_SUCH_BINARY);
         else binaryContentRepository.delete(id);
+    }
+
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        return binaryContentRepository.findAllByIdIn(binaryContentIds);
     }
 }

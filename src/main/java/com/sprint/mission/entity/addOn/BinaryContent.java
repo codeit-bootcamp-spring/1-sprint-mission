@@ -32,8 +32,4 @@ public class BinaryContent {
         this.contentType = contentType;
         this.bytes = bytes;
     }
-
-    public static BinaryContent CreateBinaryContentByDTO(BinaryContentDto dto) {
-        return new BinaryContent(dto.getFileName(), dto.getContentType(), dto.getBytes());
-    }
 }

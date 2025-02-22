@@ -12,6 +12,7 @@ public enum ErrorCode {
     NO_SUCH_USER(HttpStatus.NOT_FOUND, "존재하지 않는 유저입니다"),
     NO_SUCH_CHANNEL(HttpStatus.NOT_FOUND, "존재하지 않는 채널입니다"),
     NO_SUCH_MESSAGE(HttpStatus.NOT_FOUND, "존재하지 않는 메시지입니다"),
+    NO_SUCH_BINARY(HttpStatus.NOT_FOUND, "존재하지 않는 Binary_Content 입니다"),
     NO_SUCH_USER_STATUS(HttpStatus.NOT_FOUND, "존재하지 않는 유저 상태입니다"),
     NO_SUCH_READ_STATUS(HttpStatus.NOT_FOUND, "존재하지 않는 READ 상태입니다"),
 

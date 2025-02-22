@@ -1,5 +1,6 @@
 package com.sprint.mission.dto.request;
 
+import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,10 @@ public class BinaryContentDto {
         this.fileName = fileName;
         this.contentType = contentType;
         this.bytes = bytes;
+    }
+
+    public BinaryContent toEntity() {
+        return new BinaryContent(fileName, contentType, bytes);
     }
 
     public static Optional<BinaryContentDto> fileToBinaryContentDto(MultipartFile file) {
