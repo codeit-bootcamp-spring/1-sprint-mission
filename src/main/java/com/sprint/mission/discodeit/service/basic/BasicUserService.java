@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.duplication.DuplicateResourceException;
+import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -29,16 +31,16 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public User create(UserCreateRequest userCreateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+  public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
-    if (userRepository.existsByEmail(email)) {
-      throw new IllegalArgumentException("User with email " + email + " already exists");
-    }
     if (userRepository.existsByUsername(username)) {
-      throw new IllegalArgumentException("User with username " + username + " already exists");
+      throw new DuplicateResourceException("Username already exists: " + username);
+    }
+
+    if (userRepository.existsByEmail(email)) {
+      throw new DuplicateResourceException("Email already exists: " + email);
     }
 
     UUID nullableProfileId = optionalProfileCreateRequest
@@ -46,8 +48,7 @@ public class BasicUserService implements UserService {
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
           return binaryContentRepository.save(binaryContent).getId();
         })
         .orElse(null);
@@ -60,43 +61,42 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(createdUser.getId(), now);
     userStatusRepository.save(userStatus);
 
-    return createdUser;
+    return toDto(createdUser);
   }
 
   @Override
-  public UserDto find(UUID userId) {
+  public UserDto findById(UUID userId) {
     return userRepository.findById(userId)
         .map(this::toDto)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
   }
 
   @Override
   public List<UserDto> findAll() {
-    return userRepository.findAll()
-        .stream()
+    return userRepository.findAll().stream()
         .map(this::toDto)
         .toList();
   }
 
   @Override
-  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
-      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+  public UserDto update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
-    if (userRepository.existsByEmail(newEmail)) {
-      throw new IllegalArgumentException("User with email " + newEmail + " already exists");
-    }
     if (userRepository.existsByUsername(newUsername)) {
-      throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+      throw new DuplicateResourceException("Username already exists: " + newUsername);
+    }
+
+    if (userRepository.existsByEmail(newEmail)) {
+      throw new DuplicateResourceException("Email already exists: " + newEmail);
     }
 
     UUID nullableProfileId = optionalProfileCreateRequest
         .map(profileRequest -> {
           Optional.ofNullable(user.getProfileId())
-              .ifPresent(binaryContentRepository::deleteById);
+                  .ifPresent(binaryContentRepository::deleteById);
 
           String fileName = profileRequest.fileName();
           String contentType = profileRequest.contentType();
@@ -110,13 +110,13 @@ public class BasicUserService implements UserService {
     String newPassword = userUpdateRequest.newPassword();
     user.update(newUsername, newEmail, newPassword, nullableProfileId);
 
-    return userRepository.save(user);
+    return toDto(userRepository.save(user));
   }
 
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
 
     Optional.ofNullable(user.getProfileId())
         .ifPresent(binaryContentRepository::deleteById);

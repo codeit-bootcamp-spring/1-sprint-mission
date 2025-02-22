@@ -26,10 +26,10 @@ public interface ChannelApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "Public Channel이 성공적으로 생성됨",
-          content = @Content(schema = @Schema(implementation = Channel.class))
+          content = @Content(schema = @Schema(implementation = ChannelDto.class))
       )
   })
-  ResponseEntity<Channel> create(
+  ResponseEntity<ChannelDto> createPublicChannel(
       @Parameter(description = "Public Channel 생성 정보") PublicChannelCreateRequest request
   );
 
@@ -37,10 +37,10 @@ public interface ChannelApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "Private Channel이 성공적으로 생성됨",
-          content = @Content(schema = @Schema(implementation = Channel.class))
+          content = @Content(schema = @Schema(implementation = ChannelDto.class))
       )
   })
-  ResponseEntity<Channel> create(
+  ResponseEntity<ChannelDto> createPrivateChannel(
       @Parameter(description = "Private Channel 생성 정보") PrivateChannelCreateRequest request
   );
 
@@ -48,7 +48,7 @@ public interface ChannelApi {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "Channel 정보가 성공적으로 수정됨",
-          content = @Content(schema = @Schema(implementation = Channel.class))
+          content = @Content(schema = @Schema(implementation = ChannelDto.class))
       ),
       @ApiResponse(
           responseCode = "404", description = "Channel을 찾을 수 없음",
@@ -59,7 +59,7 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Private channel cannot be updated"))
       )
   })
-  ResponseEntity<Channel> update(
+  ResponseEntity<ChannelDto> updatePublicChannel(
       @Parameter(description = "수정할 Channel ID") UUID channelId,
       @Parameter(description = "수정할 Channel 정보") PublicChannelUpdateRequest request
   );
@@ -74,7 +74,7 @@ public interface ChannelApi {
           content = @Content(examples = @ExampleObject(value = "Channel with id {channelId} not found"))
       )
   })
-  ResponseEntity<Void> delete(
+  ResponseEntity<Void> deleteChannel(
       @Parameter(description = "삭제할 Channel ID") UUID channelId
   );
 
@@ -85,7 +85,7 @@ public interface ChannelApi {
           content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class)))
       )
   })
-  ResponseEntity<List<ChannelDto>> findAll(
+  ResponseEntity<List<ChannelDto>> getChannelsOfUser(
       @Parameter(description = "조회할 User ID") UUID userId
   );
 }
