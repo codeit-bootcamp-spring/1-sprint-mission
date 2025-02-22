@@ -45,4 +45,8 @@ public class JCFMessageRepository implements MessageRepository{
     public boolean existsById(UUID id) {
         return data.containsKey(id);
     }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        data.values().removeIf(message -> message.getChannelId().equals(channelId));
+    }
 }

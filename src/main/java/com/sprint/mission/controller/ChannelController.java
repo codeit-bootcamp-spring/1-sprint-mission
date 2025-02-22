@@ -4,6 +4,8 @@ package com.sprint.mission.controller;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
+import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
@@ -29,9 +31,18 @@ public class ChannelController {
     private final JCFChannelService channelService;
     private final JCFUserService userService;
 
-    @PostMapping
-    public ResponseEntity<FindChannelDto> create(@RequestBody ChannelDtoForRequest requestDTO) {
-        Channel createdChannel = channelService.create(requestDTO);
+    @RequestMapping(path = "createPublic")
+    public ResponseEntity<FindChannelDto> create(@RequestBody PublicChannelCreateDTO request) {
+        Channel createdChannel = channelService.createPublicChannel(request);
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(getFindChannelDto(createdChannel));
+        //dto?
+    }
+
+    @RequestMapping(path = "createPrivate")
+    public ResponseEntity<FindChannelDto> create(@RequestBody PrivateChannelCreateDTO request) {
+        Channel createdChannel = channelService.createPrivateChannel(request);
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(getFindChannelDto(createdChannel));
@@ -40,8 +51,8 @@ public class ChannelController {
 
 
     @PatchMapping("{id}")
-    public ResponseEntity<String> update(@PathVariable UUID channelId
-        , @RequestBody ChannelDtoForRequest requestDTO) {
+    public ResponseEntity<String> update(@PathVariable("id") UUID channelId,
+        @RequestBody ChannelDtoForRequest requestDTO) {
 
         if (requestDTO.getChannelType().equals(ChannelType.PRIVATE)){
             throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
@@ -62,6 +73,7 @@ public class ChannelController {
     }
 
 
+    //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @GetMapping
     public ResponseEntity<List<FindChannelDto>> findAllByUserId(@RequestParam("userId") UUID userId) {
         List<Channel> channelList = channelService.findAllByUserId(userId);

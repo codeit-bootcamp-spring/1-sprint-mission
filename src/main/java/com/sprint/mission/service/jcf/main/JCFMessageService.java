@@ -90,4 +90,8 @@ public class JCFMessageService implements MessageService {
         return messageRepository.findById(channelId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
+
+    public void deleteAllByChannelId(UUID channelId) {
+        messageRepository.deleteAllByChannelId(channelId);
+    }
 }
