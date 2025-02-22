@@ -7,13 +7,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageRepository {
-  boolean save(Message message);
+  Message save(Message message);
 
-  Optional<Message> findById(UUID id);
+  Optional<Message> findById(UUID messageId);
 
-  List<Message> findAll();
+  List<Message> findAllByChannelId(UUID channelId); // 채널 ID가 있어야 채널에 있는 메세지를 삭제할 수 있음
 
-  boolean updateOne(UUID id, String content, UUID authorId);
+  boolean existsById(UUID messageId);
 
-  boolean deleteOne(UUID id);
+  void deleteById(UUID messageId);
+
+  void deleteAllByChannelId(UUID channelId);
 }

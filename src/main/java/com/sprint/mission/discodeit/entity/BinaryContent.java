@@ -14,29 +14,13 @@ public class BinaryContent implements Serializable {
 
     private final UUID id = UUID.randomUUID();
     private final Instant createdAt = Instant.now();
-    private final byte[] profileImageUrl;
-    private final byte[] messageFileUrl;
 
-    private final User user;  // User 객체를 참조
-    private final Message msg;  // Message 객체를 참조
+    private final String fileName;
+    private final Long size;
+    private final String contentType;
+    private final byte[] bytes;
 
-    // BinaryContent 객체에서 User와 Message의 ID를 반환하는 메소드
-    public UUID getUserId() {
-        return user.getId();
-    }
+    private UUID userId;  // User 참조
+    private UUID messageId;  // Message 참조
 
-    public UUID getMessageId() {
-        return msg.getId();
-    }
-
-    // BinaryContent 객체를 출력하는 메소드
-    @Override
-    public String toString() {
-        return "BinaryContent{" +
-                "profileImageUrl='" + profileImageUrl + '\'' +
-                ", messageFileUrl='" + messageFileUrl + '\'' +
-                ", userId=" + getUserId() +
-                ", messageId=" + getMessageId() +
-                '}';
-    }
 }

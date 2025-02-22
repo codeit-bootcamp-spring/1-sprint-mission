@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -19,11 +20,20 @@ public class Message implements Serializable {
   @NonNull
   private String content;
   private final UUID authorId;
+  private final UUID channelId;
+  private final List<UUID> attachmentIds;
 
 
-  public void update(String content) {
-    this.content = content;
-    this.updatedAt = Instant.now();
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
+    }
+
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
   }
 
   @Override
