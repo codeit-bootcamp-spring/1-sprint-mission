@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binarycontetnt.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.Status;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -26,69 +25,59 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserResponse createUser(CreateUserRequest request) {
+    public UserResponse createUser(CreateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest) {
         if (userRepository.existsByUsername(request.username()) || userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
         }
 
-        User user = new User(request.username(), request.email());
-        if (request.profileImage() != null) {
-            user.updateProfileImage(request.profileImage());
-        }
+        User user = new User(request.username(), request.password(), request.email());
+        optionalRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                }).ifPresent(user::updateProfileImage);
 
         UserStatus userStatus = new UserStatus(user.getId());
-        userStatus.updateStatus(Status.CONNECTED);
+        userStatus.updateStatus();
         user.updateUserStatus(userStatus);
 
-        userRepository.save(user);
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getStatus(), user.getProfileImage());
+        return UserResponse.fromEntity(userRepository.save(user));
     }
 
     @Override
     public List<UserResponse> findAllUsers() {
         return userRepository.getAllUsers().stream()
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getStatus(),
-                        user.getProfileImage()
-                ))
+                .map(UserResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<UserResponse> findUserById(UUID userId) {
         return Optional.ofNullable(userRepository.getUserById(userId))
-                .map(user -> new UserResponse(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getEmail(),
-                        user.getStatus(),
-                        user.getProfileImage()
-                ));
+                .map(UserResponse::fromEntity);
     }
 
     @Override
-    public Optional<UserResponse> updateUser(UpdateUserRequest request) {
+    public Optional<UserResponse> updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest) {
         return Optional.ofNullable(userRepository.getUserById(request.id()))
                 .map(user -> {
                     if (request.username() != null) {
                         user.updateUsername(request.username());
                     }
-                    if (request.profileImage() != null) {
-                        user.updateProfileImage(request.profileImage());
-                    }
-
+                    optionalRequest
+                            .map(profileRequest -> {
+                                String fileName = profileRequest.fileName();
+                                String contentType = profileRequest.contentType();
+                                byte[] bytes = profileRequest.bytes();
+                                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                                return binaryContentRepository.save(binaryContent).getId();
+                            }).ifPresent(user::updateProfileImage);
                     userRepository.save(user);
 
-                    return new UserResponse(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            user.getStatus(),
-                            user.getProfileImage()
-                    );
+                    return UserResponse.fromEntity(user);
                 });
     }
 
@@ -96,23 +85,10 @@ public class BasicUserService implements UserService {
     public void deleteUser(UUID userId) {
         Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
             // 관련된 데이터 삭제
-            binaryContentRepository.delete(user.getProfileImage());
-            userStatusRepository.deleteByUserId(user.getId());
+            binaryContentRepository.deleteById(user.getProfileImage());
+            userStatusRepository.deleteById(user.getStatus().getId());
 
-            userRepository.delete(user.getId());
-        });
-    }
-
-    @Override
-    public void updateReadStatus(UUID userId, UUID channelId) {
-        User user = userRepository.getUserById(userId);
-
-        user.getReadStatuses().compute(channelId, (key, status) -> {
-            if (status == null) {
-                return new ReadStatus(userId, channelId);
-            }
-            status.setUpdatedAt(Instant.now().toEpochMilli());
-            return status;
+            userRepository.deleteById(user.getId());
         });
     }
 }

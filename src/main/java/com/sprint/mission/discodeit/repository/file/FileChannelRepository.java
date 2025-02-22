@@ -1,31 +1,60 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
-public class FileChannelRepository {
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+public class FileChannelRepository implements ChannelRepository {
     private final String filePath;
 
     public FileChannelRepository(@Value("${file.path.channel}") String filePath) {
         this.filePath = filePath;
     }
 
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         List<Channel> channels = load();
         channels.removeIf(c -> c.getId().equals(channel.getId())); // 기존 채널 제거
         channels.add(channel);
         saveToFile(channels);
+        return channel;
     }
 
     public Optional<Channel> getChannelById(UUID id) {
         return load().stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst();
+    }
+
+    @Override
+    public List<UUID> getMessagesUUIDFromChannel(UUID uuid) {
+        return load().stream()
+                .filter(c -> c.getId().equals(uuid))
+                .findFirst()
+                .map(Channel::getMessageList)
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    public Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Channel> updateChannelName(UUID uuid, String channelName) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteChannel(UUID uuid) {
+
     }
 
     public void deleteById(UUID id) {
@@ -37,6 +66,16 @@ public class FileChannelRepository {
 
     public List<Channel> getAllChannels() {
         return load();
+    }
+
+    @Override
+    public void save() {
+
+    }
+
+    @Override
+    public boolean existsById(UUID uuid) {
+        return false;
     }
 
     private List<Channel> load() {

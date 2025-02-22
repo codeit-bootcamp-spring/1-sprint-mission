@@ -13,34 +13,36 @@ public class User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String username;
     private String email;
+    private String password;
     private UserStatus status;
     private Map<UUID, ReadStatus> readStatuses;
-    private BinaryContent profileImage;
+    private UUID profileImage;
 
-    public User(String username, String email) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.username = username;
+        this.password = password;
         this.email = email;
-        this.createdAt = Instant.now().toEpochMilli();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
     }
 
     public void updateUsername(String username) {
         this.username = username;
-        this.updatedAt = Instant.now().toEpochMilli();
+        this.updatedAt = Instant.now();
     }
 
-    public void updateProfileImage(BinaryContent newProfileImage) {
+    public void updateProfileImage(UUID newProfileImage) {
         this.profileImage = newProfileImage;
-        this.updatedAt = Instant.now().toEpochMilli();
+        this.updatedAt = Instant.now();
     }
 
     public void updateUserStatus(UserStatus newStatus) {
         this.status = newStatus;
-        this.updatedAt = Instant.now().toEpochMilli();
+        this.updatedAt = Instant.now();
     }
 }

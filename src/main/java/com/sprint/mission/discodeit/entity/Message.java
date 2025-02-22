@@ -12,8 +12,8 @@ public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
     private String text;
     private final UUID authorId;
     private final UUID channelId;
@@ -22,14 +22,14 @@ public class Message implements Serializable {
         this.authorId = authorId;
         this.channelId = channelId;
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().toEpochMilli();
+        this.createdAt = Instant.now();
         this.updatedAt = createdAt;
         this.text = text;
     }
 
     public void updateText(String text) {
         this.text = text;
-        this.updatedAt = Instant.now().toEpochMilli();
+        this.updatedAt = Instant.now();
     }
 
     public String toString(){

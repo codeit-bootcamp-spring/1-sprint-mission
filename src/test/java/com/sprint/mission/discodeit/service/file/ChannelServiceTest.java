@@ -12,7 +12,8 @@ import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,12 +24,12 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 
 
-class FileChannelServiceTest {
+class ChannelServiceTest {
     @Mock
-    private FileChannelRepository channelRepository;
+    private ChannelRepository channelRepository;
 
     @InjectMocks
-    private FileChannelService channelService;
+    private BasicChannelService channelService;
 
     @BeforeEach
     void setUp() {
@@ -78,7 +79,8 @@ class FileChannelServiceTest {
 
         String userName1 = "username1";
         String userEmail1 = "email1@email.com";
-        User user1 = new User(userName1, userEmail1);
+        String password1 = "password1";
+        User user1 = new User(userName1, userEmail1, password1);
 
         String message1 = "message1";
 

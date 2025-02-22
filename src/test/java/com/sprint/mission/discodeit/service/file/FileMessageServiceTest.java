@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
@@ -14,10 +13,9 @@ import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ChannelService;
-import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,16 +25,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 class FileMessageServiceTest {
-    private static final String TEST_FILE_PATH = "data/test_messages.dat";
-
     @Mock
-    private FileMessageRepository messageRepository;
+    private MessageRepository messageRepository;
 
     @Mock
     private ChannelService channelService;
 
     @InjectMocks
-    private FileMessageService messageService;
+    private MessageService messageService;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +51,7 @@ class FileMessageServiceTest {
         CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        when(channelService.getChannel(any())).thenReturn(Optional.of(ChannelResponse.fromEntity(channel1)));
         Optional<MessageResponse> message = Optional.ofNullable(messageService.createMessage(request));
 
         // then
@@ -78,9 +74,9 @@ class FileMessageServiceTest {
         CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        when(channelService.getChannel(any())).thenReturn(Optional.of(ChannelResponse.fromEntity(channel1)));
         MessageResponse message = messageService.createMessage(request);
-        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        when(messageRepository.getMessageById(any())).thenReturn(message1);
         Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
@@ -103,9 +99,9 @@ class FileMessageServiceTest {
         CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        when(channelService.getChannel(any())).thenReturn(Optional.of(ChannelResponse.fromEntity(channel1)));
         MessageResponse message = messageService.createMessage(request);
-        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        when(messageRepository.getMessageById(any())).thenReturn(message1);
         Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
@@ -117,8 +113,8 @@ class FileMessageServiceTest {
         // when
         String updatedText = "updated";
         UpdateMessageRequest request1 = new UpdateMessageRequest(message.id(), updatedText);
-        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
-        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        when(channelService.getChannel(any())).thenReturn(Optional.of(ChannelResponse.fromEntity(channel1)));
+        when(messageRepository.getMessageById(any())).thenReturn(message1);
         Optional<MessageResponse> updatedResponse = messageService.updateMessage(request1);
 
         // then
@@ -141,9 +137,9 @@ class FileMessageServiceTest {
         CreateMessageRequest request = new CreateMessageRequest(authorID, channel1.getId(), text);
 
         // when
-        when(channelService.getChannel(any())).thenReturn(Optional.of(new ChannelResponse(channel1.getChannelName())));
+        when(channelService.getChannel(any())).thenReturn(Optional.of(ChannelResponse.fromEntity(channel1)));
         MessageResponse message = messageService.createMessage(request);
-        when(messageRepository.getMessageById(any())).thenReturn(Optional.of(message1));
+        when(messageRepository.getMessageById(any())).thenReturn(message1);
         Optional<MessageResponse> response = messageService.getMessage(message.id());
 
         // then
@@ -154,7 +150,7 @@ class FileMessageServiceTest {
 
         // when
         messageService.deleteMessage(message.id());
-        when(messageRepository.getMessageById(any())).thenReturn(Optional.empty());
+        when(messageRepository.getMessageById(any())).thenReturn(null);
         response = messageService.getMessage(message.id());
 
         // then
