@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.UUID;
 
-public record MessageDetailDto(
+public record MessageDetailResponse(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
@@ -13,8 +13,8 @@ public record MessageDetailDto(
         UUID writer,
         UUID channelId
 ) {
-    public static MessageDetailDto from(Message message) {
-        return new MessageDetailDto(
+    public static MessageDetailResponse from(Message message) {
+        return new MessageDetailResponse(
                 message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
