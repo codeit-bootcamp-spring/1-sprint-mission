@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -10,11 +11,12 @@ import com.sprint.mission.discodeit.repository.file.FileManager;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,26 +35,31 @@ public class BinaryContentService {
         fileManager.createDirectory(directoryPath);
     }
 
-    public BinaryContent create(BinaryContentRequest dto) {
+    public BinaryContent create(BinaryContentRequest request) {
 
         //존재하는 user or message에 대한 요청인지 확인
-        BinaryContent.Type type = dto.type();
+        BinaryContent.Type type = request.type();
         if (type == BinaryContent.Type.PROFILE) {
-            userRepository.findById(dto.belongTo())
-                    .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + dto.belongTo()));
+            userRepository.findById(request.belongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + request.belongTo()));
         } else {
-            messageRepository.findById(dto.belongTo())
-                    .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + dto.belongTo()));
+            messageRepository.findById(request.belongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + request.belongTo()));
         }
+        MultipartFile file = request.file();
 
         UUID id = UUID.randomUUID();
-        byte[] data = dto.data();
-        String fileName = generateFileName(id, dto.name());
+        String fileName = generateFileName(id, file.getOriginalFilename());
         Path path = directoryPath.resolve(fileName);
-        fileManager.createFile(path, data);
 
-        BinaryContent content = BinaryContent.of(id, dto.type(),
-                dto.belongTo(), fileName, path.toString());
+        try {
+            file.transferTo(path);
+        } catch (IOException e) {
+            throw new FileIOException("파일 생성 실패");
+        }
+
+        BinaryContent content = BinaryContent.of(id, request.type(),
+                request.belongTo(), fileName, path.toString());
         return binaryContentRepository.save(content);
     }
 
@@ -61,33 +68,25 @@ public class BinaryContentService {
         return id + extension;
     }
 
-    public BinaryContentRequest find(UUID id) {
+    public Path find(UUID id) {
         BinaryContent content = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 binary content. id=" + id));
-        byte[] data = fileManager.readFile(Path.of(content.getPath()));
-        return BinaryContentRequest.of(content.getName(), content.getType(),
-                content.getId(), data);
+        return Path.of(content.getPath());
     }
 
-    public BinaryContentRequest findByUserId(UUID userId) {
-        Optional<BinaryContent> binaryContent = binaryContentRepository.findByUserId(userId);
-        BinaryContent content = binaryContent.orElseThrow(
-                () -> new NotFoundException("존재하지 않는 user에 대한 BinaryContent 요청"));
-        byte[] data = fileManager.readFile(Path.of(content.getPath()));
-        return BinaryContentRequest.of(content.getName(), content.getType(),
-                content.getBelongTo(), data);
+    public Path findByUserId(UUID userId) {
+        BinaryContent content = binaryContentRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 user에 대한 BinaryContent 요청"));
+        return Path.of(content.getPath());
     }
 
-    public List<BinaryContentRequest> findByMessageId(UUID messageId) {
-        ArrayList<BinaryContentRequest> dtos = new ArrayList<>(100);
+    public List<Path> findByMessageId(UUID messageId) {
+        ArrayList<Path> paths = new ArrayList<>(100);
         List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
         for (BinaryContent content : contents) {
-            byte[] data = fileManager.readFile(Path.of(content.getPath()));
-            BinaryContentRequest dto = BinaryContentRequest.of(content.getName(),
-                    content.getType(), content.getBelongTo(), data);
-            dtos.add(dto);
+            paths.add(Path.of(content.getPath()));
         }
-        return dtos;
+        return paths;
     }
 
     public void delete(UUID id) {
