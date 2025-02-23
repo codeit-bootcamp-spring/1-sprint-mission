@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record UpdateChannelDto(
         String channelName,
-        ChannelType channelType,
         String description,
         Instant updatedAt
 ) {
