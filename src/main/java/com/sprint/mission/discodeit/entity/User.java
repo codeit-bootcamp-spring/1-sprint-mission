@@ -19,8 +19,8 @@ public class User implements Serializable {
     private String nickname;
     //이메일 - 로그인용 계정 아이디
     private String email;
-    //비밀번호 -
-    private transient String password;
+    //비밀번호
+    private String password;
     //생성 날짜 - 유닉스 타임스탬프
     private final Instant createdAt;
     //수정 시간
@@ -113,10 +113,11 @@ public class User implements Serializable {
             isUpdated = true;
         }
 
-        if (updateUserDto.profileImageId() != null && !updateUserDto.profileImageId().equals(this.profileImageId)) {
-            this.profileImageId = updateUserDto.profileImageId();
+        if(statusMessage==null || (!statusMessage.equals(updateUserDto.statusMessage()) && updateUserDto.statusMessage() != null)) {
+            setStatusMessage(updateUserDto.statusMessage());
             isUpdated = true;
         }
+
         return isUpdated;
     }
 }

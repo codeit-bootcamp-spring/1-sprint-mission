@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -11,6 +12,9 @@ public interface UserService {
 
     //생성
     UserResponseDto create(CreateUserDto createUserDto);
+
+    //생성 with profile image
+    UserResponseDto create(CreateUserDto createUserDto, MultipartFile multipartFile);
 
     //모두 읽기
     List<UserResponseDto> findAll();
@@ -33,6 +37,9 @@ public interface UserService {
 
     //수정
     UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto);
+
+    //수정 - 프로필 이미지와 함께
+    UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile multipartFile);
 
     //삭제
     boolean deleteUser(String userId);

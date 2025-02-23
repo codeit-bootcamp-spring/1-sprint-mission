@@ -15,9 +15,7 @@ public record UpdateUserDto(
         String statusMessage,
         //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
         AccountStatus accountStatus,
-        //사용자 프로필 사진
-        String profileImageId,
-
+        //갱신 일자
         Instant updatedAt
 
 ) {

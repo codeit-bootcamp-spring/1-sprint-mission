@@ -46,6 +46,20 @@ public class FileUserRepository implements UserRepository {
         return (User) FileService.read(userPath);
     }
 
+    //todo - findByUsername 개선
+    //Username 찾을 때 전체 조회하는 문제. 어떻게 개선할 수 있는지 생각해보기
+    @Override
+    public User findByUsername(String username) {
+        List<User> allUsers = findAll();
+        return allUsers.stream().filter( u -> u.getUsername().equals(username)).findFirst().orElse(null);
+    }
+
+    @Override
+    public User findByEmail(String email) {
+        List<User> allUsers = findAll();
+        return allUsers.stream().filter( u -> u.getUsername().equals(email)).findFirst().orElse(null);
+    }
+
     @Override
     public List<User> findAll() {
         return FileService.load(Paths.get(directory.toString()));

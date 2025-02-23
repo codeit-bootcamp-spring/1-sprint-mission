@@ -5,8 +5,9 @@ public enum ErrorCode {
     //사용자 관련 에러
     USER_NOT_FOUND(1001, "사용자를 찾을 수 없습니다."),
     USER_EMAIL_ALREADY_REGISTERED(1002, "이미 등록된 이메일 입니다."),
-    INVALID_USER_STATUS(1003, "유효하지 않은 사용자 상태입니다."),
-    USER_NOT_IN_CHANNEL(1004, "사용자가 해당 채널에 있지 않습니다."),
+    USER_NAME_ALREADY_REGISTERED(1003, "이미 등록된 username 입니다."),
+    INVALID_USER_STATUS(1004, "유효하지 않은 사용자 상태입니다."),
+    USER_NOT_IN_CHANNEL(1005, "사용자가 해당 채널에 있지 않습니다."),
 
     //채널 관련 에러
     CHANNEL_NOT_FOUND(2001, "채널을 찾을 수 없습니다."),

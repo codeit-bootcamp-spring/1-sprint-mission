@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,9 +30,17 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto create(CreateUserDto createUserDto) {
-        boolean userExists = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(createUserDto.email()));
-        if (userExists) {
+        boolean userNameExists = userRepository.findByUsername(createUserDto.username()) != null;
+        boolean userEmailExists = userRepository.findByEmail(createUserDto.email()) != null;
+        if (userNameExists) {
+            throw new CustomException(ErrorCode.USER_NAME_ALREADY_REGISTERED);
+        }
+        if (userEmailExists) {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
+        }
+
+        if(createUserDto == null || createUserDto.username()==null ||createUserDto.password() == null ) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
         User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
@@ -42,14 +51,16 @@ public class BasicUserService implements UserService {
         return UserResponseDto.from(user, userStatusDto.isOnline());
     }
 
-    public UserResponseDto create(CreateUserDto createUserDto, String profileImageId) {
+    @Override
+    public UserResponseDto create(CreateUserDto createUserDto, MultipartFile file) throws CustomException {
         UserResponseDto userDto = create(createUserDto);
         User user = userRepository.findById(userDto.id());
-        user.setProfileImageId(profileImageId);
+
+        ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
+        user.setProfileImageId(responseBinaryContentDto.id());
         userRepository.save(user);
 
         return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
-
     }
 
     @Override
@@ -119,18 +130,22 @@ public class BasicUserService implements UserService {
     }
 
     // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
-    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, CreateBinaryContentDto createBinaryContentDto) throws CustomException {
+    @Override
+    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file) throws CustomException {
         User user = userRepository.findById(userId);
-
+        //todo - 유저 조회를 두 번 한다. 수정 필요
         updateUser(userId, updateUserDto);
 
-        if (createBinaryContentDto.binaryImage() == null) {
+        if (file == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
-        binaryContentService.deleteById(user.getProfileImageId());
+        if (user.getProfileImageId()!=null && !user.getProfileImageId().isEmpty()) {
+            binaryContentService.deleteById(user.getProfileImageId());
+        }
 
-        user.setProfileImageId(binaryContentService.create(createBinaryContentDto).id());
+        user.setProfileImageId(binaryContentService.create(file).id());
+        user.setUpdatedAt(updateUserDto.updatedAt());
 
         return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isOnline());
     }

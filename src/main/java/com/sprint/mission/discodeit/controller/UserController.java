@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,19 +23,27 @@ public class UserController {
         return userService.findById(userId);
     }
 
-    //todo - 사용자 등록
+    //사용자 등록
+    //InvalidContentTypeException 예외처리해야 -> 예외처리 없이 application/json 으로 보냈을때도 받을 수 있게 할 수는 없을까?
     @PostMapping
-    public UserResponseDto createUser(@RequestBody CreateUserDto createUserDto) {
-        return userService.create(createUserDto);
+    public UserResponseDto createUser(@RequestPart(value = "file", required = false) MultipartFile file, @RequestPart("user") CreateUserDto createUserDto) {
+        if(file==null || file.isEmpty()){
+            return userService.create(createUserDto);
+        }
+        return userService.create(createUserDto, file);
     }
 
-    //todo - 사용자 정보 수정
+    //사용자 정보 수정
     @PutMapping("/{userId}")
-    public UserResponseDto updateUser(@PathVariable String userId, @RequestBody UpdateUserDto updateUserDto) {
-        return userService.updateUser(userId, updateUserDto);
+    public UserResponseDto updateUser(@PathVariable String userId, @RequestPart("user") UpdateUserDto updateUserDto, @RequestPart(value = "file", required = false)MultipartFile file) {
+        if(file==null || file.isEmpty()){
+            return userService.updateUser(userId, updateUserDto);
+        }
+
+        return userService.updateUser(userId, updateUserDto, file);
     }
 
-    //todo - 사용자 삭제
+    //사용자 삭제
     @DeleteMapping("/{userId}")
     public String deleteUser(@PathVariable String userId) {
         if(userService.deleteUser(userId)){
@@ -43,7 +52,7 @@ public class UserController {
         return "Delete user failed";
     }
 
-    // todo - 모든 사용자 조회
+    //모든 사용자 조회
     @GetMapping
     public List<UserResponseDto> getUsers() {
         return userService.findAll();
