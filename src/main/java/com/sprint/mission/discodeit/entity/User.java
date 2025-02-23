@@ -97,7 +97,7 @@ public class User implements Serializable {
 
     public boolean isSamePassword(String password) {
 //        return BCrypt.checkpw(this.password, password);
-        return true;
+        return this.password.equals(password);
     }
 
     public void validateDuplicateName(String name) {
