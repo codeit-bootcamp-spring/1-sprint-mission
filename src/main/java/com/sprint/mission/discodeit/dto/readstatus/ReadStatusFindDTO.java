@@ -1,5 +1,13 @@
 package com.sprint.mission.discodeit.dto.readstatus;
 
 
-public class ReadStatusFindDTO {
+import java.time.Instant;
+import java.util.UUID;
+
+public record ReadStatusFindDTO(
+    UUID id,
+    UUID userId,
+    UUID channelId,
+    Instant time
+) {
 }
