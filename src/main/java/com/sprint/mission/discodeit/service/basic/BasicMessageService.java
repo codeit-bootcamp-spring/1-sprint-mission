@@ -11,12 +11,17 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -91,4 +96,21 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.deleteById(messageId);
     }
+
+    private Optional<BinaryContentCreateRequest> convertToBinaryRequest(MultipartFile file) {
+        try {
+            if (file == null || file.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.of(new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+            ));
+        } catch (IOException e) {
+            log.error("파일 변환 실패: {}", file.getOriginalFilename(), e);
+            return Optional.empty();
+        }
+    }
+
 }
