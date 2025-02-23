@@ -57,7 +57,7 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User findByEmail(String email) {
         List<User> allUsers = findAll();
-        return allUsers.stream().filter( u -> u.getUsername().equals(email)).findFirst().orElse(null);
+        return allUsers.stream().filter( u -> u.getEmail().equals(email)).findFirst().orElse(null);
     }
 
     @Override

@@ -30,13 +30,15 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto create(CreateUserDto createUserDto) {
-        boolean userNameExists = userRepository.findByUsername(createUserDto.username()) != null;
+
         boolean userEmailExists = userRepository.findByEmail(createUserDto.email()) != null;
-        if (userNameExists) {
-            throw new CustomException(ErrorCode.USER_NAME_ALREADY_REGISTERED);
-        }
         if (userEmailExists) {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
+        }
+
+        boolean userNameExists = userRepository.findByUsername(createUserDto.username()) != null;
+        if (userNameExists) {
+            throw new CustomException(ErrorCode.USER_NAME_ALREADY_REGISTERED);
         }
 
         if(createUserDto == null || createUserDto.username()==null ||createUserDto.password() == null ) {
