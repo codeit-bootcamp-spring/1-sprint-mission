@@ -1,5 +1,6 @@
 package com.sprint.mission.controller;
 
+import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.AuthService;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import static org.springframework.http.HttpStatus.*;
 
 @Controller("/api/auth")
 @RequiredArgsConstructor
@@ -20,10 +23,9 @@ public class AuthController {
     private final AuthService authService;
 
     @RequestMapping("login")
-    public ResponseEntity<User> login(LoginRequest request) {
+    public ResponseEntity<CommonResponse> login(LoginRequest request) {
         User user = authService.login(request);
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(user);
+        return CommonResponse.toResponseEntity
+                (OK, "로그인 성공", user);
     }
 }

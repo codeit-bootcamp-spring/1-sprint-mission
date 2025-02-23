@@ -1,5 +1,6 @@
 package com.sprint.mission.controller;
 
+import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 import java.util.List;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.http.HttpStatus.*;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -22,19 +25,17 @@ public class BinaryContentController {
   private final BinaryService binaryContentService;
 
   @RequestMapping(path = "find")
-  public ResponseEntity<BinaryContent> find(@RequestParam("id") UUID binaryContentId) {
+  public ResponseEntity<CommonResponse> find(@RequestParam("id") UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(binaryContent);
+    return CommonResponse.toResponseEntity
+        (OK, "BinaryContent 조회 성공", binaryContent);
   }
 
   @RequestMapping(path = "findAllByIdIn")
-  public ResponseEntity<List<BinaryContent>> findAllByIdIn(
+  public ResponseEntity<CommonResponse> findAllByIdIn(
       @RequestParam("ids") List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
-    return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(binaryContents);
+    return CommonResponse.toResponseEntity
+        (OK, "BinaryContent 목록 조회 성공", binaryContents);
   }
 }

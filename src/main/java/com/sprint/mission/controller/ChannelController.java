@@ -2,6 +2,7 @@ package com.sprint.mission.controller;
 
 
 //import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.*;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -32,50 +35,42 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(path = "createPublic")
-    public ResponseEntity<FindChannelDto> create(@RequestBody PublicChannelCreateDTO request) {
+    public ResponseEntity<CommonResponse> create(@RequestBody PublicChannelCreateDTO request) {
         Channel createdChannel = channelService.createPublicChannel(request);
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(getFindChannelDto(createdChannel));
-        //dto?
+        return CommonResponse.toResponseEntity
+                (CREATED, "Public 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
     @RequestMapping(path = "createPrivate")
-    public ResponseEntity<FindChannelDto> create(@RequestBody PrivateChannelCreateDTO request) {
+    public ResponseEntity<CommonResponse> create(@RequestBody PrivateChannelCreateDTO request) {
         Channel createdChannel = channelService.createPrivateChannel(request);
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(getFindChannelDto(createdChannel));
-        //dto?
+        return CommonResponse.toResponseEntity
+                (CREATED, "Private 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
     @RequestMapping(path = "update")
-    public ResponseEntity<String> update(@RequestParam("channelId") UUID channelId,
+    public ResponseEntity<CommonResponse> update(@RequestParam("channelId") UUID channelId,
         @RequestBody ChannelDtoForRequest requestDTO) {
         channelService.update(channelId, requestDTO);
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body("수정 완료");
+        return CommonResponse.toResponseEntity
+                (OK, "성공적으로 업데이트되었습니다", requestDTO);
     }
 
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @RequestMapping(path = "findAllByUserId")
-    public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(
+    public ResponseEntity<CommonResponse> findAllByUserId(
         @RequestParam("userId") UUID userId) {
 
         List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
-
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(channelDtoList);
+        return CommonResponse.toResponseEntity
+                (OK, "성공적으로 조회되었습니다", channelDtoList);
     }
 
     @RequestMapping(path = "delete")
-    public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
+    public ResponseEntity<CommonResponse> delete(@RequestParam("channelId") UUID channelId) {
         channelService.delete(channelId);
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
+        return CommonResponse.toResponseEntity
+                (NO_CONTENT, "성공적으로 삭제되었습니다", null);
     }
 
 
