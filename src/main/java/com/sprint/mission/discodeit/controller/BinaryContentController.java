@@ -19,6 +19,13 @@ public class BinaryContentController
     public ResponseBinaryContentDto viewFile(@PathVariable String contentId) {
         return binaryContentService.findById(contentId);
     }
+
+    @GetMapping
+    //todo - 여러개 조회 수정하기
+    public List<ResponseBinaryContentDto> getBinaryContents(@RequestParam List<String> contentIds){
+        return binaryContentService.findAllByIdIn(contentIds);
+    }
+
     @PostMapping
     public ResponseBinaryContentDto uploadBinaryContent(@RequestParam("file") MultipartFile file){
         return binaryContentService.create(file);
