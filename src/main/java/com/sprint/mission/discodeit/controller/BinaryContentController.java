@@ -19,4 +19,8 @@ public class BinaryContentController
     public ResponseBinaryContentDto viewFile(@PathVariable String contentId) {
         return binaryContentService.findById(contentId);
     }
+    @PostMapping
+    public ResponseBinaryContentDto uploadBinaryContent(@RequestParam("file") MultipartFile file){
+        return binaryContentService.create(file);
+    }
 }
