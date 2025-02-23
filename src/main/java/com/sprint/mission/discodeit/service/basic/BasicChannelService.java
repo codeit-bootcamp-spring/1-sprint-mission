@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator channelValidator;
-//    private final MessageService messageService; // 순환 참조 발생함.
     private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
 
@@ -72,8 +71,6 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponse findById(UUID id) {
         Channel channel = findByIdOrThrow(id);
         return ChannelResponse.entityToDto(channel, getLastMessageTime(id), findJoinUsersById(id));
-        // ChannelResponse.entityToDto(channel) 로 한다면
-        // dto 에서 service 를 사용해서 getLastMessageTime(id), getJoinUsers(id)를 직접 호출하여 값을 넣어주기??
     }
 
     @Override
@@ -81,7 +78,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = findByIdOrThrow(id);
 
         if (channel.getChannelType() == Channel.ChannelType.PRIVATE) {
-            log.error("Private Channel can not be changed");
+            throw new RestApiException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED, "id : " + id);
         } else if (channelValidator.isValidTitle(request.title()) && channelValidator.isValidTitle(request.description())) {
             channel.update(request.title(), request.description());
             Channel updatedChannel = channelRepository.save(channel);
@@ -93,7 +90,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteById(UUID id) {
-//        messageService.deleteAllByChannelId(id); // 굳이 서비스 단에서 불러와야할까?
         messageRepository.findAllByChannelId(id);
         readStatusService.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
@@ -106,7 +102,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     private Instant getLastMessageTime(UUID id) {
-        //List<Message> channelMessages = messageService.findAllByChannelId(id);
         List<Message> channelMessages = messageRepository.findAllByChannelId(id);
         if  (channelMessages.isEmpty()) {
             return null;

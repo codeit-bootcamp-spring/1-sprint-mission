@@ -24,6 +24,7 @@ public enum ErrorCode {
     // CHANNEL
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "CHANNEL001", "해당 채널이 존재하지 않습니다."),
     CHANNEL_NAME_BLANK(HttpStatus.BAD_REQUEST, "CHANNEL002", "채널 이름은 비워둘 수 없습니다."),
+    PRIVATE_CHANNEL_CANNOT_BE_MODIFIED(HttpStatus.BAD_REQUEST, "CHANNEL003", "Private 채널은 수정될 수 없습니다."),
 
     // MESSAGE
     MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE001", "해당 메세지가 존재하지 않습니다."),

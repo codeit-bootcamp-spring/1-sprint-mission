@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -18,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +48,7 @@ public class BasicUserService implements UserService {
             }
 
             log.info("Create User: {}", newUser);
-            return UserResponse.entityToDto(newUser, newUserStatus.getStatus(),newBinaryContentId);
+            return UserResponse.entityToDto(newUser, newUserStatus.getStatus(), newBinaryContentId);
         }
         return null;
     }
@@ -58,10 +56,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> UserResponse.entityToDto(
-                        user,
-                        userStatusService.findByUserId(user.getId()).getStatus(),
-                        binaryContentService.findByUserId(user.getId()).id())
+                .map(this::entityToUserResponse
                 )
                 .collect(Collectors.toList());
     }
@@ -69,10 +64,7 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse findById(UUID id) {
         User user = findByIdOrThrow(id);
-        return UserResponse.entityToDto(user,
-                userStatusService.findByUserId(user.getId()).getStatus(),
-                binaryContentService.findByUserId(user.getId()).id()
-        );
+        return entityToUserResponse(user);
     }
 
     @Override
@@ -87,13 +79,8 @@ public class BasicUserService implements UserService {
                 binaryContentService.updateUserProfileFile(userProfileImage, id);
             }
         }
-
         log.info("Update User :{}", user);
-        return UserResponse.entityToDto(
-                user,
-                userStatusService.findByUserId(user.getId()).getStatus(),
-                binaryContentService.findByUserId(user.getId()).id()
-        );
+        return entityToUserResponse(user);
     }
 
     @Override
@@ -109,4 +96,15 @@ public class BasicUserService implements UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
     }
+
+    private UserResponse entityToUserResponse(User user) {
+        UserStatus.Status userStatus =  userStatusService.findByUserId(user.getId()).getStatus();
+        UUID binaryContentId = null;
+        BinaryContentResponse binaryContentResponse = binaryContentService.findByUserId(user.getId());
+        if (binaryContentResponse != null) {
+            binaryContentId = binaryContentResponse.id();
+        }
+        return UserResponse.entityToDto(user, userStatus, binaryContentId);
+    }
+
 }

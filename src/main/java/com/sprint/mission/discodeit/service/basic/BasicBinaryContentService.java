@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

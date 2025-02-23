@@ -4,18 +4,18 @@ import com.sprint.mission.discodeit.dto.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -25,15 +25,15 @@ import java.util.stream.Collectors;
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
-    private final UserService userService;
-//    private final ChannelService channelService;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
     public ReadStatusResponse create(ReadStatusRequest request) {
-        User user = userService.findByIdOrThrow(request.userId());
-//        Channel channel = channelService.findByIdOrThrow(channelId);
+        User user = userRepository.findById(request.userId()).orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
+        Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "channelId : " + request.channelId()));
         if (readStatusRepository.existsByUserIdAndChannelId(request.userId(), request.channelId())) {
-            throw new RestApiException(ErrorCode.READ_STATUS_NOT_FOUND, "");
+            throw new RestApiException(ErrorCode.READ_IS_ALREADY_EXIST, "");
         }
         ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId());
         readStatusRepository.save(newReadStatus);
