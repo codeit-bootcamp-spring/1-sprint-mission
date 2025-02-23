@@ -1,23 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.entity.Channel;
-import com.sprint.mission.discodeit.dto.entity.ReadStatus;
-import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
-import com.sprint.mission.discodeit.dto.form.PrivateChannelDto;
-import com.sprint.mission.discodeit.dto.form.PublicChannelDto;
+import com.sprint.mission.discodeit.domain.entity.Channel;
+import com.sprint.mission.discodeit.domain.entity.ChannelGroup;
+import com.sprint.mission.discodeit.domain.entity.Participant;
+import com.sprint.mission.discodeit.domain.entity.ReadStatus;
+import com.sprint.mission.discodeit.domain.entity.User;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.web.dto.PrivateChannelDto;
+import com.sprint.mission.discodeit.web.dto.PublicChannelDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JcfParticipantRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 
@@ -27,60 +30,96 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
-    private final JcfParticipantRepository paricipantRepository;
 
     @Override
-    public void createPublicChannel(PublicChannelDto channelParam,UUID userId) {
+    public Channel createPublicChannel(PublicChannelDto channelParam,Participant... participants) {
         if (channelParam.getChannelName().trim().isEmpty()) {
-            log.info("채널 이름을 입력해주세요.");
-            return;
+            throw new IllegalArgumentException("채널 이름을 입력해주세요.");
         }
         if (channelParam.getDescription().trim().isEmpty()) {
-            log.info("채널 설명을 입력해주세요.");
-            return;
+            throw new IllegalArgumentException("채널 설명을 입력해주세요.");
         }
-        Channel channel = new Channel(channelParam.getChannelName(), channelParam.getDescription(), channelParam.getChannelGroup());
-        channelRepository.createChannel(channel.getId(),channel);
-        participate(userId, channel);
-    }
-
-    @Override
-    public void createPrivateChannel(PrivateChannelDto channelParam,UUID userId) {
-        Channel channel = new Channel(channelParam.getChannelGroup());
-        channelRepository.createChannel(channel.getId(), channel);
-        participate(userId, channel);
-        Set<UUID> participants = paricipantRepository.getParticipants(channel.getId());
-        for (UUID participant : participants) {
-            ReadStatus readStatus = new ReadStatus(participant,channel.getId());
+        Channel channel = new Channel(channelParam.getId(),channelParam.getChannelName(), channelParam.getDescription(), channelParam.getGroup());
+        for (Participant participant : participants) {
+            channel.addParticipant(participant);
+            ReadStatus readStatus = new ReadStatus(participant.getUser().getId(), channel.getId());
             readStatusRepository.createReadStatus(readStatus);
         }
-    }
-
-    private void participate(UUID userId, Channel channel) {
-        Set<UUID> userSet = paricipantRepository.participants(userId);
-        paricipantRepository.create(channel.getId(), userSet);
-    }
-
-    @Override
-    public Optional<PrivateChannelDto> findPrivateChannel(UUID id) {
-        return channelRepository.findById(id).map(PrivateChannelDto::new);
-    }
-    @Override
-    public Optional<PublicChannelDto> findPublicChannel(UUID id) {
-        return channelRepository.findById(id).map(PublicChannelDto::new);
+        channelRepository.createChannel(channel);
+        return channel;
     }
 
 
     @Override
-    public List<Channel> findAllChannels() {
-        return channelRepository.findAll();
+    public Channel createPrivateChannel(PrivateChannelDto channelParam,Participant... participants) {
+        Channel channel = new Channel(channelParam.getId(),channelParam.getGroup());
+        for (Participant participant : participants) {
+            channel.addParticipant(participant);
+            ReadStatus readStatus = new ReadStatus(participant.getUser().getId(), channel.getId());
+            readStatusRepository.createReadStatus(readStatus);
+        }
+        channelRepository.createChannel(channel);
+        return channel;
     }
 
     @Override
-    public List<UUID> findAllByUserId(UUID userId) {
-        return paricipantRepository.getParticipationChannels(userId);
+    public Optional<?> findById(UUID id) {
+        Channel findchannel = channelRepository.findById(id).orElseThrow(()->new IllegalArgumentException("해당 ID의 채널을 찾을 수 없습니다."));
+        List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannelId(findchannel.getId());
+        ReadStatus lastStatus = allByChannelId.get(allByChannelId.size() - 1);
+        if (findchannel.isPublic(findchannel)) {
+            return Optional.of(new PublicChannelDto(findchannel,lastStatus.getLastReadAt()));
+        } else if (findchannel.getGroup() == ChannelGroup.PRIVATE) {
+            return Optional.of(new PrivateChannelDto(findchannel,lastStatus.getLastReadAt()));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public List<PublicChannelDto> findAllPublicChannels() {
+        List<PublicChannelDto> publicChannels = new ArrayList<>();
+        List<Channel> all = channelRepository.findAll();
+        for (Channel channel : all) {
+            List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannelId(channel.getId());
+            ReadStatus lastStatus = allByChannelId.get(allByChannelId.size() - 1);
+            if(channel.getGroup().equals(ChannelGroup.PUBLIC)) {
+                publicChannels.add(new PublicChannelDto(channel,lastStatus.getLastReadAt()));
+            }
+        }
+        return publicChannels;
+    }
+
+    @Override
+    public List<PrivateChannelDto> findAllPrivateChannels() {
+        List<PrivateChannelDto> channels = new ArrayList<>();
+        List<Channel> all = channelRepository.findAll();
+        for (Channel channel : all) {
+            List<ReadStatus> allByChannelId = readStatusRepository.findAllByChannelId(channel.getId());
+            ReadStatus lastStatus = allByChannelId.get(allByChannelId.size() - 1);
+            if (channel.getGroup().equals(ChannelGroup.PRIVATE)) {
+                channels.add(new PrivateChannelDto(channel,lastStatus.getLastReadAt()));
+            }
+        }
+        return channels;
+    }
+
+    @Override
+    public List<UUID> findAllByLoginId(String loginId) {
+        List<UUID> result = new ArrayList<>();
+        User user= userRepository.findByloginId(loginId).orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+        List<Channel> all = channelRepository.findAll();
+        for (Channel channel : all) {
+            List<Participant> participants = channel.getParticipants();
+            for (Participant participant : participants) {
+                if (participant.getUser().equals(user)) {
+                    result.add(channel.getId());
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -98,7 +137,7 @@ public class BasicChannelService implements ChannelService {
     }
     private void validateChannelExits(UUID uuid) {
         if (channelRepository.findById(uuid).isEmpty()) {
-            throw new RuntimeException("해당 채널이 존재하지 않습니다.");
+            throw new IllegalArgumentException("해당 채널이 존재하지 않습니다.");
         }
     }
 }

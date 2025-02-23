@@ -1,6 +1,6 @@
-package com.sprint.mission.discodeit.dto.form;
+package com.sprint.mission.discodeit.web.dto;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.entity.BinaryContent;
 import lombok.Getter;
 
 import java.time.Instant;

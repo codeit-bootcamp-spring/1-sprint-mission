@@ -1,9 +1,10 @@
-package com.sprint.mission.discodeit.dto.entity;
+package com.sprint.mission.discodeit.domain.entity;
 
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
@@ -24,5 +25,17 @@ public class BinaryContent implements Serializable {
         this.size = size;
         this.contentType = contentType;
         this.bytes = bytes;
+    }
+
+    @Override
+    public String toString() {
+        return "BinaryContent{" +
+                "id=" + id +
+                ", createAt=" + createAt +
+                ", uploadFileName='" + uploadFileName + '\'' +
+                ", size=" + size +
+                ", contentType='" + contentType + '\'' +
+                ", bytes=" + Arrays.toString(bytes) +
+                '}';
     }
 }

@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.entity.Message;
+import com.sprint.mission.discodeit.domain.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.io.FileInputStream;
@@ -22,11 +22,12 @@ public class FileMessageRepository implements MessageRepository{
     private final Map<UUID, Message> data=new HashMap<>();
 
     @Override
-    public Message createMessage(UUID id, Message message) {
-        data.put(id, message);
+    public Message createMessage(Message message) {
+        data.put(message.getId(),message);
         save();
         return message;
     }
+
 
     @Override
     public void updateMessage(UUID id, String content) {

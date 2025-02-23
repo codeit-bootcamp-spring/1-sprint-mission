@@ -1,19 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.entity.UserStatus;
-import com.sprint.mission.discodeit.dto.form.UserStatusUpdateDto;
+import com.sprint.mission.discodeit.domain.entity.UserStatus;
+import com.sprint.mission.discodeit.web.dto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
@@ -59,5 +62,29 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void delete(UUID userStatusId) {
         userStatusRepository.deleteById(userStatusId);
+    }
+
+    public boolean isUserOnline(UUID userId) {
+        if (userStatusRepository.findByUserId(userId).isEmpty()) {
+            return false;
+        } else {
+            UserStatus userStatus = userStatusRepository.findByUserId(userId).get();
+            if(userStatus.isOnline()) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    public List<UUID> getOnlineUsers() {
+        List<UserStatus> all = userStatusRepository.findAll();
+        List<UUID> userIds = new ArrayList<>();
+        for (UserStatus userStatus : all) {
+            if(!userStatus.isOnline()) {
+                log.info("오프라인");
+            }
+            userIds.add(userStatus.getUserId());
+        }
+        return userIds;
     }
 }

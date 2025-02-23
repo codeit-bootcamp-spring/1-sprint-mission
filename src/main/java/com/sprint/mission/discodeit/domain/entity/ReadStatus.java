@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.entity;
+package com.sprint.mission.discodeit.domain.entity;
 
 import lombok.Data;
 
@@ -6,19 +6,26 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class ReadStatus extends BaseEntity{
+public class ReadStatus{
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId) {
-        super();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.updatedAt = createdAt;
+
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = Instant.now();
     }
     public void updateRead(Instant newLastReadAt) {
         this.lastReadAt = newLastReadAt;
-        setUpdatedAt();
+        this.updatedAt = Instant.now();
     }
 }

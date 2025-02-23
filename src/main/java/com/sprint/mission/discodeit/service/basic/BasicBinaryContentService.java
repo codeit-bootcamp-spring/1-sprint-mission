@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
+import com.sprint.mission.discodeit.domain.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId).get();
+        return binaryContentRepository.findById(binaryContentId).orElseThrow(() -> new IllegalArgumentException("파일이 존재하지 않습니다."));
     }
 
     @Override

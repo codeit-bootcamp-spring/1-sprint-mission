@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.entity.Channel;
-import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
+import com.sprint.mission.discodeit.domain.entity.Channel;
+import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,8 +26,8 @@ public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data=new HashMap<>();
 
     @Override
-    public Channel createChannel(UUID id, Channel channel) {
-        data.put(id, channel);
+    public Channel createChannel(Channel channel) {
+        data.put(channel.getId(), channel);
         save();
         return channel;
     }
@@ -36,12 +35,13 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void updateChannel(UUID id, ChannelUpdateDto channelUpdateDto) {
         Channel findChannel = data.get(id);
-        if(findChannel.getChannelGroup().equals("PUBLIC")) {
-            findChannel.setDescription(channelUpdateDto.getDescription());
-            findChannel.setChannelName(channelUpdateDto.getChannelName());
+        if(findChannel.isPublic(findChannel)) {
+            findChannel.setDescription(channelUpdateDto.getNewDescription());
+            findChannel.setChannelName(channelUpdateDto.getNewChannelName());
             log.info("PUBLIC 채널 수정완료");
         }
         log.info("PRIVATE는 채널 수정 불가입니다.");
+        return;
     }
 
     @Override

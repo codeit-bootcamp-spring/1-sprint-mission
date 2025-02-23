@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.entity.Channel;
-import com.sprint.mission.discodeit.dto.form.ChannelUpdateDto;
-import com.sprint.mission.discodeit.dto.form.PrivateChannelDto;
-import com.sprint.mission.discodeit.dto.form.PublicChannelDto;
+import com.sprint.mission.discodeit.domain.entity.Channel;
+import com.sprint.mission.discodeit.domain.entity.ChannelGroup;
+import com.sprint.mission.discodeit.domain.entity.Participant;
+import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.web.dto.PrivateChannelDto;
+import com.sprint.mission.discodeit.web.dto.PublicChannelDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,53 +23,46 @@ public class FileChannelService implements ChannelService {
     }
 
     @Override
-    public void createPublicChannel(PublicChannelDto channelParam,UUID userId) {
+    public Channel createPublicChannel(PublicChannelDto channelParam,Participant... participants) {
         if (channelParam.getChannelName().trim().isEmpty()) {
-            log.info("채널 이름을 입력해주세요.");
-            return;
+            throw new IllegalArgumentException("채널 이름을 입력해주세요.");
         }
         if (channelParam.getDescription().trim().isEmpty()) {
-            log.info("채널 설명을 입력해주세요.");
-            return;
+            throw new IllegalArgumentException("채널 설명을 입력해주세요.");
         }
-        Channel channel = new Channel(channelParam.getChannelName(), channelParam.getDescription(), channelParam.getChannelGroup());
-        if (!channelParam.getChannelGroup().equals("PUBLIC")) {
-            log.info("PUBLIC 채널이 아닙니다.");
-            return;
-        }
-        channelRepository.createChannel(channel.getId(),channel);
+        Channel channel = new Channel(channelParam.getId(),channelParam.getChannelName(), channelParam.getDescription(), channelParam.getGroup());
+        channelRepository.createChannel(channel);
+        return channel;
     }
     @Override
-    public void createPrivateChannel(PrivateChannelDto channelParam,UUID userId) {
-        if (!channelParam.getChannelGroup().equals("PRIVATE")) {
-            log.info("PRIVATE 채널이 아닙니다.");
-            return;
-        }
-        Channel channel = new Channel(channelParam.getChannelGroup());
-        channelRepository.createChannel(channel.getId(), channel);
-    }
-    @Override
-    public Optional<PrivateChannelDto> findPrivateChannel(UUID id) {
-        Optional<Channel> optionalChannel = channelRepository.findById(id);
-        Channel channel = optionalChannel.get();
-        return Optional.of(new PrivateChannelDto(channel));
-    }
-    @Override
-    public Optional<PublicChannelDto> findPublicChannel(UUID id) {
-        Optional<Channel> optionalChannel = channelRepository.findById(id);
-        Channel channel = optionalChannel.get();
-        return Optional.of(new PublicChannelDto(channel));
+    public Channel createPrivateChannel(PrivateChannelDto channelParam,Participant... participants) {
+
+        Channel channel = new Channel(channelParam.getId(),channelParam.getGroup());
+        channelRepository.createChannel(channel);
+        return channel;
     }
 
     @Override
-    public List<Channel> findAllChannels() {
-        return channelRepository.findAll();
+    public Optional<?> findById(UUID id) {
+        return Optional.empty();
     }
 
+
     @Override
-    public List<UUID> findAllByUserId(UUID userId) {
+    public List<PrivateChannelDto> findAllPrivateChannels() {
         return List.of();
     }
+
+    @Override
+    public List<PublicChannelDto> findAllPublicChannels() {
+        return List.of();
+    }
+
+    @Override
+    public List<UUID> findAllByLoginId(String loginId) {
+        return List.of();
+    }
+
 
     @Override
     public void updateChannel(UUID id, ChannelUpdateDto channelParam) {

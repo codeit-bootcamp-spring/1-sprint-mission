@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.entity.User;
-import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
+import com.sprint.mission.discodeit.domain.entity.Channel;
+import com.sprint.mission.discodeit.domain.entity.Participant;
+import com.sprint.mission.discodeit.domain.entity.User;
+import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +19,13 @@ import java.util.UUID;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class JcfUserRepository implements UserRepository {
 
     private static final Map<UUID, User> data = new HashMap<>();
 
     @Override
-    public User createUser(UUID id, User user) {
-        log.info("save: user={}", user);
+    public User createUser(User user) {
         data.put(user.getId(), user);
         return user;
     }
@@ -33,8 +37,7 @@ public class JcfUserRepository implements UserRepository {
         findUser.setUserEmail(userParam.getUserEmail());
         findUser.setLoginId(userParam.getLoginId());
         findUser.setPassword(userParam.getPassword());
-        findUser.setAttachProfile(userParam.getAttachProfile());
-        findUser.setUpdatedAt();
+        findUser.setUpdatedAt(Instant.now());
     }
 
     @Override
@@ -59,9 +62,17 @@ public class JcfUserRepository implements UserRepository {
     }
 
     @Override
+    public List<User> findUsersInChannel(Channel channel) {
+        List<User> userLists=new ArrayList<>();
+        List<Participant> participants = channel.getParticipants();
+        for (Participant participant : participants) {
+            userLists.add(participant.getUser());
+        }
+        return userLists;
+    }
+
+    @Override
     public List<User> findAll() {
         return new ArrayList<>(data.values());
     }
-
-
 }
