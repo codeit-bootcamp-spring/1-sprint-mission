@@ -11,5 +11,5 @@ import java.util.UUID;
 @AllArgsConstructor
 public class BinaryContentDto {
     private UUID id;
-    private byte[] data;
+    private byte[] contentBytes;
 }

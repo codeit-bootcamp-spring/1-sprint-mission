@@ -22,12 +22,12 @@ public class Channel implements Serializable {
     private Instant updatedAt = Instant.now();
 
     // 일반 필드들
-    private com.sprint.mission.discodeit.entity.ChannelType type;
+    private ChannelType type;
     private String name;
     private String description;
 
     // 특정 필드만을 받아서 초기화하는 생성자
-    public Channel(Instant updatedAt, com.sprint.mission.discodeit.entity.ChannelType type, String name, String description) {
+    public Channel(Instant updatedAt, ChannelType type, String name, String description) {
         this.updatedAt = updatedAt;
         this.type = type;
         this.name = name;

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,8 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class BasicBinaryContentService implements BinaryContentService {
-    private static final Logger log = LoggerFactory.getLogger(BasicBinaryContentService.class);
+
     private final BinaryContentRepository binaryContentRepository;
 
     public BasicBinaryContentService(BinaryContentRepository binaryContentRepository) {
