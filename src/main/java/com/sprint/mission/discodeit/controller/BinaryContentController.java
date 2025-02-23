@@ -19,7 +19,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("/files")
+@RequestMapping("/api/files")
 @RequiredArgsConstructor
 public class BinaryContentController {
 

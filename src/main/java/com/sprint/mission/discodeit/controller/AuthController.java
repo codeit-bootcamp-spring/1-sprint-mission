@@ -16,7 +16,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
+    @PostMapping("/api/login")
     public ResponseEntity<UserDetailResponse> login(@RequestBody UserLoginRequest userLoginRequest, HttpSession session) {
         UserDetailResponse login = authService.login(userLoginRequest);
         return ResponseEntity.ok(login);
