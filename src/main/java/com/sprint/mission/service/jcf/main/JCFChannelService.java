@@ -90,6 +90,11 @@ public class JCFChannelService implements ChannelService {
   public void update(UUID channelId, ChannelDtoForRequest dto) {
     Channel updatingChannel = channelRepository.findById(channelId)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
+
+    if (updatingChannel.getChannelType().equals(ChannelType.PRIVATE)){
+      throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
+    }
+
     updatingChannel.updateByDTO(dto);
     channelRepository.save(updatingChannel);
   }

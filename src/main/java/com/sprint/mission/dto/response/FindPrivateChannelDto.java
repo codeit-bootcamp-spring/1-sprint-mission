@@ -16,11 +16,13 @@ import lombok.NoArgsConstructor;
 @Data
 public class FindPrivateChannelDto implements FindChannelDto {
 
+    private final UUID channelId;
     private final ChannelType channelType;
     private final String description;
     private final String name;
 
     public FindPrivateChannelDto(Channel channel) {
+        this.channelId = channel.getId();
         this.channelType = channel.getChannelType();
         this.description = channel.getDescription();
         this.name = channel.getName();
