@@ -70,8 +70,11 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
+        if (username == null) {
+            return Optional.empty(); // username이 null인 경우 빈 Optional 반환
+        }
         return this.findAll().stream()
-                .filter(user -> user.getUsername().equals(username))
+                .filter(user -> username.equals(user.getUsername())) // null-safe 비교
                 .findFirst();
     }
 
@@ -114,13 +117,19 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public boolean existsByEmail(String email) {
+        if (email == null) {
+            return false; // email이 null인 경우 false 반환
+        }
         return this.findAll().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
+                .anyMatch(user -> email.equals(user.getEmail())); // null-safe 비교
     }
 
     @Override
     public boolean existsByUsername(String username) {
+        if (username == null) {
+            return false;
+        }
         return this.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
+                .anyMatch(user -> username.equals(user.getUsername())); // null-safe 비교
     }
 }
