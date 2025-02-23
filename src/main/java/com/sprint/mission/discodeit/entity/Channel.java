@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 public class Channel extends AbstractEntity {
     private String name;
     private String description;

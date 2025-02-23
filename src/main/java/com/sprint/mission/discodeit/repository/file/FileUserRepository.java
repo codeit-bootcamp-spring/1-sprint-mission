@@ -2,12 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.*;
+@Repository
 public class FileUserRepository implements UserRepository {
     private final String filePath = "users.ser";
     private Map<UUID, User> data;
+
 
     public FileUserRepository() {
         this.data = loadFromFile();

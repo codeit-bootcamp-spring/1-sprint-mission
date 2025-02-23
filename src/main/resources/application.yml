@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: discodeit
+  main:
+    banner-mode: "off"
