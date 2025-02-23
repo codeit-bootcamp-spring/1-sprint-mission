@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.sprint.mission.discodeit.service.basic.BasicAuthServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-02-14T01:17:34" hostname="sineunscBookAir" time="0.505">
+  <properties/>
+  <testcase name="login()" classname="com.sprint.mission.discodeit.service.basic.BasicAuthServiceTest" time="0.505"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
