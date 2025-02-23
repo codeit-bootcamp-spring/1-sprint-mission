@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 
@@ -12,22 +13,24 @@ public class Message extends BaseEntity implements Serializable {
     private final UUID channelId;
     private final UUID writerId;
     private String content;
+    private List<UUID> attachmentIds;
 
-    public Message(UUID channelId, String content, UUID writerId) {
+    public Message(UUID channelId, String content, UUID writerId, List<UUID> attachmentIds) {
         super();
         this.channelId = channelId;
         this.writerId = writerId;
         this.content = content;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
-        boolean anyValueUpdated = false;
-        if (newContent != null && !newContent.equals(this.content)) {
+        boolean isUpdated = false;
+        if (!newContent.equals(this.content)) {
             this.content = newContent;
-            anyValueUpdated = true;
+            isUpdated = true;
         }
 
-        if (anyValueUpdated) {
+        if (isUpdated) {
             updated();
         }
     }

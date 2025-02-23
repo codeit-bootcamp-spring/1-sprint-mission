@@ -22,4 +22,7 @@ public class ReadStatus extends BaseEntity implements Serializable {
         this.lastReadAt =  lastReadAt;
     }
 
+    public void update(Instant newLastReadAt){
+        this.lastReadAt = newLastReadAt;
+    }
 }

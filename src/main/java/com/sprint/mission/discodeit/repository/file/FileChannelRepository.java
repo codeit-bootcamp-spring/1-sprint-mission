@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -13,29 +15,23 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private static FileChannelRepository instance;
 
-    private FileChannelRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "data", Channel.class.getSimpleName());
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
-                System.out.println("디렉토리 생성 완료");
             } catch (IOException e) {
-                throw new RuntimeException(e.getMessage(), e);
+                throw new RuntimeException(e);
             }
         }
-    }
-
-    public static FileChannelRepository getInstance() {
-        if (instance == null) {
-            instance = new FileChannelRepository();
-        }
-        return instance;
     }
 
     private Path resolvePath(UUID id) {
@@ -94,6 +90,12 @@ public class FileChannelRepository implements ChannelRepository {
     public boolean existsId(UUID id) {
         Path path = resolvePath(id);
         return Files.exists(path);
+    }
+
+    @Override
+    public boolean existsName(String channelName) {
+        return findAll().stream()
+                .anyMatch(user -> user.getChannelName().equals(channelName));
     }
 
     @Override
