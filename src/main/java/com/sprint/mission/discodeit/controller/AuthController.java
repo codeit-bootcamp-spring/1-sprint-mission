@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
-import com.sprint.mission.discodeit.dto.user.UserLoginDto;
+import com.sprint.mission.discodeit.dto.response.UserDetailResponse;
+import com.sprint.mission.discodeit.dto.request.UserLoginRequest;
 import com.sprint.mission.discodeit.service.basic.AuthService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserInfoDto> login(@RequestBody UserLoginDto userLoginDto, HttpSession session) {
-        UserInfoDto login = authService.login(userLoginDto);
+    public ResponseEntity<UserDetailResponse> login(@RequestBody UserLoginRequest userLoginRequest, HttpSession session) {
+        UserDetailResponse login = authService.login(userLoginRequest);
         return ResponseEntity.ok(login);
     }
 }

@@ -35,13 +35,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User createUser(UserRequest userRequest) {
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (user.getName().equals(userRequest.name())
-                    || user.getEmail().equals(userRequest.email())) {
-                throw new DuplicateException("중복된 이름 혹은 이메일 입니다.");
-            }
-        }
+        duplicationCheck(userRequest);
 
         String password = generatePassword(userRequest.password());
         User newUser = User.of(userRequest.name(), userRequest.email(), password);
@@ -74,6 +68,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, UserRequest userRequest) {
+        duplicationCheck(userRequest);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
         user.updateName(userRequest.name());
@@ -92,6 +88,16 @@ public class BasicUserService implements UserService {
         }
         userStatusRepository.delete(userId);
         userRepository.deleteUser(userId);
+    }
+
+    private void duplicationCheck(UserRequest userRequest) {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (user.getName().equals(userRequest.name())
+                    || user.getEmail().equals(userRequest.email())) {
+                throw new DuplicateException("중복된 이름 혹은 이메일 입니다.");
+            }
+        }
     }
 
     private String generatePassword(String password) {
