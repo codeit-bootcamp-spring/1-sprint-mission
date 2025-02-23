@@ -31,11 +31,11 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(path = "/create",
+    @RequestMapping(path = "create",
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
     )
     public ResponseEntity<User> createUser(
-            @RequestPart("userCreateRequest") UserCreate userCreate,
+            @RequestPart("userCreate") UserCreate userCreate,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
@@ -52,7 +52,7 @@ public class UserController {
     )
     public ResponseEntity<User> updateUser(
             @RequestParam("userId") UUID userId,
-            @RequestPart("userUpdateRequest") UserUpdate userUpdate,
+            @RequestPart("userUpdate") UserUpdate userUpdate,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
@@ -79,7 +79,7 @@ public class UserController {
                 .body(users);
     }
 
-    @RequestMapping(path = "updateUserStatusByUserId")
+    @RequestMapping(path = "updateUserStatus")
     public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
                                                                @RequestBody UserStatusUpdate userStatusUpdate) {
         UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
