@@ -51,12 +51,7 @@ public class BasicChannelService implements ChannelService {
                 .map(Message::getCreatedAt)
                 .orElse(channel.getCreatedAt());
 
-        List<UUID> userIdList = channel.getUsers().values().stream()
-                .map(User::getId)
-                .toList();
-
-        return ChannelDetailResponse.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList);
+        return ChannelDetailResponse.of(channel, latestMessageTime);
     }
 
     @Override
@@ -70,11 +65,8 @@ public class BasicChannelService implements ChannelService {
                     .max(Comparator.comparing(Message::getCreatedAt))
                     .map(Message::getCreatedAt)
                     .orElse(channel.getCreatedAt());
-            List<UUID> userIdList = channel.getUsers().values().stream()
-                    .map(User::getId)
-                    .toList();
-            channelDetailResponses.add(ChannelDetailResponse.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
-                    channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList));
+
+            channelDetailResponses.add(ChannelDetailResponse.of(channel, latestMessageTime));
         }
 
         return channelDetailResponses;

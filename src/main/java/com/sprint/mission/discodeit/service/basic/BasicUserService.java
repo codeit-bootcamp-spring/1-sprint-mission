@@ -56,7 +56,7 @@ public class BasicUserService implements UserService {
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
         UserStatus userStatus = userStatusRepository.findById(user.getId())
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + userId));
-        return UserDetailResponse.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+        return UserDetailResponse.of(user, userStatus.isOnline());
     }
 
     @Override
@@ -66,7 +66,7 @@ public class BasicUserService implements UserService {
         for (User user : users) {
             UserStatus userStatus = userStatusRepository.findById(user.getId())
                     .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + user.getId()));
-            UserDetailResponse userDetailResponse = UserDetailResponse.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+            UserDetailResponse userDetailResponse = UserDetailResponse.of(user, userStatus.isOnline());
             userDetailResponses.add(userDetailResponse);
         }
         return userDetailResponses;

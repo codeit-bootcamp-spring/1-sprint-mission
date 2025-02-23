@@ -30,7 +30,7 @@ public class AuthService {
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
-        return UserDetailResponse.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+        return UserDetailResponse.of(user, userStatus.isOnline());
     }
 
     public String generatePassword(String password) {

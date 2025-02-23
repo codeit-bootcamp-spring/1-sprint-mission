@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.time.Instant;
 import java.util.List;
@@ -14,10 +15,22 @@ public record ChannelDetailResponse(
         String name,
         String description,
         Instant latestMessageTime,
-        List<UUID> userIdList
+        List<UUID> userIds
 ) {
-    public static ChannelDetailResponse of(UUID id, Instant createdAt, Instant updatedAt, Channel.Type type,
-                                           String name, String description, Instant latestMessageTime, List<UUID> userIdList) {
-        return new ChannelDetailResponse(id, createdAt, updatedAt, type, name, description, latestMessageTime, userIdList);
+
+    public static ChannelDetailResponse of(Channel channel, Instant latestMessageTime) {
+        List<UUID> userIds = channel.getUsers().values().stream()
+                .map(User::getId)
+                .toList();
+        return new ChannelDetailResponse(
+                channel.getId(),
+                channel.getCreatedAt(),
+                channel.getUpdatedAt(),
+                channel.getType(),
+                channel.getName(),
+                channel.getDescription(),
+                latestMessageTime,
+                userIds
+        );
     }
 }
