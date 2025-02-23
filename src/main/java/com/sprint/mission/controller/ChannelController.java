@@ -11,6 +11,7 @@ import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
+import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import java.util.List;
@@ -28,8 +29,7 @@ import java.util.UUID;
 @RequestMapping("/api/channels")
 public class ChannelController {
 
-    private final JCFChannelService channelService;
-    private final JCFUserService userService;
+    private final ChannelService channelService;
 
     @RequestMapping(path = "createPublic")
     public ResponseEntity<FindChannelDto> create(@RequestBody PublicChannelCreateDTO request) {

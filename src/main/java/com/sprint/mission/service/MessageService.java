@@ -22,4 +22,6 @@ public interface MessageService {
     void delete(UUID messageId);
 
     Message findById(UUID messageId);
+
+    void deleteAllByChannelId(UUID channelId);
 }

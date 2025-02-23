@@ -13,5 +13,7 @@ public interface UserRepository {
     List<User> findAll();
     void delete(UUID userId);
     boolean existsById(UUID userId);
+
+    Optional<User> findByUsername(String username);
     //User updateUserNamePW(User user)
 }

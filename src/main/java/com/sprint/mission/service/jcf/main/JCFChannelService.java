@@ -10,6 +10,7 @@ import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
@@ -18,6 +19,7 @@ import com.sprint.mission.dto.request.ChannelDtoForRequest;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
+import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +34,9 @@ import java.util.*;
 @RequiredArgsConstructor
 public class JCFChannelService implements ChannelService {
 
-  private final JCFChannelRepository channelRepository;
-  private final JCFUserService userService;
-  private final JCFUserRepository userRepository;
-  private final UserStatusService userStatusService;
+  private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
-  private final JCFMessageService messageService;
+  private final MessageService messageService;
 
   @Override
   public Channel createPublicChannel(PublicChannelCreateDTO request) {

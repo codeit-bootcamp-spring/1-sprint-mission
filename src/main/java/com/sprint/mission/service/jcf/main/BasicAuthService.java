@@ -4,6 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BasicAuthService implements com.sprint.mission.service.AuthService {
 
-  private final JCFUserRepository userRepository;
+  private final UserRepository userRepository;
 
   @Override
   public User login(LoginRequest loginRequest) {

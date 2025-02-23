@@ -5,6 +5,7 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.dto.response.FindMessageDto;
 import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
@@ -28,7 +29,7 @@ import java.util.UUID;
 @RequestMapping("/api/messages")
 public class MessageController {
 
-  private final JCFMessageService messageService;
+  private final MessageService messageService;
 
   @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<String> create(@RequestPart("messageCreateDto") MessageDtoForCreate requestDTO,

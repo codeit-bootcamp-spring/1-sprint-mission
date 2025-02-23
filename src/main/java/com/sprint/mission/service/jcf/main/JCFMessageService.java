@@ -80,7 +80,6 @@ public class JCFMessageService implements MessageService {
 //        if (channelRepository.existsById(channelId)){
 //            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
 //        }
-
         return messageRepository.findAllByChannel(channelId);
     }
 
@@ -96,6 +95,7 @@ public class JCFMessageService implements MessageService {
     }
 
 
+    @Override
     public void deleteAllByChannelId(UUID channelId) {
         messageRepository.deleteAllByChannelId(channelId);
     }

@@ -7,6 +7,7 @@ import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.UserService;
@@ -24,12 +25,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class JCFUserService implements UserService {
 
-    private final JCFUserRepository userRepository;
+    private final UserRepository userRepository;
     private final UserStatusService userStatusService;
-    private final JCFChannelRepository channelRepository;
     private final BinaryService profileService;
 
-    // 테스트에서 create 후 userId 필요해서 임시적 USER 반환 (할거면 나중에 컨트롤러에서)
     @Override
     public User create(UserDtoForCreate requestDTO, Optional<BinaryContentDto> profileDTO) {
 

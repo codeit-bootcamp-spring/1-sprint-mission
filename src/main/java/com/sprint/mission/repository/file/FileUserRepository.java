@@ -97,10 +97,16 @@ public class FileUserRepository implements UserRepository {
     }
   }
 
-  @SneakyThrows
   @Override
   public boolean existsById(UUID userId) {
     return Files.exists(getUserFilePath(userId));
+  }
+
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> username.equals(user.getName()))
+        .findFirst();
   }
 
   /**
