@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Optional;
+
 import java.util.UUID;
 
 public interface UserService {
@@ -18,5 +19,8 @@ public interface UserService {
     List<UserDto> readAll();
     User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
     void deleteUserById(UUID userId);
+    Map<UUID, User> getUserList();
+    void setUserList(Map<UUID, User> userList);
+
 
 }

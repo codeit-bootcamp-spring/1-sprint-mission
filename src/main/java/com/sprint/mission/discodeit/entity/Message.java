@@ -33,6 +33,7 @@ public class Message implements Serializable {
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
             flag = true;
+
         }
 
         if (flag) {
