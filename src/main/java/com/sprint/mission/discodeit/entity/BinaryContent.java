@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -17,10 +16,8 @@ public class BinaryContent implements Serializable {
 
     private final BelongType type;
     private final UUID belongTo;
-    @Setter
-    private String name;
-    @Setter
-    private String path;
+    private final String name;
+    private final String path;
 
     private BinaryContent(UUID id, BelongType type, UUID belongTo, String name, String path) {
         this.id = id;
