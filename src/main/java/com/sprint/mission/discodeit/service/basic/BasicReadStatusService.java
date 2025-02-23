@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -47,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus findByIdOrThrow(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Read Status does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.READ_STATUS_NOT_FOUND, "id : " + id));
     }
 
     @Override

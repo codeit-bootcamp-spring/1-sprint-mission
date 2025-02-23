@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -100,7 +102,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel findByIdOrThrow(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Channel does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + id));
     }
 
     private Instant getLastMessageTime(UUID id) {

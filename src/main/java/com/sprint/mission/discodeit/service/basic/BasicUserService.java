@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -113,6 +115,6 @@ public class BasicUserService implements UserService {
     @Override
     public User findByIdOrThrow(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
     }
 }

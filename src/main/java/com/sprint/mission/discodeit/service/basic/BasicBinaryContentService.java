@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -50,13 +52,13 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Override
     public BinaryContent findByIdOrThrow(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("File does not exists"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
     }
 
     @Override
     public BinaryContent findByUserIdOrThrow(UUID userId) {
         return binaryContentRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("File does not exists"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "userId :" + userId));
     }
 
     @Override
@@ -83,7 +85,7 @@ public class BasicBinaryContentService implements BinaryContentService {
         try {
             return imageFile.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException("Fail ImageFile Convert To file");
+            throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "");
         }
     }
 }

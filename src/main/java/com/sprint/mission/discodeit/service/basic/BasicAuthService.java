@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -27,9 +29,9 @@ public class BasicAuthService implements AuthService {
 
     public UserResponse login(UserRequest.Login request) {
         User findUser = userRepository.findByName(request.name())
-                .orElseThrow(() -> new NoSuchElementException("User does not exist, or entered the wrong ID"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED, "User does not exist, or entered the wrong ID"));
         if (!findUser.getPassword().equals(request.password())) {
-            throw new NoSuchElementException("Entered the wrong password.");
+            throw new RestApiException(ErrorCode.LOGIN_FAILED, "Entered the wrong password.");
         }
         log.info("user login : {}", findUser.getId());
         UserStatus loginUserStatus = userStatusService.findByUserId(findUser.getId());

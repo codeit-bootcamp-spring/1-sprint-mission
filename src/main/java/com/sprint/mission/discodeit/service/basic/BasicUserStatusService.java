@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -35,13 +37,13 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus findById(UUID id) {
         return userStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User Status does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
     }
 
     @Override
     public UserStatus findByUserId(UUID userId) {
         return userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("User Status does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
     }
 
     @Override

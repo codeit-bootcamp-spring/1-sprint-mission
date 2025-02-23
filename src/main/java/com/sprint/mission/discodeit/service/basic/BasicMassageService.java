@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -92,6 +94,6 @@ public class BasicMassageService implements MessageService {
     @Override
     public Message findByIdOrThrow(UUID id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Message does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.MESSAGE_NOT_FOUND, "id : " + id));
     }
 }

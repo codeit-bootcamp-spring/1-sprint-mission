@@ -22,7 +22,7 @@ public class UserValidatorImpl implements UserValidator {
         if (name.isBlank()) {
             log.error("The name is blank. name={}", name);
         } else if (name.length() < 2) {
-            log.error("The name must be at least 6 length. name={}", name);
+            log.error("The name must be at least 2 length. name={}", name);
         } else if (userRepository.existsByName(name)) {
             log.error("The name already exists. name={}", name);
         }  else {
