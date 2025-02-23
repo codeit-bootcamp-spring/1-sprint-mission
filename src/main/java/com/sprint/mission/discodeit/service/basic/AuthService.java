@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserLoginDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.AuthenticationException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,8 @@ public class AuthService {
     private final UserStatusService userStatusService;
 
     public UserInfoDto login(UserLoginDto dto) {
-        User user = userRepository.findByName(dto.name());
+        User user = userRepository.findByName(dto.name())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. name=" + dto.name()));
 
         String password = generatePassword(dto.password());
         if (!user.getName().equals(dto.name()) || !user.getPassword().equals(password)) {

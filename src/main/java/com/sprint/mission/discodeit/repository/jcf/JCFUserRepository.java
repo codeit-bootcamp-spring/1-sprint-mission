@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -25,17 +24,15 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
-        return Optional.ofNullable(data.get(userId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다."));
+    public Optional<User> findById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
     }
 
     @Override
-    public User findByName(String name) {
+    public Optional<User> findByName(String name) {
         return data.values().stream()
                 .filter(u -> u.getName().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 user입니다. name: " + name));
+                .findFirst();
     }
 
     @Override

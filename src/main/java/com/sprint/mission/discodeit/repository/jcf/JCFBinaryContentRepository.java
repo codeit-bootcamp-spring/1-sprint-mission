@@ -26,9 +26,8 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        return Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 BinaryContent 입니다."));
+    public Optional<BinaryContent> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override

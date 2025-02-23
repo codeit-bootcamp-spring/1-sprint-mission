@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BelongType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.FileIOException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,13 +49,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (BinaryContent) ois.readObject();
+            BinaryContent content = (BinaryContent) ois.readObject();
+            return Optional.of(content);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 BinaryContent 입니다.");
+            return Optional.empty();
         }
     }
 

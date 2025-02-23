@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -49,13 +50,14 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
+    public Optional<Channel> findById(UUID channelId) {
         Path path = directoryPath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (Channel) ois.readObject();
+            Channel channel = (Channel) ois.readObject();
+            return Optional.of(channel);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 channel입니다.");
+            return Optional.empty();
         }
     }
 

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -24,8 +25,10 @@ public class ReadStatusService {
         UUID userId = dto.userId();
         UUID channelId = dto.channelId();
 
-        userRepository.findById(userId);
-        channelRepository.findById(channelId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
+        channelRepository.findById(channelId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + channelId));
 
         List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
         for (ReadStatus readStatus : readStatuses) {
@@ -38,7 +41,8 @@ public class ReadStatusService {
     }
 
     public ReadStatus find(UUID id) {
-        return readStatusRepository.findById(id);
+        return readStatusRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 ReadStatus. id=" + id));
     }
 
     public List<ReadStatus> findAllByUserId(UUID userId) {
@@ -46,7 +50,7 @@ public class ReadStatusService {
     }
 
     public void update(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
+        ReadStatus readStatus = find(id);
         readStatus.update();
         readStatusRepository.save(readStatus);
     }

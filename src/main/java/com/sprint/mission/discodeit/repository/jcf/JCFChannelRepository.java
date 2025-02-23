@@ -27,9 +27,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
-        return Optional.ofNullable(data.get(channelId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel입니다."));
+    public Optional<Channel> findById(UUID channelId) {
+        return Optional.ofNullable(data.get(channelId));
     }
 
     @Override

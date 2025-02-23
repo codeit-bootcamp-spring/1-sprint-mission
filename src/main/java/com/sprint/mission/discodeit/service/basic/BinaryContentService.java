@@ -39,9 +39,11 @@ public class BinaryContentService {
         //존재하는 user or message에 대한 요청인지 확인
         BelongType type = dto.getType();
         if (type == BelongType.PROFILE) {
-            userRepository.findById(dto.getBelongTo());
+            userRepository.findById(dto.getBelongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + dto.getBelongTo()));
         } else {
-            messageRepository.findById(dto.getBelongTo());
+            messageRepository.findById(dto.getBelongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + dto.getBelongTo()));
         }
 
         UUID id = UUID.randomUUID();
@@ -61,7 +63,8 @@ public class BinaryContentService {
     }
 
     public BinaryContentDto find(UUID id) {
-        BinaryContent content = binaryContentRepository.findById(id);
+        BinaryContent content = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 binary content. id=" + id));
         byte[] data = fileManager.readFile(Path.of(content.getPath()));
         return BinaryContentDto.of(content.getName(), content.getType(),
                 content.getId(), data);
@@ -89,7 +92,8 @@ public class BinaryContentService {
     }
 
     public void delete(UUID id) {
-        BinaryContent content = binaryContentRepository.findById(id);
+        BinaryContent content = binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 binary content. id=" + id));
         fileManager.deleteFile(Path.of(content.getPath()));
         binaryContentRepository.delete(id);
     }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -25,9 +24,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus findById(UUID userId) {
-        return Optional.ofNullable(data.get(userId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 UserStatus입니다."));
+    public Optional<UserStatus> findById(UUID userId) {
+        return Optional.ofNullable(data.get(userId));
     }
 
     @Override

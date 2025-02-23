@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -51,8 +52,10 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserInfoDto readUser(UUID userId) {
-        User user = userRepository.findById(userId);
-        UserStatus userStatus = userStatusRepository.findById(user.getId());
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
+        UserStatus userStatus = userStatusRepository.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + userId));
         return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
     }
 
@@ -61,7 +64,8 @@ public class BasicUserService implements UserService {
         List<User> users = userRepository.findAll();
         List<UserInfoDto> userInfoDtos = new ArrayList<>(100);
         for (User user : users) {
-            UserStatus userStatus = userStatusRepository.findById(user.getId());
+            UserStatus userStatus = userStatusRepository.findById(user.getId())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + user.getId()));
             UserInfoDto userInfoDto = UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
             userInfoDtos.add(userInfoDto);
         }
@@ -70,7 +74,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public void updateUser(UUID userId, UserDto userDto) {
-        User user = userRepository.findById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
         user.updateName(userDto.name());
         user.updateEmail(userDto.email());
         user.updatePassword(generatePassword(userDto.password()));

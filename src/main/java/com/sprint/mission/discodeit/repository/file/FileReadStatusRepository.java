@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.FileIOException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -48,13 +48,14 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
+    public Optional<ReadStatus> findById(UUID id) {
         Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (ReadStatus) ois.readObject();
+            ReadStatus readStatus = (ReadStatus) ois.readObject();
+            return Optional.of(readStatus);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 ReadStatus입니다.");
+            return Optional.empty();
         }
     }
 

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -26,9 +25,8 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
-        return Optional.ofNullable(data.get(messageId))
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 message입니다."));
+    public Optional<Message> findById(UUID messageId) {
+        return Optional.ofNullable(data.get(messageId));
     }
 
     @Override

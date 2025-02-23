@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ public class UserStatusService {
     private final UserRepository userRepository;
 
     public UserStatus create(UUID userId) {
-        userRepository.findById(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
         List<UserStatus> userStatuses = userStatusRepository.findAll();
 
         for (UserStatus userStatus : userStatuses) {
@@ -32,13 +34,14 @@ public class UserStatusService {
     }
 
     public void update(UUID id) {
-        UserStatus userStatus = userStatusRepository.findById(id);
+        UserStatus userStatus = findById(id);
         userStatus.setUpdateAt();
         userStatusRepository.save(userStatus);
     }
 
     public UserStatus findById(UUID userId) {
-        return userStatusRepository.findById(userId);
+        return userStatusRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + userId));
     }
 
     public List<UserStatus> findAll() {

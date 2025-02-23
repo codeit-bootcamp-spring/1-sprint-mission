@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
 import com.sprint.mission.discodeit.entity.Channel;
 
@@ -11,13 +11,13 @@ public interface ChannelService {
 
     Channel createPrivateChannel(UUID userId);
 
-    Channel createPublicChannel(ChannelDto channelDto);
+    Channel createPublicChannel(PublicChannelDto publicChannelDto);
 
     ChannelInfoDto readChannel(UUID channelId);
 
     List<ChannelInfoDto> readAllByUserId(UUID userId);
 
-    void updateChannel(UUID channelId, ChannelDto channelDto);
+    void updateChannel(UUID channelId, PublicChannelDto publicChannelDto);
 
     void addUser(UUID channelId, UUID userId);
 

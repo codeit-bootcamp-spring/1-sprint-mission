@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.FileIOException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -48,13 +48,14 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message findById(UUID messageId) {
+    public Optional<Message> findById(UUID messageId) {
         Path path = directoryPath.resolve(messageId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (Message) ois.readObject();
+            Message message = (Message) ois.readObject();
+            return Optional.of(message);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 message입니다.");
+            return Optional.empty();
         }
     }
 
