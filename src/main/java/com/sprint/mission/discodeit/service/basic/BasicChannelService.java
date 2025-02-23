@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.PublicChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelInfoDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDetailDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.PrivateChannelModificationException;
@@ -42,7 +42,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelInfoDto readChannel(UUID channelId) {
+    public ChannelDetailDto readChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + channelId));
         List<Message> messages = messageRepository.findByChannelId(channelId);
@@ -55,14 +55,14 @@ public class BasicChannelService implements ChannelService {
                 .map(User::getId)
                 .toList();
 
-        return ChannelInfoDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
+        return ChannelDetailDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
                 channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList);
     }
 
     @Override
-    public List<ChannelInfoDto> readAllByUserId(UUID userId) {
+    public List<ChannelDetailDto> readAllByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAllByUserId(userId);
-        List<ChannelInfoDto> channelInfoDtos = new ArrayList<>(100);
+        List<ChannelDetailDto> channelDetailDtos = new ArrayList<>(100);
 
         for (Channel channel : channels) {
             List<Message> messages = messageRepository.findByChannelId(channel.getId());
@@ -73,11 +73,11 @@ public class BasicChannelService implements ChannelService {
             List<UUID> userIdList = channel.getUsers().values().stream()
                     .map(User::getId)
                     .toList();
-            channelInfoDtos.add(ChannelInfoDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
+            channelDetailDtos.add(ChannelDetailDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
                     channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList));
         }
 
-        return channelInfoDtos;
+        return channelDetailDtos;
     }
 
     @Override

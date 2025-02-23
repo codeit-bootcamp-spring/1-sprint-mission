@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserDetailDto;
 import com.sprint.mission.discodeit.dto.user.UserLoginDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -20,7 +20,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
 
-    public UserInfoDto login(UserLoginDto dto) {
+    public UserDetailDto login(UserLoginDto dto) {
         User user = userRepository.findByName(dto.name())
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user. name=" + dto.name()));
 
@@ -30,7 +30,7 @@ public class AuthService {
         }
 
         UserStatus userStatus = userStatusService.findById(user.getId());
-        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+        return UserDetailDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
     }
 
     public String generatePassword(String password) {

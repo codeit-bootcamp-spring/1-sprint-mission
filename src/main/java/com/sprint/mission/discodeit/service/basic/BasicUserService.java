@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.user.UserDetailDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -51,25 +51,25 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserInfoDto readUser(UUID userId) {
+    public UserDetailDto readUser(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
         UserStatus userStatus = userStatusRepository.findById(user.getId())
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + userId));
-        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+        return UserDetailDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
     }
 
     @Override
-    public List<UserInfoDto> readAll() {
+    public List<UserDetailDto> readAll() {
         List<User> users = userRepository.findAll();
-        List<UserInfoDto> userInfoDtos = new ArrayList<>(100);
+        List<UserDetailDto> userDetailDtos = new ArrayList<>(100);
         for (User user : users) {
             UserStatus userStatus = userStatusRepository.findById(user.getId())
                     .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + user.getId()));
-            UserInfoDto userInfoDto = UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
-            userInfoDtos.add(userInfoDto);
+            UserDetailDto userDetailDto = UserDetailDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus.isOnline());
+            userDetailDtos.add(userDetailDto);
         }
-        return userInfoDtos;
+        return userDetailDtos;
     }
 
     @Override
