@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binaryContentDto.CreateBinaryContentRequestDto;
 import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
 import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
 import com.sprint.mission.discodeit.dto.userDto.UpdateUserRequestDto;
@@ -7,6 +8,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.UserDeletedEvent;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FilePathContents;
 import com.sprint.mission.discodeit.vo.Email;
@@ -25,6 +27,7 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
+    private final BinaryContentService binaryContentService;
     private final ApplicationEventPublisher eventPublisher;
 
     // User 생성(가입)
@@ -32,10 +35,11 @@ public class BasicUserService implements UserService {
     public UUID create(CreateUserRequestDto createUserDto) throws IOException {
 
         MultipartFile profileImageFile = createUserDto.profileImageFile();
-        BinaryContent profileImage = null;
+        UUID profileImageId = null;
 
         if (profileImageFile != null) {
-            profileImage = new BinaryContent(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
+            CreateBinaryContentRequestDto createBinaryContentRequestDto = new CreateBinaryContentRequestDto(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
+            profileImageId = binaryContentService.create(createBinaryContentRequestDto);
         }
 
         User user = new User(
@@ -44,11 +48,11 @@ public class BasicUserService implements UserService {
                 createUserDto.name(),
                 createUserDto.nickname(),
                 createUserDto.phoneNumber(),
-                (profileImage != null) ? profileImage.getId() : null
+                profileImageId
         );
 
         validationUser(user);
-        userRepository.save(user);
+        userRepository.save(user);;
 
         return user.getId();
     }
@@ -63,7 +67,7 @@ public class BasicUserService implements UserService {
 
         User user = userRepository.load().get(id);
 
-        return new FindUserResponseDto(user);
+        return FindUserResponseDto.fromEntity(user);
     }
 
     // 모든 데이터 읽어오기
@@ -73,7 +77,7 @@ public class BasicUserService implements UserService {
         List<User> users = changeMapToList(userRepository.load());
 
         return users.stream()
-                .map(FindUserResponseDto::new)
+                .map(FindUserResponseDto::fromEntity)
                 .toList();
     }
 
@@ -91,7 +95,7 @@ public class BasicUserService implements UserService {
 
         MultipartFile profileImageFile = updateUserRequestDto.profileImageFile();
 
-        if (profileImageFile != null) {
+        if (!profileImageFile.isEmpty()) {
             BinaryContent profileImage = new BinaryContent(profileImageFile, FilePathContents.PROFILEIMAGE_DIR);
             updateUser.updateProfileImageId(profileImage.getId());
         }

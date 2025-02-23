@@ -20,15 +20,19 @@ public class FindPublicChannelResponseDto implements FindChannelResponseDto {
     String category;
     Instant lastMessageTime;
     List<UUID> members;
+    boolean isPublic;
 
-    public FindPublicChannelResponseDto(Channel channel) {
-        this.id = channel.getId();
-        this.ownerId = channel.getOwnerId();
-        this.name = channel.getName();
-        this.explanation = channel.getExplanation();
-        this.category = channel.getCategory();
-        this.lastMessageTime = channel.getLastMessageTime();
-        this.members = channel.getMembers();
+    public static FindPublicChannelResponseDto fromEntity(Channel channel) {
+        return new FindPublicChannelResponseDto(
+                channel.getId(),
+                channel.getOwnerId(),
+                channel.getName(),
+                channel.getExplanation(),
+                channel.getCategory(),
+                channel.getLastMessageTime(),
+                channel.getMembers(),
+                channel.isPublic()
+        );
     }
 
     @Override
@@ -64,5 +68,10 @@ public class FindPublicChannelResponseDto implements FindChannelResponseDto {
     @Override
     public List<UUID> getMembers() {
         return members;
+    }
+
+    @Override
+    public boolean getIsPublic() {
+        return isPublic;
     }
 }

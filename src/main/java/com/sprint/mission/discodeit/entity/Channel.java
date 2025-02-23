@@ -29,6 +29,7 @@ public class Channel implements Serializable {      // 채널 (게시판)
     private final List<UUID> members; // 멤버 목록
     private final Map<UUID, ReadStatus> readStatuses;    // 멤버별 읽음 상태
     private Instant lastMessageTime;
+    private final boolean isPublic; // 공개 채널 여부
 
     // 생성자
     // public 채널
@@ -50,48 +51,52 @@ public class Channel implements Serializable {      // 채널 (게시판)
         // readStatus
         this.readStatuses = new HashMap<>();
         readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
+
+        this.isPublic = true;
     }
 
     // private 채널
-    public Channel(User user) {
+    public Channel(UUID userId) {
         // 공통 필드 초기화
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         // Channel 필드
-        this.ownerId = user.getId();
+        this.ownerId = userId;
         this.category = null;                       // 카테고리는 기본적으로 null로 설정
         this.name = null;
         this.explanation = null;
 
         // member
         this.members = new ArrayList<>();           // 텅빈 ArrayList로 초기화
-        members.add(user.getId());                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
+        members.add(userId);                       // 기본적으로 멤버에 채널 주인 이름 넣어놓음
 
         // readStatus
         this.readStatuses = new HashMap<>();
         readStatuses.put(ownerId, new ReadStatus(this.ownerId, this.id));    // 채널주 readStatus 넣어놓음
+
+        this.isPublic = false;
     }
 
 
 
     // update 함수
     public void updateCategory(String category) {
-        if (category != null){
+        if (!category.isEmpty()){
             validationAndSetCategory(category);
             updateUpdateAt();
         }
     }
 
     public void updateName(String name) {
-        if (name != null){
+        if (!name.isEmpty()){
             validationAndSetName(name);
             updateUpdateAt();
         }
     }
 
     public void updateExplanation(String explanation) {
-        if (explanation != null){
+        if (!explanation.isEmpty()){
             this.explanation = explanation;
             updateUpdateAt();
         }
@@ -123,12 +128,6 @@ public class Channel implements Serializable {      // 채널 (게시판)
 
     public void updateUpdateAt() {
         this.updatedAt = Instant.now();
-    }
-
-    // 이름이 null이면 private - true
-    // 이름이 null이 아니면 public - false
-    public boolean isPublic() {
-        return name != null;
     }
 
 

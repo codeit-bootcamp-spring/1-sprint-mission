@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto.messageDto;
 
 import com.sprint.mission.discodeit.entity.Message;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class FindMessageResponseDto {
     UUID id;
     UUID channelId;
@@ -18,12 +20,14 @@ public class FindMessageResponseDto {
     List<UUID> imagesId;
     Instant createAt;
 
-    public FindMessageResponseDto(Message message) {
-        this.id = message.getId();
-        this.channelId = message.getChannelId();
-        this.writerId = message.getWriterId();
-        this.context = message.getContext();
-        this.imagesId = message.getImagesId();
-        this.createAt = message.getCreatedAt();
+    public static FindMessageResponseDto fromEntity(Message message) {
+        return new FindMessageResponseDto(
+                message.getId(),
+                message.getChannelId(),
+                message.getWriterId(),
+                message.getContext(),
+                message.getImagesId(),
+                message.getCreatedAt()
+        );
     }
 }

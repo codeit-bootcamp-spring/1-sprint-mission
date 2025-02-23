@@ -10,16 +10,17 @@ import java.util.UUID;
 
 public interface MessageService {
     // 생성
-    UUID create(CreateMessageRequestDto createMessageRequestDto) throws IOException;
+    FindMessageResponseDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException;
 
     // 읽기
     FindMessageResponseDto find(UUID id);
 
     // 모두 읽기
     List<FindMessageResponseDto> findAllByChannelId(UUID channelId);
+    List<FindMessageResponseDto> findAllByUserId(UUID userId);
 
     // 수정
-    void updateContext(UpdateMessageRequestDto updateMessageRequestDto);
+    FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto);
     
     // 삭제
     void delete(UUID id);

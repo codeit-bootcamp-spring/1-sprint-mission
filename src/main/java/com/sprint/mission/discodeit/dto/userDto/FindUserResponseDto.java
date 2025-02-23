@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.userDto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class FindUserResponseDto {
     UUID id;
     String email;
@@ -18,13 +20,12 @@ public class FindUserResponseDto {
     UUID profileImageId;
     boolean isOnline;
 
-    public FindUserResponseDto(User user) {
-        this.id = user.getId();
-        this.email = user.getEmail().toString();
-        this.name = user.getName();
-        this.nickname = user.getNickname();
-        this.phoneNumber = user.getPhoneNumber().toString();
-        this.profileImageId = user.getProfileImageId();
-        this.isOnline = user.getUserStatus().checkAccess();
+    public static FindUserResponseDto fromEntity(User user) {
+        return new FindUserResponseDto(user.getId()
+                , user.getEmail().toString()
+                , user.getName(), user.getNickname()
+                , user.getPhoneNumber().toString()
+                , user.getProfileImageId()
+                , user.getUserStatus().checkAccess());
     }
 }

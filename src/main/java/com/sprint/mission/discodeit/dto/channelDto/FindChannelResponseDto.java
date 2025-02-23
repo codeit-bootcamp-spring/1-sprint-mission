@@ -14,6 +14,8 @@ public interface FindChannelResponseDto {
     Instant getLastMessageTime();
 
     List<UUID> getMembers();
+
+    boolean getIsPublic();
     // default method
     // Java 8부터 도입됨
     // 인터페이스에 있는 구현 메서드

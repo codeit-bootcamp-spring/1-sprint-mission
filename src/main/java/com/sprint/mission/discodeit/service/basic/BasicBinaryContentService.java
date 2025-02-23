@@ -37,7 +37,15 @@ public class BasicBinaryContentService implements BinaryContentService {
 
         BinaryContent binaryContent = binaryContentRepository.load().get(id);
 
-        return new FindBinaryContentResponseDto(binaryContent);
+        return FindBinaryContentResponseDto.fromEntity(binaryContent);
+    }
+
+    @Override
+    public List<FindBinaryContentResponseDto> findAll() {
+
+        return binaryContentRepository.load().values().stream()
+                .map(FindBinaryContentResponseDto::fromEntity)
+                .toList();
     }
 
     @Override

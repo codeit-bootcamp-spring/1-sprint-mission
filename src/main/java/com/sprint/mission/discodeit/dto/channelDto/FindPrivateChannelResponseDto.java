@@ -16,12 +16,16 @@ public class FindPrivateChannelResponseDto implements FindChannelResponseDto {
     UUID ownerId;
     Instant lastMessageTime;
     List<UUID> members;
+    boolean isPublic;
 
-    public FindPrivateChannelResponseDto(Channel channel) {
-        this.id = channel.getId();
-        this.ownerId = channel.getOwnerId();
-        this.lastMessageTime = channel.getLastMessageTime();
-        this.members = channel.getMembers();
+    public static FindPrivateChannelResponseDto fromEntity(Channel channel) {
+        return new FindPrivateChannelResponseDto(
+                channel.getId(),
+                channel.getOwnerId(),
+                channel.getLastMessageTime(),
+                channel.getMembers(),
+                channel.isPublic()
+        );
     }
 
     @Override
@@ -42,5 +46,10 @@ public class FindPrivateChannelResponseDto implements FindChannelResponseDto {
     @Override
     public List<UUID> getMembers() {
         return members;
+    }
+
+    @Override
+    public boolean getIsPublic() {
+        return isPublic;
     }
 }

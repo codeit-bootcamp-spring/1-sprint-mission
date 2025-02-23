@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface BinaryContentService {
     UUID create(CreateBinaryContentRequestDto createBinaryContentRequestDto) throws IOException;
     FindBinaryContentResponseDto find(UUID id);
+    List<FindBinaryContentResponseDto> findAll();
     List<UUID> findAllByIdIn();
     void delete(UUID id);
 }

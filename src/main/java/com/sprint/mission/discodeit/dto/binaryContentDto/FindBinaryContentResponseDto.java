@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.dto.binaryContentDto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
+@AllArgsConstructor
 public class FindBinaryContentResponseDto {
     UUID id;
     String fileName;
@@ -11,11 +15,13 @@ public class FindBinaryContentResponseDto {
     Long size;
     String filePath;
 
-    public FindBinaryContentResponseDto(BinaryContent binaryContent) {
-        this.id = binaryContent.getId();
-        this.fileName = binaryContent.getFileName();
-        this.contentType = binaryContent.getContentType();
-        this.size = binaryContent.getSize();
-        this.filePath = binaryContent.getFilePath();
+    public static FindBinaryContentResponseDto fromEntity(BinaryContent binaryContent) {
+        return new FindBinaryContentResponseDto(
+                binaryContent.getId(),
+                binaryContent.getFileName(),
+                binaryContent.getContentType(),
+                binaryContent.getSize(),
+                binaryContent.getFilePath()
+        );
     }
 }
