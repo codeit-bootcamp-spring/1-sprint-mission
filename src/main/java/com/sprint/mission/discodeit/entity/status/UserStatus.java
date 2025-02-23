@@ -26,6 +26,8 @@ public class UserStatus implements Serializable {
 
     // 이 메소드가 왜 필요한지 생각해보자.
     public boolean isUpdated(Instant updatedAt) {
-        return this.updatedAt != updatedAt;
+        boolean isUpdated = this.updatedAt != updatedAt;
+        this.updatedAt = updatedAt;
+        return isUpdated;
     }
 }

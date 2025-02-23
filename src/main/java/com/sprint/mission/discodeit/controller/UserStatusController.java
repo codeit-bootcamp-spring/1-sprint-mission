@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user-status")
 @RequiredArgsConstructor
@@ -16,5 +18,10 @@ public class UserStatusController {
     @PutMapping("/{userId}")
     public UserStatusResponseDto getUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto updateUserStatusDto) {
         return userStatusService.updateByUserId(userId, updateUserStatusDto);
+    }
+
+    @GetMapping
+    public List<UserStatusResponseDto> getAllUserStatus() {
+        return userStatusService.findAll();
     }
 }
