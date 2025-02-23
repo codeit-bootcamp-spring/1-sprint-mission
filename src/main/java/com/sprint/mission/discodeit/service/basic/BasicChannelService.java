@@ -4,12 +4,14 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
@@ -25,21 +27,26 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator validator;
 
-    private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
     @Override
     public Channel create(PublicChannelCreateRequest channelCreateRequest) {
-        Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequest.name(), channelCreateRequest.introduction());
+        Channel channel = new Channel(ChannelType.PUBLIC, channelCreateRequest.name(), channelCreateRequest.description());
 
         return channelRepository.save(channel);
     }
 
     @Override
     public Channel create(PrivateChannelCreateRequest privateChannelCreateRequest) {
-        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+        Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, null, null));
 
-        return channelRepository.save(channel);
+        privateChannelCreateRequest.participantsIds().stream()
+                .map(userId -> ReadStatusCreateRequest.from(channel.getId(), userId))
+                .forEach(readStatusService::create);
+
+        return channel;
     }
 
     @Override
@@ -75,7 +82,7 @@ public class BasicChannelService implements ChannelService {
     public List<UUID> findParticipantsIds(Channel channel) {
         List<UUID> participantIds = new ArrayList<>();
         if (channel.getType().equals(ChannelType.PRIVATE)) {
-            readStatusService.findAllByUserId(channel.getId())
+            readStatusRepository.findAllByChannelId(channel.getId())
                     .stream()
                     .map(ReadStatus::getUserId)
                     .forEach(participantIds::add);
@@ -85,19 +92,17 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponse getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantIds) {
-
-
         return ChannelResponse.from(channel.getId(), channel.getType(),
-                channel.getName(), channel.getIntroduction(), lastMessageTime, participantIds);
+                channel.getName(), channel.getDescription(), lastMessageTime, participantIds);
     }
 
     @Override
     public Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest) {
-        validator.validate(channelUpdateRequest.name(), channelUpdateRequest.introduction());
+        validator.validate(channelUpdateRequest.name(), channelUpdateRequest.description());
         Channel channel = Optional.ofNullable(channelRepository.find(channelId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
-        channel.update(channelUpdateRequest.name(), channelUpdateRequest.introduction());
+        channel.update(channelUpdateRequest.name(), channelUpdateRequest.description());
         return channelRepository.save(channel);
     }
 

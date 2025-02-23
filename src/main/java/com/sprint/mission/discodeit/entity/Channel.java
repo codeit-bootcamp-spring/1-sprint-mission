@@ -17,27 +17,27 @@ public class Channel implements Serializable {
 
     private ChannelType type;
     private String name;
-    private String introduction;
+    private String description;
 
-    public Channel(ChannelType type, String name, String introduction) {
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.type = type;
         this.name = name;
-        this.introduction = introduction;
+        this.description = description;
     }
 
     public void updateUpdatedAt() {
         updatedAt = Instant.now();
     }
 
-    public void update(String name, String introduction) {
+    public void update(String name, String description) {
         boolean updated = false;
         if (updateName(name)) {
             updated = true;
         }
-        if (updateIntroduction(introduction)) {
+        if (updatedescription(description)) {
             updated = true;
         }
 
@@ -54,18 +54,18 @@ public class Channel implements Serializable {
         return true;
     }
 
-    public boolean updateIntroduction(String introduction) {
-        if (this.introduction.equals(introduction)) {
+    public boolean updatedescription(String description) {
+        if (this.description.equals(description)) {
             return false;
         }
-        this.introduction = introduction;
+        this.description = description;
         return true;
     }
 
     @Override
     public String toString() {
         return String.format(
-                name + " | " + introduction + System.lineSeparator()
+                name + " | " + description + System.lineSeparator()
         );
     }
 }

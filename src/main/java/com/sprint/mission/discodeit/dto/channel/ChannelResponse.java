@@ -10,11 +10,11 @@ public record ChannelResponse(
         UUID id,
         ChannelType type,
         String name,
-        String introduction,
+        String description,
         Instant lastMessageTime,
         List<UUID> participantIds
 ) {
-    public static ChannelResponse from(UUID id, ChannelType type, String name, String introduction, Instant lastMessageTime, List<UUID> participantIds) {
-        return new ChannelResponse(id, type, name, introduction, lastMessageTime, participantIds);
+    public static ChannelResponse from(UUID id, ChannelType type, String name, String description, Instant lastMessageTime, List<UUID> participantIds) {
+        return new ChannelResponse(id, type, name, description, lastMessageTime, participantIds);
     }
 }

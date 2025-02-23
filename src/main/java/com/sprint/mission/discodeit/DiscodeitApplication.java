@@ -33,7 +33,7 @@ public class DiscodeitApplication {
 		System.out.println("PUBLIC 채널");
 
 		// 생성
-		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "description", null));
 		System.out.println("채널 생성");
 		System.out.println(channelResponseDto);
 		// 조회
@@ -116,11 +116,11 @@ public class DiscodeitApplication {
 	}
 
 	static ChannelResponseDto setupPublicChannel(ChannelService channelService) {
-		return channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "description", null));
 	}
 
 	static ChannelResponseDto setupPrivateChannel(ChannelService channelService, UserResponseDto userResponseDto) {
-		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "introduction",
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "description",
 				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
 	}
 
