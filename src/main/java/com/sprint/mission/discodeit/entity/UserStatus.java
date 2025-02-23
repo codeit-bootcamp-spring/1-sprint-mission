@@ -42,7 +42,7 @@ public class UserStatus implements Serializable {
     }
 
     public OnlineStatus calculateOnlineStatus() {
-        if (Duration.between(updatedAt, Instant.now()).toMinutes() >= 5) {
+        if (Duration.between(lastActiveAt, Instant.now()).toMinutes() >= 5) {
             return OnlineStatus.OFFLINE;
         }
         return OnlineStatus.ONLINE;

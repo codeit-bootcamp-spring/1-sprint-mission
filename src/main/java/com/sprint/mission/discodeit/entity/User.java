@@ -34,13 +34,11 @@ public class User implements Serializable {
         this.updatedAt = Instant.now();
     }
 
-    public void updateBinaryContentId(UUID binaryContentId) {
-        this.binaryContentId = binaryContentId;
-        updateUpdatedAt();
-    }
-
-    public void update(String name, String email, String password) {
+    public void update(UUID binaryContentId, String name, String email, String password) {
         boolean updated = false;
+        if (updateBinaryContentId(binaryContentId)) {
+            updated = true;
+        }
         if (updateName(name)) {
             updated = true;
         }
@@ -54,6 +52,14 @@ public class User implements Serializable {
         if (updated) {
             updateUpdatedAt();
         }
+    }
+
+    public boolean updateBinaryContentId(UUID binaryContentId) {
+        if (binaryContentId == null || this.binaryContentId.equals(binaryContentId)) {
+            return false;
+        }
+        this.binaryContentId = binaryContentId;
+        return true;
     }
 
     public boolean updateName(String name) {

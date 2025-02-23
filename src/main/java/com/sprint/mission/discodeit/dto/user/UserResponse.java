@@ -10,10 +10,10 @@ public record UserResponse(
         UUID id,
         String name,
         String email,
-        byte[] binaryContentData,
+        UUID binaryContentId,
         OnlineStatus onlineStatus
 ) {
-    public static UserResponse from(User user, BinaryContent binaryContent, OnlineStatus onlineStatus) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), binaryContent.getData(), onlineStatus);
+    public static UserResponse from(User user, UUID binaryContentId, OnlineStatus onlineStatus) {
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), binaryContentId, onlineStatus);
     }
 }

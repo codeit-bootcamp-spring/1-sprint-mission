@@ -65,26 +65,28 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse getUserInfo(User user) {
-        BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+        UUID binaryContentId = null;
+        if (user.getBinaryContentId() != null) {
+            binaryContentId = binaryContentService.find(user.getBinaryContentId()).getId();
+        }
         OnlineStatus onlineStatus = userStatusService.getOnlineStatus(user.getId());
 
-        return UserResponse.from(user, binaryContent, onlineStatus);
+        return UserResponse.from(user, binaryContentId, onlineStatus);
     }
 
     @Override
-    public User update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest) {
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest) {
         validator.validate(userUpdateRequest.name(), userUpdateRequest.email());
         User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
-        if (binaryContentRequest != null) {
-            BinaryContent binaryContent = binaryContentService.create(binaryContentRequest);
-            user.updateBinaryContentId(binaryContent.getId());
-        }
-        user.update(userUpdateRequest.name(), userUpdateRequest.email(), userUpdateRequest.password());
-        userRepository.save(user);
+        UUID binaryContentId = binaryContentRequest
+                .map(binaryContentService::create)
+                .map(BinaryContent::getId)
+                .orElse(null);
+        user.update(binaryContentId, userUpdateRequest.name(), userUpdateRequest.email(), userUpdateRequest.password());
 
-        return user;
+        return userRepository.save(user);
     }
 
     @Override

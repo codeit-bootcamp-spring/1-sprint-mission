@@ -15,7 +15,7 @@ public interface UserService {
     UserResponse find(UUID userId);
     List<UserResponse> findAll();
     UserResponse getUserInfo(User user);
-    User update(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentRequest binaryContentRequest);
+    User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest);
     void delete(UUID userId);
     void validateDuplicateName(String name);
     void validateDuplicateEmail(String email);
