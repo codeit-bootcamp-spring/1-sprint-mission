@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.user.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.global.dto.CommonResponse;
+import com.sprint.mission.discodeit.message.entity.BinaryContent;
+import com.sprint.mission.discodeit.message.service.BinaryContentService;
 import com.sprint.mission.discodeit.user.dto.request.CreateUserRequest;
 import com.sprint.mission.discodeit.user.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.user.dto.request.UpdateUserStatusRequest;
@@ -35,11 +38,14 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
 	private final UserService userService;
 	private final UserStatusService userStatusService;
+	private final BinaryContentService binaryContentService;
 	private final UserMapper userMapper;
 
-	public UserController(UserService userService, UserStatusService userStatusService, UserMapper userMapper) {
+	public UserController(UserService userService, UserStatusService userStatusService,
+		BinaryContentService binaryContentService, UserMapper userMapper) {
 		this.userService = userService;
 		this.userStatusService = userStatusService;
+		this.binaryContentService = binaryContentService;
 		this.userMapper = userMapper;
 	}
 
@@ -50,22 +56,22 @@ public class UserController {
 		//나중에 JPA를 적용하여 UserStatus -> User로의 단방향 연관관계를 맺게 된다면 똑같이 생성을 해야겠다...
 		User newUser = userService.createUser(createUserRequest);
 		UserStatus userStatus = userStatusService.find(newUser.getId());
+		Optional<BinaryContent> profileImage = binaryContentService.findProfileImageByAuthorId(newUser.getId());
 
 		//mapper를 통한 dto로 변환
-		UserResponse response = userMapper.userToUserResponse(newUser, userStatus);
+		UserResponse response = userMapper.userToUserResponse(newUser, userStatus, profileImage);
 		return new ResponseEntity<>(CommonResponse.created(response), HttpStatus.CREATED);
 	}
 
 	//특정 사용자 조회
 	@GetMapping(value = "/{userid}")
 	public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("userid") UUID userId) {
-		log.info("user생성중");
 		User existUser = userService.findUser(userId);
-		log.info("user생성완료");
 		UserStatus userStatus = userStatusService.find(existUser.getId());
+		Optional<BinaryContent> profileImage = binaryContentService.findProfileImageByAuthorId(existUser.getId());
 
 		//mapper를 통한 dto로 변환
-		UserResponse response = userMapper.userToUserResponse(existUser, userStatus);
+		UserResponse response = userMapper.userToUserResponse(existUser, userStatus, profileImage);
 		return new ResponseEntity<>(CommonResponse.created(response), HttpStatus.OK);
 	}
 
@@ -86,8 +92,9 @@ public class UserController {
 		User updatedUser = userService.updateUser(userId, request);
 		UserStatus userStatus = userStatusService.updateByUserId(
 			new UpdateUserStatusRequest(updatedUser.getId(), request.requestAt()));
+		Optional<BinaryContent> profileImage = binaryContentService.findProfileImageByAuthorId(updatedUser.getId());
 
-		UserResponse response = userMapper.userToUserResponse(updatedUser, userStatus);
+		UserResponse response = userMapper.userToUserResponse(updatedUser, userStatus, profileImage);
 		return new ResponseEntity<>(CommonResponse.success(response), HttpStatus.OK);
 	}
 

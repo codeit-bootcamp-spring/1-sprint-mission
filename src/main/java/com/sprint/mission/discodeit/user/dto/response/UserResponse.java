@@ -13,6 +13,7 @@ public record UserResponse(
 	String username,
 	String email,
 	UserStatusType userStatus,
+	UUID profileImageId,
 	Instant createdAt,
 	Instant updatedAt) implements Serializable {
 }

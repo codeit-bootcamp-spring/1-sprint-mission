@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.sprint.mission.discodeit.global.util.FileStorage;
 import com.sprint.mission.discodeit.global.util.JsonFileStorage;
 import com.sprint.mission.discodeit.message.entity.BinaryContent;
+import com.sprint.mission.discodeit.message.entity.BinaryContentType;
 import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
@@ -82,6 +83,20 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public Optional<BinaryContent> findByAuthorIdAndBinaryContentTypeAndMessageIdIsNull(UUID authorId,
+		BinaryContentType binaryContentType
+	) {
+		List<BinaryContent> contents = findAll();
+		for (BinaryContent content : contents) {
+			if (content.getAuthorId().equals(authorId) && content.getBinaryContentType() == binaryContentType
+				&& content.getMessageId() == null) {
+				return Optional.of(content);
+			}
+		}
+		return Optional.empty();
 	}
 
 	@Override

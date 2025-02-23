@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.message.entity.BinaryContent;
+import com.sprint.mission.discodeit.message.entity.BinaryContentType;
 import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
 
 public class JCFBinaryContentRepository implements BinaryContentRepository {
@@ -44,6 +45,13 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 			}
 		}
 		return result;
+	}
+
+	@Override
+	public Optional<BinaryContent> findByAuthorIdAndBinaryContentTypeAndMessageIdIsNull(UUID authorId,
+		BinaryContentType binaryContentType
+	) {
+		return null;
 	}
 
 	@Override

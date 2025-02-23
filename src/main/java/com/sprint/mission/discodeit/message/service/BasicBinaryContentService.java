@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.message.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.message.dto.request.binaryContent.CreateBinaryContentRequest;
@@ -108,6 +109,12 @@ public class BasicBinaryContentService implements BinaryContentService {
 		List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
 
 		return contents;
+	}
+
+	@Override
+	public Optional<BinaryContent> findProfileImageByAuthorId(UUID authorId) {
+		return binaryContentRepository.findByAuthorIdAndBinaryContentTypeAndMessageIdIsNull(authorId,
+			BinaryContentType.PROFILE_IMAGE);
 	}
 
 	/**
