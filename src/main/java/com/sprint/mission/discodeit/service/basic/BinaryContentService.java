@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -33,26 +33,26 @@ public class BinaryContentService {
         fileManager.createDirectory(directoryPath);
     }
 
-    public BinaryContent create(BinaryContentDto dto) {
+    public BinaryContent create(BinaryContentRequest dto) {
 
         //존재하는 user or message에 대한 요청인지 확인
-        BinaryContent.Type type = dto.getType();
+        BinaryContent.Type type = dto.type();
         if (type == BinaryContent.Type.PROFILE) {
-            userRepository.findById(dto.getBelongTo())
-                    .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + dto.getBelongTo()));
+            userRepository.findById(dto.belongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + dto.belongTo()));
         } else {
-            messageRepository.findById(dto.getBelongTo())
-                    .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + dto.getBelongTo()));
+            messageRepository.findById(dto.belongTo())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + dto.belongTo()));
         }
 
         UUID id = UUID.randomUUID();
-        byte[] data = dto.getData();
-        String fileName = generateFileName(id, dto.getName());
+        byte[] data = dto.data();
+        String fileName = generateFileName(id, dto.name());
         Path path = directoryPath.resolve(fileName);
         fileManager.createFile(path, data);
 
-        BinaryContent content = BinaryContent.of(id, dto.getType(),
-                dto.getBelongTo(), fileName, path.toString());
+        BinaryContent content = BinaryContent.of(id, dto.type(),
+                dto.belongTo(), fileName, path.toString());
         return binaryContentRepository.save(content);
     }
 
@@ -61,29 +61,29 @@ public class BinaryContentService {
         return id + extension;
     }
 
-    public BinaryContentDto find(UUID id) {
+    public BinaryContentRequest find(UUID id) {
         BinaryContent content = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 binary content. id=" + id));
         byte[] data = fileManager.readFile(Path.of(content.getPath()));
-        return BinaryContentDto.of(content.getName(), content.getType(),
+        return BinaryContentRequest.of(content.getName(), content.getType(),
                 content.getId(), data);
     }
 
-    public BinaryContentDto findByUserId(UUID userId) {
+    public BinaryContentRequest findByUserId(UUID userId) {
         Optional<BinaryContent> binaryContent = binaryContentRepository.findByUserId(userId);
         BinaryContent content = binaryContent.orElseThrow(
                 () -> new NotFoundException("존재하지 않는 user에 대한 BinaryContent 요청"));
         byte[] data = fileManager.readFile(Path.of(content.getPath()));
-        return BinaryContentDto.of(content.getName(), content.getType(),
+        return BinaryContentRequest.of(content.getName(), content.getType(),
                 content.getBelongTo(), data);
     }
 
-    public List<BinaryContentDto> findByMessageId(UUID messageId) {
-        ArrayList<BinaryContentDto> dtos = new ArrayList<>(100);
+    public List<BinaryContentRequest> findByMessageId(UUID messageId) {
+        ArrayList<BinaryContentRequest> dtos = new ArrayList<>(100);
         List<BinaryContent> contents = binaryContentRepository.findByMessageId(messageId);
         for (BinaryContent content : contents) {
             byte[] data = fileManager.readFile(Path.of(content.getPath()));
-            BinaryContentDto dto = BinaryContentDto.of(content.getName(),
+            BinaryContentRequest dto = BinaryContentRequest.of(content.getName(),
                     content.getType(), content.getBelongTo(), data);
             dtos.add(dto);
         }

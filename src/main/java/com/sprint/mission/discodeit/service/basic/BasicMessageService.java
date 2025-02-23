@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.MessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -28,11 +28,11 @@ public class BasicMessageService implements MessageService {
     private final FileManager fileManager;
 
     @Override
-    public Message createMessage(MessageDto messageDto) {
-        Channel channel = channelRepository.findById(messageDto.channelId())
-                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + messageDto.channelId()));
-        User user = channel.getUser(messageDto.writer().getId());
-        Message message = Message.of(user, messageDto.content(), channel);
+    public Message createMessage(MessageRequest messageRequest) {
+        Channel channel = channelRepository.findById(messageRequest.channelId())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + messageRequest.channelId()));
+        User user = channel.getUser(messageRequest.writer().getId());
+        Message message = Message.of(user, messageRequest.content(), channel);
         return messageRepository.save(message);
     }
 

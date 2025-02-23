@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.DuplicateException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -21,7 +21,7 @@ public class ReadStatusService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
-    public ReadStatus create(ReadStatusDto dto) {
+    public ReadStatus create(ReadStatusRequest dto) {
         UUID userId = dto.userId();
         UUID channelId = dto.channelId();
 

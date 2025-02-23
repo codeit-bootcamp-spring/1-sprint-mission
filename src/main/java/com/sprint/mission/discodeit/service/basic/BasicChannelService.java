@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channel.PublicChannelDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelDetailDto;
+import com.sprint.mission.discodeit.dto.request.PublicChannelRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelDetailResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.PrivateChannelModificationException;
@@ -37,12 +37,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel createPublicChannel(PublicChannelDto publicChannelDto) {
-        return channelRepository.save(Channel.of(Channel.Type.PUBLIC, publicChannelDto.name(), publicChannelDto.description()));
+    public Channel createPublicChannel(PublicChannelRequest publicChannelRequest) {
+        return channelRepository.save(Channel.of(Channel.Type.PUBLIC, publicChannelRequest.name(), publicChannelRequest.description()));
     }
 
     @Override
-    public ChannelDetailDto readChannel(UUID channelId) {
+    public ChannelDetailResponse readChannel(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + channelId));
         List<Message> messages = messageRepository.findByChannelId(channelId);
@@ -55,14 +55,14 @@ public class BasicChannelService implements ChannelService {
                 .map(User::getId)
                 .toList();
 
-        return ChannelDetailDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
+        return ChannelDetailResponse.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
                 channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList);
     }
 
     @Override
-    public List<ChannelDetailDto> readAllByUserId(UUID userId) {
+    public List<ChannelDetailResponse> readAllByUserId(UUID userId) {
         List<Channel> channels = channelRepository.findAllByUserId(userId);
-        List<ChannelDetailDto> channelDetailDtos = new ArrayList<>(100);
+        List<ChannelDetailResponse> channelDetailResponses = new ArrayList<>(100);
 
         for (Channel channel : channels) {
             List<Message> messages = messageRepository.findByChannelId(channel.getId());
@@ -73,23 +73,23 @@ public class BasicChannelService implements ChannelService {
             List<UUID> userIdList = channel.getUsers().values().stream()
                     .map(User::getId)
                     .toList();
-            channelDetailDtos.add(ChannelDetailDto.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
+            channelDetailResponses.add(ChannelDetailResponse.of(channel.getId(), channel.getCreatedAt(), channel.getUpdatedAt(),
                     channel.getType(), channel.getName(), channel.getDescription(), latestMessageTime, userIdList));
         }
 
-        return channelDetailDtos;
+        return channelDetailResponses;
     }
 
     @Override
-    public void updateChannel(UUID channelId, PublicChannelDto publicChannelDto) {
+    public void updateChannel(UUID channelId, PublicChannelRequest publicChannelRequest) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + channelId));
         if (channel.getType() == Channel.Type.PRIVATE) {
             throw new PrivateChannelModificationException("private 채널은 수정할 수 없습니다.");
         }
 
-        channel.updateName(publicChannelDto.name());
-        channel.updateDescription(publicChannelDto.description());
+        channel.updateName(publicChannelRequest.name());
+        channel.updateDescription(publicChannelRequest.description());
         channelRepository.updateChannel(channel);
     }
 
