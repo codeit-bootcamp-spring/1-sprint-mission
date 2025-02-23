@@ -5,15 +5,21 @@ import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import java.time.Instant;
 
 public record ReadStatusResponseDto(
+        String id,
         String channelId,
         String userId,
-        Instant updateAt
+        Instant updatedAt,
+        Instant lastReadAt,
+        boolean isNewMessage
 ) {
-    public ReadStatusResponseDto from(ReadStatus readStatus) {
+    public static ReadStatusResponseDto from(ReadStatus readStatus, boolean isNewMessage) {
         return new ReadStatusResponseDto(
+                readStatus.getId(),
                 readStatus.getChannelId(),
                 readStatus.getUserId(),
-                readStatus.getUpdatedAt()
+                readStatus.getUpdatedAt(),
+                readStatus.getLastReadAt(),
+                isNewMessage
         );
     }
 }

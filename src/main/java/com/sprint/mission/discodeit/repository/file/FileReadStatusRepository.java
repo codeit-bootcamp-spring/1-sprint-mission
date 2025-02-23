@@ -4,15 +4,12 @@ import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file", matchIfMissing = false)
@@ -33,7 +30,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public ReadStatus save(ReadStatus readStatus) {
         Path readStatusPath = directory.resolve(readStatus.getId().concat(extension));
         FileService.save(readStatusPath, readStatus);
-        return null;
+        return readStatus;
     }
 
     @Override
@@ -55,16 +52,21 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus findByChannelIdWithUserId(String channelId, String userId) {
-        return findAll().stream().filter(rs -> rs.getChannelId().equals(channelId) && rs.getUserId().equals(userId)).findFirst().orElse(null);
+        for (ReadStatus readStatus : findAll()) {
+            if (readStatus.getChannelId().equals(channelId) && readStatus.getUserId().equals(userId)) {
+                return readStatus;
+            }
+        }
+        return null;
     }
 
     @Override
     public List<ReadStatus> findAllByUserId(String userId) {
-        return findAll().stream().filter(rs -> rs.getUserId().equals(userId)).collect(Collectors.toList());
+        return findAll().stream().filter(rs -> rs.getUserId().equals(userId)).toList();
     }
 
     @Override
     public List<ReadStatus> findAllByChannelId(String channelId) {
-        return findAll().stream().filter(rs -> rs.getChannelId().equals(channelId)).collect(Collectors.toList());
+        return findAll().stream().filter(rs -> rs.getChannelId().equals(channelId)).toList();
     }
 }
