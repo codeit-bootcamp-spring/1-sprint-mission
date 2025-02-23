@@ -29,7 +29,7 @@ public class BasicChannelService implements ChannelService {
     public Channel createPrivateChannel(UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
-        Channel channel = Channel.of(ChannelType.PRIVATE, user.getName(), user.getName() + "의 Private 채널");
+        Channel channel = Channel.of(Channel.Type.PRIVATE, user.getName(), user.getName() + "의 Private 채널");
         channel.addUser(user);
         ReadStatus readStatus = ReadStatus.of(user.getId(), channel.getId());
         readStatusRepository.save(readStatus);
@@ -38,7 +38,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel createPublicChannel(PublicChannelDto publicChannelDto) {
-        return channelRepository.save(Channel.of(ChannelType.PUBLIC, publicChannelDto.name(), publicChannelDto.description()));
+        return channelRepository.save(Channel.of(Channel.Type.PUBLIC, publicChannelDto.name(), publicChannelDto.description()));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class BasicChannelService implements ChannelService {
     public void updateChannel(UUID channelId, PublicChannelDto publicChannelDto) {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + channelId));
-        if (channel.getType() == ChannelType.PRIVATE) {
+        if (channel.getType() == Channel.Type.PRIVATE) {
             throw new PrivateChannelModificationException("private 채널은 수정할 수 없습니다.");
         }
 

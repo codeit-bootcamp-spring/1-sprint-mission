@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.BelongType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -72,7 +71,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 BinaryContent binaryContent = (BinaryContent) ois.readObject();
-                if (binaryContent.getType() == BelongType.PROFILE
+                if (binaryContent.getType() == BinaryContent.Type.PROFILE
                         && binaryContent.getBelongTo().equals(userId)) {
                     content = binaryContent;
                 }
@@ -96,7 +95,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 BinaryContent binaryContent = (BinaryContent) ois.readObject();
-                if (binaryContent.getType() == BelongType.MESSAGE
+                if (binaryContent.getType() == BinaryContent.Type.MESSAGE
                         && binaryContent.getBelongTo().equals(messageId)) {
                     contents.add(binaryContent);
                 }

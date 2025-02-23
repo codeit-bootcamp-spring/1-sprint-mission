@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BelongType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -37,8 +36,8 @@ public class BinaryContentService {
     public BinaryContent create(BinaryContentDto dto) {
 
         //존재하는 user or message에 대한 요청인지 확인
-        BelongType type = dto.getType();
-        if (type == BelongType.PROFILE) {
+        BinaryContent.Type type = dto.getType();
+        if (type == BinaryContent.Type.PROFILE) {
             userRepository.findById(dto.getBelongTo())
                     .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + dto.getBelongTo()));
         } else {

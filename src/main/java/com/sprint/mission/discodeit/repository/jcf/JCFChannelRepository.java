@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,7 +35,7 @@ public class JCFChannelRepository implements ChannelRepository {
         return data.values().stream()
                 .filter(c -> {
                     try {
-                        return c.getType() == ChannelType.PUBLIC || c.getUser(userId) != null;
+                        return c.getType() == Channel.Type.PUBLIC || c.getUser(userId) != null;
                     } catch (NotFoundException e) {
                         return false;
                     }

@@ -19,13 +19,17 @@ public class Channel implements Serializable {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    private ChannelType type;
+    private Type type;
     private String name;
     private String description;
 
     private Map<UUID, User> users;
 
-    private Channel(ChannelType type, String name, String description) {
+    public enum Type {
+        PUBLIC, PRIVATE
+    }
+
+    private Channel(Type type, String name, String description) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = createdAt;
@@ -35,11 +39,11 @@ public class Channel implements Serializable {
         users = new HashMap<>(100);
     }
 
-    public static Channel of(ChannelType type, String name, String description) {
+    public static Channel of(Type type, String name, String description) {
         return new Channel(type, name, description);
     }
 
-    public void updateType(ChannelType type) {
+    public void updateType(Type type) {
         this.type = type;
         updatedAt = Instant.now();
     }

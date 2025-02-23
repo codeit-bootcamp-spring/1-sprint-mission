@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -73,7 +72,7 @@ public class FileChannelRepository implements ChannelRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Channel channel = (Channel) ois.readObject();
-                if (channel.getType() == ChannelType.PUBLIC || channel.getUser(userId) != null) {
+                if (channel.getType() == Channel.Type.PUBLIC || channel.getUser(userId) != null) {
                     channels.add(channel);
                 }
             } catch (IOException | ClassNotFoundException e) {
