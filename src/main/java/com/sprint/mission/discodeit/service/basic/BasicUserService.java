@@ -78,24 +78,14 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage) {
         User user = findByIdOrThrow(id);
-        String newName = null;
-        String newEmail = null;
-        String newPassword = null;
 
-        if (request.name() != null && userValidator.isValidName(request.name())) {
-            newName = request.name();
-        }
-        if (request.email() != null && userValidator.isValidEmail(request.email())) {
-            newEmail = request.email();
-        }
-        if (request.password() != null && userValidator.isValidPassword(request.password())) {
-            newPassword = request.password();
-        }
-        user.update(newName, newEmail, newPassword);
-        userRepository.save(user);
+        if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email()) && userValidator.isValidPassword(request.password())) {
+            user.update(request.name(), request.email(), request.password());
+            userRepository.save(user);
 
-        if (userProfileImage != null) {
-            binaryContentService.updateUserProfileFile(userProfileImage, id);
+            if (userProfileImage != null) {
+                binaryContentService.updateUserProfileFile(userProfileImage, id);
+            }
         }
 
         log.info("Update User :{}", user);
