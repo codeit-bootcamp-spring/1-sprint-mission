@@ -39,14 +39,16 @@ public class BasicUserService implements UserService {
     private UserDto vaildateUser(String userName, String email) {
         List<User> users = repository.findAll();
         if (users.stream().anyMatch(u -> u.getUserName().equals(userName))) {
-            System.out.println("이미 존재하는 사용자입니다.");
-            User user = users.stream().filter(s -> s.getUserName().equals(userName)).findAny().get();
-            return new UserDto(user);
+            //System.out.println("이미 존재하는 사용자입니다.");
+            throw new IllegalStateException("이미 존재하는 사용자입니다.");
+            //User user = users.stream().filter(s -> s.getUserName().equals(userName)).findAny().get();
+            //return new UserDto(user);
         }
         if (users.stream().anyMatch(u -> u.getEmail().equals(email))) {
-            System.out.println("이미 존재하는 이메일입니다.");
-            User user = users.stream().filter(s -> s.getEmail().equals(email)).findAny().get();
-            return new UserDto(user);
+            throw new IllegalStateException("이미 존재하는 이메일입니다.");
+            //System.out.println("이미 존재하는 이메일입니다.");
+            //User user = users.stream().filter(s -> s.getEmail().equals(email)).findAny().get();
+            //return new UserDto(user);
         }
         return null;
     }

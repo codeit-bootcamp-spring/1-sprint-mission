@@ -100,11 +100,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel save(String channelName, ChannelType type) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        /*if (channelMap.values().stream().anyMatch(channel -> channel.getName().equals(channelName))) {
-            System.out.println("이미 존재하는 채널입니다.");
-            return channelMap.get(channelMap.keySet().stream().filter(s -> channelMap.get(s).getName().equals(channelName)).findFirst().get()); //존재하는 채널 UUID 반환
-        }
-        System.out.println("채널 생성 중");*/
         Channel newChannel = new Channel(channelName, type);
         channelMap.put(newChannel.getId(), newChannel);
         messages.put(newChannel.getId(), new ArrayList<>());
@@ -116,6 +111,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     @Override
     public Channel save(ChannelType type) {
+        //메시지와 관련된 내용 빼고 MessageService에서 처리할 수 있도록 하자
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
         System.out.println("채널 생성 중");
         Channel newChannel = new Channel(type);
@@ -160,16 +156,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void update(UUID id, String name) {
         Map<UUID, Channel> channelMap = loadFromSer(FILE_NAME);
-        /*
-        if (channelMap.values().stream().anyMatch(channel -> channel.getChannelName().equals(name))) {
-            System.out.println("이미 존재하는 채널입니다.");
-            return;
-        }*/
-        /*List<Channel> channels = findAll();
-        if(channels.contains(findById(id))){
-            System.out.println("이미 존재하는 채널입니다.");
-            return;
-        }*/
         if (channelMap.containsKey(id)) {
             System.out.println("채널 수정 중");
             Channel channel = findById(id);

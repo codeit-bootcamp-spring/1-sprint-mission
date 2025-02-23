@@ -32,7 +32,7 @@ public class BinaryContentService {
     }
 
     public List<BinaryContentDto> findByDomainId(UUID domainId) {
-        if(userRepository.findUserById(domainId) != null || messageRepository.findMessagesById(domainId) != null){
+        if(userRepository.findUserById(domainId) != null || messageRepository.findMessagesByChannelId(domainId) != null){ //findMessagesByChannelId 오류나면 ~ BySenderId
             List<BinaryContent> binaryContents = binaryContentRepository.findByDomainId(domainId);
             List<BinaryContentDto> binaryContentDtos = new ArrayList<>();
             for (BinaryContent binaryContent : binaryContents) {

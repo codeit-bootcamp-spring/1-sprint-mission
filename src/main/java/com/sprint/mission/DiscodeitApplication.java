@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.domain.UserStatusService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,10 +22,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class DiscodeitApplication {
 
-    /*public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         // 서비스 초기화
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
@@ -204,18 +205,18 @@ public class DiscodeitApplication {
         System.out.println("===================================================");
         System.out.println("BinaryContent 로직 확인 : 유저");
         File file = new File("C:\\Users\\ypd06\\codit\\files\\BinaryContentTest.txt");
-        UserDto userDto5 = userService.createUser(new UserDto("Ha", "HaPassword", "ha@naver.com", new BinaryContentDto(file)));
+        //UserDto userDto5 = userService.createUser(new UserDto("Ha", "HaPassword", "ha@naver.com", new BinaryContentDto((MultipartFile) file)));
         binaryContentService.findAll().forEach(System.out::println);
         System.out.println("===================================================");
         System.out.println("find By DomainId : 유저");
-        List<BinaryContentDto> binaryContentByDomainId = binaryContentService.findByDomainId(userDto5.id());
-        System.out.println("binaryContentByDomainId = " + binaryContentByDomainId);
+        //List<BinaryContentDto> binaryContentByDomainId = binaryContentService.findByDomainId(userDto5.id());
+        //System.out.println("binaryContentByDomainId = " + binaryContentByDomainId);
         System.out.println("===================================================");
         System.out.println("find By Id : 유저");
-        System.out.println("find By Id : " +binaryContentService.findById(binaryContentByDomainId.get(0).id()));
+        //System.out.println("find By Id : " +binaryContentService.findById(binaryContentByDomainId.get(0).id()));
         System.out.println("===================================================");
         System.out.println("delete By id : 유저 : 삭제 후 모든 BinaryContent 출력");
-        binaryContentService.delete(binaryContentByDomainId.get(0).id());
+        //binaryContentService.delete(binaryContentByDomainId.get(0).id());
         System.out.println("binaryContentService.findAll().isEmpty() : " + binaryContentService.findAll().isEmpty());
 
 
@@ -232,6 +233,6 @@ public class DiscodeitApplication {
         } catch (IOException e) {
             System.err.println("❌ 파일 초기화 중 오류 발생: " + e.getMessage());
         }
-    }*/
+    }
 }
 

@@ -42,7 +42,7 @@ public class BasicMessageService implements MessageService {
     public List<Message> findAllByUserId(UUID userId) {
         //UserId로 메시지 확인 행동은 사용자가 채널로 메시지를 확인했다고 볼 수 있을 것 같음
         readStatusService.findAllByUserId(userId);
-        return messageRepository.findMessagesById(userId);
+        return messageRepository.findMessagesBySenderId(userId);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class BasicMessageService implements MessageService {
     }
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findMessagesById(channelId);
+        return messageRepository.findMessagesByChannelId(channelId);
     }
 
     @Override
