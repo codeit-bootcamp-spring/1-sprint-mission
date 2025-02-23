@@ -29,7 +29,6 @@ import java.util.Optional;
 @SpringBootApplication
 public class DiscodeitApplication {
 	static User setupUser(UserService userService) {
-
 		UserCreateRequest request = new UserCreateRequest("woody12", "woody12@codeit.com", "woody1234");
 		User user = userService.create(request, Optional.empty());
 		return user;
@@ -60,6 +59,9 @@ public class DiscodeitApplication {
 		Channel channel = setupChannel(channelService);
 		// 테스트
 		messageCreateTest(messageService, channel, user);
+
+
+
 
 	}
 }

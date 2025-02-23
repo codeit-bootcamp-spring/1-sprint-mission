@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileUserStatusRepository implements UserStatusRepository {

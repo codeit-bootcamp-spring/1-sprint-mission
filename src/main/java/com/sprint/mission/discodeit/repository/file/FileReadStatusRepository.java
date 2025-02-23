@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
