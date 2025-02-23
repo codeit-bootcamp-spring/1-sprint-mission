@@ -14,17 +14,17 @@ import com.sprint.mission.discodeit.channel.entity.Channel;
 import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
 import com.sprint.mission.discodeit.user.entity.User;
 
 public class FileChannelRepository implements ChannelRepository {
 	private final Path rootDir;
-	private static final String CHANNEL_FILE = "channel.ser";
+	private static final String CHANNEL_FILE = "channel.json";
 	private final FileStorage<Channel> fileStorage;
 
 	public FileChannelRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(Channel.class);
+		this.fileStorage = new JsonFileStorage<>(Channel.class);
 		fileStorage.init(rootDir);
 	}
 

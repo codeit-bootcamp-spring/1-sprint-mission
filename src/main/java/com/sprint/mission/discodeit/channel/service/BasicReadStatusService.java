@@ -42,10 +42,10 @@ public class BasicReadStatusService implements ReadStatusService {
 			.orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
 		// 읽음 상태 중복 체크
-		if (readStatusRepository.findByUserIdAndChannelId(
+		/*if (readStatusRepository.findByUserIdAndChannelId(
 			request.userId(), request.channelId()).isPresent()) {
 			throw new IllegalArgumentException("ReadStatus already exists");
-		}
+		}*/
 
 		// messageId가 null이 아닐 때만 메시지 존재 여부 확인
 		if (request.messageId() != null) {

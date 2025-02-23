@@ -5,10 +5,12 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.channel.dto.request.readStatus.CreateReadStatusRequest;
@@ -28,7 +30,7 @@ public class ReadStatusController {
 	}
 
 	//특정 채널의 메시지 수신 정보 생성(message,lastreadat = null로 처리)
-	@RequestMapping(name = "", method = RequestMethod.POST)
+	@PostMapping(value = "")
 	public ResponseEntity<CommonResponse<ReadStatus>> createReadStatus(@RequestBody CreateReadStatusRequest request) {
 		ReadStatus createdStatus = readStatusService.create(request);
 		return new ResponseEntity<>(
@@ -36,14 +38,14 @@ public class ReadStatusController {
 				createdStatus), HttpStatus.OK);
 	}
 
-	@RequestMapping(name = "/{readStatusId}", method = RequestMethod.PATCH)
+	@PutMapping(value = "/{readStatusId}")
 	public ResponseEntity<CommonResponse<ReadStatus>> updateReadStatus(@PathVariable("readStatusId") UUID readStatusId,
 		@RequestBody UpdateReadStatusRequest request) {
 		ReadStatus updatedStatus = readStatusService.update(readStatusId, request);
 		return ResponseEntity.ok(CommonResponse.success("ReadStatus updated successfully", updatedStatus));
 	}
 
-	@RequestMapping(name = "/user/{userId}", method = RequestMethod.GET)
+	@GetMapping(value = "/user/{userId}")
 	public ResponseEntity<CommonResponse<List<ReadStatus>>> getReadStatusesByUser(@PathVariable("userId") UUID userId) {
 		List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
 		return ResponseEntity.ok(CommonResponse.success("User's ReadStatus list retrieved", statuses));

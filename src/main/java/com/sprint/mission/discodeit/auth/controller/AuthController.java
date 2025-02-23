@@ -2,9 +2,9 @@ package com.sprint.mission.discodeit.auth.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.auth.dto.LoginUserRequest;
@@ -30,7 +30,7 @@ public class AuthController {
 		this.userMapper = userMapper;
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@PostMapping(value = "/login")
 	public ResponseEntity<CommonResponse<UserResponse>> login(@RequestBody LoginUserRequest request) {
 		User loginUser = authService.login(request);
 		UserStatus userStatus = userStatusService.find(loginUser.getId());

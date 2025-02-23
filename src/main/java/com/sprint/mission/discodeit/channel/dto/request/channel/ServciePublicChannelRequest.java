@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record CreatePublicChannelRequest(
+public record ServciePublicChannelRequest(
 	UUID creatorId, //uuid
 	String name,
 	String description,

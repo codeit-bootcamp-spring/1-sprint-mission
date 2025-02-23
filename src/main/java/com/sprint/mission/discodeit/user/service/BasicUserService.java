@@ -15,6 +15,9 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.entity.UserStatus;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BasicUserService implements UserService {
 	private final UserRepository userRepository;
 	private final UserStatusService userStatusService;
@@ -74,8 +77,10 @@ public class BasicUserService implements UserService {
 	//비밀번호 변경시에는 userresponse에서는 password를 반환하지 않는데 새로운 메서드를 하나 만들어야될까?
 	@Override
 	public User findUser(UUID existUserId) {
+		log.info("Finding user with ID: {}", existUserId);
 		User user = userRepository.findById(existUserId)
 			.orElseThrow(() -> new IllegalArgumentException("User not found: " + existUserId));
+		log.info("Found user: {}", user);
 		return user;
 	}
 

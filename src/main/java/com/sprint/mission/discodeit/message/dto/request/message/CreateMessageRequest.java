@@ -10,9 +10,7 @@ public record CreateMessageRequest(
 	String content,
 	UUID authorId,
 	UUID channelId,
-	//privateChannel 생성을 위해 받는 사람 id 추가
 	UUID receiverId,
 	Instant createdAt,
-	List<MultipartFile> attachments
-) {
+	List<MultipartFile> attachments) {
 }

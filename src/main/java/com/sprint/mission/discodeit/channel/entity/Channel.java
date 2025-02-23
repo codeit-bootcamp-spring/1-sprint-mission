@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.channel.entity;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -12,10 +11,11 @@ import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.user.entity.User;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class Channel extends BaseEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class Channel extends BaseEntity {
 	private String name;
 	private String description;
 	private Map<UUID, User> participants;
@@ -25,8 +25,7 @@ public class Channel extends BaseEntity implements Serializable {
 	private ChannelType channelType;
 
 	public Channel(String name, String description, Map<UUID, User> participants, Instant lastMessageAt,
-		List<Message> messageList,
-		ChannelType channelType) {
+		List<Message> messageList, ChannelType channelType) {
 		super();
 		this.name = name;
 		this.description = description;

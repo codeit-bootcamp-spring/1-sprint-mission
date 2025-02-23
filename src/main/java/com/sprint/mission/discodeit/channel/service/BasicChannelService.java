@@ -22,6 +22,9 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.user.service.UserStatusService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BasicChannelService implements ChannelService {
 	private final ChannelRepository channelRepository;
 	private final UserService userService;
@@ -74,8 +77,22 @@ public class BasicChannelService implements ChannelService {
 
 		readStatusService.create(readStatus1);
 		readStatusService.create(readStatus2);
-
 		return savedChannel;
+	}
+
+	/**
+	 * 그룹 채널을 생성합니다.
+	 * @param channelId privateChannel에서 메시지 생성 요청
+	 * @param message privateChannel을 보낼때 만들어진 message
+	 */
+	@Override
+	public void addMessageToChannel(UUID channelId, Message message) {
+		Channel channel = channelRepository.findById(channelId)
+			.orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+
+		// 🔥 채널의 메시지 리스트에 메시지 추가
+		channel.getMessageList().add(message);
+		channelRepository.save(channel); // 변경사항 저장
 	}
 
 	/**
@@ -178,11 +195,9 @@ public class BasicChannelService implements ChannelService {
 	public Channel updateChannel(UUID channelId, UpdateChannelRequest request) {
 		Channel channel = channelRepository.findById(channelId)
 			.orElseThrow(() -> new IllegalArgumentException("Channel not found"));
-
 		if (channel.getChannelType() == ChannelType.PRIVATE) {
 			throw new IllegalArgumentException("Cannot update PRIVATE channel");
 		}
-
 		// 참여자 정보 업데이트
 		Map<UUID, User> updatedParticipants = new HashMap<>();
 		for (UUID userId : request.participantIds()) {

@@ -6,11 +6,14 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.global.dto.CommonResponse;
@@ -41,7 +44,7 @@ public class UserController {
 	}
 
 	//사용자 등록
-	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<CommonResponse<UserResponse>> createUser(
 		@ModelAttribute CreateUserRequest createUserRequest) {
 		//나중에 JPA를 적용하여 UserStatus -> User로의 단방향 연관관계를 맺게 된다면 똑같이 생성을 해야겠다...
@@ -54,7 +57,7 @@ public class UserController {
 	}
 
 	//특정 사용자 조회
-	@RequestMapping(value = "/{userid}", method = RequestMethod.GET)
+	@GetMapping(value = "/{userid}")
 	public ResponseEntity<CommonResponse<UserResponse>> getUserById(@PathVariable("userid") UUID userId) {
 		log.info("user생성중");
 		User existUser = userService.findUser(userId);
@@ -67,7 +70,7 @@ public class UserController {
 	}
 
 	//전체 사용자 조회
-	@RequestMapping(value = "/all-users", method = RequestMethod.GET)
+	@GetMapping(value = "")
 	public ResponseEntity<CommonResponse<List<UserResponse>>> getAllUsers() {
 		List<User> users = userService.findAllUsers();
 		List<UserStatus> userStatuses = userStatusService.findAll();
@@ -77,7 +80,7 @@ public class UserController {
 	}
 
 	//사용자 수정
-	@RequestMapping(value = "/{userid}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/{userid}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<CommonResponse<UserResponse>> updateUser(@PathVariable("userid") UUID userId,
 		@ModelAttribute UpdateUserRequest request) {
 		User updatedUser = userService.updateUser(userId, request);
@@ -89,14 +92,14 @@ public class UserController {
 	}
 
 	//사용자 삭제
-	@RequestMapping(value = "/{userid}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{userid}")
 	public ResponseEntity<CommonResponse<Void>> deleteUser(@PathVariable("userid") UUID userId) {
 		userService.deleteUser(userId);
 		return new ResponseEntity<>(CommonResponse.success("User deleted successfully", null), HttpStatus.OK);
 	}
 
 	//사용자 온라인 상태 업데이트
-	@RequestMapping(value = "", method = RequestMethod.PATCH)
+	@PutMapping(value = "")
 	public ResponseEntity<CommonResponse<Void>> updateUserStatus(
 		@RequestBody UpdateUserStatusRequest request) {
 		userStatusService.update(request);

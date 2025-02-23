@@ -28,7 +28,7 @@ public class BinaryContentController {
 		this.binaryContentMapper = binaryContentMapper;
 	}
 
-	@GetMapping("/{binaryContentId}")
+	@GetMapping(value = "/{binaryContentId}")
 	public ResponseEntity<CommonResponse<BinaryContentResponse>> getBinaryContentById(
 		@PathVariable("binaryContentId") UUID id) {
 		BinaryContent content = binaryContentService.find(id);
@@ -36,7 +36,7 @@ public class BinaryContentController {
 			CommonResponse.success("Binary content retrieved successfully", binaryContentMapper.toResponse(content)));
 	}
 
-	@GetMapping("")
+	@GetMapping(value = "")
 	public ResponseEntity<CommonResponse<List<BinaryContentResponse>>> getBinaryContentsByIds(
 		@RequestParam("ids") List<UUID> ids) {
 		List<BinaryContent> contents = binaryContentService.findAllByIdIn(ids);

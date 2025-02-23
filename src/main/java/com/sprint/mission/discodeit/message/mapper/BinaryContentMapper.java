@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.message.mapper;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class BinaryContentMapper {
 			binaryContent.getCreatedAt(),
 			binaryContent.getAuthorId(),
 			binaryContent.getMessageId(),
-			binaryContent.getContent(),
+			Base64.getEncoder().encode(binaryContent.getContent()),
 			binaryContent.getContentType(),
 			binaryContent.getFileName(),
 			binaryContent.getFileSize(),

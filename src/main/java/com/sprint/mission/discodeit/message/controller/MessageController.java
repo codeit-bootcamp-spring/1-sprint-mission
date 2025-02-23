@@ -5,11 +5,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.global.dto.CommonResponse;
@@ -22,8 +26,11 @@ import com.sprint.mission.discodeit.message.mapper.MessageMapper;
 import com.sprint.mission.discodeit.message.service.BinaryContentService;
 import com.sprint.mission.discodeit.message.service.MessageService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("api/messages")
+@Slf4j
 public class MessageController {
 
 	private final MessageService messageService;
@@ -38,8 +45,9 @@ public class MessageController {
 	}
 
 	//메시지 보내기
-	@RequestMapping(name = "", method = RequestMethod.POST)
-	public ResponseEntity<CommonResponse<MessageResponse>> createMessage(@RequestBody CreateMessageRequest request) {
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<CommonResponse<MessageResponse>> createMessage(@ModelAttribute CreateMessageRequest request) {
+		/*	CreateMessageRequest messageRequest = messageMapper.requestToServiceRequest(request);*/
 		Message newMessage = messageService.create(request);
 		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(newMessage.getId());
 		MessageResponse response = messageMapper.messageToMessageResponse(newMessage, attachments);
@@ -47,9 +55,10 @@ public class MessageController {
 	}
 
 	//메시지 수정
-	@RequestMapping(name = "/{messageId}", method = RequestMethod.PATCH)
-	public ResponseEntity<CommonResponse<MessageResponse>> updateMessage(@PathVariable("messageId") UUID messageId,
-		@RequestBody UpdateMessageRequest request) {
+	@PutMapping(value = "/{messageId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<CommonResponse<MessageResponse>> updateMessage(
+		@PathVariable("messageId") UUID messageId,
+		@ModelAttribute UpdateMessageRequest request) {
 		Message updatedMessage = messageService.update(messageId, request);
 		List<BinaryContent> attachments = binaryContentService.findAllByMessageId(updatedMessage.getId());
 		MessageResponse response = messageMapper.messageToMessageResponse(updatedMessage, attachments);
@@ -57,9 +66,10 @@ public class MessageController {
 	}
 
 	//특정 채널의 메시지 목록
-	@RequestMapping(name = "", method = RequestMethod.GET)
+	//Todo 만약 private이라면 누가 누구에게 보냈는지도 dto에 담아서 보내줘야될까...?
+	@GetMapping(value = "/{channelId}")
 	public ResponseEntity<CommonResponse<List<MessageResponse>>> findAllMessagesByChannel(
-		@PathVariable("id") UUID channelId) {
+		@PathVariable("channelId") UUID channelId) {
 		List<Message> messages = messageService.findAllByChannelId(channelId);
 		List<BinaryContent> attachments = new ArrayList<>();
 		for (Message message : messages) {
@@ -72,7 +82,7 @@ public class MessageController {
 	}
 
 	//메시지 삭제
-	@RequestMapping(name = "/{messageId}", method = RequestMethod.DELETE)
+	@DeleteMapping(value = "/{messageId}")
 	public ResponseEntity<CommonResponse<Void>> deleteMessage(@PathVariable("messageId") UUID messageId) {
 		messageService.delete(messageId);
 		return new ResponseEntity<>(CommonResponse.success("Message deleted successfully"), HttpStatus.OK);

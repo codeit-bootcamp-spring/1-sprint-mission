@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.sprint.mission.discodeit.global.util.FileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
 import com.sprint.mission.discodeit.message.entity.Message;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
-import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
 
 public class FileMessageRepository implements MessageRepository {
 
 	private final Path rootDir;
-	private static final String MESSAGE_FILE = "message.ser";
+	private static final String MESSAGE_FILE = "message.json";
 	private final FileStorage<Message> fileStorage;
 
 	public FileMessageRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(Message.class);
+		this.fileStorage = new JsonFileStorage<>(Message.class);
 		fileStorage.init(rootDir);
 	}
 

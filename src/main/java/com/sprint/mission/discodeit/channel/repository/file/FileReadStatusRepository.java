@@ -10,17 +10,17 @@ import java.util.UUID;
 import com.sprint.mission.discodeit.channel.entity.ReadStatus;
 import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.global.util.FileStorage;
-import com.sprint.mission.discodeit.global.util.SerializableFileStorage;
+import com.sprint.mission.discodeit.global.util.JsonFileStorage;
 
 public class FileReadStatusRepository implements ReadStatusRepository {
 	// 루트 디렉터리 및 파일 경로 정의
-	private static final String READSTATUS_FILE = "readstatus.ser";
+	private static final String READSTATUS_FILE = "readstatus.json";
 	private final Path rootDir;
 	private final FileStorage<ReadStatus> fileStorage;
 
 	public FileReadStatusRepository(String fileDirectory) {
 		this.rootDir = Paths.get(System.getProperty("user.dir"), fileDirectory);
-		this.fileStorage = new SerializableFileStorage<>(ReadStatus.class);
+		this.fileStorage = new JsonFileStorage<>(ReadStatus.class);
 		fileStorage.init(rootDir);
 	}
 

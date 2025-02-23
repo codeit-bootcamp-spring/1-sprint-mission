@@ -21,6 +21,9 @@ import com.sprint.mission.discodeit.user.entity.User;
 import com.sprint.mission.discodeit.user.service.UserService;
 import com.sprint.mission.discodeit.user.service.UserStatusService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class BasicMessageService implements MessageService {
 	private final MessageRepository messageRepository;
 	private final UserService userService;
@@ -49,13 +52,7 @@ public class BasicMessageService implements MessageService {
 		User author = userService.findUser(request.authorId());
 		// 사용자 online 처리
 		userStatusService.updateByUserId(new UpdateUserStatusRequest(author.getId(), request.createdAt()));
-		Channel channel = channelService.find(request.channelId());
 		UUID channelId = request.channelId();
-		// 메시지 작성자가 채널 참여자인지 확인
-		if (!channel.getParticipants().containsKey(request.authorId())) {
-			throw new IllegalArgumentException(
-				"Author is not a participant of the channel: " + request.channelId());
-		}
 
 		// Private Channel 생성 로직 추가 (디스코드도 private은 메세지를 상대방에게 보내야지 channel 추가 public은 초대를 먼저 한 후 메시지를 보낸다)
 		// findPrivateChannelBetweenUsers는 나중에 구현...
@@ -79,14 +76,25 @@ public class BasicMessageService implements MessageService {
 					recipientId, request.createdAt());
 				Channel privateChannel = channelService.createPrivateChannel(privateChannelRequest);
 				channelId = privateChannel.getId();
+				log.info("private channel 생성완료" + channelId);
 			}
 		}
 
+		// 기존에는 private channel로 meesage를 보내면 이 코드가 조건문 앞에 들어가 있어서 무조건 에러가 발생해서 조건문 끝난 뒤로 수정
+		Channel channel = channelService.find(channelId);
+
+		// 메시지 작성자가 채널 참여자인지 확인
+		if (!channel.getParticipants().containsKey(request.authorId())) {
+			throw new IllegalArgumentException(
+				"Author is not a participant of the channel: " + request.channelId());
+		}
+
 		// 메시지 기본 정보 생성 및 저장
-		Message message = new Message(request.content(), request.authorId(), request.channelId());
+		Message message = new Message(request.content(), request.authorId(), channelId);
 		Message savedMessage = messageRepository.save(message);
 
 		// 첨부파일이 있는 경우 처리
+		// Todo 한 메시지에 첨부파일 보내는 개수 정하는게 좋을것 같다
 		if (request.attachments() != null && !request.attachments().isEmpty()) {
 			for (MultipartFile file : request.attachments()) {
 				CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(
@@ -98,6 +106,9 @@ public class BasicMessageService implements MessageService {
 				binaryContentService.create(binaryRequest);
 			}
 		}
+
+		// 메시지를 채널에 추가하는 로직을 `ChannelService`에게 위임 message는 그동안 저장을 하지 않아서 안됐다
+		channelService.addMessageToChannel(channelId, savedMessage);
 
 		return savedMessage;
 	}
@@ -125,13 +136,6 @@ public class BasicMessageService implements MessageService {
 	public List<Message> findAllByChannelId(UUID channelId) {
 		List<Message> messages = messageRepository.findAllByChannelId(channelId);
 
-		/* 각 메시지의 첨부파일 정보를 포함하여 응답 생성 캐싱을 사용해야될까...?
-		for (Message message : messages) {
-			List<BinaryContentResponse> attachments = binaryContentService
-				.findAllByMessageId(message.getId());
-			responses.add(MessageResponse.from(message, attachments));
-		}*/
-
 		return messages;
 	}
 
@@ -149,21 +153,17 @@ public class BasicMessageService implements MessageService {
 		message.updateContent(request.content());
 		Message updatedMessage = messageRepository.save(message);
 
-		// 기존 메시지에 연결된 첨부파일 목록 조회
+		// 기존 첨부파일 모두 삭제
+		// Todo 해당 메시지에서 기존 첨부파일을 모두 삭제한 뒤에 업데이트 된 첨부파일들을 전부 다시 넣게 된다면 삭제되지 않아야 하는 첨부파일들에 대해서도
+		// Todo 삭제를 하니까 비효율적인게 아닐까...? 처음처럼 삭제할 file, 추가할 file을 따로 받아서 적용하는게 더 나은 방법일까...?
 		List<BinaryContent> currentAttachments = binaryContentService.findAllByMessageId(messageId);
-
-		// 삭제할 첨부파일 ID가 존재하면 해당 첨부파일 제거
-		if (request.attachmentsToRemove() != null && !request.attachmentsToRemove().isEmpty()) {
-			for (UUID attachmentId : request.attachmentsToRemove()) {
-				binaryContentService.delete(attachmentId);
-			}
-			// 다시 조회하여 현재 첨부파일 목록을 갱신
-			currentAttachments = binaryContentService.findAllByMessageId(messageId);
+		for (BinaryContent attachment : currentAttachments) {
+			binaryContentService.delete(attachment.getId());
 		}
 
 		// 새 첨부파일 추가
-		if (request.attachmentsToAdd() != null && !request.attachmentsToAdd().isEmpty()) {
-			for (MultipartFile file : request.attachmentsToAdd()) {
+		if (request.attachments() != null && !request.attachments().isEmpty()) {
+			for (MultipartFile file : request.attachments()) {
 				CreateBinaryContentRequest binaryRequest = new CreateBinaryContentRequest(
 					message.getAuthorId(),
 					messageId,
@@ -193,7 +193,7 @@ public class BasicMessageService implements MessageService {
 		}
 
 		// 메시지 삭제
-		messageRepository.delete(messageId);
+		messageRepository.delete(message.getId());
 	}
 
 }
