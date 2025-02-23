@@ -14,12 +14,13 @@ public class CommonErrorResponse {
   private String errorCode;
 
   public static ResponseEntity<CommonErrorResponse> toResponseEntity(ErrorCode e) {
+    HttpStatus eStatus = e.getStatus();
     return ResponseEntity
-        .status(e.getStatus())
+        .status(eStatus)
         .body(CommonErrorResponse.builder()
-            .status(e.getStatus().value())
+            .status(eStatus.value())
             .message(e.getMessage())
-            .errorCode(e.getStatus().getReasonPhrase())
+            .errorCode(eStatus.getReasonPhrase())
             .build());
   }
   // 결과 예시 : {"status":400,"message":"잘못된 요청입니다.","errorCode":"BAD_REQUEST"}

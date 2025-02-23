@@ -77,12 +77,11 @@ public class JCFUserService implements UserService {
         //if (!userRepository.existsById(userId)) throw new NotFoundId();
 
         userRepository.findById(userId)
-            .map(user -> {
-                userRepository.delete(userId);
+            .ifPresentOrElse(user -> {
                 profileService.deleteById(user.getProfileImgId());
                 userStatusService.deleteByUserId(userId);
-                return null;
-            }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+                userRepository.delete(userId);
+            }, () -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
         //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
@@ -90,10 +89,11 @@ public class JCFUserService implements UserService {
     @Override
     public void isDuplicateNameEmail(String name, String email) {
         List<User> allUser = userRepository.findAll();
-        boolean isDuplicateName = allUser.stream().anyMatch(user -> user.getName().equals(name));
+        boolean isDuplicateName = allUser.stream()
+            .anyMatch(user -> name.equals(user.getName()));
         if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
-        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> user.getEmail().equals(email));
+        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
         if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 }

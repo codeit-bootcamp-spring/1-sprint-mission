@@ -12,6 +12,7 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,7 @@ public class JCFMessageService implements MessageService {
         Message updatingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
         updatingMessage.setContent(updateDto.newContent());
+        updatingMessage.setUpdateAt(Instant.now());
         messageRepository.save(updatingMessage);
     }
 

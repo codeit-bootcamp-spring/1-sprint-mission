@@ -1,6 +1,7 @@
 package com.sprint.mission.dto.request;
 
 import com.sprint.mission.entity.main.User;
+import java.time.Instant;
 
 public record UserDtoForUpdate(
     String newName,
@@ -11,6 +12,7 @@ public record UserDtoForUpdate(
     user.setName(newName);
     user.setPassword(newPassword);
     user.setEmail(newEmail);
+    user.setUpdateAt(Instant.now());
     return user;
   }
 }

@@ -7,10 +7,12 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserStatusService {
@@ -46,11 +48,11 @@ public class UserStatusService {
   // 이건 DTO가 필요없는거 같은데
   //[ ] userId 로 특정 User의 객체를 업데이트합니다.
   // ??? 오타인걸로 생각 userstatus 업데이트
-  public void updateByUserId(UUID userId) {
+  public UserStatus updateByUserId(UUID userId) {
     UserStatus updatingUserStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
     updatingUserStatus.update();
-    userStatusRepository.save(updatingUserStatus);
+    return userStatusRepository.save(updatingUserStatus);
   }
 
   public void delete(UUID statusId) {
@@ -65,16 +67,18 @@ public class UserStatusService {
     userStatusRepository.deleteByUserId(userId);
   }
 
-  public Map<User, UserStatus> findStatusMapByUserList() {
-    Map<User, UserStatus> userStatusMap = new HashMap<>();
-    userRepository.findAll().stream()
-        .map((user) -> {
-          Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
-          userStatus.ifPresent((status) -> {
-            userStatusMap.put(user, status);
+  public Map<User, Boolean> findStatusMapByUserList() {
+    Map<User, Boolean> userStatusMap = new HashMap<>();
+    userRepository.findAll().forEach((user) -> {
+      Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
+      userStatus.ifPresentOrElse(status ->
+          {
+            userStatusMap.put(user, status.isOnline());
+          },
+          () -> {
+            userStatusMap.put(user, false);
           });
-          return null;
-        });
+    });
     return userStatusMap;
   }
 };

@@ -38,17 +38,17 @@ public class UserController {
   }
 
   @RequestMapping(path = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> update(@RequestParam("userId") UUID userId,
-      @RequestPart("dto") UserDtoForUpdate requestDTO) {
+  public ResponseEntity<UserDtoForUpdate> update(@RequestParam("userId") UUID userId,
+      @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
 
     userService.update(userId, requestDTO);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body("Successfully updated");
+        .body(requestDTO);
   }
 
 
-  @RequestMapping("userId")
+  @RequestMapping("delete")
   public ResponseEntity<Void> delete(@RequestParam("userId") UUID userId) {
     userService.delete(userId);
     return ResponseEntity
@@ -58,7 +58,7 @@ public class UserController {
 
   @RequestMapping("updateStatusByUserId")
   public ResponseEntity<String> updateStatusByUserId(@RequestParam("userId") UUID userId) {
-    userStatusService.updateByUserId(userId);
+    UserStatus userStatus = userStatusService.updateByUserId(userId);
     return ResponseEntity
         .status(HttpStatus.OK)
         .body("Successfully updated");
@@ -67,11 +67,11 @@ public class UserController {
 
   @RequestMapping("findAll")
   public ResponseEntity<List<FindUserDto>> findAll() {
-    Map<User, UserStatus> statusMapByUser = userStatusService.findStatusMapByUserList();
-
+    Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
+    log.info("statusMapByUser : {}", statusMapByUser);
     List<FindUserDto> findUserDtos = statusMapByUser.keySet().stream()
         .map(user -> {
-          return FindUserDto.fromEntityAndStatus(user, statusMapByUser.get(user).isOnline());
+          return FindUserDto.fromEntityAndStatus(user, statusMapByUser.get(user));
         }).toList();
 
     return ResponseEntity
