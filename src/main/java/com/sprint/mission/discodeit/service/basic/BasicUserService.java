@@ -1,148 +1,138 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.time.Instant;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-/**
- * defines Basic as cache + DBMS
- * data load + implementation CRUD
- */
+@RequiredArgsConstructor
+@Service
 public class BasicUserService implements UserService {
-    private static BasicUserService instance;
-    private Map<UUID, User> UserList;
-    public BasicUserService() {
-        this.UserList = new HashMap<>();
-    }
-    public static BasicUserService getInstance() {
-        if (instance == null) {
-            instance = new BasicUserService();
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
+
+    @Override
+    public User createUser(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+        String username = userCreateRequest.username();
+        String email = userCreateRequest.email();
+
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException(email + " already exists");
         }
-        return instance;
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException(username + " already exists");
+        }
+
+        UUID profileId = profileCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+        String password = userCreateRequest.password();
+
+        User user = new User(username, email, password, profileId);
+        User createdUser = userRepository.save(user);
+
+        Instant now = Instant.now();
+        UserStatus userStatus = new UserStatus(createdUser.getId(), now);
+        userStatusRepository.save(userStatus);
+
+        return createdUser;
     }
 
     @Override
-    public void createUser(User user) {
-        UserList.put(user.getId(), user);
-    }
-    /*
-     * To Maximize advantage of HashMap,
-     * Using get method is appropriate.
-     */
-    @Override // Read Information of User using UUID
-    public User readUserById(UUID userId) {
-        return UserList.get(userId);
+    public UserDto readUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .map(this::toDto)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
     }
 
-
-    /**
-     *
-     * applied reflection for extension(member field feature update)
-     */
     @Override
-    public void updateUserField(UUID userId, String fieldName, String contents) {
-        String filePath = "/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/properties/UpdatableUserField.txt";
-        //String filePath = "../../properties/UpdatableUserField.txt"; //if set up file path like this, it doesn't work
-        User user = UserList.get(userId);
-        if (user == null) {
-            System.out.println("User doesn't exist!");
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String existingFieldName;
-            while ((existingFieldName = br.readLine()) != null) {
-                if (existingFieldName.equals(fieldName)) {
-
-                    Method setterMethod = user.getClass().getMethod("set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1), String.class);
-                    setterMethod.invoke(user, contents);
-                    user.setUpdatedAt();
-                    break;
-                }
-            }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public List<UserDto> readAll() {
+        return userRepository.readAllContents()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
+    @Override
+    public User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+
+        String newUsername = userUpdateRequest.newUsername();
+        String newEmail = userUpdateRequest.newEmail();
+        if (userRepository.existsByEmail(newEmail)) {
+            throw new IllegalArgumentException("User with email " + newEmail + " already exists");
+        }
+        if (userRepository.existsByUsername(newUsername)) {
+            throw new IllegalArgumentException("User with username " + newUsername + " already exists");
+        }
+
+        UUID nullableProfileId = optionalProfileCreateRequest
+                .map(profileRequest -> {
+                    Optional.ofNullable(user.getProfileId())
+                            .ifPresent(binaryContentRepository::deleteById);
+
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
+        String newPassword = userUpdateRequest.newPassword();
+        user.update(newUsername, newEmail, newPassword, nullableProfileId);
+
+        return userRepository.save(user);
+    }
 
     @Override
     public void deleteUserById(UUID userId) {
-        User user = UserList.remove(userId);
-        Map<UUID, Channel> chList = BasicChannelService.getInstance().getChannelList();
-/** refactor: apply Stream API instead of for-each
- for (UUID channelId : user.getAttending()) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException(userId + " not found"));
 
- Channel channel = channelService.readChannelInfo(channelId);
- if (channel != null) {
- chList.remove(userId);
- }
- } //channel attendance deletion
+        Optional.ofNullable(user.getProfileId())
+                .ifPresent(binaryContentRepository::deleteById);
+        userStatusRepository.deleteById(userId);
 
- */
-
-
-
-        user.getAttending().forEach(channelId -> {
-            Channel channel = BasicChannelService.getInstance().readChannelInfo(channelId);
-            if (channel != null) {
-                channel.getChannelMessageList().removeIf(msg -> msg.getWriter().equals(userId));
-            }
-        }); //deletion message as source of channel(Channel class's message related props)
-
-
-
-        user.getAttending().forEach(channelId -> {
-            Channel channel = BasicChannelService.getInstance().readChannelInfo(channelId);
-            if (channel != null) {
-                channel.getChannelUserList().removeIf(usr -> usr.getId().equals(userId));
-            }
-        }); //deletion user as participant of channel (Channel class's user related props)
-
-
-        chList.entrySet()
-                .removeIf(entry -> entry
-                        .getValue()
-                        .getOwner()
-                        .equals(userId));
-        //deletion user's channel.
-
-        List<Message> msgList = BasicMessageService.getInstance().getMessageList();
-        msgList =  msgList.stream()
-                .filter(msg -> !msg
-                        .getWriter()
-                        .equals(userId)
-                ).collect(Collectors.toList());
-        //deletion user's message
-
-
+        userRepository.deleteById(userId);
     }
 
+    private UserDto toDto(User user) {
+        Boolean online = userStatusRepository.findById(user.getId())
+                .map(UserStatus::isOnline)
+                .orElse(null);
 
-    @Override
-    public Map<UUID, User> getUserList() {
-        return UserList;
-    }
-
-    public void setUserList(Map<UUID, User> userList) {
-        this.UserList = userList;
-    }
-
-    public void printing() {
-        UserList.entrySet().stream()
-                .map(entry->entry.getValue().toString())
-                .forEach(s -> System.out.println(s));
+        return new UserDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getAlias(),
+                user.getEmail(),
+                user.getProfileId(),
+                online
+        );
     }
 }

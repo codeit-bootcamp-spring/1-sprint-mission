@@ -1,81 +1,93 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
+@Service
 public class BasicMessageService implements MessageService {
-    private static BasicMessageService instance;
-    private List<Message> messageList;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    private BasicMessageService() {
-        this.messageList = new ArrayList<>();
-    }
+    @Override
+    public Message createMessage(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+        UUID channelId = messageCreateRequest.channelId();
+        UUID authorId = messageCreateRequest.authorId();
 
-    public static BasicMessageService getInstance() {
-        if (instance == null) {
-            instance = new BasicMessageService();
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException(channelId + " does not exist");
         }
-        return instance;
-    }
-    @Override
-    public List<Message> getMessageList() {
-        return messageList;
-    }
-
-    public void setMessageList(List<Message> messageList) {
-        this.messageList = messageList;
-    }
-
-    @Override
-    public void createMessage(Message message) {
-        messageList.add(message);
-        BasicChannelService.getInstance().getChannelList().get(message.getSource()).getChannelMessageList().add(message);
-    }
-
-
-
-    @Override
-    public void updateMessageById(UUID messageId, String contents) {
-        Message messageForUpdate = messageList.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst()
-                .get();
-        messageForUpdate.setContents(contents);
-        messageForUpdate.setUpdatedAt();
-    }
-    @Override //delete message -> related class : BasicMessage, channel
-    public void deleteMessage(UUID messageId) {
-        //messageList.removeIf(msg -> msg.getId().equals(messageId));
-
-        Message messageForDelete = messageList.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst()
-                .get();
-
-
-
-        List<Message> mesgList = BasicChannelService.getInstance().getChannelList().get(messageForDelete.getSource()).getChannelMessageList();
-
-        //traverse in range of msgList is better than messageList...
-        Message ch_msg = mesgList.stream()
-                .filter(message -> message.getId().equals(messageId))
-                .findFirst().orElse(null);
-
-        if (ch_msg != null) {
-            mesgList.remove(ch_msg);
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException(authorId + " does not exist");
         }
 
-        messageList.remove(messageForDelete);
+        List<UUID> attachmentIds = new ArrayList<>();
+
+        binaryContentCreateRequests.stream().forEach(attachmentRequest -> {
+            String fileName = attachmentRequest.fileName();
+            String contentType = attachmentRequest.contentType();
+            byte[] bytes = attachmentRequest.bytes();
+
+            BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+            BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+            attachmentIds.add(createdBinaryContent.getId());
+        });
+
+        String content = messageCreateRequest.content();
+        Message message = new Message(
+                content,
+                channelId,
+                authorId,
+                attachmentIds
+        );
+        return messageRepository.save(message);
     }
 
-    public void printing() {
-        messageList.stream()
-                .map(msg->msg.toString())
-                .forEach(s -> System.out.println(s));
+    @Override
+    public Message readMessageById(UUID messageId) {
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+    }
+
+    @Override
+    public List<Message> readAllByChannelId(UUID channelId) {
+        return messageRepository.findAllByChannelId(channelId);
+    }
+
+    @Override
+    public Message updateMessageField(UUID messageId, MessageUpdateRequest request) {
+        String newContent = request.newContent();
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException(messageId + " not found"));
+        message.update(newContent);
+        return messageRepository.save(message);
+    }
+
+    @Override
+    public void deleteMessageById(UUID messageId) {
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NoSuchElementException(messageId + " not found"));
+
+        message.getAttachmentIds()
+                .forEach(binaryContentRepository::deleteById);
+
+        messageRepository.deleteById(messageId);
     }
 }
