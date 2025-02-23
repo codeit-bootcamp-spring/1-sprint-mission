@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.config.RepositoryProperties;
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
@@ -28,8 +27,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent save(CreateBinaryContentDto createBinaryContentDto) {
-        BinaryContent binaryContent = new BinaryContent(createBinaryContentDto.binaryImage(), createBinaryContentDto.createdAt());
+    public BinaryContent save(BinaryContent binaryContent) {
         Path binarayContentPath = directory.resolve(binaryContent.getId().concat(extension));
         FileService.save(binarayContentPath, binaryContent);
         return binaryContent;
