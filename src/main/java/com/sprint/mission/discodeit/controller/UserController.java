@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,13 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public String showUserList(Model model) {
+        List<UserResponse> users = userService.findAll();
+        model.addAttribute("users", users);
+        return "userList";
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> create(@RequestBody UserCreateRequest userCreateRequest,

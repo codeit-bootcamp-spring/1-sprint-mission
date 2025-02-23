@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 목록</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="title">사용자 목록</div>
+    <div class="user-list">
+        <div class="user" th:each="user : ${users}">
+<!--            <img th:src="@{${user.imageUrl}}" alt="User Image">-->
+            <div class="user-info">
+                <div>
+                    <div th:text="${user.name}"></div>
+                    <div th:text="${user.email}"></div>
+                </div>
+                <div class="status"
+                     th:classappend="${user.onlineStatus.toString() == 'ONLINE' ? 'online' : 'offline'}"
+                     th:text="${user.onlineStatus.toString() == 'ONLINE' ? '온라인' : '오프라인'}"></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
