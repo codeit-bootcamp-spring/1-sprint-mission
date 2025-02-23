@@ -24,12 +24,15 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public UserResponseDto login(UserLoginDto userLoginDto) throws CustomException {
-        User user = userRepository.findById(userLoginDto.username());
+        if(userLoginDto==null || userLoginDto.username()==null || userLoginDto.password()==null) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
+        }
+        User user = userRepository.findByUsername(userLoginDto.username());
         if(user == null || !user.getPassword().equals(userLoginDto.password()) ) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         // 이것도 마찬가지로 어할 수 없는 값이라 이 방식을 쓰면 안되는지?
-        UserStatusResponseDto userStatusDto = userStatusService.updateByUserId(user.getId(), new UpdateUserStatusDto(user.getId(), Instant.now()));
+        UserStatusResponseDto userStatusDto = userStatusService.updateByUserId(user.getId(), new UpdateUserStatusDto( Instant.now()));
 
         return UserResponseDto.from(user, userStatusDto.isOnline());
     }
