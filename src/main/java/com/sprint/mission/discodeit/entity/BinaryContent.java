@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.binaryContentDto.CreateBinaryContentResponseDto;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentResponseDto;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 

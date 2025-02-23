@@ -1,9 +1,9 @@
 
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
-import com.sprint.mission.discodeit.dto.userDto.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;

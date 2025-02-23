@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.dto.messageDto.FindMessageResponseDto;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 

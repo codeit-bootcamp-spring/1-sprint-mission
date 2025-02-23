@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.messageDto;
+package com.sprint.mission.discodeit.dto.message;
 
 import org.springframework.web.multipart.MultipartFile;
 

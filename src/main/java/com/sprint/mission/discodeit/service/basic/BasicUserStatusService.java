@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatusDto.FindUserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;

@@ -1,6 +1,5 @@
-package com.sprint.mission.discodeit.dto.userDto;
+package com.sprint.mission.discodeit.dto.user;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

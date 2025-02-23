@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.event;
 
-import com.sprint.mission.discodeit.dto.messageDto.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;

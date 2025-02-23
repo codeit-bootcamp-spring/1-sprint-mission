@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 
 import java.util.Comparator;
 import java.util.List;

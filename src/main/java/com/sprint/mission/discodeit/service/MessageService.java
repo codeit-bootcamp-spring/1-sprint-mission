@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.messageDto.CreateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.messageDto.FindMessageResponseDto;
-import com.sprint.mission.discodeit.dto.messageDto.UpdateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 
 import java.io.IOException;
 import java.util.List;

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContentDto.CreateBinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
-import com.sprint.mission.discodeit.dto.userDto.UpdateUserRequestDto;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.UserDeletedEvent;
@@ -151,21 +151,18 @@ public class BasicUserService implements UserService {
 
         String emailString = email.toString();
 
-        // userRepository에서 가져온 Map에서 email만 추출하여 List 형태로 저장
-        List<String> emails = userRepository.load().values().stream()
+        // 가입된 이메일일 경우 true 반환
+        return userRepository.load().values().stream()
                 .map(user -> user.getEmail().toString())
-                .toList();
-
-        return emails.contains(email.toString());    // 가입된 이메일일 경우 true 반환
+                .anyMatch(emailString::equals);
     }
 
     // 동일 이름 존재 여부 확인
     private boolean checkIsNameExist(String name) {
 
-        List<String> names = userRepository.load().values().stream()
+        // 가입된 이름일 경우 true 반환
+        return userRepository.load().values().stream()
                 .map(User::getName)
-                .toList();
-
-        return names.contains(name);    // 가입된 이름일 경우 true 반환
+                .anyMatch(name::equals);
     }
 }

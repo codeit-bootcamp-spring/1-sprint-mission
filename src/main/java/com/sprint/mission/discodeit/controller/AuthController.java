@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.authDto.LoginRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.auth.LoginRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

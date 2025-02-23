@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.readStatusDto.CreateReadStatusRequestDto;
-import com.sprint.mission.discodeit.dto.readStatusDto.FindReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusRequestDto;
+import com.sprint.mission.discodeit.dto.readStatus.FindReadStatusResponseDto;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.userDto.CreateUserRequestDto;
-import com.sprint.mission.discodeit.dto.userDto.FindUserResponseDto;
-import com.sprint.mission.discodeit.dto.userDto.UpdateUserRequestDto;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
 
 import java.io.IOException;
 import java.util.List;
