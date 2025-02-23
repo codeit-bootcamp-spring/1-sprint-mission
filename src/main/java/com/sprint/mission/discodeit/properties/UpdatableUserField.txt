@@ -1,3 +1,0 @@
-passWord
-email
-alias
