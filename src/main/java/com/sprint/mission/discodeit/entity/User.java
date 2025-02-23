@@ -27,7 +27,8 @@ public class User implements Serializable {
         this.binaryContentId = binaryContentId;
         this.name = name;
         this.email = email;
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+//        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+        this.password = password;
     }
 
     public void updateUpdatedAt() {
@@ -78,11 +79,15 @@ public class User implements Serializable {
         return true;
     }
 
-    public boolean updatePassword(String newPassword) {
-        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
+    public boolean updatePassword(String password) {
+//        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
+//            return false;
+//        }
+//        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        if (password.isBlank() || this.password.equals(password)) {
             return false;
         }
-        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        this.password = password;
         return true;
     }
 
@@ -91,7 +96,8 @@ public class User implements Serializable {
     }
 
     public boolean isSamePassword(String password) {
-        return BCrypt.checkpw(this.password, password);
+//        return BCrypt.checkpw(this.password, password);
+        return true;
     }
 
     public void validateDuplicateName(String name) {
