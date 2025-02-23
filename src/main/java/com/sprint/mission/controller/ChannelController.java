@@ -58,15 +58,6 @@ public class ChannelController {
             .body("수정 완료");
     }
 
-    @RequestMapping(path = "delete")
-    public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
-        channelService.delete(channelId);
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
-    }
-
-
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @RequestMapping(path = "findAllByUserId")
     public ResponseEntity<List<FindChannelAllDto>> findAllByUserId(
@@ -78,6 +69,15 @@ public class ChannelController {
             .status(HttpStatus.OK)
             .body(channelDtoList);
     }
+
+    @RequestMapping(path = "delete")
+    public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
+        channelService.delete(channelId);
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
+    }
+
 
     /**
      * 응답 DTO (타입별)

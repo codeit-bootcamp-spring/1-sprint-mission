@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
@@ -30,7 +31,7 @@ public class MessageController {
   private final JCFMessageService messageService;
 
   @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> save(@RequestPart("dto") MessageDtoForCreate requestDTO,
+  public ResponseEntity<String> create(@RequestPart("messageCreateDto") MessageDtoForCreate requestDTO,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     Optional<List<BinaryContentDto>> binaryContentDtoList =  attachments == null || attachments.isEmpty()
@@ -51,6 +52,7 @@ public class MessageController {
   public ResponseEntity<List<FindMessageDto>> findInChannel(
       @RequestParam("channelId") UUID channelId) {
     List<Message> messageList = messageService.findAllByChannelId(channelId);
+    log.info("Attachments: {}", messageList.get(0).getAttachmentIdList());
     List<FindMessageDto> dtoList = messageList.stream()
         .map(FindMessageDto::fromEntity).toList();
 
@@ -59,7 +61,7 @@ public class MessageController {
         .body(dtoList);
   }
 
-  @RequestMapping("message/{id}")
+  @RequestMapping("update")
   public ResponseEntity<String> update(@PathVariable("id") UUID messageId,
       @RequestBody MessageDtoForUpdate requestDTO) {
     messageService.update(messageId, requestDTO);
@@ -69,8 +71,8 @@ public class MessageController {
   }
 
 
-  @DeleteMapping("messages/{id}")
-  public ResponseEntity<String> delete(@PathVariable("id") UUID messageId) {
+  @RequestMapping("delete")
+  public ResponseEntity<String> delete(@RequestParam("messageId") UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.ok("Successfully deleted");
   }

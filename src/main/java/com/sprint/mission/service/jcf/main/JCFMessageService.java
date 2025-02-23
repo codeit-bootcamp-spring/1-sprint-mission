@@ -43,7 +43,9 @@ public class JCFMessageService implements MessageService {
 
         Message createdMessage = responseDto.toEntity();
 
-        if (!attachmentsDto.isEmpty()) {
+        List<BinaryContentDto> bcdList = attachmentsDto.orElse(Collections.emptyList());
+        log.info("attachmentsDto: {}", bcdList);
+        if (!bcdList.isEmpty()) {
             List<BinaryContentDto> binaryContentDtoList = attachmentsDto.get();
             for (BinaryContentDto bcd : binaryContentDtoList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
@@ -51,6 +53,7 @@ public class JCFMessageService implements MessageService {
             }
         }
 
+        log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
         //writtenChannel.updateLastMessageTime();
         //channelRepository.save(writtenChannel);
         messageRepository.save(createdMessage);
@@ -74,9 +77,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        if (channelRepository.existsById(channelId)){
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
+//        if (channelRepository.existsById(channelId)){
+//            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+//        }
 
         return messageRepository.findAllByChannel(channelId);
     }
