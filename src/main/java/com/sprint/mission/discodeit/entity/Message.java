@@ -46,4 +46,8 @@ public class Message implements Serializable {
     public boolean isSameChannelId(UUID channelId) {
         return this.channelId.equals(channelId);
     }
+
+    public boolean isSameAuthorId(UUID authorId) {
+        return this.authorId.equals(authorId);
+    }
 }

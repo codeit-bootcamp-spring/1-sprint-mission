@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
@@ -74,6 +76,52 @@ public class FileMessageRepository implements MessageRepository {
                             throw new RuntimeException(e);
                         }
                     })
+                    .toList();
+            return messages;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try {
+            List<Message> messages = Files.list(DIRECTORY)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (Message) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).filter(Objects::nonNull)
+                    .filter(message -> message.isSameChannelId(channelId))
+                    .toList();
+            return messages;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        try {
+            List<Message> messages = Files.list(DIRECTORY)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (Message) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).filter(Objects::nonNull)
+                    .filter(message -> message.isSameAuthorId(authorId))
                     .toList();
             return messages;
         } catch (IOException e) {

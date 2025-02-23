@@ -51,35 +51,32 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageResponse find(UUID messageId) {
+    public Message find(UUID messageId) {
         Message message = Optional.ofNullable(messageRepository.find(messageId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
-        return getMessageInfo(message);
+        return message;
     }
 
     @Override
-    public List<MessageResponse> findAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findAll();
-
-        if (channelId == null) {
-            return messages.stream()
-                    .map(this::getMessageInfo)
-                    .toList();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
 
-        return messages.stream()
-                .filter(message -> message.isSameChannelId(channelId))
-                .map(this::getMessageInfo)
+        return messageRepository.findAllByChannelId(channelId).stream()
                 .toList();
     }
 
     @Override
-    public MessageResponse getMessageInfo(Message message) {
-        List<byte[]> binaryContentData = message.getBinaryContentData().stream()
-                .map(binaryContentId -> binaryContentService.find(binaryContentId).getData())
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
+
+        return messageRepository.findAllByAuthorId(authorId).stream()
                 .toList();
-        return MessageResponse.from(message.getId(), message.getContent(), message.getAuthorId(), message.getChannelId(), binaryContentData);
     }
+
 
     @Override
     public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {

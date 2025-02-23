@@ -36,6 +36,18 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.data.values().stream()
+                .filter(message -> message.isSameChannelId(channelId)).toList();
+    }
+
+    @Override
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        return this.data.values().stream()
+                .filter(message -> message.isSameAuthorId(authorId)).toList();
+    }
+
+    @Override
     public void delete(UUID messageId) {
         data.remove(messageId);
     }
