@@ -32,4 +32,8 @@ public class BinaryContent implements Serializable {
     public boolean containsId(List<UUID> ids) {
         return ids.contains(this.id);
     }
+
+    public String generateImageUrl() {
+        return "/img/" + fileName;
+    }
 }

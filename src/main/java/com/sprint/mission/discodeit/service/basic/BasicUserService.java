@@ -15,7 +15,9 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -46,6 +48,7 @@ public class BasicUserService implements UserService {
         return user;
     }
 
+
     @Override
     public UserResponse find(UUID userId) {
         User user = Optional.ofNullable(userRepository.find(userId))
@@ -66,12 +69,15 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse getUserInfo(User user) {
         UUID binaryContentId = null;
+        String fileUrl = null;
         if (user.getBinaryContentId() != null) {
-            binaryContentId = binaryContentService.find(user.getBinaryContentId()).getId();
+            BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+            binaryContentId = binaryContent.getId();
+            fileUrl = binaryContent.generateImageUrl();
         }
         OnlineStatus onlineStatus = userStatusService.getOnlineStatus(user.getId());
 
-        return UserResponse.from(user, binaryContentId, onlineStatus);
+        return UserResponse.from(user, binaryContentId, fileUrl, onlineStatus);
     }
 
     @Override

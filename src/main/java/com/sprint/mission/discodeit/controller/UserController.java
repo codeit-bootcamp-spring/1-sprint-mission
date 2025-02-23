@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,10 +32,13 @@ public class UserController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<User> create(@RequestBody UserCreateRequest userCreateRequest,
-                                       @RequestBody(required = false) BinaryContentRequest binaryContentRequest) {
-        return ResponseEntity.ok(userService.create(userCreateRequest, Optional.ofNullable(binaryContentRequest)));
+    public ResponseEntity<User> create(@RequestPart UserCreateRequest userCreateRequest,
+                                       @RequestPart(required = false) MultipartFile multipartFile) {
+        Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(multipartFile)
+                .flatMap(this::resolveProfileRequest);
+        return ResponseEntity.ok(userService.create(userCreateRequest, binaryContentRequest));
     }
+
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
@@ -55,5 +60,22 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
+        if (profileFile.isEmpty()) {
+            return Optional.empty();
+        } else {
+            try {
+                BinaryContentRequest binaryContentCreateRequest = new BinaryContentRequest(
+                        profileFile.getOriginalFilename(),
+                        profileFile.getContentType(),
+                        profileFile.getBytes()
+                );
+                return Optional.of(binaryContentCreateRequest);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

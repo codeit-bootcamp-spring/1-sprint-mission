@@ -11,9 +11,10 @@ public record UserResponse(
         String name,
         String email,
         UUID binaryContentId,
+        String imageUrl,
         OnlineStatus onlineStatus
 ) {
-    public static UserResponse from(User user, UUID binaryContentId, OnlineStatus onlineStatus) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), binaryContentId, onlineStatus);
+    public static UserResponse from(User user, UUID binaryContentId, String imageUrl, OnlineStatus onlineStatus) {
+        return new UserResponse(user.getId(), user.getName(), user.getEmail(), binaryContentId, imageUrl, onlineStatus);
     }
 }

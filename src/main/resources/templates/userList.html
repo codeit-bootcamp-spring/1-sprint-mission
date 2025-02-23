@@ -12,7 +12,7 @@
     <div class="title">사용자 목록</div>
     <div class="user-list">
         <div class="user" th:each="user : ${users}">
-<!--            <img th:src="@{${user.imageUrl}}" alt="User Image">-->
+            <img th:src="@{${user.imageUrl}}" alt="User Image">
             <div class="user-info">
                 <div>
                     <div th:text="${user.name}"></div>
