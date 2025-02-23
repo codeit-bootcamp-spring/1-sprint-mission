@@ -41,17 +41,33 @@ public class BasicChannelService implements ChannelService {
     private final UserStatusService userStatusService;
 
     @Override
-    public ChannelResponseDto create(CreateChannelDto createChannelDto) {
+    public ChannelResponseDto create(CreateChannelDto createChannelDto) throws CustomException {
+
+        if(createChannelDto == null || createChannelDto.channelType() == null || createChannelDto.channelCategory() == null ) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
+        }
+
         Channel channel = channelRepository.save(new Channel(createChannelDto.channelName(), createChannelDto.channelType(), createChannelDto.channelCategory(), createChannelDto.description()));
         return ChannelResponseDto.from(channel, null, null);
     }
 
     @Override
     public ChannelResponseDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
+        if (createPrivateChannelDTo == null) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
+        }
+
         CreateChannelDto createChannelDto = createPrivateChannelDTo.createChannelDto();
+
+        if( createChannelDto == null || createChannelDto.channelType() == null ||createChannelDto.channelCategory() == null ) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
+        }
+
         Channel channel = channelRepository.save(new Channel(null, createChannelDto.channelType(), createChannelDto.channelCategory(), null));
 
-        for (String userId : createPrivateChannelDTo.userIds()) {
+        List<String> userIds = createPrivateChannelDTo.userIds().stream().distinct().toList();
+
+        for (String userId : userIds) {
             User user = userRepository.findById(userId);
             readStatusService.create(new CreateReadStatusDto(channel.getId(), userId));
             channel.getUserSet().add(user.getId());
@@ -62,13 +78,16 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponseDto> findAllByUserId(String userId) {
-        List<Channel> channels = channelRepository.findAll().stream().toList();
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
 
         List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
 
-        for(Channel channel: channels) {
+        for(Channel channel: channelRepository.findAll()) {
             //PRIVATE 채널인데, 해당 채널에 유저가 참여하고 있지 않다면 조회 결과 담지 않음
-            if(channel.getChannelType().equals(ChannelType.PRIVATE) && !channel.getUserSet().contains(userId) ) {
+            if( channel.getChannelType().equals(ChannelType.PRIVATE) && !channel.getUserSet().contains(userId) ) {
                 continue;
             }
 
@@ -146,7 +165,7 @@ public class BasicChannelService implements ChannelService {
         //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을끼?
         //대용량 서비스라면? -> 삭제 완료될 때까지 기다려야함
         messageRepository.findAllByChannelId(channelId).forEach(m-> messageRepository.delete(m.getId()));
-        readStatusService.findAllByChannelId(channelId).forEach(rs -> readStatusService.delete(rs.getId()));
+        readStatusService.findAllByChannelId(channelId).forEach(rs -> readStatusService.delete(rs.id()));
 
         return channelRepository.delete(channel);
     }
@@ -208,6 +227,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     public Instant getLastMessageTimestamp(Channel channel) throws CustomException {
+        //todo
+        //이것도 레포지토리 쪽으로 책임 넘기기
         Instant lastMessageTimestamp = messageRepository.findAllByChannelId(channel.getId()).stream()
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo).orElse(null);
