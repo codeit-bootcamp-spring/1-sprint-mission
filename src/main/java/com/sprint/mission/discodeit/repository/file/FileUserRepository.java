@@ -18,21 +18,21 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
 
-    @Value("${discodeit.repository.file-directory}")
-    private String directory;
-
-    private Path directoryPath;
+    private final Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
+    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directory, FileManager fileManager) {
+        this.fileManager = fileManager;
+        this.directoryPath = Path.of(System.getProperty("user.dir"), directory, "users");
+    }
+
     @PostConstruct
     private void init() {
-        directoryPath = Path.of(System.getProperty("user.dir"), directory, "users");
         fileManager.createDirectory(directoryPath);
     }
 
