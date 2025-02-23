@@ -15,10 +15,6 @@ java {
     }
 }
 
-war {
-    enabled = true
-    webAppDirName = 'src/main/webapp'
-}
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
