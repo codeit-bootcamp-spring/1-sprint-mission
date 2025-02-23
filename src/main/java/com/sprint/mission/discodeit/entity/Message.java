@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.constant.MessageType;
-import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import java.io.Serializable;
@@ -16,16 +15,15 @@ public class Message extends BaseEntity implements Serializable {
   private final UUID senderId;
   private UUID replyToId;
   private String content;
-  @Nullable
-  private List<BinaryContent> binaryContent;
+  private List<UUID> binaryContentIds;
   private MessageType type;
   
-  public static Message ofCommon(UUID channelId, UUID senderId, List<BinaryContent> binaryContent, String content) {
-    return new Message(channelId, senderId, null, content, binaryContent, MessageType.COMMON);
+  public static Message ofCommon(UUID channelId, UUID senderId, List<UUID> binaryContentIds, String content) {
+    return new Message(channelId, senderId, null, content, binaryContentIds, MessageType.COMMON);
   }
   
-  public static Message ofReply(UUID channelId, UUID senderId, UUID replyToId, List<BinaryContent> binaryContent, String content) {
-    return new Message(channelId, senderId, replyToId, content, binaryContent, MessageType.REPLY);
+  public static Message ofReply(UUID channelId, UUID senderId, UUID replyToId, List<UUID> binaryContentIds, String content) {
+    return new Message(channelId, senderId, replyToId, content, binaryContentIds, MessageType.REPLY);
   }
   
   public void updateContent(String content) {

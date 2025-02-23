@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
 import org.junit.jupiter.api.Test;
-
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +32,6 @@ class BasicAuthServiceTest {
     when(encryptor.getSalt()).thenReturn("randomSalt");
     when(encryptor.encryptPassword("testPassword", "randomSalt")).thenReturn("encryptedPassword");
     
-    
     User user = new User("encryptedPassword", "randomSalt", "testUser", "testEmail@gmail.com", null);
     UserStatus userStatus = new UserStatus(user.getId());
     
@@ -47,7 +45,7 @@ class BasicAuthServiceTest {
     assertNotNull(result);
     assertEquals("testUser", result.name());
     assertEquals("testEmail@gmail.com", result.email());
-    assertNull(result.profileImage());
+    assertNull(result.profileImageId());
     assertEquals(userStatus, result.status());
   }
 }

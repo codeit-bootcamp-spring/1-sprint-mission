@@ -17,19 +17,36 @@ public class BasicBinaryContentService implements BinaryContentService {
   
   @Override
   public void create(BinaryContentDto binaryContentDto) {
-    BinaryContent binaryContent = new BinaryContent(binaryContentDto.uploadedById(), binaryContentDto.type());
+    BinaryContent binaryContent = new BinaryContent(binaryContentDto.uploadedById(),
+        binaryContentDto.fileName(),
+        binaryContentDto.size(),
+        binaryContentDto.contentType(),
+        binaryContentDto.bytes());
     binaryContentRepository.save(binaryContent);
   }
   
   @Override
-  public BinaryContent findById(UUID binaryContentId) {
-    return binaryContentRepository.findById(binaryContentId)
+  public BinaryContentDto findById(UUID binaryContentId) {
+    BinaryContent binaryContent = binaryContentRepository.findById(binaryContentId)
         .orElseThrow(() -> new NoSuchElementException("binary content not found with id: " + binaryContentId));
+    return new BinaryContentDto(binaryContent.getUploadedById(),
+        binaryContent.getFileName(),
+        binaryContent.getSize(),
+        binaryContent.getContentType(),
+        binaryContent.getBytes());
+    
   }
   
   @Override
-  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds);
+  public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
+    List<BinaryContent> binaryContents = binaryContentRepository.findAllByIdIn(binaryContentIds);
+    return binaryContents.stream()
+        .map(b -> new BinaryContentDto(b.getUploadedById(),
+            b.getFileName(),
+            b.getSize(),
+            b.getContentType(),
+            b.getBytes()))
+        .toList();
   }
   
   @Override

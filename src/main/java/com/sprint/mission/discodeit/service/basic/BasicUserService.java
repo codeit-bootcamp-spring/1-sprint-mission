@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.FindUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.security.Encryptor;
@@ -38,11 +38,11 @@ public class BasicUserService implements UserService {
   }
   
   @Override
-  public void createUser(CreateUserDto createUserDto) {
-    if (userValidator.validateUser(createUserDto)) {
+  public void createUser(UserCreateRequest userCreateRequest) {
+    if (userValidator.validateUser(userCreateRequest)) {
       String salt = encryptor.getSalt();
-      String encryptedPassword = encryptor.encryptPassword(createUserDto.password(), salt);
-      User user = new User(encryptedPassword, salt, createUserDto.name(), createUserDto.email(), createUserDto.profileImage());
+      String encryptedPassword = encryptor.encryptPassword(userCreateRequest.password(), salt);
+      User user = new User(encryptedPassword, salt, userCreateRequest.name(), userCreateRequest.email(), userCreateRequest.profileImageId());
       UserStatus userStatus = new UserStatus(user.getId());
       userRepository.save(user);
       userStatusRepository.save(userStatus);
@@ -59,7 +59,7 @@ public class BasicUserService implements UserService {
     FindUserDto userDto = new FindUserDto(user.getId(),
         user.getName(),
         user.getEmail(),
-        user.getProfileImage(),
+        user.getProfileImageId(),
         status);
     
     return userDto;
@@ -73,7 +73,7 @@ public class BasicUserService implements UserService {
     FindUserDto userDto = new FindUserDto(user.getId(),
         user.getName(),
         user.getEmail(),
-        user.getProfileImage(),
+        user.getProfileImageId(),
         status);
     
     return userDto;
@@ -84,7 +84,7 @@ public class BasicUserService implements UserService {
     List<FindUserDto> userDtos = new ArrayList<>();
     userRepository.findAll().forEach(u -> {
       UserStatus status = new UserStatus(u.getId());
-      userDtos.add(new FindUserDto(u.getId(), u.getName(), u.getEmail(), u.getProfileImage(), status));
+      userDtos.add(new FindUserDto(u.getId(), u.getName(), u.getEmail(), u.getProfileImageId(), status));
     });
     return userDtos;
   }
@@ -109,14 +109,14 @@ public class BasicUserService implements UserService {
   public void updateProfileImage(UpdateUserDto updateUserDto) {
     User user = userRepository.findById(updateUserDto.id())
         .orElseThrow(() -> new NoSuchElementException("user not found with id: " + updateUserDto.id()));
-    user.updateProfileImage(updateUserDto.profileImage());
+    user.updateProfileImage(updateUserDto.profileImageId());
   }
   
   @Override
   public void remove(UUID id) {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("user not found with id: " + id));
-    binaryContentRepository.remove(user.getProfileImage().get().getId());
+    binaryContentRepository.remove(user.getProfileImageId());
     userStatusRepository.remove(id);
     userRepository.remove(id);
   }

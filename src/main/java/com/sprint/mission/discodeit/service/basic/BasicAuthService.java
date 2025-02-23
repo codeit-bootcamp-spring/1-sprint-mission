@@ -34,7 +34,7 @@ public class BasicAuthService implements AuthService {
       return new FindUserDto(user.getId(),
           user.getName(),
           user.getEmail(),
-          user.getProfileImage(),
+          user.getProfileImageId(),
           status);
     } else {
       throw new IllegalArgumentException("wrong password: " + password);
