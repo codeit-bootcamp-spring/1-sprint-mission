@@ -31,7 +31,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest userCreateRequest,
-                       Optional<BinaryContentCreateRequest> profileCreateRequestDTO) {
+                       Optional<BinaryContentCreateRequest> profileCreateRequest) {
         if (!isValidEmail(userCreateRequest.email())) {
             throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
         }
@@ -44,17 +44,21 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
         }
 
-        if(profileCreateRequestDTO.isPresent()){
-            BinaryContentCreateRequest profileData = profileCreateRequestDTO.get();
-            BinaryContent binaryContent = new BinaryContent(
-                    profileData.fileName(),
-                    profileData.contentType(),
-                    profileData.file()
-            );
-            binaryContentRepository.save(binaryContent);
-        }
+        UUID nullableProfileId = profileCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.file();
+                    BinaryContent binaryContent = new BinaryContent(fileName, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
 
-        User user = new User(userCreateRequest.userName(), userCreateRequest.email(), userCreateRequest.password());
+        User user = new User(
+                userCreateRequest.userName(),
+                userCreateRequest.email(),
+                userCreateRequest.password(),
+                nullableProfileId);
         userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
@@ -93,11 +97,11 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
         }
 
-        if (!userRepository.existsName(userUpdateRequest.newUsername())){
+        if (userRepository.existsName(userUpdateRequest.newUsername())){
             throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
         }
 
-        if(!userRepository.existsEmail(userUpdateRequest.newEmail())){
+        if(userRepository.existsEmail(userUpdateRequest.newEmail())){
             throw new IllegalArgumentException("이미 존재하는 사용자 이메일입니다.");
         }
 
@@ -120,7 +124,10 @@ public class BasicUserService implements UserService {
             throw new NoSuchElementException("유저가 존재하지 않습니다.");
         }
 
-        binaryContentRepository.deleteById(userId);
+        if (binaryContentRepository.existsId(userId)) {
+            binaryContentRepository.deleteById(userId);
+        }
+
         userStatusRepository.deleteByUserId(userId);
         userRepository.delete(userId);
     }

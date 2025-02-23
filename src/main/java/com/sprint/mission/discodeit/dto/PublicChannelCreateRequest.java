@@ -5,5 +5,4 @@ import java.util.UUID;
 public record PublicChannelCreateRequest(
         String channelName,
         UUID adminId
-) {
-}
+) {}

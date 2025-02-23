@@ -25,10 +25,10 @@ public class BasicUserStatusService implements UserStatusService {
         UUID userId = request.userId();
 
         if (!userRepository.existsId(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " does not exist");
+            throw new NoSuchElementException("유저가 존재하지 않습니다.");
         }
         if (userStatusRepository.findByUserId(userId).isPresent()) {
-            throw new IllegalArgumentException("UserStatus with id " + userId + " already exists");
+            throw new IllegalArgumentException("유저상태가 존재하지 않습니다.");
         }
 
         Instant lastActiveAt = request.lastActiveAt();
@@ -39,7 +39,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatus find(UUID userStatusId) {
         return userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class BasicUserStatusService implements UserStatusService {
         Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
         userStatus.update(newLastActiveAt);
 
         return userStatusRepository.save(userStatus);
@@ -64,7 +64,7 @@ public class BasicUserStatusService implements UserStatusService {
         Instant newLastActiveAt = request.newLastActiveAt();
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
         userStatus.update(newLastActiveAt);
 
         return userStatusRepository.save(userStatus);
@@ -73,7 +73,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public void delete(UUID userStatusId) {
         if (!userStatusRepository.existsId(userStatusId)) {
-            throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
+            throw new NoSuchElementException("유저상태가 존재하지 않습니다.");
         }
         userStatusRepository.deleteById(userStatusId);
     }

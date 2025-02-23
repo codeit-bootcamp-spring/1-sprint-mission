@@ -44,7 +44,7 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(privateChannelCreateRequest.adminId())
                 .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-        if (!channelRepository.existsName(privateChannelCreateRequest.channelName())){
+        if (channelRepository.existsName(privateChannelCreateRequest.channelName())){
             throw new IllegalArgumentException("이미 존재하는 채널 이름입니다.");
         }
 

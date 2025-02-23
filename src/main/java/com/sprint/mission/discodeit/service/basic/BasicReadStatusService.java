@@ -27,15 +27,15 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID userId = request.userId();
         UUID channelId = request.channelId();
 
-        if (!userRepository.existsId(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " does not exist");
+        if (userRepository.existsId(userId)) {
+            throw new NoSuchElementException("유저가 존재하지 않습니다.");
         }
-        if (!channelRepository.existsId(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+        if (channelRepository.existsId(channelId)) {
+            throw new NoSuchElementException("채널이 존재하지 않습니다.");
         }
         if (readStatusRepository.findAllByUserId(userId).stream()
                 .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
-            throw new IllegalArgumentException("ReadStatus with userId " + userId + " and channelId " + channelId + " already exists");
+            throw new IllegalArgumentException("이미 존재합니다.");
         }
 
         Instant lastReadAt = request.lastReadAt();
@@ -46,7 +46,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus find(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("수신정보가 존재하지 않습니다."));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new NoSuchElementException("수신정보가 존재하지 않습니다."));
         readStatus.update(newLastReadAt);
         return readStatusRepository.save(readStatus);
     }
@@ -67,7 +67,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsId(readStatusId)) {
-            throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
+            throw new NoSuchElementException("수신정보가 존재하지 않습니다.");
         }
         readStatusRepository.deleteById(readStatusId);
     }
