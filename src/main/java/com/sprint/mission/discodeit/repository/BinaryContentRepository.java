@@ -17,4 +17,8 @@ public interface BinaryContentRepository {
     boolean existsById(UUID id);
 
     void deleteById(UUID id);
+
+    Optional<BinaryContent> getBinaryContentById(UUID id);
+
+    List<BinaryContent> getBinaryContentListByIds(List<UUID> ids);
 }
