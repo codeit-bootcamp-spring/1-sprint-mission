@@ -102,16 +102,13 @@ public class JCFChannelService implements ChannelService {
 
   @Override
   public void delete(UUID channelId) {
-    if (channelRepository.existsById(channelId)) {
-      throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-    }
+    Channel deletingChannel = channelRepository.findById(channelId)
+        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-    if (readStatusRepository.existsById(channelId)) {
-      throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS_MATCHING_CHANNEL);
+    if (deletingChannel.getChannelType().equals(ChannelType.PRIVATE)){
+      readStatusRepository.deleteAllByChannelId(channelId);
     }
-
     messageService.deleteAllByChannelId(channelId);
-    readStatusRepository.deleteAllByChannelId(channelId);
     channelRepository.delete(channelId);
   }
 

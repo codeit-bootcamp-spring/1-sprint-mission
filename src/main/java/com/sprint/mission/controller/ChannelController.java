@@ -58,7 +58,7 @@ public class ChannelController {
             .body("수정 완료");
     }
 
-    @RequestMapping(path = "find")
+    @RequestMapping(path = "delete")
     public ResponseEntity<Void> delete(@RequestParam("channelId") UUID channelId) {
         channelService.delete(channelId);
         return ResponseEntity

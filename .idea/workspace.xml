@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPrivateChannelDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindPublicChannelDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ChannelController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,9 +99,9 @@
       <recent name="C:\1-sprint-mission\test\java\com\sprint\mission" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.sprint.mission.dto.request" />
       <recent name="com.sprint.mission.service" />
       <recent name="com.sprint.mission.controller" />
-      <recent name="com.sprint.mission.dto.request" />
       <recent name="com.sprint.mission.entity.main" />
     </key>
   </component>
@@ -144,7 +144,7 @@
       <workItem from="1740103378015" duration="3844000" />
       <workItem from="1740111021062" duration="12069000" />
       <workItem from="1740142458624" duration="8259000" />
-      <workItem from="1740284643612" duration="4932000" />
+      <workItem from="1740284643612" duration="5991000" />
     </task>
     <servers />
   </component>
