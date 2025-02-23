@@ -6,11 +6,13 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 
+@Slf4j
 public record BinaryContentDto (
     String fileName,
     String contentType,
@@ -21,7 +23,8 @@ public record BinaryContentDto (
     }
 
     public static Optional<BinaryContentDto> fileToBinaryContentDto(MultipartFile file) {
-        if (file.isEmpty()) {
+        log.info("file : {}", file);
+        if (file == null || file.isEmpty()) {
             return Optional.empty();
         }
         try {

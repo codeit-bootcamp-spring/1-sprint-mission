@@ -28,13 +28,13 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
-      @RequestPart("profile") MultipartFile profile) {
+  public ResponseEntity<User> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) {
     Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
-    userService.create(requestDTO, binaryContentDto);
+    User user = userService.create(requestDTO, binaryContentDto);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body("User created successfully");
+        .body(user);
   }
 
   @RequestMapping(path = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

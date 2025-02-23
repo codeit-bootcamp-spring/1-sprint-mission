@@ -31,9 +31,9 @@ public class MessageController {
 
   @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<String> save(@RequestPart("dto") MessageDtoForCreate requestDTO,
-      @RequestPart("attachments") List<MultipartFile> attachments) {
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    Optional<List<BinaryContentDto>> binaryContentDtoList = attachments.isEmpty()
+    Optional<List<BinaryContentDto>> binaryContentDtoList =  attachments == null || attachments.isEmpty()
         ? Optional.empty()
         : Optional.of(attachments.stream()
             .map(BinaryContentDto::fileToBinaryContentDto)
