@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 import java.util.UUID;
 
 public record MessageRequest() {

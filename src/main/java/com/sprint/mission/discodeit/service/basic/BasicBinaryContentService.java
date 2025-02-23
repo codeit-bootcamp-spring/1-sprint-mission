@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
@@ -12,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,46 +24,54 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent createUserProfileFile(MultipartFile file, UUID userId) {
+    public BinaryContentResponse createUserProfileFile(MultipartFile file, UUID userId) {
         BinaryContent newFile = BinaryContent.createBinaryContent(
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.USER, userId
         );
         log.info("Create User Profile : {}", newFile);
-        return binaryContentRepository.save(newFile);
+        BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
+        return BinaryContentResponse.entityToDto(newBinaryContent);
     }
 
     @Override
-    public BinaryContent createMessageFile(MultipartFile file, UUID messageId) {
+    public BinaryContentResponse createMessageFile(MultipartFile file, UUID messageId) {
         BinaryContent newFile = BinaryContent.createBinaryContent(
                 file.getName(), file.getContentType(), convertToBytes(file),
                 BinaryContent.ParentType.MESSAGE, messageId
         );
         log.info("Create Message Files : {}", newFile);
-        return binaryContentRepository.save(newFile);
+        BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
+        return BinaryContentResponse.entityToDto(newBinaryContent);
     }
 
     @Override
-    public BinaryContent updateUserProfileFile(MultipartFile file, UUID userId) {
+    public BinaryContentResponse updateUserProfileFile(MultipartFile file, UUID userId) {
         binaryContentRepository.deleteByUserId(userId);
         return createUserProfileFile(file, userId);
     }
 
     @Override
-    public BinaryContent findByIdOrThrow(UUID id) {
-        return binaryContentRepository.findById(id)
+    public BinaryContentResponse findByIdOrThrow(UUID id) {
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "id :" + id));
+        return BinaryContentResponse.entityToDto(binaryContent);
     }
 
     @Override
-    public BinaryContent findByUserIdOrThrow(UUID userId) {
-        return binaryContentRepository.findByUserId(userId)
-                .orElseThrow(() -> new RestApiException(ErrorCode.BINARY_CONTENT_NOT_FOUND, "userId :" + userId));
+    public BinaryContentResponse findByUserId(UUID userId) {
+        BinaryContent binaryContent = binaryContentRepository.findByUserId(userId).orElse(null);
+        if (binaryContent != null) {
+            return BinaryContentResponse.entityToDto(binaryContent);
+        }
+        return null;
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return ids.stream().map(this::findByIdOrThrow).collect(Collectors.toList());
+    public List<BinaryContentResponse> findAllByIdIn(List<UUID> ids) {
+        return ids.stream()
+                .map(this::findByIdOrThrow)
+                .collect(Collectors.toList());
     }
 
     @Override

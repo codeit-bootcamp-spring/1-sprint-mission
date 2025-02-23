@@ -1,10 +1,13 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import lombok.AccessLevel;
+import lombok.Builder;
 
 import java.time.Instant;
 import java.util.UUID;
 
+@Builder(access = AccessLevel.PRIVATE)
 public record ReadStatusResponse(
         UUID id,
         Instant createdAt,
@@ -13,12 +16,12 @@ public record ReadStatusResponse(
         UUID channelId
 ) {
     public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
-        return new ReadStatusResponse(
-                readStatus.getId(),
-                readStatus.getCreatedAt(),
-                readStatus.getUpdatedAt(),
-                readStatus.getUserId(),
-                readStatus.getChannelId()
-        );
+        return ReadStatusResponse.builder()
+                .id(readStatus.getId())
+                .userId(readStatus.getUserId())
+                .channelId(readStatus.getChannelId())
+                .createdAt(readStatus.getCreatedAt())
+                .updatedAt(readStatus.getUpdatedAt())
+                .build();
     }
 }

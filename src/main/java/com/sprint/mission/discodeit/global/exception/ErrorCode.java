@@ -36,7 +36,8 @@ public enum ErrorCode {
     BINARY_CONTENT_NOT_FOUND(HttpStatus.NOT_FOUND, "BINARY001", "해당 파일이 존재하지 않습니다."),
 
     // READ_STATUS
-    READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ_STATUS001", "해당 수신 상태가 존재하지 않습니다.."),
+    READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ_STATUS001", "해당 수신 상태 정보가 존재하지 않습니다."),
+    READ_IS_ALREADY_EXIST(HttpStatus.NOT_FOUND, "READ_STATUS002", "수신 상태 정보가 이미 존재합니다."),
 
     // USER_STATUS
     USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_STATUS001", "해당 사용자 상태가 존재하지 않습니다.");

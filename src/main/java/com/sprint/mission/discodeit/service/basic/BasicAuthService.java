@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -35,7 +36,7 @@ public class BasicAuthService implements AuthService {
         }
         log.info("user login : {}", findUser.getId());
         UserStatus loginUserStatus = userStatusService.findByUserId(findUser.getId());
-        BinaryContent loginUserProfile = binaryContentService.findByUserIdOrThrow(findUser.getId());
-        return UserResponse.entityToDto(findUser, loginUserStatus.getStatus(), loginUserProfile.getId());
+        BinaryContentResponse loginUserProfile = binaryContentService.findByUserId(findUser.getId());
+        return UserResponse.entityToDto(findUser, loginUserStatus.getStatus(), loginUserProfile.id());
     }
 }

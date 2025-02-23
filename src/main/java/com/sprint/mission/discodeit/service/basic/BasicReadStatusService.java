@@ -33,7 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
         User user = userService.findByIdOrThrow(request.userId());
 //        Channel channel = channelService.findByIdOrThrow(channelId);
         if (readStatusRepository.existsByUserIdAndChannelId(request.userId(), request.channelId())) {
-            throw new DuplicateRequestException("ReadStatus already exists");
+            throw new RestApiException(ErrorCode.READ_STATUS_NOT_FOUND, "");
         }
         ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId());
         readStatusRepository.save(newReadStatus);
