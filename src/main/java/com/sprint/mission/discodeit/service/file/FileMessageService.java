@@ -26,11 +26,11 @@
 //    }
 //
 //    @Override
-//    public Message createMessage(UUID sendUserId, UUID channelId, String content) {
-//        User sendUser = fileUserService.findUserByIdOrThrow(sendUserId);
+//    public Message createMessage(UUID senderId, UUID channelId, String content) {
+//        User sender = fileUserService.findUserByIdOrThrow(senderId);
 //        Channel foundChannel = fileChannelService.findChannelByIdOrThrow(channelId);
 //
-//        Message message = Message.of(sendUser, foundChannel, content);
+//        Message message = Message.of(sender, foundChannel, content);
 //
 //        return fileMessageRepository.saveMessage(message);
 //    }
@@ -47,12 +47,12 @@
 //    }
 //
 //    @Override
-//    public Message updateMessage(UUID sendUserId, UUID messageId, String content) {
-//        fileUserService.findUserByIdOrThrow(sendUserId);
+//    public Message updateMessage(UUID senderId, UUID messageId, String content) {
+//        fileUserService.findUserByIdOrThrow(senderId);
 //        Message foundMessage = findMessageByIdOrThrow(messageId);
 //
-//        if (foundMessage.isNotOwner(sendUserId)) {
-//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(sendUserId));
+//        if (foundMessage.isNotOwner(senderId)) {
+//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(senderId));
 //        }
 //
 //        foundMessage.updateContent(content);
@@ -62,11 +62,11 @@
 //    }
 //
 //    @Override
-//    public void deleteMessage(UUID sendUserId, UUID messageId) {
+//    public void deleteMessage(UUID senderId, UUID messageId) {
 //        Message foundMessage = findMessageByIdOrThrow(messageId);
 //
-//        if (foundMessage.isNotOwner(sendUserId)) {
-//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(sendUserId));
+//        if (foundMessage.isNotOwner(senderId)) {
+//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(senderId));
 //        }
 //
 //        fileMessageRepository.removeMessage(messageId);

@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.global.config.FileRepositoryCondition;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.stereotype.Repository;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
+@Repository
+@FileRepositoryCondition
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
     private final FileStorage fileStorage;

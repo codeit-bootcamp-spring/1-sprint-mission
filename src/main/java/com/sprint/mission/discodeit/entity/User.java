@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.global.util.TimeUtil;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -29,27 +28,27 @@ public class User extends BaseEntity implements Serializable {
 
     public void updateName(String name) {
         this.name = name;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateEmail(String email) {
         this.email = email;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updatePassword(String password) {
         this.password = password;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateProfileImage(BinaryContent profileImage) {
         this.profileImage = profileImage;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
     
     public void updateUserInfo(String name, String nickname, String email, String password) {

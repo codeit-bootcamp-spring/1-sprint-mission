@@ -2,8 +2,10 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.global.config.JCFRepositoryCondition;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,7 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 @NoArgsConstructor
+@JCFRepositoryCondition
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> messageData = new HashMap<>();
 

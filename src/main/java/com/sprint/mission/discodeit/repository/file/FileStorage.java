@@ -26,7 +26,7 @@ public class FileStorage {
                 Files.createDirectories(directory);
             }
         } catch (IOException e) {
-            throw new RuntimeException(ErrorCode.DIRECTORY_INIT_FAIL.format(directory));
+            throw new RuntimeException(ErrorCode.DIRECTORY_INIT_FAIL.format("path: " + directory));
         }
     }
 
@@ -39,12 +39,13 @@ public class FileStorage {
                             try {
                                 Files.deleteIfExists(path);
                             } catch (IOException e) {
-                                throw new RuntimeException(ErrorCode.FILE_REMOVE_FAIL.format(path.toString()));
+                                throw new RuntimeException(ErrorCode.FILE_REMOVE_FAIL
+                                        .format("path: " + path.toString()));
                             }
                         });
             }
         } catch (IOException e) {
-            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format(baseDirectory));
+            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format("path: " + baseDirectory));
         }
     }
 
@@ -54,7 +55,8 @@ public class FileStorage {
             oos.writeObject(data);
             return data;
         } catch (IOException e) {
-            throw new RuntimeException(ErrorCode.FILE_WRITE_FAIL.format(filePath, data));
+            throw new RuntimeException(ErrorCode.FILE_WRITE_FAIL
+                    .format("path: " + filePath + "data: " + data));
         }
     }
 
@@ -71,12 +73,12 @@ public class FileStorage {
                         T data = deserialize(file);
                         list.add(data);
                     } catch (IOException | ClassNotFoundException e) {
-                        throw new RuntimeException(ErrorCode.FILE_READ_FAIL.format(file.toString()));
+                        throw new RuntimeException(ErrorCode.FILE_READ_FAIL.format("path: " + file.toString()));
                     }
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format(directory));
+            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format("path: " + directory));
         }
         return list;
     }
@@ -95,12 +97,13 @@ public class FileStorage {
                             Files.deleteIfExists(file);
                         }
                     } catch (IOException | ClassNotFoundException e) {
-                        throw new RuntimeException(ErrorCode.FILE_REMOVE_FAIL.format(file.toString()));
+                        throw new RuntimeException(ErrorCode.FILE_REMOVE_FAIL
+                                .format("path: " + file.toString()));
                     }
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format(directory));
+            throw new RuntimeException(ErrorCode.FILES_LOAD_FAIL.format("path: " + directory));
         }
     }
 

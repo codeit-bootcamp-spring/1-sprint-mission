@@ -25,11 +25,11 @@
 //    }
 //
 //    @Override
-//    public Message createMessage(UUID sendUserId, UUID channelId, String content) {
-//        User sendUser = jcfUserService.findUserByIdOrThrow(sendUserId);
+//    public Message createMessage(UUID senderId, UUID channelId, String content) {
+//        User sender = jcfUserService.findUserByIdOrThrow(senderId);
 //        Channel foundChannel = jcfChannelService.findChannelByIdOrThrow(channelId);
 //
-//        Message message = Message.of(sendUser, foundChannel, content);
+//        Message message = Message.of(sender, foundChannel, content);
 //
 //        return jcfMessageRepository.saveMessage(message);
 //    }
@@ -46,12 +46,12 @@
 //    }
 //
 //    @Override
-//    public Message updateMessage(UUID sendUserId, UUID messageId, String content) {
-//        jcfUserService.findUserByIdOrThrow(sendUserId);
+//    public Message updateMessage(UUID senderId, UUID messageId, String content) {
+//        jcfUserService.findUserByIdOrThrow(senderId);
 //        Message foundMessage = findMessageByIdOrThrow(messageId);
 //
-//        if (foundMessage.isNotOwner(sendUserId)) {
-//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(sendUserId));
+//        if (foundMessage.isNotOwner(senderId)) {
+//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(senderId));
 //        }
 //
 //        foundMessage.updateContent(content);
@@ -61,13 +61,13 @@
 //    }
 //
 //    @Override
-//    public void deleteMessage(UUID sendUserId, UUID messageId) {
+//    public void deleteMessage(UUID senderId, UUID messageId) {
 //        // 메세지 조회
 //        Message foundMessage = findMessageByIdOrThrow(messageId);
 //
 //        // 메세지 생성자가 맞는지 확인
-//        if (foundMessage.isNotOwner(sendUserId)) {
-//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(sendUserId));
+//        if (foundMessage.isNotOwner(senderId)) {
+//            throw new RuntimeException(ErrorMessage.NOT_MESSAGE_CREATOR.format(senderId));
 //        }
 //
 //        // 메세지 삭제

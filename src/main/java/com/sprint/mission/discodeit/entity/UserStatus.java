@@ -29,13 +29,13 @@ public class UserStatus extends BaseEntity {
         return new UserStatus(user);
     }
 
-    public boolean getIsOnline() {
+    public boolean isOnline() {
         return this.isOnline;
     }
 
     public void updateLoginAt() {
         this.loginAt = TimeUtil.getCurrentTime();
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public boolean isRecentLogin() {
@@ -44,7 +44,7 @@ public class UserStatus extends BaseEntity {
 
     public void updateOnline(boolean isOnline) {
         this.isOnline = isOnline;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateUserStatusInfo(boolean isOnline) {

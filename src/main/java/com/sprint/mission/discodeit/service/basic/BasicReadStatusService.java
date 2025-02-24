@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.global.util.TimeUtil;
 import com.sprint.mission.discodeit.dto.readStatus.request.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -45,7 +44,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus updateReadStatus(UUID readStatusId) {
         ReadStatus readStatus= readStatusValidator.validateReadStatusExistsById(readStatusId);
-        readStatus.updateUpdatedAt(TimeUtil.getCurrentTime());
+        readStatus.updateUpdatedAt();
 
         return readStatus;
     }

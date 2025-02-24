@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.config.JCFRepositoryCondition;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,7 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 @NoArgsConstructor
+@JCFRepositoryCondition
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> userData = new HashMap<>();
 

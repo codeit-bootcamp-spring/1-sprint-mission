@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageMapper {
 
-    public Message toEntity(User sendUser, Channel channel, String content) {
-        return Message.of(sendUser, channel, content);
+    public Message toEntity(User sender, Channel channel, String content) {
+        return Message.of(sender, channel, content);
     }
 
     public CreateMessageResponse toCreateMessageResponse(Message message) {

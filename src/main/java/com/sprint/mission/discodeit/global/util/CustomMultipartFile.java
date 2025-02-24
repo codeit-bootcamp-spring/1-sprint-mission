@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.global.util;
 
+import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Getter
 public class CustomMultipartFile implements MultipartFile {
 
     private final byte[] input;

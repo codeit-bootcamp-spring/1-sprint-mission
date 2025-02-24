@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.study;
 
 import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusByIdRequest;
-import com.sprint.mission.discodeit.dto.userStatus.request.UpdateUserStatusByUserIdRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserStatusValidator;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -51,14 +49,14 @@ public class TempUserStatusService {
         return userStatusRepository.saveUserStatus(userStatus);
     }
 
-    public UserStatus updateUserStatusByUserId(UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
-        User user = userValidator.validateUserExistsByUserId(updateUserStatusByUserIdRequest.userId());
-        UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(user);
-
-        userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.isOnline());
-
-        return userStatusRepository.saveUserStatus(userStatus);
-    }
+//    public UserStatus updateUserStatusByUserId(UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
+//        User user = userValidator.validateUserExistsByUserId(updateUserStatusByUserIdRequest.userId());
+//        UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(user);
+//
+//        userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.isOnline());
+//
+//        return userStatusRepository.saveUserStatus(userStatus);
+//    }
 
     public void deleteUserStatus(UUID userStatusId) {
         userStatusValidator.validateUserStatusExistsById(userStatusId);

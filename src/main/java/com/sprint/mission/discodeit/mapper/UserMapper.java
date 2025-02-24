@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
 import com.sprint.mission.discodeit.dto.user.response.LoginResponse;
 import com.sprint.mission.discodeit.dto.user.response.UpdateUserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 public class UserMapper {
@@ -21,7 +19,7 @@ public class UserMapper {
         return new CreateUserResponse(user.getId(), user.getName(), user.getNickname(), user.getEmail(), user.getPassword());
     }
 
-    public FindUserResponse toFindUserResponse(User user, MultipartFile profileImage, boolean isOnline) {
+    public FindUserResponse toFindUserResponse(User user, byte[] profileImage, boolean isOnline) {
         return new FindUserResponse(user.getName(), user.getNickname(), user.getEmail(), profileImage, isOnline);
     }
 

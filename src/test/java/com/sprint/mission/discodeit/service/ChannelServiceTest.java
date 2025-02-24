@@ -287,11 +287,11 @@ class ChannelServiceTest {
             String updateDescription = "description2";
 
             UpdateChannelRequest updateChannelRequest =
-                    new UpdateChannelRequest(channelOwner.getId(), channel.getId(),
+                    new UpdateChannelRequest(channelOwner.getId(),
                             updatedName, updateDescription);
 
             // when
-            Channel updateChannel = channelService.updateChannel(updateChannelRequest);
+            Channel updateChannel = channelService.updateChannel(channel.getId(), updateChannelRequest);
 
             // then
             assertEquals(updatedName, updateChannel.getName());
@@ -310,11 +310,11 @@ class ChannelServiceTest {
             String updateDescription = "description2";
 
             UpdateChannelRequest updateChannelRequest =
-                    new UpdateChannelRequest(anotherUser.getId(), channel.getId(),
+                    new UpdateChannelRequest(anotherUser.getId(),
                             updatedName, updateDescription);
 
             // when & then
-            assertThatThrownBy(() -> channelService.updateChannel(updateChannelRequest))
+            assertThatThrownBy(() -> channelService.updateChannel(channel.getId(), updateChannelRequest))
                     .isInstanceOf(NotChannelCreatorException.class)
                     .hasMessage(ErrorCode.NOT_CHANNEL_CREATOR.format("id: " + anotherUser.getId()));
         }
@@ -331,11 +331,11 @@ class ChannelServiceTest {
             String updateDescription = "description2";
 
             UpdateChannelRequest updateChannelRequest =
-                    new UpdateChannelRequest(anotherUser.getId(), channel.getId(),
+                    new UpdateChannelRequest(anotherUser.getId(),
                             updatedName, updateDescription);
 
             // when & then
-            assertThatThrownBy(() -> channelService.updateChannel(updateChannelRequest))
+            assertThatThrownBy(() -> channelService.updateChannel(channel.getId(), updateChannelRequest))
                     .isInstanceOf(CannotUpdatePrivateChannelException.class)
                     .hasMessage(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL.format("id: " + channel.getId()));
         }
@@ -352,10 +352,10 @@ class ChannelServiceTest {
             Channel channel = createPrivateChannel(channelOwner);
 
             DeleteChannelRequest deleteChannelRequest =
-                    new DeleteChannelRequest(channelOwner.getId(), channel.getId());
+                    new DeleteChannelRequest(channelOwner.getId());
 
             // when
-            channelService.deleteChannel(deleteChannelRequest);
+            channelService.deleteChannel(channel.getId(), deleteChannelRequest);
 
             // then
             assertNull(channelRepository.findChannelById(channel.getId()));
@@ -374,11 +374,11 @@ class ChannelServiceTest {
             Channel channel = createPrivateChannel(channelOwner);
 
             DeleteChannelRequest deleteChannelRequest =
-                    new DeleteChannelRequest(anotherUser.getId(), channel.getId());
+                    new DeleteChannelRequest(anotherUser.getId());
 
 
             // when & then
-            assertThatThrownBy(() -> channelService.deleteChannel(deleteChannelRequest))
+            assertThatThrownBy(() -> channelService.deleteChannel(channel.getId(), deleteChannelRequest))
                     .isInstanceOf(NotChannelCreatorException.class)
                     .hasMessage(ErrorCode.NOT_CHANNEL_CREATOR.format("id: " + anotherUser.getId()));
         }

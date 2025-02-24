@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.global.error.execption.message.MessageNotFoundException;
-import com.sprint.mission.discodeit.global.error.execption.message.NotMessageCreatorException;
-import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.dto.message.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.DeleteMessageRequest;
 import com.sprint.mission.discodeit.dto.message.request.UpdateMessageRequest;
@@ -10,6 +7,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.error.execption.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.global.error.execption.message.NotMessageCreatorException;
+import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -42,9 +42,9 @@ public class BasicMessageService implements MessageService {
     public Message createMessage(CreateMessageRequest createMessageRequest,
                                  List<MultipartFile> multipartFileList) {
 
-        User sendUser = userValidator.validateUserExistsByUserId(createMessageRequest.sendUserId());
+        User sender = userValidator.validateUserExistsByUserId(createMessageRequest.senderId());
         Channel foundChannel = channelValidator.validateChannelExistsByChannelId(createMessageRequest.channelId());
-        Message message = messageMapper.toEntity(sendUser, foundChannel, createMessageRequest.content());
+        Message message = messageMapper.toEntity(sender, foundChannel, createMessageRequest.content());
 
         multipartFileList.forEach(
                 multipartFile -> {
@@ -73,14 +73,15 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message updateMessage(UpdateMessageRequest updateMessageRequest, List<MultipartFile> multipartFileList) {
-        UUID sendUserId = updateMessageRequest.sendUserId();
-        userValidator.validateUserExistsByUserId(sendUserId);
+    public Message updateMessage(UUID messageId, UpdateMessageRequest updateMessageRequest,
+                                 List<MultipartFile> multipartFileList) {
+        UUID senderId = updateMessageRequest.senderId();
+        userValidator.validateUserExistsByUserId(senderId);
 
-        Message foundMessage = findMessageByIdOrThrow(updateMessageRequest.messageId());
+        Message foundMessage = findMessageByIdOrThrow(messageId);
 
-        if (foundMessage.isNotOwner(sendUserId)) {
-            throw new NotMessageCreatorException("id: " + sendUserId);
+        if (foundMessage.isNotOwner(senderId)) {
+            throw new NotMessageCreatorException("id: " + senderId);
         }
 
         foundMessage.updateContent(updateMessageRequest.content());
@@ -90,14 +91,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void deleteMessage(DeleteMessageRequest deleteMessageRequest) {
-        UUID messageId = deleteMessageRequest.messageId();
-        UUID sendUserId = deleteMessageRequest.sendUserId();
+    public void deleteMessage(UUID messageId, DeleteMessageRequest deleteMessageRequest) {
+        UUID senderId = deleteMessageRequest.senderId();
 
         Message foundMessage = findMessageByIdOrThrow(messageId);
 
-        if (foundMessage.isNotOwner(sendUserId)) {
-            throw new NotMessageCreatorException("id: " + sendUserId);
+        if (foundMessage.isNotOwner(senderId)) {
+            throw new NotMessageCreatorException("id: " + senderId);
         }
 
         foundMessage.getBinaryContentList()
@@ -124,11 +124,13 @@ public class BasicMessageService implements MessageService {
 
 
         // 새로운 리스트에 포함되지 않은 것을 삭제
-        originBinaryContentList.stream()
+        List<BinaryContent> removeList = originBinaryContentList.stream()
                 .filter(binaryContent -> !newBinaryContentList.contains(binaryContent))
-                .forEach(binaryContent -> {
-                    binaryContentRepository.removeBinaryContent(binaryContent.getId());
-                    message.deleteBinaryContent(binaryContent);
-                });
+                .toList();
+
+        removeList.forEach(binaryContent -> {
+            binaryContentRepository.removeBinaryContent(binaryContent.getId());
+            message.deleteBinaryContent(binaryContent);
+        });
     }
 }

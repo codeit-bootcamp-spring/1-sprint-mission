@@ -195,11 +195,11 @@ class UserServiceTest {
         void success() {
             // given
             User user = createUser(0);
-            UpdateUserRequest updateUserRequest = new UpdateUserRequest(user.getId(), "test2",
+            UpdateUserRequest updateUserRequest = new UpdateUserRequest("test2",
                     "nickname2", "email2", "password2");
 
             // when
-            User updatedUser = userService.updateUser(updateUserRequest, null);
+            User updatedUser = userService.updateUser(user.getId(), updateUserRequest, null);
 
             // then
             assertEquals("test2", updatedUser.getName());

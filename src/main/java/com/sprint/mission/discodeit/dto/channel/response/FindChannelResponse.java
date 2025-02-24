@@ -9,7 +9,7 @@ import java.util.UUID;
 public record FindChannelResponse(
         String name,
         String description,
-        Instant lastMessageTime,
+        Instant lastMessageAt,
         ChannelType channelType,
         List<UUID> channelUserIdList
 ) {

@@ -62,7 +62,7 @@ class AuthServiceTest {
         assertEquals(loginResponse.userId(), user.getId());
 
         UserStatus foundUserStatus = userStatusRepository.findUserStatusById(userStatus.getId());
-        assertTrue(foundUserStatus.getIsOnline());
+        assertTrue(foundUserStatus.isOnline());
     }
 
 }

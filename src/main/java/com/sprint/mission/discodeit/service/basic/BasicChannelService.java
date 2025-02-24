@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.global.error.execption.channel.CannotUpdatePrivateChannelException;
-import com.sprint.mission.discodeit.global.error.execption.channel.NotChannelCreatorException;
-import com.sprint.mission.discodeit.global.util.RandomStringGenerator;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.request.DeleteChannelRequest;
@@ -13,6 +10,9 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.global.error.execption.channel.CannotUpdatePrivateChannelException;
+import com.sprint.mission.discodeit.global.error.execption.channel.NotChannelCreatorException;
+import com.sprint.mission.discodeit.global.util.RandomStringGenerator;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -94,9 +94,9 @@ public class BasicChannelService implements ChannelService {
         Message foundMessage = messageRepository.findLastMessage().orElse(null);
 
         // 채널에 메세지가 하나도 없을 때 시간 정보를 null로 해서 보내도 될까? -> 일단 EPOCH 로 기본값 지정
-        Instant lastMessageTime = Instant.EPOCH;
+        Instant lastMessageAt = Instant.EPOCH;
         if (foundMessage != null) {
-           lastMessageTime = foundMessage.getCreatedAt();
+           lastMessageAt = foundMessage.getCreatedAt();
         }
 
         List<UUID> channelUsersIdList = new ArrayList<>();
@@ -107,7 +107,7 @@ public class BasicChannelService implements ChannelService {
                     .toList();
         }
 
-        return channelMapper.toFindChannelResponse(channel, lastMessageTime, channelUsersIdList);
+        return channelMapper.toFindChannelResponse(channel, lastMessageAt, channelUsersIdList);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel updateChannel(UpdateChannelRequest updateChannelRequest) {
-        Channel foundChannel = channelValidator.validateChannelExistsByChannelId(updateChannelRequest.channelId());
+    public Channel updateChannel(UUID channelId, UpdateChannelRequest updateChannelRequest) {
+        Channel foundChannel = channelValidator.validateChannelExistsByChannelId(channelId);
 
         if (foundChannel.isPrivate()) {
             throw new CannotUpdatePrivateChannelException("id: " + foundChannel.getId());
@@ -144,9 +144,8 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void deleteChannel(DeleteChannelRequest deleteChannelRequest) {
+    public void deleteChannel(UUID channelId, DeleteChannelRequest deleteChannelRequest) {
         UUID channelOwnerId = deleteChannelRequest.channelOwnerId();
-        UUID channelId = deleteChannelRequest.channelId();
 
         userValidator.validateUserExistsByUserId(channelOwnerId);
         Channel foundChannel = channelValidator.validateChannelExistsByChannelId(channelId);

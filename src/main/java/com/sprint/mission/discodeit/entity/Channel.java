@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.global.error.ErrorCode;
 import com.sprint.mission.discodeit.global.error.execption.channel.ChannelOwnerNotNullException;
 import com.sprint.mission.discodeit.global.error.execption.user.UserNotNullException;
-import com.sprint.mission.discodeit.global.util.TimeUtil;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -40,17 +38,17 @@ public class Channel extends BaseEntity {
             throw new ChannelOwnerNotNullException();
         }
         this.channelOwner = channelOwner;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateName(String name) {
         this.name = name;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateDescription(String description) {
         this.description = description;
-        this.updateUpdatedAt(TimeUtil.getCurrentTime());
+        this.updateUpdatedAt();
     }
 
     public void updateChannelInfo(String name, String description) {

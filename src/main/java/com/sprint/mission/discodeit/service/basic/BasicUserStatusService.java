@@ -52,8 +52,9 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus updateUserStatusByUserId(UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
-        User user = userValidator.validateUserExistsByUserId(updateUserStatusByUserIdRequest.userId());
+    public UserStatus updateUserStatusByUserId(UUID userid,
+                                               UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest) {
+        User user = userValidator.validateUserExistsByUserId(userid);
         UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(user);
 
         userStatus.updateUserStatusInfo(updateUserStatusByUserIdRequest.isOnline());

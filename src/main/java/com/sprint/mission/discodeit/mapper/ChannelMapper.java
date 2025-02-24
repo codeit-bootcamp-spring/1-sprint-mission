@@ -22,8 +22,8 @@ public class ChannelMapper {
         return new CreateChannelResponse(channel.getId(), channel.getName(), channel.getDescription());
     }
 
-    public FindChannelResponse toFindChannelResponse(Channel channel, Instant lastMessageTime, List<UUID> channelUsersIdList) {
-        return new FindChannelResponse(channel.getName(), channel.getDescription(), lastMessageTime,
+    public FindChannelResponse toFindChannelResponse(Channel channel, Instant lastMessageAt, List<UUID> channelUsersIdList) {
+        return new FindChannelResponse(channel.getName(), channel.getDescription(), lastMessageAt,
                 channel.getChannelType(), channelUsersIdList);
     }
 

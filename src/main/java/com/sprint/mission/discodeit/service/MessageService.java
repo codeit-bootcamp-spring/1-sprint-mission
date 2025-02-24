@@ -17,7 +17,8 @@ public interface MessageService {
 
     List<Message> findAllMessagesByChannelId(UUID channelId);
 
-    Message updateMessage(UpdateMessageRequest updateMessageRequest, List<MultipartFile> multipartFileList);
+    Message updateMessage(UUID messageId, UpdateMessageRequest updateMessageRequest,
+                          List<MultipartFile> multipartFileList);
 
-    void deleteMessage(DeleteMessageRequest deleteMessageRequest);
+    void deleteMessage(UUID messageId, DeleteMessageRequest deleteMessageRequest);
 }

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.study;
 
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -39,8 +38,8 @@ public class UserFacadeService {
         User foundUser = userService.findUserByIdOrThrow(userId);
         UserStatus userStatus = userStatusService.findUserStatusByUser(foundUser);
 
-        MultipartFile profileImage = binaryContentService.getMultipartFile(foundUser.getProfileImage());
-        return userMapper.toFindUserResponse(foundUser, profileImage, userStatus.getIsOnline());
+        byte[] profileImage = foundUser.getProfileImage().getContent();
+        return userMapper.toFindUserResponse(foundUser, profileImage, userStatus.isOnline());
     }
 
     public List<FindUserResponse> findAllUsers() {
@@ -49,13 +48,13 @@ public class UserFacadeService {
                 .collect(Collectors.toList());
     }
 
-    public User updateUser(UpdateUserRequest updateUserRequest, MultipartFile profileImageFile) {
-        User updatedUser = userService.updateUser(updateUserRequest, profileImageFile);
-
-        updateProfileImage(updatedUser, profileImageFile);
-
-        return updatedUser;
-    }
+//    public User updateUser(UpdateUserRequest updateUserRequest, MultipartFile profileImageFile) {
+//        User updatedUser = userService.updateUser(updateUserRequest, profileImageFile);
+//
+//        updateProfileImage(updatedUser, profileImageFile);
+//
+//        return updatedUser;
+//    }
 
     public void deleteUser(UUID userId) {
         // 유저 존재 여부 확인

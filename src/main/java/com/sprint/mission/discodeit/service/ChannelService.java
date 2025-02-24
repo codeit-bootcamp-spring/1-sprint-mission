@@ -20,9 +20,9 @@ public interface ChannelService {
 
     List<FindChannelResponse> findAllChannelsByUserId(UUID userId);
 
-    Channel updateChannel(UpdateChannelRequest updateChannelRequest);
+    Channel updateChannel(UUID channelId, UpdateChannelRequest updateChannelRequest);
 
-    void deleteChannel(DeleteChannelRequest deleteChannelRequest);
+    void deleteChannel(UUID channelId, DeleteChannelRequest deleteChannelRequest);
 
     Channel inviteUsers(UUID channelId, List<User> invitedUsers);
 

@@ -22,8 +22,8 @@ public abstract class BaseEntity implements Serializable {
         this.updatedAt = createdAt;
     }
 
-    public void updateUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+    public void updateUpdatedAt() {
+        this.updatedAt = TimeUtil.getCurrentTime();
     }
 
     @Override

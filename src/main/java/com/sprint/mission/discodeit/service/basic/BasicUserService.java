@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.dto.user.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.response.FindUserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.util.MultipartFileConverter;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -14,9 +14,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validator.UserStatusValidator;
 import com.sprint.mission.discodeit.validator.UserValidator;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,9 +61,9 @@ public class BasicUserService implements UserService {
         User foundUser = userValidator.validateUserExistsByUserId(userId);
         UserStatus userStatus = userStatusValidator.validateUserStatusExistsByUser(foundUser);
 
-        MultipartFile profileImage = multipartFileConverter.toMultipartFile(foundUser.getProfileImage().getContent());
+        byte[] profileImage = foundUser.getProfileImage().getContent();
 
-        return userMapper.toFindUserResponse(foundUser, profileImage, userStatus.getIsOnline());
+        return userMapper.toFindUserResponse(foundUser, profileImage, userStatus.isOnline());
     }
 
     @Override
@@ -76,8 +74,8 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User updateUser(UpdateUserRequest updateUserRequest, MultipartFile profileImageFile) {
-        User foundUser = userValidator.validateUserExistsByUserId(updateUserRequest.userId());
+    public User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile profileImageFile) {
+        User foundUser = userValidator.validateUserExistsByUserId(userId);
 
         foundUser.updateUserInfo(updateUserRequest.name(), updateUserRequest.nickname(),
                 updateUserRequest.email(), updateUserRequest.password());

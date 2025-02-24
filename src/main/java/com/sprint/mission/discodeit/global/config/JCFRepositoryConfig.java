@@ -6,12 +6,10 @@ import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFReadStatusRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.repository.jcf.JCFUserStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
+//@Configuration
+//@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFRepositoryConfig {
 
     @Bean

@@ -16,7 +16,7 @@ public interface UserService {
 
     List<FindUserResponse> findAllUsers();
 
-    User updateUser(UpdateUserRequest updateUserRequest, MultipartFile profileImageFile);
+    User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile profileImageFile);
 
     void deleteUser(UUID id);
 }

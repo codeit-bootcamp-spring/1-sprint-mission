@@ -25,8 +25,8 @@ public class BasicAuthService implements AuthService {
 
         // UserStatus 로그인 여부 변경
         UpdateUserStatusByUserIdRequest updateUserStatusByUserIdRequest =
-                new UpdateUserStatusByUserIdRequest(user.getId(), true);
-        userStatusService.updateUserStatusByUserId(updateUserStatusByUserIdRequest);
+                new UpdateUserStatusByUserIdRequest(true);
+        userStatusService.updateUserStatusByUserId(user.getId(), updateUserStatusByUserIdRequest);
 
         return userMapper.toLoginResponse(user);
     }
