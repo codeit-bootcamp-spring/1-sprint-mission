@@ -26,27 +26,27 @@ public class Message implements Serializable {
 
     // 생성자
     public Message(MessageDTO.request messageReqDTO) {
-        id = UUID.randomUUID();
-        createdAt = Instant.now();
-        authorId = messageReqDTO.author();
-        channelId = messageReqDTO.channel();
-        content = messageReqDTO.content();
-        status = true;
-        setUpdatedAt();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        this.authorId = messageReqDTO.author();
+        this.channelId = messageReqDTO.channel();
+        this.content = messageReqDTO.content();
+        this.status = true;
+        refreshUpdatedAt();
     }
 
     public void updateContent(String content) {
         this.content = content;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateStatus(boolean status) {
         this.status = status;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
-    void setUpdatedAt() {
-        updatedAt = Instant.now();
+    void refreshUpdatedAt() {
+        this.updatedAt = Instant.now();
     }
 
     @Override

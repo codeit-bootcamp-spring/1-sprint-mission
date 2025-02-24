@@ -97,7 +97,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public boolean isBinaryContentExist(UUID referenceId) {
+    public boolean hasBinaryContent(UUID referenceId) {
         return loadAll().entrySet().stream()
                 .anyMatch(entry -> entry.getValue().getReferenceId().equals(referenceId));
     }

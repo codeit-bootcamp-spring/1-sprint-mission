@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.validation;
+package com.sprint.mission.discodeit.util.validation;
 
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -20,17 +20,17 @@ public class ChannelValidator implements Validator<Channel, ChannelDTO.request> 
     @Override
     public Channel validateUpdate(Channel current, ChannelDTO.request update) {
         boolean isUpdated = false;
-        if (update.owner() != null && !current.getOwnerId().equals(update.owner())) {
+        if (update.owner() != null && !update.owner().equals(current.getOwnerId())) {
             current.updateOwner(update.owner());
             isUpdated = true;
         }
 
-        if (update.serverName() != null && !current.getServerName().getName().equals(update.serverName())) {
+        if (update.serverName() != null && !update.serverName().equals(current.getServerName().getName())) {
             current.updateServerName(update.serverName());
             isUpdated = true;
         }
 
-        if (update.description() != null && !current.getDescription().equals(update.description())) {
+        if (update.description() != null && !update.description().equals(current.getDescription())) {
             current.updateDescription(update.description());
             isUpdated = true;
         }

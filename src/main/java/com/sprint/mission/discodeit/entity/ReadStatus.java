@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sprint.mission.discodeit.dto.ReadStatusDTO;
 import lombok.Getter;
 
@@ -16,7 +17,10 @@ public class ReadStatus implements Serializable {
     private UUID id;
     private UUID userId;
     private UUID channelId;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Instant lastReadAt;
+
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -30,13 +34,13 @@ public class ReadStatus implements Serializable {
     }
 
     public void updateLastReadAt() {    // 읽을 시 시간 갱신을 위함
-        lastReadAt = Instant.now();
-        updatedAt = Instant.now();
+        this.lastReadAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void updateLastReadAt(Instant time) {    // 읽을 시 시간 갱신을 위함
-        lastReadAt = time;
-        updatedAt = Instant.now();
+        this.lastReadAt = time;
+        this.updatedAt = Instant.now();
     }
 
     @Override

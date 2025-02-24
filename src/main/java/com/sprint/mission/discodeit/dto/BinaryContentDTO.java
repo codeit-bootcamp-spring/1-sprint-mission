@@ -16,4 +16,8 @@ public class BinaryContentDTO {
     public record response(Long id, UUID uuid, byte[] file, UUID referenceId, ContentType contentType) {
     }
 
+    @Builder
+    public record convert(Long id, UUID uuid, byte[] file, String mimeType, String filename) {
+    }
+
 }

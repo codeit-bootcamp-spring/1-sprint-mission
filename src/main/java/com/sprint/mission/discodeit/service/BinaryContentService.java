@@ -17,4 +17,8 @@ public interface BinaryContentService {
     BinaryContentDTO.response delete(Long id);
 
     BinaryContentDTO.response delete(UUID uuid);
+
+    BinaryContentDTO.convert findProfileByReferenceId(UUID referenceId);
+
+    List<BinaryContentDTO.convert> findContentsByReferenceId(UUID referenceId);
 }

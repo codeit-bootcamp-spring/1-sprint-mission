@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.validation;
+package com.sprint.mission.discodeit.util.validation;
 
 import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.entity.User;
@@ -39,35 +39,35 @@ public class UserValidator implements Validator<User, UserDTO.request> {
     @Override
     public User validateUpdate(User current, UserDTO.request update) {
         boolean isUpdated = false;
-        if (update.userName() != null && !current.getUserName().getName().equals(update.userName()) && ValidatorExp.USERNAME.matches(update.userName())) {
+        if (update.userName() != null && !update.userName().equals(current.getUserName().getName()) && ValidatorExp.USERNAME.matches(update.userName())) {
             current.updateUserName(update.userName());
             isUpdated = true;
         }
 
-        if (update.nickname() != null && !current.getNickname().getName().equals(update.nickname()) && ValidatorExp.NICKNAME.matches(update.nickname())) {
+        if (update.nickname() != null && !update.nickname().equals(current.getNickname().getName()) && ValidatorExp.NICKNAME.matches(update.nickname())) {
             current.updateNickname(update.nickname());
             isUpdated = true;
         }
 
-        if (update.email() != null && !current.getEmail().getEmail().equals(update.email()) && ValidatorExp.EMAIL.matches(update.email())) {
+        if (update.email() != null && !update.email().equals(current.getEmail().getEmail()) && ValidatorExp.EMAIL.matches(update.email())) {
             current.updateEmail(update.email());
             isUpdated = true;
         }
 
-        if (update.userType() != null && (current.getUserType() != UserType.fromString(update.userType().toString().toUpperCase()))) {
+        if (update.userType() != null && (update.userType() != UserType.fromString(current.getUserType().toString().toUpperCase()))) {
             current.updateUserType(UserType.fromString(update.userType().toString().toUpperCase()));
             isUpdated = true;
         }
 
         // phone
         if ((update.regionCode() != null && update.phone() != null)
-                && (!current.getPhone().getPhone().equals(update.phone()) || current.getPhone().getRegionCode() != RegionCode.fromString(update.regionCode().toString().toUpperCase()))
+                && (!update.phone().equals(current.getPhone().getPhone()) || update.regionCode() != RegionCode.fromString(current.getPhone().getRegionCode().toString().toUpperCase()))
                 && ValidatorExp.PHONE.matches(update.phone())) {
             current.updatePhone(update.phone(), update.regionCode().toString().toUpperCase());
             isUpdated = true;
         }
 
-        if (update.introduce() != null && !current.getIntroduce().equals(update.introduce())) {
+        if (update.introduce() != null && !update.introduce().equals(current.getIntroduce())) {
             current.updateIntroduce(update.introduce());
             isUpdated = true;
         }

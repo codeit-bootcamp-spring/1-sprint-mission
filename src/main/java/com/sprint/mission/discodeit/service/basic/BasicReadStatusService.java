@@ -20,9 +20,10 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
 
     @Override
-    public Long create(ReadStatusDTO.request readStatusReqDto) {
+    public ReadStatusDTO.idResponse create(ReadStatusDTO.request readStatusReqDto) {
         try {
-            return readStatusRepository.save(new ReadStatus(readStatusReqDto));
+            Long statusId = readStatusRepository.save(new ReadStatus(readStatusReqDto));
+            return ReadStatusDTO.idResponse.builder().id(statusId).uuid(readStatusRepository.load(statusId).getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +68,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public void update(ReadStatusDTO.update updateDTO) {
+    public ReadStatusDTO.idResponse update(ReadStatusDTO.update updateDTO) {
         ReadStatus readStatus = readStatusRepository.load(updateDTO.id());
 
         if (readStatus == null) {
@@ -79,18 +80,19 @@ public class BasicReadStatusService implements ReadStatusService {
             readStatus.updateLastReadAt(updateDTO.lastReadAt());
             readStatusRepository.update(updateDTO.id(), readStatus);
         }
+        return ReadStatusDTO.idResponse.builder().id(updateDTO.id()).uuid(readStatus.getId()).build();
     }
 
     @Override
-    public Long delete(Long id) {
+    public ReadStatusDTO.idResponse delete(Long id) {
         readStatusRepository.delete(id);
-        return id;
+        return ReadStatusDTO.idResponse.builder().id(id).uuid(readStatusRepository.load(id).getId()).build();
     }
 
     @Override
-    public Long delete(UUID uuid) {
+    public ReadStatusDTO.idResponse delete(UUID uuid) {
         Map.Entry<Long, ReadStatus> readStatus = readStatusRepository.load(uuid);
         readStatusRepository.delete(readStatus.getKey());
-        return readStatus.getKey();
+        return ReadStatusDTO.idResponse.builder().id(readStatus.getKey()).uuid(readStatus.getValue().getId()).build();
     }
 }

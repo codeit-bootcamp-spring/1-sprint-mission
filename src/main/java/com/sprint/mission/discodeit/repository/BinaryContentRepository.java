@@ -15,7 +15,7 @@ public interface BinaryContentRepository {
     void delete(Long id);
 
     // Content 존재 여부 확인
-    boolean isBinaryContentExist(UUID referenceId);
+    boolean hasBinaryContent(UUID referenceId);
 
     Map.Entry<Long, BinaryContent> findBinaryContentByUUID(UUID uuid);
 

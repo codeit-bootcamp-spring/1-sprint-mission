@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class Password {
-    private String passwd;
+    private String password;
 }

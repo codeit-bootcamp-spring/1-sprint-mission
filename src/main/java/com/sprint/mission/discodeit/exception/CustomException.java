@@ -1,14 +1,19 @@
 package com.sprint.mission.discodeit.exception;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class CustomException extends RuntimeException {
-    // 언체크 예외
-    private ErrorCode errorCode;
+    private final ErrorCode errorCode;
 
-    public CustomException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+    @Override
+    public String getMessage() {
+        return errorCode.getMessage();
+    }
+
+    public String getCustomException() {
+        return errorCode.getMessage() + "in Custom Exception";
     }
 }

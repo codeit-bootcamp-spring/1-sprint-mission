@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.validation;
+package com.sprint.mission.discodeit.util.validation;
 
 public interface Validator<T, U> {
     void validateCreate(U entity);

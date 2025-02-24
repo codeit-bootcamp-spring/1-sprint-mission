@@ -122,8 +122,9 @@ public class FileChannelRepository implements ChannelRepository {
     public Map<Long, Channel> findChannelsByUserId(UUID userId) {
         return loadAll().entrySet().stream()
                 .filter(channel ->
-                        channel.getValue().getChannelType() == ChannelType.PUBLIC ||
-                                channel.getValue().getMembers().stream()                // Public은 전체 조회
+                        channel.getValue().getChannelType() == ChannelType.PUBLIC ||   // Public은 전체 조회
+                                channel.getValue().getOwnerId().equals(userId) ||
+                                channel.getValue().getMembers().stream()
                                         .anyMatch(uuid -> uuid.equals(userId))    // Private의 경우 필터링
                 )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

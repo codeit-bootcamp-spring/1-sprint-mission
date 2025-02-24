@@ -12,11 +12,13 @@ public interface UserStatusService {
 
     UserStatusDTO.response find(UUID uuid);
 
+    UserStatusDTO.response findByUserId(UUID userid);
+
     List<UserStatusDTO.response> findAll();
 
-    boolean update(UserStatusDTO.update updateDTO);
+    UserStatusDTO.idResponse update(UserStatusDTO.update updateDTO);
 
-    boolean updateByUserId(UUID userId, UserStatusDTO.update updateDTO);
+    UserStatusDTO.idResponse updateByUserId(UUID userId, UserStatusDTO.update updateDTO);
 
     Long delete(Long id);
 

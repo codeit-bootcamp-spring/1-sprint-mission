@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    Long create(ReadStatusDTO.request readStatusReqDto);
+    ReadStatusDTO.idResponse create(ReadStatusDTO.request readStatusReqDto);
 
     ReadStatusDTO.response find(Long id);
 
@@ -14,9 +14,9 @@ public interface ReadStatusService {
 
     List<ReadStatusDTO.response> findAllByUserId(UUID userId);
 
-    void update(ReadStatusDTO.update updateDto);
+    ReadStatusDTO.idResponse update(ReadStatusDTO.update updateDto);
 
-    Long delete(Long id);
+    ReadStatusDTO.idResponse delete(Long id);
 
-    Long delete(UUID uuid);
+    ReadStatusDTO.idResponse delete(UUID uuid);
 }

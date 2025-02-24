@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.validation.ChannelValidator;
-import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.dto.ReadStatusDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -13,6 +11,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.util.validation.ChannelValidator;
+import com.sprint.mission.discodeit.util.validation.Validator;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Long createPublicChannel(ChannelDTO.request channelReqDTO) {
+    public ChannelDTO.idResponse createPublicChannel(ChannelDTO.request channelReqDTO) {
         // 생성
         try {
             ChannelDTO.request channelDto = ChannelDTO.request.builder()
@@ -43,14 +43,17 @@ public class BasicChannelService implements ChannelService {
                     .build();
 
             channelValidator.validateCreate(channelDto);
-            return channelRepository.save(new Channel(channelDto));
+            Channel channel = new Channel(channelDto);
+            Long channelId = channelRepository.save(channel);
+
+            return ChannelDTO.idResponse.builder().id(channelId).uuid(channel.getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Long createPrivateChannel(ChannelDTO.request channelReqDTO) {
+    public ChannelDTO.idResponse createPrivateChannel(ChannelDTO.request channelReqDTO) {
         try {
             ChannelDTO.request channelDto = ChannelDTO.request.builder()
                     .owner(channelReqDTO.owner())
@@ -76,7 +79,7 @@ public class BasicChannelService implements ChannelService {
                                     .build()));
                 }
             }
-            return channelId;
+            return ChannelDTO.idResponse.builder().id(channelId).uuid(channel.getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -136,7 +139,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public boolean update(ChannelDTO.update updateDTO) {
+    public ChannelDTO.idResponse update(ChannelDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
             Channel channel = channelRepository.load(updateDTO.id());
@@ -144,7 +147,7 @@ public class BasicChannelService implements ChannelService {
                 throw new CustomException(ErrorCode.PRIVATE_CANNOT_MODIFY);
             }
             channelRepository.update(updateDTO.id(), channel);
-            return isUpdated;
+            return ChannelDTO.idResponse.builder().id(updateDTO.id()).uuid(channel.getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -152,24 +155,24 @@ public class BasicChannelService implements ChannelService {
 
     // 채널 삭제
     @Override
-    public ChannelDTO.response delete(Long id) {
+    public ChannelDTO.idResponse delete(Long id) {
         ChannelDTO.response deleteChannel = find(id);
 
         messageRepository.deleteAllByChannelId(deleteChannel.uuid());
         readStatusRepository.deleteAllByChannelId(deleteChannel.uuid());
 
         channelRepository.delete(id);
-        return deleteChannel;
+        return ChannelDTO.idResponse.builder().id(deleteChannel.id()).uuid(deleteChannel.uuid()).build();
     }
 
     @Override
-    public ChannelDTO.response delete(UUID uuid) {
+    public ChannelDTO.idResponse delete(UUID uuid) {
         ChannelDTO.response deleteChannel = find(uuid);
 
         messageRepository.deleteAllByChannelId(uuid);
         readStatusRepository.deleteAllByChannelId(uuid);
 
         channelRepository.delete(deleteChannel.id());
-        return deleteChannel;
+        return ChannelDTO.idResponse.builder().id(deleteChannel.id()).uuid(deleteChannel.uuid()).build();
     }
 }

@@ -86,4 +86,32 @@ public class BasicBinaryContentService implements BinaryContentService {
                 .contentType(deleteContent.getValue().getContentType())
                 .build();
     }
+
+    @Override
+    public BinaryContentDTO.convert findProfileByReferenceId(UUID referenceId) {
+        Map.Entry<Long, BinaryContent> content = binaryContentRepository.findProfileImageByMessageId(referenceId);
+        return BinaryContentDTO.convert.builder()
+                .id(content.getKey())
+                .uuid(content.getValue().getId())
+                .file(content.getValue().getData())
+                .filename(content.getValue().getFilename())
+                .mimeType(content.getValue().getMimeType())
+                .build();
+    }
+
+    @Override
+    public List<BinaryContentDTO.convert> findContentsByReferenceId(UUID referenceId) {
+        Map<Long, BinaryContent> content = binaryContentRepository.findMessageImageByMessageId(referenceId);
+
+        return content.entrySet().stream()
+                .map(binaryContent -> BinaryContentDTO.convert.builder()
+                        .id(binaryContent.getKey())
+                        .uuid(binaryContent.getValue().getId())
+                        .file(binaryContent.getValue().getData())
+                        .filename(binaryContent.getValue().getFilename())
+                        .mimeType(binaryContent.getValue().getMimeType())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
 }

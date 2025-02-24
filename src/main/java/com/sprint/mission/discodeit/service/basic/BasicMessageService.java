@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.common.validation.MessageValidator;
-import com.sprint.mission.discodeit.common.validation.Validator;
 import com.sprint.mission.discodeit.dto.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -12,6 +10,8 @@ import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.util.validation.MessageValidator;
+import com.sprint.mission.discodeit.util.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,17 +44,17 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Long create(MessageDTO.request messageReqDTO) {
+    public MessageDTO.idResponse create(MessageDTO.request messageReqDTO, List<MultipartFile> attachments) {
         try {
             messageValidator.validateCreate(messageReqDTO);
             Long messageId = messageRepository.save(new Message(messageReqDTO));
             UUID messageUUID = messageRepository.load(messageId).getId();
             // 첨부파일이 존재하면 저장
-            if (messageReqDTO.attachments() != null && !messageReqDTO.attachments().isEmpty()) {
-                saveAttachmentList(messageUUID, messageReqDTO.attachments());
+            if (attachments != null && !attachments.isEmpty()) {
+                saveAttachmentList(messageUUID, attachments);
             }
 
-            return messageId;
+            return MessageDTO.idResponse.builder().id(messageId).uuid(messageUUID).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +102,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public boolean update(MessageDTO.update updateDTO) {
+    public MessageDTO.idResponse update(MessageDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
             Message msg = messageRepository.load(updateDTO.id());   // 기존 메시지 조회
@@ -122,30 +122,33 @@ public class BasicMessageService implements MessageService {
             }
 
             messageRepository.update(updateDTO.id(), msg);
-            return isUpdated;
+            return MessageDTO.idResponse.builder().id(updateDTO.id()).uuid(msg.getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public Long delete(Long id) {
+    public MessageDTO.idResponse delete(Long id) {
         UUID uuid = messageRepository.load(id).getId();
         // 관련 도메인(첨부파일)도 함께 삭제
-        if (binaryContentRepository.isBinaryContentExist(uuid)) {
+        if (binaryContentRepository.hasBinaryContent(uuid)) {
             Map<Long, BinaryContent> binaryContents = binaryContentRepository.findMessageImageByMessageId(uuid);
             binaryContents.keySet().forEach(binaryContentRepository::delete);
         }
-        return messageRepository.delete(id);
+        messageRepository.delete(id);
+        return MessageDTO.idResponse.builder().id(id).uuid(uuid).build();
     }
 
     @Override
-    public Long delete(UUID uuid) {
+    public MessageDTO.idResponse delete(UUID uuid) {
         // 관련 도메인(첨부파일)도 함께 삭제
-        if (binaryContentRepository.isBinaryContentExist(uuid)) {
+        if (binaryContentRepository.hasBinaryContent(uuid)) {
             Map<Long, BinaryContent> binaryContents = binaryContentRepository.findMessageImageByMessageId(uuid);
             binaryContents.keySet().forEach(binaryContentRepository::delete);
         }
-        return messageRepository.delete(messageRepository.load(uuid).getKey());
+        Long deletedId = messageRepository.load(uuid).getKey();
+        messageRepository.delete(deletedId);
+        return MessageDTO.idResponse.builder().id(deletedId).uuid(uuid).build();
     }
 }

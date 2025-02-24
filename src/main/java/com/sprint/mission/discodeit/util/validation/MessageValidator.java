@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.common.validation;
+package com.sprint.mission.discodeit.util.validation;
 
 import com.sprint.mission.discodeit.dto.MessageDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -22,7 +22,7 @@ public class MessageValidator implements Validator<Message, MessageDTO.request> 
     @Override
     public Message validateUpdate(Message current, MessageDTO.request update) {
         boolean isUpdated = false;
-        if (update.content() != null && !current.getContent().equals(update.content())) {
+        if (update.content() != null && !update.content().equals(current.getContent())) {
             current.updateContent(update.content());
             isUpdated = true;
         }

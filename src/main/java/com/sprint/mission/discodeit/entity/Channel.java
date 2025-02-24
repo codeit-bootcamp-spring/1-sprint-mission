@@ -31,14 +31,14 @@ public class Channel implements Serializable {
 
     // 생성자
     public Channel(ChannelDTO.request channelReqDTO) {
-        id = UUID.randomUUID();
-        createdAt = Instant.now();
+        this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
         this.ownerId = channelReqDTO.owner();
         this.serverName = new Name(channelReqDTO.serverName());
         this.channelType = channelReqDTO.channelType();
         this.description = channelReqDTO.description();
-        members = new ArrayList<>();
-        bannedUser = new ArrayList<>();
+        this.members = new ArrayList<>();
+        this.bannedUser = new ArrayList<>();
         this.status = true;  // 기본 생성 시 활성화 상태
     }
 
@@ -47,46 +47,46 @@ public class Channel implements Serializable {
     // Setter (update)
     public void updateOwner(UUID userId) {
         this.ownerId = userId;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateServerName(String name) {
         this.serverName.setName(name);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateDescription(String content) {
         this.description = content;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateStatus(boolean status) {
         this.status = status;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void addMember(UUID member) {
         this.members.add(member);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void removeMember(UUID member) {
         this.members.remove(member);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void addBannedUser(UUID bannedUser) {
         this.bannedUser.add(bannedUser);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void removeBannedUser(UUID bannedUser) {
         this.bannedUser.remove(bannedUser);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
-    void setUpdatedAt() {
-        updatedAt = Instant.now();
+    void refreshUpdatedAt() {
+        this.updatedAt = Instant.now();
     }
 
     @Override

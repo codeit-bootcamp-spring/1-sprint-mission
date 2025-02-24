@@ -38,7 +38,7 @@ public class User implements Serializable {
 
     // 생성자
     public User(UserDTO.request userReqDTO) {
-        id = UUID.randomUUID();
+        this.id = UUID.randomUUID();
         this.userName = new Name(userReqDTO.userName());
         this.nickname = new Name(userReqDTO.nickname());
         this.email = new Email(userReqDTO.email());
@@ -46,8 +46,8 @@ public class User implements Serializable {
         this.phone = new Phone(userReqDTO.phone(), userReqDTO.regionCode());
         this.userType = userReqDTO.userType();    // BOT은 어떻게 생성되는지 모른다.. 일단 COMMON으로 정해둠
         this.status = true;
-        createdAt = Instant.now();
-        setUpdatedAt();
+        this.createdAt = Instant.now();
+        refreshUpdatedAt();
         this.introduce = userReqDTO.introduce();
     }
 
@@ -55,42 +55,42 @@ public class User implements Serializable {
     public void updateUserName(String userName) {
         // 사용자명(userName) 업데이트 - 고유한 값이기 때문에 불변 객체로 설정
         this.userName = new Name(userName);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateNickname(String nickname) {
         this.nickname.setName(nickname);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateEmail(String email) {
         this.email.changeEmailAddr(email);
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updatePhone(String phone, String regionCode) {
         this.phone.setPhone(phone);
         this.phone.setRegionCode(RegionCode.fromString(regionCode));
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateUserType(UserType userType) {
         this.userType = userType;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateStatus(boolean status) {
         this.status = status;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
     public void updateIntroduce(String introduce) {
         this.introduce = introduce;
-        setUpdatedAt();
+        refreshUpdatedAt();
     }
 
-    void setUpdatedAt() {
-        updatedAt = Instant.now();
+    void refreshUpdatedAt() {
+        this.updatedAt = Instant.now();
     }
 
     @Override

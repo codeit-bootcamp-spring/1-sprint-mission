@@ -9,7 +9,7 @@ import java.util.UUID;
 public class MessageDTO {
 
     @Builder
-    public record request(UUID author, UUID channel, String content, List<MultipartFile> attachments) {
+    public record request(UUID author, UUID channel, String content) {
     }
 
     @Builder
@@ -17,7 +17,11 @@ public class MessageDTO {
     }
 
     @Builder
-    public record update(Long id, UUID author, UUID channel, String content, List<MultipartFile> attachments) {
+    public record update(Long id, String content, List<MultipartFile> attachments) {
+    }
+
+    @Builder
+    public record idResponse(Long id, UUID uuid) {
     }
 
 }

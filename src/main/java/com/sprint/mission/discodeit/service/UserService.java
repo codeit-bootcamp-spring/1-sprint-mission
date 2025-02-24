@@ -11,7 +11,7 @@ public interface UserService {
     // 유일한 지 찾는거
 
     // 사용자 생성
-    Long create(UserDTO.request userReqDto, MultipartFile profile);
+    UserDTO.idResponse create(UserDTO.request userReqDto, MultipartFile profile);
 
     // 사용자 조회
     UserDTO.response find(Long id);
@@ -22,10 +22,10 @@ public interface UserService {
 
     // 사용자 정보 업데이트
     // 비밀번호랑 Active 수정은 따로 빼기
-    boolean update(UserDTO.update updateDTO);
+    UserDTO.idResponse update(UserDTO.update updateDTO);
 
     // 사용자 삭제
-    Long delete(Long id);
+    UserDTO.idResponse delete(Long id);
 
-    Long delete(UUID uuid);
+    UserDTO.idResponse delete(UUID uuid);
 }

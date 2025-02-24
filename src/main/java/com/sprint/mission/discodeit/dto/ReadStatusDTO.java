@@ -19,4 +19,8 @@ public class ReadStatusDTO {
     public record update(Long id, Instant lastReadAt) {
     }
 
+    @Builder
+    public record idResponse(Long id, UUID uuid) {
+    }
+
 }

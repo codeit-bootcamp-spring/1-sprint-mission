@@ -19,4 +19,8 @@ public class UserStatusDTO {
     public record update(Long id, UUID userId, Instant accessedAt) {
     }
 
+    @Builder
+    public record idResponse(Long id, UUID uuid) {
+    }
+
 }

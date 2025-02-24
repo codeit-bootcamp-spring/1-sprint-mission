@@ -53,6 +53,17 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public UserStatusDTO.response findByUserId(UUID userid) {
+        Map.Entry<Long, UserStatus> userStatus = userStatusRepository.findUserStatusByUserId(userid);
+        return UserStatusDTO.response.builder()
+                .id(userStatus.getKey())
+                .uuid(userStatus.getValue().getId())
+                .userId(userStatus.getValue().getUserId())
+                .accessedAt(userStatus.getValue().getAccessedAt())
+                .build();
+    }
+
+    @Override
     public List<UserStatusDTO.response> findAll() {
         Map<Long, UserStatus> userStatuses = userStatusRepository.loadAll();
         return userStatuses.entrySet().stream()
@@ -67,7 +78,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public boolean update(UserStatusDTO.update updateDTO) {
+    public UserStatusDTO.idResponse update(UserStatusDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
             UserStatus userStatus = userStatusRepository.load(updateDTO.id());
@@ -82,14 +93,14 @@ public class BasicUserStatusService implements UserStatusService {
             }
 
             userStatusRepository.update(updateDTO.id(), userStatus);
-            return isUpdated;
+            return UserStatusDTO.idResponse.builder().id(updateDTO.id()).uuid(userStatus.getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean updateByUserId(UUID userId, UserStatusDTO.update updateDTO) {
+    public UserStatusDTO.idResponse updateByUserId(UUID userId, UserStatusDTO.update updateDTO) {
         boolean isUpdated = false;
         try {
             Map.Entry<Long, UserStatus> userStatus = userStatusRepository.findUserStatusByUserId(userId);
@@ -103,8 +114,9 @@ public class BasicUserStatusService implements UserStatusService {
                 isUpdated = true;
             }
 
+            // TODO: 삼항연산자를 넣는게 나을까?
             userStatusRepository.update(userStatus.getKey(), userStatus.getValue());
-            return isUpdated;
+            return UserStatusDTO.idResponse.builder().id(userStatus.getKey()).uuid(userStatus.getValue().getId()).build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

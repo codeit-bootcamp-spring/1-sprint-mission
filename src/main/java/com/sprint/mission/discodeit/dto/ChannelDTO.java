@@ -26,4 +26,8 @@ public class ChannelDTO {
                          List<UUID> members, Instant recent) {
 
     }
+
+    @Builder
+    public record idResponse(Long id, UUID uuid) {
+    }
 }
