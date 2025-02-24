@@ -13,9 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,85 +23,64 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
-    private final UserStatusService userStatusService;
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-    @RequestMapping(path = "create",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-    )
-    public ResponseEntity<User> createUser(
-            @RequestPart("userCreate") UserCreate userCreate,
-            @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) {
-        Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
-                .flatMap(this::resolveProfileRequest);
-        User createdUser = userService.createUser(userCreate, profileRequest);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdUser);
-    }
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<User> createUser(
+      @RequestPart("userCreate") UserCreate userCreate,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) throws IOException {
+    Optional<BinaryContentCreateDto> profileRequest = processProfile(profile);
+    User createdUser = userService.createUser(userCreate, profileRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+  }
 
-    @RequestMapping(
-            path = "update",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-    )
-    public ResponseEntity<User> updateUser(
-            @RequestParam("userId") UUID userId,
-            @RequestPart("userUpdate") UserUpdate userUpdate,
-            @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) {
-        Optional<BinaryContentCreateDto> profileRequest = Optional.ofNullable(profile)
-                .flatMap(this::resolveProfileRequest);
-        User updatedUser = userService.update(userId, userUpdate, profileRequest);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(updatedUser);
-    }
+  @PutMapping(value = "{userId}", consumes = {"multipart/form-data"})
+  public ResponseEntity<User> updateUser(@PathVariable UUID userId,
+      @RequestPart("userUpdate") UserUpdate userUpdate,
+      @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
+    Optional<BinaryContentCreateDto> profileRequest = processProfile(profile);
+    User updatedUser = userService.update(userId, userUpdate, profileRequest);
+    return ResponseEntity.ok(updatedUser);
+  }
 
-    @RequestMapping(path = "delete")
-    public ResponseEntity<Void> deleteUser(@RequestParam("userId") UUID userId) {
-        userService.delete(userId);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
-    }
+  @DeleteMapping("{userId}")
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    userService.delete(userId);
+    return ResponseEntity.noContent().build();
+  }
 
-    @RequestMapping(path = "findAll")
-    public ResponseEntity<List<UserDto>> findAll() {
-        List<UserDto> users = userService.findAll();
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(users);
-    }
+  @GetMapping
+  public ResponseEntity<List<UserDto>> findAll() {
+    List<UserDto> users = userService.findAll();
+    return ResponseEntity.ok(users);
+  }
 
-    @RequestMapping(path = "updateUserStatus")
-    public ResponseEntity<UserStatus> updateUserStatusByUserId(@RequestParam("userId") UUID userId,
-                                                               @RequestBody UserStatusUpdate userStatusUpdate) {
-        UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(updatedUserStatus);
-    }
+  @PatchMapping("{userId}/status")
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+      @RequestBody UserStatusUpdate userStatusUpdate) {
+    UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, userStatusUpdate);
+    return ResponseEntity.ok(updatedUserStatus);
+  }
 
-    private Optional<BinaryContentCreateDto> resolveProfileRequest(MultipartFile profileFile) {
-        if (profileFile.isEmpty()) {
-            return Optional.empty();
-        } else {
-            try {
-                BinaryContentCreateDto binaryContentCreateRequest = new BinaryContentCreateDto(
-                        profileFile.getOriginalFilename(),
-                        profileFile.getContentType(),
-                        profileFile.getBytes()
-                );
-                return Optional.of(binaryContentCreateRequest);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+  private Optional<BinaryContentCreateDto> processProfile(MultipartFile multipartFile)
+      throws IOException {
+    if (multipartFile == null || multipartFile.isEmpty()) {
+      return Optional.empty();
     }
+    try {
+      return Optional.of(new BinaryContentCreateDto(
+          multipartFile.getOriginalFilename(),
+          multipartFile.getContentType(),
+          multipartFile.getBytes()
+      ));
+    } catch (IOException e) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "유효하지 않은 파일입니다.", e);
+    }
+  }
 }

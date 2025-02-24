@@ -27,25 +27,39 @@ h1 {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* 사용자 아이템 스타일 */
 .user-item {
     display: flex;
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #eee;
+    transition: background-color 0.3s;
+}
+
+.user-item:hover {
+    background-color: #f9f9f9;
 }
 
 .user-item:last-child {
     border-bottom: none;
 }
 
+/* 사용자 아바타 스타일 */
 .user-avatar {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     margin-right: 20px;
     object-fit: cover;
+    border: 2px solid #ddd;
+    transition: transform 0.2s;
 }
 
+.user-avatar:hover {
+    transform: scale(1.05);
+}
+
+/* 사용자 정보 */
 .user-info {
     flex-grow: 1;
 }
@@ -62,11 +76,14 @@ h1 {
     color: #666;
 }
 
+/* 온라인 상태 표시 */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 14px;
     font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .online {
@@ -77,4 +94,30 @@ h1 {
 .offline {
     background-color: #9e9e9e;
     color: white;
+}
+
+/* ✅ 추가된 스타일 */
+
+/* 로딩 메시지 스타일 */
+.loading-message {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+    padding: 20px;
+}
+
+/* 에러 메시지 스타일 */
+.error-message {
+    text-align: center;
+    font-size: 16px;
+    color: red;
+    padding: 20px;
+    font-weight: bold;
+}
+
+/* 사용자 목록 컨테이너 정렬 */
+#userList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
