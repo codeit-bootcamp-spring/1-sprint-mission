@@ -1,18 +1,15 @@
 package com.sprint.mission.discodeit.dto;
 
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.UUID;
-
 public record UserRequest(
-        String name,
-        String email,
-        String password
+    String name,
+    String email,
+    String password
 ) {
 
-    public record Login(
-            String name,
-            String password
-    ){
-    }
+  public record Login(
+      String name,
+      String password
+  ) {
+
+  }
 }

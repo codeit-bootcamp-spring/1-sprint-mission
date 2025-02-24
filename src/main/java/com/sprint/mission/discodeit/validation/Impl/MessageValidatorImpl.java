@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MessageValidatorImpl implements MessageValidator {
 
-    @Override
-    public boolean inValidContent(String content) {
-        if (content.isBlank()) {
-            log.error("content must not be blank");
-            return false;
-        }
-        return true;
+  @Override
+  public boolean inValidContent(String content) {
+    if (content.isBlank()) {
+      log.error("content must not be blank");
+      return false;
     }
+    return true;
+  }
 }

@@ -9,10 +9,16 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(UserRequest request, MultipartFile userProfileImage);
-    List<UserResponse> findAll();
-    UserResponse findById(UUID id);
-    User findByIdOrThrow(UUID id);
-    UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage);
-    void deleteById(UUID id);
+
+  UserResponse createUser(UserRequest request, MultipartFile userProfileImage);
+
+  List<UserResponse> findAll();
+
+  UserResponse findById(UUID id);
+
+  User findByIdOrThrow(UUID id);
+
+  UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage);
+
+  void deleteById(UUID id);
 }

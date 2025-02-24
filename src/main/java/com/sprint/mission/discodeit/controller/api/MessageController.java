@@ -14,33 +14,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/message")
 public class MessageController {
-    private final MessageService messageService;
 
-    @PostMapping
-    public MessageResponse createMessage(
-            @RequestPart MessageRequest.Create messageRequest,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
-            ) {
-        return messageService.createMessage(messageRequest, files);
-    }
+  private final MessageService messageService;
 
-    @PutMapping("/{messageId}")
-    public MessageResponse updateMessage(
-            @PathVariable UUID messageId,
-            @RequestPart MessageRequest.Update messageRequest,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files
-    ) {
-        return messageService.update(messageId, messageRequest, files);
-    }
+  @PostMapping
+  public MessageResponse createMessage(
+      @RequestPart MessageRequest.Create messageRequest,
+      @RequestPart(value = "files", required = false) List<MultipartFile> files
+  ) {
+    return messageService.createMessage(messageRequest, files);
+  }
 
-    @DeleteMapping("/{messageId}")
-    public String deleteMessage(@PathVariable UUID messageId) {
-        messageService.deleteById(messageId);
-        return "delete ok";
-    }
+  @PutMapping("/{messageId}")
+  public MessageResponse updateMessage(
+      @PathVariable UUID messageId,
+      @RequestPart MessageRequest.Update messageRequest,
+      @RequestPart(value = "files", required = false) List<MultipartFile> files
+  ) {
+    return messageService.update(messageId, messageRequest, files);
+  }
 
-    @GetMapping
-    public List<MessageResponse> getMessageListByChannel(@RequestParam("channelId") UUID channelId) {
-        return messageService.findAllByChannelId(channelId);
-    }
+  @DeleteMapping("/{messageId}")
+  public String deleteMessage(@PathVariable UUID messageId) {
+    messageService.deleteById(messageId);
+    return "delete ok";
+  }
+
+  @GetMapping
+  public List<MessageResponse> getMessageListByChannel(@RequestParam("channelId") UUID channelId) {
+    return messageService.findAllByChannelId(channelId);
+  }
 }

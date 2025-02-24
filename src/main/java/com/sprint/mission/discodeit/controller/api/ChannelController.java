@@ -13,34 +13,37 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/channel")
 public class ChannelController {
-    private final ChannelService channelService;
 
-    @PostMapping("/public")
-    public ChannelResponse createPublicChannel(@RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
-        return channelService.createPublicChannel(publicChannelRequest);
-    }
+  private final ChannelService channelService;
 
-    @PostMapping("/private")
-    public ChannelResponse createPrivateChannel(@RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
-        return channelService.createPrivateChannel(privateChannelRequest);
-    }
+  @PostMapping("/public")
+  public ChannelResponse createPublicChannel(
+      @RequestBody ChannelRequest.CreatePublic publicChannelRequest) {
+    return channelService.createPublicChannel(publicChannelRequest);
+  }
 
-    @PutMapping("/public/{channelId}")
-    public ChannelResponse updatePublicChannel(
-            @PathVariable UUID channelId,
-            @RequestBody ChannelRequest.Update publicChannelRequest
-    ) {
-        return channelService.update(channelId, publicChannelRequest);
-    }
+  @PostMapping("/private")
+  public ChannelResponse createPrivateChannel(
+      @RequestBody ChannelRequest.CreatePrivate privateChannelRequest) {
+    return channelService.createPrivateChannel(privateChannelRequest);
+  }
 
-    @DeleteMapping("/{channelId}")
-    public String deleteChannel(@PathVariable UUID channelId) {
-        channelService.deleteById(channelId);
-        return "delete ok";
-    }
+  @PutMapping("/public/{channelId}")
+  public ChannelResponse updatePublicChannel(
+      @PathVariable UUID channelId,
+      @RequestBody ChannelRequest.Update publicChannelRequest
+  ) {
+    return channelService.update(channelId, publicChannelRequest);
+  }
 
-    @GetMapping
-    public List<ChannelResponse> getChannelListByUser(@RequestParam("userId") UUID userId) {
-        return channelService.findAllByUserId(userId);
-    }
+  @DeleteMapping("/{channelId}")
+  public String deleteChannel(@PathVariable UUID channelId) {
+    channelService.deleteById(channelId);
+    return "delete ok";
+  }
+
+  @GetMapping
+  public List<ChannelResponse> getChannelListByUser(@RequestParam("userId") UUID userId) {
+    return channelService.findAllByUserId(userId);
+  }
 }

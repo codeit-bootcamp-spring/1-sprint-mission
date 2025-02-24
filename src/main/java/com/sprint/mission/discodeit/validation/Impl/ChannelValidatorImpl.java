@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ChannelValidatorImpl implements ChannelValidator {
 
-    @Override
-    public boolean isValidTitle(String title) {
-        if (title.isBlank()) {
-            log.error("title must not be blank");
-            return false;
-        }
-        return true;
+  @Override
+  public boolean isValidTitle(String title) {
+    if (title.isBlank()) {
+      log.error("title must not be blank");
+      return false;
     }
+    return true;
+  }
 }

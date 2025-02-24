@@ -13,20 +13,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/readStatus")
 public class ReadStatusController {
-    private final ReadStatusService readStatusService;
 
-    @PostMapping
-    public ReadStatusResponse createReadStatus(@RequestBody ReadStatusRequest readStatusRequest) {
-        return readStatusService.create(readStatusRequest);
-    }
+  private final ReadStatusService readStatusService;
 
-    @PutMapping("/{readStatusId}")
-    public ReadStatusResponse updateReadStatus(@PathVariable UUID readStatusId) {
-        return readStatusService.update(readStatusId);
-    }
+  @PostMapping
+  public ReadStatusResponse createReadStatus(@RequestBody ReadStatusRequest readStatusRequest) {
+    return readStatusService.create(readStatusRequest);
+  }
 
-    @GetMapping
-    public List<ReadStatusResponse> getReadStatusByUser(@RequestParam("userId") UUID userId) {
-        return readStatusService.findAllByUserId(userId);
-    }
+  @PutMapping("/{readStatusId}")
+  public ReadStatusResponse updateReadStatus(@PathVariable UUID readStatusId) {
+    return readStatusService.update(readStatusId);
+  }
+
+  @GetMapping
+  public List<ReadStatusResponse> getReadStatusByUser(@RequestParam("userId") UUID userId) {
+    return readStatusService.findAllByUserId(userId);
+  }
 }

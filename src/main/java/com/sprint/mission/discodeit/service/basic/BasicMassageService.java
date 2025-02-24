@@ -27,72 +27,81 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class BasicMassageService implements MessageService {
-    private final MessageRepository messageRepository;
-    private final MessageValidator messageValidator;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final BinaryContentService binaryContentService;
 
-    @Override
-    public MessageResponse createMessage(MessageRequest.Create request, List<MultipartFile> messageFiles) {
-        User user = userRepository.findById(request.userId()).orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
-        Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "channelId : " + request.channelId()));
+  private final MessageRepository messageRepository;
+  private final MessageValidator messageValidator;
+  private final UserRepository userRepository;
+  private final ChannelRepository channelRepository;
+  private final BinaryContentService binaryContentService;
 
-        if (messageValidator.inValidContent(request.content())) {
-            Message newMessage = Message.createMessage(request.content(), request.channelId(), request.userId());
-            messageRepository.save(newMessage);
+  @Override
+  public MessageResponse createMessage(MessageRequest.Create request,
+      List<MultipartFile> messageFiles) {
+    User user = userRepository.findById(request.userId()).orElseThrow(
+        () -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
+    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(
+        () -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND,
+            "channelId : " + request.channelId()));
 
-            if (messageFiles != null) {
-                messageFiles.forEach(file -> binaryContentService.createMessageFile(file, newMessage.getId()));
-            }
-            log.info("Create Message: {}", newMessage);
-            return MessageResponse.EntityToDto(newMessage);
-        }
-        return null;
+    if (messageValidator.inValidContent(request.content())) {
+      Message newMessage = Message.createMessage(request.content(), request.channelId(),
+          request.userId());
+      messageRepository.save(newMessage);
+
+      if (messageFiles != null) {
+        messageFiles.forEach(
+            file -> binaryContentService.createMessageFile(file, newMessage.getId()));
+      }
+      log.info("Create Message: {}", newMessage);
+      return MessageResponse.EntityToDto(newMessage);
     }
+    return null;
+  }
 
-    @Override
-    public List<MessageResponse> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId).stream()
-                .map(MessageResponse::EntityToDto)
-                .collect(Collectors.toList());
+  @Override
+  public List<MessageResponse> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId).stream()
+        .map(MessageResponse::EntityToDto)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public MessageResponse findById(UUID id) {
+    return MessageResponse.EntityToDto(findByIdOrThrow(id));
+  }
+
+  @Override
+  public MessageResponse update(UUID id, MessageRequest.Update request,
+      List<MultipartFile> messageFiles) {
+    Message message = findByIdOrThrow(id);
+    if (messageValidator.inValidContent(request.content())) {
+      message.update(request.content());
+      messageRepository.save(message);
+
+      if (messageFiles != null) {
+        messageFiles.forEach(file -> binaryContentService.createMessageFile(file, id));
+      }
+      log.info("update message: {}", message);
+      return MessageResponse.EntityToDto(message);
     }
+    return null;
+  }
 
-    @Override
-    public MessageResponse findById(UUID id) {
-        return MessageResponse.EntityToDto(findByIdOrThrow(id));
-    }
+  @Override
+  public void deleteById(UUID id) {
+    binaryContentService.deleteAllByMessageId(id);
+    messageRepository.deleteById(id);
+  }
 
-    @Override
-    public MessageResponse update(UUID id, MessageRequest.Update request, List<MultipartFile> messageFiles) {
-        Message message = findByIdOrThrow(id);
-        if (messageValidator.inValidContent(request.content())) {
-            message.update(request.content());
-            messageRepository.save(message);
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    messageRepository.findAllByChannelId(channelId)
+        .forEach(message -> deleteById(message.getChannelId()));
+  }
 
-            if (messageFiles != null) {
-                messageFiles.forEach(file -> binaryContentService.createMessageFile(file, id));
-            }
-            log.info("update message: {}", message);
-            return MessageResponse.EntityToDto(message);
-        }
-        return null;
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        binaryContentService.deleteAllByMessageId(id);
-        messageRepository.deleteById(id);
-    }
-
-    @Override
-    public void deleteAllByChannelId(UUID channelId) {
-        messageRepository.findAllByChannelId(channelId).forEach(message -> deleteById(message.getChannelId()));
-    }
-
-    @Override
-    public Message findByIdOrThrow(UUID id) {
-        return messageRepository.findById(id)
-                .orElseThrow(() -> new RestApiException(ErrorCode.MESSAGE_NOT_FOUND, "id : " + id));
-    }
+  @Override
+  public Message findByIdOrThrow(UUID id) {
+    return messageRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(ErrorCode.MESSAGE_NOT_FOUND, "id : " + id));
+  }
 }

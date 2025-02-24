@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/user")
 public class UserViewController {
 
-    @GetMapping
-    public String findAll() {
-        return "user-list";
-    }
+  @GetMapping
+  public String findAll() {
+    return "user-list";
+  }
 }

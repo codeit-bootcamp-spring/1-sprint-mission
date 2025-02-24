@@ -13,15 +13,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/file")
 public class BinaryContentController {
-    private final BinaryContentService binaryContentService;
 
-    @GetMapping("/{fileId}")
-    public BinaryContentResponse getFile(@PathVariable UUID fileId) {
-        return binaryContentService.findByIdOrThrow(fileId);
-    }
+  private final BinaryContentService binaryContentService;
 
-    @GetMapping
-    public List<BinaryContentResponse> getFileList(@RequestParam("ids") List<UUID> fileIds) {
-        return binaryContentService.findAllByIdIn(fileIds);
-    }
+  @GetMapping("/{fileId}")
+  public BinaryContentResponse getFile(@PathVariable UUID fileId) {
+    return binaryContentService.findByIdOrThrow(fileId);
+  }
+
+  @GetMapping
+  public List<BinaryContentResponse> getFileList(@RequestParam("ids") List<UUID> fileIds) {
+    return binaryContentService.findAllByIdIn(fileIds);
+  }
 }

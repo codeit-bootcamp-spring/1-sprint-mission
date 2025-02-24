@@ -12,58 +12,59 @@ import java.util.stream.Collectors;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
-    private static final String FILE_PATH = "message.ser";
-    private final FileManager<Message> fileManager =  new FileManager<>(FILE_PATH);
 
-    public Message save(Message message) {
-        Map<UUID, Message> savedMessageList = loadMessageMapToFile();
-        savedMessageList.put(message.getId(), message);
-        saveMessageMapToFile(savedMessageList);
-        return message;
-    }
+  private static final String FILE_PATH = "message.ser";
+  private final FileManager<Message> fileManager = new FileManager<>(FILE_PATH);
 
-    public Optional<Message> findById(UUID id) {
-        Map<UUID, Message> savedMessageList = loadMessageMapToFile();
-        return Optional.ofNullable(savedMessageList.get(id));
-    }
+  public Message save(Message message) {
+    Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+    savedMessageList.put(message.getId(), message);
+    saveMessageMapToFile(savedMessageList);
+    return message;
+  }
 
-    public List<Message> findAll() {
-        return fileManager.loadListToFile();
-    }
+  public Optional<Message> findById(UUID id) {
+    Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+    return Optional.ofNullable(savedMessageList.get(id));
+  }
 
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return fileManager.loadListToFile().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
-                .collect(Collectors.toList());
-    }
+  public List<Message> findAll() {
+    return fileManager.loadListToFile();
+  }
 
-    public void deleteById(UUID id) {
-        Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return fileManager.loadListToFile().stream()
+        .filter(message -> message.getChannelId().equals(channelId))
+        .collect(Collectors.toList());
+  }
+
+  public void deleteById(UUID id) {
+    Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+    savedMessageList.remove(id);
+    saveMessageMapToFile(savedMessageList);
+  }
+
+  public void deleteAllByChannelId(UUID channelId) {
+    Map<UUID, Message> savedMessageList = loadMessageMapToFile();
+    for (UUID id : savedMessageList.keySet()) {
+      if (savedMessageList.get(id).getChannelId().equals(channelId)) {
         savedMessageList.remove(id);
-        saveMessageMapToFile(savedMessageList);
+      }
     }
+    saveMessageMapToFile(savedMessageList);
+  }
 
-    public void deleteAllByChannelId(UUID channelId) {
-        Map<UUID, Message> savedMessageList = loadMessageMapToFile();
-        for (UUID id : savedMessageList.keySet()) {
-            if (savedMessageList.get(id).getChannelId().equals(channelId)) {
-                savedMessageList.remove(id);
-            }
-        }
-        saveMessageMapToFile(savedMessageList);
-    }
+  private void saveMessageMapToFile(Map<UUID, Message> saveMessageMap) {
+    List<Message> saveMessageList = saveMessageMap.values().stream().collect(Collectors.toList());
+    fileManager.saveListToFile(saveMessageList);
+  }
 
-    private void saveMessageMapToFile(Map<UUID, Message> saveMessageMap) {
-        List<Message> saveMessageList = saveMessageMap.values().stream().collect(Collectors.toList());
-        fileManager.saveListToFile(saveMessageList);
+  private Map<UUID, Message> loadMessageMapToFile() {
+    List<Message> loadMessageList = fileManager.loadListToFile();
+    if (loadMessageList.isEmpty()) {
+      return new HashMap<>();
     }
-
-    private Map<UUID, Message> loadMessageMapToFile() {
-        List<Message> loadMessageList = fileManager.loadListToFile();
-        if (loadMessageList.isEmpty()) {
-            return new HashMap<>();
-        }
-        return loadMessageList.stream()
-                .collect(Collectors.toMap(Message::getId, Function.identity()));
-    }
+    return loadMessageList.stream()
+        .collect(Collectors.toMap(Message::getId, Function.identity()));
+  }
 }

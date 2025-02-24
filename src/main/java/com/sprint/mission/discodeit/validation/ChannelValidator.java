@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.validation;
 
 public interface ChannelValidator {
-    boolean isValidTitle(String title);
+
+  boolean isValidTitle(String title);
 }

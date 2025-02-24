@@ -11,52 +11,53 @@ import java.util.stream.Collectors;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> data;
 
-    public JCFUserRepository() {
-        data = new HashMap<>();
-    }
+  private final Map<UUID, User> data;
 
-    @Override
-    public User save(User user) {
-        data.put(user.getId(), user);
-        return user;
-    }
+  public JCFUserRepository() {
+    data = new HashMap<>();
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public User save(User user) {
+    data.put(user.getId(), user);
+    return user;
+  }
 
-    @Override
-    public Optional<User> findByName(String name) {
-        return data.values().stream()
-                .filter(user -> user.getName().equals(name))
-                .findAny();
-    }
+  @Override
+  public Optional<User> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
 
-    @Override
-    public List<User> findAll() {
-        return data.values().stream().collect(Collectors.toList());
-    }
+  @Override
+  public Optional<User> findByName(String name) {
+    return data.values().stream()
+        .filter(user -> user.getName().equals(name))
+        .findAny();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-    }
+  @Override
+  public List<User> findAll() {
+    return data.values().stream().collect(Collectors.toList());
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return data.values().stream().anyMatch(user -> user.getId().equals(id));
-    }
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+  }
 
-    @Override
-    public boolean existsByName(String name) {
-        return data.values().stream().anyMatch(user -> user.getName().equals(name));
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return data.values().stream().anyMatch(user -> user.getId().equals(id));
+  }
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return data.values().stream().anyMatch(user -> user.getEmail().equals(email));
-    }
+  @Override
+  public boolean existsByName(String name) {
+    return data.values().stream().anyMatch(user -> user.getName().equals(name));
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return data.values().stream().anyMatch(user -> user.getEmail().equals(email));
+  }
 }

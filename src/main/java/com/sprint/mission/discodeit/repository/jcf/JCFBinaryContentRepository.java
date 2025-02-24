@@ -11,57 +11,59 @@ import java.util.stream.Collectors;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID, BinaryContent> data;
 
-    public JCFBinaryContentRepository() {
-        data = new HashMap<>();
-    }
+  private final Map<UUID, BinaryContent> data;
 
-    @Override
-    public BinaryContent save(BinaryContent binaryContent) {
-        data.put(binaryContent.getId(), binaryContent);
-        return binaryContent;
-    }
+  public JCFBinaryContentRepository() {
+    data = new HashMap<>();
+  }
 
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    data.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
+  }
 
-    @Override
-    public Optional<BinaryContent> findByUserId(UUID userId) {
-        return data.values().stream()
-                .filter(binaryContent -> binaryContent.getUserId().equals(userId))
-                .findAny();
-    }
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return List.of();
-    }
+  @Override
+  public Optional<BinaryContent> findByUserId(UUID userId) {
+    return data.values().stream()
+        .filter(binaryContent -> binaryContent.getUserId().equals(userId))
+        .findAny();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return List.of();
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+  }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    for (UUID id : data.keySet()) {
+      if (data.get(id).getUserId().equals(userId)) {
         data.remove(id);
+        break;
+      }
     }
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        for (UUID id : data.keySet()) {
-            if (data.get(id).getUserId().equals(userId)) {
-                data.remove(id);
-                break;
-            }
-        }
+  @Override
+  public void deleteAllByMessageId(UUID messageId) {
+    ;
+    for (UUID id : data.keySet()) {
+      UUID getMessageId = data.get(id).getMessageId();
+      if (getMessageId != null && getMessageId.equals(messageId)) {
+        data.remove(id);
+      }
     }
-
-    @Override
-    public void deleteAllByMessageId(UUID messageId) {;
-        for (UUID id : data.keySet()) {
-            UUID getMessageId = data.get(id).getMessageId();
-            if (getMessageId != null && getMessageId.equals(messageId)) {
-                data.remove(id);
-            }
-        }
-    }
+  }
 }

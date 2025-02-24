@@ -28,18 +28,19 @@ import java.util.UUID;
 @Slf4j
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
-    private final UserService userService;
+  private final UserRepository userRepository;
+  private final UserService userService;
 
-    public UserResponse login(UserRequest.Login request) {
-        User findUser = userRepository.findByName(request.name())
-                .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED, "User does not exist, or entered the wrong ID"));
+  public UserResponse login(UserRequest.Login request) {
+    User findUser = userRepository.findByName(request.name())
+        .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED,
+            "User does not exist, or entered the wrong ID"));
 
-        if (!findUser.getPassword().equals(request.password())) {
-            throw new RestApiException(ErrorCode.LOGIN_FAILED, "Entered the wrong password.");
-        }
-
-        log.info("user login : {}", findUser.getId());
-        return userService.findById(findUser.getId());
+    if (!findUser.getPassword().equals(request.password())) {
+      throw new RestApiException(ErrorCode.LOGIN_FAILED, "Entered the wrong password.");
     }
+
+    log.info("user login : {}", findUser.getId());
+    return userService.findById(findUser.getId());
+  }
 }

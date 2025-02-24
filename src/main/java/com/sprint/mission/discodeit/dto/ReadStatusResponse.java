@@ -9,19 +9,20 @@ import java.util.UUID;
 
 @Builder(access = AccessLevel.PRIVATE)
 public record ReadStatusResponse(
-        UUID id,
-        Instant createdAt,
-        Instant updatedAt,
-        UUID userId,
-        UUID channelId
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    UUID userId,
+    UUID channelId
 ) {
-    public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
-        return ReadStatusResponse.builder()
-                .id(readStatus.getId())
-                .userId(readStatus.getUserId())
-                .channelId(readStatus.getChannelId())
-                .createdAt(readStatus.getCreatedAt())
-                .updatedAt(readStatus.getUpdatedAt())
-                .build();
-    }
+
+  public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
+    return ReadStatusResponse.builder()
+        .id(readStatus.getId())
+        .userId(readStatus.getUserId())
+        .channelId(readStatus.getChannelId())
+        .createdAt(readStatus.getCreatedAt())
+        .updatedAt(readStatus.getUpdatedAt())
+        .build();
+  }
 }

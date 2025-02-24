@@ -16,41 +16,41 @@ import java.util.UUID;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private final UserService userService;
-    private final UserStatusService userStatusService;
+  private final UserService userService;
+  private final UserStatusService userStatusService;
 
-    @GetMapping
-    public List<UserResponse> getAllUser() {
-        return userService.findAll();
-    }
+  @GetMapping
+  public List<UserResponse> getAllUser() {
+    return userService.findAll();
+  }
 
-    @PostMapping
-    public UserResponse createUser(
-            @RequestPart("userRequest") UserRequest userRequest,
-            @RequestPart(value="image", required = false) MultipartFile userProfileImage
-            ) {
-        return userService.createUser(userRequest, userProfileImage);
-    }
+  @PostMapping
+  public UserResponse createUser(
+      @RequestPart("userRequest") UserRequest userRequest,
+      @RequestPart(value = "image", required = false) MultipartFile userProfileImage
+  ) {
+    return userService.createUser(userRequest, userProfileImage);
+  }
 
-    @PutMapping("/{userId}")
-    public UserResponse updateUser(
-            @PathVariable UUID userId,
-            @RequestPart("userRequest") UserRequest userRequest,
-            @RequestPart(value="image", required = false) MultipartFile userProfileImage
-            ) {
-        return userService.update(userId, userRequest, userProfileImage);
-    }
+  @PutMapping("/{userId}")
+  public UserResponse updateUser(
+      @PathVariable UUID userId,
+      @RequestPart("userRequest") UserRequest userRequest,
+      @RequestPart(value = "image", required = false) MultipartFile userProfileImage
+  ) {
+    return userService.update(userId, userRequest, userProfileImage);
+  }
 
-    @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable UUID userId) {
-        userService.deleteById(userId);
-        return "delete ok";
-    }
+  @DeleteMapping("/{userId}")
+  public String deleteUser(@PathVariable UUID userId) {
+    userService.deleteById(userId);
+    return "delete ok";
+  }
 
-    @PutMapping("/{userId}/status")
-    public String updateUserStatus(@PathVariable UUID userId) {
-        userStatusService.updateByUserId(userId);
-        return "user status update ok";
-    }
+  @PutMapping("/{userId}/status")
+  public String updateUserStatus(@PathVariable UUID userId) {
+    userStatusService.updateByUserId(userId);
+    return "user status update ok";
+  }
 
 }

@@ -22,51 +22,53 @@ import java.util.UUID;
 @Slf4j
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;  // 순환 참조 발생
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    public UserStatus create(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + userId));
-        if (userStatusRepository.existsByUserId(userId)) {
-            throw new DuplicateRequestException("UserStatus already exists");
-        }
-        UserStatus newUserStatus = UserStatus.createUserStatus(userId);
-        log.info("Create UserStatus: {}" , newUserStatus);
-        return userStatusRepository.save(newUserStatus);
+  @Override
+  public UserStatus create(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + userId));
+    if (userStatusRepository.existsByUserId(userId)) {
+      throw new DuplicateRequestException("UserStatus already exists");
     }
+    UserStatus newUserStatus = UserStatus.createUserStatus(userId);
+    log.info("Create UserStatus: {}", newUserStatus);
+    return userStatusRepository.save(newUserStatus);
+  }
 
-    @Override
-    public UserStatus findById(UUID id) {
-        return userStatusRepository.findById(id)
-                .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
-    }
+  @Override
+  public UserStatus findById(UUID id) {
+    return userStatusRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
+  }
 
-    @Override
-    public UserStatus findByUserId(UUID userId) {
-        return userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
-    }
+  @Override
+  public UserStatus findByUserId(UUID userId) {
+    return userStatusRepository.findByUserId(userId)
+        .orElseThrow(
+            () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
+  }
 
-    @Override
-    public UserStatus updateByUserId(UUID userId) {
-        UserStatus userStatus = findByUserId(userId);
-        userStatus.updateStatus();
-        return userStatusRepository.save(userStatus);
-    }
+  @Override
+  public UserStatus updateByUserId(UUID userId) {
+    UserStatus userStatus = findByUserId(userId);
+    userStatus.updateStatus();
+    return userStatusRepository.save(userStatus);
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll();
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        userStatusRepository.deleteById(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    userStatusRepository.deleteById(id);
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        userStatusRepository.deleteByUserId(userId);
-    }
+  @Override
+  public void deleteByUserId(UUID userId) {
+    userStatusRepository.deleteByUserId(userId);
+  }
 }
