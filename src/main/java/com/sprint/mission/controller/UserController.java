@@ -1,6 +1,9 @@
 package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
+import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
@@ -14,6 +17,8 @@ import com.sprint.mission.service.jcf.main.JCFUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,9 +46,16 @@ public class UserController {
     private final UserStatusService userStatusService;
 
     @Operation(summary = "User 등록", description = "Create User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "유저가 성공적으로 생성되었습니다.",
+                    content = @Content(schema = @Schema(implementation = SaveUserDto.class))),
+            @ApiResponse(responseCode = "409", description = "이메일 또는 이름 중복",
+                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
+    })
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CommonResponse> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
-                                                 @RequestPart(value = "profile", required = false) MultipartFile profile) {
+    public ResponseEntity<CommonResponse> create(
+            @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") UserDtoForCreate requestDTO,
+            @Parameter(description = "유저 프로필 ") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
         User user = userService.create(requestDTO, binaryContentDto);
         return CommonResponse.toResponseEntity
@@ -54,11 +66,13 @@ public class UserController {
     @Operation(summary = "User 정보 수정", description = "Create User")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 업데이트되었습니다"),
-            @ApiResponse(responseCode = "409", description = "이메일 또는 이름 중복")
+            @ApiResponse(responseCode = "409", description = "이메일 또는 이름 중복",
+                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @PatchMapping(path = "{id}", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> update(
-            @Parameter(description = "User ID") @PathVariable("id") UUID userId,
+            // @Parameter(description = "User ID")
+           @PathVariable("id") UUID userId,
             @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);

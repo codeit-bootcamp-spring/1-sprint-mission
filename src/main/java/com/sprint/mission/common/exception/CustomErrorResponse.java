@@ -1,5 +1,6 @@
 package com.sprint.mission.common.exception;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
 import lombok.Data;
@@ -8,12 +9,19 @@ import org.springframework.http.ResponseEntity;
 
 @Data
 @Builder
+@Schema(description = "커스텀 에러 응답")
 public class CustomErrorResponse {
 
-  private int status;
+  @Schema(description = "HTTP 상태 코드", example = "4XX, 5XX")
+  private String status;
+
+  @Schema(description = "에러 메시지", example = "잘못된 요청입니다.")
   private String message;
+
+  @Schema(description = "HTTP 에러 코드", example = "BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR etc..")
   private String errorCode;
-//  private String path;
+
+  //  private String path;
 //  private String timestamp;
 
   public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e) {
@@ -21,7 +29,7 @@ public class CustomErrorResponse {
     return ResponseEntity
         .status(eStatus)
         .body(CustomErrorResponse.builder()
-            .status(eStatus.value())
+            .status(eStatus.value()+"")
             .message(e.getMessage())
             .errorCode(eStatus.getReasonPhrase())
             .build());
@@ -33,7 +41,7 @@ public class CustomErrorResponse {
     return ResponseEntity
             .status(eStatus)
             .body(CustomErrorResponse.builder()
-                    .status(eStatus.value())
+                    .status(eStatus.value()+"")
                     .message(e.getMessage())
                     .errorCode(eStatus.getReasonPhrase())
 //                    .path(request.getRequestURI())
