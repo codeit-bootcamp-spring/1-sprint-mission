@@ -50,7 +50,7 @@ public class ChannelController {
 
     @RequestMapping(path = "update")
     public ResponseEntity<CommonResponse> update(@RequestParam("channelId") UUID channelId,
-        @RequestBody ChannelDtoForRequest requestDTO) {
+                                                 @RequestBody ChannelDtoForRequest requestDTO) {
         channelService.update(channelId, requestDTO);
         return CommonResponse.toResponseEntity
                 (OK, "성공적으로 업데이트되었습니다", requestDTO);
@@ -59,7 +59,7 @@ public class ChannelController {
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
     @RequestMapping(path = "findAllByUserId")
     public ResponseEntity<CommonResponse> findAllByUserId(
-        @RequestParam("userId") UUID userId) {
+            @RequestParam("userId") UUID userId) {
 
         List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
         return CommonResponse.toResponseEntity
@@ -83,3 +83,5 @@ public class ChannelController {
                 : new FindPublicChannelDto(findedChannel));
     }
 }
+
+

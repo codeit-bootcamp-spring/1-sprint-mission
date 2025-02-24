@@ -7,12 +7,18 @@ spring:
       max-file-size: 100MB # 요청 파일 하나당 허용 사이즈
       max-request-size: 100MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
 
-
 discodeit:
   repository:
     type: jcf
     file-directory: .discodeit
 
+
 logging:
   level:
     com.sprint: TRACE
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

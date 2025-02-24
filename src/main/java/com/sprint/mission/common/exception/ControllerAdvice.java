@@ -14,7 +14,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<CommonErrorResponse> handleCustomException(CustomException e, HttpServletRequest request){
-        return CommonErrorResponse.toResponseEntity(e.getErrorCode());
+        return CommonErrorResponse.toResponseEntity(e.getErrorCode(), request);
     }
 
 //    @ExceptionHandler({MethodArgumentTypeMismatchException.class, MethodArgumentNotValidException.class})
