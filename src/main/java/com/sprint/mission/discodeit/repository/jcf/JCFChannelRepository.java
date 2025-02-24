@@ -26,8 +26,8 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean delete(Channel channel) {
-        return data.remove(channel.getId()) != null;
+    public boolean delete(String channelId) {
+        return data.remove(channelId) != null;
     }
 
     @Override

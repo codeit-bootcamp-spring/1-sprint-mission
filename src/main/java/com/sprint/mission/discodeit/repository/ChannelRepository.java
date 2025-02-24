@@ -10,7 +10,7 @@ public interface ChannelRepository {
     Channel save(Channel channel);
 
     //delete
-    boolean delete(Channel channel);
+    boolean delete(String channelId);
 
     //search
     Channel findById(String id);

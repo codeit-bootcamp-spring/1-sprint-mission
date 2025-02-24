@@ -34,8 +34,8 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean delete(Channel channel) {
-        return FileService.delete(directory.resolve(channel.getId().concat(extension)));
+    public boolean delete(String channelId) {
+        return FileService.delete(directory.resolve(channelId.concat(extension)));
     }
 
     @Override

@@ -35,8 +35,8 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean delete(User user) {
-        Path userPath = directory.resolve(user.getId().concat(extension));
+    public boolean delete(String userId) {
+        Path userPath = directory.resolve(userId.concat(extension));
         return FileService.delete(userPath);
     }
 
