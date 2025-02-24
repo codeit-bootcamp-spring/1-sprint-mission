@@ -5,7 +5,7 @@ import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.FindChannelAllDto;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ public interface ChannelService {
 
   Channel findById(UUID id);
 
-  void update(UUID channelId, ChannelDtoForRequest dto);
+  void update(UUID channelId, ChannelDtoForUpdate dto);
 
   void delete(UUID channelId);
 //    void validateDuplicateName(String name);

@@ -3,8 +3,10 @@ package com.sprint.mission.dto.request;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.BinaryContent;
+
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -16,11 +18,12 @@ import java.io.IOException;
 
 
 @Slf4j
-public record BinaryContentDto (
+public record BinaryContentDto(
 
-    String fileName,
-    String contentType,
-    byte[] bytes){
+        @Schema(example = "zessy")
+        String fileName,
+        String contentType,
+        byte[] bytes) {
 
     public BinaryContent toEntity() {
         return new BinaryContent(fileName, contentType, bytes);
@@ -33,7 +36,7 @@ public record BinaryContentDto (
         }
         try {
             BinaryContentDto binaryContentDto = new BinaryContentDto(file.getName(),
-                file.getContentType(), file.getBytes());
+                    file.getContentType(), file.getBytes());
             return Optional.of(binaryContentDto);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);

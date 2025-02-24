@@ -16,7 +16,7 @@ public class CommonResponse<T> {
     @Schema(description = "응답 메시지", example = "성공")
     private String message;
 
-    @Schema(description = "응답 데이터", implementation = Object.class)
+    @Schema(description = "응답 데이터")
     private T data;
 
     public static ResponseEntity<CommonResponse> toResponseEntity(HttpStatus status, String message, Object data){

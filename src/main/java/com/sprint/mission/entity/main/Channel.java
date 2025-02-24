@@ -1,6 +1,6 @@
 package com.sprint.mission.entity.main;
 
-import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,7 +30,7 @@ public class Channel implements Serializable {
         this.createdAt = Instant.now();
     }
 
-    public void updateByDTO(ChannelDtoForRequest dto){
+    public void updateByDTO(ChannelDtoForUpdate dto){
         this.name = dto.newName();
         this.description = dto.newDescription();
         this.updatedAt = Instant.now();

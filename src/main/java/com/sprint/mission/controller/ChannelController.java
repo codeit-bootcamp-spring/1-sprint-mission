@@ -5,7 +5,7 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
 import com.sprint.mission.dto.response.FindChannelAllDto;
@@ -15,8 +15,6 @@ import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.service.jcf.main.JCFChannelService;
-import com.sprint.mission.service.jcf.main.JCFUserService;
 
 import java.util.List;
 
@@ -31,7 +29,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,7 +77,7 @@ public class ChannelController {
     @PatchMapping("{id}")
     public ResponseEntity<CommonResponse> update(
             @Parameter(description = "수정할 Channel ID") @PathVariable("id") UUID channelId,
-            @RequestBody @Valid ChannelDtoForRequest requestDTO) {
+            @RequestBody @Valid ChannelDtoForUpdate requestDTO) {
         channelService.update(channelId, requestDTO);
         return CommonResponse.toResponseEntity
                 (OK, "성공적으로 업데이트되었습니다", requestDTO);

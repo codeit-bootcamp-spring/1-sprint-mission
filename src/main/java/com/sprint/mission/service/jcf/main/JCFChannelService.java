@@ -12,15 +12,12 @@ import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
-import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.ChannelService;
-import com.sprint.mission.dto.request.ChannelDtoForRequest;
+import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.response.FindChannelDto;
 import com.sprint.mission.dto.response.FindPrivateChannelDto;
 import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,7 +83,7 @@ public class JCFChannelService implements ChannelService {
   }
 
   @Override
-  public void update(UUID channelId, ChannelDtoForRequest dto) {
+  public void update(UUID channelId, ChannelDtoForUpdate dto) {
     Channel updatingChannel = channelRepository.findById(channelId)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
