@@ -1,53 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel {
+@Getter
+public class Channel implements Serializable {
 
-    private final UUID channeluuId;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String channelName;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private ChannelType type;
+  private String name;
+  private String description;
 
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-
-    public Channel(String channelName) {
-        this.channeluuId = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.channelName = channelName;
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-
-    public UUID getuuId(){
-        return channeluuId;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public void update(String channelName) {
-        this.channelName = channelName;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
-    }
-
-    @Override
-    public String toString() {
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "Channel{\n" +
-                "UUId : " + channeluuId +
-                ", \nchannelName : " + channelName +
-                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) + "\n}";
-    }
-
+  }
 }

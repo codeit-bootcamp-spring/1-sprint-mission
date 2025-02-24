@@ -1,65 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import lombok.Getter;
 
-public class Message {
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
-    private final UUID msguuId;
-    private final Channel destinationCh;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String content;
-    private final User SendUser;
+@Getter
+public class Message implements Serializable {
 
+  private static final long serialVersionUID = 1L;
 
-    public Message(User SendUser, Channel destinationCh, String content) {
-        this.msguuId = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = this.createdAt;
-        this.content = content;
-        this.SendUser = SendUser;
-        this.destinationCh = destinationCh;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private String content;
+  //
+  private UUID channelId;
+  private UUID authorId;
+  private List<UUID> attachmentIds;
+
+  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.content = content;
+    this.channelId = channelId;
+    this.authorId = authorId;
+    this.attachmentIds = attachmentIds;
+  }
+
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
     }
 
-    public UUID getMsguuId() {
-        return msguuId;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public User  SendUser() {
-        return SendUser;
-    }
-
-    public Channel getDestinationChannel() {
-        return destinationCh;
-    }
-
-    public void update(String content) {
-        this.content = content;
-        this.updatedAt = System.currentTimeMillis(); // 수정 시간을 갱신
-    }
-
-    @Override
-    public String toString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return "Message{\n" +
-                "UUId=" + msguuId +
-                ", \ndestinationChannel : " + destinationCh.getChannelName() +
-                ", \ncreatedAt : " + sdf.format(new java.util.Date(createdAt)) +
-                ", \nupdatedAt : " + sdf.format(new java.util.Date(updatedAt)) +
-                ", \ncontent : " + content + '\'' +
-                ", \nsendUser : " + SendUser.getName() + "\n}";
-    }
-
+  }
 }
