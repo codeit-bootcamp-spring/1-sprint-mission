@@ -9,25 +9,24 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/binary-contents")
+@RequestMapping("/api/binary-contents")
 @RequiredArgsConstructor
-public class BinaryContentController
-{
-    private final BinaryContentService binaryContentService;
+public class BinaryContentController {
 
-    @GetMapping("/{contentId}")
-    public ResponseBinaryContentDto viewFile(@PathVariable String contentId) {
-        return binaryContentService.findById(contentId);
-    }
+  private final BinaryContentService binaryContentService;
 
-    @GetMapping
-    //todo - 여러개 조회 수정하기
-    public List<ResponseBinaryContentDto> getBinaryContents(@RequestParam List<String> contentIds){
-        return binaryContentService.findAllByIdIn(contentIds);
-    }
+  @GetMapping("/{contentId}")
+  public ResponseBinaryContentDto viewFile(@PathVariable String contentId) {
+    return binaryContentService.findById(contentId);
+  }
 
-    @PostMapping
-    public ResponseBinaryContentDto uploadBinaryContent(@RequestParam("file") MultipartFile file){
-        return binaryContentService.create(file);
-    }
+  @GetMapping
+  public List<ResponseBinaryContentDto> getBinaryContents(@RequestParam List<String> contentIds) {
+    return binaryContentService.findAllByIdIn(contentIds);
+  }
+
+  @PostMapping
+  public ResponseBinaryContentDto uploadBinaryContent(@RequestParam("file") MultipartFile file) {
+    return binaryContentService.create(file);
+  }
 }

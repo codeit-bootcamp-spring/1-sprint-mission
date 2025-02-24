@@ -11,51 +11,55 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
-    //사용자 단일 조회
-    @GetMapping("/{userId}")
-    public UserResponseDto getUser(@PathVariable String userId) {
-        return userService.findById(userId);
+  //사용자 단일 조회
+  @GetMapping("/{userId}")
+  public UserResponseDto getUser(@PathVariable String userId) {
+    return userService.findById(userId);
+  }
+
+  //사용자 등록
+  //InvalidContentTypeException 예외처리해야 -> 예외처리 없이 application/json 으로 보냈을때도 받을 수 있게 할 수는 없을까?
+  @PostMapping
+  public UserResponseDto createUser(
+      @RequestPart(value = "file", required = false) MultipartFile file,
+      @RequestPart("user") CreateUserDto createUserDto) {
+    if (file == null || file.isEmpty()) {
+      return userService.create(createUserDto);
+    }
+    return userService.create(createUserDto, file);
+  }
+
+  //사용자 정보 수정
+  @PutMapping("/{userId}")
+  public UserResponseDto updateUser(@PathVariable String userId,
+      @RequestPart("user") UpdateUserDto updateUserDto,
+      @RequestPart(value = "file", required = false) MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      return userService.updateUser(userId, updateUserDto);
     }
 
-    //사용자 등록
-    //InvalidContentTypeException 예외처리해야 -> 예외처리 없이 application/json 으로 보냈을때도 받을 수 있게 할 수는 없을까?
-    @PostMapping
-    public UserResponseDto createUser(@RequestPart(value = "file", required = false) MultipartFile file, @RequestPart("user") CreateUserDto createUserDto) {
-        if(file==null || file.isEmpty()){
-            return userService.create(createUserDto);
-        }
-        return userService.create(createUserDto, file);
-    }
+    return userService.updateUser(userId, updateUserDto, file);
+  }
 
-    //사용자 정보 수정
-    @PutMapping("/{userId}")
-    public UserResponseDto updateUser(@PathVariable String userId, @RequestPart("user") UpdateUserDto updateUserDto, @RequestPart(value = "file", required = false)MultipartFile file) {
-        if(file==null || file.isEmpty()){
-            return userService.updateUser(userId, updateUserDto);
-        }
-
-        return userService.updateUser(userId, updateUserDto, file);
+  //사용자 삭제
+  @DeleteMapping("/{userId}")
+  public String deleteUser(@PathVariable String userId) {
+    if (userService.deleteUser(userId)) {
+      return "User deleted successfully";
     }
+    return "Delete user failed";
+  }
 
-    //사용자 삭제
-    @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable String userId) {
-        if(userService.deleteUser(userId)){
-            return "User deleted successfully";
-        }
-        return "Delete user failed";
-    }
-
-    //모든 사용자 조회
-    @GetMapping
-    public List<UserResponseDto> getUsers() {
-        return userService.findAll();
-    }
+  //모든 사용자 조회
+  @GetMapping
+  public List<UserResponseDto> getUsers() {
+    return userService.findAll();
+  }
 
 }

@@ -9,19 +9,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user-status")
+@RequestMapping("/api/user-status")
 @RequiredArgsConstructor
 public class UserStatusController {
 
-    private final UserStatusService userStatusService;
+  private final UserStatusService userStatusService;
 
-    @PutMapping("/{userId}")
-    public UserStatusResponseDto getUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto updateUserStatusDto) {
-        return userStatusService.updateByUserId(userId, updateUserStatusDto);
-    }
+  @PutMapping("/{userId}")
+  public UserStatusResponseDto getUserStatus(@PathVariable String userId,
+      @RequestBody UpdateUserStatusDto updateUserStatusDto) {
+    return userStatusService.updateByUserId(userId, updateUserStatusDto);
+  }
 
-    @GetMapping
-    public List<UserStatusResponseDto> getAllUserStatus() {
-        return userStatusService.findAll();
-    }
+  @GetMapping
+  public List<UserStatusResponseDto> getAllUserStatus() {
+    return userStatusService.findAll();
+  }
 }
