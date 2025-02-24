@@ -62,7 +62,6 @@ public class UserController {
                 (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
     }
 
-
     @Operation(summary = "User 정보 수정", description = "Create User")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 업데이트되었습니다"),
@@ -80,6 +79,8 @@ public class UserController {
                 (OK, "성공적으로 업데이트되었습니다", requestDTO);
     }
 
+
+    @Operation(summary = "User 정보 조회", description = "Create User")
 
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> delete(@PathVariable("id") UUID userId) {

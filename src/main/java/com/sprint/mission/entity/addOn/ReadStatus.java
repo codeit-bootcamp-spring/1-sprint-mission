@@ -1,11 +1,13 @@
 package com.sprint.mission.entity.addOn;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Schema(description = "메시지 읽음 상태 정보")
 @Getter
 public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -20,7 +22,6 @@ public class ReadStatus implements Serializable {
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        //
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
