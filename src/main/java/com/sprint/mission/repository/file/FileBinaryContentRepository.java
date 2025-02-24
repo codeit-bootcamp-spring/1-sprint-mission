@@ -3,7 +3,7 @@ package com.sprint.mission.repository.file;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.repository.jcf.BinarycontentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

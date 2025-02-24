@@ -4,8 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.repository.jcf.BinarycontentRepository;
-import com.sprint.mission.repository.jcf.addOn.JCFBinaryContentRepository;
+import com.sprint.mission.repository.BinarycontentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

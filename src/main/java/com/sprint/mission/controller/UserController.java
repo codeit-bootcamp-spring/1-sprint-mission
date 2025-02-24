@@ -11,6 +11,12 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,12 +33,14 @@ import static org.springframework.http.MediaType.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "User", description = "USER API")
 @RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
 
+    @Operation(summary = "User 등록", description = "Create User")
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
                                                  @RequestPart(value = "profile", required = false) MultipartFile profile) {
@@ -42,9 +50,15 @@ public class UserController {
                 (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
     }
 
+
+    @Operation(summary = "User 정보 수정", description = "Create User")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공적으로 업데이트되었습니다"),
+            @ApiResponse(responseCode = "409", description = "이메일 또는 이름 중복")
+    })
     @PatchMapping(path = "{id}", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> update(
-            @PathVariable("id") UUID userId,
+            @Parameter(description = "User ID") @PathVariable("id") UUID userId,
             @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
