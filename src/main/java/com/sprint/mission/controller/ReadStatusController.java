@@ -62,22 +62,20 @@ public class ReadStatusController {
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
     })
     @PatchMapping("{id}")
-    public ResponseEntity<CommonResponse> update(@RequestParam("id") UUID readStatusId,
-                                                 @RequestBody ReadStatusUpdateRequest request) {
+    public ResponseEntity<CommonResponse> update(
+            @Parameter(description = "수정할 읽음 상태 ID") @RequestParam("id") UUID readStatusId,
+            @RequestBody @Valid ReadStatusUpdateRequest request) {
         ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
         return CommonResponse.toResponseEntity
                 (OK, "읽음 상태가 업데이트되었습니다.", updatedReadStatus);
     }
 
     @Operation(summary = "User의 Message 읽음 상태 목록 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))))
-    })
+    @ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findAllByUserId(
-            @Parameter(description = "조회할 User ID", required = true)
-            @RequestParam("userId") UUID userId) {
+            @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
         List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
         return CommonResponse.toResponseEntity
                 (OK, "읽음 상태 목록이 조회되었습니다.", readStatuses);

@@ -91,7 +91,7 @@ public class ChannelController {
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindChannelAllDto.class)))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommonResponse.class)))),
             @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })

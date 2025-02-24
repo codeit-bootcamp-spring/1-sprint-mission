@@ -78,8 +78,7 @@ public class MessageController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindMessageDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findInChannel(
-            @Parameter(description = "조회할 Channel ID")
-            @RequestParam("channelId") UUID channelId) {
+            @Parameter(description = "조회할 Channel ID") @RequestParam("channelId") UUID channelId) {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         log.info("Attachments: {}", messageList.get(0).getAttachmentIdList());
         List<FindMessageDto> dtoList = messageList.stream()
