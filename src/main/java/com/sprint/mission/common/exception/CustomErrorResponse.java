@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 @Data
 @Builder
-public class CommonErrorResponse {
+public class CustomErrorResponse {
 
   private int status;
   private String message;
@@ -16,11 +16,11 @@ public class CommonErrorResponse {
 //  private String path;
 //  private String timestamp;
 
-  public static ResponseEntity<CommonErrorResponse> toResponseEntity(ErrorCode e) {
+  public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e) {
     HttpStatus eStatus = e.getStatus();
     return ResponseEntity
         .status(eStatus)
-        .body(CommonErrorResponse.builder()
+        .body(CustomErrorResponse.builder()
             .status(eStatus.value())
             .message(e.getMessage())
             .errorCode(eStatus.getReasonPhrase())
@@ -28,11 +28,11 @@ public class CommonErrorResponse {
   }
   // 결과 예시 : {"status":400,"message":"잘못된 요청입니다.","errorCode":"BAD_REQUEST"}
 
-  public static ResponseEntity<CommonErrorResponse> toResponseEntity(ErrorCode e, HttpServletRequest request) {
+  public static ResponseEntity<CustomErrorResponse> toResponseEntity(ErrorCode e, HttpServletRequest request) {
     HttpStatus eStatus = e.getStatus();
     return ResponseEntity
             .status(eStatus)
-            .body(CommonErrorResponse.builder()
+            .body(CustomErrorResponse.builder()
                     .status(eStatus.value())
                     .message(e.getMessage())
                     .errorCode(eStatus.getReasonPhrase())
