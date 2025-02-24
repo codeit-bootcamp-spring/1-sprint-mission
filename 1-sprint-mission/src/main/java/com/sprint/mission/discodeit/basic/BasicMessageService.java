@@ -67,28 +67,28 @@ public class BasicMessageService extends parse {
         return MessageDto.fromEntity(messageService.readMessageAll());
     }
 
-    @PatchMapping("/message-title/id")
+    @PatchMapping("/title/id")
     public boolean updateMessageTitle(@RequestBody NameIdDto nameIdDto) {
         UUID id=nameIdDto.getId();
         String change=nameIdDto.getName();
         return messageService.updateMessageTitle(id,change);
     }
 
-    @PatchMapping("/message-title/title")
+    @PatchMapping("/title/title")
     public boolean updateMessageTitle(@RequestBody NameNameDto nameNameDto) {
         String name=nameNameDto.getName1();
         String change=nameNameDto.getName2();
         return messageService.updateMessageBody(name,change);
     }
 
-    @PatchMapping("/message-body/id")
+    @PatchMapping("/body/id")
     public boolean updateMessageBody(@RequestBody NameIdDto nameIdDto) {
         UUID id=nameIdDto.getId();
         String change=nameIdDto.getName();
         return messageService.updateMessageBody(id,change);
     }
 
-    @PatchMapping("/message-body/name")
+    @PatchMapping("/body/name")
     public boolean updateMessageBody(@RequestBody NameNameDto nameNameDto) {
         String name=nameNameDto.getName1();
         String change=nameNameDto.getName2();

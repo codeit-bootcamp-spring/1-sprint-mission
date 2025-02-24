@@ -26,7 +26,7 @@ public class BasicUserService extends parse {
 
 
     @PostMapping
-    public void createNewUser(@RequestParam String name,@RequestParam String password,@RequestParam String email) {
+    public void createNewUser(@RequestParam String name,@RequestParam String email,@RequestBody String password) {
         userService.createNewUser(name,password,email);
     }
 
@@ -68,19 +68,19 @@ public class BasicUserService extends parse {
         return userService.deleteUser(name,password);
     }
 
-    @PatchMapping("/img-to-name/{name}")
+    @PatchMapping("/img/name/{name}")
     public boolean updateUserSelfImg(@PathVariable  String name, @RequestBody String img) {
         char [] pass=img.toCharArray();
         return userService.updateUserSelfImg(name,pass);
     }
 
-    @PatchMapping("/img-to-id/{name}")
+    @PatchMapping("/img/id/{id}")
     public boolean updateUserSelfImg(@PathVariable UUID id, @RequestBody String img) {
         char [] pass=img.toCharArray();
         return userService.updateUserSelfImg(id,pass);
     }
 
-    @PostMapping("/send-message")
+    @PostMapping("/message/user")
     public boolean sendMessageToUser(@RequestBody MessageRequest request) {
         Object sender = parseUUIDOrString(request.getSender());
         Object receiver = parseUUIDOrString(request.getReceiver());
@@ -88,7 +88,7 @@ public class BasicUserService extends parse {
         return userService.sendMessageToUser(sender,receiver,message);
     }
 
-    @PatchMapping("/isbool/{user}")
+    @PatchMapping("/{user}/update")
     public void updateUserIsBoolean(@PathVariable String user){
         Object changeUser=parseUUIDOrString(user);
         userService.updateUserStatus(changeUser);

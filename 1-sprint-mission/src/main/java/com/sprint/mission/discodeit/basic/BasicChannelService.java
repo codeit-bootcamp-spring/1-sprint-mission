@@ -67,29 +67,29 @@ public class BasicChannelService extends parse {
         return channelService.updateChannelName(id,name);
     }
 
-    @PostMapping("/name/user-name")
+    @PostMapping("/name/username")
     public boolean updateChannelName(@RequestBody NameNameDto nameIdDto) {
         String ChannelName=nameIdDto.getName1();
         String name=nameIdDto.getName2();
         return channelService.updateChannelName(ChannelName,name);
     }
 
-    @DeleteMapping("/channel-id/{id}")
+    @DeleteMapping("/id/{id}")
     public boolean deleteChannel(@PathVariable UUID id) {
         readStatusService.delete(channelService.getReadStatusAll(id));
         userStatusService.delete (channelService.getUserStatusAll(id));
         return channelService.deleteChannel(id);
     }
 
-    @DeleteMapping("/channel-name/{name}")
+    @DeleteMapping("/name/{name}")
     public boolean deleteChannel(@PathVariable String name) {
         readStatusService.delete(channelService.getReadStatusAll(name));
         userStatusService.delete (channelService.getUserStatusAll(name));
         return channelService.deleteChannel(name);
     }
 
-    @DeleteMapping("/user/name/{channelName}")
-    public void deleteUserToChannel(@PathVariable String channelName,@RequestBody String userName){
+    @DeleteMapping("/user/{channelName}/{userName}")
+    public void deleteUserToChannel(@PathVariable String channelName,@PathVariable String userName){
         channelService.deleteUserToChannel(channelName,userName);
     }
 
@@ -105,12 +105,12 @@ public class BasicChannelService extends parse {
         return channelService.readChannelInMessage(channelName);
     }
 
-    @GetMapping("/username-in-channel/{userId}")
+    @GetMapping("/username/channel/{userId}")
     public List<ChannelDto> findAllByUserId(@PathVariable UUID userId){
         return channelService.findAllByUserId(userId);
     }
 
-    @GetMapping("/userid-in-channel/{userName}")
+    @GetMapping("/userid/channel/{userName}")
     public List<ChannelDto> findAllByUserName(@PathVariable String userName) {
         return channelService.findAllByUserName(userName);
     }
@@ -127,7 +127,7 @@ public class BasicChannelService extends parse {
         return newReadStatus;
     }
 
-    @PatchMapping("/send-message")
+    @PostMapping("/message")
     public boolean sendMesgaeUserInChannel(@RequestBody SendMessaageInChannelDto sendMessaageInChannelDto){
         Object channel=parseUUIDOrString(sendMessaageInChannelDto.getChannel());
         Object sender = parseUUIDOrString(sendMessaageInChannelDto.getSender());
