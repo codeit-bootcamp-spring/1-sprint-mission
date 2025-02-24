@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.User;
-import com.sprint.mission.discodeit.domain.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.web.dto.CheckUserDto;
-import com.sprint.mission.discodeit.web.dto.UserStatusUpdateDto;
 import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

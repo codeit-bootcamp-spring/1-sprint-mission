@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.Message;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.Optional;

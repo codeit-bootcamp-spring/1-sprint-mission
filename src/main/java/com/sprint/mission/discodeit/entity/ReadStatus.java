@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.domain.entity;
+package com.sprint.mission.discodeit.entity;
 
 import lombok.Data;
 

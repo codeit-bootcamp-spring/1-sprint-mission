@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.web.dto.UserStatusUpdateDto;
 
 import java.util.List;

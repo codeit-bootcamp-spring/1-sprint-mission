@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.domain.entity.Channel;
-import com.sprint.mission.discodeit.domain.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 
 import java.util.List;

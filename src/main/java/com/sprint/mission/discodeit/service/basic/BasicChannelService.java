@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.entity.Channel;
-import com.sprint.mission.discodeit.domain.entity.ChannelGroup;
-import com.sprint.mission.discodeit.domain.entity.Participant;
-import com.sprint.mission.discodeit.domain.entity.ReadStatus;
-import com.sprint.mission.discodeit.domain.entity.User;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelGroup;
+import com.sprint.mission.discodeit.entity.Participant;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.web.dto.PrivateChannelDto;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.entity.Channel;
-import com.sprint.mission.discodeit.domain.entity.Participant;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Participant;
 import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.web.dto.PrivateChannelDto;
 import com.sprint.mission.discodeit.web.dto.PublicChannelDto;

@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.User;
-import com.sprint.mission.discodeit.domain.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.web.dto.CheckUserDto;
 import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;

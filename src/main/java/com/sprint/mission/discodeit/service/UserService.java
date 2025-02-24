@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.User;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.web.dto.CheckUserDto;
 import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 

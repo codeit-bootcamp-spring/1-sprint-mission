@@ -1,13 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.web.dto.ReadStatusUpdateDto;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

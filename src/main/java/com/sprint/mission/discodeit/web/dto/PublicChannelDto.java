@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.web.dto;
 
-import com.sprint.mission.discodeit.domain.entity.Channel;
-import com.sprint.mission.discodeit.domain.entity.ChannelGroup;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelGroup;
 
 import lombok.Getter;
 

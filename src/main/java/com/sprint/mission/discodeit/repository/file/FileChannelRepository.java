@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.domain.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import lombok.extern.slf4j.Slf4j;

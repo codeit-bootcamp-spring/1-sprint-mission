@@ -1,30 +1,8 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.Channel;
-import com.sprint.mission.discodeit.domain.entity.ChannelGroup;
-import com.sprint.mission.discodeit.domain.entity.Message;
-import com.sprint.mission.discodeit.domain.entity.Participant;
-import com.sprint.mission.discodeit.domain.entity.User;
-import com.sprint.mission.discodeit.service.LoginService;
-import com.sprint.mission.discodeit.web.dto.ChannelUpdateDto;
-import com.sprint.mission.discodeit.web.dto.PrivateChannelDto;
-import com.sprint.mission.discodeit.web.dto.PublicChannelDto;
-import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.NetworkService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
 
 @Slf4j
 @SpringBootApplication

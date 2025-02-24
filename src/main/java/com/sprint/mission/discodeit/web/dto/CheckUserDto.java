@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.web.dto;
 
-import com.sprint.mission.discodeit.domain.entity.BinaryContent;
-import com.sprint.mission.discodeit.domain.entity.User;
-import com.sprint.mission.discodeit.domain.entity.UserStatus;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
 import lombok.Getter;
 
 import java.util.UUID;
