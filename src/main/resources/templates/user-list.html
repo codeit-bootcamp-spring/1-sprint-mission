@@ -6,12 +6,83 @@
     <link rel="stylesheet"
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #313338;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 48px auto;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 32px;
+            color: #fff;
+        }
+
+        .table {
+            width: 100%;
+            background-color: #2B2D31;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .thead-light {
+            background-color: #1E1F22;
+        }
+
+        .table th {
+            color: #B5BAC1;
+            padding: 16px;
+            text-align: left;
+        }
+
+        .table td {
+            padding: 16px;
+            border-bottom: 1px solid #1E1F22;
+            color: #B5BAC1;
+        }
+
         .profile-img {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #ddd;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: #ED4245;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background-color: #5865F2;
+            color: #fff;
+            margin-right: 8px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
         }
     </style>
 </head>

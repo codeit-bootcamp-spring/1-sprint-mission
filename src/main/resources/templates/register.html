@@ -3,7 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <title>회원가입</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #5865F2;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: #313338;
+            padding: 32px;
+            border-radius: 5px;
+            width: 480px;
+        }
+
+        h2 {
+            color: #fff;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #B5BAC1;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            background-color: #1E1F22;
+            border: none;
+            border-radius: 3px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border: 1px solid #5865F2;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: #5865F2;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #4752C4;
+        }
+
+        .btn-link {
+            color: #00A8FC;
+            text-decoration: none;
+            font-size: 14px;
+            display: block;
+            text-align: center;
+            margin-top: 16px;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">

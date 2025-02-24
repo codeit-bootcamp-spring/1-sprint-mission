@@ -2,13 +2,56 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>메인 메뉴</title>
-    <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Discodeit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #313338;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 48px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .list-group {
+            background-color: #2B2D31;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .list-group-item {
+            padding: 16px 20px;
+            color: #B5BAC1;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #1E1F22;
+            transition: background-color 0.2s;
+        }
+
+        .list-group-item:hover {
+            background-color: #404249;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Discodeit 메인 메뉴</h1>
+    <h1 class="mb-4">Discodeit</h1>
     <div class="list-group">
         <a href="/users/register" class="list-group-item list-group-item-action">
             회원가입

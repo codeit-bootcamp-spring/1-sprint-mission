@@ -1,10 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.aspectj.bridge.IMessage;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import java.io.Serializable;
@@ -24,8 +28,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
 
+    @NotBlank(message = "이름은 필수입니다.")
+    @Size(min = 2, max = 20, message = "2자 이상 20자 이하로 입력해주세요.")
     private String name;
+
+    @NotBlank(message = "이메일은 필수입니다.")
+    @Email(message = "올바른 이메일 형식이 아닙니다.")
     private String email;
+
+    @NotBlank(message = "비밀번호는 필수입니다.")
+    @Size(min = 4, message = "4자리 이상 입력해주세요.")
     private String password;
 
     private boolean online;

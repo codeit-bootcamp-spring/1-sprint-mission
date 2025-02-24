@@ -26,10 +26,15 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public Channel create(ChannelDTO channelDTO) {
+        User creator = userRepository.findById(channelDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+
         Channel channel = new Channel(
                 channelDTO.getName(),
                 channelDTO.getDescription(),
                 ChannelType.valueOf(channelDTO.getType().toUpperCase()));
+
+        channel.addMember(creator);
         return channelRepository.save(channel);
     }
 
@@ -86,4 +91,6 @@ public class BasicChannelService implements ChannelService {
     public List<Channel> findAll() {
         return channelRepository.findAll();
     }
+
+
 }
