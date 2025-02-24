@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.data;
+package com.sprint.mission.discodeit.dto.channelDto;
 
 import com.sprint.mission.discodeit.entity.ChannelType;
 import java.time.Instant;
@@ -13,4 +13,5 @@ public record ChannelDto(
     List<UUID> participantIds,
     Instant lastMessageAt
 ) {
+
 }

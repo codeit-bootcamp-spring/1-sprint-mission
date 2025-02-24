@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.UserStatusDto;
-import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -40,15 +40,15 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatusDto findById(UUID userStatusId) {
     return userStatusRepository.findById(userStatusId)
-            .map(this::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
+        .map(this::toDto)
+        .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
   }
 
   @Override
   public List<UserStatusDto> findAll() {
     return userStatusRepository.findAll().stream()
-            .map(this::toDto)
-            .toList();
+        .map(this::toDto)
+        .toList();
   }
 
   @Override
@@ -83,10 +83,10 @@ public class BasicUserStatusService implements UserStatusService {
 
   private UserStatusDto toDto(UserStatus userStatus) {
     return new UserStatusDto(userStatus.getId(),
-            userStatus.getCreatedAt(),
-            userStatus.getUpdatedAt(),
-            userStatus.getUserId(),
-            userStatus.getLastActiveAt(),
-            userStatus.getOnline());
+        userStatus.getCreatedAt(),
+        userStatus.getUpdatedAt(),
+        userStatus.getUserId(),
+        userStatus.getLastActiveAt(),
+        userStatus.getOnline());
   }
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.request;
+package com.sprint.mission.discodeit.dto.channelDto;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
-import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +29,8 @@ public class ReadStatusController implements ReadStatusApi {
   // 메시지 수신 정보 생성
   @Override
   @PostMapping
-  public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateRequest request) {
+  public ResponseEntity<ReadStatusDto> createReadStatus(
+      @RequestBody ReadStatusCreateRequest request) {
     ReadStatusDto readStatusDto = readStatusService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatusDto);
   }
@@ -38,8 +39,8 @@ public class ReadStatusController implements ReadStatusApi {
   @Override
   @PatchMapping("/{readStatusId}")
   public ResponseEntity<ReadStatusDto> updateReadStatus(
-          @PathVariable UUID readStatusId,
-          @RequestBody ReadStatusUpdateRequest request) {
+      @PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
     ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);
     return ResponseEntity.ok(readStatusDto);
   }
@@ -48,7 +49,7 @@ public class ReadStatusController implements ReadStatusApi {
   @Override
   @GetMapping
   public ResponseEntity<List<ReadStatusDto>> getReadStatusesOfUser(
-          @RequestParam UUID userId) {
+      @RequestParam UUID userId) {
     List<ReadStatusDto> readStatuses = readStatusService.findAllByUserId(userId);
     return ResponseEntity.ok(readStatuses);
   }

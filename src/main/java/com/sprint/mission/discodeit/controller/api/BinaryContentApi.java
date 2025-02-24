@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -26,7 +26,7 @@ public interface BinaryContentApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "첨부 파일을 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "BinaryContent with id {binaryContentId} not found"))
+          content = @Content(examples = @ExampleObject(value = "BinaryContent not found: BinaryContentId = {binaryContentId}"))
       )
   })
   ResponseEntity<BinaryContentDto> getFile(

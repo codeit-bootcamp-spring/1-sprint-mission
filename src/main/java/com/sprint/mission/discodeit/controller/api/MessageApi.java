@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.api;
 
 
-import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
+import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,7 +30,7 @@ public interface MessageApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "Channel | Author with id {channelId | authorId} not found"))
+          content = @Content(examples = @ExampleObject(value = "Channel | Author not found: {channelId | authorId}"))
       ),
   })
   ResponseEntity<MessageDto> createMessage(
@@ -52,7 +52,7 @@ public interface MessageApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "Message를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found"))
+          content = @Content(examples = @ExampleObject(value = "Message not found: {messageId}"))
       ),
   })
   ResponseEntity<MessageDto> updateMessage(
@@ -67,7 +67,7 @@ public interface MessageApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "Message를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "Message with id {messageId} not found"))
+          content = @Content(examples = @ExampleObject(value = "Message not found: {messageId}"))
       ),
   })
   ResponseEntity<Void> deleteMessage(

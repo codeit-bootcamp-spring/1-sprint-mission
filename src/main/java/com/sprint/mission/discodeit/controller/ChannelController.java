@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.ChannelApi;
-import com.sprint.mission.discodeit.dto.data.ChannelDto;
-import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.ChannelDto;
+import com.sprint.mission.discodeit.dto.channelDto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channelDto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @PostMapping("/public")
   public ResponseEntity<ChannelDto> createPublicChannel(
-          @RequestBody PublicChannelCreateRequest request) {
+      @RequestBody PublicChannelCreateRequest request) {
     ChannelDto channelDto = channelService.createPublicChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
   }
@@ -42,7 +42,7 @@ public class ChannelController implements ChannelApi {
   @Override
   @PostMapping("/private")
   public ResponseEntity<ChannelDto> createPrivateChannel(
-          @RequestBody PrivateChannelCreateRequest request) {
+      @RequestBody PrivateChannelCreateRequest request) {
     ChannelDto channelDto = channelService.createPrivateChannel(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(channelDto);
   }
@@ -51,8 +51,8 @@ public class ChannelController implements ChannelApi {
   @Override
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelDto> updatePublicChannel(
-          @PathVariable UUID channelId,
-          @RequestBody PublicChannelUpdateRequest request) {
+      @PathVariable UUID channelId,
+      @RequestBody PublicChannelUpdateRequest request) {
     ChannelDto channelDto = channelService.updatePublicChannel(channelId, request);
     return ResponseEntity.ok(channelDto);
   }

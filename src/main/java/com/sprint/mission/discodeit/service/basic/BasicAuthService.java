@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.authDto.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
@@ -33,8 +33,9 @@ public class BasicAuthService implements AuthService {
     }
 
     boolean isOnline = userStatusRepository.findByUserId(user.getId())
-            .map(UserStatus::isOnline)
-            .orElseThrow(() -> new ResourceNotFoundException("User status not found"));
-    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(), user.getEmail(), user.getProfileId(), isOnline);
+        .map(UserStatus::isOnline)
+        .orElseThrow(() -> new ResourceNotFoundException("User status not found"));
+    return new UserDto(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getUsername(),
+        user.getEmail(), user.getProfileId(), isOnline);
   }
 }

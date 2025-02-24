@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
+import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
@@ -67,15 +67,15 @@ public class BasicMessageService implements MessageService {
   @Override
   public MessageDto findById(UUID messageId) {
     return messageRepository.findById(messageId)
-            .map(this::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
+        .map(this::toDto)
+        .orElseThrow(() -> new ResourceNotFoundException("Message not found: " + messageId));
   }
 
   @Override
   public List<MessageDto> findAllByChannelId(UUID channelId) {
     return messageRepository.findAllByChannelId(channelId).stream()
-            .map(this::toDto)
-            .toList();
+        .map(this::toDto)
+        .toList();
   }
 
   @Override
@@ -102,11 +102,11 @@ public class BasicMessageService implements MessageService {
 
   private MessageDto toDto(Message message) {
     return new MessageDto(message.getId(),
-            message.getCreatedAt(),
-            message.getUpdatedAt(),
-            message.getContent(),
-            message.getChannelId(),
-            message.getAuthorId(),
-            message.getAttachmentIds());
+        message.getCreatedAt(),
+        message.getUpdatedAt(),
+        message.getContent(),
+        message.getChannelId(),
+        message.getAuthorId(),
+        message.getAttachmentIds());
   }
 }

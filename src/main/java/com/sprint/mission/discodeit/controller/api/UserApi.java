@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.controller.api;
 
 
-import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.data.UserStatusDto;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -32,7 +32,7 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
-          content = @Content(examples = @ExampleObject(value = "User with email {email} already exists"))
+          content = @Content(examples = @ExampleObject(value = "email | username already exists: {email | username}"))
       ),
   })
   ResponseEntity<UserDto> createUser(
@@ -54,11 +54,11 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject("User with id {userId} not found"))
+          content = @Content(examples = @ExampleObject("User not found: {userId}"))
       ),
       @ApiResponse(
           responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
-          content = @Content(examples = @ExampleObject("user with email {newEmail} already exists"))
+          content = @Content(examples = @ExampleObject("Email already exists: {newEmail}"))
       )
   })
   ResponseEntity<UserDto> updateUser(
@@ -76,7 +76,7 @@ public interface UserApi {
       @ApiResponse(
           responseCode = "404",
           description = "User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "User with id {id} not found"))
+          content = @Content(examples = @ExampleObject(value = "User not found: {userId}"))
       )
   })
   ResponseEntity<Void> deleteUser(
@@ -100,7 +100,7 @@ public interface UserApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "UserStatus with userId {userId} not found"))
+          content = @Content(examples = @ExampleObject(value = "UserStatus not found: userId = {userId}"))
       )
   })
   ResponseEntity<UserStatusDto> updateUserStatusByUserId(

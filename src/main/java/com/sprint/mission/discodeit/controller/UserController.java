@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.data.UserStatusDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusDto;
+import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.userStatusDto.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public class UserController implements UserApi {
   @Override
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(
-          @PathVariable UUID userId) {
+      @PathVariable UUID userId) {
     userService.delete(userId);
     return ResponseEntity.noContent().build();
   }
@@ -84,8 +84,8 @@ public class UserController implements UserApi {
   @Override
   @PatchMapping("/{userId}/userStatus")
   public ResponseEntity<UserStatusDto> updateUserStatusByUserId(
-          @PathVariable UUID userId,
-          @RequestBody UserStatusUpdateRequest request) {
+      @PathVariable UUID userId,
+      @RequestBody UserStatusUpdateRequest request) {
     UserStatusDto userStatusDto = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.ok(userStatusDto);
   }

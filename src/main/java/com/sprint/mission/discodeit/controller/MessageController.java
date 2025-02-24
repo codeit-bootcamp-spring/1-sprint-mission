@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.MessageApi;
-import com.sprint.mission.discodeit.dto.data.MessageDto;
-import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageDto;
+import com.sprint.mission.discodeit.dto.binaryContentDto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.messageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,8 +63,8 @@ public class MessageController implements MessageApi {
   @Override
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(
-          @PathVariable UUID messageId,
-          @RequestBody MessageUpdateRequest request) {
+      @PathVariable UUID messageId,
+      @RequestBody MessageUpdateRequest request) {
     MessageDto messageDto = messageService.update(messageId, request);
     return ResponseEntity.ok(messageDto);
   }
@@ -73,7 +73,7 @@ public class MessageController implements MessageApi {
   @Override
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> deleteMessage(
-          @PathVariable UUID messageId) {
+      @PathVariable UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.noContent().build();
   }

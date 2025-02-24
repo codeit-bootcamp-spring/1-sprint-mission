@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller.api;
 
 
-import com.sprint.mission.discodeit.dto.data.UserDto;
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.userDto.UserDto;
+import com.sprint.mission.discodeit.dto.authDto.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,11 +24,11 @@ public interface AuthApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "사용자를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "User with username {username} not found"))
+          content = @Content(examples = @ExampleObject(value = "User not found"))
       ),
       @ApiResponse(
           responseCode = "400", description = "비밀번호가 일치하지 않음",
-          content = @Content(examples = @ExampleObject(value = "Wrong password"))
+          content = @Content(examples = @ExampleObject(value = "Invalid password"))
       )
   })
   ResponseEntity<UserDto> login(

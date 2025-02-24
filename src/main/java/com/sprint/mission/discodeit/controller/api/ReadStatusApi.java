@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.controller.api;
 
 
-import com.sprint.mission.discodeit.dto.data.ReadStatusDto;
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatusDto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,11 +29,11 @@ public interface ReadStatusApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "Channel | User with id {channelId | userId} not found"))
+          content = @Content(examples = @ExampleObject(value = "Channel | User not found: {channelId | userId}"))
       ),
       @ApiResponse(
           responseCode = "400", description = "이미 읽음 상태가 존재함",
-          content = @Content(examples = @ExampleObject(value = "ReadStatus with userId {userId} and channelId {channelId} already exists"))
+          content = @Content(examples = @ExampleObject(value = "ReadStatus already exists: userId = {userId}, channelId = {channelId}"))
       )
   })
   ResponseEntity<ReadStatusDto> createReadStatus(
@@ -48,7 +48,7 @@ public interface ReadStatusApi {
       ),
       @ApiResponse(
           responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음",
-          content = @Content(examples = @ExampleObject(value = "ReadStatus with id {readStatusId} not found"))
+          content = @Content(examples = @ExampleObject(value = "ReadStatus not found: {readStatusId}"))
       )
   })
   ResponseEntity<ReadStatusDto> updateReadStatus(
