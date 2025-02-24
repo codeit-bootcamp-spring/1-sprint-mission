@@ -115,7 +115,9 @@ public class BasicChannelService implements ChannelService {
     if (channelMessages.isEmpty()) {
       return null;
     }
-    return channelMessages.get(-1).getCreatedAt();
+    return channelMessages.stream()
+        .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+        .findFirst().get().getCreatedAt();
   }
 
   private List<UUID> findJoinUsersById(UUID id) {
