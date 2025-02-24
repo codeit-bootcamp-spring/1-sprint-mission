@@ -18,21 +18,18 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        // 이메일로 사용자 조회
-        User user = userRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new NoSuchElementException("Invalid email or password"));
+    public User login(LoginRequest loginRequest) {
+        String username = loginRequest.username();
+        String password = loginRequest.password();
 
-        // 비밀번호 검증
-        if (!user.getPassword().equals(loginRequest.password())) {
-            throw new IllegalArgumentException("Invalid email or password");
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("User with username " + username + " not found"));
+
+        if (!user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Wrong password");
         }
 
-        //  임시 토큰 생성
-        String token = UUID.randomUUID().toString();
-
-        // 로그인 응답 반환
-        return new LoginResponse(user.getId(), user.getUsername(), user.getEmail(), token);
+        return user;
     }
 
 }
