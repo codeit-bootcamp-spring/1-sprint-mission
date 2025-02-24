@@ -21,7 +21,7 @@ public class ErrorResponse {
   public ErrorResponse(ErrorCode errorCode, String detail) {
     this.timestamp = LocalDateTime.now();
     this.status = errorCode.getHttpStatus().value();
-    this.error = errorCode.getHttpStatus().name();
+    this.error = errorCode.name();
     this.code = errorCode.getCode();
     this.message = errorCode.getMessage();
     this.detail = detail;
