@@ -11,6 +11,7 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,7 +37,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CommonResponse> create(@RequestPart("messageCreateDto") MessageDtoForCreate requestDTO,
+  public ResponseEntity<CommonResponse> create(@RequestPart("messageCreateDto") @Valid MessageDtoForCreate requestDTO,
                                                @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     Optional<List<BinaryContentDto>> binaryContentDtoList =  attachments == null || attachments.isEmpty()
@@ -66,7 +67,7 @@ public class MessageController {
 
   @PatchMapping("{id}")
   public ResponseEntity<CommonResponse> update(@PathVariable("id") UUID messageId,
-      @RequestBody MessageDtoForUpdate requestDTO) {
+      @RequestBody @Valid MessageDtoForUpdate requestDTO) {
     messageService.update(messageId, requestDTO);
     return CommonResponse.toResponseEntity
         (OK, "메시지가 성공적으로 업데이트되었습니다.", requestDTO);

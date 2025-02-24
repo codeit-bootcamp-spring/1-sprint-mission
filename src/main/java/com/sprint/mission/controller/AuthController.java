@@ -4,6 +4,7 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping
-    public ResponseEntity<CommonResponse> login(LoginRequest request) {
+    public ResponseEntity<CommonResponse> login(@Valid LoginRequest request) {
         User user = authService.login(request);
         return CommonResponse.toResponseEntity
                 (OK, "로그인 성공", user);

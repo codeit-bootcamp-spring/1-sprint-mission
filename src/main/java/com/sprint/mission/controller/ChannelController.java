@@ -16,6 +16,8 @@ import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
 import java.util.List;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -35,14 +37,14 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @PostMapping("public")
-    public ResponseEntity<CommonResponse> create(@RequestBody PublicChannelCreateDTO request) {
+    public ResponseEntity<CommonResponse> create(@RequestBody @Valid PublicChannelCreateDTO request) {
         Channel createdChannel = channelService.createPublicChannel(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "Public 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
     @PostMapping("private")
-    public ResponseEntity<CommonResponse> create(@RequestBody PrivateChannelCreateDTO request) {
+    public ResponseEntity<CommonResponse> create(@RequestBody @Valid PrivateChannelCreateDTO request) {
         Channel createdChannel = channelService.createPrivateChannel(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "Private 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
@@ -50,7 +52,7 @@ public class ChannelController {
 
     @PatchMapping("{id}")
     public ResponseEntity<CommonResponse> update(@PathVariable("id") UUID channelId,
-                                                 @RequestBody ChannelDtoForRequest requestDTO) {
+                                                 @RequestBody @Valid ChannelDtoForRequest requestDTO) {
         channelService.update(channelId, requestDTO);
         return CommonResponse.toResponseEntity
                 (OK, "성공적으로 업데이트되었습니다", requestDTO);

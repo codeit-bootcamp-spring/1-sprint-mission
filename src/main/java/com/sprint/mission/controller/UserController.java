@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -54,7 +55,7 @@ public class UserController {
     })
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> create(
-            @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") UserDtoForCreate requestDTO,
+            @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "유저 프로필 ") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
         User user = userService.create(requestDTO, binaryContentDto);
@@ -72,7 +73,7 @@ public class UserController {
     public ResponseEntity<CommonResponse> update(
             // @Parameter(description = "User ID")
            @PathVariable("id") UUID userId,
-            @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
+            @RequestPart("updateRequestDto") @Valid UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
         return CommonResponse.toResponseEntity

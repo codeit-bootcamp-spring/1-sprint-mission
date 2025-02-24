@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.Locked;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class ReadStatusController {
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @PostMapping
-    public ResponseEntity<CommonResponse> create(@RequestBody ReadStatusCreateRequest request) {
+    public ResponseEntity<CommonResponse> create(@RequestBody @Valid ReadStatusCreateRequest request) {
         ReadStatus createdReadStatus = readStatusService.create(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "읽음 상태가 생성되었습니다.", createdReadStatus);
@@ -56,7 +57,7 @@ public class ReadStatusController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Message 읽음 상태가 성공적으로 수정됨",
                     content = @Content(schema = @Schema(implementation = CommonResponse.class))),
-            @ApiResponse(responseCode = "200", description = "Message 읽음 상태를 찾을 수 없음",
+            @ApiResponse(responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
     })
     @PatchMapping("{id}")
