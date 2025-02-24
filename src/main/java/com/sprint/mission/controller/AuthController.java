@@ -4,6 +4,7 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "인증 API")
 public class AuthController {
     //[ ] username, password과 일치하는 유저가 있는지 확인합니다.
     //[ ] 일치하는 유저가 있는 경우: 유저 정보 반환

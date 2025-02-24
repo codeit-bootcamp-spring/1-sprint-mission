@@ -39,8 +39,8 @@ import static org.springframework.http.MediaType.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "User", description = "USER API")
 @RequestMapping("/api/users")
+@Tag(name = "User", description = "User API")
 public class UserController {
 
     private final UserService userService;

@@ -11,6 +11,7 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 import com.sprint.mission.service.jcf.main.JCFChannelService;
 import com.sprint.mission.service.jcf.main.JCFMessageService;
 import com.sprint.mission.service.jcf.main.JCFUserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import static org.springframework.http.MediaType.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
+@Tag(name = "Message", description = "Message API")
 public class MessageController {
 
   private final MessageService messageService;

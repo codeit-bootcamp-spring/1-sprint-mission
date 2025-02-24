@@ -5,6 +5,8 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 import java.util.List;
 import java.util.UUID;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import static org.springframework.http.HttpStatus.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
+@Tag(name = "BinaryContent", description = "첨부 파일 API")
 public class BinaryContentController {
 
   private final BinaryService binaryContentService;

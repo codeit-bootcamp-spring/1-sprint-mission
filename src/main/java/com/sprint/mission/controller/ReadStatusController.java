@@ -28,10 +28,11 @@ import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
 
-@Tag(name = "ReadStatus", description = "READ STATUS API")
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/readStatuses")
+@Tag(name = "ReadStatus", description = "Message 읽음 상태 API")
 public class ReadStatusController {
 
     // 카피
