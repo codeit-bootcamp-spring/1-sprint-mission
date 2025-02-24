@@ -9,6 +9,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
@@ -31,48 +32,56 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent save(BinaryContent content) {
-        Path path = resolvePath(content.getId());
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
-            oos.writeObject(content);
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = resolvePath(binaryContent.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(binaryContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return content;
+        return binaryContent;
     }
 
     @Override
     public Optional<BinaryContent> findById(UUID id) {
+        BinaryContent binaryContentNullable = null;
         Path path = resolvePath(id);
         if (Files.exists(path)) {
-            try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-                return Optional.of((BinaryContent) ois.readObject());
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                binaryContentNullable = (BinaryContent) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
-    }
-
-    @Override
-    public List<BinaryContent> findAllByUserId(UUID userId) {
-        return findAll().stream()
-                .filter(content -> content.getUserId() != null && content.getUserId().equals(userId))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<BinaryContent> findAllByMessageId(UUID messageId) {
-        return findAll().stream()
-                .filter(content -> content.getMessageId() != null && content.getMessageId().equals(messageId))
-                .collect(Collectors.toList());
+        return Optional.ofNullable(binaryContentNullable);
     }
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return findAll().stream()
-                .filter(content -> ids.contains(content.getId()))
-                .collect(Collectors.toList());
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (BinaryContent) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .filter(content -> ids.contains(content.getId()))
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -85,33 +94,10 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         }
     }
 
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        findAllByMessageId(messageId).forEach(content -> deleteById(content.getId()));
-    }
 
     @Override
     public boolean existsById(UUID id) {
-        return Files.exists(resolvePath(id));
-    }
-
-    private List<BinaryContent> findAll() {
-        try {
-            if (Files.notExists(DIRECTORY)) {
-                return Collections.emptyList();
-            }
-            return Files.list(DIRECTORY)
-                    .filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-                            return (BinaryContent) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Path path = resolvePath(id);
+        return Files.exists(path);
     }
 }

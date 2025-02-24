@@ -38,20 +38,29 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
         if (request.password() == null || request.password().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
+            throw new IllegalArgumentException("Password is required for private channels.");
         }
-        Channel channel = new Channel(ChannelType.PRIVATE, "Private Channel", "Private description", request.password());
+        // 비공개 채널 생성
+        Channel channel = new Channel(ChannelType.PRIVATE, request.name(), request.description(), request.password());
 
-        for (UUID userId : request.userIds()) {
+        // 채널을 먼저 저장
+        channelRepository.save(channel);
+
+        // 비공개 채널 참여자 등록
+        List<UUID> participantIds = (request.userIds() != null) ? request.userIds() : List.of();
+
+        for (UUID userId : participantIds) {
             if (!userRepository.existsById(userId)) {
                 throw new IllegalArgumentException("User with id " + userId + " not found");
             }
 
-            ReadStatus readStatus = new ReadStatus(userId, channel.getId(), null, null); // ✅ 수정됨
+            ReadStatus readStatus = new ReadStatus(userId, channel.getId(), null, null);
             readStatusRepository.save(readStatus);
         }
+
         return channel;
     }
+
 
     @Override
     public ChannelDTO find(UUID channelId) {
@@ -87,11 +96,6 @@ public class BasicChannelService implements ChannelService {
                     return ChannelDTO.from(channel, lastMessageAt.orElse(null), participantUserIds);
                 })
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public Instant findLastMessageAtByChannelId(UUID channelId) {
-        return messageRepository.findLastMessageAtByChannelId(channelId).orElse(null);
     }
 
     @Override
@@ -133,5 +137,11 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteByChannelId(channelId);
 
         channelRepository.deleteById(channelId);
+
+    }
+
+    @Override
+    public Instant findLastMessageAtByChannelId(UUID channelId) {
+        return messageRepository.findLastMessageAtByChannelId(channelId).orElse(null);
     }
 }
