@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.*;
 
 @Slf4j
 @RestController
@@ -32,7 +33,7 @@ public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
 
-    @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> create(@RequestPart("createRequestDto") UserDtoForCreate requestDTO,
                                                  @RequestPart(value = "profile", required = false) MultipartFile profile) {
         Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
@@ -41,9 +42,9 @@ public class UserController {
                 (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
     }
 
-    @RequestMapping(path = "update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "{id}", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> update(
-            @RequestParam("userId") UUID userId,
+            @PathVariable("id") UUID userId,
             @RequestPart("updateRequestDto") UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
@@ -52,22 +53,22 @@ public class UserController {
     }
 
 
-    @RequestMapping("delete")
-    public ResponseEntity<CommonResponse> delete(@RequestParam("userId") UUID userId) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<CommonResponse> delete(@PathVariable("id") UUID userId) {
         userService.delete(userId);
         return CommonResponse.toResponseEntity
                 (NO_CONTENT, "성공적으로 삭제되었습니다", null);
     }
 
-    @RequestMapping("updateStatusByUserId")
-    public ResponseEntity<CommonResponse> updateStatusByUserId(@RequestParam("userId") UUID userId) {
+    @PatchMapping("{id}/status")
+    public ResponseEntity<CommonResponse> updateStatusByUserId(@PathVariable("id") UUID userId) {
         UserStatus userStatus = userStatusService.updateByUserId(userId);
         return CommonResponse.toResponseEntity
                 (OK, "status updated Successfully", userStatus);
     }
 
 
-    @RequestMapping("findAll")
+    @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
         log.info("statusMapByUser : {}", statusMapByUser);

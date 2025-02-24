@@ -9,29 +9,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.HttpStatus.*;
 
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
   private final BinaryService binaryContentService;
 
-  @RequestMapping(path = "find")
-  public ResponseEntity<CommonResponse> find(@RequestParam("id") UUID binaryContentId) {
+  @GetMapping("{id}")
+  public ResponseEntity<CommonResponse> find(@PathVariable("id") UUID binaryContentId) {
     BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
     return CommonResponse.toResponseEntity
         (OK, "BinaryContent 조회 성공", binaryContent);
   }
 
-  @RequestMapping(path = "findAllByIdIn")
+  @GetMapping
   public ResponseEntity<CommonResponse> findAllByIdIn(
       @RequestParam("ids") List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);

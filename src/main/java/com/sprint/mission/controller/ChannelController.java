@@ -34,22 +34,22 @@ public class ChannelController {
 
     private final ChannelService channelService;
 
-    @RequestMapping(path = "createPublic")
+    @PostMapping("public")
     public ResponseEntity<CommonResponse> create(@RequestBody PublicChannelCreateDTO request) {
         Channel createdChannel = channelService.createPublicChannel(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "Public 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
-    @RequestMapping(path = "createPrivate")
+    @PostMapping("private")
     public ResponseEntity<CommonResponse> create(@RequestBody PrivateChannelCreateDTO request) {
         Channel createdChannel = channelService.createPrivateChannel(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "Private 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
-    @RequestMapping(path = "update")
-    public ResponseEntity<CommonResponse> update(@RequestParam("channelId") UUID channelId,
+    @PatchMapping("{id}")
+    public ResponseEntity<CommonResponse> update(@PathVariable("id") UUID channelId,
                                                  @RequestBody ChannelDtoForRequest requestDTO) {
         channelService.update(channelId, requestDTO);
         return CommonResponse.toResponseEntity
@@ -57,7 +57,7 @@ public class ChannelController {
     }
 
     //[ ] 특정 사용자가 볼 수 있는 모든 채널 목록을 조회할 수 있다.
-    @RequestMapping(path = "findAllByUserId")
+    @GetMapping
     public ResponseEntity<CommonResponse> findAllByUserId(
             @RequestParam("userId") UUID userId) {
 
@@ -66,8 +66,8 @@ public class ChannelController {
                 (OK, "성공적으로 조회되었습니다", channelDtoList);
     }
 
-    @RequestMapping(path = "delete")
-    public ResponseEntity<CommonResponse> delete(@RequestParam("channelId") UUID channelId) {
+    @DeleteMapping("{id}")
+    public ResponseEntity<CommonResponse> delete(@PathVariable("id") UUID channelId) {
         channelService.delete(channelId);
         return CommonResponse.toResponseEntity
                 (NO_CONTENT, "성공적으로 삭제되었습니다", null);

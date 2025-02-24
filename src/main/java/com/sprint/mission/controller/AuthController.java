@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import static org.springframework.http.HttpStatus.*;
@@ -22,7 +23,7 @@ public class AuthController {
     //[ ] DTO를 활용해 파라미터를 그룹화합니다.
     private final AuthService authService;
 
-    @RequestMapping("login")
+    @GetMapping
     public ResponseEntity<CommonResponse> login(LoginRequest request) {
         User user = authService.login(request);
         return CommonResponse.toResponseEntity

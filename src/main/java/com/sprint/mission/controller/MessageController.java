@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.*;
 
 
 @Slf4j
@@ -34,7 +35,7 @@ public class MessageController {
 
   private final MessageService messageService;
 
-  @RequestMapping(path = "create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<CommonResponse> create(@RequestPart("messageCreateDto") MessageDtoForCreate requestDTO,
                                                @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
@@ -50,8 +51,8 @@ public class MessageController {
         (CREATED, "메시지가 성공적으로 생성되었습니다.", null);
   }
 
-  // @GetMapping("/messages}")
-  @RequestMapping("findInChannel")
+
+  @GetMapping
   public ResponseEntity<CommonResponse> findInChannel(
       @RequestParam("channelId") UUID channelId) {
     List<Message> messageList = messageService.findAllByChannelId(channelId);
@@ -63,7 +64,7 @@ public class MessageController {
         (OK, "메시지 목록을 성공적으로 조회했습니다.", dtoList);
   }
 
-  @RequestMapping("update")
+  @PatchMapping("{id}")
   public ResponseEntity<CommonResponse> update(@PathVariable("id") UUID messageId,
       @RequestBody MessageDtoForUpdate requestDTO) {
     messageService.update(messageId, requestDTO);
@@ -72,8 +73,8 @@ public class MessageController {
   }
 
 
-  @RequestMapping("delete")
-  public ResponseEntity<CommonResponse> delete(@RequestParam("messageId") UUID messageId) {
+  @DeleteMapping("{id}")
+  public ResponseEntity<CommonResponse> delete(@RequestParam("id") UUID messageId) {
     messageService.delete(messageId);
     return CommonResponse.toResponseEntity
         (NO_CONTENT, "메시지가 성공적으로 삭제되었습니다.", null);
