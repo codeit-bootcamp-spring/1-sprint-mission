@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

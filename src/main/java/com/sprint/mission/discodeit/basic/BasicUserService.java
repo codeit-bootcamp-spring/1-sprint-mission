@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class BasicUserService implements UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public User update(String id, UsersDTO usersDTO, byte[] profileImage) {
         User user = userRepository.findById(id)

@@ -29,8 +29,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(
                 channelDTO.getName(),
                 channelDTO.getDescription(),
-                ChannelType.valueOf(channelDTO.getType().toUpperCase())
-        );
+                ChannelType.valueOf(channelDTO.getType().toUpperCase()));
         return channelRepository.save(channel);
     }
 
