@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;

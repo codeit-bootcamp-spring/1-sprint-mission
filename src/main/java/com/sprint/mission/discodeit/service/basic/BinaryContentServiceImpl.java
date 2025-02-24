@@ -3,10 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -17,6 +14,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
+import static com.sprint.mission.discodeit.constant.MessageConstant.MESSAGE_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent create(BinaryContent content) {
 
-    validator.findOrThrow(User.class, content.getUserId(), new UserNotFoundException());
+    validator.findOrThrow(User.class, content.getUserId(), new NotFoundException(NO_MATCHING_USER));
 
     // 기존에 존재하던 프로필 삭제. 그냥 교채로 바꿀수도?
     if (content.isProfilePicture()) {
@@ -84,7 +83,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents) {
 
-    validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
+    validator.findOrThrow(Message.class, messageId, new NotFoundException(MESSAGE_NOT_FOUND));
 
     if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();

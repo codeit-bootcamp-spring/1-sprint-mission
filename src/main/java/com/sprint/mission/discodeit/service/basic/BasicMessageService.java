@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.sprint.mission.discodeit.constant.MessageConstant.MESSAGE_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -41,7 +43,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message getMessageById(String messageId) {
-    return messageRepository.findById(messageId).orElseThrow(MessageNotFoundException::new);
+    return messageRepository.findById(messageId).orElseThrow(() -> new NotFoundException(MESSAGE_NOT_FOUND));
   }
 
   @Override

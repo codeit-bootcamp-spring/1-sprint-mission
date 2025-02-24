@@ -5,7 +5,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-
+/**
+ * This log is for development only
+ */
 @Slf4j
 @Component
 public class RequestLoggingInterceptor implements HandlerInterceptor {

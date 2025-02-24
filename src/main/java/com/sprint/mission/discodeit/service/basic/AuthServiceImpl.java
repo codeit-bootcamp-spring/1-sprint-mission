@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.PASSWORD_MATCH_ERROR;
+import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
 
 @Service
 @Slf4j
@@ -33,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
   public LoginResponseDto login(String username, String password) {
 
     log.info("[Login Request] : 요청 수신");
-    User targetUser = userRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
+    User targetUser = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(NO_MATCHING_USER));
 
     if(!PasswordEncryptor.checkPassword(password, targetUser.getPassword())){
       log.info("[Login Request] : 비밀번호 검증 실패");

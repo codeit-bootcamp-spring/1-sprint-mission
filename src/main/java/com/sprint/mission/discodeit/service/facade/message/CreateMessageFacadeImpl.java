@@ -6,8 +6,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -20,6 +19,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+
+import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
 
 @Slf4j
 @Component
@@ -36,8 +38,8 @@ public class CreateMessageFacadeImpl implements CreateMessageFacade{
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
 
-    User user = validator.findOrThrow(User.class, messageDto.authorId(), new UserNotFoundException());
-    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new ChannelNotFoundException());
+    User user = validator.findOrThrow(User.class, messageDto.authorId(), new NotFoundException(NO_MATCHING_USER));
+    Channel channel = validator.findOrThrow(Channel.class, messageDto.channelId(), new NotFoundException(CHANNEL_NOT_FOUND));
 
     channelService.validateUserAccess(channel, user.getId());
     Message message = messageMapper.toEntity(messageDto, messageDto.channelId(), binaryContentMapper);

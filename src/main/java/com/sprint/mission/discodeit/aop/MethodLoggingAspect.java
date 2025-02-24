@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.aop;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
@@ -37,11 +36,11 @@ public class MethodLoggingAspect {
   }
 
   @After("execution(* com.sprint.mission.discodeit.service.facade..*MasterFacade.*(..))")
-  public void logFacadeCompletion(){
+  public void logFacadeCompletion() {
     List<String> calledMethods = methodTrace.get();
 
-    for(int i = 0; i< calledMethods.size(); i++){
-      log.info("[Called Method {}] : {}", i, calledMethods.get(i));
+    for (int i = 0; i < calledMethods.size(); i++) {
+      log.info("\t\t[Called Method {}] : {}", i, calledMethods.get(i));
     }
 
     methodTrace.remove();

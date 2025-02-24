@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -14,6 +14,8 @@ import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
 
 
 @Slf4j
@@ -29,7 +31,7 @@ public class CreateChannelFacadeImpl implements CreateChannelFacade{
   @Override
   public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
     channelDto.participantIds().forEach(
-        id -> validator.findOrThrow(User.class, id, new UserNotFoundException())
+        id -> validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER))
     );
 
     Channel channel = channelService.createPrivateChannel(channelMapper.toEntity(channelDto));

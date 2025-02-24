@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
+import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.ChannelConstant.PRIVATE_CHANNEL_CANNOT_BE_UPDATED;
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
@@ -49,7 +50,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel getChannelById(String channelId) {
-    return validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
+    return validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
   }
 
 
@@ -69,7 +70,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel updateChannel(String channelId, ChannelUpdateDto dto) {
 
-    Channel channel = validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
+    Channel channel = validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
 
     if (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)) {
       throw new InvalidOperationException(PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
@@ -84,7 +85,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(String channelId) {
-    validator.findOrThrow(Channel.class, channelId, new ChannelNotFoundException());
+    validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
 
     channelRepository.delete(channelId);
   }

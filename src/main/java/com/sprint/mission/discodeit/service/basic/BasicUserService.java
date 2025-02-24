@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -56,7 +56,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public User findUserById(String id) {
-    return validator.findOrThrow(User.class, id, new UserNotFoundException());
+    return validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
   }
 
   @Override
@@ -68,7 +68,7 @@ public class BasicUserService implements UserService {
   @Override
   public User updateUser(String id, UserUpdateDto updatedUser) {
 
-    User originalUser = validator.findOrThrow(User.class, id, new UserNotFoundException());
+    User originalUser = validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
 
     synchronized (originalUser) {
       updateFields(originalUser, updatedUser);
@@ -94,7 +94,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void deleteUser(String id) {
-    validator.findOrThrow(User.class, id, new UserNotFoundException());
+    validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
 
     userRepository.delete(id);
   }

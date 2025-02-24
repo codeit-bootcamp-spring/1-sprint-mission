@@ -5,10 +5,8 @@ import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -20,7 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_FOUND;
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
+import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
 
 @Service
 @Slf4j
@@ -34,8 +34,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus create(CreateReadStatusDto dto, boolean skipValidation) {
 
     if (!skipValidation) {
-      validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
-      validator.findOrThrow(Channel.class, dto.channelId(), new ChannelNotFoundException());
+      validator.findOrThrow(User.class, dto.userId(), new NotFoundException(NO_MATCHING_USER));
+      validator.findOrThrow(Channel.class, dto.channelId(), new NotFoundException(CHANNEL_NOT_FOUND));
     }
 
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
