@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,8 +32,11 @@ public class User {
     @Lob
     private byte[] profileImage;
 
+    @ManyToMany(mappedBy = "members")
+    private Set<Channel> channels = new HashSet<>();
+
     public User(String name, String email, String password) {
-        this.id = UUID.randomUUID().toString(); // 직접 UUID 생성
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.email = email;
         this.password = password;

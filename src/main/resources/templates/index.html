@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>메인 메뉴</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Discodeit 메인 메뉴</h1>
+    <div class="list-group">
+        <a href="/users/register" class="list-group-item list-group-item-action">
+            회원가입
+        </a>
+        <a href="/users" class="list-group-item list-group-item-action">
+            유저 목록
+        </a>
+
+        <a href="/auth/login" class="list-group-item list-group-item-action">
+            로그인
+        </a>
+
+        <a href="/channels/create" class="list-group-item list-group-item-action">
+            채널 생성
+        </a>
+        <a href="/channels" class="list-group-item list-group-item-action">
+            채널 목록 조회
+        </a>
+
+        <a href="/messages/create" class="list-group-item list-group-item-action">
+            메시지 보내기
+        </a>
+        <a href="/messages" class="list-group-item list-group-item-action">
+            메시지 목록 조회
+        </a>
+
+        <a href="/read-status" class="list-group-item list-group-item-action">
+            메시지 수신 정보 관리
+        </a>
+
+        <a href="/files" class="list-group-item list-group-item-action">
+            바이너리 파일 조회
+        </a>
+    </div>
+</div>
+</body>
+</html>
