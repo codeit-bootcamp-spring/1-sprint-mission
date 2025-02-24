@@ -25,7 +25,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findById(String id) {
+    public Optional<BinaryContent> findByUserId(String id) {
         return Optional.ofNullable(dataStore.get(id));
     }
 

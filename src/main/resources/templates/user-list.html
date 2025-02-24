@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>유저 목록</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">유저 목록</h2>
+    <table class="table table-striped">
+        <thead class="thead-light">
+        <tr>
+            <th>프로필</th>
+            <th>이름</th>
+            <th>이메일</th>
+            <th>상태</th>
+            <th>액션</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td>
+                <img th:if="${user.profileImage != null && user.profileImage != ''}"
+                     th:src="@{'data:image/jpeg;base64,' + ${user.profileImage}}"
+                     class="profile-img" alt="Profile Image">
+                <span th:if="${user.profileImage == null || user.profileImage == ''}">
+        No Image
+      </span>
+            </td>
+            <td th:text="${user.name}">이름</td>
+            <td th:text="${user.email}">이메일</td>
+            <td th:text="${user.online} ? '온라인' : '오프라인'">상태</td>
+            <td>
+                <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm">삭제</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/users/register" class="btn btn-primary">회원가입</a>
+    <a href="/" class="btn btn-primary">홈</a>
+</div>
+</body>
+</html>

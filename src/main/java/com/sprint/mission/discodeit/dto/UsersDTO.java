@@ -2,18 +2,19 @@ package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.objenesis.instantiator.basic.NewInstanceInstantiator;
 
-@Getter
-@Setter
+import java.util.Base64;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChannelDTO {
+public class UsersDTO {
+    private String id;
     private String name;
-    private String description;
-    private String type;
-
+    private String email;
+    private String password;
+    private boolean online = false;
+    private String profileImage;
 }

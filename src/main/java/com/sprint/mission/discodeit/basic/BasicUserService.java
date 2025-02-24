@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.basic;
 
 import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.UsersDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -10,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Primary
@@ -21,30 +21,27 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public User create(UserDTO userDTO, byte[] profileImage) {
-        User user = new User(userDTO.getName(), userDTO.getEmail(), userDTO.getPassword());
-        userRepository.save(user);
+    public User create(UsersDTO dto, byte[] imageBytes) {
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+        user.setOnline(true);
 
-        if (profileImage != null) {
-            BinaryContent profile = new BinaryContent(user.getId(), profileImage);
-            binaryContentRepository.save(profile);
+        if (imageBytes != null && imageBytes.length > 0) {
+            user.setProfileImage(imageBytes);
         }
 
-        return user;
+        return userRepository.save(user);
     }
 
     @Override
-    public User update(String id, UserDTO userDTO, byte[] profileImage) {
+    public User update(String id, UsersDTO usersDTO, byte[] profileImage) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Objects.requireNonNull(userDTO, "UserDTO cannot be null");
-
-        user.update(
-                userDTO.getName() != null ? userDTO.getName() : user.getName(),
-                userDTO.getEmail() != null ? userDTO.getEmail() : user.getEmail()
-        );
+        Objects.requireNonNull(usersDTO, "UserDTO cannot be null");
 
         userRepository.save(user);
 
@@ -67,13 +64,39 @@ public class BasicUserService implements UserService {
     public UserDTO find(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return new UserDTO(user.getName(), user.getEmail(), user.getPassword());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
-    @Override
-    public List<UserDTO> findAll() {
-        return userRepository.findAll().stream()
-                .map(user -> new UserDTO(user.getName(), user.getEmail(), user.getPassword()))
+    private UsersDTO toDTO(User user) {
+        UsersDTO dto = new UsersDTO();
+        dto.setId(user.getId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPassword(user.getPassword());
+        dto.setOnline(user.isOnline());
+
+        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
+            String base64Str = Base64.getEncoder().encodeToString(user.getProfileImage());
+            dto.setProfileImage(base64Str);
+        } else {
+            dto.setProfileImage("");
+        }
+        return dto;
+    }
+
+    public List<UsersDTO> findAll() {
+        List<User> userList = userRepository.findAll();
+        return userList.stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    public void updateOnlineStatus(String userId, boolean online) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
+
+        user.setOnline(online);
+
+        userRepository.save(user);
     }
 }
