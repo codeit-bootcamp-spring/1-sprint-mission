@@ -1,0 +1,65 @@
+package com.sprint.mission.discodeit.controller.docs;
+
+import com.sprint.mission.discodeit.dto.UserRequest;
+import com.sprint.mission.discodeit.dto.UserResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+@Tag(name = "User API", description = "User 관련 API")
+public interface UserApiDocs {
+
+  @Operation(summary = "모든 유저 정보", description = "모든 유저 정보 가져오기")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "모든 유저 정보 가져오기 성공"),
+      @ApiResponse(responseCode = "400", description = "모든 유저 정보 가져오기 실패")
+  })
+  List<UserResponse> getAllUser();
+
+  @Operation(summary = "유저 생성", description = "유저 생성하기")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 생성 성공"),
+      @ApiResponse(responseCode = "400", description = "유저 생성 실패")
+  })
+  UserResponse createUser(
+      UserRequest userRequest,
+      MultipartFile userProfileImage
+  );
+
+  @Operation(summary = "유저 정보 수정", description = "유저 정보 수정하기")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 정보 수정 성공"),
+      @ApiResponse(responseCode = "400", description = "유저 정보 수정 실패"),
+      @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
+  })
+  UserResponse updateUser(
+      UUID userId,
+      UserRequest userRequest,
+      MultipartFile userProfileImage
+  );
+
+  @Operation(summary = "유저 삭제", description = "유저 삭제 수정하기")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 삭제 성공"),
+      @ApiResponse(responseCode = "400", description = "유저 삭제 실패"),
+  })
+  String deleteUser(UUID userId);
+
+  @Operation(summary = "유저 상태 업데이트", description = "유저 상태 업데이트(online or offline)")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "유저 상태 업데이트 성공"),
+      @ApiResponse(responseCode = "400", description = "유저 상태 업데이트 실패, 잘못된 요청입니다."),
+      @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
+  })
+  String updateUserStatus(UUID userId);
+}

@@ -11,8 +11,13 @@ discodeit:
     file-directory: tmp
 
 logging:
-#  file:
-#    name: ${user.dir}/log/test.log
+  #  file:
+  #    name: ${user.dir}/log/test.log
   level:
-    com.sprint.mission.discodeit : info
+    com.sprint.mission.discodeit: info
 
+#springdoc:
+#  api-docs:
+#    path: /api-docs
+#  swagger-ui:
+#    path: /swagger-ui.html

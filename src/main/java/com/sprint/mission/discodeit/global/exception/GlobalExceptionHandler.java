@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 // Controller + ResponseBody
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = {"com.sprint.mission.discodeit.controller.api"})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
   // RestApiException 에 대한 예외 처리하기

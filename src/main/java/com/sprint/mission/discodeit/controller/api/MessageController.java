@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.api;
 
+import com.sprint.mission.discodeit.controller.docs.MessageApiDocs;
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -13,11 +14,12 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
-public class MessageController {
+public class MessageController implements MessageApiDocs {
 
   private final MessageService messageService;
 
   @PostMapping
+  @Override
   public MessageResponse createMessage(
       @RequestPart MessageRequest.Create messageRequest,
       @RequestPart(value = "files", required = false) List<MultipartFile> files
@@ -26,6 +28,7 @@ public class MessageController {
   }
 
   @PutMapping("/{messageId}")
+  @Override
   public MessageResponse updateMessage(
       @PathVariable UUID messageId,
       @RequestPart MessageRequest.Update messageRequest,
@@ -35,12 +38,14 @@ public class MessageController {
   }
 
   @DeleteMapping("/{messageId}")
+  @Override
   public String deleteMessage(@PathVariable UUID messageId) {
     messageService.deleteById(messageId);
     return "delete ok";
   }
 
   @GetMapping
+  @Override
   public List<MessageResponse> getMessageListByChannel(@RequestParam("channelId") UUID channelId) {
     return messageService.findAllByChannelId(channelId);
   }
