@@ -43,7 +43,8 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
     // Logging
     implementation 'org.slf4j:slf4j-api:2.0.9'
-    //implementation 'ch.qos.logback:logback-classic:1.4.11'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

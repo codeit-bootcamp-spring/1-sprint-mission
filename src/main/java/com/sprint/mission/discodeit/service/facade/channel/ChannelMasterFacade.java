@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.facade.channel;
 
-import com.sprint.mission.discodeit.dto.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.*;
 
 import java.util.List;
