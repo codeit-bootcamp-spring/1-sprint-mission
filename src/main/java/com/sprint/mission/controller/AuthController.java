@@ -4,6 +4,10 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +33,10 @@ public class AuthController {
     //[ ] DTO를 활용해 파라미터를 그룹화합니다.
     private final AuthService authService;
 
-    @GetMapping
+    @Operation(summary = "로그인")
+    @ApiResponse(responseCode = "200", description = "로그인 성공",
+            content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+    @GetMapping("/login")
     public ResponseEntity<CommonResponse> login(@Valid LoginRequest request) {
         User user = authService.login(request);
         return CommonResponse.toResponseEntity
