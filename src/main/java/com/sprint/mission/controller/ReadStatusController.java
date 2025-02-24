@@ -41,7 +41,7 @@ public class ReadStatusController {
     @Operation(summary = "Message 읽음 상태 생성")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "읽음 상태 생성 성공",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ReadStatus.class))),
             @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
             @ApiResponse(responseCode = "409", description = "읽음 상태가 이미 존재함",
@@ -57,7 +57,7 @@ public class ReadStatusController {
     @Operation(summary = "Message 읽음 상태 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Message 읽음 상태가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ReadStatus.class))),
             @ApiResponse(responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
     })

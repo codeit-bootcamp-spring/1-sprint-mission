@@ -2,6 +2,7 @@ package com.sprint.mission.entity.main;
 
 
 import com.sprint.mission.dto.request.UserDtoForCreate;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@Schema(description = "유저")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;

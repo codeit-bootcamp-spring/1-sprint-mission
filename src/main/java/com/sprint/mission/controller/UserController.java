@@ -50,7 +50,7 @@ public class UserController {
     @Operation(summary = "User 등록", description = "Create User")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User가 성공적으로 생성됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = User.class))),
             @ApiResponse(responseCode = "409", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -64,17 +64,18 @@ public class UserController {
                 (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
     }
 
-    @Operation(summary = "User 정보 수정", description = "Create User")
+    @Operation(summary = "User 정보 수정")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "성공적으로 업데이트되었습니다",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
-            @ApiResponse(responseCode = "409", description = "이메일 또는 이름 중복",
+            @ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨",
+                    content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @PatchMapping(path = "{id}", consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> update(
-            // @Parameter(description = "User ID")
-           @PathVariable("id") UUID userId,
+            @Parameter(description = "수정할 User ID") @PathVariable("id") UUID userId,
             @RequestPart("updateRequestDto") @Valid UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
@@ -83,10 +84,9 @@ public class UserController {
     }
 
 
-    @Operation(summary = "User 삭제", description = "Delete User")
+    @Operation(summary = "User 삭제")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "User가 성공적으로 삭제됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "204", description = "User가 성공적으로 삭제됨", content = @Content()),
             @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -100,10 +100,10 @@ public class UserController {
     }
 
 
-    @Operation(summary = "User 온라인 상태 업데이트", description = "Update User Status")
+    @Operation(summary = "User 온라인 상태 업데이트")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = UserStatus.class))),
             @ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -119,7 +119,7 @@ public class UserController {
 
     @Operation(summary = "전체 User 목록 조회")
     @ApiResponse(responseCode = "200", description = "User 목록 조회 성공",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommonResponse.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindUserDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();

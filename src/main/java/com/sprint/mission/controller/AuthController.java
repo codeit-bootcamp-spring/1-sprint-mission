@@ -35,7 +35,9 @@ public class AuthController {
 
     @Operation(summary = "로그인")
     @ApiResponse(responseCode = "200", description = "로그인 성공",
-            content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = User.class)))
     @GetMapping("/login")
     public ResponseEntity<CommonResponse> login(@Valid LoginRequest request) {
         User user = authService.login(request);

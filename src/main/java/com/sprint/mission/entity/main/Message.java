@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.main;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Schema(description = "메시지 엔티티")
 public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;

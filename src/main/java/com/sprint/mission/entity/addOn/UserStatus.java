@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Schema(description = "유저 상태")
 public class UserStatus implements Serializable {
     private static final long serialVersionUID = 1L;
     private UUID id;

@@ -1,6 +1,7 @@
 package com.sprint.mission.entity.main;
 
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.util.*;
 
 @Getter
 @Setter
+@Schema(description = "채널")
 public class Channel implements Serializable {
 
     private static final long serialVersionUID = 2L;

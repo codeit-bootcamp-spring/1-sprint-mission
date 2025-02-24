@@ -1,6 +1,7 @@
 package com.sprint.mission.entity.addOn;
 
 import com.sprint.mission.dto.request.BinaryContentDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Schema(description = "바이너리 컨텐츠")
 public class BinaryContent {
 
     private static final long serialVersionUID = 1L;

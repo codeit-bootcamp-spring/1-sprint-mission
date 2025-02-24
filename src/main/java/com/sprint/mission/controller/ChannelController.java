@@ -18,6 +18,7 @@ import com.sprint.mission.service.ChannelService;
 
 import java.util.List;
 
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -29,6 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,7 +49,7 @@ public class ChannelController {
 
     @Operation(summary = "Public Channel 생성")
     @ApiResponse(responseCode = "201", description = "Public Channel이 성공적으로 생성됨",
-            content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            content = @Content(schema = @Schema(implementation = Channel.class)))
     @PostMapping("public")
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid PublicChannelCreateDTO request) {
         Channel createdChannel = channelService.createPublicChannel(request);
@@ -57,7 +59,7 @@ public class ChannelController {
 
     @Operation(summary = "Private Channel 생성")
     @ApiResponse(responseCode = "201", description = "Private Channel이 성공적으로 생성됨",
-            content = @Content(schema = @Schema(implementation = CommonResponse.class)))
+            content = @Content(schema = @Schema(implementation = Channel.class)))
     @PostMapping("private")
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid PrivateChannelCreateDTO request) {
         Channel createdChannel = channelService.createPrivateChannel(request);
@@ -68,7 +70,7 @@ public class ChannelController {
     @Operation(summary = "Channel 정보 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Channel 정보가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ChannelDtoForUpdate.class))),
             @ApiResponse(responseCode = "404", description = "Channel을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "Private Channel은 수정할 수 없음",
@@ -88,7 +90,7 @@ public class ChannelController {
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = CommonResponse.class)))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindChannelAllDto.class)))),
             @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -103,8 +105,7 @@ public class ChannelController {
 
     @Operation(summary = "Channel 삭제")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Channel이 성공적으로 삭제됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Channel이 성공적으로 삭제됨", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Channel을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })

@@ -49,13 +49,12 @@ public class MessageController {
     @Operation(summary = "Message 생성")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Message가 성공적으로 생성됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = Message.class))),
             @ApiResponse(responseCode = "404", description = "Channel 또는 User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @PostMapping(consumes = MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse> create(
-            @Parameter(description = "메시지 생성을 위한 DTO")
             @RequestPart("messageCreateDto") @Valid MessageDtoForCreate requestDTO,
             @Parameter(description = "Message 첨부 파일들")
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
@@ -92,7 +91,7 @@ public class MessageController {
     @Operation(summary = "Message 내용 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Message가 성공적으로 수정됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+                    content = @Content(schema = @Schema(implementation = Message.class))),
             @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -100,7 +99,6 @@ public class MessageController {
     public ResponseEntity<CommonResponse> update(
             @Parameter(description = "수정할 Message ID")
             @PathVariable("id") UUID messageId,
-            @Parameter(description = "메시지 수정을 위한 DTO")
             @RequestBody @Valid MessageDtoForUpdate requestDTO) {
         messageService.update(messageId, requestDTO);
         return CommonResponse.toResponseEntity
@@ -110,8 +108,7 @@ public class MessageController {
 
     @Operation(summary = "Message 삭제")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Message가 성공적으로 삭제됨",
-                    content = @Content(schema = @Schema(implementation = CommonResponse.class))),
+            @ApiResponse(responseCode = "204", description = "Message가 성공적으로 삭제됨", content = @Content()),
             @ApiResponse(responseCode = "404", description = "Message를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
