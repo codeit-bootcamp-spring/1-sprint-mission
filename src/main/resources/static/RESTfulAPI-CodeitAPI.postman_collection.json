@@ -1,0 +1,456 @@
+{
+	"info": {
+		"_postman_id": "4cb7564b-65f4-4067-aac9-75565d08b1bb",
+		"name": "RESTfulAPI-CodeitAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42135903"
+	},
+	"item": [
+		{
+			"name": "CreateUser",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userCreate",
+							"value": "{\n \"username\" : \"rex\",  \"userEmail\" : \"rex@naver.com\",  \"password\" : \"123456\"\n\n}",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "profile",
+							"contentType": "multipart/form-data",
+							"type": "file",
+							"src": "postman-cloud:///1eff1f64-4051-4f90-8930-e1b6694ed8e3"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LoginUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\" : \"woody\",\n    \"password\" : \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUser",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userUpdate",
+							"value": "{\n \"username\" : \"wooody\", \n \"userEmail\" : \"woody@gmail.com\",  \"password\" : \"woody1234\"\n\n}",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "profile",
+							"contentType": "multipart/form-data",
+							"type": "file",
+							"src": "postman-cloud:///1eff1eee-22b6-4560-b926-e4ec1ff0e6ef"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllUser",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUserStatus",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\" : \"ONLINE\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users/a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PublicChannelCreate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"Channel\", \n    \"description\" : \"Codeit Channel\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/channels/public",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"public"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Private Channel Create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\" : \"6Team Channel\", \n    \"description\" : \"This is 6Team's Channel\",\n    \"participantsIds\" : [\"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f\",\"d746fae7-dfd8-4aa4-9b6d-12711a6d7636\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/cahnnels/private",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"cahnnels",
+						"private"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "All Channels",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/channels?userId=a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "messageCreate",
+							"value": "{\n \"content\" : \"주강사님은 누구신가요?\", \"channelId\" : \"08eee30e-33bc-4385-a870-b9786e95d2f2\", \"authorId\" : \"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f\"\n}",
+							"contentType": "application/json",
+							"type": "text"
+						},
+						{
+							"key": "attachments",
+							"contentType": "multipart/form-data",
+							"type": "file",
+							"src": [],
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/messages",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetAllMessages in Channel",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/messages/channel/08eee30e-33bc-4385-a870-b9786e95d2f2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages",
+						"channel",
+						"08eee30e-33bc-4385-a870-b9786e95d2f2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateMessageReadStatus",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/readStatus/27f76c10-7061-4480-9ee2-dc52743e6cec",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"readStatus",
+						"27f76c10-7061-4480-9ee2-dc52743e6cec"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetUsersReadStatus",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/readStatus/user/a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"readStatus",
+						"user",
+						"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateReadStatus",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\" : \"a21f7bcf-b4e1-45b1-8b70-43bf9b0c505f\",\n    \"channelId\" : \"08eee30e-33bc-4385-a870-b9786e95d2f2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/readStatus",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"readStatus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteMessage",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/messages/ab4b0599-120e-4810-a410-4b06d096967a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"messages",
+						"ab4b0599-120e-4810-a410-4b06d096967a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteChannel",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/channels/f2bfbf84-a6b9-445a-baf1-61f1af5e470d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"channels",
+						"f2bfbf84-a6b9-445a-baf1-61f1af5e470d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/users/cbe6895b-9dd0-4d22-b985-4481f9505553",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users",
+						"cbe6895b-9dd0-4d22-b985-4481f9505553"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
