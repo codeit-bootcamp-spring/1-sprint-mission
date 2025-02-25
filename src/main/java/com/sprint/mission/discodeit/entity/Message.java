@@ -2,50 +2,44 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class Message implements Serializable {
-    @Serial
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
-
+    //
     private String content;
+    //
+    private UUID channelId;
+    private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    private final UUID channelId;
-    private final UUID authorId;
-
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-
-        this.updatedAt = this.createdAt;
+        //
         this.content = content;
-        this.authorId = authorId;
         this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
-        this.content = newContent;
-        this.updatedAt = Instant.now(); // 수정 시간을 갱신
-    }
+        boolean anyValueUpdated = false;
+        if (newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
 
-    @Override
-    public String toString() {
-        return "Message{\n" +
-                "UUId=" + id +
-                ", \ndestinationChannel ID : " + channelId +
-                ", \ncreatedAt : " + createdAt +
-                ", \nupdatedAt : " + updatedAt +
-                ", \ncontent : " + content + '\'' +
-                ", \nsendUser ID : " + authorId + "\n}";
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
 }

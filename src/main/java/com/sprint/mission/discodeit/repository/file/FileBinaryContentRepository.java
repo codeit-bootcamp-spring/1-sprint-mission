@@ -1,48 +1,46 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.data.BinaryContent;
-import com.sprint.mission.discodeit.entity.data.ContentType;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
-
     private final Path DIRECTORY;
-    private final Path PROFILE_IMAGE;
-    private final Path MESSAGE_IMAGE;
     private final String EXTENSION = ".ser";
 
-    public FileBinaryContentRepository(){
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),
-                "file-data-map", BinaryContent.class.getSimpleName());
-        this.PROFILE_IMAGE = Paths.get(System.getProperty("user.dir"),
-                "file-data-map", BinaryContent.class.getSimpleName(),"PROFILE_IMAGE");
-        this.MESSAGE_IMAGE = Paths.get(System.getProperty("user.dir"),
-                "file-data-map", BinaryContent.class.getSimpleName(),"MESSAGE_IMAGE");
-        init(DIRECTORY);
-        init(PROFILE_IMAGE);
-        init(MESSAGE_IMAGE);
+    public FileBinaryContentRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
-    private Path resolvePath(UUID id, ContentType contentType){
-        return DIRECTORY.resolve(contentType.name()).resolve(id + EXTENSION);
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public BinaryContent save(BinaryContent binaryContent, ContentType contentType) {
-        Path path = resolvePath(binaryContent.getId(), contentType);
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = resolvePath(binaryContent.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -53,85 +51,59 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         }
         return binaryContent;
     }
-    //이미지파일의 id로 조회
+
     @Override
     public Optional<BinaryContent> findById(UUID id) {
-        Path[] directories = {PROFILE_IMAGE, MESSAGE_IMAGE};
-
-        for (Path dir : directories) {
-            Optional<BinaryContent> content = findInDirectory(dir, id);
-            if (content.isPresent()) {
-                return content;
+        BinaryContent binaryContentNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                binaryContentNullable = (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
-        return Optional.empty();
+        return Optional.ofNullable(binaryContentNullable);
     }
-
-    private Optional<BinaryContent> findInDirectory(Path directory, UUID id) {
-        Path path = directory.resolve(id + EXTENSION);
-
-        if (!Files.exists(path)) {
-            return Optional.empty();
-        }
-
-        try (
-                FileInputStream fis = new FileInputStream(path.toFile());
-                ObjectInputStream ois = new ObjectInputStream(fis)
-        ) {
-            return Optional.ofNullable((BinaryContent) ois.readObject());
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("파일 읽기 오류 발생: " + path, e);
-        }
-    }
-
 
     @Override
-    public List<BinaryContent> findAll() {
-            List<BinaryContent> allContents = new ArrayList<>();
-            allContents.addAll(findFilesInDirectory(PROFILE_IMAGE));
-            allContents.addAll(findFilesInDirectory(MESSAGE_IMAGE));
-            return allContents;
-    }
-
-    private List<BinaryContent> findFilesInDirectory(Path directory) {
-        List<BinaryContent> contents = new ArrayList<>();
-        try {
-            Files.list(directory)
+    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
-                    .forEach(path -> {
+                    .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
-                            BinaryContent content = (BinaryContent) ois.readObject();
-                            contents.add(content);
+                            return (BinaryContent) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException("파일 읽기 오류 발생: " + path, e);
+                            throw new RuntimeException(e);
                         }
-                    });
+                    })
+                    .filter(content -> ids.contains(content.getId()))
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("디렉토리 순회 오류 발생", e);
-        }
-        return contents;
-    }
-
-    @Override
-    public void deleteById(UUID id, ContentType contentType) {
-        Path path = resolvePath(id, contentType);
-        try {
-            Files.delete(path);
-        }catch (IOException e){
             throw new RuntimeException(e);
         }
     }
 
-    private void init(Path DIRECTORY) {
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

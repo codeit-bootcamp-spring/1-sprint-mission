@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: discodeit
-
-server:
-  port: 8080

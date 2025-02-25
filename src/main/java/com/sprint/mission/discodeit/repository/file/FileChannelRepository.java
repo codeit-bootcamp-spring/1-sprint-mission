@@ -2,27 +2,29 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileChannelRepository() {
-        // CHANNEL 클래스를 기준으로 디렉토리 생성
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),
-                "file-data-map", Channel.class.getSimpleName());
-        init(DIRECTORY);
-    }
-    // 디렉토리가 없다면 생성
-    private void init(Path DIRECTORY){
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
@@ -31,19 +33,19 @@ public class FileChannelRepository implements ChannelRepository {
             }
         }
     }
-    // 파일 경로 생성
+
     private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);  // 채널의 UUID를 기준으로 파일 경로 생성
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Channel save(Channel channel) {
-        Path path = resolvePath(channel.getId());  // 채널 ID에 맞는 파일 경로 생성
+        Path path = resolvePath(channel.getId());
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            oos.writeObject(channel);  // 채널 객체를 직렬화하여 저장
+            oos.writeObject(channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,30 +61,30 @@ public class FileChannelRepository implements ChannelRepository {
                     FileInputStream fis = new FileInputStream(path.toFile());
                     ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-                channelNullable = (Channel) ois.readObject();  // 채널 객체를 역직렬화하여 반환
+                channelNullable = (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
-        return Optional.ofNullable(channelNullable);  // 존재하지 않으면 Optional.empty() 반환
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
     public List<Channel> findAll() {
-        try {
-            return Files.list(DIRECTORY)  // 디렉토리에서 모든 파일을 읽어오기
-                    .filter(path -> path.toString().endsWith(EXTENSION))  // 확장자가 .ser인 파일만 필터링
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
-                            return (Channel) ois.readObject();  // 파일을 읽어와서 채널 객체로 변환
+                            return (Channel) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
                     })
-                    .toList();  // 모든 채널을 리스트로 반환
+                    .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -91,18 +93,16 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public boolean existsById(UUID id) {
         Path path = resolvePath(id);
-        return Files.exists(path);  // 파일이 존재하는지 확인
+        return Files.exists(path);
     }
 
     @Override
     public void deleteById(UUID id) {
         Path path = resolvePath(id);
         try {
-            Files.delete(path);  // 해당 파일 삭제
+            Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-
 }
