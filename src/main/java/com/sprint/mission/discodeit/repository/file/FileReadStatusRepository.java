@@ -71,8 +71,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
+        try {
+            return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
@@ -93,8 +93,8 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        try (Stream<Path> paths = Files.list(DIRECTORY)) {
-            return paths
+        try {
+            return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
                         try (
