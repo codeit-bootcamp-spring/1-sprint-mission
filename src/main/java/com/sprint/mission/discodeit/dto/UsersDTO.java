@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Base64;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class UsersDTO {
     private String id;
     private String name;

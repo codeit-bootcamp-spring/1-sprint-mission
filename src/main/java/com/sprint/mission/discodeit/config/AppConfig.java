@@ -12,12 +12,12 @@ import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.basic.BasicUserService;
 import com.sprint.mission.discodeit.basic.BasicChannelService;
-import com.sprint.mission.discodeit.basic.BasicMessageService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -56,10 +56,4 @@ public class AppConfig {
         return new BasicChannelService(channelRepository, userRepository);
     }
 
-    @Bean
-    public MessageService messageService(MessageRepository messageRepository,
-                                         ChannelRepository channelRepository,
-                                         UserRepository userRepository) {
-        return new BasicMessageService(messageRepository, channelRepository, userRepository);
-    }
 }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Primary
 @Service
 @RequiredArgsConstructor
@@ -86,11 +88,20 @@ public class BasicUserService implements UserService {
         return dto;
     }
 
+    @Override
     public List<UsersDTO> findAll() {
-        List<User> userList = userRepository.findAll();
-        return userList.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        try {
+            List<UsersDTO> users = userRepository.findAll();
+            if (users == null) {
+               log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
+                return new ArrayList<>();
+            }
+            return users;
+        } catch (Exception e) {
+            log.error("사용자 목록 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public void updateOnlineStatus(String userId, boolean online) {

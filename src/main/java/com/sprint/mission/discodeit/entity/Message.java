@@ -1,33 +1,34 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+import java.time.LocalDateTime;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
 @Getter
-public class Message implements Serializable {
-    private final String id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+@Setter
+@Table(name = "messages")
+public class Message {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    private String content;
-    private String userId;
+    @Column(name = "channel_id")
     private String channelId;
 
-    public Message(String content, String userId, String channelId) {
-        this.id = UUID.randomUUID().toString();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
+    @Column(name = "sender_id")
+    private String senderId;
 
-        this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
-    }
+    @Column(name = "sender_name")
+    private String senderName;
 
-    public void update(String content) {
-        this.content = content;
-        this.updatedAt = Instant.now();
-    }
+    @Column(name = "channel_name")
+    private String ChannelName;
+
+    @Column(nullable = false)
+    private String content;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

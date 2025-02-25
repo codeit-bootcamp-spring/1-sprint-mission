@@ -45,11 +45,11 @@ public class AuthController {
                 userService.updateOnlineStatus(userDTO.getId(), true);
                 return "redirect:/";
             } else {
-                log.info("이메일 또는 비밀번호를 확인해주세요.");
+                log.error("이메일 또는 비밀번호를 확인해주세요.");
                 return "login";
             }
         } catch (Exception e) {
-            log.info("로그인 처리 중 오류 발생");
+            log.error("로그인 처리 중 오류 발생");
             return "login";
         }
     }

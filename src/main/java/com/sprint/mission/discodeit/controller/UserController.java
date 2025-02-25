@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.UserDTO;
 import com.sprint.mission.discodeit.dto.UsersDTO;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,24 +15,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @InitBinder("user")
     public void initBinder(WebDataBinder binder) {
         binder.setDisallowedFields("profileImage");
     }
 
-    // 유저 목록 조회
     @GetMapping
     public String userList(Model model) {
         List<UsersDTO> users = userService.findAll();
+
+        if (users == null) {
+            users = new ArrayList<>();
+            log.warn("경고: userService.findAll()이 null을 반환했습니다.");
+        }
+
+        log.info("UserController.userList() 호출됨. 결과 크기: " + users.size());
+
         model.addAttribute("users", users);
         return "user-list";
     }
@@ -43,19 +57,28 @@ public class UserController {
 
     // 회원가입 처리
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") UsersDTO usersDTO,
-                               @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
-        byte[] imageBytes = null;
-        try {
-            if (profileImage != null && !profileImage.isEmpty()) {
-                imageBytes = profileImage.getBytes();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "error";
+    public String registerUser(@ModelAttribute User user, @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) {
+        if (user.getId() == null || user.getId().isEmpty()) {
+            user.setId(UUID.randomUUID().toString());
         }
-        User createdUser = userService.create(usersDTO, imageBytes);
-        usersDTO.setId(createdUser.getId());
+
+        user.setOnline(false);
+
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                byte[] imageBytes = profileImage.getBytes();
+                user.setProfileImage(imageBytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+//             user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
+
+        userRepository.save(user);
+
         return "redirect:/users";
     }
 

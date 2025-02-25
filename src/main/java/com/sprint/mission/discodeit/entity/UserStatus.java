@@ -5,10 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
-import static com.sprint.mission.discodeit.entity.UserStatusType.OFFLINE;
-import static com.sprint.mission.discodeit.entity.UserStatusType.ONLINE;
 
 @Getter
 @NoArgsConstructor

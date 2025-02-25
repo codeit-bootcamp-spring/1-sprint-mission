@@ -6,9 +6,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.util.List;
 
 public interface MessageService {
-    Message create(MessageDTO messageDTO);
-    Message find(String messageId);
-    Message update(String messageId, MessageDTO messageDTO);
-    void delete(String messageId);
-    List<Message> findAllByChannelId(String channelId);
+    MessageDTO createMessage(MessageDTO messageDTO);  // create -> createMessage로 변경
+    MessageDTO updateMessage(String id, MessageDTO messageDTO);
+    void deleteMessage(String id);
+    List<MessageDTO> getChannelMessages(String channelId);
+    List<MessageDTO> findAllByChannelId(String channelId);
+    List<MessageDTO> findAll();
 }

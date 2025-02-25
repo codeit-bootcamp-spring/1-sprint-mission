@@ -1,64 +1,117 @@
 package com.sprint.mission.discodeit.basic;
 
 import com.sprint.mission.discodeit.dto.MessageDTO;
+import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
+import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForLocalDateTime;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Primary
+
 @Service
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
+
     private final MessageRepository messageRepository;
-    private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
+    private final ChannelService channelService;
+    private final UserService userService;
 
     @Override
-    public Message create(MessageDTO messageDTO) {
-        userRepository.findById(messageDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    @Transactional
+    public MessageDTO createMessage(MessageDTO messageDTO) {
+        Message message = new Message();
+        message.setId(UUID.randomUUID().toString());
+        message.setChannelId(messageDTO.getChannelId());
+        message.setSenderId(messageDTO.getSenderId());
+        message.setContent(messageDTO.getContent());
+        message.setCreatedAt(LocalDateTime.now());
 
-        channelRepository.findById(messageDTO.getChannelId())
-                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+        try {
+            Channel channel = channelService.find(messageDTO.getChannelId());
+            message.setChannelName(channel.getName());
+        } catch (Exception e) {
+            message.setChannelName("Unknown Channel");
+        }
 
-        Message message = new Message(
-                messageDTO.getContent(),
-                messageDTO.getUserId(),
-                messageDTO.getChannelId()
-        );
+        try {
+            UserDTO user = userService.find(messageDTO.getSenderId());
+            message.setSenderName(user.getName());
+        } catch (Exception e) {
+            message.setSenderName("Unknown Sender");
+        }
 
-        return messageRepository.save(message);
+        Message savedMessage = messageRepository.save(message);
+        return convertToDTO(savedMessage);
+    }
+
+    private MessageDTO convertToDTO(Message message) {
+        MessageDTO dto = new MessageDTO();
+        dto.setId(message.getId());
+        dto.setChannelId(message.getChannelId());
+        dto.setChannelName(message.getChannelName());
+        dto.setSenderId(message.getSenderId());
+        dto.setSenderName(message.getSenderName());
+        dto.setContent(message.getContent());
+        dto.setCreatedAt(message.getCreatedAt());
+        dto.setUpdatedAt(message.getUpdatedAt());
+        return dto;
     }
 
     @Override
-    public Message update(String id, MessageDTO messageDTO) {
+    public List<MessageDTO> getChannelMessages(String channelId) {
+        List<Message> messages = messageRepository.findAllByChannelId(channelId);
+        return messages.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public MessageDTO updateMessage(String id, MessageDTO messageDTO) {
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
+                .orElseThrow(() -> new RuntimeException("Message not found"));
 
-        message.update(messageDTO.getContent());
-        return messageRepository.save(message);
+        message.setContent(messageDTO.getContent());
+        message.setUpdatedAt(LocalDateTime.now());
+
+        Message updatedMessage = messageRepository.save(message);
+        return convertToDTO(updatedMessage);
     }
 
     @Override
-    public void delete(String id) {
+    public List<MessageDTO> findAllByChannelId(String channelId) {
+        return messageRepository.findAllByChannelId(channelId)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessage(String id) {
         messageRepository.deleteById(id);
     }
 
-    @Override
-    public Message find(String id) {
-        return messageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Message not found"));
-    }
+
 
     @Override
-    public List<Message> findAllByChannelId(String channelId) {
-        return messageRepository.findAllByChannelId(channelId);
+    public List<MessageDTO> findAll() {
+        return messageRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.dto.ChannelJoinDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
