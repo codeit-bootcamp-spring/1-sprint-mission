@@ -47,18 +47,4 @@ public class FileIOUtil {
             throw new RuntimeException("❌ JSON 변환 중 오류 발생 (" + jsonFilePath + "): " + e.getMessage(), e);
         }
     }
-
-    // 파일 초기화 및 새로 생성
-    public static void initializeFiles() {
-        String[] fileNames = { "users.ser", "messages.ser", "channels.ser", "binarycontent.ser", "userstatus.ser" };
-        for (String fileName : fileNames) {
-            Path filePath = Paths.get("./result/" + fileName);
-            try {
-                Files.deleteIfExists(filePath);
-                Files.createFile(filePath);
-            } catch (IOException e) {
-                System.err.println("⚠️ 파일 초기화 중 오류 발생 (" + filePath + "): " + e.getMessage());
-            }
-        }
-    }
 }

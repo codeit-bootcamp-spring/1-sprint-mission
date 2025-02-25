@@ -17,7 +17,7 @@ public class UserDTO {
         private Instant createdAt;
         private Instant updatedAt;
         private String name;
-        private String phone;
+        private String email;
         private UUID profileImageId;
         private UUID userStatusId;
 
@@ -27,7 +27,7 @@ public class UserDTO {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .name(user.getName())
-                .phone(user.getPhone())
+                .email(user.getEmail())
                 .profileImageId(user.getProfileImageId())
                 .userStatusId(user.getUserStatusId())
                 .build();

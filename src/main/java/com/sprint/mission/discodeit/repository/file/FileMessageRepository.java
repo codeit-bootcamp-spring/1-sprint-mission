@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.util.FileIOUtil.*;
 import static com.sprint.mission.discodeit.util.FileIOUtil.saveToFile;
@@ -43,6 +44,20 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> findById(UUID uuid) {
         return Optional.of(messageMap.get(uuid));
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelID().equals(channelId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Message> findLatestByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelID().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     @Override

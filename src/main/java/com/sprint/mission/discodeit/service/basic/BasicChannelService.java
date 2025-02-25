@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.aspect.UpdateUserStatus;
 import com.sprint.mission.discodeit.domain.*;
 import com.sprint.mission.discodeit.dto.channel.CreateChannel;
 import com.sprint.mission.discodeit.dto.channel.ChannelDTO;
 import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannel;
-import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.ServiceException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -79,18 +79,8 @@ public class BasicChannelService implements ChannelService  {
     public ChannelDTO.PublicChannelDTO findPublicChannel(UUID channelId) {
         PublicChannel findChannel = (PublicChannel) channelRepository.findById(channelId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_CHANNEL));
 
-        // 해당 채널의 가장 최근 메시지의 시간 정보를 포함합니다.
-        Instant latestMessageTime = Instant.EPOCH; // 초기값 설정
-        List<Message> messageList = messageRepository.findAll();
-
-        for (Message message : messageList) {
-            if (message.getChannelID().equals(findChannel.getId())) {
-                if (message.getCreatedAt().isAfter(latestMessageTime)) {
-                    latestMessageTime = message.getCreatedAt();
-                }
-            }
-        }
-        return ChannelDTO.PublicChannelDTO.fromDomain(findChannel, latestMessageTime);
+        Message lastestMessage = messageRepository.findLatestByChannelId(channelId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_MESSAGE));
+        return ChannelDTO.PublicChannelDTO.fromDomain(findChannel, lastestMessage.getCreatedAt());
     }
 
     @Override
@@ -116,24 +106,11 @@ public class BasicChannelService implements ChannelService  {
         return ChannelDTO.PrivateChannelDTO.fromDomain(findChannel, latestMessageTime);
     }
 
-    @Override
-    public List<Channel> findAllPublic() {
-        List<Channel> allChannels = channelRepository.findAll();
-        return allChannels.stream()
-                .filter(channel -> channel instanceof PublicChannel)  // Public 채널만 필터링
-                .collect(Collectors.toList());
-    }
-
+    @UpdateUserStatus
     @Override
     public List<Channel> findAllPrivate(UUID userId) { // 통일성을 위해 findAllByUserId보다는 findAllPrivate으로 하였습니다.
         // 해당 userId를 갖는 User가 repository에 저장되어 있는지 확인하기
         validUser(userId);
-
-        // User가 채널을 찾으면 UserStatus 업데이트하기
-        UserStatus userStatus = userStatusService.findByUserId(userId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
-        UpdateUserStatusRequest updateRequest = new UpdateUserStatusRequest(userStatus.getId(), Instant.now());
-        userStatusService.update(updateRequest);
-
 
         // Private 채널 내에서 userId가 같은 회원을 joinMembers 리스트에 갖고 있는 채널만 선택한다.
         List<Channel> allChannels = channelRepository.findAll();
@@ -145,14 +122,14 @@ public class BasicChannelService implements ChannelService  {
     }
 
     @Override
+    public List<Channel> findAll() {
+        return channelRepository.findAll();
+    }
+
+    @Override
     public Channel update(UpdatePublicChannel request) { // 채널에 새로운 유저 참여, 채널 이름, 설명 수정 가능
         validChannel(request.channelId());
         validUser(request.newUserID());
-
-        // User가 채널에 참여하면 UserStatus 업데이트하기
-        UserStatus userStatus = userStatusService.findByUserId(request.newUserID()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
-        UpdateUserStatusRequest updateRequest = new UpdateUserStatusRequest(userStatus.getId(), Instant.now());
-        userStatusService.update(updateRequest);
 
         PublicChannel updateChannel = (PublicChannel) channelRepository.findById(request.channelId()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_CHANNEL));
         updateChannel.update(request.name(), request.description(), request.newUserID());
@@ -162,7 +139,7 @@ public class BasicChannelService implements ChannelService  {
     }
 
     @Override
-    public void delete(UUID channelId) {
+    public Channel deletePrivate(UUID channelId) {
         validChannel(channelId);
 
         Channel removeChannel = channelRepository.findById(channelId)
@@ -175,10 +152,28 @@ public class BasicChannelService implements ChannelService  {
         }
 
         // 채널에 포함된 ReadStatus 삭제하기
-        ReadStatus readStatuses = readStatusRepository.findByChannelId(channelId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_READSTATUS));
-        readStatusRepository.delete(readStatuses);
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+        readStatusRepository.deleteAll(readStatuses);
 
         channelRepository.delete(removeChannel);
+        return removeChannel;
+    }
+
+    @Override
+    public Channel deletePublic(UUID channelId) {
+        validChannel(channelId);
+
+        Channel removeChannel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_CHANNEL));
+
+        // 채널에 포함된 메시지 삭제하기
+        List<Message> messages = messageService.findAllByChannelId(channelId);
+        if (!messages.isEmpty()) {
+            messages.forEach(message -> messageRepository.delete(message));
+        }
+
+        channelRepository.delete(removeChannel);
+        return removeChannel;
     }
 
     // 채널 검증

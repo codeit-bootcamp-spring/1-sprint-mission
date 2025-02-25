@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Profile("jcf")
 @Repository
@@ -33,6 +34,20 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return messageMap.values().stream().toList();
+    }
+
+    @Override
+    public List<Message> findByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelID().equals(channelId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Message> findLatestByChannelId(UUID channelId) {
+        return messageMap.values().stream()
+                .filter(message -> message.getChannelID().equals(channelId))
+                .max(Comparator.comparing(Message::getCreatedAt));
     }
 
     @Override

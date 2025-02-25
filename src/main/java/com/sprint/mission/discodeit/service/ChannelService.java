@@ -17,11 +17,13 @@ public interface ChannelService {
 
     ChannelDTO.PrivateChannelDTO findPrivateChannel(UUID channelId);
 
-    List<Channel> findAllPublic();
-
     List<Channel> findAllPrivate(UUID userId);
+
+    List<Channel> findAll();
 
     Channel update(UpdatePublicChannel request);
 
-    void delete(UUID channelId);
+    Channel deletePrivate(UUID channelId);
+
+    Channel deletePublic(UUID channelId);
 }

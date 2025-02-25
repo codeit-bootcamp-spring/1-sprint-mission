@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.dto.userstatus.CreateUserStatusRequest;
-import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.ServiceException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -11,8 +10,8 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,13 +35,15 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public Optional<UserStatus> find(UUID id) {
-        return userStatusRepository.findById(id);
+    public UserStatus find(UUID id) {
+        UserStatus userStatus = userStatusRepository.findById(id).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public Optional<UserStatus> findByUserId(UUID userID) {
-        return userStatusRepository.findByUserId(userID);
+    public UserStatus findByUserId(UUID userID) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userID).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
@@ -51,20 +52,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatus update(UpdateUserStatusRequest request) {
-        UserStatus findUserStatus = userStatusRepository.findById(request.id()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
-
-        findUserStatus.update(request.lastActiveAt());
-        userStatusRepository.save(findUserStatus);
-        return findUserStatus;
-    }
-
-    @Override
-    public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequest request) {
+    public UserStatus updateByUserId(UUID userId) {
         validUser(userId);
 
         UserStatus userStatus = userStatusRepository.findByUserId(userId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
-        userStatus.update(request.lastActiveAt());
+        userStatus.update(Instant.now());
         userStatusRepository.save(userStatus);
         return userStatus;
     }

@@ -13,6 +13,8 @@ public interface UserStatusRepository {
 
     Optional<UserStatus> findById(UUID id);
 
+    List<UserStatus> findByIsOnlineTrue();
+
     List<UserStatus> findAll();
 
     void deleteById(UUID id);

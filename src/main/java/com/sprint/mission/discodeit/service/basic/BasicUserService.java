@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.aspect.UpdateUserStatus;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.domain.User;
 import com.sprint.mission.discodeit.domain.UserStatus;
 import com.sprint.mission.discodeit.dto.user.*;
-import com.sprint.mission.discodeit.dto.userstatus.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.ServiceException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.util.type.BinaryContentType;
 import com.sprint.mission.discodeit.util.type.OnlineStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,16 +32,8 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserDTO create(CreateUserRequest request) {
-        if (!User.isValidPassword(request.password())) {
-            throw new ServiceException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        if (!User.isValidPhone(request.phone())) {
-            throw new ServiceException(ErrorCode.INVALID_PHONE);
-        }
-
-        userRepository.findByPhone(request.phone()).ifPresent(x -> {
-                    throw new ServiceException(ErrorCode.DUPLICATE_PHONE);}); // 저는 이메일 대신 핸드폰 번호로 했습니다
+        userRepository.findByEmail(request.email()).ifPresent(x -> {
+                    throw new ServiceException(ErrorCode.DUPLICATE_EMAIL);});
 
         userRepository.findByName(request.name()).ifPresent(x -> {
             throw new ServiceException(ErrorCode.DUPLICATE_NAME);}); // 유저의 이름이 같으면 안된다.
@@ -53,7 +43,7 @@ public class BasicUserService implements UserService {
                     .orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_PROFILE));
         }
 
-        User createdUser = new User(request.name(), request.phone(), request.password(), request.profileId(), null);
+        User createdUser = new User(request.name(), request.email(), request.password(), request.profileId(), null);
         userRepository.save(createdUser); // User 레포지토리에 저장하기
 
         Instant lastActiveAt = Instant.now();
@@ -74,8 +64,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserDTO> getOnlineUsers() {
-        List<UUID> onlineUserIds = userStatusRepository.findAll().stream()
-                .filter(userStatus -> userStatus.getOnlineStatusType().equals(OnlineStatusType.ACTIVE))
+        List<UUID> onlineUserIds = userStatusRepository.findByIsOnlineTrue().stream()
                 .map(UserStatus::getUserId)
                 .toList();
 
@@ -91,33 +80,27 @@ public class BasicUserService implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @UpdateUserStatus
     @Override
-    public User update(UpdateUserRequest request) {
-        User updateUser = userRepository.findById(request.userId()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USER));
-
-        updateUser.update(request.password()); // 비밀번호를 수정합니다.
-
-        if (request.profile() != null) { // 만약 요청에 content가 있다면 프로필을 새로 교체합니다.
-            if (updateUser.getProfileImageId() == null) {
-                // 새로운 Profile 을 생성하고 저장합니다.
-                BinaryContent profile = new BinaryContent(request.profile(), BinaryContentType.IMAGE);
-                binaryContentRepository.save(profile);
-                updateUser.setProfileImageId(profile.getId());
-            } else { // 이미 프로필이 존재한다면
-                BinaryContent profile = binaryContentRepository.findById(updateUser.getProfileImageId()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_PROFILE));
-                profile.updateContent(request.profile());
-                updateUser.setProfileImageId(profile.getId());
-            }
-        }
-
-        // User가 회원 정보를 UserStatus 업데이트하기
-        UserStatus userStatus = userStatusService.findByUserId(request.userId()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USERSTATUS));
-        UpdateUserStatusRequest updateRequest = new UpdateUserStatusRequest(userStatus.getId(), Instant.now());
-        userStatusService.update(updateRequest);
+    public User updatePassword(UUID userId, UpdatePasswordRequest request) {
+        User updateUser = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USER));
+        updateUser.updatePassword(request.oldPassword(), request.newPassword()); // 비밀번호를 수정합니다.
 
         userRepository.save(updateUser);
         return updateUser;
     }
+
+    @UpdateUserStatus
+    @Override
+    public User updateProfile(UUID userId, UpdateProfileRequest request) {
+        User updateUser = userRepository.findById(userId).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_USER));
+        BinaryContent profile = binaryContentRepository.findById(request.profileId()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_PROFILE));
+
+        updateUser.updateProfile(request.profileId(), request.newProfileId());
+        userRepository.save(updateUser);
+        return updateUser;
+    }
+
 
     @Override
     public UserDTO delete(UUID id) {

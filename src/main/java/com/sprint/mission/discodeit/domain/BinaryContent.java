@@ -1,30 +1,31 @@
 package com.sprint.mission.discodeit.domain;
 
-import com.sprint.mission.discodeit.util.type.BinaryContentType;
-import lombok.Getter;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
+@Data
 public class BinaryContent implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private final UUID id;
     private Instant createdAt;
     private byte[] content;
-    private BinaryContentType contentType;
+    private String filePath;
+    private String contentType;
+    private String originalFileName;
+    private String storedFileName;
 
-    public BinaryContent(byte[] content, BinaryContentType contentType) {
+    public BinaryContent(byte[] content, String filePath, String contentType, String originalFileName, String storedFileName) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.content = content;
         this.contentType = contentType;
-    }
-
-    public void updateContent(byte[] newContent) {
-        this.content = newContent;
+        this.originalFileName = originalFileName;
+        this.storedFileName = storedFileName;
+        this.filePath = filePath;
     }
 }

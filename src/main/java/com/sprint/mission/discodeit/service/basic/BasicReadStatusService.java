@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -44,8 +43,8 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public Optional<ReadStatus> find(UUID id) {
-        return readStatusRepository.findById(id);
+    public ReadStatus find(UUID id) {
+        return readStatusRepository.findById(id).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_READSTATUS));
     }
 
     @Override
@@ -58,12 +57,21 @@ public class BasicReadStatusService implements ReadStatusService {
     User가 채널에서 메시지를 읽은 시간을 업데이트
      */
     @Override
-    public ReadStatus update(UpdateReadStatusRequest request) {
-        ReadStatus readStatus = readStatusRepository.findById(request.readStatusID()).orElseThrow(() -> new ServiceException(ErrorCode.CANNOT_FOUND_READSTATUS));
-        readStatus.updateLastReadTime(readStatus.getLastReadAt());
-        readStatusRepository.save(readStatus);
-        return readStatus;
+    public List<ReadStatus> updateByChannelId(UUID channelId) {
+        validChannel(channelId);
+
+        // 채널에 해당하는 ReadStatus 목록을 가져옴
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+
+        // 모든 ReadStatus의 'lastReadTime'을 업데이트
+        readStatuses.forEach(readStatus -> readStatus.updateLastReadTime(Instant.now()));
+
+        // 모든 수정된 ReadStatus 저장
+        readStatusRepository.saveAll(readStatuses);
+
+        return readStatuses;
     }
+
 
     @Override
     public void delete(UUID id) {

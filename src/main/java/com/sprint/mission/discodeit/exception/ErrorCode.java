@@ -17,17 +17,17 @@ public enum ErrorCode {
     CANNOT_FOUND_ATTACHMENT("해당하는 첨부자료를 찾을 수 없습니다"),
 
     DUPLICATE_NAME("이미 등록된 사용자 이름입니다."),
-    DUPLICATE_PHONE("이미 등록된 핸드폰 번호 입니다."),
+    DUPLICATE_EMAIL("이미 등록된 이메일 입니다."),
     DUPLICATE_CHANNEL("이미 존재하는 채널 이름 입니다."),
 
     ALREADY_EXIST_READSTATUS("이미 저장된 Read Status 입니다."),
     ALREADY_EXIST_USERSTAUTS("이미 저장된 User Status 입니다."),
 
-    INVALID_PASSWORD("올바르지 않은 비밀번호 형식 입니다. 비밀번호는 8자리 이상 15자리 이하 대문자 및 특수문자 하나 이상 포함해야 합니다."),
     INVALID_WRITER("작성자가 올바르지 않습니다"),
-    INVALID_PHONE("올바르지 않은 핸드폰 번호 형식 입니다."),
+    INVALID_PROFILE("기존 프로필과 동일한 프로필입니다"),
 
     MESSAGE_EDIT_NOT_ALLOWED("메시지 수정은 작성자 본인만 가능합니다"),
+    PASSWORD_EDIT_NOT_ALLOWED("이전 비밀번호와 일치하지 않습니다"),
 
     PASSWORD_MISMATCH("비밀번호가 일치하지 않습니다"),
     USERNAME_MISMATCH("이름이 일치하지 않습니다"),

@@ -6,5 +6,5 @@ import com.sprint.mission.discodeit.domain.User;
 import java.util.List;
 import java.util.UUID;
 
-public record CreateMessageRequest(List<UUID> attachmentsID, String content, UUID channelID, UUID writerID) {
+public record CreateMessageRequest(List<UUID> attachmentsID, String content, UUID channelID) {
 }

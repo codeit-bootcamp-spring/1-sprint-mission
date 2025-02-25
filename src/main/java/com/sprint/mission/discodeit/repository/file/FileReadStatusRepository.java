@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.domain.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -50,11 +48,32 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public Optional<ReadStatus> findByChannelId(UUID channelID) {
+    public List<ReadStatus> findAllByChannelId(UUID channelID) {
         return readStatusMap.values().stream()
                 .filter(readStatus -> readStatus.getChannelId().equals(channelID))
-                .findFirst();
+                .toList();
     }
+
+    @Override
+    public List<ReadStatus> saveAll(List<ReadStatus> readStatuses) {
+        // 각 ReadStatus를 readStatusMap에 추가
+        readStatuses.forEach(readStatus -> readStatusMap.put(readStatus.getId(), readStatus));
+
+        // 파일에 모든 ReadStatus를 저장
+        saveToFile(readStatusMap, filePath);
+
+        return readStatuses;
+    }
+
+    @Override
+    public void deleteAll(List<ReadStatus> readStatuses) {
+        // 각 ReadStatus를 삭제
+        readStatuses.forEach(readStatus -> readStatusMap.remove(readStatus.getId()));
+
+        // 변경된 내용을 파일에 반영
+        saveToFile(readStatusMap, filePath);
+    }
+
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userID) {

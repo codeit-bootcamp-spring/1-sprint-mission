@@ -28,9 +28,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByPhone(String phone) {
+    public Optional<User> findByEmail(String email) {
         return userMap.values().stream()
-                .filter(user -> user.getPhone().equals(phone))
+                .filter(user -> user.getEmail().equals(email))
                 .findFirst();
     }
 

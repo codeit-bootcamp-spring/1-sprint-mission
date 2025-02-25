@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.domain.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +50,17 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public List<BinaryContent> findAll() {
         return repository.values().stream().toList();
+    }
+
+    @Override
+    public List<BinaryContent> findAllIdIn(List<UUID> uuidList) {
+        if (uuidList == null || uuidList.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return uuidList.stream()
+                .map(repository::get)  // UUID에 해당하는 BinaryContent 찾기
+                .filter(Objects::nonNull)  // 존재하는 항목만 필터링
+                .toList();
     }
 
     @Override

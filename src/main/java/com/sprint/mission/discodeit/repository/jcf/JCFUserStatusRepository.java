@@ -31,6 +31,14 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public List<UserStatus> findByIsOnlineTrue() {
+        return repository.values().stream()
+                .filter(UserStatus::isOnline)  // isOnline()이 true인 값만 필터링
+                .toList();
+    }
+
+
+    @Override
     public Optional<UserStatus> findById(UUID id) {
         return repository.values().stream()
                 .filter(userStatus -> userStatus.getId().equals(id))

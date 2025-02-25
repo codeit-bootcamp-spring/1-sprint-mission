@@ -37,6 +37,14 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
+    public List<UserStatus> findByIsOnlineTrue() {
+        return userStatusMap.values().stream()
+                .filter(UserStatus::isOnline)  // isOnline()이 true인 값만 필터링
+                .toList();
+    }
+
+
+    @Override
     public UserStatus save(UserStatus userStatus) {
         userStatusMap.put(userStatus.getId(), userStatus);
         saveToFile(userStatusMap, filePath);

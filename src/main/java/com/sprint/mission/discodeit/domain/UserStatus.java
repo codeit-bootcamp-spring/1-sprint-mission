@@ -22,7 +22,7 @@ public class UserStatus implements Serializable { // 사용자 별 마지막으�
     private Instant updateAt;
     private Instant lastActiveAt;
     private UUID userId;
-    private OnlineStatusType onlineStatusType;
+    private boolean online;
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
@@ -30,16 +30,16 @@ public class UserStatus implements Serializable { // 사용자 별 마지막으�
         this.updateAt = Instant.now();
         this.lastActiveAt = lastActiveAt;
         this.userId = userId;
-        this.onlineStatusType = isOnline();
+        this.online = isOnline();
     }
 
-    public OnlineStatusType isOnline() {
-        return ChronoUnit.MINUTES.between(lastActiveAt, Instant.now()) <= 5 ? OnlineStatusType.ACTIVE : OnlineStatusType.SLEEP;
+    public boolean isOnline() {
+        return ChronoUnit.MINUTES.between(lastActiveAt, Instant.now()) <= 5;
     }
 
     public void update(Instant lastActiveAt) {
         this.updateAt = Instant.now();
         this.lastActiveAt = lastActiveAt;
-        this.onlineStatusType = isOnline();
+        this.online = isOnline();
     }
 }

@@ -1,18 +1,14 @@
 package com.sprint.mission.discodeit.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
+@Data
 public class Message implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -38,17 +34,5 @@ public class Message implements Serializable {
         this.content = content;
         this.attachmentsID.add(newAttachment);
         this.updatedAt = Instant.now();
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", content='" + content + '\'' +
-                ", writer='" + writerID + '\'' +
-                ", channel='" + channelID + '\'' +
-                '}';
     }
 }
