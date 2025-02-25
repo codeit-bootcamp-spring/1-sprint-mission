@@ -1,84 +1,69 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Gender;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 import org.springframework.stereotype.Repository;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class FileUserRepository implements UserRepository {
-  private final List<UserDto> data;
-  public FileUserRepository(SerializationUtil<UserDto> util) {
-    this.data = util.loadData(); // 이 부분, filePath 매개변수 이해 잘 안됨
+  private final Map<UUID, User> data;
+  public FileUserRepository(SerializationUtil<UUID, User> util) {
+    this.data = util.loadData(); // TODO : 이 부분, filePath 매개변수 이해 잘 안됨
+  }
+
+
+  @Override
+  public User save(User user){
+    data.put(user.getId(), user);
+    return user;
   }
 
   @Override
-  public boolean save(UserDto user){
-    try {
-      if (user == null) {
-        throw new IllegalArgumentException("회원이 null일 수 없습니다.");
-      }
-      return data.add(user); // 성공하면 true 반환
-    } catch(IllegalArgumentException e) {
-      System.out.println("회원 생성 실패: " + e.getMessage());
-    } catch(Exception e) {
-      System.out.println("알 수 없는 오류가 발생했습니다."); // 일반적인 예외 처리
-    }
-    return false; // 실패시 false 반환
+  public Optional<User> findById(UUID userId){
+    return Optional.ofNullable(this.data.get(userId));
+//   **map이니까 key 기반 빠른 조회 가능** 만약 data가 리스트였으면 이렇게 반복문 돌려야 함!
+//    for (User user : data){
+//      if(user.user().getId().equals(id)){
+//        return Optional.of(user);
+//      }
+//    }
+//    return Optional.empty();
   }
 
   @Override
-  public Optional<UserDto> findById(UUID id){
-    if (id == null) {
-      return Optional.empty();  // id가 null이면 빈 Optional을 반환
-    }
-    for (UserDto usr : data){
-      if(usr.user().getId().equals(id)){
-        return Optional.of(usr);
-      }
-    }
-    return Optional.empty();
+  public Optional<User> findByUsername(String userName) {
+    return this.findAll().stream()
+            .filter(user -> user.getUsername().equals(userName))
+            .findFirst();
   }
 
   @Override
-  public List<UserDto> findAll(){ return data; }
-
-  @Override
-  public boolean updateOne(UUID id, String name, int age, Gender gender) {
-    if (id == null) {
-      System.out.println("회원 수정 실패");
-      return false;
-    }
-    for (UserDto usr : data) {
-      if (usr.user().getId().equals(id)) {
-        usr.user().update(name, age, gender); // data는 상수이므로 data.update(name, topic) 하면 안됨.
-        return true;
-      }
-    }
-    System.out.println("회원 수정 실패");
-    return false;
+  public boolean existsById(UUID userId) {
+    return this.data.containsKey(userId);
   }
 
   @Override
-  public boolean deleteOne(UUID id){
-    if (id == null) {
-      System.out.println("회원 삭제 실패");
-      return false;
-    }
-    for (Iterator<UserDto> itr = data.iterator(); itr.hasNext();) {
-      UserDto usr = itr.next();
-      if (usr.user().getId().equals(id)) {
-        itr.remove();
-        return true;
-      }
-    }
-    System.out.println("회원 삭제 실패");
-    return false;
+  public List<User> findAll(){
+    List<User> users = new ArrayList<>(data.values());
+    return users;
+    // return this.data.values().stream().toList();
+  }
+
+  @Override
+  public void deleteById(UUID userId) {
+    this.data.remove(userId);
+  }
+
+  @Override
+  public boolean existsByUsername(String userName){
+    return this.findAll().stream().anyMatch(user -> user.getEmail().equals(userName));
+  }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
   }
 }

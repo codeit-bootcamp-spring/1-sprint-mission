@@ -1,17 +1,19 @@
 package com.sprint.mission.discodeit.repository;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentRepository {
-    // 프로필 이미지 업로드
-    void saveProfileImage(byte[] image, UUID userId);
+    BinaryContent save(BinaryContent binaryContent);
 
-    // 프로필 이미지 삭제
-    void deleteProfileImage(byte[] image);
+    Optional<BinaryContent> findById(UUID contentId);
 
-    // 메세지 파일 저장
-    void saveMessageFile(byte[] image, UUID messageId);
+    List<BinaryContent> findAllByIdIn(List<UUID> contentIds);
 
-    // 모든 도메인 정보 삭제
-    void deleteAllByUserId(UUID userId);
+    boolean existsById(UUID contentId);
+
+    void deleteById(UUID contentId);
 }

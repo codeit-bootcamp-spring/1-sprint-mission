@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -7,15 +10,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-  boolean createMessage(Message message);
+  Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
-  Optional<Message> readMessage(UUID id);
+  Optional<Message> find(UUID id);
 
-  List<Message> readAllMessages();
+  List<Message> findAllByChannelId(UUID channelId);
 
-  void updateMessage(UUID id, String content, UUID authorId);
+  Message update(UUID messageId, UUID requesterId, MessageUpdateRequest request);
 
-  void deleteMessage(UUID id);
-
-  List<Message> getAllMessages();
+  void delete(UUID messageId, UUID requesterId);
 }

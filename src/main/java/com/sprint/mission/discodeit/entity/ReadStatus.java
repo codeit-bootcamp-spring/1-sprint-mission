@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
@@ -14,16 +15,27 @@ public class ReadStatus implements Serializable {
 
     private final UUID id = UUID.randomUUID();
     private final Instant createdAt = Instant.now();
-    private Instant updatedAt = null;
-    private final User user;
-    private final UUID channelId;
-    private final UUID messageId;
+    // TODO : 롬복 생성자 대상이 아닌데 = null 초기화 안해줘도 되나?
+    private Instant updatedAt;
 
-    public void update() {
-        this.updatedAt = Instant.now();
+    private final UUID userId;
+    private final UUID channelId;
+    @NonNull
+    private Instant lastReadAt;
+
+    public void update(Instant newLastReadAt) {
+        boolean anyValueUpdated = false;
+        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+            this.lastReadAt = newLastReadAt;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
     @Override
+    // TODO : toString()
     public String toString() {
         return "ReadStatus{" +
                 "updatedAt=" + updatedAt +

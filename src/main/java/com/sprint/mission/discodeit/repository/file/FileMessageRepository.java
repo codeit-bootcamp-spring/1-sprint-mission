@@ -5,76 +5,46 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.util.SerializationUtil;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class FileMessageRepository implements MessageRepository {
-  private final List<Message> data;
-  public FileMessageRepository(SerializationUtil<Message> util){
+  private final Map<UUID, Message> data;
+  public FileMessageRepository(SerializationUtil<UUID, Message> util) {
     this.data = util.loadData();
   }
 
   @Override
-  public boolean save(Message message){
-    try {
-      if (message == null) {
-        throw new IllegalArgumentException("메세지가 null일 수 없습니다.");
-      }
-      return data.add(message); // 성공하면 true 반환
-    } catch(IllegalArgumentException e) {
-      System.out.println("메세지 생성 실패: " + e.getMessage());
-    } catch(Exception e) {
-      System.out.println("알 수 없는 오류가 발생했습니다."); // 일반적인 예외 처리
-    }
-    return false; // 실패시 false 반환
+  public Message save(Message message){
+    this.data.put(message.getId(), message);
+    return message;
   }
 
   @Override
-  public Optional<Message> findById(UUID id){
-    if (id == null) {
-      return Optional.empty();  // id가 null이면 빈 Optional을 반환
-    }
-    for (Message msg : data){
-      if(msg.getId().equals(id)){
-        return Optional.of(msg);
-      }
-    }
-    return Optional.empty();
+  public Optional<Message> findById(UUID messageId){
+    return Optional.ofNullable(this.data.get(messageId));
   }
 
   @Override
-  public List<Message> findAll(){ return data; }
-
+  public List<Message> findAllByChannelId(UUID channelId){
+    return this.data.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
+  }
   @Override
-  public boolean updateOne(UUID id, String content, UUID authorId) {
-    if (id == null) {
-      System.out.println("메세지 수정 실패");
-      return false;
-    }
-    for (Message msg : data) {
-      if (msg.getId().equals(id)) {
-        msg.update(content); // data는 상수이므로 data.update(name, topic) 하면 안됨.
-        return true;
-      }
-    }
-    System.out.println("메세지 수정 실패");
-    return false;
+  public boolean existsById(UUID messageId) {
+    return this.data.containsKey(messageId);
   }
 
   @Override
-  public boolean deleteOne(UUID id){
-    if (id == null) {
-      System.out.println("메세지 삭제 실패");
-      return false;
-    }
-    for (Iterator<Message> itr = data.iterator(); itr.hasNext();) {
-      Message msg = itr.next();
-      if (msg.getId().equals(id)) {
-        itr.remove();
-        return true;
-      }
-    }
-    System.out.println("메세지 삭제 실패");
-    return false;
+  public void deleteById(UUID messageId) {
+    this.data.remove(messageId);
+  }
+
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    this.findAllByChannelId(channelId)
+            .forEach(message -> this.deleteById(message.getId()));
   }
 }
