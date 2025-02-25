@@ -4,10 +4,17 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface BinaryContentRepository {
+
     BinaryContent save(BinaryContent binaryContent);
-    void deleteById(String userId);
-    Optional<BinaryContent> findByUserId(String userId);
-    List<BinaryContent> findAll();
+
+    Optional<BinaryContent> findById(UUID id);
+
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
+    boolean existsById(UUID id);
+
+    void deleteById(UUID id);
 }
