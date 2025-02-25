@@ -18,28 +18,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정
-                .csrf(csrf -> csrf.disable()) // ✅ CSRF 비활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/user-list.html", "/styles.css", "/script.js").permitAll() // ✅ 정적 리소스 허용
-                        .requestMatchers("/api/users/**").permitAll() // ✅ 사용자 API 인증 없이 허용
-                        .requestMatchers("/api/channels/**").permitAll() // ✅ 채널 API 인증 없이 허용
-                        .requestMatchers("/api/messages/**").permitAll() // ✅ 메시지 API 인증 없이 허용 (수정됨)
-                        .anyRequest().authenticated() // ✅ 나머지 요청은 인증 필요
+                        // ✅ Swagger 관련 엔드포인트 허용
+                        .requestMatchers("/", "/user-list.html", "/styles.css", "/script.js",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // ✅ API 엔드포인트 허용 (테스트를 위해 전체 허용)
+                        .requestMatchers("/api/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable()) // ✅ 기본 로그인 페이지 비활성화
-                .httpBasic(basic -> basic.disable()); // ✅ 기본 인증 비활성화
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable());
 
         return http.build();
     }
 
-    // ✅ 비밀번호 암호화 설정
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // ✅ CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

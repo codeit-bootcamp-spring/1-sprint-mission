@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,10 +21,12 @@ public class ChannelDTO {
     private String description;
     private UUID creatorId;
     private boolean isPrivate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     private Instant createdAt;
+
     private List<UUID> memberIds;
 
-    // ✅ `createdAt`, `members` 포함하는 생성자 추가
     public ChannelDTO(UUID id, String name, String description, UUID creatorId, boolean isPrivate) {
         this.id = id;
         this.name = name;
@@ -33,7 +37,8 @@ public class ChannelDTO {
         this.memberIds = List.of();
     }
 
-    public void setLastMessageTime(Instant lastMessageTime) {
-        this.createdAt = lastMessageTime != null ? lastMessageTime : Instant.now();
+    @JsonProperty("createdAt")
+    public long getCreatedAtAsLong() {
+        return createdAt != null ? createdAt.toEpochMilli() : 0;
     }
 }

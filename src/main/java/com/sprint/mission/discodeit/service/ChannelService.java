@@ -9,13 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {
-    void createPublicChannel(ChannelCreateDTO channelCreateDTO);
-    void createPrivateChannel(UUID creatorId, List<UUID> members);
+    ChannelDTO createChannel(ChannelCreateDTO channelCreateDTO);
     List<ChannelDTO> readAll();
     Optional<ChannelDTO> read(UUID channelId);
     void update(UUID channelId, ChannelUpdateDTO channelUpdateDTO);
     void delete(UUID channelId);
-
-    // ✅ 특정 사용자가 볼 수 있는 채널 목록 조회 추가
     List<ChannelDTO> getChannelsForUser(UUID userId);
 }

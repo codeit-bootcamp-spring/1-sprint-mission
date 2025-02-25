@@ -35,7 +35,7 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllPrivateChannelsByUserId(UUID userId) {
         return channels.values().stream()
-                .filter(channel -> !channel.isPublic() && channel.getCreatorId().equals(userId))
+                .filter(channel -> !channel.isPublic() && channel.getMembers().contains(userId))
                 .toList();
     }
 }

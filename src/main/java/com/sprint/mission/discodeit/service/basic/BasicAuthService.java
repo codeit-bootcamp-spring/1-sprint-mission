@@ -22,6 +22,6 @@ public class BasicAuthService implements AuthService {
     public Optional<AuthResponseDTO> login(AuthRequestDTO authRequestDTO) {
         return userRepository.findByUsername(authRequestDTO.getUsername())
                 .filter(user -> passwordEncoder.matches(authRequestDTO.getPassword(), user.getPassword()))  // 비밀번호 비교
-                .map(user -> new AuthResponseDTO(user.getId(), "로그인 성공"));
+                .map(user -> new AuthResponseDTO(user.getId().toString(), "로그인 성공"));  // ✅ UUID → String 변환
     }
 }

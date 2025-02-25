@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponseDTO {
-    private UUID userId;
+    private String userId; // ✅ 기존 getUsername()이 아니라 getUserId() 사용
     private String message;
 }

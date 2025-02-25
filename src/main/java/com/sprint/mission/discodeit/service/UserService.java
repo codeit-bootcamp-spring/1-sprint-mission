@@ -9,15 +9,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    void create(UserCreateDTO userDTO);
+    // 생성 후 새 사용자 정보를 반환하도록 수정
+    UserReadDTO create(UserCreateDTO userDTO);
     Optional<UserReadDTO> read(UUID id);
     List<UserReadDTO> readAll();
     void update(UUID id, UserUpdateDTO userDTO);
     void delete(UUID id);
 
-    // ✅ 사용자의 마지막 활동 시간 업데이트
+    // 사용자의 마지막 활동 시간 업데이트
     boolean updateLastSeen(UUID userId);
 
-    // ✅ 프로필 이미지 업데이트 (새로운 기능 추가)
+    // 프로필 이미지 업데이트
     void updateProfileImage(UUID userId, UUID imageId);
 }

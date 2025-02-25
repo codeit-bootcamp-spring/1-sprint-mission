@@ -4,45 +4,33 @@ import com.sprint.mission.discodeit.dto.ChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.ChannelDTO;
 import com.sprint.mission.discodeit.dto.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.service.ChannelService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/channels")
+@RequiredArgsConstructor
 public class ChannelController {
 
     private final ChannelService channelService;
 
-    @Autowired
-    public ChannelController(ChannelService channelService) {
-        this.channelService = channelService;
+    @PostMapping
+    public ResponseEntity<ChannelDTO> createChannel(@RequestBody ChannelCreateDTO channelCreateDTO) {
+        ChannelDTO createdChannel = channelService.createChannel(channelCreateDTO);
+        return ResponseEntity.created(URI.create("/api/channels/" + createdChannel.getId()))
+                .body(createdChannel);
     }
 
-    // ✅ 1. 공개 채널 생성
-    @PostMapping("/public")
-    public ResponseEntity<Void> createPublicChannel(@RequestBody ChannelCreateDTO channelCreateDTO) {
-        channelService.createPublicChannel(channelCreateDTO);
-        return ResponseEntity.ok().build();
-    }
-
-    // ✅ 2. 비공개 채널 생성
-    @PostMapping("/private")
-    public ResponseEntity<Void> createPrivateChannel(@RequestParam UUID creatorId, @RequestBody List<UUID> members) {
-        channelService.createPrivateChannel(creatorId, members);
-        return ResponseEntity.ok().build();
-    }
-
-    // ✅ 3. 모든 채널 조회
     @GetMapping
     public ResponseEntity<List<ChannelDTO>> getAllChannels() {
         return ResponseEntity.ok(channelService.readAll());
     }
 
-    // ✅ 4. 특정 채널 조회
     @GetMapping("/{channelId}")
     public ResponseEntity<ChannelDTO> getChannelById(@PathVariable UUID channelId) {
         return channelService.read(channelId)
@@ -50,24 +38,20 @@ public class ChannelController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // ✅ 5. 채널 수정
     @PutMapping("/{channelId}")
-    public ResponseEntity<Void> updateChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateDTO channelUpdateDTO) {
+    public ResponseEntity<Void> update(@PathVariable UUID channelId, @RequestBody ChannelUpdateDTO channelUpdateDTO) {
         channelService.update(channelId, channelUpdateDTO);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    // ✅ 6. 채널 삭제
     @DeleteMapping("/{channelId}")
-    public ResponseEntity<Void> deleteChannel(@PathVariable UUID channelId) {
+    public ResponseEntity<Void> delete(@PathVariable UUID channelId) {
         channelService.delete(channelId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    // ✅ 7. 특정 사용자가 볼 수 있는 채널 목록 조회 (추가된 부분)
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ChannelDTO>> getUserChannels(@PathVariable UUID userId) {
-        List<ChannelDTO> channels = channelService.getChannelsForUser(userId);
-        return ResponseEntity.ok(channels);
+        return ResponseEntity.ok(channelService.getChannelsForUser(userId));
     }
 }

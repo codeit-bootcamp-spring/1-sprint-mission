@@ -10,10 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
 
 @Service("basicChannelService")
 @Primary
@@ -23,28 +25,26 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public void createPublicChannel(ChannelCreateDTO channelCreateDTO) {
+    public ChannelDTO createChannel(ChannelCreateDTO channelCreateDTO) {
         Channel channel = new Channel(
                 UUID.randomUUID(),
                 channelCreateDTO.getName(),
                 channelCreateDTO.getDescription(),
                 channelCreateDTO.getCreatorId(),
-                false
+                channelCreateDTO.isPrivate(),
+                Instant.now(),
+                new ArrayList<>()
         );
         channelRepository.save(channel);
-    }
-
-    @Override
-    public void createPrivateChannel(UUID creatorId, List<UUID> members) {
-        Channel channel = new Channel(
-                UUID.randomUUID(),
-                "Private Channel",
-                "Private Channel for users",
-                creatorId,
-                true
+        return new ChannelDTO(
+                channel.getId(),
+                channel.getName(),
+                channel.getDescription(),
+                channel.getCreatorId(),
+                channel.isPrivate(),
+                channel.getCreatedAt(),
+                channel.getMembers()
         );
-        channel.setMembers(members);
-        channelRepository.save(channel);
     }
 
     @Override
@@ -93,11 +93,10 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(channelId);
     }
 
-    // ✅ 특정 사용자가 볼 수 있는 채널 목록 조회 (추가된 부분)
     @Override
     public List<ChannelDTO> getChannelsForUser(UUID userId) {
         return channelRepository.findAll().stream()
-                .filter(channel -> channel.isPublic() || channel.getMembers().contains(userId)) // 공개 채널 또는 사용자가 속한 비공개 채널만 필터링
+                .filter(channel -> channel.isPublic() || channel.getMembers().contains(userId))
                 .map(channel -> new ChannelDTO(
                         channel.getId(),
                         channel.getName(),

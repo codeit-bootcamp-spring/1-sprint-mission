@@ -9,6 +9,8 @@ public interface ChannelRepository {
     void save(Channel channel);
     Optional<Channel> findById(UUID id);
     List<Channel> findAll();
-    List<Channel> findAllPrivateChannelsByUserId(UUID userId);
     void deleteById(UUID id);
+
+    // ✅ 특정 사용자가 볼 수 있는 비공개 채널 목록 조회 추가
+    List<Channel> findAllPrivateChannelsByUserId(UUID userId);
 }
