@@ -36,7 +36,7 @@ public class JCFUserService implements UserService {
 
         User createdUser = requestDTO.toEntity();
         // 선택적 프로필 생성
-        if (profileDTO.isPresent()){
+        if (profileDTO.isPresent()) {
             BinaryContent binaryContent = profileService.create(profileDTO.get());
             createdUser.setProfileImgId(binaryContent.getId());
         }
@@ -62,7 +62,7 @@ public class JCFUserService implements UserService {
     @Override
     public User findById(UUID userId) {
         return userRepository.findById(userId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
     @Override
@@ -75,21 +75,22 @@ public class JCFUserService implements UserService {
     public void delete(UUID userId) {
         //if (!userRepository.existsById(userId)) throw new NotFoundId();
 
-        userRepository.findById(userId)
-            .ifPresentOrElse(user -> {
-                profileService.deleteById(user.getProfileImgId());
-                userStatusService.deleteByUserId(userId);
-                userRepository.delete(userId);
-            }, () -> new CustomException(ErrorCode.NO_SUCH_USER));
+        User deletingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+
+        profileService.deleteById(deletingUser.getProfileImgId());
+        userStatusService.deleteByUserId(userId);
+        userRepository.delete(userId);
+
     }
 
-        //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
+    //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
 
     @Override
     public void isDuplicateNameEmail(String name, String email) {
         List<User> allUser = userRepository.findAll();
         boolean isDuplicateName = allUser.stream()
-            .anyMatch(user -> name.equals(user.getName()));
+                .anyMatch(user -> name.equals(user.getName()));
         if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
         boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));

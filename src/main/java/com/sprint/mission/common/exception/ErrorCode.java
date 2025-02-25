@@ -31,13 +31,9 @@ public enum ErrorCode {
     CANNOT_REQUEST_LAST_READ_TIME(FORBIDDEN, "Public 채널은 유저별 lastReadTime 호출 불가"),
     CANNOT_UPDATE_PRIVATE_CHANNEL(FORBIDDEN, "Private 채널은 수정 불가능입니다."),
 
-
     ALREADY_EXIST_USER_STATUS(CONFLICT, "이미 존재하는 유저 상태입니다"),
     ALREADY_EXIST_READ_STATUS(CONFLICT, "이미 존재하는 READ 상태입니다"),
-
-    @Schema(description = "이미 존재하는 이름입니다")
     ALREADY_EXIST_NAME(CONFLICT, "이미 존재하는 이름입니다"),
-    @Schema(description = "이미 존재하는 이메일입니다")
     ALREADY_EXIST_EMAIL(CONFLICT, "이미 존재하는 이메일입니다"),
 
     FILE_CONVERT_ERROR(INTERNAL_SERVER_ERROR, "파일 변환 중 오류가 발생했습니다."),

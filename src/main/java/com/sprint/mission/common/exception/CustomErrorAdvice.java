@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.method.MethodValidationException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 //import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
@@ -24,15 +29,33 @@ public class CustomErrorAdvice {
         return CustomErrorResponse.toResponseEntity(e.getErrorCode(), request);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CustomErrorResponse> handleMethodValidationException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        String validationMessage = fieldError == null
+                ? "Invalid value"
+                : fieldError.getDefaultMessage();
+
+        return ResponseEntity
+                .status(BAD_REQUEST)
+                .body(
+                        CustomErrorResponse.builder()
+                                .status(BAD_REQUEST.value()+"")
+                                .message(validationMessage)
+                                .errorCode(BAD_REQUEST.getReasonPhrase())
+                                .build()
+                );
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomErrorResponse> handleException(Exception e, HttpServletRequest request) {
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(INTERNAL_SERVER_ERROR)
                 .body(
                         CustomErrorResponse.builder()
-                                .status(HttpStatus.INTERNAL_SERVER_ERROR.value()+"")
+                                .status(INTERNAL_SERVER_ERROR.value()+"")
                                 .message(e.getMessage())
                                 .build()
                 );

@@ -73,10 +73,11 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
-    @PatchMapping(path = "{id}", consumes = MULTIPART_FORM_DATA_VALUE)
+
+    @PatchMapping("/{id}")
     public ResponseEntity<CommonResponse> update(
             @Parameter(description = "수정할 User ID") @PathVariable("id") UUID userId,
-            @RequestPart("updateRequestDto") @Valid UserDtoForUpdate requestDTO) {
+            @RequestBody @Valid UserDtoForUpdate requestDTO) {
 
         userService.update(userId, requestDTO);
         return CommonResponse.toResponseEntity
@@ -107,6 +108,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
+
     @PatchMapping("{id}/status")
     public ResponseEntity<CommonResponse> updateStatusByUserId(
             @Parameter(description = "상태를 변경할 User ID")
