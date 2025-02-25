@@ -62,4 +62,32 @@ public class SwaggerConfiguration {
                 .displayName("Channel API")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi messageApi() {
+        return GroupedOpenApi.builder()
+                .group("05. Message API")
+                .pathsToMatch("/api/messages/**")
+                .displayName("Message API")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi readStatusApi() {
+        return GroupedOpenApi.builder()
+                .group("06. Read Status API")
+                .pathsToMatch("/api/readStatuses/**")
+                .displayName("Read Status API")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi userApi() {
+        return GroupedOpenApi.builder()
+                .group("07. User API")
+                .pathsToMatch("/api/users/**")
+                .displayName("User API")
+                .build();
+    }
+
 }
