@@ -10,40 +10,40 @@ import java.util.*;
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    private final Map<UUID, BinaryContent> data;
+  private final Map<UUID, BinaryContent> data;
 
-    public JCFBinaryContentRepository() {
-        data = new HashMap<>();
-    }
+  public JCFBinaryContentRepository() {
+    data = new HashMap<>();
+  }
 
 
-    @Override
-    public UUID save(BinaryContent binaryContent) {
-        data.put(binaryContent.getId(), binaryContent);
-        return binaryContent.getId();
-    }
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    data.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
+  }
 
-    @Override
-    public BinaryContent findOne(UUID id) {
-        return data.get(id);
-    }
+  @Override
+  public BinaryContent findOne(UUID id) {
+    return data.get(id);
+  }
 
-    @Override
-    public List<BinaryContent> findAll() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public List<BinaryContent> findAll() {
+    return new ArrayList<>(data.values());
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return ids.stream()
-                .map(key -> data.get(key))
-                .filter(Objects::nonNull)
-                .toList();
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return ids.stream()
+        .map(key -> data.get(key))
+        .filter(Objects::nonNull)
+        .toList();
+  }
 
-    @Override
-    public UUID delete(UUID id) {
-        data.remove(id);
-        return id;
-    }
+  @Override
+  public UUID delete(UUID id) {
+    data.remove(id);
+    return id;
+  }
 }

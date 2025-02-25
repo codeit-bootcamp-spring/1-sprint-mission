@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -24,57 +25,58 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final MessageRepository messageRepository;
-    private final BinaryContentService binaryContentService;
-    private final MessageValidator messageValidator;
+  private final MessageRepository messageRepository;
+  private final BinaryContentService binaryContentService;
+  private final MessageValidator messageValidator;
 
-    @Override
-    public UUID create(MessageCreateDTO dto) {
-        messageValidator.validateMessage(dto.getContent(), dto.getUserId(), dto.getChannelId());
-        Message message = new Message(dto.getContent(), dto.getUserId(), dto.getChannelId());
+  @Override
+  public Message create(MessageCreateDTO dto) {
+    messageValidator.validateMessage(dto.getContent(), dto.getUserId(), dto.getChannelId());
+    Message message = new Message(dto.getContent(), dto.getUserId(), dto.getChannelId());
 
-        if(dto.getFiles() != null && !dto.getFiles().isEmpty()){
-            for(MultipartFile file : dto.getFiles()){
-                UUID bId = binaryContentService.create(new BinaryContentCreateDTO(file));
-                message.addBinaryContent(bId);
-            }
-        }
-        return messageRepository.save(message);
+    if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
+      for (MultipartFile file : dto.getFiles()) {
+        BinaryContent binaryContent = binaryContentService.create(
+            new BinaryContentCreateDTO(file));
+        message.addBinaryContent(binaryContent.getId());
+      }
     }
+    return messageRepository.save(message);
+  }
 
-    @Override
-    public Message find(UUID id) {
-        Message findMessage = messageRepository.findOne(id);
-        return Optional.ofNullable(findMessage)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+  @Override
+  public Message find(UUID id) {
+    Message findMessage = messageRepository.findOne(id);
+    return Optional.ofNullable(findMessage)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+  }
+
+  @Override
+  public List<Message> findAll() {
+    return messageRepository.findAll();
+  }
+
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId);
+  }
+
+  @Override
+  public Message update(UUID id, MessageUpdateDTO dto) {
+    Message findMessage = messageRepository.findOne(id);
+
+    findMessage.setMessage(dto.getContent());
+    messageRepository.update(findMessage);
+    return findMessage;
+  }
+
+  @Override
+  public UUID delete(UUID id) {
+    Message findMessage = messageRepository.findOne(id);
+
+    for (UUID binaryContentId : findMessage.getBinaryContentIds()) {
+      binaryContentService.delete(binaryContentId);
     }
-
-    @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
-    }
-
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findAllByChannelId(channelId);
-    }
-
-    @Override
-    public Message update(UUID id, MessageUpdateDTO dto) {
-        Message findMessage = messageRepository.findOne(id);
-
-        findMessage.setMessage(dto.getContent());
-        messageRepository.update(findMessage);
-        return findMessage;
-    }
-
-    @Override
-    public UUID delete(UUID id) {
-        Message findMessage = messageRepository.findOne(id);
-
-        for(UUID binaryContentId : findMessage.getBinaryContentIds()){
-            binaryContentService.delete(binaryContentId);
-        }
-        return messageRepository.delete(findMessage.getId());
-    }
+    return messageRepository.delete(findMessage.getId());
+  }
 }

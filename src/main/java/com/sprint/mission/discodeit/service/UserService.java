@@ -12,9 +12,13 @@ import java.util.UUID;
 public interface UserService {
 
 
-    UUID create(UserCreateDTO userCreateDTO);
-    UserFindDTO find(UUID id);
-    List<UserFindDTO> findAll();
-    User update(UUID userId, UserUpdateDTO dto);
-    UUID delete(UUID id);
+  User create(UserCreateDTO userCreateDTO);
+
+  UserFindDTO find(UUID id);
+
+  List<UserFindDTO> findAll();
+
+  User update(UUID userId, UserUpdateDTO dto);
+
+  UUID delete(UUID id);
 }

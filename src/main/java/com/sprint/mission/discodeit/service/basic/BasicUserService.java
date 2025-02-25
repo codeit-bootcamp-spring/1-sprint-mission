@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -22,90 +23,90 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
 
-    private final BinaryContentService binaryContentService;
-    private final UserValidator userValidator;
+  private final BinaryContentService binaryContentService;
+  private final UserValidator userValidator;
 
 
-    @Override
-    public UUID create(UserCreateDTO dto) {
-        userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
-        User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
+  @Override
+  public User create(UserCreateDTO dto) {
+    userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
+    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
-        if (dto.getFile() != null) {
-            BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(dto.getFile());
-            UUID binaryContentId = binaryContentService.create(binaryContentCreateDTO);
-            user.updateBinaryContentId(binaryContentId);
-        }
-
-        UUID userId = userRepository.save(user);
-        userStatusRepository.save(new UserStatus(userId));
-        return userId;
+    if (dto.getFile() != null) {
+      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(dto.getFile());
+      BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDTO);
+      user.updateBinaryContentId(binaryContent.getId());
     }
+    User saveUser = userRepository.save(user);
+    userStatusRepository.save(new UserStatus(saveUser.getId()));
+    return saveUser;
+  }
 
-    @Override
-    public UserFindDTO find(UUID id) {
-        User findUser = userRepository.findOne(id);
-        Optional.ofNullable(findUser)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        return toDTO(findUser);
+  @Override
+  public UserFindDTO find(UUID id) {
+    User findUser = userRepository.findOne(id);
+    Optional.ofNullable(findUser)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    return toDTO(findUser);
+  }
+
+  @Override
+  public List<UserFindDTO> findAll() {
+    List<User> users = userRepository.findAll();
+    return users.stream()
+        .map(this::toDTO).toList();
+  }
+
+  @Override
+  public User update(UUID id, UserUpdateDTO dto) {
+    userValidator.validateUpdateUser(id, dto.getName(), dto.getEmail(), dto.getPassword());
+    User findUser = userRepository.findOne(id);
+    findUser.setUser(dto.getName(), dto.getEmail(), dto.getPassword());
+
+    //기존 사진이 있다면 삭제하고 만들기
+    if (dto.getFile() != null) {
+      if (findUser.getBinaryContentId() != null) {
+        binaryContentService.delete(findUser.getBinaryContentId());
+      }
+      BinaryContent binaryContent = binaryContentService.create(
+          new BinaryContentCreateDTO(dto.getFile()));
+      findUser.updateBinaryContentId(binaryContent.getId());
     }
+    userRepository.update(findUser);
+    return findUser;
+  }
 
-    @Override
-    public List<UserFindDTO> findAll() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(this::toDTO).toList();
-    }
+  @Override
+  public UUID delete(UUID id) {
+    User findUser = userRepository.findOne(id);
+    Optional.ofNullable(findUser)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-    @Override
-    public User update(UUID id, UserUpdateDTO dto) {
-        userValidator.validateUpdateUser(id, dto.getName(), dto.getEmail(), dto.getPassword());
-        User findUser = userRepository.findOne(id);
-        findUser.setUser(dto.getName(), dto.getEmail(), dto.getPassword());
+    userStatusRepository.deleteByUserId(id);
 
-        //기존 사진이 있다면 삭제하고 만들기
-        if(dto.getFile() != null){
-            if(findUser.getBinaryContentId() !=null){
-                binaryContentService.delete(findUser.getBinaryContentId());
-            }
-            UUID binaryContentId = binaryContentService.create(new BinaryContentCreateDTO(dto.getFile()));
-            findUser.updateBinaryContentId(binaryContentId);
-        }
-        userRepository.update(findUser);
-        return findUser;
-    }
+    Optional.ofNullable(findUser.getBinaryContentId())
+        .ifPresent(binaryContentService::delete);
 
-    @Override
-    public UUID delete(UUID id) {
-        User findUser = userRepository.findOne(id);
-        Optional.ofNullable(findUser)
-                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    return userRepository.delete(findUser.getId());
+  }
 
-        userStatusRepository.deleteByUserId(id);
+  private UserFindDTO toDTO(User user) {
+    Boolean online = userStatusRepository.findByUserId(user.getId())
+        .map(UserStatus::isOnline)
+        .orElse(null);
 
-        Optional.ofNullable(findUser.getBinaryContentId())
-                        .ifPresent(binaryContentService::delete);
-
-        return userRepository.delete(findUser.getId());
-    }
-
-    private UserFindDTO toDTO(User user){
-        Boolean online = userStatusRepository.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElse(null);
-
-        return new UserFindDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                online,
-                user.getBinaryContentId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
-    }
+    return new UserFindDTO(
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        online,
+        user.getBinaryContentId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt()
+    );
+  }
 
 }

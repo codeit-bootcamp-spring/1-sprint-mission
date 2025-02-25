@@ -19,46 +19,46 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
 
-    private final ReadStatusRepository readStatusRepository;
-    private final ReadStatusValidator readStatusValidator;
+  private final ReadStatusRepository readStatusRepository;
+  private final ReadStatusValidator readStatusValidator;
 
-    @Override
-    public UUID create(ReadStatusCreateDTO dto) {
-        readStatusValidator.validateReadStatus(dto.getUserId(), dto.getChannelId());
-        ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId());
-        readStatusRepository.save(readStatus);
-        return readStatus.getId();
-    }
+  @Override
+  public ReadStatus create(ReadStatusCreateDTO dto) {
+    readStatusValidator.validateReadStatus(dto.getUserId(), dto.getChannelId());
+    ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId());
+    readStatusRepository.save(readStatus);
+    return readStatus;
+  }
 
-    @Override
-    public ReadStatus find(UUID id) {
-        ReadStatus findReadStatus = readStatusRepository.findOne(id);
-        Optional.ofNullable(findReadStatus)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
-        return findReadStatus;
-    }
+  @Override
+  public ReadStatus find(UUID id) {
+    ReadStatus findReadStatus = readStatusRepository.findOne(id);
+    Optional.ofNullable(findReadStatus)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
+    return findReadStatus;
+  }
 
-    @Override
-    public List<ReadStatus> findAll(){
-        return readStatusRepository.findAll();
-    }
+  @Override
+  public List<ReadStatus> findAll() {
+    return readStatusRepository.findAll();
+  }
 
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
-    }
+  @Override
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    return readStatusRepository.findAllByUserId(userId);
+  }
 
-    @Override
-    public ReadStatus update(UUID id, ReadStatusUpdateDTO dto) {
-        ReadStatus findReadStatus = readStatusRepository.findOne(id);
-        findReadStatus.updateReadStatus(dto.getTime());
-        readStatusRepository.update(findReadStatus);
-        return findReadStatus;
-    }
+  @Override
+  public ReadStatus update(UUID id, ReadStatusUpdateDTO dto) {
+    ReadStatus findReadStatus = readStatusRepository.findOne(id);
+    findReadStatus.updateReadStatus(dto.getTime());
+    readStatusRepository.update(findReadStatus);
+    return findReadStatus;
+  }
 
-    @Override
-    public UUID delete(UUID id) {
-        return readStatusRepository.delete(id);
-    }
+  @Override
+  public UUID delete(UUID id) {
+    return readStatusRepository.delete(id);
+  }
 
 }

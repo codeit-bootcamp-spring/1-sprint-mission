@@ -9,50 +9,50 @@ import java.util.*;
 @Repository
 public class JCFUserStatusRepository implements UserStatusRepository {
 
-    private final Map<UUID, UserStatus> data;
+  private final Map<UUID, UserStatus> data;
 
-    public JCFUserStatusRepository() {
-        data = new HashMap<>();
-    }
+  public JCFUserStatusRepository() {
+    data = new HashMap<>();
+  }
 
-    @Override
-    public UUID save(UserStatus userStatus) {
-        data.put(userStatus.getId(), userStatus);
-        return userStatus.getUserId();
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    data.put(userStatus.getId(), userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UserStatus find(UUID id) {
-        return data.get(id);
-    }
+  @Override
+  public UserStatus find(UUID id) {
+    return data.get(id);
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return new ArrayList<>(data.values());
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return new ArrayList<>(data.values());
+  }
 
-    @Override
-    public Optional<UserStatus> findByUserId(UUID userId){
-        return data.values().stream()
-                .filter(userStatus -> userStatus.getUserId().equals(userId))
-                .findFirst();
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return data.values().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst();
+  }
 
-    @Override
-    public UUID update(UserStatus userStatus) {
-        data.put(userStatus.getId(), userStatus);
-        return userStatus.getId();
-    }
+  @Override
+  public UserStatus update(UserStatus userStatus) {
+    data.put(userStatus.getId(), userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public UUID delete(UUID id) {
-        data.remove(id);
-        return id;
-    }
+  @Override
+  public UUID delete(UUID id) {
+    data.remove(id);
+    return id;
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId){
-        findByUserId(userId).ifPresent(uS -> delete(uS.getId()));
-    }
+  @Override
+  public void deleteByUserId(UUID userId) {
+    findByUserId(userId).ifPresent(uS -> delete(uS.getId()));
+  }
 
 }

@@ -21,58 +21,58 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserStatusValidator userStatusValidator;
+  private final UserStatusRepository userStatusRepository;
+  private final UserStatusValidator userStatusValidator;
 
-    @Override
-    public UUID create(UserStatusCreateDTO dto) {
-        userStatusValidator.validateUserStatus(dto.getUserid());
+  @Override
+  public UserStatus create(UserStatusCreateDTO dto) {
+    userStatusValidator.validateUserStatus(dto.getUserid());
 
-        UserStatus userStatus = new UserStatus(dto.getUserid());
-        return userStatusRepository.save(userStatus);
-    }
+    UserStatus userStatus = new UserStatus(dto.getUserid());
+    return userStatusRepository.save(userStatus);
+  }
 
-    @Override
-    public UserStatus find(UUID id) {
-        UserStatus findUserStatus = userStatusRepository.find(id);
-        Optional.ofNullable(findUserStatus)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+  @Override
+  public UserStatus find(UUID id) {
+    UserStatus findUserStatus = userStatusRepository.find(id);
+    Optional.ofNullable(findUserStatus)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-        //접속시간 업데이트하고 > 사용자가 접속했다는 것을 어떻게 아냐?
-        //UserService의 updateUserOnline로 상태 업데이트
-        findUserStatus.isOnline();
-        return findUserStatus;
-    }
+    //접속시간 업데이트하고 > 사용자가 접속했다는 것을 어떻게 아냐?
+    //UserService의 updateUserOnline로 상태 업데이트
+    findUserStatus.isOnline();
+    return findUserStatus;
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll().stream()
-                .peek(UserStatus::isOnline)
-                .toList();
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll().stream()
+        .peek(UserStatus::isOnline)
+        .toList();
+  }
 
-    @Override
-    public UserStatus update(UUID userId, UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
-        findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getTime());
-        userStatusRepository.update(findUserStatus);
-        return findUserStatus;
-    }
+  @Override
+  public UserStatus update(UUID userId, UserStatusUpdateDTO userStatusUpdateDTO) {
+    UserStatus findUserStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+    findUserStatus.updateLastActiveAt(userStatusUpdateDTO.getTime());
+    userStatusRepository.update(findUserStatus);
+    return findUserStatus;
+  }
 
-    @Override
-    public UserStatus updateByUserId(UUID userId,  Instant time) {
-        UserStatus finduserStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
+  @Override
+  public UserStatus updateByUserId(UUID userId, Instant time) {
+    UserStatus finduserStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_STATUS_NOT_FOUND));
 
-        finduserStatus.updateLastActiveAt(time);
-        userStatusRepository.update(finduserStatus);
-        return finduserStatus;
-    }
+    finduserStatus.updateLastActiveAt(time);
+    userStatusRepository.update(finduserStatus);
+    return finduserStatus;
+  }
 
-    @Override
-    public UUID delete(UUID id) {
-        return userStatusRepository.delete(id);
-    }
+  @Override
+  public UUID delete(UUID id) {
+    return userStatusRepository.delete(id);
+  }
 
 }

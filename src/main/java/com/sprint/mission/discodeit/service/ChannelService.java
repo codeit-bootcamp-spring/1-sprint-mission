@@ -10,12 +10,17 @@ import java.util.UUID;
 public interface ChannelService {
 
 
-    //서비스 로직
-    UUID create(ChannelCreatePublicDTO channelCreatePublicDTO);
-    UUID create(ChannelCreatePrivateDTO dto);
-    ChannelFindDTO find(UUID id);
-    List<ChannelFindDTO> findAllByUserId(UUID userId);
-    Channel update(UUID id, ChannelUpdateDTO dto);
-    UUID delete(UUID id);
+  //서비스 로직
+  Channel create(ChannelCreatePublicDTO channelCreatePublicDTO);
+
+  Channel create(ChannelCreatePrivateDTO dto);
+
+  ChannelFindDTO find(UUID id);
+
+  List<ChannelFindDTO> findAllByUserId(UUID userId);
+
+  Channel update(UUID id, ChannelUpdateDTO dto);
+
+  UUID delete(UUID id);
 }
 

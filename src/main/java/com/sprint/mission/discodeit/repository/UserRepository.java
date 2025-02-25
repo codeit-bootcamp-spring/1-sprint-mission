@@ -7,9 +7,13 @@ import java.util.UUID;
 
 public interface UserRepository {
 
-    UUID save(User user);
-    User findOne(UUID id);
-    List<User> findAll();
-    UUID update(User user);
-    UUID delete(UUID id);
+  User save(User user);
+
+  User findOne(UUID id);
+
+  List<User> findAll();
+
+  UUID update(User user);
+
+  UUID delete(UUID id);
 }

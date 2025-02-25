@@ -19,55 +19,55 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public UUID create(BinaryContentCreateDTO dto) {
+  @Override
+  public BinaryContent create(BinaryContentCreateDTO dto) {
 
-        byte[] file = getFileBytes(dto.getFile());
-        String fileName = dto.getFile().getOriginalFilename();
-        String contentType = dto.getFile().getContentType();
-        Long size = dto.getFile().getSize();
+    byte[] file = getFileBytes(dto.getFile());
+    String fileName = dto.getFile().getOriginalFilename();
+    String contentType = dto.getFile().getContentType();
+    Long size = dto.getFile().getSize();
 
-        BinaryContent binaryContent = new BinaryContent(file, fileName ,contentType, size);
-        return binaryContentRepository.save(binaryContent);
+    BinaryContent binaryContent = new BinaryContent(file, fileName, contentType, size);
+    return binaryContentRepository.save(binaryContent);
+  }
+
+  public byte[] getFileBytes(MultipartFile multipartFile) {
+    byte[] file = null;
+    try {
+      if (multipartFile != null && !multipartFile.isEmpty()) {
+        file = multipartFile.getBytes();
+      } else {
+        System.out.println("파일이 존재하지 않거나 비어 있음.");
+      }
+    } catch (IOException e) {
+      System.err.println("파일 변환 중 오류 발생: " + e.getMessage());
+      e.printStackTrace();
     }
+    return file;
+  }
 
-    public byte[] getFileBytes(MultipartFile multipartFile){
-        byte[] file = null;
-        try {
-            if (multipartFile != null && !multipartFile.isEmpty()) {
-                file =  multipartFile.getBytes();
-            } else {
-                System.out.println("파일이 존재하지 않거나 비어 있음.");
-            }
-        } catch (IOException e) {
-            System.err.println("파일 변환 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return file;
-    }
+  @Override
+  public BinaryContent find(UUID id) {
+    BinaryContent findBinaryContent = binaryContentRepository.findOne(id);
+    Optional.ofNullable(findBinaryContent)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
+    return findBinaryContent;
+  }
 
-    @Override
-    public BinaryContent find(UUID id) {
-        BinaryContent findBinaryContent = binaryContentRepository.findOne(id);
-        Optional.ofNullable(findBinaryContent)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
-        return findBinaryContent;
-    }
+  @Override
+  public List<BinaryContent> findAll() {
+    return binaryContentRepository.findAll();
+  }
 
-    @Override
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll();
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids);
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return binaryContentRepository.findAllByIdIn(ids);
-    }
-
-    @Override
-    public UUID delete(UUID id) {
-        return binaryContentRepository.delete(id);
-    }
+  @Override
+  public UUID delete(UUID id) {
+    return binaryContentRepository.delete(id);
+  }
 }
