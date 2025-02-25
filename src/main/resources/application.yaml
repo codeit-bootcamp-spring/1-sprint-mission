@@ -7,3 +7,10 @@ file:
     user: data/users.dat
     channel: data/channels.dat
     message: data/messages.dat
+    binarycontent: data/binarycontents.dat
+    readstatus: data/readstatus.dat
+    userstatus: data/userstatus.dat
+
+discodeit:
+  repository:
+    type: file

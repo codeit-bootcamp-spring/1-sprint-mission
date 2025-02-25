@@ -1,11 +1,19 @@
 package com.sprint.mission.discodeit.repository;
 
-import org.springframework.stereotype.Repository;
+import com.sprint.mission.discodeit.entity.UserStatus;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public class UserStatusRepository {
-    public void deleteByUserId(UUID id) {
-    }
+public interface UserStatusRepository {
+    void deleteById(UUID id);
+
+    Optional<UserStatus> findById(UUID uuid);
+
+    UserStatus save(UserStatus userStatus);
+
+    Optional<UserStatus> findByUserId(UUID userId);
+
+    List<UserStatus> findAll();
 }

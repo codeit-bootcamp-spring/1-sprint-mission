@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface ChannelService {
     Optional<ChannelResponse> updateChannel(UUID uuid, String channelName);
 
     void deleteChannel(UUID uuid);
+
+    ChannelResponse createPrivateChannel(CreatePrivateChannelRequest request);
 }

@@ -12,7 +12,7 @@ public interface UserRepository {
 
     User getUserById(UUID id);
 
-    void delete(UUID id);
+    void deleteById(UUID id);
 
     void save();
 
@@ -21,4 +21,6 @@ public interface UserRepository {
     boolean existsByEmail(String email);
 
     Optional<User> getUserByEmail(String userEmail1);
+
+    boolean existsById(UUID uuid);
 }

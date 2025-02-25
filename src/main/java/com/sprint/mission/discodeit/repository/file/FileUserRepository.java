@@ -4,75 +4,85 @@ import com.sprint.mission.discodeit.collection.Users;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
     private final String filePath;
-    private Users users; // 🔥 users 인스턴스를 메모리에 유지
 
     public FileUserRepository(@Value("${file.path.user}") String filePath) {
         this.filePath = filePath;
-        this.users = load().orElse(new Users());
     }
 
     @Override
     public synchronized User save(User newUser) {
+        Users users = load().orElse(new Users());
         users.add(newUser.getId(), newUser);
-        saveToFile();
+        saveToFile(users);
         return newUser;
     }
 
     @Override
     public List<User> getAllUsers() {
-        return users.getUsersList();
+        return load().map(Users::getUsersList).orElse(List.of());
     }
 
     @Override
     public User getUserById(UUID id) {
-        return users.get(id)
+        return load()
+                .flatMap(users -> users.get(id))
                 .orElseThrow(() -> new RuntimeException("해당 ID의 사용자를 찾을 수 없습니다."));
     }
 
     @Override
-    public synchronized void delete(UUID id) {
+    public synchronized void deleteById(UUID id) {
+        Users users = load().orElse(new Users());
         users.remove(id);
-        saveToFile();
+        saveToFile(users);
     }
 
     @Override
     public void save() {
-        saveToFile();
     }
 
     @Override
     public boolean existsByUsername(String username) {
-        return users.getUsersList().stream().anyMatch(user -> user.getUsername().equals(username));
+        return load().map(users ->
+                users.getUsersList().stream().anyMatch(user -> user.getUsername().equals(username))
+        ).orElse(false);
     }
 
     @Override
     public boolean existsByEmail(String email) {
-        return users.getUsersList().stream().anyMatch(user -> user.getEmail().equals(email));
+        return load().map(users ->
+                users.getUsersList().stream().anyMatch(user -> user.getEmail().equals(email))
+        ).orElse(false);
     }
 
     @Override
-    public Optional<User> getUserByEmail(String userEmail1) {
-        return users.getUsersList().stream()
-                .filter(user -> user.getEmail().equals(userEmail1))
-                .findFirst();
+    public Optional<User> getUserByEmail(String userEmail) {
+        return load().flatMap(users ->
+                users.getUsersList().stream()
+                        .filter(user -> user.getEmail().equals(userEmail))
+                        .findFirst()
+        );
     }
 
-    private synchronized void saveToFile() {
+    @Override
+    public boolean existsById(UUID uuid) {
+        return load().map(users ->
+                users.getUsersList().stream().anyMatch(user -> user.getId().equals(uuid))
+        ).orElse(false);
+    }
+
+    private synchronized void saveToFile(Users users) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
             oos.writeObject(users);
         } catch (IOException e) {
