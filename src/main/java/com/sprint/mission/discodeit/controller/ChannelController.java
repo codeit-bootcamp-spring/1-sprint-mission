@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +21,9 @@ public class ChannelController {
     private final ChannelService channelService;
 
     @RequestMapping(value = "/create/public", method = RequestMethod.POST)
-    public ResponseEntity<ChannelDTO> createPublicChannel(@RequestBody PublicChannelCreateRequest request) {
+    public ResponseEntity<ChannelDTO> create(@RequestBody PublicChannelCreateRequest request) {
         Channel channel = channelService.create(request);
-        return ResponseEntity.ok(new ChannelDTO(
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelDTO(
                 channel.getId(),
                 channel.getAdmin().getId(),
                 channel.getType(),
@@ -33,9 +34,9 @@ public class ChannelController {
     }
 
     @RequestMapping(value = "/create/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelDTO> createPrivateChannel(@RequestBody PrivateChannelCreateRequest request) {
+    public ResponseEntity<ChannelDTO> create(@RequestBody PrivateChannelCreateRequest request) {
         Channel channel = channelService.create(request);
-        return ResponseEntity.ok(new ChannelDTO(
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelDTO(
                 channel.getId(),
                 channel.getAdmin().getId(),
                 channel.getType(),
@@ -51,7 +52,7 @@ public class ChannelController {
             @PathVariable UUID adminId,
             @RequestBody PublicChannelUpdateRequest request) {
         Channel channel = channelService.update(channelId, adminId, request);
-        return ResponseEntity.ok(new ChannelDTO(
+        return ResponseEntity.status(HttpStatus.OK).body(new ChannelDTO(
                 channel.getId(),
                 channel.getAdmin().getId(),
                 channel.getType(),
@@ -66,11 +67,11 @@ public class ChannelController {
             @PathVariable UUID channelId,
             @PathVariable UUID adminId) {
         channelService.delete(channelId, adminId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
     public ResponseEntity<List<ChannelDTO>> getUserChannels(@PathVariable UUID userId) {
-        return ResponseEntity.ok(channelService.findAllByUserId(userId));
+        return ResponseEntity.status(HttpStatus.OK).body(channelService.findAllByUserId(userId));
     }
 }
