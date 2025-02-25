@@ -1,20 +1,17 @@
 package com.sprint.mission.discodeit.basic;
 
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.UserDTO;
+import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.FutureOrPresentValidatorForLocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,23 +28,23 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public MessageDTO createMessage(MessageDTO messageDTO) {
+    public MessageDto createMessage(MessageDto messageDTO) {
         Message message = new Message();
         message.setId(UUID.randomUUID().toString());
         message.setChannelId(messageDTO.getChannelId());
         message.setSenderId(messageDTO.getSenderId());
         message.setContent(messageDTO.getContent());
         message.setCreatedAt(LocalDateTime.now());
+//
+//        try {
+//            Channel channel = channelService.find();
+//            message.setChannelName(channel.getName());
+//        } catch (Exception e) {
+//            message.setChannelName("Unknown Channel");
+//        }
 
         try {
-            Channel channel = channelService.find(messageDTO.getChannelId());
-            message.setChannelName(channel.getName());
-        } catch (Exception e) {
-            message.setChannelName("Unknown Channel");
-        }
-
-        try {
-            UserDTO user = userService.find(messageDTO.getSenderId());
+            UserDto user = userService.find(messageDTO.getSenderId());
             message.setSenderName(user.getName());
         } catch (Exception e) {
             message.setSenderName("Unknown Sender");
@@ -57,8 +54,8 @@ public class BasicMessageService implements MessageService {
         return convertToDTO(savedMessage);
     }
 
-    private MessageDTO convertToDTO(Message message) {
-        MessageDTO dto = new MessageDTO();
+    private MessageDto convertToDTO(Message message) {
+        MessageDto dto = new MessageDto();
         dto.setId(message.getId());
         dto.setChannelId(message.getChannelId());
         dto.setChannelName(message.getChannelName());
@@ -71,7 +68,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> getChannelMessages(String channelId) {
+    public List<MessageDto> getChannelMessages(String channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
                 .map(this::convertToDTO)
@@ -80,7 +77,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public MessageDTO updateMessage(String id, MessageDTO messageDTO) {
+    public MessageDto updateMessage(String id, MessageDto messageDTO) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message not found"));
 
@@ -92,7 +89,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> findAllByChannelId(String channelId) {
+    public List<MessageDto> findAllByChannelId(String channelId) {
         return messageRepository.findAllByChannelId(channelId)
                 .stream()
                 .map(this::convertToDTO)
@@ -108,7 +105,7 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public List<MessageDTO> findAll() {
+    public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
                 .map(this::convertToDTO)

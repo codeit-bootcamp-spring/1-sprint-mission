@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.basic;
 
-import com.sprint.mission.discodeit.dto.UserStatusDTO;
+import com.sprint.mission.discodeit.dto.UserStatusDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.entity.UserStatusType;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -18,17 +18,17 @@ public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public UserStatusDTO create(UserStatusDTO userStatusDTO) {
+    public UserStatusDto create(UserStatusDto userStatusDTO) {
         UserStatus userStatus = new UserStatus(userStatusDTO.getUserId(), Instant.now());
         userStatusRepository.save(userStatus);
-        return new UserStatusDTO(userStatus.getUserId(), userStatus.getLastSeen());
+        return new UserStatusDto(userStatus.getUserId(), userStatus.getLastSeen());
     }
 
     @Override
-    public UserStatusDTO find(String userId) {
+    public UserStatusDto find(String userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
-        return new UserStatusDTO(userStatus.getUserId(), userStatus.getLastSeen());
+        return new UserStatusDto(userStatus.getUserId(), userStatus.getLastSeen());
     }
 
     @Override

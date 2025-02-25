@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UsersDTO;
+import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -37,13 +35,13 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<UsersDTO> findAll() {
+    public List<UsersDto> findAll() {
         return readFromFile().values().stream()
                 .map(this::convertToUsersDTO)
                 .collect(Collectors.toList());
     }
-    private UsersDTO convertToUsersDTO(User user) {
-        UsersDTO dto = new UsersDTO();
+    private UsersDto convertToUsersDTO(User user) {
+        UsersDto dto = new UsersDto();
         dto.setId(user.getId());
         dto.setName(user.getName());
 

@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthDTO {
-    private String id;
-    private String username;
-    private String password;
+public class UserStatusDto {
+    private String userId;
+    private Instant lastSeen;
 }

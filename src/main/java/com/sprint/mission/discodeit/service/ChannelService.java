@@ -1,20 +1,18 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.ChannelDTO;
-import com.sprint.mission.discodeit.dto.ChannelJoinDTO;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.ChannelJoinDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ChannelService {
-    Channel create(ChannelDTO channelDTO);
-    Channel find(String channelId);
-    Channel update(String channelId, ChannelDTO channelDTO);
-    Map<User, Channel> join(ChannelJoinDTO joinDTO);
+    ChannelDto create(ChannelDto channelDTO);
+    ChannelDto find(String channelId);
+    Channel update(String channelId, ChannelDto channelDTO);
+    Map<User, Channel> join(ChannelJoinDto joinDTO);
     void delete(String channelId);
-    List<Channel> findAll();
+    List<ChannelDto> findAll();
 }

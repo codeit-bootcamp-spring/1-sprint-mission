@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UsersDTO;
+import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.context.annotation.Primary;
@@ -33,14 +32,14 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<UsersDTO> findAll() {
+    public List<UsersDto> findAll() {
         return dataStore.values().stream()
                 .map(this::convertToUsersDTO)
                 .collect(Collectors.toList());
     }
 
-    private UsersDTO convertToUsersDTO(User user) {
-        UsersDTO dto = new UsersDTO();
+    private UsersDto convertToUsersDTO(User user) {
+        UsersDto dto = new UsersDto();
         dto.setId(user.getId());
         dto.setName(user.getName());
 

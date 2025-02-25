@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import ch.qos.logback.core.testUtil.StringListAppender;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -38,7 +36,7 @@ public class AuthController {
             return "login";
         }
         try {
-            UserDTO userDTO = userService.find(loginRequest.getEmail());
+            UserDto userDTO = userService.find(loginRequest.getEmail());
 
             if (userDTO != null && userDTO.getPassword().equals(loginRequest.getPassword())) {
                 session.setAttribute("userId", userDTO.getId());

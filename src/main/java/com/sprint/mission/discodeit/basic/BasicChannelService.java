@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDTO;
-import com.sprint.mission.discodeit.dto.ChannelJoinDTO;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.ChannelJoinDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -13,9 +13,8 @@ import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Primary
 @Service
@@ -25,7 +24,7 @@ public class BasicChannelService implements ChannelService {
     private final UserRepository userRepository;
 
     @Override
-    public Channel create(ChannelDTO channelDTO) {
+    public ChannelDto create(ChannelDto channelDTO) {
         User creator = userRepository.findById(channelDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
 
@@ -35,11 +34,29 @@ public class BasicChannelService implements ChannelService {
                 ChannelType.valueOf(channelDTO.getType().toUpperCase()));
 
         channel.addMember(creator);
-        return channelRepository.save(channel);
+        Channel saved = channelRepository.save(channel);
+        return convertToDTO(saved);
+    }
+
+    private ChannelDto convertToDTO(Channel channel) {
+        ChannelDto dto = new ChannelDto();
+        dto.setId(channel.getId());
+        dto.setName(channel.getName());
+        dto.setDescription(channel.getDescription());
+        dto.setType(channel.getType().toString());
+        return dto;
     }
 
     @Override
-    public Map<User, Channel> join(ChannelJoinDTO joinDTO) {
+    public ChannelDto find(String id) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
+
+        return convertToDTO(channel);
+    }
+
+    @Override
+    public Map<User, Channel> join(ChannelJoinDto joinDTO) {
 
         Channel channel = channelRepository.findById(joinDTO.getChannelName())
                 .orElseThrow(() -> new IllegalArgumentException("Channel Not Found"));
@@ -54,7 +71,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(String id, ChannelDTO channelDTO) {
+    public Channel update(String id, ChannelDto channelDTO) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
@@ -81,16 +98,15 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(id);
     }
 
-    @Override
-    public Channel find(String id) {
-        return channelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
-    }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<ChannelDto> findAll() {
+        return channelRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
+
 
 
 }

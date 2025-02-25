@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class MessageDTO {
+public class MessageDto {
     private String id;
     private String channelId;
     private String senderId;

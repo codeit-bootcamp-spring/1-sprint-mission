@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.basic;
 
-import com.sprint.mission.discodeit.dto.AuthDTO;
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UsersDTO;
+import com.sprint.mission.discodeit.dto.AuthDto;
+import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -17,7 +16,7 @@ public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDTO login(AuthDTO authDTO) {
+    public UserDto login(AuthDto authDTO) {
         log.info("[로그인 시도] 유저네임: " + authDTO.getUsername());
 
         User user = userRepository.findById(authDTO.getId())
@@ -34,6 +33,6 @@ public class BasicAuthService implements AuthService {
 
         log.info("[로그인 성공] 유저네임: " + user.getName());
 
-        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPassword());
+        return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 }

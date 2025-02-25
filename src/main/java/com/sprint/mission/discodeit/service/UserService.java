@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.UserDTO;
-import com.sprint.mission.discodeit.dto.UsersDTO;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 
 public interface UserService {
-    User create(UsersDTO usersDTO, byte[] profileImage);
-    User update(String id, UsersDTO usersDTO, byte[] profileImage);
+    UsersDto create(UsersDto usersDTO, byte[] profileImage);
+    User update(String id, UsersDto usersDTO, byte[] profileImage);
     void delete(String id);
-    UserDTO find(String id);
-    List<UsersDTO> findAll();
+    UserDto find(String id);
+    List<UsersDto> findAll();
     void updateOnlineStatus(String userId, boolean online);
 }

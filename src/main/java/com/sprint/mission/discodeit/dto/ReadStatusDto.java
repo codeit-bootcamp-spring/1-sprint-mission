@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +10,10 @@ import java.time.Instant;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserStatusDTO {
+@Data
+public class ReadStatusDto {
+    private String id;
     private String userId;
-    private Instant lastSeen;
+    private String channelId;
+    private Instant lastReadTime;
 }

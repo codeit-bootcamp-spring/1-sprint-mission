@@ -41,10 +41,6 @@ public class AppConfig {
         return useFileStorage ? new FileMessageRepository() : new JCFMessageRepository();
     }
 
-    @Bean
-    public BinaryContentRepository binaryContentRepository() {
-        return useFileStorage ? new FileBinaryContentRepository() : new JCFBinaryContentRepository();
-    }
 
     @Bean
     public UserService userService(UserRepository userRepository, BinaryContentRepository binaryContentRepository) {
