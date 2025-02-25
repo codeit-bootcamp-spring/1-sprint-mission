@@ -14,20 +14,21 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;
 
-  @PostMapping("/readStatus")
+  @PostMapping
   public ApiResponse<UUID> createReadStatus(@RequestBody ReadStatusCreateDTO request) {
     return ApiResponse.<UUID>builder()
-        .code(HttpStatus.OK.value())
+        .code(HttpStatus.CREATED.value())
         .message("메시지 수신정보 생성 완료")
         .data(readStatusService.create(request))
         .build();
   }
 
-  @PutMapping("/readStatus/{readStatusId}")
+  @PutMapping("{readStatusId}")
   public ApiResponse updateReadStatus(@PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateDTO request) {
     readStatusService.update(readStatusId, request);
@@ -37,8 +38,8 @@ public class ReadStatusController {
         .build();
   }
 
-  @GetMapping("readStatus/{userId}")
-  public ApiResponse<List<ReadStatus>> getUserReadStatus(@PathVariable UUID userId) {
+  @GetMapping
+  public ApiResponse<List<ReadStatus>> getUserReadStatus(@RequestParam("userId") UUID userId) {
     return ApiResponse.<List<ReadStatus>>builder()
         .code(HttpStatus.OK.value())
         .message("특정 사용자의 메시지 수신 정보를 조회")
