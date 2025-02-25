@@ -11,7 +11,7 @@ import java.util.*;
 public class FileUserRepository implements UserRepository {
   private final Map<UUID, User> data;
   public FileUserRepository(SerializationUtil<UUID, User> util) {
-    this.data = util.loadData(); // 이 부분, filePath 매개변수 이해 잘 안됨
+    this.data = util.loadData(); // TODO : 이 부분, filePath 매개변수 이해 잘 안됨
   }
 
 

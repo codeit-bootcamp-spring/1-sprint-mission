@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FileMessageRepository implements MessageRepository {
   private final Map<UUID, Message> data;
   public FileMessageRepository(SerializationUtil<UUID, Message> util) {
-    this.data = util.loadData(); // 이 부분, filePath 매개변수 이해 잘 안됨
+    this.data = util.loadData();
   }
 
   @Override

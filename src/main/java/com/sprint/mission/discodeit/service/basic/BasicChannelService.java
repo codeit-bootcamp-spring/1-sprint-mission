@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -27,7 +24,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
 
-    // 채널아이디,이름,주제,타입,
+
     @Override
     public Channel createPublicChannel(PublicChannelCreateRequest request) {
         // 1. 파라미터 예외처리, 변수에 넣기 2. 객체 만들기 3. repository.save
@@ -49,7 +46,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    // TODO : toDto 설계 공부
     // 가장 최근 메세지 정보를 담을 거니까 channelDto 반환.
     public ChannelDto find(UUID channelId) {
         return channelRepository.findById(channelId)
@@ -77,17 +73,18 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public void update(UUID channelId, ChannelUpdateRequest request) {
+    public Channel update(UUID channelId, ChannelUpdateRequest request) {
         // private 채널이면 수정할 수 없다는 말
-        channelRepository.findById(channelId).ifPresent(channel -> {
-            if (channel.getType().equals(ChannelType.PRIVATE)) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(()-> new NoSuchElementException("해당 채널이 존재하지 않습니다."));
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
                 System.out.println("PRIVATE 채널은 수정할 수 없습니다.");
-            }else{
-                String newName = request.name();
-                String newTopic = request.topic();
-                channel.update(newName, newTopic);
+        }else{
+            String newName = request.name();
+            String newTopic = request.topic();
+            channel.update(newName, newTopic);
             }
-        });
+        return channelRepository.save(channel);
     }
 
     @Override
@@ -122,6 +119,7 @@ public class BasicChannelService implements ChannelService {
         if(channel.getType().equals(ChannelType.PRIVATE)){
             readStatusRepository.findAllByChannelId(channel.getId())
                     .forEach(readStatus -> participantIds.add(readStatus.getUserId()));
+                    // .forEach()는 Iterable에서 제공하는 메서드라서 .stream() 안써도 된다.
 
         }
 

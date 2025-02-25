@@ -35,6 +35,7 @@ public class ReadStatus implements Serializable {
     }
 
     @Override
+    // TODO : toString()
     public String toString() {
         return "ReadStatus{" +
                 "updatedAt=" + updatedAt +

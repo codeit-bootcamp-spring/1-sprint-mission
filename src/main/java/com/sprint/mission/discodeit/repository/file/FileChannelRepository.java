@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FileChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> data;
     public FileChannelRepository(SerializationUtil<UUID, Channel> util) {
-        this.data = util.loadData(); // 이 부분, filePath 매개변수 이해 잘 안됨
+        this.data = util.loadData();
     }
 
 

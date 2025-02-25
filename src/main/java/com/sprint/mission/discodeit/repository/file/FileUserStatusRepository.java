@@ -40,7 +40,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public List<UserStatus> findAllByUserId(UUID userId) {
         List<UserStatus> userStatusList = this.data.values().stream().toList();
-        // data.values().stream().toList() 는 불변리스트임
+        // data.values().stream().toList() 는 불변리스트임. data를 final로 선언했으니까
         // List<UserStatus> userStatusList = new ArrayList<>(this.data.values()); 했으면 add나 remove 가능한 변경 가능한 리스트 됐을 것 (여기선 불변이든 가변이든 뭐 상관 없음)
         List<UserStatus> returnList = new ArrayList<>();
         for (UserStatus userStatus : userStatusList) {

@@ -34,7 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
         }
         UUID userId = request.userId();
         Instant lastActiveAt = request.lastActiveAt();
-        UserStatus userStatus = new UserStatus(userId, lastActiveAt); // TODO : 롬복 생성자 헷갈림! -> 공부
+        UserStatus userStatus = new UserStatus(userId, lastActiveAt); // TODO : 롬복 @RequiredArgsConstructor는 final과 not null 필드에 대한 생성자를 생성하므로 이 필드에 대해 파라미터로 전달하면 된다. -> userId, lastActiveAt!
         return userStatusRepository.save(userStatus);
     }
 
@@ -53,15 +53,16 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void update(UUID userStatusId, UserStatusUpdateRequest request){
+    public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request){
         Instant lastActiveAt = request.newLastActiveAt();
         UserStatus userStatus = userStatusRepository.findById(userStatusId)
                 .orElseThrow(() -> new NoSuchElementException("아이디가 " + userStatusId + "인 회원 상태가 존재하지 않습니다."));
         userStatus.update(lastActiveAt);
+        return userStatusRepository.save(userStatus);
     }
 
     @Override
-    public void updateByUserId(UUID userId, UserStatusUpdateRequest request){
+    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request){
         if(!userRepository.existsById(userId)) {
             throw new NoSuchElementException("아이디가" + userId + "인 회원이 존재하지 않습니다.");
         }
@@ -70,6 +71,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new NoSuchElementException("회원 상태가 존재하지 않습니다."));
 
         userStatus.update(lastActiveAt);
+        return userStatusRepository.save(userStatus);
     }
 
     @Override

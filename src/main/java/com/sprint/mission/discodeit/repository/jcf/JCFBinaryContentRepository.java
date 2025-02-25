@@ -24,6 +24,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
+    // TODO : filter 메서드 공부
     public List<BinaryContent> findAllByIdIn(List<UUID> contentIds) {
         return this.data.values().stream()
                 .filter(content -> contentIds.contains(content.getId()))

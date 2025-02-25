@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@RequiredArgsConstructor // 롬복은 나중에 생성자 호출할 때 파라미터로 뭘 줘야하는지 헷갈림
+@RequiredArgsConstructor // TODO : 롬복은 나중에 생성자 호출할 때 파라미터로 뭘 줘야하는지 헷갈림
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -22,14 +22,14 @@ public class User implements Serializable {
   private Instant updatedAt = null;
 
   @NonNull
-  private String username; // int같은 기본 타입은 null이 될 수가 없더라도 @NonNull로 명시를 해줘야 @RequiredArgsConstructor가 인식을 하는거 아닌가..?
+  private String username; // TODO : int같은 기본 타입은 null이 될 수가 없더라도 @NonNull로 명시를 해줘야 @RequiredArgsConstructor가 인식을 하는거 아닌가..?
   @NonNull
   private String email;
   @NonNull
   private String password;
   @NonNull
   private UUID profileId;
-  // User에 직접적으로 channelId 연결 안하는 이유 > 채널 서비스에서 participantIds 가져오는 toDto 관련 > 유저레포지토리에 findByChannelId해서 할 수도 있는데,,?
+  // TODO : User에 직접적으로 channelId 연결 안하는 이유 > 채널 서비스에서 participantIds 가져오는 toDto 관련 > 유저레포지토리에 findByChannelId해서 할 수도 있는데,,?
 
 
   public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
