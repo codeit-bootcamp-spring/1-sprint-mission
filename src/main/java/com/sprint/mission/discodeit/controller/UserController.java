@@ -36,6 +36,7 @@ public class UserController {
         byte[] profileImage = null;
         try {
             if (pof != null && !pof.isEmpty()) {
+
                 profileImage = pof.getBytes();
             }
         } catch (IOException e) {
