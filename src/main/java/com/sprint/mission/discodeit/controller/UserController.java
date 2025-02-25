@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-//@RestController
 @Controller
 @RequestMapping("/api/users")
 public class UserController implements UserApiDocs {
