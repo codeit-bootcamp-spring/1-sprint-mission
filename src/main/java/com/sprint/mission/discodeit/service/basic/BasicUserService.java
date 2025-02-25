@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -15,9 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +33,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentService binaryContentService;
 
     @Override
-    public UserResponse createUser(UserRequest request) {
+    public UserResponse createUser(UserRequest request, MultipartFile userProfileImage) {
         if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email()) && userValidator.isValidPassword(request.password())) {
 
             User newUser = User.createUser(request.name(), request.email(), request.password());
@@ -39,13 +41,14 @@ public class BasicUserService implements UserService {
 
             UserStatus newUserStatus = userStatusService.create(newUser.getId());
 
-            MultipartFile userProfileImg = request.file();
-            if (userProfileImg != null) {
-                binaryContentService.createUserProfileFile(userProfileImg, newUser.getId());
+            UUID newBinaryContentId = null;
+            if (userProfileImage != null) {
+                BinaryContentResponse newBinaryContent = binaryContentService.createUserProfileFile(userProfileImage, newUser.getId());
+                newBinaryContentId = newBinaryContent.id();
             }
 
             log.info("Create User: {}", newUser);
-            return UserResponse.entityToDto(newUser, newUserStatus);
+            return UserResponse.entityToDto(newUser, newUserStatus.getStatus(), newBinaryContentId);
         }
         return null;
     }
@@ -53,40 +56,31 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
-                .map(user -> UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId())))
+                .map(this::entityToUserResponse
+                )
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserResponse findById(UUID id) {
         User user = findByIdOrThrow(id);
-        return UserResponse.entityToDto(user, userStatusService.findByUserId(user.getId()));
+        return entityToUserResponse(user);
     }
 
     @Override
-    public void update(UUID id, UserRequest request) {
+    public UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage) {
         User user = findByIdOrThrow(id);
-        String newName = null;
-        String newEmail = null;
-        String newPassword = null;
 
-        if (request.name() != null && userValidator.isValidName(request.name())) {
-            newName = request.name();
-        }
-        if (request.email() != null && userValidator.isValidEmail(request.name())) {
-            newEmail = request.email();
-        }
-        if (request.password() != null && userValidator.isValidPassword(request.name())) {
-            newPassword = request.password();
-        }
-        user.update(newName, newEmail, newPassword);
-        userRepository.save(user);
+        if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email()) && userValidator.isValidPassword(request.password())) {
+            user.update(request.name(), request.email(), request.password());
+            userRepository.save(user);
 
-        MultipartFile userProfileImg = request.file();
-        if (userProfileImg != null) {
-            binaryContentService.updateUserProfileFile(userProfileImg, id);
+            if (userProfileImage != null) {
+                binaryContentService.updateUserProfileFile(userProfileImage, id);
+            }
         }
         log.info("Update User :{}", user);
+        return entityToUserResponse(user);
     }
 
     @Override
@@ -100,7 +94,17 @@ public class BasicUserService implements UserService {
     @Override
     public User findByIdOrThrow(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
+    }
+
+    private UserResponse entityToUserResponse(User user) {
+        UserStatus.Status userStatus =  userStatusService.findByUserId(user.getId()).getStatus();
+        UUID binaryContentId = null;
+        BinaryContentResponse binaryContentResponse = binaryContentService.findByUserId(user.getId());
+        if (binaryContentResponse != null) {
+            binaryContentId = binaryContentResponse.id();
+        }
+        return UserResponse.entityToDto(user, userStatus, binaryContentId);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
@@ -25,6 +26,13 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     @Override
     public Optional<BinaryContent> findById(UUID id) {
         return Optional.ofNullable(data.get(id));
+    }
+
+    @Override
+    public Optional<BinaryContent> findByUserId(UUID userId) {
+        return data.values().stream()
+                .filter(binaryContent -> binaryContent.getUserId().equals(userId))
+                .findAny();
     }
 
     @Override
@@ -48,9 +56,10 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public void deleteAllByMessageId(UUID messageId) {
+    public void deleteAllByMessageId(UUID messageId) {;
         for (UUID id : data.keySet()) {
-            if (data.get(id).getMessageId().equals(messageId)) {
+            UUID getMessageId = data.get(id).getMessageId();
+            if (getMessageId != null && getMessageId.equals(messageId)) {
                 data.remove(id);
             }
         }

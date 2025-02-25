@@ -2,9 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.ChannelRequest;
 import com.sprint.mission.discodeit.dto.ChannelResponse;
+import com.sprint.mission.discodeit.dto.ReadStatusRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.global.exception.ErrorCode;
+import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -27,7 +31,6 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ChannelValidator channelValidator;
-//    private final MessageService messageService; // 순환 참조 발생함.
     private final MessageRepository messageRepository;
     private final ReadStatusService readStatusService;
 
@@ -48,7 +51,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.save(newChannel);
 
         for (UUID userId : request.joinUsers()) {
-            readStatusService.create(userId, newChannel.getId());
+            readStatusService.create(new ReadStatusRequest(userId, newChannel.getId()));
         }
 
         log.info("Create Private Channel: {}", newChannel);
@@ -68,8 +71,6 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponse findById(UUID id) {
         Channel channel = findByIdOrThrow(id);
         return ChannelResponse.entityToDto(channel, getLastMessageTime(id), findJoinUsersById(id));
-        // ChannelResponse.entityToDto(channel) 로 한다면
-        // dto 에서 service 를 사용해서 getLastMessageTime(id), getJoinUsers(id)를 직접 호출하여 값을 넣어주기??
     }
 
     @Override
@@ -77,7 +78,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = findByIdOrThrow(id);
 
         if (channel.getChannelType() == Channel.ChannelType.PRIVATE) {
-            log.error("Private Channel can not be changed");
+            throw new RestApiException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED, "id : " + id);
         } else if (channelValidator.isValidTitle(request.title()) && channelValidator.isValidTitle(request.description())) {
             channel.update(request.title(), request.description());
             Channel updatedChannel = channelRepository.save(channel);
@@ -89,7 +90,6 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteById(UUID id) {
-//        messageService.deleteAllByChannelId(id); // 굳이 서비스 단에서 불러와야할까?
         messageRepository.findAllByChannelId(id);
         readStatusService.deleteAllByChannelId(id);
         channelRepository.deleteById(id);
@@ -98,11 +98,10 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel findByIdOrThrow(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Channel does not exist"));
+                .orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + id));
     }
 
     private Instant getLastMessageTime(UUID id) {
-        //List<Message> channelMessages = messageService.findAllByChannelId(id);
         List<Message> channelMessages = messageRepository.findAllByChannelId(id);
         if  (channelMessages.isEmpty()) {
             return null;
@@ -111,6 +110,6 @@ public class BasicChannelService implements ChannelService {
     }
 
     private List<UUID> findJoinUsersById(UUID id) {
-        return readStatusService.findAllByChannelId(id).stream().map(ReadStatus::getUserId).collect(Collectors.toList());
+        return readStatusService.findAllByChannelId(id).stream().map(ReadStatusResponse::channelId).collect(Collectors.toList());
     }
 }

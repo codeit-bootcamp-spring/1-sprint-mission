@@ -22,14 +22,15 @@ public class UserStatus implements Serializable {
     }
 
     public static UserStatus createUserStatus(UUID userId) {
-        return new UserStatus(userId);
+        return new UserStatus(userId, Status.ONLINE);
     }
 
-    private UserStatus(UUID userId) {
+    private UserStatus(UUID userId, Status status) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
-        this.status = Status.ONLINE;
+        this.userId = userId;
+        this.status = status;
     }
 
     public Status getStatus() {
