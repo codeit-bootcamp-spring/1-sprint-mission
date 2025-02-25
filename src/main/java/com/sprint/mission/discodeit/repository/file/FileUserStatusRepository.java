@@ -4,6 +4,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -80,5 +81,10 @@ public class FileUserStatusRepository extends AbstractFileRepository<UserStatus>
   public void clear() {
     File file = new File(getFilePath());
     if(file.exists()) file.delete();
+  }
+
+  @PostConstruct
+  private void postContruct(){
+    clear();
   }
 }

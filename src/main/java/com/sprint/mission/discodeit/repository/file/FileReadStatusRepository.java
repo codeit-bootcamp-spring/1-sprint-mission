@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.FileException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -98,5 +99,10 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
     } catch (IOException e) {
       throw new FileException();
     }
+  }
+
+  @PostConstruct
+  private void postContruct(){
+    clear();
   }
 }

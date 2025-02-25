@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -134,5 +135,10 @@ public class FileBinaryContentRepository extends AbstractFileRepository<BinaryCo
   public void clear() {
     File file = new File(getFilePath());
     if(file.exists()) file.delete();
+  }
+
+  @PostConstruct
+  private void postContruct(){
+    clear();
   }
 }
