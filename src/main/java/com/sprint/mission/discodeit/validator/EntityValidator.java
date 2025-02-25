@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.validator;
 
-
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.BaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class EntityValidator {
 
     BaseRepository<T, String> repository = (BaseRepository<T, String>) baseRepositoryMap.get(entityType);
 
-    if(repository == null) throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE + entityType);
+    if(repository == null) throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
 
     return repository.findById(id)
         .orElseThrow(() -> exception);

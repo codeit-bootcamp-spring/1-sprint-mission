@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -37,10 +37,10 @@ public class UserStatusServiceImpl implements UserStatusService {
 
   @Override
   public UserStatus create(UserStatus status) {
-    validator.findOrThrow(User.class, status.getUserId(), new NotFoundException(NO_MATCHING_USER));
+    validator.findOrThrow(User.class, status.getUserId(), new CustomException(ErrorCode.USER_NOT_FOUND));
 
     if (userStatusRepository.findByUserId(status.getUserId()).isPresent()) {
-      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
+      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 
     return userStatusRepository.save(status);
@@ -48,12 +48,12 @@ public class UserStatusServiceImpl implements UserStatusService {
 
   @Override
   public UserStatus find(String id) {
-    return userStatusRepository.findById(id).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+    return userStatusRepository.findById(id).orElseThrow(() ->new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE));
   }
 
   @Override
   public UserStatus findByUserId(String userId) {
-    validator.findOrThrow(User.class, userId, new NotFoundException(NO_MATCHING_USER));
+    validator.findOrThrow(User.class, userId, new CustomException(ErrorCode.USER_NOT_FOUND));
     return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new UserStatus(userId, Instant.now())));
   }
 
@@ -66,10 +66,10 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatusResponseDto updateByUserId(String userId, UpdateUserStatusDto dto) {
 
-    User user = validator.findOrThrow(User.class, userId,new NotFoundException(NO_MATCHING_USER));
+    User user = validator.findOrThrow(User.class, userId,new CustomException(ErrorCode.USER_NOT_FOUND));
 
     UserStatus status = userStatusRepository.findByUserId(userId).orElseThrow(
-        () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+        () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
     );
 
     status.updateLastOnline(dto.newLastActiveAt());

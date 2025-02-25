@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
-import com.sprint.mission.discodeit.exception.UserValidationException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.UserConstant.*;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.*;
+import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
 
 @Slf4j
 @Service
@@ -47,16 +48,16 @@ public class BasicUserService implements UserService {
   }
 
   private void validEmail(String email, String id, List<User> users) {
-    if (!email.matches(EMAIL_REGEX)) throw new UserValidationException(ERROR_INVALID_EMAIL);
+    if (!email.matches(EMAIL_REGEX)) throw new CustomException(ErrorCode.ERROR_INVALID_EMAIL);
     if (users.stream()
         .anyMatch(u -> u.getEmail().equals(email) && !u.getId().equals(id)))
-      throw new UserValidationException(DUPLICATE_EMAIL);
+      throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
   }
 
 
   @Override
   public User findUserById(String id) {
-    return validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
+    return validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
   }
 
   @Override
@@ -68,7 +69,7 @@ public class BasicUserService implements UserService {
   @Override
   public User updateUser(String id, UserUpdateDto updatedUser) {
 
-    User originalUser = validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
+    User originalUser = validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
 
     synchronized (originalUser) {
       updateFields(originalUser, updatedUser);
@@ -94,7 +95,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public void deleteUser(String id) {
-    validator.findOrThrow(User.class, id, new NotFoundException(NO_MATCHING_USER));
+    validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
 
     userRepository.delete(id);
   }

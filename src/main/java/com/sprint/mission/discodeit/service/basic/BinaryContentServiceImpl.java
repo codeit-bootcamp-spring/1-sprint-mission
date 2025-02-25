@@ -3,7 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -13,9 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.constant.MessageConstant.MESSAGE_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent create(BinaryContent content) {
 
-    validator.findOrThrow(User.class, content.getUserId(), new NotFoundException(NO_MATCHING_USER));
+    validator.findOrThrow(User.class, content.getUserId(), new CustomException(ErrorCode.USER_NOT_FOUND));
 
     // 기존에 존재하던 프로필 삭제. 그냥 교채로 바꿀수도?
     if (content.isProfilePicture()) {
@@ -43,7 +43,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent find(String id) {
     return binaryContentRepository.findById(id).orElseThrow(
-        () -> new NotFoundException(DEFAULT_ERROR_MESSAGE)
+        () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
     );
   }
 
@@ -55,7 +55,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
     return ids.stream().map(
-        id -> binaryContentRepository.findById(id).orElseThrow(() -> new NotFoundException(DEFAULT_ERROR_MESSAGE))
+        id -> binaryContentRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE))
     ).toList();
   }
 
@@ -83,7 +83,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents) {
 
-    validator.findOrThrow(Message.class, messageId, new NotFoundException(MESSAGE_NOT_FOUND));
+    validator.findOrThrow(Message.class, messageId, new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
 
     if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();

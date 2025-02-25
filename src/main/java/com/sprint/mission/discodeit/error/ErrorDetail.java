@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ErrorDetail {
 
-  @Schema(description = "HTTP Status Code", example = "404")
+  @Schema(description = "HTTP Status Code", example = "4xx")
   private final int code;
 
-  @Schema(description = "Error Message", example = "User not found")
+  @Schema(description = "Error Message", example = "Error Response")
   private final String message;
 }

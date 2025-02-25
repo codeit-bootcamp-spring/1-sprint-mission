@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.USER_NOT_FOUND;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
@@ -57,7 +58,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     User targetUser = users.stream()
         .filter(u -> u.getId().equals(user.getId()))
         .findAny()
-        .orElseThrow(() -> new NotFoundException(NO_MATCHING_USER));
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     users.remove(targetUser);
     users.add(user);
@@ -72,7 +73,7 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
     User targetUser = users.stream()
         .filter(u -> u.getId().equals(userId))
         .findAny()
-        .orElseThrow(() -> new NotFoundException(NO_MATCHING_USER));
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     users.remove(targetUser);
     saveAll(users);
   }

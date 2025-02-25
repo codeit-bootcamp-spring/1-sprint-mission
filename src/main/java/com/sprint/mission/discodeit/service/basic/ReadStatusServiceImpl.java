@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -18,9 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.constant.UserConstant.NO_MATCHING_USER;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.*;
 
 @Service
 @Slf4j
@@ -34,8 +32,8 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus create(CreateReadStatusDto dto, boolean skipValidation) {
 
     if (!skipValidation) {
-      validator.findOrThrow(User.class, dto.userId(), new NotFoundException(NO_MATCHING_USER));
-      validator.findOrThrow(Channel.class, dto.channelId(), new NotFoundException(CHANNEL_NOT_FOUND));
+      validator.findOrThrow(User.class, dto.userId(), new CustomException(ErrorCode.USER_NOT_FOUND));
+      validator.findOrThrow(Channel.class, dto.channelId(), new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
     }
 
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
@@ -63,13 +61,13 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
     if (exists) {
       log.info("이미 존재하는 user + channel status 입니다={} + {}", userId, channelId);
-      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
+      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
   }
 
   @Override
   public ReadStatus find(String id) {
-    return readStatusRepository.findById(id).orElseThrow( () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+    return readStatusRepository.findById(id).orElseThrow( () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE));
   }
 
   @Override
@@ -79,7 +77,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id) {
-    ReadStatus status = readStatusRepository.findById(id).orElseThrow(() -> new NotFoundException(DEFAULT_ERROR_MESSAGE));
+    ReadStatus status = readStatusRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE));
     status.updateLastReadAt(readStatusDto.newLastReadAt());
     readStatusRepository.save(status);
 
@@ -104,7 +102,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public ReadStatus update(CreateReadStatusDto dto) {
-    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(dto.channelId(), dto.userId()).orElseThrow(() -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE));
+    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(dto.channelId(), dto.userId()).orElseThrow(() -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE));
 
     readStatus.updateLastReadAtToCurrentTime();
     readStatusRepository.save(readStatus);

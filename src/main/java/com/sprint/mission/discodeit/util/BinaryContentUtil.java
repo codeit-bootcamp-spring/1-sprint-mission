@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.util;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ public class BinaryContentUtil {
     try {
       return mFile.getBytes();
     } catch (IOException e) {
-      throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
+      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
   }
 

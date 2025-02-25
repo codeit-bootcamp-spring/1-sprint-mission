@@ -2,8 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
@@ -14,10 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-
-import static com.sprint.mission.discodeit.constant.ChannelConstant.CHANNEL_NOT_FOUND;
-import static com.sprint.mission.discodeit.constant.ChannelConstant.PRIVATE_CHANNEL_CANNOT_BE_UPDATED;
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 
 @Slf4j
 @Service
@@ -39,18 +35,19 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.save(channel);
   }
 
+
   @Override
   public void validateUserAccess(Channel channel, String userId) {
     if (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)) {
       channel.getParticipatingUsers().stream().filter(id -> id.equals(userId)).findAny().orElseThrow(
-          () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
+          () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
       );
     }
   }
 
   @Override
   public Channel getChannelById(String channelId) {
-    return validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
+    return validator.findOrThrow(Channel.class, channelId, new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
   }
 
 
@@ -70,10 +67,10 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel updateChannel(String channelId, ChannelUpdateDto dto) {
 
-    Channel channel = validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
+    Channel channel = validator.findOrThrow(Channel.class, channelId, new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
     if (Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE)) {
-      throw new InvalidOperationException(PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
+      throw new CustomException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
     }
 
     channel.updateChannelName(dto.newName());
@@ -85,7 +82,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(String channelId) {
-    validator.findOrThrow(Channel.class, channelId, new NotFoundException(CHANNEL_NOT_FOUND));
+    validator.findOrThrow(Channel.class, channelId, new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
 
     channelRepository.delete(channelId);
   }

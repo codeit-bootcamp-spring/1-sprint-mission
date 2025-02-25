@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +14,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.MessageConstant.MESSAGE_NOT_FOUND;
+import static com.sprint.mission.discodeit.constant.ErrorConstant.MESSAGE_NOT_FOUND;
+
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)
@@ -61,7 +63,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     Message targetMessage = messages.stream()
         .filter(m -> m.getId().equals(message.getId()))
         .findAny()
-        .orElseThrow(() -> new NotFoundException(MESSAGE_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
     messages.remove(targetMessage);
     messages.add(message);
     saveAll(messages);
@@ -74,7 +76,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
     Message targetMessage = messages.stream()
         .filter(m -> m.getId().equals(id))
         .findAny()
-        .orElseThrow(() -> new NotFoundException(MESSAGE_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
     messages.remove(targetMessage);
 
     saveAll(messages);
