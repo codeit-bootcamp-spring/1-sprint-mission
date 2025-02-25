@@ -12,12 +12,13 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
 
-  @GetMapping("/binaryContent/{binaryContentId}")
-  public ApiResponse<BinaryContent> getBinaryContent(@PathVariable UUID binaryContentId) {
+  @GetMapping("{binaryContentId}")
+  public ApiResponse<BinaryContent> find(@PathVariable UUID binaryContentId) {
     return ApiResponse.<BinaryContent>builder()
         .code(HttpStatus.OK.value())
         .message("바이터리 파일 조회")
@@ -25,8 +26,9 @@ public class BinaryContentController {
         .build();
   }
 
-  @PostMapping("/binaryContent")
-  public ApiResponse<List<BinaryContent>> getBinaryContentList(@RequestBody List<UUID> ids) {
+  @PostMapping
+  public ApiResponse<List<BinaryContent>> findAllByIdIn(
+      @RequestParam("binaryContentIds") List<UUID> ids) {
     return ApiResponse.<List<BinaryContent>>builder()
         .code(HttpStatus.OK.value())
         .message("바이너리 파일 조회")

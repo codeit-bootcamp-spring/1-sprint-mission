@@ -15,30 +15,31 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/channels")
 public class ChannelController {
 
   private final ChannelService channelService;
 
-  @PostMapping("/channels/pulblic")
-  public ApiResponse<UUID> createPublicChannel(@RequestBody ChannelCreatePublicDTO request) {
+  @PostMapping("public")
+  public ApiResponse<UUID> createPublic(@RequestBody ChannelCreatePublicDTO request) {
     return ApiResponse.<UUID>builder()
-        .code(HttpStatus.OK.value())
+        .code(HttpStatus.CREATED.value())
         .message("public 채널 생성 완료")
         .data(channelService.create(request))
         .build();
   }
 
-  @PostMapping("/channels/private")
-  public ApiResponse<UUID> createPrivateChannel(@RequestBody ChannelCreatePrivateDTO request) {
+  @PostMapping("private")
+  public ApiResponse<UUID> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
     return ApiResponse.<UUID>builder()
-        .code(HttpStatus.OK.value())
+        .code(HttpStatus.CREATED.value())
         .message("private 채널 생성 완료")
         .data(channelService.create(request))
         .build();
   }
 
-  @PutMapping("channels/{channelId}")
-  public ApiResponse updateChannel(@PathVariable UUID channelId,
+  @PutMapping("{channelId}")
+  public ApiResponse update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateDTO request) {
     channelService.update(channelId, request);
     return ApiResponse.<UUID>builder()
@@ -47,8 +48,8 @@ public class ChannelController {
         .build();
   }
 
-  @DeleteMapping("channels/{channelId}")
-  public ApiResponse<UUID> deleteChannel(@PathVariable UUID channelId) {
+  @DeleteMapping("{channelId}")
+  public ApiResponse<UUID> delete(@PathVariable UUID channelId) {
     return ApiResponse.<UUID>builder()
         .code(HttpStatus.OK.value())
         .message("채널 삭제 완료")
@@ -56,8 +57,8 @@ public class ChannelController {
         .build();
   }
 
-  @GetMapping("channels/{userId}")
-  public ApiResponse<List<ChannelFindDTO>> getUserChannels(@PathVariable UUID userId) {
+  @GetMapping
+  public ApiResponse<List<ChannelFindDTO>> findAllByUserId(@RequestParam("userId") UUID userId) {
     return ApiResponse.<List<ChannelFindDTO>>builder()
         .code(HttpStatus.OK.value())
         .message("사용자가 볼 수 있는 채널 목록")

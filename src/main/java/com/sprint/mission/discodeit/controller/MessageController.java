@@ -20,7 +20,7 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping
-  public ApiResponse<UUID> sendMessage(@ModelAttribute MessageCreateDTO request) {
+  public ApiResponse<UUID> create(@ModelAttribute MessageCreateDTO request) {
     return ApiResponse.<UUID>builder()
         .code(HttpStatus.CREATED.value())
         .message("메시지 생성 완료")
@@ -29,7 +29,7 @@ public class MessageController {
   }
 
   @PutMapping("{messageId}")
-  public ApiResponse updateMessage(@PathVariable UUID messageId,
+  public ApiResponse update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateDTO request) {
     messageService.update(messageId, request);
     return ApiResponse.<UUID>builder()
@@ -39,7 +39,7 @@ public class MessageController {
   }
 
   @DeleteMapping("{messageId}")
-  public ApiResponse<UUID> deleteMessage(@PathVariable UUID messageId) {
+  public ApiResponse<UUID> delete(@PathVariable UUID messageId) {
     return ApiResponse.<UUID>builder()
         .code(HttpStatus.NO_CONTENT.value())
         .message("메시지가 삭제 완료")
@@ -48,7 +48,7 @@ public class MessageController {
   }
 
   @GetMapping
-  public ApiResponse<List<Message>> getMessageByChannel(@RequestParam("channelId") UUID channelId) {
+  public ApiResponse<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
     return ApiResponse.<List<Message>>builder()
         .code(HttpStatus.OK.value())
         .message("특정 채널 메시지 조회")
