@@ -1,10 +1,10 @@
 package discodeit.repository.file;
 
 import discodeit.entity.ReadStatus;
-import discodeit.entity.User;
 import discodeit.repository.ReadStatusRepository;
 import discodeit.utils.FileUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -12,12 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@ConditionalOnProperty(value = "repository.type", havingValue = "file")
 @Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
     private Map<String, ReadStatus> readStatusData;
-    private Path path;
+    private final Path path;
 
-    public FileReadStatusRepository(@Qualifier("readStatusFilPath") Path path) {
+    public FileReadStatusRepository(@Value("repository.read-status-file-path") Path path) {
         this.path = path;
         if (!Files.exists(this.path)) {
             try {
@@ -44,6 +45,16 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             throw new NoSuchElementException("[error] 존재하지 않는 read status ID입니다.");
         }
         return Optional.ofNullable(readStatusData.get(id.toString()));
+    }
+
+    @Override
+    public List<ReadStatus> findAll() {
+        return readStatusData.values().stream().toList();
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusData.values().stream().filter(readStatus -> readStatus.getUserId().equals(userId)).toList();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package discodeit.service.basic;
 
-import discodeit.dto.channel.ChannelDto;
 import discodeit.dto.channel.CreatePrivateChannelRequest;
 import discodeit.dto.channel.CreatePublicChannelRequest;
 import discodeit.dto.channel.UpdateChannelRequest;
@@ -46,14 +45,13 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto find(UUID channelId) {
+    public Channel find(UUID channelId) {
         return channelRepo.findById(channelId)
-                .map(this::toDto)
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 채널 ID입니다."));
     }
 
     @Override
-    public List<ChannelDto> findAllByUserId(UUID userId) {
+    public List<Channel> findAllByUserId(UUID userId) {
         // private 채널 중 userID가 참여한 채널만 추출
         List<Channel> channelListAll = new ArrayList<>(channelRepo.findAllByUserId(userId)
                 .stream()
@@ -67,17 +65,15 @@ public class BasicChannelService implements ChannelService {
                 .filter(channel -> channel.getType().equals(ChannelType.PUBLIC))
                 .forEach(channelListAll::add);
 
-        return channelListAll.stream()
-                .map(this::toDto)
-                .toList();
+        return channelListAll.stream().toList();
     }
 
     @Override
-    public Channel update(UUID channelId, UpdateChannelRequest updateChannelRequest) {
-        Channel channel = channelRepo.findById(channelId)
+    public Channel update(UpdateChannelRequest updateChannelRequest) {
+        Channel channel = channelRepo.findById(updateChannelRequest.id())
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 채널 ID입니다."));
 
-        if (isChannelNameDuplicate(updateChannelRequest.newName())) {
+        if (channelRepo.existsByName(updateChannelRequest.newName())) {
             throw new IllegalArgumentException("[error] 이미 존재하는 채널 이름입니다.");
         }
 
@@ -92,6 +88,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID channelId) {
        channelRepo.deleteById(channelId);
+       messageRepo.deleteByChannelId(channelId);
+       readStatusRepo.deleteByChannelId(channelId);
     }
 
     @Override
@@ -101,7 +99,7 @@ public class BasicChannelService implements ChannelService {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 User ID입니다."));
 
-        if (isUserDuplicate(channel, user.getId())) {
+        if (channel.getParticipantIds().contains(userId)) {
             throw new IllegalArgumentException("[error] 이미 존재하는 user입니다.");
         }
         channel.addParticipant(user.getId());
@@ -114,41 +112,13 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepo.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 채널 ID입니다."));
 
-        if (!isUserDuplicate(channel, userId)) {
+        if (!channel.getParticipantIds().contains(userId)) {
             throw new IllegalArgumentException("[error] 존재하지 않는 채널 user입니다.");
         }
         channel.deleteParticipant(userId);
-        messageRepo.deleteByChannelId(channelId);
         readStatusRepo.deleteByChannelId(channelId);
         System.out.println("[User 삭제 완료]");
         channelRepo.save(channel);
     }
 
-    public ChannelDto toDto(Channel channel) {
-        Instant lastMessageAt = messageRepo.findAllByChannelId(channel.getId())
-                .stream()
-                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
-                .map(Message::getCreatedAt)
-                .limit(1)
-                .findFirst()
-                .orElse(Instant.MIN);
-
-        return new ChannelDto(
-                channel.getId(),
-                channel.getCreatedAt(),
-                channel.getChannelName(),
-                channel.getType(),
-                channel.getDescription(),
-                channel.getParticipantIds(),
-                lastMessageAt
-        );
-    }
-
-    private boolean isChannelNameDuplicate(String channelName) {
-        return channelRepo.findAll().stream().anyMatch(channel -> channel.getChannelName().equals(channelName));
-    }
-
-    private boolean isUserDuplicate(Channel channel, UUID userId) {
-        return channel.getParticipantIds().contains(userId);
-    }
 }

@@ -3,7 +3,8 @@ package discodeit.repository.file;
 import discodeit.entity.Message;
 import discodeit.repository.MessageRepository;
 import discodeit.utils.FileUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -11,12 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+@ConditionalOnProperty(value = "repository.type", havingValue = "file")
 @Repository
 public class FileMessageRepository implements MessageRepository {
     private Map<String, Message> messageData;
     private final Path path;
 
-    public FileMessageRepository(@Qualifier("messageFilePath") Path path) {
+    public FileMessageRepository(@Value("repository.message-file-path") Path path) {
         this.path = path;
         if (!Files.exists(this.path)) {
             try {

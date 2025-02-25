@@ -1,6 +1,17 @@
+server:
+  port: 8080
 spring:
   application:
     name: discodeit
+logging:
+  level:
+    root: info
 
-  main:
-    allow-bean-definition-overriding: true
+repository:
+  type: file     # jcf | file
+  user-file-path: .data/User.json
+  channel-file-path: .data/Channel.json
+  message-file-path: .data/Message.json
+  user-status-file-path: .data/UserStatus.json
+  read-status-file-path: .data/ReadStatus.json
+  binary-content-file-path: .data/BinaryContent.json

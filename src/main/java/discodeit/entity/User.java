@@ -28,33 +28,43 @@ public class User {
         this.username = username;
         this.email = email;
         this.phoneNum = phoneNum;
-        // TODO: 이렇게 되면 password가 외부에서 접근가능한 거 아닌지??
         this.password = password;
         this.profileId = profileId;
     }
 
     // Setter
-    public void update(String newUsername, String newEmail, String newPhoneNum, String newPassword, UUID newProfileId) {
-        if (newUsername != null && !newUsername.equals(this.username)) {
-            this.username = newUsername;
-            this.updatedAt = Instant.now();
+    public void updatePassword(String oldPassword, String newPassword) {
+        if (!oldPassword.equals(this.password)) {
+            throw new IllegalArgumentException("[error] 비밀번호가 일치하지 않습니다.");
         }
-        if (newEmail != null && !newEmail.equals(this.email)) {
-            this.email = newEmail;
-            this.updatedAt = Instant.now();
+        if (newPassword == null) {
+            throw new IllegalArgumentException("[error] 비밀번호가 입력되지 않았습니다.");
         }
-        if (newPhoneNum != null && !newPhoneNum.equals(this.phoneNum)) {
-            this.phoneNum = newPhoneNum;
-            this.updatedAt = Instant.now();
+        if (newPassword.equals(this.password)) {
+            throw new IllegalArgumentException("[error] 현재 비밀번호와 동일합니다.");
         }
-        if (newPassword != null && !newPassword.equals(this.password)) {
-            this.password = newPassword;
-            this.updatedAt = Instant.now();
+        this.password = newPassword;
+        this.updatedAt = Instant.now();
+    }
+
+    public void updatePhoneNum(String newPhoneNum) {
+        if (newPhoneNum == null) {
+            throw new IllegalArgumentException("[error] 전화번호가 입력되지 않았습니다.");
         }
-        if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+        if (newPhoneNum.equals(this.phoneNum)) {
+            throw new IllegalArgumentException("[error] 현재 전화번호와 동일합니다.");
+        }
+        this.phoneNum = newPhoneNum;
+        this.updatedAt = Instant.now();
+
+    }
+
+    public void updateProfile(UUID newProfileId) {
+        if (newProfileId != null) {
             this.profileId = newProfileId;
             this.updatedAt = Instant.now();
         }
     }
+
 
 }

@@ -18,12 +18,12 @@ public class UserStatus {
 
     // 생성자
     protected UserStatus() {
-        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
     }
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this();
+        this.id = userId;
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
     }

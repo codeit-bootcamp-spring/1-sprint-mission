@@ -6,25 +6,22 @@ import discodeit.entity.User;
 import discodeit.repository.UserRepository;
 import discodeit.utils.FileUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
+@ConditionalOnProperty(value = "repository.type", havingValue = "file")
 @Repository
 public class FileUserRepository implements UserRepository {
     private Map<String, User> userData;
-    private Path path;
-    private ObjectMapper objectMapper;
+    private final Path path;
 
-    public FileUserRepository(@Qualifier("userFilePath") Path path) {
+    public FileUserRepository(@Value("repository.user-file-path") Path path) {
         this.path = path;
-
-        // ObjectMapper 초기화 및 JavaTimeModule 등록
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());  // JavaTimeModule을 등록하여 Instant 처리
-
         if (!Files.exists(this.path)) {
             try {
                 Files.createFile(this.path);

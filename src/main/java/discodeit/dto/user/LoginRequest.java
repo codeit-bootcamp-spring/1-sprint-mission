@@ -1,5 +1,8 @@
 package discodeit.dto.user;
 
-public record LoginRequest(String username,
+import java.util.UUID;
+
+public record LoginRequest(UUID userId,
+                           String username,
                            String password) {
 }

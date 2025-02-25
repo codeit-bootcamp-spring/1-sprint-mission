@@ -2,8 +2,9 @@ package discodeit.service.basic;
 
 import discodeit.dto.binarycontent.AddBinaryContentRequest;
 import discodeit.dto.user.CreateUserRequest;
-import discodeit.dto.user.UpdateUserRequest;
-import discodeit.dto.user.UserDto;
+import discodeit.dto.user.UpdatePasswordRequest;
+import discodeit.dto.user.UpdatePhoneNumRequest;
+import discodeit.dto.user.UpdateProfileRequest;
 import discodeit.entity.BinaryContent;
 import discodeit.entity.BinaryContentType;
 import discodeit.entity.User;
@@ -12,9 +13,11 @@ import discodeit.repository.BinaryContentRepository;
 import discodeit.repository.UserStatusRepository;
 import discodeit.service.UserService;
 import discodeit.repository.UserRepository;
+import discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -23,6 +26,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepo;
     private final UserStatusRepository userStatusRepo;
     private final BinaryContentRepository binaryContentRepo;
+    private final UserStatusService userStatusService;
 
     @Override
     public User create(CreateUserRequest createUserRequest, Optional<AddBinaryContentRequest> addBinaryContentRequest) {
@@ -52,64 +56,68 @@ public class BasicUserService implements UserService {
                 })
                 .orElse(null);
 
-        // user 객체를 생성할 때도 createUserRequest DTO를 사용하면 안되나요?
-        // User newUser = new User(CreateUserRequset createUserRequset); 이런 식으로요
-        User newUser = new User(createUserRequest.username(), createUserRequest.email(), createUserRequest.phoneNum(), createUserRequest.password(), nullableProfileId);
+        User newUser = new User(
+                createUserRequest.username(),
+                createUserRequest.email(),
+                createUserRequest.phoneNum(),
+                createUserRequest.password(),
+                nullableProfileId);
+
+        UserStatus userStatus = new UserStatus(newUser.getId(), Instant.now());
+        userStatusRepo.save(userStatus);
         return userRepo.save(newUser);
     }
 
     @Override
-    public UserDto find(UUID userId) {
-        User findUser = userRepo.findById(userId)
+    public User find(UUID userId) {
+        return userRepo.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 User ID입니다."));
-        return toDto(findUser);
     }
 
     @Override
-    public List<UserDto> findAll() {
+    public List<User> findAll() {
         return userRepo.findAll()
                 .stream()
-                .map(this::toDto)
                 .toList();
     }
 
     @Override
-    public User update(UUID userId, UpdateUserRequest updateUserRequest, Optional<AddBinaryContentRequest> addBinaryContentRequest) {
-        User user = userRepo.findById(userId)
+    public User updatePhoneNum(UpdatePhoneNumRequest request) {
+        User user = userRepo.findById(request.userId())
                 .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 User ID입니다."));
 
-        if (isUsernameDuplicate(updateUserRequest.newUsername())) {
-            throw new IllegalArgumentException("[error] 이미 존재하는 사용자 이름입니다.");
-        }
-        if (isEmailDuplicate((updateUserRequest.newEmail()))) {
-            throw new IllegalArgumentException("[error] 이미 존재하는 E-mail입니다.");
-        }
-        if (isValidEmail(updateUserRequest.newEmail())) {
-            throw new IllegalArgumentException("[error] 유효하지 않은 E-mail 형식입니다.");
-        }
-        if (isPhoneNumDuplicate(updateUserRequest.newPhoneNum())) {
+        if (isPhoneNumDuplicate(request.newPhoneNum())) {
             throw new IllegalArgumentException("[error] 이미 존재하는 전화번호입니다.");
         }
-        if (isValidPhoneNum(updateUserRequest.newPhoneNum())) {
+        if (isValidPhoneNum(request.newPhoneNum())) {
             throw new IllegalArgumentException("[error] 유효하지 않은 전화번호 형식입니다. '010-0000-0000' 형식으로 작성해 주세요.");
         }
 
-        UUID nullableProfileId = addBinaryContentRequest
-                .map(profileRequest -> {
-                    Optional.ofNullable(user.getProfileId())
-                            .ifPresent(binaryContentRepo::deleteById);
+        user.updatePhoneNum(request.newPhoneNum());
+        UserStatus userStatus = userStatusService.findByUserId(user.getId());
+        userStatus.update(Instant.now());
+        userStatusRepo.save(userStatus);
+        return userRepo.save(user);
+    }
 
-                    String fileName = profileRequest.filename();
-                    BinaryContentType contentType = profileRequest.type();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, contentType, (long) bytes.length, bytes);
-                    return binaryContentRepo.save(binaryContent).getId();
-                })
-                .orElse(null);
+    @Override
+    public User updatePassword(UpdatePasswordRequest request) {
+        User user = userRepo.findById(request.userId())
+                .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 User ID입니다."));
 
-        String newPassword = updateUserRequest.newPassword();
-        user.update(updateUserRequest.newUsername(), updateUserRequest.newEmail(), updateUserRequest.newPhoneNum(), updateUserRequest.newPassword(), nullableProfileId);
+        user.updatePassword(request.oldPassword(), request.newPassword());
+        return userRepo.save(user);
+    }
 
+    @Override
+    public User updateProfile(UpdateProfileRequest request) {
+        User user = userRepo.findById(request.userId())
+                .orElseThrow(() -> new NoSuchElementException("[error] 존재하지 않는 User ID입니다."));
+
+        user.updateProfile(request.newProfileId());
+        UserStatus userStatus = userStatusService.findByUserId(user.getId());
+        userStatus.update(Instant.now());
+        userStatusRepo.save(userStatus);
         return userRepo.save(user);
     }
 
@@ -121,25 +129,10 @@ public class BasicUserService implements UserService {
         Optional.ofNullable(user.getProfileId())
                 .ifPresent(binaryContentRepo::deleteById);
         userStatusRepo.deleteByUserId(userId);
-
         userRepo.deleteById(userId);
         System.out.println("[삭제 완료]");
     }
 
-    private UserDto toDto(User user) {
-        Boolean online = userStatusRepo.findByUserId(user.getId())
-                .map(UserStatus::isOnline)
-                .orElse(null);
-
-        return new UserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getPhoneNum(),
-                user.getUpdatedAt(),
-                online);
-    }
 
     private boolean isUsernameDuplicate(String username) {
         return userRepo.findAll().stream().anyMatch(user -> user.getUsername().equals(username));

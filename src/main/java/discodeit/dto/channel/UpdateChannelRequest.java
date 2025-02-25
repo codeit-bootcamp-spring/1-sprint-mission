@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 // only PUBLIC channel
-public record UpdateChannelRequest(String newName,
+public record UpdateChannelRequest(UUID id,
+                                   String newName,
                                    String newDescription) {
 }
