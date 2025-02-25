@@ -6,13 +6,12 @@ import java.util.UUID;
 
 @Getter
 public class PublicChannelCreateRequestDto {
-    private final UUID userId;
-    private final String channelName;
-    private final String description;
 
-    public PublicChannelCreateRequestDto(UUID userId, String channelName, String description) {
-        this.userId = userId;
-        this.channelName = channelName;
-        this.description = description;
-    }
+  private final String name;
+  private final String description;
+
+  public PublicChannelCreateRequestDto(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
 }

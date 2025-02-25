@@ -8,8 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 @AllArgsConstructor
 public class UserUpdateRequestDto {
-    private String newName;
-    private String newEmail;
-    private String newPassword;
-    private MultipartFile NewProfileImage;
+
+  private String newUsername;
+  private String newEmail;
+  private String newPassword;
 }

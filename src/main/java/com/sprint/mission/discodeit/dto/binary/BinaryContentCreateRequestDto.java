@@ -7,13 +7,14 @@ import java.util.UUID;
 
 @Getter
 public class BinaryContentCreateRequestDto {
-    private UUID userId;
-    private UUID messageId;
-    private MultipartFile multipartFile;
 
-    public BinaryContentCreateRequestDto(UUID userId, UUID messageId, MultipartFile multipartFile)  {
-        this.userId = userId;
-        this.messageId = messageId;
-        this.multipartFile = multipartFile;
-    }
+  String fileName;
+  String contentType;
+  byte[] bytes;
+
+  public BinaryContentCreateRequestDto(String fileName, String contentType, byte[] bytes) {
+    this.fileName = fileName;
+    this.contentType = contentType;
+    this.bytes = bytes;
+  }
 }

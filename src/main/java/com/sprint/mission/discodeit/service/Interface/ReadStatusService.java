@@ -9,11 +9,18 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatus create(CreateReadStatusRequestDto request);
-    Optional<ReadStatus> find (UUID id);
-    List<ReadStatus> findAllByUserid(UUID userId);
-    ReadStatus update(UUID readStatusId,UpdateReadStatusRequestDto request);
-    List<ReadStatus> findAllByChannelId(UUID userId);
-    void delete(UUID id);
-    void deleteByChannelId(UUID id);
+
+  ReadStatus create(CreateReadStatusRequestDto request);
+
+  ReadStatus find(UUID id);
+
+  List<ReadStatus> findAllByUserId(UUID userId);
+
+  ReadStatus update(UUID readStatusId, UpdateReadStatusRequestDto request);
+
+  List<ReadStatus> findAllByChannelId(UUID userId);
+
+  void delete(UUID id);
+
+  void deleteByChannelId(UUID id);
 }

@@ -18,66 +18,60 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    @Autowired
-    private final UserStatusRepository userStatusRepository;
-    @Autowired
-    private final UserRepository userRepository;
+
+  @Autowired
+  private final UserStatusRepository userStatusRepository;
+  @Autowired
+  private final UserRepository userRepository;
 
 
-    @Override
-    public void create(UserStatusCreateRequestDto request) {
-        if (!userRepository.existsById(request.getUserId())){
-            throw new NoSuchElementException("User not found");
-        }
-        Optional<UserStatus> existingStatus=userStatusRepository.findByUserId(request.getUserId());
-        if(existingStatus.isPresent()){
-            throw new IllegalArgumentException("UserStatus already exists");
-        }
-        UserStatus userStatus=new UserStatus(request.getUserId(),request.getCreatedAt());
-        System.out.println("userStatus 생성:"+userStatus.getId());
-        userStatusRepository.save(userStatus);
+  @Override
+  public UserStatus create(UserStatusCreateRequestDto request) {
+    if (!userRepository.existsById(request.getUserId())) {
+      throw new NoSuchElementException("User not found");
     }
-
-    @Override
-    public UserStatus find(UUID id) {
-        return userStatusRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("User status not found"));
+    Optional<UserStatus> existingStatus = userStatusRepository.findByUserId(request.getUserId());
+    if (existingStatus.isPresent()) {
+      throw new IllegalArgumentException("UserStatus already exists");
     }
+    UserStatus userStatus = new UserStatus(request.getUserId(), request.getCreatedAt());
+    System.out.println("userStatus 생성:" + userStatus.getId());
+    return userStatusRepository.save(userStatus);
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return userStatusRepository.findAll();
+  @Override
+  public UserStatus find(UUID id) {
+    return userStatusRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("User status not found"));
+  }
+
+  @Override
+  public List<UserStatus> findAll() {
+    return userStatusRepository.findAll();
+  }
+
+  @Override
+  public void update(UUID userStatusId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
+    userStatus.update(request.getNewLastActiveAt());
+    userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
+    userStatus.update(request.getNewLastActiveAt());
+    return userStatusRepository.save(userStatus);
+  }
+
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    if (!userStatusRepository.existsById(userId)) {
+      throw new NoSuchElementException("UserStatus not found");
     }
-
-    @Override
-    public void update(UUID userId,UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
-        userStatus.updateLastSeenAt();
-        userStatusRepository.save(userStatus);
-    }
-
-    @Override
-    public void updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-        userStatusRepository.findByUserId(userId)
-                .ifPresentOrElse(
-                        userStatus -> {
-                            userStatus.updateLastSeenAt();
-                            userStatusRepository.save(userStatus);
-                        },
-                        () -> {
-                            System.out.println("UserStatus not found for user: " + userId);
-                            throw new NoSuchElementException("UserStatus not found for user");
-                        }
-                );
-    }
-
-
-    @Override
-    public void deleteByUserId(UUID userId) {
-        if(!userStatusRepository.existsById(userId)){
-            throw new NoSuchElementException("UserStatus not found");
-        }
-        userStatusRepository.deleteByUserId(userId);
-    }
+    userStatusRepository.deleteByUserId(userId);
+  }
 }

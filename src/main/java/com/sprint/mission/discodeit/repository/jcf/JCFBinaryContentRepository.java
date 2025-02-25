@@ -9,52 +9,53 @@ import java.util.*;
 @Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    private final Map<UUID, BinaryContent> data;
+  private final Map<UUID, BinaryContent> data;
 
-    public JCFBinaryContentRepository() {
-        this.data = new HashMap<>();
+  public JCFBinaryContentRepository() {
+    this.data = new HashMap<>();
+  }
+
+  @Override
+  public BinaryContent save(BinaryContent content) {
+    data.put(content.getId(), content);
+    return content;
+  }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    data.remove(userId);
+  }
+
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(data.get(id));
+  }
+
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    List<BinaryContent> result = new ArrayList<>();
+    for (UUID id : ids) {
+      BinaryContent binaryContent = data.get(id);
+      if (binaryContent != null) {
+        result.add(binaryContent);
+      }
     }
+    return result;
+  }
 
-    @Override
-    public void save(BinaryContent content) {
-        data.put(content.getId(), content);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    data.remove(id);
+  }
 
-    @Override
-    public void deleteByUserId(UUID userId) {
-        data.values().removeIf(user -> user.getUserId().equals(userId));
-    }
+  @Override
+  public void deleteByMessageId(UUID id) {
+    data.remove(id);
+  }
 
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public ArrayList<BinaryContent> findAll() {
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        List<BinaryContent> result = new ArrayList<>();
-        for (UUID id : ids) {
-            BinaryContent binaryContent = data.get(id);
-            if (binaryContent != null) {
-                result.add(binaryContent);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-    }
-
-    @Override
-    public void deleteByMessageId(UUID id) {
-        data.values().removeIf(message -> message.getMessageId().equals(id));
-    }
-
-    @Override
-    public ArrayList<BinaryContent> findAll() {
-
-        return null;
-    }
+    return null;
+  }
 }

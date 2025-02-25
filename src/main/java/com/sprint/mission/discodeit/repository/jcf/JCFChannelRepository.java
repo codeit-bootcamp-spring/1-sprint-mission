@@ -8,40 +8,41 @@ import java.util.*;
 
 @Repository
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID,Channel> data;
 
-   public JCFChannelRepository() {
-       data = new HashMap<>();
-   }
+  private final Map<UUID, Channel> data;
+
+  public JCFChannelRepository() {
+    data = new HashMap<>();
+  }
 
 
-    @Override
-    public Channel save(Channel channel) {
-        data.put(channel.getId(), channel);
-        return channel;
+  @Override
+  public Channel save(Channel channel) {
+    data.put(channel.getId(), channel);
+    return channel;
+  }
+
+  @Override
+  public Optional<Channel> getChannelById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
+
+  @Override
+  public List<Channel> getAllChannels() {
+    return this.data.values().stream().toList();
+  }
+
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
+
+
+  @Override
+  public void deleteChannel(UUID id) {
+    if (!this.data.containsKey(id)) {
+      throw new NoSuchElementException("Channel with id" + id + " not found");
     }
-
-    @Override
-    public Optional<Channel> getChannelById(UUID id) {
-        return Optional.ofNullable(this.data.get(id));
-    }
-
-    @Override
-    public List<Channel> getAllChannels() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return this.data.containsKey(id);
-    }
-
-
-    @Override
-    public void deleteChannel(UUID id) {
-        if(!this.data.containsKey(id)){
-            throw new NoSuchElementException("Channel with id"+id+" not found");
-        }
-        data.remove(id);
-    }
+    data.remove(id);
+  }
 }

@@ -19,73 +19,53 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    @Autowired
-    private BinaryContentRepository binaryContentRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MessageRepository messageRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserRepository userRepository;
+  private final MessageRepository messageRepository;
 
-    @Override
-    public BinaryContent createProfile(BinaryContentCreateRequestDto request) {
-        if (!userRepository.existsById(request.getUserId())) {
-            throw new NoSuchElementException("User not found");
-        }
-        BinaryContent binaryContent = null;
-        try {
-            String contentType=request.getMultipartFile().getContentType();
-            binaryContent = new BinaryContent(request.getUserId(), null, request.getMultipartFile().getBytes(),contentType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        binaryContentRepository.save(binaryContent);
-        return binaryContent;
-    }
+  @Override
+  public BinaryContent create(BinaryContentCreateRequestDto request) {
+    String fileName = request.getFileName();
+    byte[] bytes = request.getBytes();
+    String contentType = request.getContentType();
+    BinaryContent binaryContent = new BinaryContent(
+        fileName,
+        (long) bytes.length,
+        contentType,
+        bytes
+    );
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public void createMessage(BinaryContentCreateRequestDto request)  {
-        if (!messageRepository.existsById(request.getMessageId())) {
-            throw new NoSuchElementException("Message not found");
-        }
+  @Override
+  public BinaryContent find(UUID id) {
+    return binaryContentRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("BinaryContent id not found"));
+  }
 
-        BinaryContent binaryContent = null;
-        String contentType=request.getMultipartFile().getContentType();
-        try {
-            binaryContent = new BinaryContent(null, request.getMessageId(), request.getMultipartFile().getBytes(), contentType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        binaryContentRepository.save(binaryContent);
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids).stream()
+        .toList();
+  }
 
-    @Override
-    public BinaryContent find(UUID id) {
-        return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("BinaryContent id not found"));
-    }
+  @Override
+  public void delete(UUID id) {
+    binaryContentRepository.deleteById(id);
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return binaryContentRepository.findAllByIdIn(ids);
-    }
+  @Override
+  public void deleteByMessageId(UUID id) {
+    binaryContentRepository.deleteByMessageId(id);
+  }
 
-    @Override
-    public void delete(UUID id) {
-        binaryContentRepository.deleteById(id);
-    }
+  @Override
+  public void deleteByUserId(UUID id) {
+    binaryContentRepository.deleteByUserId(id);
+  }
 
-    @Override
-    public void deleteByMessageId(UUID id) {
-        binaryContentRepository.deleteByMessageId(id);
-    }
-
-    @Override
-    public void deleteByUserId(UUID id) {
-        binaryContentRepository.deleteByUserId(id);
-    }
-
-    @Override
-    public List<BinaryContent> findAll() {
-        return binaryContentRepository.findAll() ;
-    }
+  @Override
+  public List<BinaryContent> findAll() {
+    return binaryContentRepository.findAll();
+  }
 }

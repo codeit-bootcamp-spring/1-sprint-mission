@@ -14,15 +14,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Override
-    public User login(AuthRequestDto request) {
-        return userRepository.getAllUsers().stream()
-                .filter(user->
-                        Objects.equals(user.getName(), request.getName()) &&
-                                Objects.equals(user.getPassword(), request.getPassword()))
-                .findFirst()
-                .orElseThrow(()->new NoSuchElementException("invalid username or password"));
+  @Override
+  public User login(AuthRequestDto request) {
+    User user = userRepository.findByUsername(request.getUsername())
+        .orElseThrow(() -> new NoSuchElementException(
+            "User with username " + request.getUsername() + " not found"));
+
+    if (!Objects.equals(user.getPassword(), user.getPassword())) {
+      throw new IllegalArgumentException("Wrong password");
     }
+    return user;
+  }
 }
