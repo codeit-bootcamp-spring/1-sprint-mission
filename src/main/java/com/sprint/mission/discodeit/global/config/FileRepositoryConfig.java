@@ -5,18 +5,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileBinaryContentRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserStatusRepository;
+import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
+import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.channel.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.channel.repository.file.FileReadStatusRepository;
+import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.message.repository.MessageRepository;
+import com.sprint.mission.discodeit.message.repository.file.FileBinaryContentRepository;
+import com.sprint.mission.discodeit.message.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.user.repository.UserRepository;
+import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.user.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.user.repository.file.FileUserStatusRepository;
 
 @Configuration
 @ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
