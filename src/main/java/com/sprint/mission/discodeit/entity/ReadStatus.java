@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNullOrEmptyArgumentException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
@@ -30,7 +31,8 @@ public class ReadStatus implements Serializable {
 
     public ReadStatus update(Instant lastReadAt) {
         if (lastReadAt == null) {
-            throw new IllegalArgumentException();
+            throw new ReadStatusNullOrEmptyArgumentException(
+                "ReadStatus lastReadAt cannot be null or empty");
         }
 
         if (lastReadAt.equals(this.lastReadAt)) {

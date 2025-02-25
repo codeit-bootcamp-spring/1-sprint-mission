@@ -1,15 +1,15 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.channel.ChannelNullOrEmptyArgumentException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class Channel implements Serializable {
 
     @Serial
@@ -28,8 +28,13 @@ public class Channel implements Serializable {
     }
 
     public Channel update(String name, String description) {
-        if (name == null || description == null) {
-            throw new IllegalArgumentException();
+        if (name == null || name.isBlank()) {
+            throw new ChannelNullOrEmptyArgumentException("Channel name cannot be null or empty");
+        }
+
+        if (description == null || description.isBlank()) {
+            throw new ChannelNullOrEmptyArgumentException(
+                "Channel description cannot be null or empty");
         }
 
         if (name.equals(this.name) && description.equals(this.description)) {

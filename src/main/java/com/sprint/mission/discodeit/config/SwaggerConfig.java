@@ -19,7 +19,8 @@ public class SwaggerConfig {
         .description("Discodeit 프로젝트의 Swagger API 문서입니다.");
 
     List<Server> servers = List.of(new Server()
-        .url("http://localhost:8080").description("로컬 서버"));
+        .url("http://localhost:8080")
+        .description("로컬 서버"));
 
     return new OpenAPI()
         .info(info)

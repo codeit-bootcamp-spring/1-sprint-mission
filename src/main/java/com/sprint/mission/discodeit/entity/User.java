@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.user.UserNullOrEmptyArgumentException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
@@ -30,8 +31,17 @@ public class User implements Serializable {
     }
 
     public User update(String username, String email, String password, UUID profileId) {
-        if (username == null || email == null || password == null || profileId == null) {
-            throw new IllegalArgumentException();
+        if (username == null || username.isBlank()) {
+            throw new UserNullOrEmptyArgumentException("User username cannot be null or empty");
+        }
+        if (email == null || email.isBlank()) {
+            throw new UserNullOrEmptyArgumentException("User email cannot be null or empty");
+        }
+        if (password == null || password.isBlank()) {
+            throw new UserNullOrEmptyArgumentException("User password cannot be null or empty");
+        }
+        if (profileId == null) {
+            throw new UserNullOrEmptyArgumentException("User profileId cannot be null or empty");
         }
 
         if (username.equals(this.username) &&

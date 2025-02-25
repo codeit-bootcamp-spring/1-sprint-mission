@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.user.UserStatusNullOrEmptyArgumentException;
 import java.io.Serial;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -31,7 +31,7 @@ public class UserStatus implements Serializable {
 
     public UserStatus update(Instant lastActiveAt) {
         if (lastActiveAt == null) {
-            throw new IllegalArgumentException();
+            throw new UserStatusNullOrEmptyArgumentException("UserStatus lastActiveAt cannot be null");
         }
 
         if (lastActiveAt.equals(this.lastActiveAt)) {

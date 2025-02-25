@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.exception.message.MessageNullOrEmptyArgumentException;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
@@ -33,8 +34,8 @@ public class Message implements Serializable {
     }
 
     public Message update(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException();
+        if (content == null || content.isBlank()) {
+            throw new MessageNullOrEmptyArgumentException("Message content cannot be null or empty");
         }
 
         if (content.equals(this.content)) {
