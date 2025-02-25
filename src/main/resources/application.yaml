@@ -11,3 +11,9 @@ discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
