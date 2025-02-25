@@ -10,6 +10,7 @@
       font-family: Arial, sans-serif;
       display: flex;
     }
+
     .sidebar {
       width: 220px;
       background: #f4f4f4;
@@ -18,6 +19,7 @@
       height: 100vh;
       overflow-y: auto;
     }
+
     .sidebar button {
       width: 100%;
       padding: 10px;
@@ -28,6 +30,7 @@
       cursor: pointer;
       text-align: left;
     }
+
     .content {
       flex: 1;
       padding: 20px;
@@ -35,6 +38,7 @@
       height: 100vh;
       box-sizing: border-box;
     }
+
     /* 결과 영역은 항상 상단에 고정 */
     #result {
       border: 1px solid #ccc;
@@ -43,27 +47,33 @@
       margin-bottom: 10px;
       background: #f9f9f9;
     }
+
     /* 섹션 영역은 교체되는 내용 */
     #section {
       /* 추가 스타일 필요시 지정 */
     }
+
     .section {
       margin-bottom: 30px;
       border-bottom: 1px solid #ddd;
       padding-bottom: 10px;
     }
+
     .section h3 {
       margin-bottom: 5px;
     }
+
     input, textarea, select {
       padding: 5px;
       margin: 5px 0;
       width: 100%;
       box-sizing: border-box;
     }
+
     button.action {
       margin-top: 5px;
     }
+
     pre {
       background: #eee;
       padding: 10px;
@@ -72,49 +82,52 @@
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <button onclick="showAuthSection()">인증 (Auth)</button>
-    <button onclick="showUserSection()">사용자 관리 (User)</button>
-    <button onclick="showChannelSection()">채널 관리 (Channel)</button>
-    <button onclick="showMessageSection()">메시지 관리 (Message)</button>
-    <button onclick="showBinarySection()">바이너리 파일 (Binary)</button>
+<div class="sidebar">
+  <button onclick="showAuthSection()">인증 (Auth)</button>
+  <button onclick="showUserSection()">사용자 관리 (User)</button>
+  <button onclick="showChannelSection()">채널 관리 (Channel)</button>
+  <button onclick="showMessageSection()">메시지 관리 (Message)</button>
+  <button onclick="showBinarySection()">바이너리 파일 (Binary)</button>
+</div>
+<div class="content" id="content">
+  <!-- 결과 영역은 항상 상단에 고정 -->
+  <div id="result"></div>
+  <!-- 섹션 내용 영역 -->
+  <div id="section">
+    <h2>API 대시보드</h2>
+    <p>좌측 메뉴에서 기능 그룹을 선택하세요.</p>
   </div>
-  <div class="content" id="content">
-    <!-- 결과 영역은 항상 상단에 고정 -->
-    <div id="result"></div>
-    <!-- 섹션 내용 영역 -->
-    <div id="section">
-      <h2>API 대시보드</h2>
-      <p>좌측 메뉴에서 기능 그룹을 선택하세요.</p>
-    </div>
-  </div>
+</div>
 
-  <script>
-    const BASE_URL = 'http://localhost:8080';
+<script>
+  const BASE_URL = 'http://localhost:8080';
 
-    // 공통 함수: API 호출 후 결과를 result 영역에 출력
-    function fetchAndShow(url, options) {
-      fetch(url, options)
-        .then(response => {
-          // 응답이 비어있을 경우 처리
-          if (response.status === 204) return { message: 'No Content' };
-          return response.json();
-        })
-        .then(data => showResult(data))
-        .catch(error => {
-          showResult({ error: error.message });
-          console.error('Error:', error);
-        });
-    }
+  // 공통 함수: API 호출 후 결과를 result 영역에 출력
+  function fetchAndShow(url, options) {
+    fetch(url, options)
+    .then(response => {
+      // 응답이 비어있을 경우 처리
+      if (response.status === 204) {
+        return {message: 'No Content'};
+      }
+      return response.json();
+    })
+    .then(data => showResult(data))
+    .catch(error => {
+      showResult({error: error.message});
+      console.error('Error:', error);
+    });
+  }
 
-    // 결과 출력 함수: 고정된 #result 영역에 JSON 형식으로 출력
-    function showResult(message) {
-      document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(message, null, 2) + '</pre>';
-    }
+  // 결과 출력 함수: 고정된 #result 영역에 JSON 형식으로 출력
+  function showResult(message) {
+    document.getElementById('result').innerHTML = '<pre>' + JSON.stringify(message, null, 2)
+        + '</pre>';
+  }
 
-    /* ========== Auth 섹션 ========== */
-    function showAuthSection() {
-      document.getElementById('section').innerHTML = `
+  /* ========== Auth 섹션 ========== */
+  function showAuthSection() {
+    document.getElementById('section').innerHTML = `
         <h2>인증 (Auth)</h2>
         <div class="section">
           <h3>로그인 (/auth/login, GET)</h3>
@@ -123,21 +136,22 @@
           <button class="action" onclick="login()">로그인</button>
         </div>
       `;
-    }
-    function login() {
-      const username = document.getElementById('authUsername').value;
-      const password = document.getElementById('authPassword').value;
+  }
 
-      fetchAndShow(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-    }
+  function login() {
+    const username = document.getElementById('authUsername').value;
+    const password = document.getElementById('authPassword').value;
 
-    /* ========== User 섹션 ========== */
-    function showUserSection() {
-      document.getElementById('section').innerHTML = `
+    fetchAndShow(`${BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    });
+  }
+
+  /* ========== User 섹션 ========== */
+  function showUserSection() {
+    document.getElementById('section').innerHTML = `
         <h2>사용자 관리 (User)</h2>
         <div class="section">
           <h3>사용자 생성 (/user, POST)</h3>
@@ -190,100 +204,113 @@
           <button class="action" onclick="updateUserStatus()">상태 업데이트</button>
         </div>
       `;
+  }
+
+  function createUser() {
+    const name = document.getElementById('userName').value;
+    const password = document.getElementById('userPassword').value;
+    const email = document.getElementById('userEmail').value;
+    fetchAndShow(`${BASE_URL}/user`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, email, password})
+    });
+  }
+
+  function readUserByName() {
+    const userInfo = document.getElementById('readUserInfo').value;
+    fetchAndShow(`${BASE_URL}/user/name/${encodeURIComponent(userInfo)}`);
+  }
+
+  function readUserById() {
+    const userInfo = document.getElementById('readUserInfo').value;
+    fetchAndShow(`${BASE_URL}/user/id/${encodeURIComponent(userInfo)}`);
+  }
+
+  function readUserAll() {
+    fetchAndShow(`${BASE_URL}/user/all`);
+  }
+
+  function updateUserName() {
+    const identifier = document.getElementById('updateUserIdentifier').value;
+    const newName = document.getElementById('updateUserNewName').value;
+    if (identifier.length > 20) {
+      fetchAndShow(
+          `${BASE_URL}/user/id/${encodeURIComponent(identifier)}?changeName=${encodeURIComponent(
+              newName)}`, {
+            method: 'PATCH'
+          });
+    } else {
+      fetchAndShow(
+          `${BASE_URL}/user/name/${encodeURIComponent(identifier)}?change=${encodeURIComponent(
+              newName)}`, {
+            method: 'PATCH'
+          });
     }
-    function createUser() {
-      const name = document.getElementById('userName').value;
-      const password = document.getElementById('userPassword').value;
-      const email = document.getElementById('userEmail').value;
-      fetchAndShow(`${BASE_URL}/user?name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}&email=${encodeURIComponent(email)}`, {
-        method: 'POST'
+  }
+
+  function deleteUser1() {
+    const identifier = document.getElementById('deleteUserIdentifier').value;
+    const password = document.getElementById('deleteUserPassword').value;
+    const options = {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password})  // 비밀번호를 객체로 감싸서 전송
+    };
+
+    fetchAndShow(`${BASE_URL}/user/name/${encodeURIComponent(identifier)}`, options);
+  }
+
+  function deleteUser2() {
+    const identifier = document.getElementById('deleteUserIdentifier').value;
+    const password = document.getElementById('deleteUserPassword').value;
+    const options = {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password})
+    };
+    fetchAndShow(`${BASE_URL}/user/id/${encodeURIComponent(identifier)}`, options);
+  }
+
+  function updateUserImg() {
+    const identifier = document.getElementById('userImgIdentifier').value;
+    const img = document.getElementById('userImg').value;
+    if (identifier.length > 20) {
+      fetchAndShow(`${BASE_URL}/user/img-to-id/${encodeURIComponent(identifier)}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(img)
+      });
+    } else {
+      fetchAndShow(`${BASE_URL}/user/img-to-name/${encodeURIComponent(identifier)}`, {
+        method: 'PATCH',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(img)
       });
     }
-    function readUserByName() {
-      const userInfo = document.getElementById('readUserInfo').value;
-      fetchAndShow(`${BASE_URL}/user/name/${encodeURIComponent(userInfo)}`);
-    }
-    function readUserById() {
-      const userInfo = document.getElementById('readUserInfo').value;
-      fetchAndShow(`${BASE_URL}/user/id/${encodeURIComponent(userInfo)}`);
-    }
-    function readUserAll() {
-      fetchAndShow(`${BASE_URL}/user/all`);
-    }
-    function updateUserName() {
-      const identifier = document.getElementById('updateUserIdentifier').value;
-      const newName = document.getElementById('updateUserNewName').value;
-      if (identifier.length > 20) {
-        fetchAndShow(`${BASE_URL}/user/id/${encodeURIComponent(identifier)}?changeName=${encodeURIComponent(newName)}`, {
-          method: 'PATCH'
-        });
-      } else {
-        fetchAndShow(`${BASE_URL}/user/name/${encodeURIComponent(identifier)}?change=${encodeURIComponent(newName)}`, {
-          method: 'PATCH'
-        });
-      }
-    }
-    function deleteUser1() {
-  const identifier = document.getElementById('deleteUserIdentifier').value;
-  const password = document.getElementById('deleteUserPassword').value;
-  const options = {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password })  // 비밀번호를 객체로 감싸서 전송
-  };
+  }
 
-  fetchAndShow(`${BASE_URL}/user/name/${encodeURIComponent(identifier)}`, options);
-}
+  function sendMessageToUser() {
+    const sender = document.getElementById('msgSender').value;
+    const receiver = document.getElementById('msgReceiver').value;
+    const message = document.getElementById('msgContent').value;
+    fetchAndShow(`${BASE_URL}/user/send-message`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({sender, receiver, message})
+    });
+  }
 
-    function deleteUser2() {
-      const identifier = document.getElementById('deleteUserIdentifier').value;
-      const password = document.getElementById('deleteUserPassword').value;
-      const options = {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(password)
-      };
- 
-        fetchAndShow(`${BASE_URL}/user/id/${encodeURIComponent(identifier)}`, options);
-      
-    }
-    function updateUserImg() {
-      const identifier = document.getElementById('userImgIdentifier').value;
-      const img = document.getElementById('userImg').value;
-      if (identifier.length > 20) {
-        fetchAndShow(`${BASE_URL}/user/img-to-id/${encodeURIComponent(identifier)}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(img)
-        });
-      } else {
-        fetchAndShow(`${BASE_URL}/user/img-to-name/${encodeURIComponent(identifier)}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(img)
-        });
-      }
-    }
-    function sendMessageToUser() {
-      const sender = document.getElementById('msgSender').value;
-      const receiver = document.getElementById('msgReceiver').value;
-      const message = document.getElementById('msgContent').value;
-      fetchAndShow(`${BASE_URL}/user/send-message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sender, receiver, message })
-      });
-    }
-    function updateUserStatus() {
-      const user = document.getElementById('statusUser').value;
-      fetchAndShow(`${BASE_URL}/user/isbool/${encodeURIComponent(user)}`, {
-        method: 'PATCH'
-      });
-    }
+  function updateUserStatus() {
+    const user = document.getElementById('statusUser').value;
+    fetchAndShow(`${BASE_URL}/user/isbool/${encodeURIComponent(user)}`, {
+      method: 'PATCH'
+    });
+  }
 
-    /* ========== Channel 섹션 ========== */
-    function showChannelSection() {
-      document.getElementById('section').innerHTML = `
+  /* ========== Channel 섹션 ========== */
+  function showChannelSection() {
+    document.getElementById('section').innerHTML = `
         <h2>채널 관리 (Channel)</h2>
         <div class="section">
           <h3>채널 생성</h3>
@@ -344,113 +371,130 @@
           <button class="action" onclick="sendMessageInChannel()">메시지 전송</button>
         </div>
       `;
-    }
-    function createChannel() {
-      const name = document.getElementById('channelName').value;
-      fetchAndShow(`${BASE_URL}/channel?name=${encodeURIComponent(name)}`, { method: 'POST' });
-    }
-    function createPrivateChannel() {
-      fetchAndShow(`${BASE_URL}/channel/private`, { method: 'POST' });
-    }
-    function readChannelByName() {
-      const param = document.getElementById('readChannelParam').value;
-      fetchAndShow(`${BASE_URL}/channel/name/${encodeURIComponent(param)}`);
-    }
-    function readChannelById() {
-      const param = document.getElementById('readChannelParam').value;
-      fetchAndShow(`${BASE_URL}/channel/id/${encodeURIComponent(param)}`);
-    }
-    function readChannelAll() {
-      fetchAndShow(`${BASE_URL}/channel/all`);
-    }
-    function updateChannelNameById() {
-      const id = document.getElementById('updateChannelId').value;
-      const newName = document.getElementById('updateChannelNewName').value;
-      fetchAndShow(`${BASE_URL}/channel/name/id`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name: newName })
-      });
-    }
-    function updateChannelNameByNames() {
-      const currentName = document.getElementById('updateChannelCurrentName').value;
-      const newName = document.getElementById('updateChannelNewName2').value;
-      fetchAndShow(`${BASE_URL}/channel/name/user-name`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name1: currentName, name2: newName })
-      });
-    }
-    function deleteChannel() {
-      const param = document.getElementById('deleteChannelParam').value;
-      if (param.length > 20) {
-        fetchAndShow(`${BASE_URL}/channel/channel-id/${encodeURIComponent(param)}`, { method: 'DELETE' });
-      } else {
-        fetchAndShow(`${BASE_URL}/channel/channel-name/${encodeURIComponent(param)}`, { method: 'DELETE' });
-      }
-    }
-    function deleteUserFromChannel() {
-      const channelName = document.getElementById('channelForUserDelete').value;
-      const userName = document.getElementById('userToDelete').value;
-      fetchAndShow(`${BASE_URL}/channel/user/name/${encodeURIComponent(channelName)}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userName)
-      });
-    }
-    function readChannelInUser() {
-      const channelName = document.getElementById('channelInUser').value;
-      // 응답이 text인 경우도 있으므로 그대로 출력
-      fetch(`${BASE_URL}/channel/user/${encodeURIComponent(channelName)}`)
-        .then(response => response.text())
-        .then(data => showResult(data))
-        .catch(error => {
-          showResult({ error: error.message });
-          console.error('Error:', error);
-        });
-    }
-    function readChannelInMessage() {
-      const channelName = document.getElementById('channelInMessage').value;
-      fetch(`${BASE_URL}/channel/message/${encodeURIComponent(channelName)}`)
-        .then(response => response.text())
-        .then(data => showResult(data))
-        .catch(error => {
-          showResult({ error: error.message });
-          console.error('Error:', error);
-        });
-    }
-    function findChannelsByUserId() {
-      const userId = document.getElementById('channelByUserId').value;
-      fetchAndShow(`${BASE_URL}/channel/username-in-channel/${encodeURIComponent(userId)}`);
-    }
-    function findChannelsByUserName() {
-      const userName = document.getElementById('channelByUserName').value;
-      fetchAndShow(`${BASE_URL}/channel/userid-in-channel/${encodeURIComponent(userName)}`);
-    }
-    function addUserToChannel() {
-      const channel = document.getElementById('addUserChannel').value;
-      const user = document.getElementById('addUser').value;
-      fetchAndShow(`${BASE_URL}/channel/user`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channel, user })
-      });
-    }
-    function sendMessageInChannel() {
-      const channel = document.getElementById('sendMsgChannel').value;
-      const sender = document.getElementById('sendMsgSender').value;
-      const receiver = document.getElementById('sendMsgReceiver').value;
-      const message = document.getElementById('sendMsgContent').value;
-      fetchAndShow(`${BASE_URL}/channel/send-message`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ channel, sender, receiver, message })
-      });
-    }
+  }
 
-    /* ========== Message 섹션 ========== */
-    function showMessageSection() {
-      document.getElementById('section').innerHTML = `
+  function createChannel() {
+    const name = document.getElementById('channelName').value;
+    fetchAndShow(`${BASE_URL}/channel?name=${encodeURIComponent(name)}`, {method: 'POST'});
+  }
+
+  function createPrivateChannel() {
+    fetchAndShow(`${BASE_URL}/channel/private`, {method: 'POST'});
+  }
+
+  function readChannelByName() {
+    const param = document.getElementById('readChannelParam').value;
+    fetchAndShow(`${BASE_URL}/channel/name/${encodeURIComponent(param)}`);
+  }
+
+  function readChannelById() {
+    const param = document.getElementById('readChannelParam').value;
+    fetchAndShow(`${BASE_URL}/channel/id/${encodeURIComponent(param)}`);
+  }
+
+  function readChannelAll() {
+    fetchAndShow(`${BASE_URL}/channel/all`);
+  }
+
+  function updateChannelNameById() {
+    const id = document.getElementById('updateChannelId').value;
+    const newName = document.getElementById('updateChannelNewName').value;
+    fetchAndShow(`${BASE_URL}/channel/name/id`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id, name: newName})
+    });
+  }
+
+  function updateChannelNameByNames() {
+    const currentName = document.getElementById('updateChannelCurrentName').value;
+    const newName = document.getElementById('updateChannelNewName2').value;
+    fetchAndShow(`${BASE_URL}/channel/name/username`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name1: currentName, name2: newName})
+    });
+  }
+
+  function deleteChannel() {
+    const param = document.getElementById('deleteChannelParam').value;
+    if (param.length > 20) {
+      fetchAndShow(`${BASE_URL}/channel/id/${encodeURIComponent(param)}`,
+          {method: 'DELETE'});
+    } else {
+      fetchAndShow(`${BASE_URL}/channel/name/${encodeURIComponent(param)}`,
+          {method: 'DELETE'});
+    }
+  }
+
+  function deleteUserFromChannel() {
+    const channelName = document.getElementById('channelForUserDelete').value;
+    const userName = document.getElementById('userToDelete').value;
+    fetchAndShow(`${BASE_URL}/channel/user/name/${encodeURIComponent(channelName)}`, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(userName)
+    });
+  }
+
+  function readChannelInUser() {
+    const channelName = document.getElementById('channelInUser').value;
+    // 응답이 text인 경우도 있으므로 그대로 출력
+    fetch(`${BASE_URL}/channel/user/${encodeURIComponent(channelName)}`)
+    .then(response => response.text())
+    .then(data => showResult(data))
+    .catch(error => {
+      showResult({error: error.message});
+      console.error('Error:', error);
+    });
+  }
+
+  function readChannelInMessage() {
+    const channelName = document.getElementById('channelInMessage').value;
+    fetch(`${BASE_URL}/channel/message/${encodeURIComponent(channelName)}`)
+    .then(response => response.text())
+    .then(data => showResult(data))
+    .catch(error => {
+      showResult({error: error.message});
+      console.error('Error:', error);
+    });
+  }
+
+  function findChannelsByUserId() {
+    const userId = document.getElementById('channelByUserId').value;
+    fetchAndShow(`${BASE_URL}/channel/username/channel/${encodeURIComponent(userId)}`);
+  }
+
+  function findChannelsByUserName() {
+    const userName = document.getElementById('channelByUserName').value;
+    fetchAndShow(`${BASE_URL}/channel/userid/channel/${encodeURIComponent(userName)}`);
+  }
+
+  function addUserToChannel() {
+    const channel = document.getElementById('addUserChannel').value;
+    const user = document.getElementById('addUser').value;
+    fetchAndShow(`${BASE_URL}/channel/user`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({channel, user})
+    });
+  }
+
+  function sendMessageInChannel() {
+    const channel = document.getElementById('sendMsgChannel').value;
+    const sender = document.getElementById('sendMsgSender').value;
+    const receiver = document.getElementById('sendMsgReceiver').value;
+    const message = document.getElementById('sendMsgContent').value;
+    fetchAndShow(`${BASE_URL}/channel/message`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({channel, sender, receiver, message})
+    });
+  }
+
+  /* ========== Message 섹션 ========== */
+  function showMessageSection() {
+    document.getElementById('section').innerHTML = `
         <h2>메시지 관리 (Message)</h2>
         <div class="section">
           <h3>일반 메시지 생성 (/message/normal, POST)</h3>
@@ -503,106 +547,117 @@
           <button class="action" onclick="deleteMessage()">삭제 (ID/제목 기반)</button>
         </div>
       `;
-    }
-    function createNormalMessage() {
-      const title = document.getElementById('msgNormalTitle').value;
-      const body = document.getElementById('msgNormalBody').value;
-      fetchAndShow(`${BASE_URL}/message/normal`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name1: title, name2: body })
-      });
-    }
-    function createMessageBinaryContent() {
-      const title = document.getElementById('msgBinTitle').value;
-      const body = document.getElementById('msgBinBody').value;
-      let binaryContents;
-      try {
-        binaryContents = JSON.parse(document.getElementById('msgBinContents').value);
-      } catch(e) {
-        showResult({ error: 'binaryContents는 JSON 배열 형식이어야 합니다.' });
-        return;
-      }
-      fetchAndShow(`${BASE_URL}/message/binaryContent`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, body, binaryContents })
-      });
-    }
-    function createImageMessage() {
-      const title = document.getElementById('msgImgTitle').value;
-      const body = document.getElementById('msgImgBody').value;
-      const imgs = document.getElementById('msgImgs').value.split(',').map(s => s.trim());
-      fetchAndShow(`${BASE_URL}/message/img`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, body, imgs })
-      });
-    }
-    function readMessageById() {
-      const param = document.getElementById('readMsgParam').value;
-      fetchAndShow(`${BASE_URL}/message/id/${encodeURIComponent(param)}`);
-    }
-    function readMessageByTitle() {
-      const param = document.getElementById('readMsgParam').value;
-      fetchAndShow(`${BASE_URL}/message/title/${encodeURIComponent(param)}`);
-    }
-    function readMessageAll() {
-      fetchAndShow(`${BASE_URL}/message/all`);
-    }
-    function updateMessageTitleById() {
-      const id = document.getElementById('updateMsgId').value;
-      const newTitle = document.getElementById('updateMsgNewTitle').value;
-      fetchAndShow(`${BASE_URL}/message/message-title/id`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name: newTitle })
-      });
-    }
-    function updateMessageTitleByTitle() {
-      const currentTitle = document.getElementById('updateMsgCurrentTitle').value;
-      const newTitle = document.getElementById('updateMsgNewTitle2').value;
-      fetchAndShow(`${BASE_URL}/message/message-title/title`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name1: currentTitle, name2: newTitle })
-      });
-    }
-    function updateMessageBodyById() {
-      const id = document.getElementById('updateMsgBodyId').value;
-      const newBody = document.getElementById('updateMsgNewBody').value;
-      fetchAndShow(`${BASE_URL}/message/message-body/id`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name: newBody })
-      });
-    }
-    function updateMessageBodyByName() {
-      const currentTitle = document.getElementById('updateMsgCurrentTitle2').value;
-      const newBody = document.getElementById('updateMsgNewBody2').value;
-      fetchAndShow(`${BASE_URL}/message/message-body/name`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name1: currentTitle, name2: newBody })
-      });
-    }
-    function deleteMessage() {
-      const param = document.getElementById('deleteMsgParam').value;
-      const options = {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(param)
-      };
-      if (param.length > 20) {
-        fetchAndShow(`${BASE_URL}/message/id`, options);
-      } else {
-        fetchAndShow(`${BASE_URL}/message/title`, options);
-      }
-    }
+  }
 
-    /* ========== Binary 섹션 ========== */
-    function showBinarySection() {
-  document.getElementById('section').innerHTML = `
+  function createNormalMessage() {
+    const title = document.getElementById('msgNormalTitle').value;
+    const body = document.getElementById('msgNormalBody').value;
+    fetchAndShow(`${BASE_URL}/message/normal`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name1: title, name2: body})
+    });
+  }
+
+  function createMessageBinaryContent() {
+    const title = document.getElementById('msgBinTitle').value;
+    const body = document.getElementById('msgBinBody').value;
+    let binaryContents;
+    try {
+      binaryContents = JSON.parse(document.getElementById('msgBinContents').value);
+    } catch (e) {
+      showResult({error: 'binaryContents는 JSON 배열 형식이어야 합니다.'});
+      return;
+    }
+    fetchAndShow(`${BASE_URL}/message/binaryContent`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title, body, binaryContents})
+    });
+  }
+
+  function createImageMessage() {
+    const title = document.getElementById('msgImgTitle').value;
+    const body = document.getElementById('msgImgBody').value;
+    const imgs = document.getElementById('msgImgs').value.split(',').map(s => s.trim());
+    fetchAndShow(`${BASE_URL}/message/img`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({title, body, imgs})
+    });
+  }
+
+  function readMessageById() {
+    const param = document.getElementById('readMsgParam').value;
+    fetchAndShow(`${BASE_URL}/message/id/${encodeURIComponent(param)}`);
+  }
+
+  function readMessageByTitle() {
+    const param = document.getElementById('readMsgParam').value;
+    fetchAndShow(`${BASE_URL}/message/title/${encodeURIComponent(param)}`);
+  }
+
+  function readMessageAll() {
+    fetchAndShow(`${BASE_URL}/message/all`);
+  }
+
+  function updateMessageTitleById() {
+    const id = document.getElementById('updateMsgId').value;
+    const newTitle = document.getElementById('updateMsgNewTitle').value;
+    fetchAndShow(`${BASE_URL}/message/title/id`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id, name: newTitle})
+    });
+  }
+
+  function updateMessageTitleByTitle() {
+    const currentTitle = document.getElementById('updateMsgCurrentTitle').value;
+    const newTitle = document.getElementById('updateMsgNewTitle2').value;
+    fetchAndShow(`${BASE_URL}/message/title/title`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name1: currentTitle, name2: newTitle})
+    });
+  }
+
+  function updateMessageBodyById() {
+    const id = document.getElementById('updateMsgBodyId').value;
+    const newBody = document.getElementById('updateMsgNewBody').value;
+    fetchAndShow(`${BASE_URL}/message/body/id`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({id, name: newBody})
+    });
+  }
+
+  function updateMessageBodyByName() {
+    const currentTitle = document.getElementById('updateMsgCurrentTitle2').value;
+    const newBody = document.getElementById('updateMsgNewBody2').value;
+    fetchAndShow(`${BASE_URL}/message/body/name`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name1: currentTitle, name2: newBody})
+    });
+  }
+
+  function deleteMessage() {
+    const param = document.getElementById('deleteMsgParam').value;
+    const options = {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(param)
+    };
+    if (param.length > 20) {
+      fetchAndShow(`${BASE_URL}/message/id`, options);
+    } else {
+      fetchAndShow(`${BASE_URL}/message/title`, options);
+    }
+  }
+
+  /* ========== Binary 섹션 ========== */
+  function showBinarySection() {
+    document.getElementById('section').innerHTML = `
     <h2>바이너리 파일 업로드 (Binary)</h2>
     <div class="section">
       <h3>바이너리 파일 업로드 (/binary/upload, POST)</h3>
@@ -610,38 +665,38 @@
       <button class="action" onclick="uploadBinaryFiles()">업로드</button>
     </div>
   `;
-}
-
-function uploadBinaryFiles() {
-  const files = document.getElementById('binaryFileInput').files;
-  
-  if (files.length === 0) {
-    alert('파일을 선택해주세요.');
-    return;
   }
 
-  const formData = new FormData();
-  
-  // 파일을 FormData에 추가
-  for (let i = 0; i < files.length; i++) {
-    formData.append('files', files[i]);
-  }
+  function uploadBinaryFiles() {
+    const files = document.getElementById('binaryFileInput').files;
 
-  // 파일 업로드 요청
-  fetch(`${BASE_URL}/binary/upload`, {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert('파일 업로드 완료');
-    console.log(data);
-  })
-  .catch(error => {
-    alert('파일 업로드 실패');
-    console.error(error);
-  });
-}
-  </script>
+    if (files.length === 0) {
+      alert('파일을 선택해주세요.');
+      return;
+    }
+
+    const formData = new FormData();
+
+    // 파일을 FormData에 추가
+    for (let i = 0; i < files.length; i++) {
+      formData.append('files', files[i]);
+    }
+
+    // 파일 업로드 요청
+    fetch(`${BASE_URL}/binary/upload`, {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('파일 업로드 완료');
+      console.log(data);
+    })
+    .catch(error => {
+      alert('파일 업로드 실패');
+      console.error(error);
+    });
+  }
+</script>
 </body>
 </html>
