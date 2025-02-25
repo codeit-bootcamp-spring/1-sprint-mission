@@ -3,11 +3,19 @@ spring:
     name: discodeit
   servlet:
     multipart:
-          enabled: true
-          max-file-size: 10MB
-          max-request-size: 10MB
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 discodeit:
   repository:
     type: file   # jcf | file
     file-directory: .discodeit
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /api
+    operations-sorter: method
+  paths-to-match: /api/**

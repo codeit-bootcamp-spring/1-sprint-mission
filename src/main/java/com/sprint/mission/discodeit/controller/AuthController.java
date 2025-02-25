@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 
+import com.sprint.mission.discodeit.docs.AuthSwagger;
 import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
@@ -16,16 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthSwagger {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    @RequestMapping(value = "/login",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        method = RequestMethod.POST)
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
-        User loginedUser = authService.login(loginRequest);
+  @RequestMapping(value = "/login",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      method = RequestMethod.POST)
+  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    User loginedUser = authService.login(loginRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(loginedUser);
-    }
+    return ResponseEntity.status(HttpStatus.OK).body(loginedUser);
+  }
 }
