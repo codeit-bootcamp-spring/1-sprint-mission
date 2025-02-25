@@ -1,2 +1,18 @@
 {
+  "d4fcd6df-0f86-4cb2-93ed-77403f902084" : {
+    "id" : "d4fcd6df-0f86-4cb2-93ed-77403f902084",
+    "createdAt" : 1740467436.326076300,
+    "updatedAt" : 1740467549.415664100,
+    "userId" : "c6b39480-b10a-4da6-87dd-787469652219",
+    "lastActiveAt" : 1740467549.411000000,
+    "online" : true
+  },
+  "b0ac18c5-ac9a-41a6-91b3-6db744dfcd7b" : {
+    "id" : "b0ac18c5-ac9a-41a6-91b3-6db744dfcd7b",
+    "createdAt" : 1740467563.445903900,
+    "updatedAt" : 1740467589.821477400,
+    "userId" : "c2b5cb04-1eaf-4efa-8690-32520a86d3f0",
+    "lastActiveAt" : 1740467589.808000000,
+    "online" : true
+  }
 }

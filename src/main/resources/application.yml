@@ -20,7 +20,7 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
-    operationsSorter: method  # 메서드 정렬 방식 설정
-    tagsSorter: alpha  # 태그 정렬 방식 설정
+    operationsSorter: method
+    tagsSorter: alpha
   cache:
-    disabled: true  # 개발 중에는 캐싱 비활성화
+    disabled: true
