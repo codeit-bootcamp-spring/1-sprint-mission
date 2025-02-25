@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ResponseDTO;
+import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -16,34 +16,34 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
-    @PostMapping("/readStatus")
-    public ResponseDTO<UUID> createReadStatus(@RequestBody ReadStatusCreateDTO request){
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("메시지 수신정보 생성 완료")
-                .data(readStatusService.create(request))
-                .build();
-    }
+  @PostMapping("/readStatus")
+  public ApiResponse<UUID> createReadStatus(@RequestBody ReadStatusCreateDTO request) {
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("메시지 수신정보 생성 완료")
+        .data(readStatusService.create(request))
+        .build();
+  }
 
-    @PutMapping("/readStatus/{readStatusId}")
-    public ResponseDTO updateReadStatus(@PathVariable UUID readStatusId,
-                                        @RequestBody ReadStatusUpdateDTO request){
-        readStatusService.update(readStatusId, request);
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("메시지 수신정보 수정 완료")
-                .build();
-    }
+  @PutMapping("/readStatus/{readStatusId}")
+  public ApiResponse updateReadStatus(@PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateDTO request) {
+    readStatusService.update(readStatusId, request);
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("메시지 수신정보 수정 완료")
+        .build();
+  }
 
-    @GetMapping("readStatus/{userId}")
-    public ResponseDTO<List<ReadStatus>> getUserReadStatus(@PathVariable UUID userId){
-        return ResponseDTO.<List<ReadStatus>>builder()
-                .code(HttpStatus.OK.value())
-                .message("특정 사용자의 메시지 수신 정보를 조회")
-                .data(readStatusService.findAllByUserId(userId))
-                .build();
-    }
+  @GetMapping("readStatus/{userId}")
+  public ApiResponse<List<ReadStatus>> getUserReadStatus(@PathVariable UUID userId) {
+    return ApiResponse.<List<ReadStatus>>builder()
+        .code(HttpStatus.OK.value())
+        .message("특정 사용자의 메시지 수신 정보를 조회")
+        .data(readStatusService.findAllByUserId(userId))
+        .build();
+  }
 
 }

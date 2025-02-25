@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ResponseDTO;
+import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -14,23 +14,23 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    @GetMapping("/binaryContent/{binaryContentId}")
-    public ResponseDTO<BinaryContent> getBinaryContent(@PathVariable UUID binaryContentId){
-        return ResponseDTO.<BinaryContent>builder()
-                .code(HttpStatus.OK.value())
-                .message("바이터리 파일 조회")
-                .data(binaryContentService.find(binaryContentId))
-                .build();
-    }
+  @GetMapping("/binaryContent/{binaryContentId}")
+  public ApiResponse<BinaryContent> getBinaryContent(@PathVariable UUID binaryContentId) {
+    return ApiResponse.<BinaryContent>builder()
+        .code(HttpStatus.OK.value())
+        .message("바이터리 파일 조회")
+        .data(binaryContentService.find(binaryContentId))
+        .build();
+  }
 
-    @PostMapping("/binaryContent")
-    public ResponseDTO<List<BinaryContent>> getBinaryContentList(@RequestBody List<UUID> ids){
-        return ResponseDTO.<List<BinaryContent>>builder()
-                .code(HttpStatus.OK.value())
-                .message("바이너리 파일 조회")
-                .data(binaryContentService.findAllByIdIn(ids))
-                .build();
-    }
+  @PostMapping("/binaryContent")
+  public ApiResponse<List<BinaryContent>> getBinaryContentList(@RequestBody List<UUID> ids) {
+    return ApiResponse.<List<BinaryContent>>builder()
+        .code(HttpStatus.OK.value())
+        .message("바이너리 파일 조회")
+        .data(binaryContentService.findAllByIdIn(ids))
+        .build();
+  }
 }

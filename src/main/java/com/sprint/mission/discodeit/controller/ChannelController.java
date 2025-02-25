@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ResponseDTO;
+import com.sprint.mission.discodeit.dto.ApiResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
@@ -17,50 +17,51 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ChannelController {
 
-    private final ChannelService channelService;
+  private final ChannelService channelService;
 
-    @PostMapping("/channels/pulblic")
-    public ResponseDTO<UUID> createPublicChannel(@RequestBody ChannelCreatePublicDTO request){
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("public 채널 생성 완료")
-                .data(channelService.create(request))
-                .build();
-    }
+  @PostMapping("/channels/pulblic")
+  public ApiResponse<UUID> createPublicChannel(@RequestBody ChannelCreatePublicDTO request) {
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("public 채널 생성 완료")
+        .data(channelService.create(request))
+        .build();
+  }
 
-    @PostMapping("/channels/private")
-    public ResponseDTO<UUID> createPrivateChannel(@RequestBody ChannelCreatePrivateDTO request){
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("private 채널 생성 완료")
-                .data(channelService.create(request))
-                .build();
-    }
+  @PostMapping("/channels/private")
+  public ApiResponse<UUID> createPrivateChannel(@RequestBody ChannelCreatePrivateDTO request) {
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("private 채널 생성 완료")
+        .data(channelService.create(request))
+        .build();
+  }
 
-    @PutMapping("channels/{channelId}")
-    public ResponseDTO updateChannel(@PathVariable UUID channelId, @RequestBody ChannelUpdateDTO request){
-        channelService.update(channelId, request);
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("채널 수정 완료")
-                .build();
-    }
+  @PutMapping("channels/{channelId}")
+  public ApiResponse updateChannel(@PathVariable UUID channelId,
+      @RequestBody ChannelUpdateDTO request) {
+    channelService.update(channelId, request);
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("채널 수정 완료")
+        .build();
+  }
 
-    @DeleteMapping("channels/{channelId}")
-    public ResponseDTO<UUID> deleteChannel(@PathVariable UUID channelId){
-        return ResponseDTO.<UUID>builder()
-                .code(HttpStatus.OK.value())
-                .message("채널 삭제 완료")
-                .data(channelService.delete(channelId))
-                .build();
-    }
+  @DeleteMapping("channels/{channelId}")
+  public ApiResponse<UUID> deleteChannel(@PathVariable UUID channelId) {
+    return ApiResponse.<UUID>builder()
+        .code(HttpStatus.OK.value())
+        .message("채널 삭제 완료")
+        .data(channelService.delete(channelId))
+        .build();
+  }
 
-    @GetMapping("channels/{userId}")
-    public ResponseDTO<List<ChannelFindDTO>> getUserChannels(@PathVariable UUID userId){
-        return ResponseDTO.<List<ChannelFindDTO>>builder()
-                .code(HttpStatus.OK.value())
-                .message("사용자가 볼 수 있는 채널 목록")
-                .data(channelService.findAllByUserId(userId))
-                .build();
-    }
+  @GetMapping("channels/{userId}")
+  public ApiResponse<List<ChannelFindDTO>> getUserChannels(@PathVariable UUID userId) {
+    return ApiResponse.<List<ChannelFindDTO>>builder()
+        .code(HttpStatus.OK.value())
+        .message("사용자가 볼 수 있는 채널 목록")
+        .data(channelService.findAllByUserId(userId))
+        .build();
+  }
 }
