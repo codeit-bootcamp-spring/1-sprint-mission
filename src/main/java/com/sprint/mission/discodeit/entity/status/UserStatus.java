@@ -7,6 +7,7 @@ import java.time.Instant;
 
 @Getter
 public class UserStatus implements Serializable {
+    private static final long serialVersionUID = 1L;
     //UserStatus의 id는 User의 식별자와 같습니다.
     private String id;
     private Instant createdAt;
@@ -25,6 +26,8 @@ public class UserStatus implements Serializable {
 
     // 이 메소드가 왜 필요한지 생각해보자.
     public boolean isUpdated(Instant updatedAt) {
-        return this.updatedAt != updatedAt;
+        boolean isUpdated = this.updatedAt != updatedAt;
+        this.updatedAt = updatedAt;
+        return isUpdated;
     }
 }

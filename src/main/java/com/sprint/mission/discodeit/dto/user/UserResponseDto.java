@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.dto.user;
 
-import com.sprint.mission.discodeit.entity.AccountStatus;
+import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 
 public record UserResponseDto(

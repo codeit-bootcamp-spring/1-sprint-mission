@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.entity.AccountStatus;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -29,32 +30,44 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponseDto create(CreateUserDto createUserDto) {
-        boolean userExists = userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(createUserDto.email()));
-        if (userExists) {
+
+        boolean userEmailExists = userRepository.findByEmail(createUserDto.email()) != null;
+        if (userEmailExists) {
             throw new CustomException(ErrorCode.USER_EMAIL_ALREADY_REGISTERED);
+        }
+
+        boolean userNameExists = userRepository.findByUsername(createUserDto.username()) != null;
+        if (userNameExists) {
+            throw new CustomException(ErrorCode.USER_NAME_ALREADY_REGISTERED);
+        }
+
+        if(createUserDto == null || createUserDto.username()==null ||createUserDto.password() == null ) {
+            throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
         User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(), createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
         userRepository.save(user);
 
-        UserStatus userStatus = userStatusService.create(new CreateUserStatusDto(user.getId()));
+        UserStatusResponseDto userStatusDto = userStatusService.create(new CreateUserStatusDto(user.getId()));
 
-        return UserResponseDto.from(user, userStatus.isActive());
+        return UserResponseDto.from(user, userStatusDto.isOnline());
     }
 
-    public UserResponseDto create(CreateUserDto createUserDto, String profileImageId) {
+    @Override
+    public UserResponseDto create(CreateUserDto createUserDto, MultipartFile file) throws CustomException {
         UserResponseDto userDto = create(createUserDto);
         User user = userRepository.findById(userDto.id());
-        user.setProfileImageId(profileImageId);
+
+        ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
+        user.setProfileImageId(responseBinaryContentDto.id());
         userRepository.save(user);
 
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
-
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
     }
 
     @Override
     public List<UserResponseDto> findAll() {
-        return userRepository.findAll().stream().map( u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isActive())).toList();
+        return userRepository.findAll().stream().map( u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isOnline())).toList();
     }
 
     @Override
@@ -63,7 +76,7 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
     }
 
     @Override
@@ -72,14 +85,14 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with email %s not found", email));
         }
-        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive());
+        return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
     }
 
     @Override
     public List<UserResponseDto> findAllContainsNickname(String nickname) {
         return userRepository.findAll().stream()
                 .filter(user -> user.getNickname().contains(nickname))
-                .map(user->UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()))
+                .map(user->UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
                 .toList();
     }
 
@@ -87,7 +100,7 @@ public class BasicUserService implements UserService {
     public List<UserResponseDto> findAllByAccountStatus(AccountStatus accountStatus) {
         return userRepository.findAll().stream()
                 .filter(user -> user.getAccountStatus().equals(accountStatus))
-                .map(user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isActive()))
+                .map(user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
                 .toList();
     }
 
@@ -102,7 +115,7 @@ public class BasicUserService implements UserService {
     //update user의 반환타입을 Dto 로 변경하려 하였으나
     //아래랑 종속적이라... 문제가 됨 -> 수정필요
     @Override
-    public User updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
+    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto) throws CustomException {
         User user = userRepository.findById(userId);
 
         if (user == null) {
@@ -115,22 +128,28 @@ public class BasicUserService implements UserService {
             user.setUpdatedAt(updateUserDto.updatedAt());
         }
 
-        return userRepository.save(user);
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isOnline());
     }
 
     // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
-    public User updateUser(String userId, UpdateUserDto updateUserDto, CreateBinaryContentDto createBinaryContentDto) throws CustomException {
-        User user = updateUser(userId, updateUserDto);
+    @Override
+    public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file) throws CustomException {
+        User user = userRepository.findById(userId);
+        //todo - 유저 조회를 두 번 한다. 수정 필요
+        updateUser(userId, updateUserDto);
 
-        if (user.getProfileImageId() == null || user.getProfileImageId().isEmpty()) {
+        if (file == null) {
             throw new CustomException(ErrorCode.EMPTY_DATA);
         }
 
-        binaryContentService.deleteById(user.getProfileImageId());
+        if (user.getProfileImageId()!=null && !user.getProfileImageId().isEmpty()) {
+            binaryContentService.deleteById(user.getProfileImageId());
+        }
 
-        user.setProfileImageId(binaryContentService.create(createBinaryContentDto).id());
+        user.setProfileImageId(binaryContentService.create(file).id());
+        user.setUpdatedAt(updateUserDto.updatedAt());
 
-        return userRepository.save(user);
+        return UserResponseDto.from(userRepository.save(user), userStatusService.findById(user.getId()).isOnline());
     }
 
 
@@ -141,6 +160,10 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, String.format("User with id %s not found", userId));
         }
+
+        //todo - userStatus가 삭제되지 않았다면?
+        userStatusService.delete(user.getId());
+
         return userRepository.delete(user);
     }
 }

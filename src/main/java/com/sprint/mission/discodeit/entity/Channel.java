@@ -90,12 +90,6 @@ public class Channel implements Serializable {
             isUpdated = true;
         }
 
-        ChannelType newChannelType = updateChannelDto.channelType();
-        if (newChannelType != null && channelType != newChannelType) {
-            channelType = newChannelType;
-            isUpdated = true;
-        }
-
         String newDescription = updateChannelDto.description();
         if (newDescription != null && !newDescription.isEmpty() && !newDescription.equals(description)) {
             description = newDescription;

@@ -1,55 +1,57 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.config.RepositoryProperties;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file", matchIfMissing = false)
+
 @Repository
+@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "file", matchIfMissing = false)
 public class FileMessageRepository implements MessageRepository {
 
-    private final Path messageDirectory;
-    private final String extension = ".ser";;
+    private final Path directory;
+    private final String extension;
 
-
-    public FileMessageRepository(@Value("${discodeit.repository.file-directory}") String fileDirectory) {
-        this.messageDirectory = Paths.get(fileDirectory).resolve("messages");
-        FileService.init(messageDirectory);
+    public FileMessageRepository(RepositoryProperties properties) {
+        this.directory = Paths.get(System.getProperty(properties.getBaseDirectory()))
+                .resolve(properties.getFileDirectory())
+                .resolve("message");
+        this.extension = properties.getExtension();
+        FileService.init(this.directory);
     }
 
     @Override
     public Message save(Message message) {
-        Path messagePath = messageDirectory.resolve(message.getId().concat(extension));
+        Path messagePath = directory.resolve(message.getId().concat(extension));
         FileService.save(messagePath, message);
         return message;
     }
 
     @Override
     public boolean delete(String messageId) {
-        Path messagePath = messageDirectory.resolve(messageId.concat(extension));
+        Path messagePath = directory.resolve(messageId.concat(extension));
         return FileService.delete(messagePath);
     }
 
     @Override
     public Message findById(String id) {
-        Path messagePath = messageDirectory.resolve(id.concat(extension));
-        List<Message> load = FileService.load(messagePath);
-        if (load == null || load.isEmpty()) {
-            return null;
-        }
-        return load.get(0);
+        Path messagePath = directory.resolve(id.concat(extension));
+        return (Message) FileService.read(messagePath);
     }
 
     @Override
     public List<Message> findAll() {
-        return FileService.load(messageDirectory);
+        return FileService.load(directory);
     }
 
     @Override

@@ -35,5 +35,5 @@ public interface MessageService {
     MessageResponseDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
 
     //삭제
-    boolean delete(String messageId);
+    boolean delete(String messageId, String userId);
 }

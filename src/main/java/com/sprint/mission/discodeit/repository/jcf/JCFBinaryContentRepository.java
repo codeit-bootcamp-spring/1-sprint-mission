@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.binaryContent.CreateBinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -10,8 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
+@ConditionalOnProperty(name="discodeit.repository.type", havingValue = "jcf")
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     private final Map<String, BinaryContent> data;
@@ -21,8 +20,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent save(CreateBinaryContentDto createBinaryContentDto) {
-        BinaryContent binaryContent = new BinaryContent(createBinaryContentDto.binaryImage(), createBinaryContentDto.createdAt());
+    public BinaryContent save(BinaryContent binaryContent) {
         data.put(binaryContent.getId(), binaryContent);
         return binaryContent;
     }
