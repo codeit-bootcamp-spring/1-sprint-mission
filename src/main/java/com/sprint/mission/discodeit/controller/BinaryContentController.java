@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
+@RestController
 @RequestMapping("/api/binaryContent")
 public class BinaryContentController {
 

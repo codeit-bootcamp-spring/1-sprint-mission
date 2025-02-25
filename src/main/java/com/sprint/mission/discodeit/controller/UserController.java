@@ -23,9 +23,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
-@RequestMapping("/api/user")
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
   private final UserService userService;

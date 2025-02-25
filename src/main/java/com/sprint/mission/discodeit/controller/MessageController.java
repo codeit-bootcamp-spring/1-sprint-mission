@@ -20,9 +20,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
-@RequestMapping("/api/message")
+@RestController
+@RequestMapping("/api/messages")
 public class MessageController {
 
   private final MessageService messageService;

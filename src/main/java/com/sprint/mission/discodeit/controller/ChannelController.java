@@ -16,14 +16,13 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
-@ResponseBody
-@RequestMapping("/api/channel")
+@RestController
+@RequestMapping("/api/channels")
 public class ChannelController {
 
   private final ChannelService channelService;
 
-  @PostMapping(path = "Public")
+  @PostMapping(path = "public")
   public ResponseEntity<Channel> create(@RequestBody PublicChannelCreateRequest request) {
     Channel createdChannel = channelService.create(request);
     return ResponseEntity
@@ -31,7 +30,7 @@ public class ChannelController {
         .body(createdChannel);
   }
 
-  @PostMapping(path = "Private")
+  @PostMapping(path = "private")
   public ResponseEntity<Channel> create(@RequestBody PrivateChannelCreateRequest request) {
     Channel createdChannel = channelService.create(request);
     return ResponseEntity
