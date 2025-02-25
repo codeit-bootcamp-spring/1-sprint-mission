@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageResponseDTO(
-        UUID id,
+        UUID messageId,
         UUID userId,
         UUID channelId,
         String content,

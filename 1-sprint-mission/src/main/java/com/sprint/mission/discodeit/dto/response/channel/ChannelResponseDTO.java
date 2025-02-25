@@ -6,5 +6,5 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResponseDTO(UUID id, String name, String description, ChannelType type, List<UUID>memberIds, Instant lastMessageAt)//최근 메시지 시간
+public record ChannelResponseDTO(UUID channelId, String name, String description, ChannelType type, List<UUID>memberIds, Instant lastMessageAt)//최근 메시지 시간
 {}

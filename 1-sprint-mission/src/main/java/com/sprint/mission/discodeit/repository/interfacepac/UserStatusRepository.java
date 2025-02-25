@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+
 public interface UserStatusRepository {
     void save(UserStatus userStatus); // 새로운 사용자 상태 저장
     //

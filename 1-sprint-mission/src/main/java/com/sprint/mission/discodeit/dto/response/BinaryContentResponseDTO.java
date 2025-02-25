@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record BinaryContentResponseDTO(
-        UUID id,
+        UUID binaryContentId,
         UUID userId,
         String filename,
         String contentType,

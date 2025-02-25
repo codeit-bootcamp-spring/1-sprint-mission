@@ -1,13 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor(force = true)
 public class User implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private UUID id;
@@ -20,7 +24,6 @@ public class User implements Serializable {
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
-        //
         this.username = username;
         this.email = email;
         this.password = password;

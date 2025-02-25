@@ -54,16 +54,6 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean existsByPassword(String password) {
-        return userData.values().stream().anyMatch(user -> user.getPassword().equals(password));
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return userData.containsKey(id);
-    }
-
-    @Override
     public boolean existsByEmail(String email) {
         return userData.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }

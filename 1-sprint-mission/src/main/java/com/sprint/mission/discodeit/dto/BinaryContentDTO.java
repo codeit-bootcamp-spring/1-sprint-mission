@@ -3,26 +3,21 @@ package com.sprint.mission.discodeit.dto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.time.Instant;
+import java.util.Base64;
 import java.util.UUID;
 
 public record BinaryContentDTO(
-        UUID id,
-        UUID userId,
-        UUID messageId,
-        String filename,
+        UUID binaryContentId,
         String contentType,
-        byte[] fileData,
-        Instant createdAt
+        byte[] bytes
+
 ) {
     public static BinaryContentDTO fromEntity(BinaryContent binaryContent) {
+
         return new BinaryContentDTO(
                 binaryContent.getId(),
-                binaryContent.getUserId(),
-                binaryContent.getMessageId(),
-                binaryContent.getFilename(),
                 binaryContent.getContentType(),
-                binaryContent.getFileData(),
-                binaryContent.getCreatedAt()
+                binaryContent.getBytes()
         );
     }
 }

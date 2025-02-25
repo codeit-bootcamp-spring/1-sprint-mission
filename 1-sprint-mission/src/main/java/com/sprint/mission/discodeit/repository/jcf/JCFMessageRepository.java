@@ -9,78 +9,57 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageRepository implements MessageRepository {
-    private final Map<User, List<Message>> messageData;;
 
-    public JCFMessageRepository() {
-        this.messageData = new HashMap<>();
-    }
+  private final Map<User, List<Message>> messageData;
+  ;
 
-    @Override
-    public Message save(Message message) {
-        messageData.computeIfAbsent(message.getUser(), k -> new ArrayList<>()).add(message);
-        return message;
-    }
+  public JCFMessageRepository() {
+    this.messageData = new HashMap<>();
+  }
 
-    @Override
-    public Optional<Message> findById(UUID id) {
-        return Optional.ofNullable(messageData.values().stream()
-                .flatMap(List::stream)
-                .filter(message -> message.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found Message")));
-    }
+  @Override
+  public Message save(Message message) {
+    messageData.computeIfAbsent(message.getUser(), k -> new ArrayList<>()).add(message);
+    return message;
+  }
 
-    @Override
-    public List<Message> findAll() {
-        List<Message> allMessages = new ArrayList<>();
-        messageData.values().forEach(allMessages::addAll);
-        return allMessages;
-    }
+  @Override
+  public Optional<Message> findById(UUID id) {
+    return Optional.ofNullable(messageData.values().stream()
+        .flatMap(List::stream)
+        .filter(message -> message.getId().equals(id))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException("Not found Message")));
+  }
 
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .filter(message -> message.getChannel().getId().equals(channelId))
-                .collect(Collectors.toList());
-    }
+  @Override
+  public List<Message> findAll() {
+    List<Message> allMessages = new ArrayList<>();
+    messageData.values().forEach(allMessages::addAll);
+    return allMessages;
+  }
 
-    @Override
-    public void deleteByMessage(Message message) {
-        List<Message> messages = messageData.get(message.getUser());
-        if(messages != null) {
-            messages.remove(message);
-            if(messages.isEmpty()) {
-                messageData.remove(message.getUser());
-            }
-        }
-    }
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageData.values().stream()
+        .flatMap(List::stream)
+        .filter(message -> message.getChannel().getId().equals(channelId))
+        .collect(Collectors.toList());
+  }
 
-    @Override
-    public void deleteByChannel(Channel channel) {
-        messageData.values()
-                .forEach(allMessages -> allMessages.removeIf(message -> message.getChannel().equals(channel)));
-    }
 
-    @Override
-    public void deleteById(UUID messageId) {
-        messageData.values()
-                .forEach(messages
-                        -> messages.removeIf(message -> message.getId().equals(messageId)));
-    }
+  @Override
+  public void deleteByChannel(Channel channel) {
+    messageData.values()
+        .forEach(
+            allMessages -> allMessages.removeIf(message -> message.getChannel().equals(channel)));
+  }
 
-    @Override
-    public boolean existsByChannel(Channel channel) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(m -> m.getChannel().equals(channel));
-
-    }
-
-    @Override
-    public boolean existsByUser(User user) {
-        return messageData.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(m -> m.getUser().equals(user));
-    }
+  @Override
+  public void deleteById(UUID messageId) {
+    messageData.values()
+        .forEach(messages
+            -> messages.removeIf(message -> message.getId().equals(messageId)));
+  }
+    
 }

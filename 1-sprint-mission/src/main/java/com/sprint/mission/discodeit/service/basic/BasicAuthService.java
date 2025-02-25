@@ -8,11 +8,13 @@ import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
 import com.sprint.mission.discodeit.service.interfacepac.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -38,8 +40,10 @@ public class BasicAuthService implements AuthService {
         userStatusRepository.save(userStatus);
 
         //온라인 상태 확인
-        Boolean isOnline = userStatus.isOnline();
+        boolean isOnline = userStatus.isOnline();
 
+
+        log.info("User Online : {} ", isOnline);
         return new UserLoginResponseDTO(
                 user.getId(),
                 user.getUsername(),

@@ -2,11 +2,13 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
@@ -16,12 +18,19 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 public class FileReadStatusRepository implements ReadStatusRepository {
-    private static final String FILE_PATH = "tmp/read_status.ser";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    private final String filePath;
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final Map<UUID, ReadStatus> readStatusData;
 
-    public FileReadStatusRepository() {
+    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+        if(!fileDirectory.endsWith("/")) {
+            fileDirectory += "/";
+        }
+        this.filePath = fileDirectory + "read_status.json";
+        ensureDirectoryExists(this.filePath);
         this.readStatusData = loadFromFile();
     }
 
@@ -94,30 +103,36 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         saveToFile();
     }
 
-
+    private void ensureDirectoryExists(String directoryPath) {
+        File directory = new File(directoryPath);
+        File parentDirectory = directory.getParentFile();
+        if (!parentDirectory.exists()) {
+            parentDirectory.mkdirs();
+        }
+    }
 
     private Map<UUID, ReadStatus> loadFromFile() {
-        File file = new File(FILE_PATH);
+        File file = new File(filePath);
         if (!file.exists()) {
             return new ConcurrentHashMap<>();
         }
-
         try {
-            return objectMapper.readValue(file, new TypeReference<Map<UUID, ReadStatus>>(){});
-        }catch (IOException e){
-            System.out.println(e.getMessage());
+            return objectMapper.readValue(file,
+                    new TypeReference<Map<UUID, ReadStatus>>(){});
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
             return new ConcurrentHashMap<>();
         }
     }
 
     private void saveToFile(){
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(readStatusData);
+        File file = new File(filePath);
+        try {
+           objectMapper.writeValue(file, readStatusData);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save read status data to file.", e);
         }
     }
-
 
 
 

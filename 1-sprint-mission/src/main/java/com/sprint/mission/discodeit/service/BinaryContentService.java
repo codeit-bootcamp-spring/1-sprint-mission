@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -35,7 +34,7 @@ public class BinaryContentService {
                 createDTO.messageId(),
                 createDTO.filename(),
                 "application/octet-stream",
-                createDTO.fileData()
+                createDTO.bytes()
         );
         binaryContentRepository.save(binaryContent);
 
@@ -51,14 +50,23 @@ public class BinaryContentService {
         return BinaryContentDTO.fromEntity(binaryContent);
     }
 
+
+
     public List<BinaryContentResponseDTO> findAllByIdIn(List<UUID> binaryContentIds){
         if(binaryContentIds.isEmpty()){
             return List.of();
         }
         return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
                 .map(BinaryContentResponseDTO::fromEntity)
-                .collect(Collectors.toList());
+                .toList();
     }
+
+    public List<BinaryContentResponseDTO> findAllByUserId(UUID userId){
+        return binaryContentRepository.findAllByUserId(userId).stream()
+                .map(BinaryContentResponseDTO::fromEntity)
+                .toList();
+    }
+
 
     public void delete(UUID binaryContentId){
         // id 기준 으로 조회
