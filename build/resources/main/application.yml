@@ -1,0 +1,12 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: discodeit
+  profiles:
+    active: "dev"
+
+logging:
+  level:
+    root: INFO
+    com.sprint.mission: DEBUG

@@ -5,9 +5,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public interface ReadStatusService {
-  ReadStatusDto createReadStatus(UUID paramUUID1, UUID paramUUID2);
-  ReadStatusDto findReadStatusById(UUID paramUUID);
-  ReadStatusDto findLastReadMessage(UUID paramUUID1, UUID paramUUID2);
-  void updateLastReadAt(UUID paramUUID, Instant paramInstant);
-  void deleteReadStatus(UUID paramUUID);
+  ReadStatusDto createReadStatus(UUID userId, UUID channelId, Instant lastReadAt);
+  ReadStatusDto findReadStatusById(UUID id);
+  ReadStatusDto findLastReadMessage(UUID userId, UUID channelId);
+  void updateLastReadAt(UUID id, Instant newTime);
+  void deleteReadStatus(UUID id);
 }
