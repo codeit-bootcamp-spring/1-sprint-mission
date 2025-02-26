@@ -5,62 +5,75 @@ import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.notfound.ResourceNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
-import com.sprint.mission.discodeit.validation.ValidateUserStatus;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
+import com.sprint.mission.discodeit.validation.UserStatusValidator;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
-    private final UserStatusRepository userStatusRepository;
-    private final ValidateUserStatus validateUserStatus;
 
-    @Override
-    public UserStatusDto create(UserStatusCreateRequest request) {
-        validateUserStatus.validateUserStatus(request.userId());
+  private final UserStatusRepository userStatusRepository;
+  private final UserStatusValidator userStatusValidator;
+  private final UserStatusMapper userStatusMapper;
 
-        UserStatus userStatus = new UserStatus(request.userId(), Instant.now());
-        userStatusRepository.save(userStatus);
-        return changeToDto(userStatus);
-    }
+  @Override
+  public UserStatusDto create(UserStatusCreateRequest request) {
+    UUID userId = request.userId();
+    Instant lastActiveAt = request.lastActiveAt();
 
-    @Override
-    public UserStatusDto findByUserId(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
-        return changeToDto(userStatus);
-    }
+    userStatusValidator.validateUser(userId);
 
-    @Override
-    public List<UserStatusDto> findAll() {
-        List<UserStatus> userStatuses = userStatusRepository.findAll();
-        return userStatuses.stream()
-                .map(this::changeToDto)
-                .collect(Collectors.toList());
-    }
+    UserStatus userStatus = new UserStatus(userId, lastActiveAt);
 
-    @Override
-    public UserStatusDto update(UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
-                .orElseThrow(() -> new ResourceNotFoundException("User status not found."));
-        userStatus.update(request.lastLoginTime());
-        userStatusRepository.save(userStatus);
-        return changeToDto(userStatus);
-    }
+    UserStatus createdUserStatus = userStatusRepository.save(userStatus);
+    return userStatusMapper.userStatusEntityToDto(createdUserStatus);
+  }
 
-    @Override
-    public void delete(UUID userId) {
-        userStatusRepository.deleteByUserId(userId);
-    }
+  @Override
+  public UserStatusDto findById(UUID userStatusId) {
+    return userStatusRepository.findById(userStatusId)
+        .map(userStatusMapper::userStatusEntityToDto)
+        .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
+  }
 
-    private UserStatusDto changeToDto(UserStatus userStatus) {
-        return new UserStatusDto(userStatus.getId(), userStatus.getUserId(), userStatus.getLastLoginTime(), userStatus.getCreatedAt(), userStatus.getUpdatedAt());
-    }
+  @Override
+  public List<UserStatusDto> findAll() {
+    return userStatusRepository.findAll().stream()
+        .map(userStatusMapper::userStatusEntityToDto)
+        .toList();
+  }
+
+  @Override
+  public UserStatusDto update(UUID userStatusId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(() -> new ResourceNotFoundException("User status not found: " + userStatusId));
+    Instant newLastActiveAt = request.newLastActiveAt();
+    userStatus.update(newLastActiveAt);
+    UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
+    return userStatusMapper.userStatusEntityToDto(updatedUserStatus);
+  }
+
+  @Override
+  public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException("User status not found: User id: " + userId));
+    Instant newLastActiveAt = request.newLastActiveAt();
+    userStatus.update(newLastActiveAt);
+    UserStatus updatedUserStatus = userStatusRepository.save(userStatus);
+    return userStatusMapper.userStatusEntityToDto(updatedUserStatus);
+  }
+
+  @Override
+  public void delete(UUID userStatusId) {
+    userStatusValidator.validateUserStatus(userStatusId);
+    userStatusRepository.deleteById(userStatusId);
+  }
 }

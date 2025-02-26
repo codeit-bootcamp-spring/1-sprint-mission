@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageDto(
-        UUID messageId,
-        UUID userId,
-        UUID channelId,
-        String message,
-        List<byte[]> content,
-        Instant createdAt,
-        Instant updatedAt
+    UUID messageId,
+    UUID authorId,
+    UUID channelId,
+    String message,
+    List<UUID> attachmentIds,
+
+    Instant createdAt,
+    Instant updatedAt
 ) {
+
 }

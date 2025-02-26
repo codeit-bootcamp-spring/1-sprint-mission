@@ -4,11 +4,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record ReadStatusDto(
-        UUID readStatusId,
-        UUID userId,
-        UUID channelId,
-        Instant lastReadTime,
-        Instant createdAt,
-        Instant updatedAt
+    UUID readStatusId,
+    UUID userId,
+    UUID channelId,
+    Instant lastReadTime,
+    Instant createdAt,
+    Instant updatedAt
 ) {
+
 }

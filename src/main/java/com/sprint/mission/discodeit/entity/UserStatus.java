@@ -1,43 +1,59 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
+import lombok.Getter;
 
+@Entity
 @Getter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
 
-    private UUID userId;
-    private Instant lastLoginTime;
+  @Id
+  private final UUID id;
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public UserStatus() {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  private UUID userId;
+  private Instant lastActiveAt;
+
+  public UserStatus() {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+  }
+
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    public UserStatus(UUID userId, Instant lastLoginTime) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userId = userId;
-        this.lastLoginTime = lastLoginTime;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public void update(Instant lastLoginTime){
-        this.lastLoginTime = lastLoginTime;
-        this.updatedAt = Instant.now();
-    }
+  @JsonProperty("online")
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-    public boolean isOnline(){
-        Instant now = Instant.now();
-        return lastLoginTime != null && Duration.between(lastLoginTime, now).toMinutes() <= 5;
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }

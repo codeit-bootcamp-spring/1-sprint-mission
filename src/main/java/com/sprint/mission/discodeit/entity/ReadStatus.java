@@ -1,39 +1,51 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
+@Entity
 @Getter
 public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
 
-    private UUID userId;
-    private UUID channelId;
-    private Instant lastReadTime;
+  @Id
+  private final UUID id;
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public ReadStatus() {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt;
+
+  public ReadStatus() {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+  }
+
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
+
+
+  public void update(Instant newLastReadAt) {
+    boolean anyValueUpdated = false;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
+      anyValueUpdated = true;
     }
 
-    public ReadStatus(UUID userId, UUID channelId){
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadTime = Instant.now();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    public void update(Instant readTime){
-        this.lastReadTime = readTime;
-        this.updatedAt = Instant.now();
-    }
+  }
 }
