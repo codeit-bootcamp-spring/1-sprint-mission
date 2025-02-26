@@ -48,13 +48,12 @@ public class BasicUserStatusService implements UserStatusService {
     // UserStatus의 id기준으로 바꾸는 것으로 이해
     UserStatus userStatus =
         userStatusRepository.findById(userStatusUpdateRequest.UserStatusId())
-            .orElseGet(() -> {
-              System.out.println("No " + userStatusUpdateRequest.UserStatusId() + " UserStatus");
-              return null;
-            });
+            .orElseThrow(() -> new NoSuchElementException(
+                "UserStatus(" + userStatusUpdateRequest.UserStatusId() + ")가 없습니다."));
 
     userStatus.refreshLastConnectAt(userStatusUpdateRequest.lastConnectTime());
     userStatus.refreshUpdateAt();
+    userStatusRepository.save(userStatus);
     return userStatus;
   }
 
@@ -65,8 +64,9 @@ public class BasicUserStatusService implements UserStatusService {
         userStatusRepository.findByUserId(userId)
             .orElseThrow(() -> new NoSuchElementException("userStatus가 존재하지 않습니다."));
 
-    userStatus.refreshLastConnectAt(userStatusUpdateByUserIdRequest.lastConnectAt());
+    userStatus.refreshLastConnectAt(userStatusUpdateByUserIdRequest.newLastActiveAt());
     userStatus.refreshUpdateAt();
+    userStatusRepository.save(userStatus);
     return userStatus;
   }
 

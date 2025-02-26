@@ -5,8 +5,8 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 
-public record ChannelPrivateRequest (
-        ChannelType type,
-        UUID ownerId
-){
+public record ChannelPrivateRequest(
+    UUID ownerId
+) {
+
 }

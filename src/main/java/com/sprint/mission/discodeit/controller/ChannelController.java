@@ -44,7 +44,7 @@ public class ChannelController {
   // 제가 느끼기에는 확장성은 조금 부족할지라도, 엔드포인트를 통해 public 채널인지 private 채널인지 확실히 구분할 수 있어 보여 좋아보이는데
   // 위와 같은 엔드 포인트를 사용했을 때의 단점도 궁금합니다!(public, prviate 뿐만 아니라 type 더 추가되면 더 복잡해진다거나)
   // 무엇보다 Public 채널을 업데이트하는 건데 엔드 포인트에 public이 붙지 않는 것도 고민되는 부분입니다.
-  @PutMapping(value = "/{channelId}")
+  @PatchMapping(value = "/{channelId}")
   public ResponseEntity<Channel> updatePublicChannel(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateRequest channelUpdateRequest) {
     return ResponseEntity.ok(channelService.updateChannel(channelId, channelUpdateRequest));

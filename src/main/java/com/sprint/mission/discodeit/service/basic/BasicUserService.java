@@ -60,8 +60,9 @@ public class BasicUserService implements UserService {
         profileImgId);
     userRepository.saveUser(user);
 
-    UserStatusCreateRequest userStatusCreateRequest = new UserStatusCreateRequest(user.getId(),
-        Instant.now());
+    UserStatusCreateRequest userStatusCreateRequest =
+        new UserStatusCreateRequest(user.getId(),
+            Instant.now());
     // UserStatus 도메인 객체 생성
     userStatusService.createUserStatus(userStatusCreateRequest);
 
