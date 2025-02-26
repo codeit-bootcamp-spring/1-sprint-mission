@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserData {
 
     // 싱글톤 패턴 사용 시 Stateful하면 여러 스레드 작동 시 동기화 문제 발생 가능 -> Stateless 상태 유지 필요
-        // Stateful : 여러 클래스가 접근해서 변경할 수 있는 필드(멤버 변수)가 있는 것
+    // Stateful : 여러 클래스가 접근해서 변경할 수 있는 필드(멤버 변수)가 있는 것
     // ConcurrentHashMap의 경우 put이나 remove 등의 값 수정 메서드의 경우 synchronized 키워드를 사용해 Thread-safe를 보장
     private final Map<UUID, User> users = new ConcurrentHashMap<>();
 
@@ -26,7 +26,7 @@ public class UserData {
 
         return userData;
     }
-    
+
     public void put(User user) {
 
         users.put(user.getId(), user);

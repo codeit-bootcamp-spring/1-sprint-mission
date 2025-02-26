@@ -1,17 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.channelDto.CreatePrivateChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channelDto.CreatePublicChannelRequestDto;
-import com.sprint.mission.discodeit.dto.channelDto.FindChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channelDto.FindPrivateChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channelDto.FindPublicChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channelDto.UpdatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.FindPrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.FindPublicChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.event.ChannelDeletedEvent;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -26,9 +24,7 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
-    private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
-
 
     // 채널 생성
     // 퍼블릭
@@ -48,13 +44,15 @@ public class BasicChannelService implements ChannelService {
 
     // 프라이빗
     @Override
-    public void createPrivate(CreatePrivateChannelRequestDto createPrivateChannelRequestDto) {
+    public UUID createPrivate(CreatePrivateChannelRequestDto createPrivateChannelRequestDto) {
 
-        User user = createPrivateChannelRequestDto.user();
+        UUID ownerId = createPrivateChannelRequestDto.ownerId();
 
-        Channel channel = new Channel(user);
+        Channel channel = new Channel(ownerId);
 
         channelRepository.save(channel);
+
+        return channel.getId();
     }
 
     // 읽기
@@ -64,9 +62,9 @@ public class BasicChannelService implements ChannelService {
 
         Channel channel = channelRepository.load().get(id);
         if (channel.isPublic()) {
-            return new FindPublicChannelResponseDto(channel);
+            return FindPublicChannelResponseDto.fromEntity(channel);
         } else {
-            return new FindPrivateChannelResponseDto(channel);
+            return FindPrivateChannelResponseDto.fromEntity(channel);
         }
     }
 
@@ -77,9 +75,9 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.load().values().stream()
                 .map(channel -> {
                     if (channel.isPublic()) {
-                        return new FindPublicChannelResponseDto(channel);
+                        return FindPublicChannelResponseDto.fromEntity(channel);
                     } else if (channel.getMembers().contains(userId)) {
-                        return new FindPrivateChannelResponseDto(channel);
+                        return FindPrivateChannelResponseDto.fromEntity(channel);
                     } else {
                         return null;
                     }
@@ -89,11 +87,11 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public void updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
+    public FindChannelResponseDto updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
 
-        if (updatePublicChannelRequestDto.isPublic()) {
-            Channel updateChannel = channelRepository.load().get(updatePublicChannelRequestDto.id());
+        Channel updateChannel = channelRepository.load().get(updatePublicChannelRequestDto.id());
 
+        if (updateChannel.isPublic()) {
             String updateCategory = updatePublicChannelRequestDto.updateCategory();
             String updateName = updatePublicChannelRequestDto.updateName();
             String updateExplanation = updatePublicChannelRequestDto.updateExplanation();
@@ -103,7 +101,11 @@ public class BasicChannelService implements ChannelService {
             updateChannel.updateExplanation(updateExplanation);
 
             channelRepository.save(updateChannel);
+
+            return find(updateChannel.getId());
         }
+
+        throw new IllegalArgumentException("채널이 존재하지 않습니다.");
     }
 
     @Override

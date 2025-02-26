@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatusDto.FindUserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -58,7 +59,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public void updateByUserId(UUID userId) {
+    public FindUserResponseDto updateByUserId(UUID userId) {
         User user = userRepository.load().get(userId);
 
         UserStatus userStatus = user.getUserStatus();
@@ -66,6 +67,8 @@ public class BasicUserStatusService implements UserStatusService {
 
         userStatusRepository.save(userStatus);
         userRepository.save(user);
+
+        return FindUserResponseDto.fromEntity(user);
     }
 
     @Override

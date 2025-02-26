@@ -12,7 +12,8 @@ public class MessageData {
     private final Map<UUID, Message> messages = new ConcurrentHashMap<>();
     private static MessageData messageData;
 
-    private MessageData(){};
+    private MessageData() {
+    }
 
     public static MessageData getInstance() {
 

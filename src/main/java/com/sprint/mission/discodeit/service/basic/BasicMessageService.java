@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.messageDto.CreateMessageRequestDto;
-import com.sprint.mission.discodeit.dto.messageDto.FindMessageResponseDto;
-import com.sprint.mission.discodeit.dto.messageDto.UpdateMessageRequestDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.binarycontent.CreateBinaryContentRequestDto;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.event.MessageDeletedEvent;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.util.FilePathContents;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,10 +30,12 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final ChannelService channelService;
+    private final UserService userService;
+    private final BinaryContentService binaryContentService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public UUID create(CreateMessageRequestDto createMessageRequestDto) throws IOException {
+    public FindMessageResponseDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException {
 
         UUID channelId = createMessageRequestDto.channelId();
         UUID writerId = createMessageRequestDto.writerId();
@@ -40,10 +43,11 @@ public class BasicMessageService implements MessageService {
         List<MultipartFile> images = createMessageRequestDto.images();
 
         List<UUID> imagesId = new ArrayList<>();
-        if (images != null){
+        if (!images.isEmpty()){
             for (MultipartFile image : images) {
-                BinaryContent a = new BinaryContent(image, FilePathContents.MESSAGEIMAGE_DIR);
-                imagesId.add(a.getId());
+                CreateBinaryContentRequestDto createBinaryContentRequestDto = new CreateBinaryContentRequestDto(image, FilePathContents.MESSAGEIMAGE_DIR);
+                UUID imageId = binaryContentService.create(createBinaryContentRequestDto);
+                imagesId.add(imageId);
             }
         }
 
@@ -51,7 +55,7 @@ public class BasicMessageService implements MessageService {
 
         messageRepository.save(message);
 
-        return message.getId();
+        return FindMessageResponseDto.fromEntity(message);
     }
 
     @Override
@@ -61,7 +65,7 @@ public class BasicMessageService implements MessageService {
 
         Message message = messageRepository.load().get(id);
 
-        return new FindMessageResponseDto(message);
+        return FindMessageResponseDto.fromEntity(message);
     }
 
     @Override
@@ -70,18 +74,32 @@ public class BasicMessageService implements MessageService {
         channelService.channelIsExist(channelID);
 
         return messageRepository.load().values().stream()
-                .map(FindMessageResponseDto::new)
+                .filter(message -> message.getChannelId().equals(channelID))
+                .map(FindMessageResponseDto::fromEntity)
                 .toList();
     }
 
     @Override
-    public void updateContext(UpdateMessageRequestDto updateMessageRequestDto) {
+    public List<FindMessageResponseDto> findAllByUserId(UUID userId) {
+
+        userService.userIsExist(userId);
+
+        return messageRepository.load().values().stream()
+                .filter(message -> message.getWriterId().equals(userId))
+                .map(FindMessageResponseDto::fromEntity)
+                .toList();
+    }
+
+    @Override
+    public FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto) {
 
         Message message = messageRepository.load().get(updateMessageRequestDto.id());
 
         message.updateContext(updateMessageRequestDto.context());
 
         messageRepository.save(message);
+
+        return FindMessageResponseDto.fromEntity(message);
     }
 
     @Override

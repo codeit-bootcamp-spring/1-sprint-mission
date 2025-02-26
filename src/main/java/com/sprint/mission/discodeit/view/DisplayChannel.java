@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.view;
 
-import com.sprint.mission.discodeit.dto.channelDto.FindChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.Comparator;

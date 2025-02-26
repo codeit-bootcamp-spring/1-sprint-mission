@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface UserRepository {
     // 저장
     void save(User user);
-    
+
     // 불러오기
     Map<UUID, User> load();
 

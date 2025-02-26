@@ -54,35 +54,35 @@ public class User implements Serializable {             // 유저 정보
 
     // update 함수
     public void updateEmail(String updateEmail) {
-        if (updateEmail != null){       // 수정 시에는 null 들어올 시 IllegalArgumentException이 뜨지 않고, 메서드가 무시되도록 하기 위해 if문 작성
+        if (!updateEmail.isBlank()){       // 수정 시에는 null 들어올 시 IllegalArgumentException이 뜨지 않고, 메서드가 무시되도록 하기 위해 if문 작성
             this.email = new Email(updateEmail);
             updateUpdateAt();
         }
     }
 
     public void updatePassword(String updatePassword) {
-        if (updatePassword != null){
+        if (!updatePassword.isBlank()){
             this.password = new Password(updatePassword);
             updateUpdateAt();
         }
     }
 
     public void updateName(String updateName) {
-        if (updateName != null){
+        if (!updateName.isBlank()){
             validationAndSetName(updateName);
             updateUpdateAt();
         }
     }
 
     public void updateNickname(String updateNickname) {
-        if (updateNickname != null){
+        if (!updateNickname.isBlank()){
             validationAndSetNickname(updateNickname);
             updateUpdateAt();
         }
     }
 
     public void updatePhoneNumber(String updatePhoneNumber) {
-        if (updatePhoneNumber != null){
+        if (!updatePhoneNumber.isBlank()){
             this.phoneNumber = new PhoneNumber(updatePhoneNumber);
             updateUpdateAt();
         }

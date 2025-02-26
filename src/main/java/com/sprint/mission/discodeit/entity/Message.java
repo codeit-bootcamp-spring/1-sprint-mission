@@ -43,8 +43,8 @@ public class Message implements Serializable {                  // 메시지 (�
         updateUpdateAt();
     }
 
-    public void updateAttachedImageId(List<UUID> attachedImagesId) {
-        this.imagesId = attachedImagesId;
+    public void updateImagesId(List<UUID> imagesId) {
+        this.imagesId = this.imagesId;
     }
 
     public void updateUpdateAt(){

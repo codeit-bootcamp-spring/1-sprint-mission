@@ -12,7 +12,10 @@ public class ChannelData {
     private final Map<UUID, Channel> channels = new ConcurrentHashMap<>();
     private static ChannelData channelData;
 
-    private ChannelData() {};
+    private ChannelData() {
+    }
+
+    ;
 
     public static ChannelData getInstance() {
 
