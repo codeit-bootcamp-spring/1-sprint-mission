@@ -11,7 +11,9 @@ public record UserResponse(
         String username,
         String email,
         boolean isCurrentlyLoggedIn,
-        Instant createdAt
+        Instant createdAt,
+        UUID profileImageId
+
 ) {
     public static UserResponse from(User user, UserStatus status) {
         return new UserResponse(
@@ -19,7 +21,8 @@ public record UserResponse(
                 user.getUsername(),
                 user.getEmail(),
                 status.isCurrentlyLoggedIn(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                user.getProfileId()
         );
     }
 }

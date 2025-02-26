@@ -97,3 +97,15 @@
 //        consoleView.displayMessages(messages, channels);
 //    }
 //}
+
+package com.sprint.mission.discodeit;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class JavaApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(JavaApplication.class, args);
+    }
+}
