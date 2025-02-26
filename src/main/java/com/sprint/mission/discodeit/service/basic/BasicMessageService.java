@@ -1,66 +1,105 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.logger.service.ServiceLogger;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
-public class BasicMessageService {
+@RequiredArgsConstructor
+@Service
+public class BasicMessageService implements MessageService {
 
-    private static final ServiceLogger logger = ServiceLogger.getInstance();
+  private final MessageRepository messageRepository;
+  //
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    public static Message setupMessage(MessageService messageService, Message messageInfoToCreate) {
-        printStartInfo("setupMessage(MessageService, Message)");
+  @Override
+  public Message create(MessageCreateRequest messageCreateRequest,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    UUID channelId = messageCreateRequest.channelId();
+    UUID authorId = messageCreateRequest.authorId();
 
-        Message message = messageService.registerMessage(messageInfoToCreate);
-
-        printArgsAndMessageInfo(messageInfoToCreate.getId(), message, "Already exist!");
-
-        return message;
+    if (!channelRepository.existsById(channelId)) {
+      throw new ChannelNotFoundException("Channel with id " + channelId + " does not exist");
+    }
+    if (!userRepository.existsById(authorId)) {
+      throw new UserNotFoundException("Author with id " + authorId + " does not exist");
     }
 
-    public static Message updateMessage(MessageService messageService, UUID key,
-        Message messageInfoToUpdate) {
-        printStartInfo("updateMessage(MessageService, UUID, Message)");
+    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+        .map(attachmentRequest -> {
+          BinaryContent binaryContent = getBinaryContent(attachmentRequest);
+          return binaryContentRepository.save(binaryContent).getId();
+        })
+        .toList();
 
-        Message message = messageService.updateMessageById(key, messageInfoToUpdate);
+    String content = messageCreateRequest.content();
+    Message message = Message.createMessage(
+        content,
+        channelId,
+        authorId,
+        attachmentIds
+    );
+    return messageRepository.save(message);
+  }
 
-        printArgsAndMessageInfo(key, message, "Not exist!");
+  private static BinaryContent getBinaryContent(BinaryContentCreateRequest attachmentRequest) {
+    String fileName = attachmentRequest.fileName();
+    String contentType = attachmentRequest.contentType();
+    byte[] bytes = attachmentRequest.bytes();
+    return BinaryContent.createBinaryContent(
+        fileName, (long) bytes.length, contentType, bytes);
+  }
 
-        return message;
-    }
+  @Override
+  public Message find(UUID messageId) {
+    return messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new MessageNotFoundException("Message with id " + messageId + " not found"));
+  }
 
-    public static Message searchMessage(MessageService messageService, UUID key) {
-        printStartInfo("searchMessage(MessageService, UUID)");
+  @Override
+  public List<Message> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannelId(channelId).stream()
+        .toList();
+  }
 
-        Message message = messageService.searchMessageById(key);
+  @Override
+  public Message update(UUID messageId, MessageUpdateRequest request) {
+    String newContent = request.content();
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new MessageNotFoundException("Message with id " + messageId + " not found"));
+    Message updatedMessage = message.update(newContent);
+    return messageRepository.save(updatedMessage);
+  }
 
-        printArgsAndMessageInfo(key, message, "Not exist!");
+  @Override
+  public void delete(UUID messageId) {
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(
+            () -> new MessageNotFoundException("Message with id " + messageId + " not found"));
 
-        return message;
-    }
+    message.getAttachmentIds()
+        .forEach(binaryContentRepository::deleteById);
 
-    public static Message removeMessage(MessageService messageService, UUID key) {
-        printStartInfo("removeMessage(MessageService, UUID)");
-
-        Message message = messageService.deleteMessageById(key);
-
-        printArgsAndMessageInfo(key, message, "Not exist!");
-
-        return message;
-    }
-
-    private static void printStartInfo(String startInfo) {
-        logger.info("---------------------------------");
-        logger.info(startInfo);
-    }
-
-    private static void printArgsAndMessageInfo(UUID key, Message message,
-        String messageWhenEmpty) {
-        logger.info("pass UUID '" + key + "'! ");
-        if (message == Message.EMPTY_MESSAGE) {
-            logger.info(messageWhenEmpty);
-        }
-        logger.info("Message info: " + message);
-    }
+    messageRepository.deleteById(messageId);
+  }
 }

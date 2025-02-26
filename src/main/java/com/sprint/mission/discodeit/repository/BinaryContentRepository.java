@@ -2,15 +2,18 @@ package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentRepository {
 
-    BinaryContent createBinaryContent(BinaryContent binaryContentToCreate);
+    BinaryContent save(BinaryContent binaryContent);
 
-    BinaryContent findBinaryContentById(UUID key);
+    Optional<BinaryContent> findById(UUID id);
 
-    List<BinaryContent> findAllBinaryContentByIdIn(List<UUID> keys);
+    List<BinaryContent> findAllByIdIn(List<UUID> ids);
 
-    BinaryContent deleteBinaryContentById(UUID key);
+    boolean existsById(UUID id);
+
+    void deleteById(UUID id);
 }

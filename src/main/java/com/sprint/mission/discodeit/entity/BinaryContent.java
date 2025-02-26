@@ -1,46 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_TIME;
-import static com.sprint.mission.discodeit.constant.StringConstant.EMPTY_UUID;
-
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.experimental.Accessors;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@Accessors(fluent = true)
-public class BinaryContent {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class BinaryContent implements Serializable {
 
-    /**
-     * Field: {@code EMPTY_BINARY_CONTENT} is literally empty static BinaryContent object
-     */
-    public static final BinaryContent EMPTY_BINARY_CONTENT;
+    @Serial
+    private static final long serialVersionUID = -2633871231984110000L;
+
     private final UUID id;
-    private final Instant createAt;
-    private final Instant updateAt;
+    private final Instant createdAt;
+    //
+    private final String fileName;
+    private final Long size;
+    private final String contentType;
+    private final byte[] bytes;
 
-    static {
-        EMPTY_BINARY_CONTENT = new BinaryContent(
-            UUID.fromString(EMPTY_UUID.getValue()),
-            Instant.parse(EMPTY_TIME.getValue()),
-            Instant.parse(EMPTY_TIME.getValue())
-        );
+    public static BinaryContent createBinaryContent(String fileName, Long size, String contentType,
+        byte[] bytes) {
+        return new BinaryContent(UUID.randomUUID(), Instant.now(), fileName, size, contentType,
+            bytes);
     }
-
-    public static BinaryContent createBinaryContent() {
-        return new BinaryContent(UUID.randomUUID(), Instant.now(), Instant.now());
-    }
-
-    public static BinaryContent createBinaryContent(UUID id) {
-        return new BinaryContent(id, Instant.now(), Instant.now());
-    }
-
-    public static BinaryContent createBinaryContent(UUID id, Instant createAt, Instant updateAt) {
-        return new BinaryContent(id, createAt, updateAt);
-    }
-
 }

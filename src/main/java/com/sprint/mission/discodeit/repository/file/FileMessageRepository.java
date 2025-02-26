@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import static com.sprint.mission.discodeit.constant.ExitStatus.DIR_CREATION_ERROR;
-
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.logger.repository.RepositoryLogger;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,130 +10,111 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
 public class FileMessageRepository implements MessageRepository {
 
-    private static final RepositoryLogger logger = RepositoryLogger.getInstance();
-    private static final Path FILE_DIR = Paths.get(System.getProperty("user.dir"), "file",
-        "message");
-    private static final String FILE_EXT = ".ser";
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    static {
-        if (!Files.exists(FILE_DIR)) {
+    public FileMessageRepository(
+        @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+            Message.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
             try {
-                Files.createDirectories(FILE_DIR);
+                Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
-                System.err.println("Failed to mkdir: " + e.getMessage());
-                System.exit(DIR_CREATION_ERROR.ordinal());
+                throw new RuntimeException(e);
             }
         }
     }
 
-    /**
-     * Create the Message while ignoring the {@code createAt} and {@code updateAt} fields from
-     * {@code messageInfoToCreate}
-     */
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
+    }
+
     @Override
-    public Message createMessage(Message messageInfoToCreate) {
-        Path filePath = getFilePath(messageInfoToCreate.getId());
-        if (Files.exists(filePath)) {
-            return Message.EMPTY_MESSAGE;
-        }
-
+    public Message save(Message message) {
+        Path path = resolvePath(message.getId());
         try (
-            FileOutputStream fos = new FileOutputStream(filePath.toFile());
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            FileOutputStream fos = new FileOutputStream(path.toFile());
+            ObjectOutputStream oos = new ObjectOutputStream(fos)
         ) {
-            Message messageToCreate = Message.createMessage(
-                messageInfoToCreate.getId(),
-                messageInfoToCreate.getContent()
-            );
-
-            oos.writeObject(messageToCreate);
-            return messageToCreate;
+            oos.writeObject(message);
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Message.EMPTY_MESSAGE;
+        return message;
     }
 
     @Override
-    public Message findMessageById(UUID key) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Message.EMPTY_MESSAGE;
+    public Optional<Message> findById(UUID id) {
+        Message messageNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                messageNullable = (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-        try (
-            FileInputStream fis = new FileInputStream(filePath.toFile());
-            ObjectInputStream ois = new ObjectInputStream(fis);
-        ) {
-            return (Message) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            logger.severe(e);
-
-        }
-
-        return Message.EMPTY_MESSAGE;
+        return Optional.ofNullable(messageNullable);
     }
 
-    /**
-     * Update the Message while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields
-     * from {@code messageInfoToUpdate}
-     */
     @Override
-    public Message updateMessageById(UUID key, Message messageInfoToUpdate) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Message.EMPTY_MESSAGE;
-        }
-
-        Message existingMessage = findMessageById(key);
-        try (
-            FileOutputStream fis = new FileOutputStream(filePath.toFile());
-            ObjectOutputStream ois = new ObjectOutputStream(fis);
-        ) {
-            Message messageToUpdate = Message.createMessage(
-                key,
-                existingMessage.getCreateAt(),
-                messageInfoToUpdate.getContent()
-            );
-
-            ois.writeObject(messageToUpdate);
-            return messageToUpdate;
+    public List<Message> findAllByChannelId(UUID channelId) {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                .filter(path -> path.toString().endsWith(EXTENSION))
+                .map(path -> {
+                    try (
+                        FileInputStream fis = new FileInputStream(path.toFile());
+                        ObjectInputStream ois = new ObjectInputStream(fis)
+                    ) {
+                        return (Message) ois.readObject();
+                    } catch (IOException | ClassNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Message.EMPTY_MESSAGE;
     }
 
     @Override
-    public Message deleteMessageById(UUID key) {
-        Path filePath = getFilePath(key);
-        if (!Files.exists(filePath)) {
-            return Message.EMPTY_MESSAGE;
-        }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
 
-        Message exsitingMessage = findMessageById(key);
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
         try {
-            Files.delete(filePath);
-            return exsitingMessage;
+            Files.delete(path);
         } catch (IOException e) {
-            logger.severe(e);
-
+            throw new RuntimeException(e);
         }
-
-        return Message.EMPTY_MESSAGE;
     }
 
-    private Path getFilePath(UUID key) {
-        return FILE_DIR.resolve(key.toString().concat(FILE_EXT));
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+            .forEach(message -> this.deleteById(message.getId()));
     }
 }

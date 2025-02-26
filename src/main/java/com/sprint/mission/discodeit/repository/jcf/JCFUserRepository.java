@@ -2,62 +2,61 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFUserRepository implements UserRepository {
     private final Map<UUID, User> data;
 
     public JCFUserRepository() {
-        data = new HashMap<>();
-    }
-
-    /**
-     * Create the User while ignoring the {@code createAt} and {@code updateAt} fields from {@code userInfoToCreate}
-     */
-    @Override
-    public User createUser(User userInfoToCreate) {
-        User userToCreate = new User.Builder(
-                userInfoToCreate.getName(), userInfoToCreate.getEmail())
-                .id(userInfoToCreate.getId())
-                .phoneNumber(userInfoToCreate.getPhoneNumber())
-                .build();
-
-        return Optional.ofNullable(data.putIfAbsent(userToCreate.getId(), userToCreate))
-                .map(existingUser -> User.createEmptyUser())
-                .orElse(userToCreate);
+        this.data = new ConcurrentHashMap<>();
     }
 
     @Override
-    public User findUserById(UUID key) {
-        return Optional.ofNullable(data.get(key))
-                .orElse(User.createEmptyUser());
-    }
-
-    /**
-     * Update the User while ignoring the {@code id}, {@code createAt}, {@code updateAt} fields from {@code userInfoToUpdate}
-     */
-    @Override
-    public User updateUserById(UUID key, User userInfoToUpdate) {
-        User exsitingUser = findUserById(key);
-        User userToUpdate = new User.Builder(
-                userInfoToUpdate.getName(), userInfoToUpdate.getEmail())
-                .id(key)
-                .createAt(exsitingUser.getCreateAt())
-                .phoneNumber(userInfoToUpdate.getPhoneNumber())
-                .build();
-
-        return Optional.ofNullable(data.computeIfPresent(
-                        key, (id, user) -> userToUpdate))
-                .orElse(User.createEmptyUser());
+    public User save(User user) {
+        this.data.put(user.getId(), user);
+        return user;
     }
 
     @Override
-    public User deleteUserById(UUID key) {
-        return Optional.ofNullable(data.remove(key))
-                .orElse(User.createEmptyUser());
+    public Optional<User> findById(UUID id) {
+        return Optional.ofNullable(this.data.get(id));
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return this.findAll().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.data.remove(id);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
     }
 }
