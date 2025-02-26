@@ -107,14 +107,24 @@ public class BasicChannelService implements ChannelService {
     return channelResponseDtos;
   }
 
-    @Override
-    public ChannelResponseDto findById(String channelId) throws CustomException {
-        //todo - private는 채널 구성원들만 조회할 수 있도록 수정
-        //그러면 조회하는 사람 id도 파라미터로 필요함!
-        Channel channel = channelRepository.findById(channelId);
-        if (channel == null) {
-            throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
-        }
+  @Override
+  public List<MessageResponseDto> findAllMessagesByChannelId(String channelId) {
+    Channel channel = channelRepository.findById(channelId);
+    if (channel == null) {
+      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+    }
+    return messageRepository.findAllByChannelId(channelId).stream().map(MessageResponseDto::from)
+        .toList();
+  }
+
+  @Override
+  public ChannelResponseDto findById(String channelId) throws CustomException {
+    //todo - private는 채널 구성원들만 조회할 수 있도록 수정
+    //그러면 조회하는 사람 id도 파라미터로 필요함!
+    Channel channel = channelRepository.findById(channelId);
+    if (channel == null) {
+      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+    }
 
     List<String> userIds = (channel.getChannelType() == ChannelType.PRIVATE ? channel.getUserSet()
         .stream().toList() : null);
