@@ -3,8 +3,6 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -13,8 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Repository
-@Scope("singleton")
-@Profile("jcf")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data;
 
@@ -36,6 +33,18 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         return data.values().stream().toList();
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.data.values().stream()
+                .filter(message -> message.isSameChannelId(channelId)).toList();
+    }
+
+    @Override
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        return this.data.values().stream()
+                .filter(message -> message.isSameAuthorId(authorId)).toList();
     }
 
     @Override

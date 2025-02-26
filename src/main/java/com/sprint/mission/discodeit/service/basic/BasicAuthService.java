@@ -1,31 +1,26 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.LoginDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
 @Service
-@Scope("singleton")
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private final UserService userService;
     private final UserRepository userRepository;
 
     @Override
-    public UserResponseDto login(LoginDto loginDto) {
-        User user = userRepository.findByName(loginDto.name());
-        if (user == null || !user.isSamePassword(loginDto.password())) {
+    public User login(LoginRequest loginRequest) {
+        User user = userRepository.findByName(loginRequest.name());
+        if (user == null || !user.isSamePassword(loginRequest.password())) {
             throw new NoSuchElementException("[ERROR] 잘못된 정보입니다.");
         }
 
-        return userService.getUserInfo(user);
+        return user;
     }
 }

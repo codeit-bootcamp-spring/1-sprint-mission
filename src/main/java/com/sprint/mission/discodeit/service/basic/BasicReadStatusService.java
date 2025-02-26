@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Scope("singleton")
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
@@ -26,22 +24,22 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateDto readStatusDto) {
-        if (!channelRepository.existsById(readStatusDto.channelId())) {
+    public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
+        if (!channelRepository.existsById(readStatusCreateRequest.channelId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
-        if (!userRepository.existsById(readStatusDto.userId())) {
+        if (!userRepository.existsById(readStatusCreateRequest.userId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
 
-        findAllByUserId(readStatusDto.userId())
+        findAllByUserId(readStatusCreateRequest.userId())
                 .forEach(readStatus -> {
-                    if (readStatus.isSameChannelId(readStatusDto.channelId())) {
+                    if (readStatus.isSameChannelId(readStatusCreateRequest.channelId())) {
                         throw new IllegalArgumentException("[ERROR] 이미 존재하는 데이터입니다.");
                     }
                 });
 
-        return readStatusRepository.save(new ReadStatus(readStatusDto.channelId(), readStatusDto.userId()));
+        return readStatusRepository.save(new ReadStatus(readStatusCreateRequest.channelId(), readStatusCreateRequest.userId()));
     }
 
     @Override
@@ -56,10 +54,10 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateDto readStatusUpdateDto) {
-        ReadStatus readStatus = find(readStatusUpdateDto.id());
-        readStatus.updateUpdatedAt();
-        return readStatus;
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
+        ReadStatus readStatus = find(readStatusId);
+        readStatus.update(readStatusUpdateRequest.lastReadAt());
+        return readStatusRepository.save(readStatus);
     }
 
     @Override

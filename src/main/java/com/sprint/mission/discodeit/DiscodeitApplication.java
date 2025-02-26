@@ -1,47 +1,12 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequestDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.validator.ChannelValidator;
-import com.sprint.mission.discodeit.validator.MessageValidator;
-import com.sprint.mission.discodeit.validator.UserValidator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 @SpringBootApplication
 public class DiscodeitApplication {
+	/*
 	static void userCRUDTest(UserService userService) {
 		// 생성
 		UserResponseDto userResponseDto = userService.create(new UserCreateRequestDto("user1", "user1@codeit.kr", "1234", null),
@@ -68,7 +33,7 @@ public class DiscodeitApplication {
 		System.out.println("PUBLIC 채널");
 
 		// 생성
-		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+		ChannelResponseDto channelResponseDto = channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "description", null));
 		System.out.println("채널 생성");
 		System.out.println(channelResponseDto);
 		// 조회
@@ -151,17 +116,19 @@ public class DiscodeitApplication {
 	}
 
 	static ChannelResponseDto setupPublicChannel(ChannelService channelService) {
-		return channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "introduction", null));
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PUBLIC, "channel", "description", null));
 	}
 
 	static ChannelResponseDto setupPrivateChannel(ChannelService channelService, UserResponseDto userResponseDto) {
-		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "introduction",
+		return channelService.create(new ChannelCreateRequestDto(ChannelType.PRIVATE, "channel", "description",
 				new ArrayList<>(Collections.singleton(userResponseDto.id()))));
 	}
 
+	 */
+
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-
+/*
 		// 서비스 초기화
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
@@ -181,6 +148,7 @@ public class DiscodeitApplication {
 		// 파일 지우기
 //        userService.delete(user.getId());
 //        channelService.delete(channel.getId());
+ */
 	}
 
 }

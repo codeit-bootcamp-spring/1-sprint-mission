@@ -1,30 +1,29 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
-import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.OnlineStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Scope("singleton")
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
@@ -34,20 +33,24 @@ public class BasicUserService implements UserService {
     private final UserStatusService userStatusService;
 
     @Override
-    public UserResponseDto create(UserCreateRequestDto userRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
-        validator.validate(userRequestDto.name(), userRequestDto.email());
-        validateDuplicateName(userRequestDto.name());
-        validateDuplicateEmail(userRequestDto.email());
+    public User create(UserCreateRequest userRequest, Optional<BinaryContentRequest> binaryContentRequest) {
+        validator.validate(userRequest.name(), userRequest.email());
+        validateDuplicateName(userRequest.name());
+        validateDuplicateEmail(userRequest.email());
 
-        BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
-        User user = userRepository.save(new User(binaryContent.getId(), userRequestDto.name(), userRequestDto.email(), userRequestDto.password()));
-        UserStatus userStatus = userStatusService.create(UserStatusCreateDto.from(user.getId()));
+        UUID binaryContentId = binaryContentRequest
+                .map(binaryContentService::create)
+                .map(BinaryContent::getId)
+                .orElse(null);
+        User user = userRepository.save(new User(binaryContentId, userRequest.name(), userRequest.email(), userRequest.password()));
+        userStatusService.create(UserStatusCreateRequest.from(user.getId()));
 
-        return UserResponseDto.from(user, binaryContent, userStatus.calculateOnlineStatus());
+        return user;
     }
 
+
     @Override
-    public UserResponseDto find(UUID userId) {
+    public UserResponse find(UUID userId) {
         User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
@@ -55,7 +58,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserResponseDto> findAll() {
+    public List<UserResponse> findAll() {
         List<User> users = userRepository.findAll();
 
         return users.stream()
@@ -64,27 +67,32 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto getUserInfo(User user) {
-        BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+    public UserResponse getUserInfo(User user) {
+        UUID binaryContentId = null;
+        String fileUrl = null;
+        if (user.getBinaryContentId() != null) {
+            BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+            binaryContentId = binaryContent.getId();
+            fileUrl = binaryContent.generateImageUrl();
+        }
         OnlineStatus onlineStatus = userStatusService.getOnlineStatus(user.getId());
 
-        return UserResponseDto.from(user, binaryContent, onlineStatus);
+        return UserResponse.from(user, binaryContentId, fileUrl, onlineStatus);
     }
 
     @Override
-    public UserResponseDto update(UserUpdateRequestDto userUpdateRequestDto, BinaryContentRequestDto binaryContentRequestDto) {
-        validator.validate(userUpdateRequestDto.name(), userUpdateRequestDto.email());
-        User user = Optional.ofNullable(userRepository.find(userUpdateRequestDto.userId()))
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest) {
+        validator.validate(userUpdateRequest.name(), userUpdateRequest.email());
+        User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
-        if (binaryContentRequestDto != null) {
-            BinaryContent binaryContent = binaryContentService.create(binaryContentRequestDto);
-            user.updateBinaryContentId(binaryContent.getId());
-        }
-        user.update(userUpdateRequestDto.name(), userUpdateRequestDto.email(), userUpdateRequestDto.password());
-        userRepository.save(user);
+        UUID binaryContentId = binaryContentRequest
+                .map(binaryContentService::create)
+                .map(BinaryContent::getId)
+                .orElse(null);
+        user.update(binaryContentId, userUpdateRequest.name(), userUpdateRequest.email(), userUpdateRequest.password());
 
-        return UserResponseDto.from(user, binaryContentService.find(user.getBinaryContentId()), userStatusService.findByUserId(user.getId()).calculateOnlineStatus());
+        return userRepository.save(user);
     }
 
     @Override

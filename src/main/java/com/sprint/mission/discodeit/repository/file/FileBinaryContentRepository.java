@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -16,18 +14,26 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-@Scope("singleton")
-@Profile("file")
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
-    private final Path directory;
+    private final Path DIRECTORY;
 
-    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directories.binaryContents}") String directory) {
-        this.directory = Paths.get(directory);
+    public FileBinaryContentRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        Path filePath = directory.resolve(binaryContent.getId() + ".ser");
+        Path filePath = DIRECTORY.resolve(binaryContent.getId() + ".ser");
         try (
                 FileOutputStream fos = new FileOutputStream(filePath.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -41,7 +47,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent find(UUID binaryContentId) {
-        Path filePath = directory.resolve(binaryContentId + ".ser");
+        Path filePath = DIRECTORY.resolve(binaryContentId + ".ser");
         try (
                 FileInputStream fis = new FileInputStream(filePath.toFile());
                 ObjectInputStream ois = new ObjectInputStream(fis);
@@ -56,7 +62,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public List<BinaryContent> findAll() {
         try {
-            List<BinaryContent> binaryContents = Files.list(directory)
+            List<BinaryContent> binaryContents = Files.list(DIRECTORY)
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
@@ -77,7 +83,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void delete(UUID binaryContentId) {
-        Path filePath = directory.resolve(binaryContentId + ".ser");
+        Path filePath = DIRECTORY.resolve(binaryContentId + ".ser");
 
         try {
             Files.delete(filePath);
@@ -88,7 +94,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public boolean existsById(UUID binaryContentId) {
-        Path filePath = directory.resolve(binaryContentId + ".ser");
+        Path filePath = DIRECTORY.resolve(binaryContentId + ".ser");
         return Files.exists(filePath);
     }
 }

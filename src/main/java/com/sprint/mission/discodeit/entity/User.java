@@ -11,38 +11,35 @@ import java.util.UUID;
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
-    private UUID binaryContentId;
 
+    private UUID binaryContentId;
     private String name;
     private String email;
-    private transient String password;
+    private String password;
 
     public User(UUID binaryContentId, String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.binaryContentId = binaryContentId;
-
         this.name = name;
         this.email = email;
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+//        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
+        this.password = password;
     }
 
     public void updateUpdatedAt() {
         this.updatedAt = Instant.now();
     }
 
-    public void updateBinaryContentId(UUID binaryContentId) {
-        this.binaryContentId = binaryContentId;
-        updateUpdatedAt();
-    }
-
-    public void update(String name, String email, String password) {
+    public void update(UUID binaryContentId, String name, String email, String password) {
         boolean updated = false;
+        if (updateBinaryContentId(binaryContentId)) {
+            updated = true;
+        }
         if (updateName(name)) {
             updated = true;
         }
@@ -56,6 +53,14 @@ public class User implements Serializable {
         if (updated) {
             updateUpdatedAt();
         }
+    }
+
+    public boolean updateBinaryContentId(UUID binaryContentId) {
+        if (binaryContentId == null || this.binaryContentId.equals(binaryContentId)) {
+            return false;
+        }
+        this.binaryContentId = binaryContentId;
+        return true;
     }
 
     public boolean updateName(String name) {
@@ -74,11 +79,15 @@ public class User implements Serializable {
         return true;
     }
 
-    public boolean updatePassword(String newPassword) {
-        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
+    public boolean updatePassword(String password) {
+//        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
+//            return false;
+//        }
+//        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        if (password.isBlank() || this.password.equals(password)) {
             return false;
         }
-        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        this.password = password;
         return true;
     }
 
@@ -87,7 +96,8 @@ public class User implements Serializable {
     }
 
     public boolean isSamePassword(String password) {
-        return BCrypt.checkpw(this.password, password);
+//        return BCrypt.checkpw(this.password, password);
+        return this.password.equals(password);
     }
 
     public void validateDuplicateName(String name) {

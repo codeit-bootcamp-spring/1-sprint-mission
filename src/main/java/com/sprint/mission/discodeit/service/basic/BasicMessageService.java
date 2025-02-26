@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequestDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.message.MessageUpdateRequestDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -11,7 +12,6 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Scope("singleton")
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
@@ -32,65 +31,59 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public MessageResponseDto create(MessageCreateRequestDto messageCreateRequestDto) {
-        if (!userRepository.existsById(messageCreateRequestDto.authorId())) {
+    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentRequest> binaryContentRequests) {
+        if (!userRepository.existsById(messageCreateRequest.authorId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
-        if (!channelRepository.existsById(messageCreateRequestDto.channelId())) {
+        if (!channelRepository.existsById(messageCreateRequest.channelId())) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
-        validator.validate(messageCreateRequestDto.content());
+        validator.validate(messageCreateRequest.content());
 
-        List<UUID> binaryContentData = messageCreateRequestDto.binaryContentData().stream()
-                .map(binaryContentRequestDto -> binaryContentService.create(binaryContentRequestDto).getId())
+        List<UUID> binaryContentIds = binaryContentRequests.stream()
+                .map(binaryContentRequest -> binaryContentService.create(binaryContentRequest).getId())
                 .toList();
-        Message message = messageRepository.save(new Message(messageCreateRequestDto.content(),
-                messageCreateRequestDto.authorId(),
-                messageCreateRequestDto.channelId(),
-                binaryContentData));
 
-        return getMessageInfo(message);
+        return messageRepository.save(new Message(messageCreateRequest.content(),
+                messageCreateRequest.authorId(),
+                messageCreateRequest.channelId(),
+                binaryContentIds));
     }
 
     @Override
-    public MessageResponseDto find(UUID messageId) {
+    public Message find(UUID messageId) {
         Message message = Optional.ofNullable(messageRepository.find(messageId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
-        return getMessageInfo(message);
+        return message;
     }
 
     @Override
-    public List<MessageResponseDto> findAllByChannelId(UUID channelId) {
-        List<Message> messages = messageRepository.findAll();
-
-        if (channelId == null) {
-            return messages.stream()
-                    .map(this::getMessageInfo)
-                    .toList();
+    public List<Message> findAllByChannelId(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다.");
         }
 
-        return messages.stream()
-                .filter(message -> message.isSameChannelId(channelId))
-                .map(this::getMessageInfo)
+        return messageRepository.findAllByChannelId(channelId).stream()
                 .toList();
     }
 
     @Override
-    public MessageResponseDto getMessageInfo(Message message) {
-        List<byte[]> binaryContentData = message.getBinaryContentData().stream()
-                .map(binaryContentId -> binaryContentService.find(binaryContentId).getData())
+    public List<Message> findAllByAuthorId(UUID authorId) {
+        if (!userRepository.existsById(authorId)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
+        }
+
+        return messageRepository.findAllByAuthorId(authorId).stream()
                 .toList();
-        return MessageResponseDto.from(message.getId(), message.getContent(), message.getAuthorId(), message.getChannelId(), binaryContentData);
     }
 
+
     @Override
-    public MessageResponseDto update(MessageUpdateRequestDto messageUpdateRequestDto) {
-        Message message = messageRepository.find(messageUpdateRequestDto.id());
+    public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+        Message message = messageRepository.find(messageId);
+        message.updateContent(messageUpdateRequest.content());
 
-        message.updateContent(messageUpdateRequestDto.content());
-        messageRepository.save(message);
-
-        return getMessageInfo(message);
+        return messageRepository.save(message);
     }
 
     @Override
