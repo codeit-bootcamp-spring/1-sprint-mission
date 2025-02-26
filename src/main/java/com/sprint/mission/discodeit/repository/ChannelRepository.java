@@ -12,7 +12,7 @@ public interface ChannelRepository {
 
     Channel findByChannelname (String channelname);
 
-    Channel findById(UUID id);
+    Channel findByChannelId(UUID id);
 
     List<Channel> findAll();
 
