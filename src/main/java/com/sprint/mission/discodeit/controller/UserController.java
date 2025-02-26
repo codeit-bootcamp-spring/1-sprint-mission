@@ -54,7 +54,7 @@ public class UserController implements UserSwagger {
     return ResponseEntity.status(HttpStatus.CREATED).body(userCreateResponse);
   }
 
-  @RequestMapping(value = "/{userId}", method = RequestMethod.PUT, consumes =
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes =
       MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<UserUpdateResponse> updateUser(
       @PathVariable UUID userId,
@@ -91,7 +91,7 @@ public class UserController implements UserSwagger {
 
   @RequestMapping(value = "{userId}/user-status",
       consumes = MediaType.APPLICATION_JSON_VALUE,
-      method = RequestMethod.PUT
+      method = RequestMethod.PATCH
   )
   public ResponseEntity<UserStatus> updateUserStatus(
       @PathVariable UUID userId,

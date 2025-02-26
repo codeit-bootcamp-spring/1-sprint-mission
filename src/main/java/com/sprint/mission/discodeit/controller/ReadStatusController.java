@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -49,8 +50,8 @@ public class ReadStatusController implements ReadStatusSwagger {
     return ResponseEntity.status(HttpStatus.OK).body(updatedReadStatus);
   }
 
-  @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-  public ResponseEntity<List<ReadStatus>> readReadStatus(@PathVariable UUID userId) {
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<ReadStatus>> readReadStatus(@RequestParam("user-id") UUID userId) {
 
     List<ReadStatus> allReadStatus = readStatusService.findAllByUserId(userId);
 

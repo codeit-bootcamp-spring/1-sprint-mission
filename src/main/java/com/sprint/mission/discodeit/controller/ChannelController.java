@@ -74,4 +74,5 @@ public class ChannelController implements ChannelSwagger {
 
     return ResponseEntity.status(HttpStatus.OK).body(allChannel);
   }
+
 }

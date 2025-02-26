@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,11 +34,11 @@ public class MessageController implements MessageSwagger {
       MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Message> sendMessage(
       @RequestPart("message") MessageCreateRequest messageCreateRequest,
-      @RequestPart(required = false) List<MultipartFile> files
+      @RequestPart(required = false) List<MultipartFile> attachments
   ) {
     List<BinaryContentCreateRequest> filesRequest = Collections.emptyList();
-    if (files != null) {
-      filesRequest = files.stream()
+    if (attachments != null) {
+      filesRequest = attachments.stream()
           .map(MessageController::getBinaryContentCreateRequest)
           .toList();
     }
@@ -66,8 +67,8 @@ public class MessageController implements MessageSwagger {
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
-  @RequestMapping(value = "/{channelId}", method = RequestMethod.GET)
-  public ResponseEntity<List<Message>> readAllMessage(@PathVariable UUID channelId) {
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<Message>> readAllMessage(@RequestParam("channel-id") UUID channelId) {
     List<Message> allMessage = messageService.findAllByChannelId(channelId);
 
     return ResponseEntity.status(HttpStatus.OK).body(allMessage);
