@@ -1,6 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -13,11 +12,12 @@ public class Channel extends Common implements Serializable {
     String name;
     String description;
     ChannelType type;
+
     public Channel(String name, String description, ChannelType type) {
         super();
         this.name = name;
         this.description = description;
-        this.type=type;
+        this.type = type;
     }
 
     public void update(String name, String description) {

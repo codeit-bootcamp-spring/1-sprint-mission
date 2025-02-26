@@ -13,8 +13,8 @@ public class UserUpdateRequest {
     public UserUpdateRequest(String name, String email,
                              String password, MultipartFile profileImage) {
         this.name = name;
-        this.email=email;
+        this.email = email;
         this.password = password;
-        this.profileImage=profileImage;
+        this.profileImage = profileImage;
     }
 }

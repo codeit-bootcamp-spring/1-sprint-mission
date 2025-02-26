@@ -2,6 +2,7 @@ package com.spirnt.mission.discodeit.repository;
 
 import com.spirnt.mission.discodeit.enity.Message;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,6 +13,8 @@ public interface MessageRepository {
     void delete(UUID messageId);
 
     Optional<Message> findById(UUID messageId);
+
+    List<Message> findAllByChannelId(UUID channelId);
 
     Map<UUID, Message> findAll();
 

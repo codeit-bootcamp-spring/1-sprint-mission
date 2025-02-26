@@ -1,33 +1,31 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.user.UserCreateRequest;
-import com.spirnt.mission.discodeit.dto.user.UserUpdateRequest;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Getter
 public class User extends Common implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private String email;
+    private String password;
+    private UUID profileImageId;
 
-    private transient String password;
 
-
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, UUID profileImageId) {
         super();
         this.name = name;
         this.email = email;
         this.password = password;
+        this.profileImageId = profileImageId;
     }
 
 
-
-
-    public void update(String name, String email, String password) {
+    public void update(String name, String email, String password, UUID profileImageId) {
         boolean anyValueUpdated = false;
         if (name != null && !name.equals(this.name)) {
             this.name = name;
@@ -37,8 +35,12 @@ public class User extends Common implements Serializable {
             this.email = email;
             anyValueUpdated = true;
         }
-        if (email != null && !email.equals(this.password)) {
-            this.password = email;
+        if (password != null && !password.equals(this.password)) {
+            this.password = password;
+            anyValueUpdated = true;
+        }
+        if (profileImageId != null && !profileImageId.equals(this.profileImageId)) {
+            this.profileImageId = profileImageId;
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {

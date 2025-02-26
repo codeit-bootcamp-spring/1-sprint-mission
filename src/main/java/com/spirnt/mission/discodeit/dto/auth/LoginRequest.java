@@ -1,4 +1,4 @@
-package com.spirnt.mission.discodeit.dto;
+package com.spirnt.mission.discodeit.dto.auth;
 
 public record LoginRequest(
         String name,

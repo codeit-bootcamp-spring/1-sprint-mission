@@ -10,7 +10,7 @@ import java.util.UUID;
 public class PrivateChannelRequest {
     private List<UUID> usersId;
 
-    public PrivateChannelRequest(List<UUID> usersId){
-        this.usersId = (usersId==null)? new ArrayList<>():usersId;
+    public PrivateChannelRequest(List<UUID> usersId) {
+        this.usersId = (usersId == null) ? new ArrayList<>() : usersId;
     }
 }

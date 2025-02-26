@@ -13,6 +13,8 @@ public interface ReadStatusRepository {
 
     Optional<ReadStatus> findById(UUID id);
 
+    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
+
     Map<UUID, ReadStatus> findAll();
 
     // 존재 검증

@@ -19,6 +19,6 @@ public class MessageCreateRequest {
         this.content = content;
         this.userId = userId;
         this.channelId = channelId;
-        this.files = (files==null)? new ArrayList<>():files;
+        this.files = (files == null) ? new ArrayList<>() : files;
     }
 }

@@ -23,21 +23,20 @@ public class ChannelResponse {
         this.description = channel.getDescription();
         this.channelId = channel.getId();
         this.type = channel.getType();
-        this.usersId = (usersId==null)? new ArrayList<>():usersId;
+        this.usersId = (usersId == null) ? new ArrayList<>() : usersId;
         this.lastMessageAt = lastMessageAt;
     }
 
     @Override
     public String toString() {
-        if(this.type==ChannelType.PUBLIC) {
+        if (this.type == ChannelType.PUBLIC) {
             return "PUBLIC Channel[Name: " + this.getName() +
                     " Description: " + this.getDescription() +
-                    " ID: " + this.channelId +" ]";
-        } else if(this.type==ChannelType.PRIVATE) {
+                    " ID: " + this.channelId + " ]";
+        } else if (this.type == ChannelType.PRIVATE) {
             return "PRIVATE Channel[" +
-                    " ID: " + this.channelId + "]"+
-                    "\nParticipants: "+usersId;
-        }
-        else return "";
+                    " ID: " + this.channelId + "]" +
+                    "\nParticipants: " + usersId;
+        } else return "";
     }
 }

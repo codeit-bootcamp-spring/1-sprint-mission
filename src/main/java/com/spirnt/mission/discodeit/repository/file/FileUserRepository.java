@@ -42,10 +42,17 @@ public class FileUserRepository extends FileRepository implements UserRepository
     }
 
     @Override
+    public Optional<User> findByName(String name) {
+        return this.findAll().values().stream()
+                .filter(user -> user.getName().equals(name))
+                .findAny();
+    }
+
+    @Override
     public Map<UUID, User> findAll() {
         Map<UUID, User> users = new HashMap<>();
         // 폴더 내 모든 .ser 파일을 찾음
-        try (Stream<Path> paths = Files.walk(this.getDIRECTORY())) {
+        try (Stream<Path> paths = Files.walk(this.getDirectory())) {
             paths.filter(path -> path.toString().endsWith(".ser"))  // .ser 파일만 필터링
                     .forEach(path -> {
                         Optional<User> userOptional = loadFromFile(path);

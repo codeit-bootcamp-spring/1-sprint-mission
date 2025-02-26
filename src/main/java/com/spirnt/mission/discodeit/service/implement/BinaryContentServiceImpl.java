@@ -12,7 +12,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,15 +35,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
                 fileExtension = "";
             } else fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
             // 경로 지정
-            UUID binaryContentId=UUID.randomUUID();
+            UUID binaryContentId = UUID.randomUUID();
             Path path = Paths.get(uploadDir + binaryContentId + fileExtension);
             File newFile = new File(String.valueOf(path));
             try (FileOutputStream fos = new FileOutputStream(newFile)) {
                 fos.write(binaryContentCreate.file().getBytes());
             }
             // entity 생성, 저장
-            BinaryContent binaryContent = new BinaryContent(binaryContentId, binaryContentCreate.userId(),
-                    binaryContentCreate.messageId(), originalFilename, binaryContentCreate.file().getContentType(),
+            BinaryContent binaryContent = new BinaryContent(binaryContentId, originalFilename, binaryContentCreate.file().getContentType(),
                     String.valueOf(path));
             binaryContentRepository.save(binaryContent);
             return binaryContent;
@@ -69,42 +71,5 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         binaryContentRepository.delete(id);
     }
 
-    //프로필사진 찾기는 하나만
-    @Override
-    public BinaryContent findUserProfile(UUID userId) {
-        Map<UUID, BinaryContent> map = binaryContentRepository.findAll();
-        return map.values().stream()
-                .filter(binaryContent -> binaryContent.getUserId().equals(userId) &&
-                        binaryContent.getMessageId() == null)
-                .findAny()
-                .orElse(null);
-    }
 
-    // 메세지에 첨부된 파일은 여러 개 반환
-    @Override
-    public List<BinaryContent> findByMessageId(UUID messageId) {
-        Map<UUID, BinaryContent> map = binaryContentRepository.findAll();
-        List<BinaryContent> list = new ArrayList<>();
-        map.values().stream()
-                .filter(binaryContent -> binaryContent.getMessageId() != null &&
-                        binaryContent.getMessageId().equals(messageId))
-                .forEach(binaryContent -> list.add(binaryContent));
-        return list;
-    }
-
-    @Override
-    public void deleteUserProfile(UUID userId) {
-        BinaryContent binaryContent = findUserProfile(userId);
-        if(binaryContent!=null) {
-            delete(binaryContent.getId());
-        }
-    }
-
-    @Override
-    public void deleteByMessageId(UUID messageId) {
-        List<BinaryContent> list = findByMessageId(messageId);
-        for (BinaryContent binaryContent : list) {
-            delete(binaryContent.getId());
-        }
-    }
 }

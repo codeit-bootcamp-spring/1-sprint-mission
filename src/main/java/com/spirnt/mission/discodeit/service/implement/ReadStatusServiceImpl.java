@@ -1,6 +1,7 @@
 package com.spirnt.mission.discodeit.service.implement;
 
-import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusDto;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusCreate;
+import com.spirnt.mission.discodeit.dto.readStatus.ReadStatusUpdate;
 import com.spirnt.mission.discodeit.enity.ReadStatus;
 import com.spirnt.mission.discodeit.repository.ChannelRepository;
 import com.spirnt.mission.discodeit.repository.ReadStatusRepository;
@@ -25,20 +26,20 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
 
     @Override
-    public ReadStatus create(ReadStatusDto readStatusDto) {
+    public ReadStatus create(ReadStatusCreate readStatusCreate) {
         // User와 Channel 존재하지 않으면 예외 발생
-        if (!userRepository.existsById(readStatusDto.userId())) {
+        if (!userRepository.existsById(readStatusCreate.userId())) {
             throw new NoSuchElementException("User ID Not Found");
         }
-        if (!channelRepository.existsById(readStatusDto.channelId())) {
+        if (!channelRepository.existsById(readStatusCreate.channelId())) {
             throw new NoSuchElementException("Channel ID Not Found");
         }
         //이미 해당 채널-유저를 가진 ReadStatus가 있으면 예외 발생
-        if (existsByUserIdChannelId(readStatusDto.userId(), readStatusDto.channelId())) {
+        if (existsByUserIdChannelId(readStatusCreate.userId(), readStatusCreate.channelId())) {
             throw new IllegalStateException("The ReadStatus with UserId and ChannelId Already Exists");
         }
-        ReadStatus readStatus = new ReadStatus(readStatusDto.userId(),
-                readStatusDto.channelId(),
+        ReadStatus readStatus = new ReadStatus(readStatusCreate.userId(),
+                readStatusCreate.channelId(),
                 Instant.now());
         readStatusRepository.save(readStatus);
         return readStatus;
@@ -48,6 +49,12 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     public ReadStatus find(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("Read Status ID Not Found"));
+    }
+
+    @Override
+    public ReadStatus findByUserIdAndChannelId(UUID userId, UUID channelId) {
+        return readStatusRepository.findByUserIdAndChannelId(userId, channelId)
+                .orElseThrow(() -> new NoSuchElementException("Invalid User ID And Channel ID."));
     }
 
     @Override
@@ -69,14 +76,13 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID readStatusId, ReadStatusDto readStatusDto) {
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdate readStatusUpdate) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("Read Status Not Found"));
-        readStatus.update(readStatusDto.lastReadAT());
+        readStatus.update(readStatusUpdate.lastReadAt());
         readStatusRepository.save(readStatus);
         return readStatus;
     }
-
 
     @Override
     public void delete(UUID id) {

@@ -9,10 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
@@ -41,10 +39,18 @@ public class FileMessageRepository extends FileRepository implements MessageRepo
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.findAll().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Map<UUID, Message> findAll() {
         Map<UUID, Message> messages = new HashMap<>();
         // 폴더 내 모든 .ser 파일을 찾음
-        try (Stream<Path> paths = Files.walk(this.getDIRECTORY())) {
+        try (Stream<Path> paths = Files.walk(this.getDirectory())) {
             paths.filter(path -> path.toString().endsWith(".ser"))  // .ser 파일만 필터링
                     .forEach(path -> {
                         Optional<Message> messageOptional = loadFromFile(path);

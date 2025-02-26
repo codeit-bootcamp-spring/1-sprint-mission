@@ -15,11 +15,4 @@ public interface BinaryContentService {
 
     void delete(UUID id);
 
-    BinaryContent findUserProfile(UUID userId);
-
-    List<BinaryContent> findByMessageId(UUID messageId);
-
-    void deleteUserProfile(UUID userId);
-
-    void deleteByMessageId(UUID messageId);
 }

@@ -34,6 +34,13 @@ public class JCFUserRepository implements UserRepository {
         return Optional.ofNullable(this.data.get(userId));
     }
 
+    @Override
+    public Optional<User> findByName(String name) {
+        return data.values().stream()
+                .filter(user -> user.getName().equals(name))
+                .findAny();
+    }
+
     public Map<UUID, User> findAll() {
         return new HashMap<>(data);
     }

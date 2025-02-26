@@ -1,14 +1,12 @@
 package com.spirnt.mission.discodeit.service;
 
-import com.spirnt.mission.discodeit.dto.channel.PrivateChannelRequest;
-import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.dto.channel.ChannelResponse;
 import com.spirnt.mission.discodeit.dto.channel.ChannelUpdateRequest;
+import com.spirnt.mission.discodeit.dto.channel.PrivateChannelRequest;
+import com.spirnt.mission.discodeit.dto.channel.PublicChannelCreateRequest;
 import com.spirnt.mission.discodeit.enity.Channel;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelService {

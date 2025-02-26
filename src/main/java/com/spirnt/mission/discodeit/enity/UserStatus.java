@@ -1,7 +1,5 @@
 package com.spirnt.mission.discodeit.enity;
 
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusCreate;
-import com.spirnt.mission.discodeit.dto.userStatus.UserStatusUpdate;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -23,6 +21,7 @@ public class UserStatus extends Common implements Serializable {
         this.lastSeenAt = lastSeenAt;
     }
 
+
     public boolean isOnline() {
         if (lastSeenAt == null) {
             return false; // 접속한 적이 없으면 오프라인으로 간주
@@ -31,9 +30,17 @@ public class UserStatus extends Common implements Serializable {
         return lastSeenAt.isAfter(fiveMinutesAgo); // 5분 이내 접속이면 온라인
     }
 
-    public void update(Instant lastSeenAt) {
+    public void update(UserStatusType userStatusType, Instant lastSeenAt) {
+        boolean anyValueUpdated = false;
         if (lastSeenAt != null && !lastSeenAt.equals(this.lastSeenAt) && this.lastSeenAt.isBefore(lastSeenAt)) {
             this.lastSeenAt = lastSeenAt;
+            anyValueUpdated = true;
+        }
+        if (userStatusType != null && this.userStatusType != userStatusType) {
+            this.userStatusType = userStatusType;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
             updateClass(Instant.now());
         }
     }

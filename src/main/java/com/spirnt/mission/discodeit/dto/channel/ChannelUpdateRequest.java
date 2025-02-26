@@ -8,7 +8,7 @@ public class ChannelUpdateRequest {
     private String description;
 
     public ChannelUpdateRequest(String name, String description) {
-        this.name= name;
-        this.description=description;
+        this.name = name;
+        this.description = description;
     }
 }

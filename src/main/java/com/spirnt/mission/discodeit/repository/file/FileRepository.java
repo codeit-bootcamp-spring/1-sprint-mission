@@ -8,19 +8,19 @@ import java.util.UUID;
 
 // Serializable한 객체만 T로 들어올 수 있음
 public abstract class FileRepository<T extends Serializable> {
-    private final String EXTENSION = ".ser";
-    private Path DIRECTORY;   // ser 파일 저장할 경로
+    private final String extension = ".ser";
+    private Path directory;   // ser 파일 저장할 경로
 
     protected FileRepository(String fileDirectory) {
-        this.DIRECTORY = Path.of(fileDirectory);
+        this.directory = Path.of(fileDirectory);
     }
 
-    protected Path getDIRECTORY() {
-        return DIRECTORY;
+    protected Path getDirectory() {
+        return directory;
     }
 
     protected Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
+        return directory.resolve(id + extension);
     }
 
     protected void saveToFile(Path path, T data) {

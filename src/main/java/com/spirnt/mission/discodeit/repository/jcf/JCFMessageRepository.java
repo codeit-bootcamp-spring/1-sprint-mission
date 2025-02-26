@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
@@ -35,6 +36,14 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public Optional<Message> findById(UUID messageId) {
         return Optional.of(this.data.get(messageId));
+    }
+
+    @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.findAll().values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .collect(Collectors.toList());
     }
 
     public Map<UUID, Message> findAll() {

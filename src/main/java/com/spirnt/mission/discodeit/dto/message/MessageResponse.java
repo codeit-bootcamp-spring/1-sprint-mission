@@ -4,6 +4,7 @@ import com.spirnt.mission.discodeit.enity.Message;
 import lombok.Getter;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,6 +15,7 @@ public class MessageResponse {
     private UUID messageId;
     private Instant createdAt;
     private Instant updatedAt;
+    private List<UUID> attachedFiles;
 
     public MessageResponse(Message message) {
         this.content = message.getContent();
@@ -22,6 +24,7 @@ public class MessageResponse {
         this.messageId = message.getId();
         this.createdAt = message.getCreatedAt();
         this.updatedAt = message.getUpdatedAt();
+        this.attachedFiles = message.getAttachedFiles();
     }
 
     @Override
