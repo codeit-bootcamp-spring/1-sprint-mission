@@ -1,20 +1,16 @@
 package com.sprint.mission.discodeit.dto.channel;
-
-import com.sprint.mission.discodeit.entity.ChannelType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ChannelServiceFindAllByUserIdDTO {
-    private UUID id;
-    private String name;
-    private String description;
-    private ChannelType type;
+public class ChannelCreatePrivateDTO {
+    private List<UUID> ids;
 }

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.message;
+package com.sprint.mission.discodeit.dto.channel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageServiceUpdateDTO {
-    private UUID id;
-    private String content;
+public class ChannelUpdateDTO {
+    private String name;
+    private String description;
 }

@@ -1,12 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
 public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private final UUID id;
     private final Instant createdAt;
@@ -15,7 +19,6 @@ public class Channel implements Serializable {
     private String name;
     private String description;
     private ChannelType type;
-    private List<UUID> userIds;
 
     public Channel(String name, String description, ChannelType type) {
         this.id = UUID.randomUUID();
@@ -24,49 +27,6 @@ public class Channel implements Serializable {
         this.name = name;
         this.description = description;
         this.type = type;
-        userIds = new ArrayList<>();
-    }
-
-    public static boolean validation(String name, String description){
-        if (name == null || name.isEmpty()) {
-            return false;
-        }
-        if (description == null || description.isEmpty()) {
-            return false;
-        }
-        return true;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public ChannelType getType() {
-        return type;
-    }
-
-    public List<UUID> getUserIds() {
-        return userIds;
-    }
-
-    public void addUsers(UUID userId) {
-        userIds.add(userId);
     }
 
     public void setUpdatedAt() {

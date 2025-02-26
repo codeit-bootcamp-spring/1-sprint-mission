@@ -1,14 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelServiceFindDTO;
-import com.sprint.mission.discodeit.dto.message.MessageServiceCreateDTO;
-import com.sprint.mission.discodeit.dto.message.MessageServiceUpdateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +29,13 @@ public class BasicMessageService implements MessageService {
     private final MessageValidator messageValidator;
 
     @Override
-    public UUID create(MessageServiceCreateDTO dto) {
+    public UUID create(MessageCreateDTO dto) {
         messageValidator.validateMessage(dto.getContent(), dto.getUserId(), dto.getChannelId());
         Message message = new Message(dto.getContent(), dto.getUserId(), dto.getChannelId());
 
         if(dto.getFiles() != null && !dto.getFiles().isEmpty()){
             for(MultipartFile file : dto.getFiles()){
-                UUID bId = binaryContentService.create(new BinaryContentCreateDTO(
-                        dto.getUserId(),
-                        dto.getChannelId(),
-                        file));
+                UUID bId = binaryContentService.create(new BinaryContentCreateDTO(file));
                 message.addBinaryContent(bId);
             }
         }
@@ -50,7 +46,7 @@ public class BasicMessageService implements MessageService {
     public Message find(UUID id) {
         Message findMessage = messageRepository.findOne(id);
         return Optional.ofNullable(findMessage)
-                .orElseThrow(() -> new NoSuchElementException("해당 메시지가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
     }
 
     @Override
@@ -64,8 +60,8 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageServiceUpdateDTO dto) {
-        Message findMessage = messageRepository.findOne(dto.getId());
+    public Message update(UUID id, MessageUpdateDTO dto) {
+        Message findMessage = messageRepository.findOne(id);
 
         findMessage.setMessage(dto.getContent());
         messageRepository.update(findMessage);
@@ -79,7 +75,6 @@ public class BasicMessageService implements MessageService {
         for(UUID binaryContentId : findMessage.getBinaryContentIds()){
             binaryContentService.delete(binaryContentId);
         }
-
         return messageRepository.delete(findMessage.getId());
     }
 }

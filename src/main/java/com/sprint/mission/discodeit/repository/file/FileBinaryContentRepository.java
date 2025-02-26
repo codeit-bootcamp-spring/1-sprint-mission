@@ -20,8 +20,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     public FileBinaryContentRepository(@Value("${discodeit.repository.file.path}") String path ) {
 
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), path, "User");
-        this.FILE_PATH = DIRECTORY.resolve("user.ser"); //두 경로 조합
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), path, "BinaryContent");
+        this.FILE_PATH = DIRECTORY.resolve("binaryContent.ser"); //두 경로 조합
 
         if (Files.notExists(DIRECTORY)) {
             try {

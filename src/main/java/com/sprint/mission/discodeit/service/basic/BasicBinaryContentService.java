@@ -1,19 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserServiceFindDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.validator.BinaryContentValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,17 +20,16 @@ import java.util.UUID;
 public class BasicBinaryContentService implements BinaryContentService {
 
     private final BinaryContentRepository binaryContentRepository;
-    private final BinaryContentValidator binaryContentValidator;
 
     @Override
     public UUID create(BinaryContentCreateDTO dto) {
-        binaryContentValidator.validateBinaryContent(dto.getUserId(), dto.getMessageId());
 
         byte[] file = getFileBytes(dto.getFile());
+        String fileName = dto.getFile().getOriginalFilename();
         String contentType = dto.getFile().getContentType();
         Long size = dto.getFile().getSize();
 
-        BinaryContent binaryContent = new BinaryContent(dto.getUserId(), dto.getMessageId(), file, contentType, size);
+        BinaryContent binaryContent = new BinaryContent(file, fileName ,contentType, size);
         return binaryContentRepository.save(binaryContent);
     }
 
@@ -53,10 +50,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent find(UUID id) {
-
         BinaryContent findBinaryContent = binaryContentRepository.findOne(id);
         Optional.ofNullable(findBinaryContent)
-                .orElseThrow(() -> new NoSuchElementException("해당 BinaryContent 가 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BINARY_CONTENT_NOT_FOUND));
         return findBinaryContent;
     }
 

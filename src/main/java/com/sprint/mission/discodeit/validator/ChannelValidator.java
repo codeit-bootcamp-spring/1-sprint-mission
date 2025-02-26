@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.validator;
 
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.ErrorCode;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,13 +14,13 @@ public class ChannelValidator {
 
     public void validateName(String name){
         if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("입력 값은 null이거나 공백일 수 없습니다.");
+            throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
         }
     }
 
     public void validateDescription(String description){
         if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("입력 값은 null이거나 공백일 수 없습니다.");
+            throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
         }
     }
 
