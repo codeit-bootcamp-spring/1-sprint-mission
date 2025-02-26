@@ -57,9 +57,9 @@ public class ReadStatusController {
   }
 
   //특정 채널의 메세지 수신 정보 수정
-  @PatchMapping("/{channelId}")
+  @PatchMapping
   public ResponseEntity<List<ReadStatusResponseDto>> updateChannelReadStatus(
-      @PathVariable String channelId,
+      @RequestParam String channelId,
       @RequestBody UpdateReadStatusDto updateReadStatusDto) {
     return ResponseEntity.ok(readStatusService.updateByChannelId(channelId, updateReadStatusDto));
   }
