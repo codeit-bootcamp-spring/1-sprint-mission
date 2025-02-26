@@ -1,0 +1,27 @@
+server:
+  port: 8080
+spring:
+  config:
+    activate:
+      on-profile: dev
+  discodeit:
+    repository:
+      type: jcf
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 20MB
+  web:
+    resources:
+      cache:
+        period: 0
+springdoc:
+  packages-to-scan: com.sprint.mission.discodeit.controller
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
