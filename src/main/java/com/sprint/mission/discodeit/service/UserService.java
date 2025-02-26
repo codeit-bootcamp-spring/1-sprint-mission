@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
     UsersDto create(UsersDto usersDTO, byte[] profileImage);
-    User update(String id, UsersDto usersDTO, byte[] profileImage);
+    UsersDto update(String id, UsersDto usersDTO, byte[] profileImage);
     void delete(String id);
     UserDto find(String id);
     List<UsersDto> findAll();

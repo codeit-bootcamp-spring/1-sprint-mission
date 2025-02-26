@@ -55,7 +55,7 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public User update(String id, UsersDto usersDTO, byte[] profileImage) {
+    public UsersDto update(String id, UsersDto usersDTO, byte[] profileImage) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -71,7 +71,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.save(newProfile);
         }
 
-        return user;
+        return usersDTO;
     }
 
     @Override
