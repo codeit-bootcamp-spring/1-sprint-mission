@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
+import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,6 +80,9 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserResponseDto findById(String userId) throws CustomException {
+    if (userId == null) {
+      throw new CustomException(ErrorCode.EMPTY_DATA, "USER ID is null");
+    }
     User user = userRepository.findById(userId);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
@@ -115,34 +120,30 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
-  //UserStatus 필드 변경으로 인한 임시 주석 처리
-//    @Override
-//    public List<User> getUserByUserStatus(UserStatus userStatus) {
-//        return userRepository.findAll().stream().filter(user -> user.getUserStatus().equals(userStatus)).toList();
-//    }
-
-
-  //todo
-  //update user의 반환타입을 Dto 로 변경하려 하였으나
-  //아래랑 종속적이라... 문제가 됨 -> 수정필요
   @Override
   public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto)
       throws CustomException {
+
+    if (updateUserDto == null) {
+      throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
+    }
+
     User user = userRepository.findById(userId);
 
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
-    } else if (updateUserDto == null) {
-      throw new CustomException(ErrorCode.EMPTY_DATA, "USER DTO is null");
     }
 
     if (user.isUpdated(updateUserDto)) {
       user.setUpdatedAt(updateUserDto.updatedAt());
     }
 
-    return UserResponseDto.from(userRepository.save(user),
-        userStatusService.findById(user.getId()).isOnline());
+    User savedUser = userRepository.save(user);
+    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
+        new UpdateUserStatusDto(Instant.now()));
+
+    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
@@ -164,8 +165,11 @@ public class BasicUserService implements UserService {
     user.setProfileImageId(binaryContentService.create(file).id());
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    return UserResponseDto.from(userRepository.save(user),
-        userStatusService.findById(user.getId()).isOnline());
+    User savedUser = userRepository.save(user);
+    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
+        new UpdateUserStatusDto(Instant.now()));
+
+    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
   }
 
 

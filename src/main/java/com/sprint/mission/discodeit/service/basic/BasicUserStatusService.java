@@ -21,10 +21,15 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
 
-    @Override
-    public UserStatusResponseDto findById(String userStatusId) {
-        return UserStatusResponseDto.from(userStatusRepository.findById(userStatusId));
+  @Override
+  public UserStatusResponseDto findById(String userStatusId) {
+    UserStatus userStatus = userStatusRepository.findById(userStatusId);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("userStatus not found");
     }
+
+    return UserStatusResponseDto.from(userStatus);
+  }
 
   @Override
   public List<UserStatusResponseDto> findAll() {
