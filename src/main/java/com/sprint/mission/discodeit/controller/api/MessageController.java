@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +19,8 @@ public class MessageController implements MessageApiDocs {
 
   private final MessageService messageService;
 
-  @PostMapping
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   @Override
   public MessageResponse createMessage(
       @RequestPart MessageRequest.Create messageRequest,
@@ -27,7 +29,8 @@ public class MessageController implements MessageApiDocs {
     return messageService.createMessage(messageRequest, files);
   }
 
-  @PutMapping("/{messageId}")
+  @PutMapping(value = "/{messageId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   @Override
   public MessageResponse updateMessage(
       @PathVariable UUID messageId,

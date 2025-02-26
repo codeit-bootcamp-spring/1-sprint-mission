@@ -21,15 +21,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(errorResponse);
   }
 
-  @ExceptionHandler(Exception.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  protected ResponseEntity<Object> handleAllException(Exception ex) {
-    ErrorResponse errorResponse = ErrorResponse.builder()
-        .errorCode(ErrorCode.INTERNAL_SERVER_ERROR)
-        .detail(ex.getMessage())
-        .build();
-    return handleExceptionInternal(errorResponse);
-  }
+//  @ExceptionHandler(Exception.class)
+//  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//  protected ResponseEntity<Object> handleAllException(Exception ex) {
+//    ErrorResponse errorResponse = ErrorResponse.builder()
+//        .errorCode(ErrorCode.INTERNAL_SERVER_ERROR)
+//        .detail(ex.getMessage())
+//        .build();
+//    return handleExceptionInternal(errorResponse);
+//  }
 
   private ResponseEntity<Object> handleExceptionInternal(ErrorResponse errorResponse) {
     return ResponseEntity

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,16 +27,18 @@ public class UserController implements UserApiDocs {
     return userService.findAll();
   }
 
-  @PostMapping
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   @Override
   public UserResponse createUser(
-      @RequestPart("userRequest") UserRequest userRequest,
+      @RequestPart("user") UserRequest userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
     return userService.createUser(userRequest, userProfileImage);
   }
 
-  @PutMapping("/{userId}")
+  @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
+      MediaType.APPLICATION_JSON_VALUE})
   @Override
   public UserResponse updateUser(
       @PathVariable UUID userId,
