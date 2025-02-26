@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.List;
 public class MessageController {
     private final MessageService messageService;
 
+    @Operation(summary = "메시지 생성", description = "메시지 생성 / 공개/비공개 구현x")
     @PostMapping
     public ResponseEntity<MessageDto> create(@Valid @RequestBody MessageDto messageDTO) {
         try {
@@ -30,6 +32,7 @@ public class MessageController {
         }
     }
 
+    @Operation(summary = "메시지 목록 조회", description = "전체 메시지 조회")
     @GetMapping
     public ResponseEntity<List<MessageDto>> channelMessages() {
         List<MessageDto> messages = messageService.findAll();
@@ -37,12 +40,14 @@ public class MessageController {
 
     }
 
+    @Operation(summary = "메시지 삭제", description = "메시지 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable String id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "메시지 수정", description = "메시지 수정")
     @PatchMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable String id,

@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
@@ -23,14 +24,14 @@ public class UserController {
 
     private final UserService userService;
 
-    // 회원 목록
+    @Operation(summary = "회원 목록 조회", description = "전체 회원 조회")
     @GetMapping
     public ResponseEntity<List<UsersDto>> listUsers() {
         List<UsersDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
-    // 단일 회원 조회
+    @Operation(summary = "회원 목록 조회", description = "단일 회원 조회")
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUser(@PathVariable String id) {
         UserDto user = userService.find(id);
@@ -40,7 +41,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // 회원 가입
+    @Operation(summary = "회원 가입", description = "회원 가입")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsersDto> registerUser(@Valid
             @RequestPart("user") UsersDto usersDTO,
@@ -60,7 +61,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(users);
     }
 
-    // 회원 정보 수정
+    @Operation(summary = "회원 정보 수정", description = "회원 정보 수정")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UsersDto> updateUser(
             @PathVariable String id,
@@ -86,14 +87,14 @@ public class UserController {
     }
 
 
-    // 유저 삭제
+    @Operation(summary = "유저 삭제", description = "회원 정보 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // 사용자의 온라인 상태 업데이트
+    @Operation(summary = "상태 업데이트", description = "사용자의 온라인 상태 업데이트")
     @PatchMapping("/{id}/online-status")
     public ResponseEntity<Void> updateOnlineStatus(
             @PathVariable String id,

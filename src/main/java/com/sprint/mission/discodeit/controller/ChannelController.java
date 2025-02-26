@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ChannelController {
     private final ChannelService channelService;
 
-    // 채널 목록
+    @Operation(summary = "채널 조회", description = "전체 채널 조회")
     @GetMapping
     public ResponseEntity<List<ChannelDto>> listChannels() {
         List<ChannelDto> channels = channelService.findAll();
@@ -26,14 +27,14 @@ public class ChannelController {
     }
 
 
-    // 채널 생성
+    @Operation(summary = "채널 생성", description = "채널 생성 / 공개/비공개 구현x")
     @PostMapping
     public ResponseEntity<ChannelDto> createChannel(@Valid @RequestBody ChannelDto channelDTO) {
         ChannelDto channel = channelService.create(channelDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
-    // 채널 수정
+    @Operation(summary = "채널 수정", description = "채널 수정")
     @PatchMapping("/{channelId}")
     public ResponseEntity<ChannelDto> updateChannel(
             @PathVariable String channelId,
@@ -43,7 +44,7 @@ public class ChannelController {
         return ResponseEntity.ok(updateChannel);
     }
 
-    // 채널 삭제
+    @Operation(summary = "채널 삭제", description = "채널 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable String id) {
         channelService.delete(id);

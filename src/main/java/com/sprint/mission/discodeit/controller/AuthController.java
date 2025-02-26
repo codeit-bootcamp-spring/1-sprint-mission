@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.LoginRequest;
 import com.sprint.mission.discodeit.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class AuthController {
 
     private final UserService userService;
 
+    @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest,
                                    BindingResult bindingResult,
@@ -61,6 +63,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -88,6 +91,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "상태 확인", description = "로그인/로그아웃 상태 확인")
     @GetMapping("/status")
     public ResponseEntity<?> checkLoginStatus(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
