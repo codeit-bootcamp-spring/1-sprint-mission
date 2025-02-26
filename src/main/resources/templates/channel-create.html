@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>채널 생성</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">채널 생성</h2>
+    <form th:action="@{/channels/create}" th:object="${channel}" method="post">
+        <div class="form-group">
+            <label>채널 이름</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="채널 이름" required>
+        </div>
+        <div class="form-group">
+            <label>채널 설명</label>
+            <textarea th:field="*{description}" class="form-control" placeholder="채널 설명"></textarea>
+        </div>
+        <div class="form-group">
+            <label>채널 타입</label>
+            <select th:field="*{type}" class="form-control" required>
+                <option value="PUBLIC">공개 채널</option>
+                <option value="PRIVATE">비공개 채널</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">생성하기</button>
+    </form>
+</div>
+</body>
+</html>

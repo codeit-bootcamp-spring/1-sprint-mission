@@ -1,13 +1,25 @@
 spring:
-  application:
-    name: discodeit
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
-  profiles:
-    active: local
+  thymeleaf:
+    cache: false
+    h2:
+      console:
+        enabled: true
 
-  main:
-    allow-bean-definition-overriding: true # Bean 충돌 방지
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        #      show_sql: true
+        format_sql: true
 
 logging:
   level:
-    org.springframework: INFO
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>채널 목록</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">채널 목록</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>채널 이름</th>
+            <th>설명</th>
+            <th>타입</th>
+            <th>액션</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ch : ${channels}">
+            <td th:text="${ch.name}">채널명</td>
+            <td th:text="${ch.description}">설명</td>
+            <td th:text="${ch.type}">타입</td>
+            <td>
+                <a th:href="@{|/channels/delete/${ch.id}|}" class="btn btn-danger btn-sm">삭제</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a href="/channels/create" class="btn btn-primary">채널 생성</a>
+    <a href="/" class="btn btn-primary">홈</a>
+</div>
+</body>
+</html>

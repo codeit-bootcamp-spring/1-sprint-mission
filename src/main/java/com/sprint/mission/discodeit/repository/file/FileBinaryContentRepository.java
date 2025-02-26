@@ -27,7 +27,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public Optional<BinaryContent> findById(String id) {
+    public Optional<BinaryContent> findByUserId(String id) {
         Map<String, BinaryContent> contentMap = readFromFile();
         return Optional.ofNullable(contentMap.get(id));
     }

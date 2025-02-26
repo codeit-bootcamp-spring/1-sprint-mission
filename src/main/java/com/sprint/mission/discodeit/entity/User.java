@@ -1,38 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class User implements Serializable {
+@Entity
+@AllArgsConstructor
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-    private Instant createdAt;
-    private Instant updatedAt;
 
     private String name;
     private String email;
     private String password;
 
+    private boolean online;
+    @Lob
+    private byte[] profileImage;
+
+    @ManyToMany(mappedBy = "members")
+    private Set<Channel> channels = new HashSet<>();
+
     public User(String name, String email, String password) {
         this.id = UUID.randomUUID().toString();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public void update(String name, String email) {
-        this.name = name;
-        this.email = email;
-        this.updatedAt = Instant.now();
-    }
 }

@@ -33,6 +33,6 @@ public class BasicAuthService implements AuthService {
 
         System.out.println("[로그인 성공] 유저네임: " + user.getName());
 
-        return new UserDTO(user.getName(), user.getEmail(), user.getPassword());
+        return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 }
