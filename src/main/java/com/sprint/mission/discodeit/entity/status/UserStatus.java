@@ -15,11 +15,11 @@ public class UserStatus implements Serializable {
   private Instant updatedAt;
   private static final int USER_ACTIVE_TIMEOUT_SECONDS = 5 * 60;
 
-    public UserStatus(String userId) {
-        id= userId;
-        createdAt = Instant.now();
-        updatedAt = createdAt;
-    }
+  public UserStatus(String userId) {
+    this.id = userId;
+    this.createdAt = Instant.now();
+    this.updatedAt = createdAt;
+  }
 
   public boolean isActive() {
 

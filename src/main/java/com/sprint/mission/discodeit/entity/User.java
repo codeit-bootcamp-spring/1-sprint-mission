@@ -102,6 +102,12 @@ public class User implements Serializable {
 
     boolean isUpdated = false;
 
+    if (!username.equals(updateUserDto.newUsername()) && updateUserDto.newUsername() != null
+        && !updateUserDto.newUsername().isEmpty()) {
+      setNickname(updateUserDto.newUsername());
+      isUpdated = true;
+    }
+
     if (!nickname.equals(updateUserDto.newNickname()) && updateUserDto.newNickname() != null
         && !updateUserDto.newNickname().isEmpty()) {
       setNickname(updateUserDto.newNickname());
