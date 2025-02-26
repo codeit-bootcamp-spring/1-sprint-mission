@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
@@ -9,8 +8,10 @@ import java.util.UUID;
 
 public interface UserStatusRepository {
     UserStatus save(UserStatus userStatus);
-    Optional<UserStatus> findByUser(User user);
-    void deleteByUser(User user);
-    boolean existsByUser(User user);
-    List<UserStatus> findAllByUserIn(List<User> users);
+    Optional<UserStatus> findById(UUID id);
+    Optional<UserStatus> findByUserId(UUID userId);
+    List<UserStatus> findAll();
+    boolean existsById(UUID id);
+    void deleteById(UUID id);
+    void deleteByUserId(UUID userId);
 }
