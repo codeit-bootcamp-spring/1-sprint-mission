@@ -43,5 +43,17 @@ public class MessageController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PatchMapping("/{id}")
+    public ResponseEntity<MessageDto> updateMessage(
+            @PathVariable String id,
+            @Valid @RequestBody MessageDto messageDto) {
+        try {
+            MessageDto updateMessage = messageService.updateMessage(id, messageDto);
+            return ResponseEntity.ok(updateMessage);
+        }
+        catch (Exception e) {
+            log.error("메시지 수정 중 오류 발생 : {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }

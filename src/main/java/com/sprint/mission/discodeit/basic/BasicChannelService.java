@@ -71,7 +71,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public Channel update(String id, ChannelDto channelDTO) {
+    public ChannelDto update(String id, ChannelDto channelDTO) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
@@ -90,7 +90,8 @@ public class BasicChannelService implements ChannelService {
                 channelType
         );
 
-        return channelRepository.save(channel);
+        Channel saved = channelRepository.save(channel);
+        return convertToDTO(saved);
     }
 
     @Override

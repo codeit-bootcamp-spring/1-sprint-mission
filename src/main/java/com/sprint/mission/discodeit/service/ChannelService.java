@@ -11,7 +11,7 @@ import java.util.Map;
 public interface ChannelService {
     ChannelDto create(ChannelDto channelDTO);
     ChannelDto find(String channelId);
-    Channel update(String channelId, ChannelDto channelDTO);
+    ChannelDto update(String channelId, ChannelDto channelDTO);
     Map<User, Channel> join(ChannelJoinDto joinDTO);
     void delete(String channelId);
     List<ChannelDto> findAll();

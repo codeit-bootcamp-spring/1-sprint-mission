@@ -13,6 +13,7 @@ public class ChannelDto {
     private String name;
     private String description;
     private String userId;
+    private String channelId;
 
     @Enumerated(EnumType.STRING)
     @NotNull

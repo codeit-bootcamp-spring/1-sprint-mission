@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +25,22 @@ public class ChannelController {
         return ResponseEntity.ok(channels);
     }
 
+
     // 채널 생성
     @PostMapping
     public ResponseEntity<ChannelDto> createChannel(@Valid @RequestBody ChannelDto channelDTO) {
         ChannelDto channel = channelService.create(channelDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
+    }
+
+    // 채널 수정
+    @PatchMapping("/{channelId}")
+    public ResponseEntity<ChannelDto> updateChannel(
+            @PathVariable String channelId,
+            @Valid @RequestBody ChannelDto channelDto) {
+
+        ChannelDto updateChannel = channelService.update(channelId, channelDto);
+        return ResponseEntity.ok(updateChannel);
     }
 
     // 채널 삭제
