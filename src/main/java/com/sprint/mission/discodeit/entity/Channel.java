@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true) // ✅ JSON에서 인식하지 못하는 필드는 무시
 public class Channel extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -40,9 +42,6 @@ public class Channel extends BaseEntity implements Serializable {
     }
 
     public void updateChannel(String name, String description) {
-        if (isPrivate) {
-            throw new IllegalArgumentException("Private channels cannot be updated.");
-        }
         this.name = name;
         this.description = description;
         setUpdatedAt(Instant.now());

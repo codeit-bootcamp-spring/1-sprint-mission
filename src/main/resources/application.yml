@@ -5,8 +5,21 @@ spring:
     locale: ko_KR
   mvc:
     log-request-details: true
+    cors:
+      allowed-origins: "*"  # 모든 도메인 허용 (테스트용)
+      allowed-methods: "*"   # 모든 HTTP 메서드 허용
+      allowed-headers: "*"   # 모든 헤더 허용
+      allow-credentials: true
+  jpa:
+    hibernate:
+      ddl-auto: update
 
-  # ✅ H2 Database 설정 제거
+  security:
+    user:
+      name: admin  # 기본 사용자 이름
+      password: 1234  # 기본 사용자 비밀번호 (테스트용)
+
+  # ✅ H2 Database 설정 제거 (필요시 활성화)
   # datasource:
   #   url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
   #   driver-class-name: org.h2.Driver
@@ -24,4 +37,15 @@ spring:
   #       show_sql: true
 
 server:
-  port: 8080
+  port: 8090  # ✅ 서버 포트 설정
+
+logging:
+  level:
+    org.springframework.security: DEBUG  # ✅ Spring Security 디버깅 활성화
+    org.springframework.web: DEBUG  # ✅ 웹 요청 로깅 활성화
+
+servlet:
+  multipart:
+    enabled: true
+    max-file-size: 50MB
+    max-request-size: 50MB

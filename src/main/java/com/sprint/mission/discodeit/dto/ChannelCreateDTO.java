@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@NoArgsConstructor  // ✅ 기본 생성자 추가
+@NoArgsConstructor
 @AllArgsConstructor
 public class ChannelCreateDTO {
     private String name;

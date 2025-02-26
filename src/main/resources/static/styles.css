@@ -1,0 +1,165 @@
+/* 기본 스타일 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+/* 컨테이너 */
+.container {
+    max-width: 800px;
+    width: 90%;
+    background: rgba(255, 255, 255, 0.9); /* 반투명 흰색 */
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    backdrop-filter: blur(10px); /* 유리 느낌 효과 */
+}
+
+/* 제목 */
+h1 {
+    font-size: 26px;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+/* 사용자 리스트 */
+.user-list {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 개별 사용자 카드 */
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    transition: all 0.3s ease-in-out;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 마지막 요소는 테두리 제거 */
+.user-item:last-child {
+    border-bottom: none;
+}
+
+/* 카드 호버 효과 */
+.user-item:hover {
+    background-color: #ffe1e6;
+    transform: scale(1.02);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 프로필 이미지 */
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 3px solid #ff6b81;
+    transition: transform 0.2s ease-in-out;
+    background-color: var(--profile-bg);
+}
+
+/* 랜덤한 배경 컬러 지정 */
+.user-avatar:nth-child(1) { --profile-bg: #ffadad; }
+.user-avatar:nth-child(2) { --profile-bg: #ffd6a5; }
+.user-avatar:nth-child(3) { --profile-bg: #fdffb6; }
+.user-avatar:nth-child(4) { --profile-bg: #9bf6ff; }
+.user-avatar:nth-child(5) { --profile-bg: #a0c4ff; }
+.user-avatar:nth-child(6) { --profile-bg: #bdb2ff; }
+
+/* 이미지 호버 효과 */
+.user-item:hover .user-avatar {
+    transform: scale(1.1);
+    border-color: #ff4f70;
+}
+
+/* 사용자 정보 */
+.user-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+/* 사용자 이름 */
+.user-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 5px;
+}
+
+/* 사용자 이메일 */
+.user-email {
+    font-size: 14px;
+    color: #555;
+}
+
+/* 상태 배지 */
+.status-badge {
+    display: flex;
+    align-items: center;
+    padding: 7px 14px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    transition: all 0.2s ease-in-out;
+}
+
+/* 온라인 상태 */
+.online {
+    background: linear-gradient(135deg, #4CAF50, #66bb6a);
+}
+
+/* 오프라인 상태 */
+.offline {
+    background: linear-gradient(135deg, #9e9e9e, #bdbdbd);
+}
+
+
+.status-badge::before {
+    content: '●';
+    font-size: 12px;
+    margin-right: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+.online::before {
+    color: #2e7d32;
+}
+
+.offline::before {
+    color: #757575;
+}
+
+
+.button {
+    background: linear-gradient(135deg, #ff6b81, #ff9a9e);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.button:hover {
+    background: linear-gradient(135deg, #ff4757, #ff758c);
+    transform: scale(1.05);
+}

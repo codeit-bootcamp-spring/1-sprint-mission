@@ -10,51 +10,39 @@ import java.util.concurrent.ConcurrentHashMap;
 @Repository("jcfUserRepository")
 public class JCFUserRepository implements UserRepository {
 
-    private final Map<UUID, User> data = new ConcurrentHashMap<>();
+    private final Map<UUID, User> userStorage = new ConcurrentHashMap<>();
 
     @Override
     public void save(User user) {
-        data.put(user.getId(), user);
+        userStorage.put(user.getId(), user);
     }
 
     @Override
     public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(data.get(id));
+        return Optional.ofNullable(userStorage.get(id));
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
+        return new ArrayList<>(userStorage.values());
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return data.values().stream()
+        return userStorage.values().stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
     }
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return data.values().stream()
+        return userStorage.values().stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findFirst();
     }
 
     @Override
-    public boolean existsByUsername(String username) {
-        return data.values().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return data.values().stream()
-                .anyMatch(user -> user.getEmail().equals(email));
+    public void deleteById(UUID id) { // ✅ 추가된 메서드
+        userStorage.remove(id);
     }
 }

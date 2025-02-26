@@ -23,7 +23,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'  // Spring Data JPA
     implementation 'org.springframework.boot:spring-boot-starter-validation'  // Validation starter
     implementation 'org.springframework.boot:spring-boot-starter-security'
-
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // ✅ Lombok (컴파일 및 애너테이션 프로세서 설정)
     compileOnly 'org.projectlombok:lombok'
