@@ -6,15 +6,16 @@ import java.util.List;
 
 public interface ChannelRepository {
 
-    //저장
-    Channel save(Channel channel);
+  //저장
+  Channel save(Channel channel);
 
-    //delete
-    boolean delete(String channelId);
+  //delete
+  boolean delete(String channelId);
 
-    //search
-    Channel findById(String id);
+  //search
+  Channel findById(String id);
 
-    List<Channel> findAll();
+
+  List<Channel> findAll();
 
 }
