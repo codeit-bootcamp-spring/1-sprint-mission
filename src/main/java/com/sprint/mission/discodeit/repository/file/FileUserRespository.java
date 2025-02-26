@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.dto.entity.User;
-import com.sprint.mission.discodeit.dto.form.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Participant;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.web.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
 import java.io.FileInputStream;
@@ -10,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,9 +25,10 @@ import java.util.UUID;
 public class FileUserRespository implements UserRepository{
     private static final String FILE_PATH = "temp/users-obj.dat";
     private final Map<UUID,User> data=new HashMap<>();
+
     @Override
-    public User createUser(UUID id, User user) {
-        data.put(id,user);
+    public User createUser(User user) {
+        data.put(user.getId(),user);
         save();
         return user;
     }
@@ -37,7 +41,7 @@ public class FileUserRespository implements UserRepository{
         findUser.setUserEmail(userParam.getUserEmail());
         findUser.setLoginId(userParam.getLoginId());
         findUser.setPassword(userParam.getPassword());
-        findUser.setAttachProfile(userParam.getAttachProfile());
+        findUser.setUpdatedAt(Instant.now());
         save();
     }
 
@@ -63,6 +67,16 @@ public class FileUserRespository implements UserRepository{
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public List<User> findUsersInChannel(Channel channel) {
+        List<User> userLists=new ArrayList<>();
+        List<Participant> participants = channel.getParticipants();
+        for (Participant participant : participants) {
+            userLists.add(participant.getUser());
+        }
+        return userLists;
     }
 
     @Override

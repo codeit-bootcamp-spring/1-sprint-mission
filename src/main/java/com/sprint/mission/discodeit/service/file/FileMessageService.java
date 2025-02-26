@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
-import com.sprint.mission.discodeit.dto.entity.Message;
-import com.sprint.mission.discodeit.dto.form.MessageWithContents;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 
@@ -19,14 +18,15 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public void messageSave(Message message) {
-        messageRepository.createMessage(message.getId(),message);
+    public Message messageSave(UUID id,Message message) {
+        return messageRepository.createMessage(message);
     }
 
     @Override
-    public void messageSaveWithContents(MessageWithContents message, BinaryContent binaryContent) {
-
+    public Message messageSaveWithContents(UUID senderId, Message message, List<BinaryContent> files) {
+        return null;
     }
+
 
     @Override
     public Optional<Message> findMessage(UUID id) {

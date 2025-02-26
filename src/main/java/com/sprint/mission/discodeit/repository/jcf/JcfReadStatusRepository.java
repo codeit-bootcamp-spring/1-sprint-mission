@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class JcfReadStatusRepository implements ReadStatusRepository {
-    Map<UUID, ReadStatus> data = new HashMap<>();
+    Map<UUID, ReadStatus> data = new ConcurrentHashMap<>();
 
     @Override
     public ReadStatus createReadStatus(ReadStatus readStatus) {

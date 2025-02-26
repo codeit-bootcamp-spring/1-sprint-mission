@@ -1,16 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
-import com.sprint.mission.discodeit.dto.entity.Message;
-import com.sprint.mission.discodeit.dto.form.MessageWithContents;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    void messageSave(Message message);
-    void messageSaveWithContents(MessageWithContents message, BinaryContent binaryContent);
+    Message messageSave(UUID id,Message message);
+    Message messageSaveWithContents(UUID senderId,Message message, List<BinaryContent> files);
     Optional<Message> findMessage(UUID id);
     List<Message> findAllMessages();
     Optional<Message> findAllByChannelId(UUID channelId);

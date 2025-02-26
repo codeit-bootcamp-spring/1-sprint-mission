@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,8 @@ import java.util.UUID;
 
 @Repository
 public class JcfBinaryContentRepository implements BinaryContentRepository {
-    private final Map<UUID,BinaryContent> data;
+    private final Map<UUID,BinaryContent> data=new HashMap<>();
 
-    public JcfBinaryContentRepository() {
-        this.data = new HashMap<>();
-    }
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
@@ -31,7 +29,13 @@ public class JcfBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return List.of();
+        List<BinaryContent> result=new ArrayList<>();
+        for (UUID id : ids) {
+            if(data.containsKey(id)) {
+                result.add(data.get(id));
+            }
+        }
+        return result;
     }
 
     @Override

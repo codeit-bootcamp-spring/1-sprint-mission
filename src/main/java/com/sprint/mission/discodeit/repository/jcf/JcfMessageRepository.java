@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.dto.entity.Channel;
-import com.sprint.mission.discodeit.dto.entity.Message;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,9 +15,11 @@ import java.util.UUID;
 @Repository
 public class JcfMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data=new HashMap<>();
+
+
     @Override
-    public Message createMessage(UUID id, Message message) {
-        data.put(id, message);
+    public Message createMessage(Message message) {
+        data.put(message.getId(), message);
         return message;
     }
 

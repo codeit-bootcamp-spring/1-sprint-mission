@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.entity.BinaryContent;
-import com.sprint.mission.discodeit.dto.entity.Message;
-import com.sprint.mission.discodeit.dto.form.MessageWithContents;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.Participant;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,29 +25,61 @@ import java.util.UUID;
 @Slf4j
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final ChannelRepository channelRepository;
 
     @Override
-    public void messageSaveWithContents(MessageWithContents messageParam, BinaryContent binaryContent) {
-        if (binaryContent == null) {
-            log.info("파일을 하나라도 등록하세요.");
-            return;
-        }
-        binaryContentRepository.save(binaryContent);
-        List<MultipartFile> files = new ArrayList<>();
-        files.add((MultipartFile) binaryContent);
-        Message message = new Message(messageParam.getContent(), messageParam.getSenderId(), messageParam.getChannelId());
-        message.getMessageFiles().addAll(files);
-        messageRepository.createMessage(message.getId(), message);
-    }
-    @Override
-    public void messageSave(Message message) {
+    public Message messageSave(UUID senderId,Message message) {
         if (message.getContent().trim().isEmpty()) {
             log.info("메세지 내용을 입력해주세요.");
-            return;
+            throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
         }
-        messageRepository.createMessage(message.getId(), message);
+        User user = userRepository.findById(senderId).orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Channel channel = channelRepository.findById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException("채널을 찾을 수 없습니다."));
+
+        Participant findParticipant=null;
+        for (Participant participant : channel.getParticipants()) {
+            if (participant.getUser().getId().equals(senderId)) {
+                findParticipant = participant;
+                break;
+            }
+        }
+        if(findParticipant == null) {
+            throw new IllegalStateException("채널에 가입하지 않았습니다.");
+        }
+        findParticipant.setMessage(message);
+        return messageRepository.createMessage(message);
     }
+
+    @Override
+    public Message messageSaveWithContents(UUID senderId,Message message, List<BinaryContent> files) {
+        if (message.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
+        }
+        User user = userRepository.findById(senderId).orElseThrow(()->new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Channel channel = channelRepository.findById(message.getChannelId()).orElseThrow(()->new IllegalArgumentException("채널을 찾을 수 없습니다."));
+
+        Participant findParticipant=null;
+        for (Participant participant : channel.getParticipants()) {
+            if (participant.getUser().getId().equals(senderId)) {
+                findParticipant = participant;
+                break;
+            }
+        }
+        if(findParticipant == null) {
+            throw new IllegalStateException("채널에 가입하지 않았습니다.");
+        }
+        List<UUID> fileIds=new ArrayList<>();
+        for (BinaryContent file : files) {
+            BinaryContent savedFile = binaryContentRepository.save(file);
+            fileIds.add(savedFile.getId());
+        }
+        Message fileMessage = new Message(message.getId(),message.getContent(), senderId, message.getChannelId(), fileIds);
+        findParticipant.setMessage(fileMessage);
+        return messageRepository.createMessage(fileMessage);
+    }
+
 
     @Override
     public Optional<Message> findMessage(UUID id) {
@@ -73,12 +108,15 @@ public class BasicMessageService implements MessageService {
     public void deleteMessage(UUID id) {
         validateMessageExits(id);
         Message message = messageRepository.findById(id).get();
-        message.getMessageFiles().clear();
+        List<UUID> messageFiles = message.getMessageFiles();
+        for (UUID messageFile : messageFiles) {
+            binaryContentRepository.deleteById(messageFile);
+        }
         messageRepository.deleteMessage(id);
 
     }
     private void validateMessageExits(UUID uuid) {
-        if (!messageRepository.findById(uuid).isPresent()) {
+        if (messageRepository.findById(uuid).isEmpty()) {
             throw new RuntimeException("해당 User가 존재하지 않습니다.");
         }
     }
