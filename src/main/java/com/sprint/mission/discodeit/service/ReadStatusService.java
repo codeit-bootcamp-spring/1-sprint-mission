@@ -10,15 +10,19 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatus createReadStatus(ReadStatusCreateRequest readStatusRequest);
 
-    ReadStatus findReadStatusById(UUID readStatusId);
-    List<ReadStautsfindAllByUserIdResponse> findAllByUserId(UUID userId);
-    List<ReadStatus> findAllByChannelId(UUID channelId);
+  ReadStatus createReadStatus(ReadStatusCreateRequest readStatusRequest);
+
+  ReadStatus findReadStatusById(UUID readStatusId);
+
+  List<ReadStatus> findAllByUserId(UUID userId);
+
+  List<ReadStatus> findAllByChannelId(UUID channelId);
 
 
-    ReadStatusUpdateResponse updateReadStatus(ReadStatusUpdateRequest readStatusUpdateRequest);
+  ReadStatus updateReadStatus(UUID id,
+      ReadStatusUpdateRequest readStatusUpdateRequest);
 
-    void deleteReadStatusById(UUID readStatusId);
+  void deleteReadStatusById(UUID readStatusId);
 
 }

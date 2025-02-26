@@ -6,11 +6,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserFindResponse(
-        UUID userid,
-        String username,
-        String email,
-        Instant createdAt,
-        Instant updatedAt,
-        UUID profileId,
-        boolean isConnected
-) { }
+    UUID id,
+    String username,
+    String email,
+    Instant createdAt,
+    Instant updatedAt,
+    UUID profileId,
+    boolean online
+) {
+
+}
