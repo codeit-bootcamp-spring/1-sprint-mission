@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -12,26 +13,11 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Repository
-public class FileUserRepository implements UserRepository {
-    //데이터 저장
-    private final Path DIRECTORY; // 데이터를 저장할 디렉토리 경로
-    private final String EXTENSION = ".ser"; // 파일확장자를 .ser로 설정하여 직렬화된 파일임을 나타냄
-    //생성자
+@Primary  // 기본적으로 사용될 구현체
+public class FileUserRepository extends AbstractFileRepository<User> implements UserRepository {
+
     public FileUserRepository() {
-        //파일 저장 디렉토리 지정
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),"file-data-map",User.class.getSimpleName());
-        //디렉토리가 없으면 생성하여 파일 생성
-        if(Files.notExists(DIRECTORY)){
-            try{
-                Files.createDirectories(DIRECTORY);
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-        }
-    }
-    //주어진 UUID를 이용해 해당 User 객체의 파일 경로를 반환
-    private Path resolvePath(UUID id){
-        return DIRECTORY.resolve(id+EXTENSION);
+        super("user");
     }
 
     //생성,업데이트
@@ -44,7 +30,7 @@ public class FileUserRepository implements UserRepository {
         ){
             oos.writeObject(user); //객체를 직렬화하여 파일에 씀
         }catch(IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 실패: " + path, e);
         }
         return user;
     }
@@ -60,7 +46,7 @@ public class FileUserRepository implements UserRepository {
             ){
                 userNullable = (User) ois.readObject();
             }catch (IOException|ClassNotFoundException e){
-                throw new RuntimeException(e);
+                throw new RuntimeException("파일 읽기 실패: " + path, e);
             }
         }
         return Optional.ofNullable(userNullable);
@@ -87,34 +73,12 @@ public class FileUserRepository implements UserRepository {
                                 ){
                             return (User)ois.readObject();
                         }catch (IOException | ClassNotFoundException e){
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("파일 읽기 실패: " + path, e);
                         }
                     })
                     .toList();
         }catch (IOException e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<User> findAllById(List<UUID> uuids) {
-        try{
-            return Files.list(DIRECTORY)//경로에 있는 파일 목록을 스트림 형태로 반환
-                    .filter(path->path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try(
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ){
-                            return (User)ois.readObject();
-                        }catch (IOException | ClassNotFoundException e){
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(user -> uuids.contains(user.getId()))
-                    .toList();
-        }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("디렉토리 읽기 실패: " + DIRECTORY, e);
         }
     }
 
@@ -124,6 +88,17 @@ public class FileUserRepository implements UserRepository {
         Path path = resolvePath(id);
         return Files.exists(path);
     }
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream()
+                .anyMatch(user -> user.getUsername().equals(username));
+    }
     //삭제
     @Override
     public void deleteById(UUID userId){
@@ -131,7 +106,7 @@ public class FileUserRepository implements UserRepository {
         try{
             Files.delete(path);
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 실패: " + path, e);
         }
     }
 

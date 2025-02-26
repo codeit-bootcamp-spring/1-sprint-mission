@@ -41,18 +41,19 @@ public class JCFUserRepository implements UserRepository {
         return new ArrayList<>(userData.values());
     }
 
-    @Override
-    public List<User> findAllById(List<UUID> uuids) {
-        return uuids.stream()
-                .map(uuid->userData.get(uuid)) // HashMap에서 UUID에 해당하는 User 가져오기
-                .filter(Objects::nonNull) // 존재하지 않는 경우 필터링
-                .toList();
-    }
-
     //존재하는지 확인
     @Override
     public boolean existsById(UUID userId) {
         return userData.containsKey(userId);
+    }
+    @Override
+    public boolean existsByEmail(String email) {
+        return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
     }
     //삭제
     @Override

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -11,23 +12,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class FileChannelRepository implements ChannelRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+@Primary  // 기본적으로 사용될 구현체
+public class FileChannelRepository extends AbstractFileRepository<Channel> implements ChannelRepository {
 
     public FileChannelRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),"file-data-map",Channel.class.getSimpleName());
-        if(Files.notExists(DIRECTORY)){
-            try{
-                Files.createDirectories(DIRECTORY);
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    private Path resolvePath(UUID id){
-        return DIRECTORY.resolve(id + EXTENSION);
+        super("channel");
     }
 
     @Override
@@ -39,7 +28,7 @@ public class FileChannelRepository implements ChannelRepository {
         ){
             oos.writeObject(channel);
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 실패: " + path, e);
         }
         return channel;
     }
@@ -55,7 +44,7 @@ public class FileChannelRepository implements ChannelRepository {
             ) {
                 channelNullable = (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("파일 읽기 실패: " + path, e);
             }
         }
         return Optional.ofNullable(channelNullable);
@@ -73,12 +62,12 @@ public class FileChannelRepository implements ChannelRepository {
                         ) {
                             return (Channel) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("파일 읽기 실패: " + path, e);
                         }
                     })
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("디렉토리 읽기 실패: " + DIRECTORY, e);
         }
     }
 
@@ -96,7 +85,7 @@ public class FileChannelRepository implements ChannelRepository {
         try {
             Files.delete(path);
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 실패: " + path, e);
         }
     }
 }

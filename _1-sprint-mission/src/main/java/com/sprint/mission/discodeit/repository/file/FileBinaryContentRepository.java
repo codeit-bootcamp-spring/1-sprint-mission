@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.file;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -14,26 +15,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class FileBinaryContentRepository implements BinaryContentRepository {
-    //데이터 저장
-    private final Path DIRECTORY; // 데이터를 저장할 디렉토리 경로
-    private final String EXTENSION = ".ser"; // 파일확장자를 .ser로 설정하여 직렬화된 파일임을 나타냄
-    //생성자
+@Primary  // 기본적으로 사용될 구현체
+public class FileBinaryContentRepository extends AbstractFileRepository<BinaryContent> implements BinaryContentRepository {
+
     public FileBinaryContentRepository() {
-        //파일 저장 디렉토리 지정
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),"file-data-map", BinaryContent.class.getSimpleName());
-        //디렉토리가 없으면 생성하여 파일 생성
-        if(Files.notExists(DIRECTORY)){
-            try{
-                Files.createDirectories(DIRECTORY);
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-        }
-    }
-    //주어진 UUID를 이용해 해당 User 객체의 파일 경로를 반환
-    private Path resolvePath(UUID id){
-        return DIRECTORY.resolve(id+EXTENSION);
+        super("binary-content");
     }
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
@@ -44,7 +30,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         ){
             oos.writeObject(binaryContent); //객체를 직렬화하여 파일에 씀
         }catch(IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 실패: " + path, e);
         }
         return binaryContent;
     }
@@ -60,33 +46,34 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
             ){
                 binaryContent = (BinaryContent) ois.readObject();
             }catch (IOException|ClassNotFoundException e){
-                throw new RuntimeException(e);
+                throw new RuntimeException("파일 읽기 실패: " + path, e);
             }
         }
         return Optional.ofNullable(binaryContent);
     }
 
     @Override
-    public List<BinaryContent> findAllById(List<UUID> binaryContentIds) {
-        try{
-            return Files.list(DIRECTORY)//경로에 있는 파일 목록을 스트림 형태로 반환
-                    .filter(path->path.toString().endsWith(EXTENSION))
+    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+        try {
+            return Files.list(DIRECTORY)
+                    .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
-                        try(
+                        try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
-                        ){
-                            return (BinaryContent)ois.readObject();
-                        }catch (IOException | ClassNotFoundException e){
-                            throw new RuntimeException(e);
+                        ) {
+                            return (BinaryContent) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException("파일 읽기 실패: " + path, e);
                         }
                     })
-                    .filter(binaryContent -> binaryContentIds.contains(binaryContent.getId()))
+                    .filter(content -> binaryContentIds.contains(content.getId()))
                     .toList();
-        }catch (IOException e){
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException("디렉토리 읽기 실패: " + DIRECTORY, e);
         }
     }
+
 
     @Override
     public void deleteById(UUID binaryContentId) {
@@ -94,7 +81,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         try{
             Files.delete(path);
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 실패: " + path, e);
         }
     }
 

@@ -1,17 +1,12 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-
+@Repository
 public class JCFMessageRepository implements MessageRepository {
     //데이터 저장
     private final Map<UUID,Message> messageData;
@@ -33,8 +28,8 @@ public class JCFMessageRepository implements MessageRepository {
 
     //다중조회
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messageData.values());
+    public List<Message> findAllByChannelId(UUID channelId) {
+        return this.messageData.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
     }
 
     @Override
@@ -47,6 +42,10 @@ public class JCFMessageRepository implements MessageRepository {
     public void deleteById(UUID messageId) {
         messageData.remove(messageId);
     }
-
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
+    }
 
 }

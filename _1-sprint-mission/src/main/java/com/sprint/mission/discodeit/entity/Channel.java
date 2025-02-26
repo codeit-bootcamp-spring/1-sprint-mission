@@ -1,22 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
-@Entity
+
 @Getter
-@NoArgsConstructor
 public class Channel extends Common implements Serializable {
     private static final long serialVersionUID = 1L; //직렬화 버전
-
-    @Id
-    @GeneratedValue
-    private UUID id;
 
     //필드
     public enum ChannelType {
@@ -26,13 +17,9 @@ public class Channel extends Common implements Serializable {
     private String channelName; // 채널 이름
     private String description; // 채널 설명
 
-    //ReadStatus와 다대일 관계
-    @OneToMany(mappedBy = "channel",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<ReadStatus> readStatuses = new ArrayList<>();
-
     // PUBLIC 전용 생성자
     public Channel(ChannelType channelType,String channelName, String description) {
-        super();
+        super(UUID.randomUUID(), Instant.now());
         //검증
         if (channelType == null) {
             throw new IllegalArgumentException("채널 타입은 필수입니다.(PUBLIC,PRIVATE)");
@@ -49,7 +36,7 @@ public class Channel extends Common implements Serializable {
     }
     //PRIVATE 전용 생성자
     public Channel(ChannelType channelType) {
-        super();
+        super(UUID.randomUUID(), Instant.now());
         //검증
         if (channelType == null) {
             throw new IllegalArgumentException("채널 타입은 필수입니다.(PUBLIC,PRIVATE)");

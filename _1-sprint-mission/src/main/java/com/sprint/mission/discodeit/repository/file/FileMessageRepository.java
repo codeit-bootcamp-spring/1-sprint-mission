@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -11,26 +12,12 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 @Repository
-public class FileMessageRepository implements MessageRepository {
-
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+@Primary  // 기본적으로 사용될 구현체
+public class FileMessageRepository extends AbstractFileRepository<Message> implements MessageRepository {
 
     public FileMessageRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "file-data-map", Message.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
-            try {
-                Files.createDirectories(DIRECTORY);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        super("message");
     }
-
-    private Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id + EXTENSION);
-    }
-
     @Override
     public Message save(Message message) {
         Path path = resolvePath(message.getId());
@@ -40,7 +27,7 @@ public class FileMessageRepository implements MessageRepository {
         ) {
             oos.writeObject(message);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 실패: " + path, e);
         }
         return message;
     }
@@ -56,14 +43,14 @@ public class FileMessageRepository implements MessageRepository {
             ) {
                 messageNullable = (Message) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("파일 읽기 실패: " + path, e);
             }
         }
         return Optional.ofNullable(messageNullable);
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findAllByChannelId(UUID channelId) {
         try {
             return Files.list(DIRECTORY)
                     .filter(path -> path.toString().endsWith(EXTENSION))
@@ -74,12 +61,13 @@ public class FileMessageRepository implements MessageRepository {
                         ) {
                             return (Message) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("파일 읽기 실패: " + path, e);
                         }
                     })
+                    .filter(message -> message.getChannelId().equals(channelId))
                     .toList();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("디렉토리 읽기 실패: " + DIRECTORY, e);
         }
     }
     @Override
@@ -93,9 +81,14 @@ public class FileMessageRepository implements MessageRepository {
         try {
             Files.delete(path);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 실패: " + path, e);
         }
     }
 
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        this.findAllByChannelId(channelId)
+                .forEach(message -> this.deleteById(message.getId()));
+    }
 
 }

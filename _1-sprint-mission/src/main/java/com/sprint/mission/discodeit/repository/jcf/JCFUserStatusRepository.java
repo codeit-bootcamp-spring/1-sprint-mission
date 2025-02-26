@@ -20,8 +20,15 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public Optional<UserStatus> findById(UUID userId) {
-        return Optional.ofNullable(userStatusData.get(userId));
+    public Optional<UserStatus> findById(UUID id) {
+        return Optional.ofNullable(userStatusData.get(id));
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(us->us.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
@@ -30,8 +37,13 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public void deleteById(UUID userId) {
-        userStatusData.remove(userId);
+    public void deleteById(UUID id) {
+        userStatusData.remove(id);
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findByUserId(userId).ifPresent(userStatus -> userStatusData.remove(userId));
     }
 
     @Override

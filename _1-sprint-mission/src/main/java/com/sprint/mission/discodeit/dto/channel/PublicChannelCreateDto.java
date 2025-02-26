@@ -1,10 +1,9 @@
 package com.sprint.mission.discodeit.dto.channel;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.Channel;
 
-public record ChannelUpdateDto(
-        UUID channelId,
+public record PublicChannelCreateDto(
         String channelName,
         String description
-) {
+){
 }

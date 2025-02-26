@@ -3,10 +3,12 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import org.springframework.stereotype.Repository;
 
 import java.nio.channels.FileChannel;
 import java.util.*;
 
+@Repository
 public class JCFChannelRepository implements ChannelRepository {
 
     //데이터 저장

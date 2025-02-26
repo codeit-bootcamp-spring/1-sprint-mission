@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.ResponseUserDto;
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -23,93 +25,64 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor // 생성자
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
+
     private final BinaryContentRepository binaryContentRepository;
+    private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserDto userDto) {
+    public User create(UserCreateDto userCreateDto, Optional<BinaryContentCreateDto> profileDto) {
         //username,email 중복 확인
-        validationUsernameAndEmail(userDto.username(),userDto.email());
+        validationUsernameAndEmail(userCreateDto.username(),userCreateDto.email());
 
-        //프로필 이미지 체크
-        User user = binaryContentCheck(userDto);
+        //프로필 이미지 Id 체크
+        UUID profileId = profileIdCheck(profileDto);
+
+        //User 생성
+        User user = new User(
+                userCreateDto.username(),
+                userCreateDto.email(),
+                userCreateDto.password(),
+                userCreateDto.phoneNumber(),
+                userCreateDto.address(),
+                profileId);
+        User createdUser = userRepository.save(user);
 
         //UserStatus 생성
-        UserStatus userStatus = new UserStatus(user,Instant.now(),user.getUserStatus().isOnlineStatus());
-        userStatusRepository.save(userStatus);
-        return userRepository.save(user);
+        Instant now = Instant.now();
+        UserStatus userStatus = new UserStatus(createdUser.getId(),now);
+        return createdUser;
     }
-    //프로필 이미지 체크
-    public User binaryContentCheck(UserDto userDto) {
-        if(userDto.profileImage() == null) {
-            return new User(userDto.username(), userDto.email(), userDto.password(), userDto.phoneNumber(), userDto.address(),null);
-        }else{
-            return new User(userDto.username(), userDto.email(), userDto.password(), userDto.phoneNumber(), userDto.address(), userDto.profileImage());
-        }
-    }
-    //username, email 다른 유저와 같은지 체크
-    public void validationUsernameAndEmail(String username, String email) {
-        User existingUserByUsername = userRepository.findByUsername(username)
-                .orElseThrow(()-> new NoSuchElementException("User Username not found"));
-        User existingUserByEmail = userRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("User Email not found"));
-        if(existingUserByUsername.getUsername().equals(username)) {
-            throw new IllegalArgumentException("이미 사용 중인 username 입니다.");
-        }
-        if(existingUserByEmail.getEmail().equals(email)) {
-            throw new IllegalArgumentException("이미 사용중인 email 입니다.");
-        }
+
+
+    @Override
+    public UserDto findById(UUID userId) {
+        return userRepository.findById(userId)
+                .map(user -> toDto(user))
+                .orElseThrow(()->new NoSuchElementException("User not found"));
     }
 
     @Override
-    public ResponseUserDto findById(UserDto userDto) {
-        User user = userRepository.findById(userDto.userId())
+    public List<UserDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(user->toDto(user))
+                .toList();
+    }
+
+    @Override
+    public User update(UUID userId, UserUpdateDto userUpdateDto,Optional<BinaryContentCreateDto> profileDto) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(()->new NoSuchElementException("UserId not found"));
-        UserStatus userStatus = userStatusRepository.findById(userDto.userId())
-                .orElseThrow(()-> new NoSuchElementException("userId not found"));
-        return new ResponseUserDto(
-                user.getUsername(),
-                user.getEmail(),
-                user.getPhoneNumber(),
-                user.getAddress(),
-                userStatus.isOnlineStatus()
-        );
-    }
-
-    @Override
-    public List<ResponseUserDto> findAll() {
-        List<User> users = userRepository.findAll();
-        return users.stream().map(user -> {
-            UserStatus userStatus = userStatusRepository.findById(user.getId()).orElseThrow(()-> new NoSuchElementException("userId not found"));
-
-            return new ResponseUserDto(
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getPhoneNumber(),
-                    user.getAddress(),
-                    userStatus.isOnlineStatus()
-            );
-        }).collect(Collectors.toList());
-    }
-
-    @Override
-    public User update(UserDto userDto) {
-        User user = userRepository.findById(userDto.userId())
-                .orElseThrow(()->new NoSuchElementException("UserId not found"));
-        //기존 프로필 이미지 삭제
-        if(userDto.profileImage() != null){
-            if(user.getProfileImage() != null) {
-                binaryContentRepository.deleteById(user.getProfileImage().getId());
-            }
-        }
+        validationUsernameAndEmail(userUpdateDto.newUsername(),userUpdateDto.newEmail());
+        UUID profileId = profileIdCheck(profileDto);
 
         user.update(
-                userDto.username(),
-                userDto.email(),
-                userDto.password(),
-                userDto.phoneNumber(),
-                userDto.address(),
-                userDto.profileImage()
+                userUpdateDto.newUsername(),
+                userUpdateDto.newEmail(),
+                userUpdateDto.newPassword(),
+                userUpdateDto.newPhonenumber(),
+                userUpdateDto.newAddress(),
+                profileId
         );
 
         return userRepository.save(user);
@@ -119,14 +92,50 @@ public class BasicUserService implements UserService {
     public void deleteById(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(()->new NoSuchElementException("userId not found"));
         //관련된 프로필 이미지 삭제
-        if(user.getProfileImage() != null){
-            binaryContentRepository.deleteById(user.getProfileImage().getId());
+        if(user.getProfileId() != null){
+            binaryContentRepository.deleteById(user.getProfileId());
         }
         //UserStatus 삭제
-        if(user.getUserStatus() != null){
-            userStatusRepository.deleteById(user.getUserStatus().getId());
-        }
+        userStatusRepository.deleteByUserId(userId);
         //유저 삭제
         userRepository.deleteById(user.getId());
+    }
+
+    //프로필 이미지 Id 체크
+    public UUID profileIdCheck(Optional<BinaryContentCreateDto> profileDto) {
+        UUID profileId = profileDto.map(p->{
+            String fileName = p.fileName();
+            String contentType = p.contentType();
+            byte[] bytes = p.bytes();
+            BinaryContent binaryContent = new BinaryContent(fileName,(long)bytes.length,contentType,bytes);
+            return binaryContentRepository.save(binaryContent).getId();
+        }).orElse(null);
+        return profileId;
+    }
+    //username, email 다른 유저와 같은지 체크
+    public void validationUsernameAndEmail(String username, String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("User with email " + email + " already exists");
+        }
+        if (userRepository.existsByUsername(username)) {
+            throw new IllegalArgumentException("User with username " + username + " already exists");
+        }
+    }
+    //entity -> dto
+    public UserDto toDto(User user){
+        Boolean online = userStatusRepository.findById(user.getId())
+                .map(userStatus->userStatus.isOnline())
+                .orElse(null);
+        return new UserDto(
+                user.getId(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getAddress(),
+                user.getProfileId(),
+                online
+        );
     }
 }

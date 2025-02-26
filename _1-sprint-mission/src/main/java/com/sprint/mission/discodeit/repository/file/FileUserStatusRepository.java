@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -13,23 +14,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class FileUserStatusRepository implements UserStatusRepository {
-    private final Path DIRECTORY;
-    private final String EXTENSION = ".ser";
+@Primary  // 기본적으로 사용될 구현체
+public class FileUserStatusRepository extends AbstractFileRepository<UserStatus> implements UserStatusRepository  {
 
     public FileUserStatusRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"),"file-data-map",UserStatus.class.getSimpleName());
-        if(Files.notExists(DIRECTORY)){
-            try{
-                Files.createDirectories(DIRECTORY);
-            }catch (IOException e){
-                throw new RuntimeException(e);
-            }
-        }
+        super("user-status");
     }
-    public Path resolvePath(UUID id) {
-        return DIRECTORY.resolve(id+EXTENSION);
-    }
+
     @Override
     public UserStatus save(UserStatus userStatus) {
         Path path = resolvePath(userStatus.getId());
@@ -39,7 +30,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
         ){
             oos.writeObject(userStatus);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 저장 실패: " + path, e);
         }
         return userStatus;
     }
@@ -55,10 +46,17 @@ public class FileUserStatusRepository implements UserStatusRepository {
                     ){
                 userStatus = (UserStatus) ois.readObject();
             }catch (IOException | ClassNotFoundException e){
-                throw new RuntimeException(e);
+                throw new RuntimeException("파일 읽기 실패: " + path, e);
             }
         }
         return Optional.ofNullable(userStatus);
+    }
+
+    @Override
+    public Optional<UserStatus> findByUserId(UUID userId) {
+        return findAll().stream()
+                .filter(userStatus -> userStatus.getUserId().equals(userId))
+                .findFirst();
     }
 
     @Override
@@ -73,11 +71,11 @@ public class FileUserStatusRepository implements UserStatusRepository {
                                 ){
                             return (UserStatus)ois.readObject();
                         }catch (IOException | ClassNotFoundException e){
-                            throw new RuntimeException(e);
+                            throw new RuntimeException("파일 읽기 실패: " + path, e);
                         }
                     }).toList();
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("디렉토리 읽기 실패: " + DIRECTORY, e);
         }
     }
 
@@ -87,8 +85,14 @@ public class FileUserStatusRepository implements UserStatusRepository {
         try {
             Files.delete(path);
         }catch (IOException e){
-            throw new RuntimeException(e);
+            throw new RuntimeException("파일 삭제 실패: "+path,e);
         }
+    }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        this.findByUserId(userId)
+                .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
     }
 
     @Override
