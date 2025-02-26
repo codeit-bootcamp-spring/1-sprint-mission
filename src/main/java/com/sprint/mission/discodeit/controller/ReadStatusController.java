@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/read-status")
 @RequiredArgsConstructor
+@Tag(name = "ReadStatus", description = "메세지 읽음 상태 API")
 public class ReadStatusController {
 
   private final ReadStatusService readStatusService;

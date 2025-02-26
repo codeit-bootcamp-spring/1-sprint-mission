@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 import com.sprint.mission.discodeit.service.MessageService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/messages")
 @RequiredArgsConstructor
+@Tag(name = "Message", description = "메세지 API")
 public class MessageController {
 
   private final MessageService messageService;

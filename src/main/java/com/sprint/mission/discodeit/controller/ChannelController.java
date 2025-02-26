@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/channels")
 @RequiredArgsConstructor
+@Tag(name = "Channel", description = "채널 API")
 public class ChannelController {
 
   private final ChannelService channelService;

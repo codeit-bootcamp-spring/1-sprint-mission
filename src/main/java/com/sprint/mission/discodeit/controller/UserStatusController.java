@@ -11,6 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-status")
 @RequiredArgsConstructor
+@Tag(name = "User Status", description = "사용자 온라인 상태 API")
 public class UserStatusController {
 
   private final UserStatusService userStatusService;
