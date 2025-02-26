@@ -8,15 +8,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-@Table(name = "users")
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
@@ -58,26 +52,5 @@ public class User implements Serializable {
         if (anyValueUpdated) {
             this.updatedAt = Instant.now();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", profileId=" + profileId +
-                '}';
-    }
-
-    public void setPassword(String password) {
-        this.password = new BCryptPasswordEncoder().encode(password);  // 비밀번호 암호화
-    }
-
-    public boolean checkPassword(String password) {
-        return new BCryptPasswordEncoder().matches(password, this.password);  // 비밀번호 확인
     }
 }
