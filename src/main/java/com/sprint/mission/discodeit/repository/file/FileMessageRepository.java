@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -10,38 +11,47 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
 @Repository
-public class FileMessageRepository  implements MessageRepository {
+@ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "file")
+public class FileMessageRepository implements MessageRepository {
     private static final String FILE_PATH = "files/messages.ser";
-    private List<Message> messages;
+    private Map<UUID, Message> messages;
 
     public FileMessageRepository() {
         this.messages = loadFromFile();
     }
 
     @Override
-    public void save(Message message) {
-        messages.add(message);
+    public Message save(Message message) {
+        messages.put(message.getId(), message);
         saveToFile();
+        return message;
     }
 
     @Override
-    public Message findByMessageId(UUID messageId) {
-        for (Message message : messages) {
-            if (message.getId().equals(messageId)) {
-                return message;
-            }
-        }
-        return null;
+    public Message findById(UUID messageId) {
+        return messages.get(messageId);
     }
 
+//    @Override
+//    public Message findBySenderId(UUID senderId) {
+//        for (Message message : messages.values()) {
+//            if (message.getSenderId().equals(senderId)) {
+//                return message;
+//            }
+//        }
+//        return null;
+//    }
+
     @Override
-    public List<Message> findBySenderId(UUID senderId) {
+    public List<Message> findAllBySenderId(UUID senderId) {
         List<Message> result = new ArrayList<>();
-        for (Message message : messages) {
+        for (Message message : messages.values()) {
             if (message.getSenderId().equals(senderId)) {
                 result.add(message);
             }
@@ -50,9 +60,9 @@ public class FileMessageRepository  implements MessageRepository {
     }
 
     @Override
-    public List<Message> findByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         List<Message> result = new ArrayList<>();
-        for (Message message : messages) {
+        for (Message message : messages.values()) {
             if (message.getChannelId().equals(channelId)) {
                 result.add(message);
             }
@@ -61,21 +71,29 @@ public class FileMessageRepository  implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        return new ArrayList<>(messages);
+    public boolean existsById(UUID id) {
+        return messages.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID messageId) {
-        for (int i = 0; i < messages.size(); i++) {
-            if (messages.get(i).getId().equals(messageId)) {
-                messages.remove(i);
-                break;
-            }
-        }
+        messages.remove(messageId);
         saveToFile();
     }
 
+    @Override
+    public void deleteAllByChannelId(UUID channelId) {
+        List<UUID> toDelete = new ArrayList<>();
+        for (Map.Entry<UUID, Message> entry : messages.entrySet()) {
+            if (entry.getValue().getChannelId().equals(channelId)) {
+                toDelete.add(entry.getKey());
+            }
+        }
+        for (UUID id : toDelete) {
+            messages.remove(id);
+        }
+        saveToFile();
+    }
 
     private void saveToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
@@ -85,12 +103,11 @@ public class FileMessageRepository  implements MessageRepository {
         }
     }
 
-    private List<Message> loadFromFile() {
+    private Map<UUID, Message> loadFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            return (List<Message>) ois.readObject();
+            return (Map<UUID, Message>) ois.readObject();
         } catch (Exception e) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
     }
-
 }

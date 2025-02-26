@@ -13,12 +13,14 @@ public class Channel implements Serializable {
     private final UUID id;
     private String channelName;
     private String description;
+    private ChannelType type;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public Channel(String channelName, String description) {
+    public Channel(ChannelType type, String channelName, String description) {
         this.id = UUID.randomUUID();
         this.channelName = channelName;
+        this.type = type;
         this.description = description;
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();

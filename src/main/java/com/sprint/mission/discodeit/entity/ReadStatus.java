@@ -6,10 +6,10 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-
 @Getter
 public class ReadStatus implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private final UUID id;
     private final Instant createdAt;
     private Instant updatedAt;
@@ -27,7 +27,7 @@ public class ReadStatus implements Serializable {
     }
 
     public void updateLastReadAt(Instant lastReadAt) {
-        this.lastReadAt = Instant.now();
+        this.lastReadAt = lastReadAt != null ? lastReadAt : Instant.now();
         this.updatedAt = Instant.now();
     }
 }
