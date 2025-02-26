@@ -43,7 +43,7 @@ public class UserController {
   //InvalidContentTypeException 예외처리해야 -> 예외처리 없이 application/json 으로 보냈을때도 받을 수 있게 할 수는 없을까?
   @PostMapping
   public ResponseEntity<UserResponseDto> createUser(
-      @RequestPart(value = "file", required = false) MultipartFile file,
+      @RequestPart(value = "profile", required = false) MultipartFile file,
       @RequestPart("userCreateRequest") CreateUserDto createUserDto) {
     if (file == null || file.isEmpty()) {
       return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(createUserDto));
@@ -55,7 +55,7 @@ public class UserController {
   @PatchMapping("/{userId}")
   public ResponseEntity<UserResponseDto> updateUser(@PathVariable String userId,
       @RequestPart("userUpdateRequest") UpdateUserDto updateUserDto,
-      @RequestPart(value = "file", required = false) MultipartFile file) {
+      @RequestPart(value = "profile", required = false) MultipartFile file) {
     if (file == null || file.isEmpty()) {
       return ResponseEntity.ok(userService.updateUser(userId, updateUserDto));
     }
