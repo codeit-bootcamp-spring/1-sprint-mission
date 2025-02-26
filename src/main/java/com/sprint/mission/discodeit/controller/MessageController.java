@@ -21,12 +21,7 @@ public class MessageController {
     @PostMapping
     public ResponseEntity<MessageDto> create(@Valid @RequestBody MessageDto messageDTO) {
         try {
-            log.info("Creating message: channelId={}, senderId={}, content={}",
-                    messageDTO.getChannelId(), messageDTO.getSenderId(), messageDTO.getContent());
-
             MessageDto message = messageService.createMessage(messageDTO);
-
-            log.info("Message created successfully");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(message);
         } catch (Exception e) {
