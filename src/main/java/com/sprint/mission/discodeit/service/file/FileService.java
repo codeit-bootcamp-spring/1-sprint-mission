@@ -11,23 +11,27 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+//todo 클래스명 변경
 public class FileService {
 
-    public static Object read(Path filePath) {
-        if(Files.exists(filePath)) {
-            try(
-                    FileInputStream fis = new FileInputStream(filePath.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                return ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            return null;
-        }
+  public static Object read(Path filePath) {
+    if (!Files.exists(filePath)) {
+      return null;
     }
+
+    try (FileInputStream fis = new FileInputStream(filePath.toFile());
+        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(fis))) {
+
+      Object obj = ois.readObject();
+      return obj;
+
+    } catch (EOFException e) {
+      // 파일이 비어있거나 손상된 경우
+      return null;
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("파일 읽기 실패: " + filePath, e);
+    }
+  }
 
   public static <T> List<T> load(Path directory) {
     if (Files.exists(directory)) {
