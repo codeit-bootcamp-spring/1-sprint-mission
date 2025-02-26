@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.request.MessageRequest;
+import com.sprint.mission.discodeit.dto.response.MessageDetailResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -27,26 +29,31 @@ public class BasicMessageService implements MessageService {
     private final FileManager fileManager;
 
     @Override
-    public Message createMessage(MessageDto messageDto) {
-        Channel channel = channelRepository.findById(messageDto.getChannel().getId());
-        User user = channel.getUser(messageDto.getWriter().getId());
-        Message message = Message.of(user, messageDto.getContent(), channel);
+    public Message createMessage(MessageRequest messageRequest) {
+        Channel channel = channelRepository.findById(messageRequest.channelId())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 channel. id=" + messageRequest.channelId()));
+        User user = channel.getUser(messageRequest.writer());
+        Message message = Message.of(user, messageRequest.content(), channel);
         return messageRepository.save(message);
     }
 
     @Override
     public Message readMessage(UUID messageId) {
-        return messageRepository.findById(messageId);
+        return messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + messageId));
     }
 
     @Override
-    public List<Message> readAllByChannelId(UUID channelId) {
-        return messageRepository.findByChannelId(channelId);
+    public List<MessageDetailResponse> readAllByChannelId(UUID channelId) {
+        return messageRepository.findByChannelId(channelId).stream()
+                .map(MessageDetailResponse::from)
+                .toList();
     }
 
     @Override
     public void updateMessage(UUID messageId, String content) {
-        Message message = messageRepository.findById(messageId);
+        Message message = messageRepository.findById(messageId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 message. id=" + messageId));
         message.updateContent(content);
         messageRepository.updateMessage(message);
     }

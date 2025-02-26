@@ -1,12 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.BelongType;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.FileIOException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -20,21 +17,21 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    @Value("${discodeit.repository.file-directory}")
-    private String directory;
-
-    private Path directoryPath;
+    private final Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
+    public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory}") String directory, FileManager fileManager) {
+        this.fileManager = fileManager;
+        this.directoryPath = Path.of(System.getProperty("user.dir"), directory, "binary_contents");
+    }
+
     @PostConstruct
     private void init() {
-        directoryPath = Path.of(System.getProperty("user.dir"), directory, "binary_contents");
         fileManager.createDirectory(directoryPath);
     }
 
@@ -51,13 +48,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path path = directoryPath.resolve(id.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (BinaryContent) ois.readObject();
+            BinaryContent content = (BinaryContent) ois.readObject();
+            return Optional.of(content);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 BinaryContent 입니다.");
+            return Optional.empty();
         }
     }
 
@@ -73,7 +71,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 BinaryContent binaryContent = (BinaryContent) ois.readObject();
-                if (binaryContent.getType() == BelongType.PROFILE
+                if (binaryContent.getType() == BinaryContent.Type.PROFILE
                         && binaryContent.getBelongTo().equals(userId)) {
                     content = binaryContent;
                 }
@@ -97,7 +95,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 BinaryContent binaryContent = (BinaryContent) ois.readObject();
-                if (binaryContent.getType() == BelongType.MESSAGE
+                if (binaryContent.getType() == BinaryContent.Type.MESSAGE
                         && binaryContent.getBelongTo().equals(messageId)) {
                     contents.add(binaryContent);
                 }

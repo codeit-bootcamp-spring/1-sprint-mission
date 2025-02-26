@@ -1,13 +1,9 @@
 package com.sprint.mission.discodeit.exception;
 
-public class NotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
 
+public class NotFoundException extends ExpectedException {
     public NotFoundException(String message) {
-        super(message);
-    }
-
-    @Override
-    public synchronized Throwable fillInStackTrace() {
-        return this;
+        super(HttpStatus.NOT_FOUND, message);
     }
 }

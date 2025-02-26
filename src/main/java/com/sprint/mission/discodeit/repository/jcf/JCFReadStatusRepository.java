@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -25,9 +24,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return Optional.ofNullable(data.get(id))
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus"));
+    public Optional<ReadStatus> findById(UUID id) {
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -38,5 +36,12 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     @Override
     public void delete(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public void deleteByChannelId(UUID channelId) {
+        data.values().stream()
+                .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+                .forEach(readStatus -> delete(readStatus.getId()));
     }
 }

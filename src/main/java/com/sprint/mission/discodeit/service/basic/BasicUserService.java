@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.user.UserInfoDto;
+import com.sprint.mission.discodeit.dto.request.UserRequest;
+import com.sprint.mission.discodeit.dto.response.UserDetailResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.DuplicateException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -33,47 +34,47 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public User createUser(UserDto userDto) {
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (user.getName().equals(userDto.getName())
-                    || user.getEmail().equals(userDto.getEmail())) {
-                throw new DuplicateException("중복된 이름 혹은 이메일 입니다.");
-            }
-        }
+    public User createUser(UserRequest userRequest) {
+        duplicationCheck(userRequest);
 
-        String password = generatePassword(userDto.getPassword());
-        User newUser = User.of(userDto.getName(), userDto.getEmail(), password);
+        String password = generatePassword(userRequest.password());
+        User newUser = User.of(userRequest.name(), userRequest.email(), password);
 
         userStatusRepository.save(UserStatus.from(newUser.getId()));
         return userRepository.save(newUser);
     }
 
     @Override
-    public UserInfoDto readUser(UUID userId) {
-        User user = userRepository.findById(userId);
-        UserStatus userStatus = userStatusRepository.findById(user.getId());
-        return UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus);
+    public UserDetailResponse readUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
+        UserStatus userStatus = userStatusRepository.findById(user.getId())
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + userId));
+        return UserDetailResponse.of(user, userStatus.isOnline());
     }
 
     @Override
-    public List<UserInfoDto> readAll() {
+    public List<UserDetailResponse> readAll() {
         List<User> users = userRepository.findAll();
-        List<UserInfoDto> userInfoDtos = new ArrayList<>(100);
+        List<UserDetailResponse> userDetailResponses = new ArrayList<>(100);
         for (User user : users) {
-            UserStatus userStatus = userStatusRepository.findById(user.getId());
-            UserInfoDto userInfoDto = UserInfoDto.of(user.getId(), user.getCreatedAt(), user.getUpdatedAt(), user.getName(), user.getEmail(), userStatus);
-            userInfoDtos.add(userInfoDto);
+            UserStatus userStatus = userStatusRepository.findById(user.getId())
+                    .orElseThrow(() -> new NotFoundException("등록되지 않은 userStatus. id=" + user.getId()));
+            UserDetailResponse userDetailResponse = UserDetailResponse.of(user, userStatus.isOnline());
+            userDetailResponses.add(userDetailResponse);
         }
-        return userInfoDtos;
+        return userDetailResponses;
     }
 
     @Override
-    public void updateUser(UUID userId, UserDto userDto) {
-        User user = userRepository.findById(userId);
-        user.updateName(userDto.getName());
-        user.updateEmail(userDto.getEmail());
-        user.updatePassword(generatePassword(userDto.getPassword()));
+    public void updateUser(UUID userId, UserRequest userRequest) {
+        duplicationCheck(userRequest);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 user. id=" + userId));
+        user.updateName(userRequest.name());
+        user.updateEmail(userRequest.email());
+        user.updatePassword(generatePassword(userRequest.password()));
 
         userRepository.updateUser(user);
     }
@@ -87,6 +88,16 @@ public class BasicUserService implements UserService {
         }
         userStatusRepository.delete(userId);
         userRepository.deleteUser(userId);
+    }
+
+    private void duplicationCheck(UserRequest userRequest) {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (user.getName().equals(userRequest.name())
+                    || user.getEmail().equals(userRequest.email())) {
+                throw new DuplicateException("중복된 이름 혹은 이메일 입니다.");
+            }
+        }
     }
 
     private String generatePassword(String password) {

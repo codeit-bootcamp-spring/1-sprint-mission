@@ -36,10 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-users/
-channels/
-messages/
+.discodeit/
 files/
-binary_contents/
-user_statuses/
-read_statuses/

@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.FileIOException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -15,24 +13,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileUserRepository implements UserRepository {
 
-    @Value("${discodeit.repository.file-directory}")
-    private String directory;
-
-    private Path directoryPath;
+    private final Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
+    public FileUserRepository(@Value("${discodeit.repository.file-directory}") String directory, FileManager fileManager) {
+        this.fileManager = fileManager;
+        this.directoryPath = Path.of(System.getProperty("user.dir"), directory, "users");
+    }
+
     @PostConstruct
     private void init() {
-        directoryPath = Path.of(System.getProperty("user.dir"), directory, "users");
         fileManager.createDirectory(directoryPath);
     }
 
@@ -49,14 +48,39 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID userId) {
+    public Optional<User> findById(UUID userId) {
         Path path = directoryPath.resolve(userId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (User)ois.readObject();
+            User user = (User) ois.readObject();
+            return Optional.of(user);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 user입니다.");
+            return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<User> findByName(String name) {
+        File[] files = directoryPath.toFile().listFiles();
+
+        if (files == null) {
+            return Optional.empty();
+        }
+
+        User user = null;
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                User findUser = (User) ois.readObject();
+                if (findUser.getName().equals(name)) {
+                    user = findUser;
+                    break;
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                throw new FileIOException("users 읽기 실패");
+            }
+        }
+
+        return Optional.ofNullable(user);
     }
 
     @Override

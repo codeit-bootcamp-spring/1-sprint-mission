@@ -1,12 +1,10 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.FileIOException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -16,24 +14,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@RequiredArgsConstructor
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
 
-    @Value("${discodeit.repository.file-directory}")
-    private String directory;
-
-    private Path directoryPath;
+    private final Path directoryPath;
     private final String FILE_EXTENSION = ".ser";
 
     private final FileManager fileManager;
 
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String directory, FileManager fileManager) {
+        this.fileManager = fileManager;
+        this.directoryPath = Path.of(System.getProperty("user.dir"), directory, "channels");
+    }
+
     @PostConstruct
     private void init() {
-        directoryPath = Path.of(System.getProperty("user.dir"), directory, "channels");
         fileManager.createDirectory(directoryPath);
     }
 
@@ -50,13 +49,14 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel findById(UUID channelId) {
+    public Optional<Channel> findById(UUID channelId) {
         Path path = directoryPath.resolve(channelId.toString().concat(FILE_EXTENSION));
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toFile()))) {
-            return (Channel) ois.readObject();
+            Channel channel = (Channel) ois.readObject();
+            return Optional.of(channel);
         } catch (IOException | ClassNotFoundException e) {
-            throw new NotFoundException("등록되지 않은 channel입니다.");
+            return Optional.empty();
         }
     }
 
@@ -72,7 +72,7 @@ public class FileChannelRepository implements ChannelRepository {
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Channel channel = (Channel) ois.readObject();
-                if (channel.getType() == ChannelType.PUBLIC || channel.getUser(userId) != null) {
+                if (channel.getType() == Channel.Type.PUBLIC || channel.getUser(userId) != null) {
                     channels.add(channel);
                 }
             } catch (IOException | ClassNotFoundException e) {
