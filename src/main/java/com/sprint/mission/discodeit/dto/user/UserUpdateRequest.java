@@ -5,9 +5,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.UUID;
 
 public record UserUpdateRequest(
-        String newUsername,
-        String newEmail,
-        String newPassword,
-        BinaryContent binaryContent
+    String newUsername,
+    String newEmail,
+    String newPassword
 ) {
+
 }
