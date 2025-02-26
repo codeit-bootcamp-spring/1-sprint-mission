@@ -6,12 +6,15 @@ import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
 import java.time.Instant;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
 
   //생성
   MessageResponseDto create(CreateMessageDto createMessageDto);
+
+  MessageResponseDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
 
   //모두 읽기
   List<MessageResponseDto> findAll();
