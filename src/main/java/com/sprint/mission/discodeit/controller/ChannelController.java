@@ -1,10 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePrivateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreatePublicDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,8 @@ public class ChannelController {
   private final ChannelService channelService;
 
   @PostMapping("public")
-  public ApiResponse<UUID> createPublic(@RequestBody ChannelCreatePublicDTO request) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<Channel> createPublic(@RequestBody ChannelCreatePublicDTO request) {
+    return ResponseDTO.<Channel>builder()
         .code(HttpStatus.CREATED.value())
         .message("public 채널 생성 완료")
         .data(channelService.create(request))
@@ -30,8 +31,8 @@ public class ChannelController {
   }
 
   @PostMapping("private")
-  public ApiResponse<UUID> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<Channel> createPrivate(@RequestBody ChannelCreatePrivateDTO request) {
+    return ResponseDTO.<Channel>builder()
         .code(HttpStatus.CREATED.value())
         .message("private 채널 생성 완료")
         .data(channelService.create(request))
@@ -39,18 +40,18 @@ public class ChannelController {
   }
 
   @PutMapping("{channelId}")
-  public ApiResponse update(@PathVariable UUID channelId,
+  public ResponseDTO<Channel> update(@PathVariable UUID channelId,
       @RequestBody ChannelUpdateDTO request) {
-    channelService.update(channelId, request);
-    return ApiResponse.<UUID>builder()
+    return ResponseDTO.<Channel>builder()
         .code(HttpStatus.OK.value())
         .message("채널 수정 완료")
+        .data(channelService.update(channelId, request))
         .build();
   }
 
   @DeleteMapping("{channelId}")
-  public ApiResponse<UUID> delete(@PathVariable UUID channelId) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<UUID> delete(@PathVariable UUID channelId) {
+    return ResponseDTO.<UUID>builder()
         .code(HttpStatus.OK.value())
         .message("채널 삭제 완료")
         .data(channelService.delete(channelId))
@@ -58,8 +59,8 @@ public class ChannelController {
   }
 
   @GetMapping
-  public ApiResponse<List<ChannelFindDTO>> findAllByUserId(@RequestParam("userId") UUID userId) {
-    return ApiResponse.<List<ChannelFindDTO>>builder()
+  public ResponseDTO<List<ChannelFindDTO>> findAllByUserId(@RequestParam("userId") UUID userId) {
+    return ResponseDTO.<List<ChannelFindDTO>>builder()
         .code(HttpStatus.OK.value())
         .message("사용자가 볼 수 있는 채널 목록")
         .data(channelService.findAllByUserId(userId))

@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -26,8 +27,8 @@ public class UserController {
   private final UserStatusService userStatusService;
 
   @PostMapping
-  public ApiResponse<UUID> create(@ModelAttribute UserCreateDTO requset) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<User> create(@ModelAttribute UserCreateDTO requset) {
+    return ResponseDTO.<User>builder()
         .code(HttpStatus.CREATED.value())
         .message("사용자 등록 완료")
         .data(userService.create(requset))
@@ -35,8 +36,8 @@ public class UserController {
   }
 
   @GetMapping
-  public ApiResponse<List<UserFindDTO>> findAll() {
-    return ApiResponse.<List<UserFindDTO>>builder()
+  public ResponseDTO<List<UserFindDTO>> findAll() {
+    return ResponseDTO.<List<UserFindDTO>>builder()
         .code(HttpStatus.OK.value())
         .message("모든 사용자 조회")
         .data(userService.findAll())
@@ -44,17 +45,18 @@ public class UserController {
   }
 
   @PutMapping("{userId}")
-  public ApiResponse update(@PathVariable UUID userId, @ModelAttribute UserUpdateDTO request) {
-    userService.update(userId, request);
-    return ApiResponse.builder()
+  public ResponseDTO<User> update(@PathVariable UUID userId,
+      @ModelAttribute UserUpdateDTO request) {
+    return ResponseDTO.<User>builder()
         .code(HttpStatus.OK.value())
         .message("사용자 수정 완료")
+        .data(userService.update(userId, request))
         .build();
   }
 
   @DeleteMapping("{userId}")
-  public ApiResponse<UUID> delete(@PathVariable UUID userId) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<UUID> delete(@PathVariable UUID userId) {
+    return ResponseDTO.<UUID>builder()
         .code(HttpStatus.NO_CONTENT.value())
         .message("사용자 삭제 완료")
         .data(userService.delete(userId))
@@ -62,10 +64,10 @@ public class UserController {
   }
 
   @PutMapping("{userId}/status")
-  public ApiResponse<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  public ResponseDTO<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateDTO request) {
     UserStatus userStatus = userStatusService.update(userId, request);
-    return ApiResponse.<UserStatus>builder()
+    return ResponseDTO.<UserStatus>builder()
         .code(HttpStatus.OK.value())
         .message("사용자 온라인 상태 업데이트 완료")
         .data(userStatus)

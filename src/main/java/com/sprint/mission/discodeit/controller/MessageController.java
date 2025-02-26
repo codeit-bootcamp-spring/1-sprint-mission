@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -20,8 +20,8 @@ public class MessageController {
   private final MessageService messageService;
 
   @PostMapping
-  public ApiResponse<UUID> create(@ModelAttribute MessageCreateDTO request) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<Message> create(@ModelAttribute MessageCreateDTO request) {
+    return ResponseDTO.<Message>builder()
         .code(HttpStatus.CREATED.value())
         .message("메시지 생성 완료")
         .data(messageService.create(request))
@@ -29,18 +29,18 @@ public class MessageController {
   }
 
   @PutMapping("{messageId}")
-  public ApiResponse update(@PathVariable UUID messageId,
+  public ResponseDTO<Message> update(@PathVariable UUID messageId,
       @RequestBody MessageUpdateDTO request) {
-    messageService.update(messageId, request);
-    return ApiResponse.<UUID>builder()
+    return ResponseDTO.<Message>builder()
         .code(HttpStatus.OK.value())
         .message("메시지 수정 완료")
+        .data(messageService.update(messageId, request))
         .build();
   }
 
   @DeleteMapping("{messageId}")
-  public ApiResponse<UUID> delete(@PathVariable UUID messageId) {
-    return ApiResponse.<UUID>builder()
+  public ResponseDTO<UUID> delete(@PathVariable UUID messageId) {
+    return ResponseDTO.<UUID>builder()
         .code(HttpStatus.NO_CONTENT.value())
         .message("메시지가 삭제 완료")
         .data(messageService.delete(messageId))
@@ -48,8 +48,8 @@ public class MessageController {
   }
 
   @GetMapping
-  public ApiResponse<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
-    return ApiResponse.<List<Message>>builder()
+  public ResponseDTO<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+    return ResponseDTO.<List<Message>>builder()
         .code(HttpStatus.OK.value())
         .message("특정 채널 메시지 조회")
         .data(messageService.findAllByChannelId(channelId))

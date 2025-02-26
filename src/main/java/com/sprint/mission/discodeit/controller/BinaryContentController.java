@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponse;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -18,20 +18,20 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @GetMapping("{binaryContentId}")
-  public ApiResponse<BinaryContent> find(@PathVariable UUID binaryContentId) {
-    return ApiResponse.<BinaryContent>builder()
+  public ResponseDTO<BinaryContent> find(@PathVariable UUID binaryContentId) {
+    return ResponseDTO.<BinaryContent>builder()
         .code(HttpStatus.OK.value())
-        .message("바이터리 파일 조회")
+        .message("바이터리 파일 조회 성공")
         .data(binaryContentService.find(binaryContentId))
         .build();
   }
 
   @PostMapping
-  public ApiResponse<List<BinaryContent>> findAllByIdIn(
+  public ResponseDTO<List<BinaryContent>> findAllByIdIn(
       @RequestParam("binaryContentIds") List<UUID> ids) {
-    return ApiResponse.<List<BinaryContent>>builder()
+    return ResponseDTO.<List<BinaryContent>>builder()
         .code(HttpStatus.OK.value())
-        .message("바이너리 파일 조회")
+        .message("바이너리 파일 조회 성공")
         .data(binaryContentService.findAllByIdIn(ids))
         .build();
   }
