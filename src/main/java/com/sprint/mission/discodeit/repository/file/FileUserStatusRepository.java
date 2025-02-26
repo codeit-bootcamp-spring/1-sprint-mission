@@ -102,4 +102,10 @@ public class FileUserStatusRepository implements UserStatusRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        findByUserId(userId)
+                .ifPresent(userStatus -> deleteById(userStatus.getId()));
+    }
 }

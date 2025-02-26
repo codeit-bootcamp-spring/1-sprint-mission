@@ -12,21 +12,20 @@ public class BinaryContent implements Serializable {
 
     private transient UUID id;
     private final Instant createdAt;
-    private UUID userId;
-    private UUID messageId;
 
-    public BinaryContent() {
+    // 메타데이터
+    private String fileName;
+    private Long size;
+    private String contentType;
+    private byte[] bytes;
+
+    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
-        this.userId = null;
-        this.messageId = null;
-    }
-
-    public void saveUserProfileImage(UUID userId){
-        this.userId = userId;
-    }
-
-    public void attachFileToMessage(UUID messageId){
-        this.messageId = messageId;
+        //
+        this.fileName = fileName;
+        this.size = size;
+        this.contentType = contentType;
+        this.bytes = bytes;
     }
 }

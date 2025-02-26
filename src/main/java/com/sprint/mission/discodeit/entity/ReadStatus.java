@@ -9,35 +9,30 @@ import java.util.UUID;
 
 
 /**
- 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
-
- User 마다 여러 개의 ReadStatus를 가질 수 있다고 상정합니다.
- 하나의 채널에 하나의 ReadStatus를 가집니다.
-
-
- ! ReadStatus lastMessageReadTime 시간 이후의 createdAt된 Messages 는 읽지 않은 메세지이다. !
-
+ * 사용자별 각 채널에 읽지 않은 메시지를 확인하기 위해 활용합니다.
+ * <p>
+ * User 마다 여러 개의 ReadStatus를 가질 수 있다고 상정합니다. 하나의 채널에 하나의 ReadStatus를 가집니다.
+ * <p>
+ * ! ReadStatus lastMessageReadTime 시간 이후의 createdAt된 Messages 는 읽지 않은 메세지이다. !
  **/
 
 @Getter
 public class ReadStatus extends BaseEntity implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
 
-    private UUID id;
-    private UUID userId;
-    private UUID channelId;
-    private Instant lastMessageReadTime; // 마지막으로 읽은 메시지의 시각
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public ReadStatus(UUID userId, UUID channelId){
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastMessageReadTime = Instant.now();
-    }
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt; // 마지막으로 읽은 메시지의 시각
 
-    public void refrashLastMessageReadTime(){
-        this.lastMessageReadTime = Instant.now();
-    }
+  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
+    this.userId = userId;
+    this.channelId = channelId;
+    this.lastReadAt = lastReadAt;
+  }
 
+  public void updateLastMessageReadAt(Instant lastReadAt) {
+    this.lastReadAt = lastReadAt;
+  }
 }
