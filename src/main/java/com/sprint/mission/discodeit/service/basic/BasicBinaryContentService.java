@@ -16,36 +16,38 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
 
-    private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public ResponseBinaryContentDto create(MultipartFile file) throws RuntimeException {
-        try{
-            BinaryContent binaryContent = new BinaryContent(
-                    file.getName(),
-                    file.getBytes(),
-                    file.getContentType()
-            );
-            BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-            return ResponseBinaryContentDto.from(savedContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  public ResponseBinaryContentDto create(MultipartFile file) throws RuntimeException {
+    try {
+      BinaryContent binaryContent = new BinaryContent(
+          file.getName(),
+          file.getBytes(),
+          file.getContentType(),
+          file.getSize()
+      );
+      BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+      return ResponseBinaryContentDto.from(savedContent);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
-    @Override
-    public ResponseBinaryContentDto findById(String contentId) {
-        return ResponseBinaryContentDto.from(binaryContentRepository.findById(contentId));
-    }
+  @Override
+  public ResponseBinaryContentDto findById(String contentId) {
+    return ResponseBinaryContentDto.from(binaryContentRepository.findById(contentId));
+  }
 
-    @Override
-    public List<ResponseBinaryContentDto> findAllByIdIn(List<String> contentIds) {
-        List<BinaryContent> list = binaryContentRepository.findAll().stream().filter(binaryContent -> contentIds.contains(binaryContent.getId())).toList();
-        return list.stream().map(ResponseBinaryContentDto::from).toList();
-    }
+  @Override
+  public List<ResponseBinaryContentDto> findAllByIdIn(List<String> contentIds) {
+    List<BinaryContent> list = binaryContentRepository.findAll().stream()
+        .filter(binaryContent -> contentIds.contains(binaryContent.getId())).toList();
+    return list.stream().map(ResponseBinaryContentDto::from).toList();
+  }
 
-    @Override
-    public boolean deleteById(String contentId) {
-        return binaryContentRepository.delete(contentId);
-    }
+  @Override
+  public boolean deleteById(String contentId) {
+    return binaryContentRepository.delete(contentId);
+  }
 }

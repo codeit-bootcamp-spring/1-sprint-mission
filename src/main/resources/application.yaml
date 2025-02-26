@@ -2,6 +2,12 @@ spring:
   application:
     name: discodeit
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 discodeit:
   repository:
     type: file

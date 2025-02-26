@@ -31,9 +31,11 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean delete(User user) {
+    public boolean delete(String userId) {
+        User user = data.get(userId);
         usernameData.remove(user.getUsername());
-        return data.remove(user.getId()) != null;
+        userEmailData.remove(user.getEmail());
+        return data.remove(userId) != null;
     }
 
     @Override

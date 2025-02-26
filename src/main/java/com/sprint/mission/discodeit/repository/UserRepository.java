@@ -8,7 +8,7 @@ public interface UserRepository {
 
     User save(User user);
 
-    boolean delete(User user);
+    boolean delete(String userId);
 
     User findById(String id);
 

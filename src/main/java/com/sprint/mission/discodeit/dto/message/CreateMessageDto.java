@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.dto.message;
 
 public record CreateMessageDto(
-        String content,
-        String channelId,
-        String userId
-){
+    String content,
+    String channelId,
+    String authorId
+) {
+
 }

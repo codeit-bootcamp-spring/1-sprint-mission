@@ -8,7 +8,7 @@ public interface MessageRepository {
 
     Message save(Message message);
 
-    boolean delete(String message);
+    boolean delete(String messageId);
 
     Message findById(String id);
 
