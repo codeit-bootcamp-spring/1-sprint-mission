@@ -1,10 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.domain.ChannelType;
-import com.sprint.mission.discodeit.dto.ChannelRequest;
-import com.sprint.mission.discodeit.dto.ChannelResponse;
-import com.sprint.mission.discodeit.dto.PrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.PublicChannelRequest;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -23,7 +19,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelResponse create(ChannelRequest request) {
         ChannelResponse response;
-        if(request.channelType() == ChannelType.Private){
+        if(request.channelType() == Channel.ChannelType.Private){
             PrivateChannelRequest privateChannel = new PrivateChannelRequest(request.member(), request.owner(), request.channelType());
             response = privateChannelCreate(privateChannel);
         }else{
@@ -79,15 +75,25 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelResponse> publicChannelReadAll() {
         List<Channel> channels = channelRepository.readAll();
         List<ChannelResponse> responses = channels.stream()
-                .filter(channel -> channel.getChannelType().equals(ChannelType.Public))
+                .filter(channel -> channel.getChannelType().equals(Channel.ChannelType.Public))
                 .map(channel -> ChannelResponse.fromEntity(channel))
                 .collect(Collectors.toList());
         return responses;
     }
 
     @Override
+    public ChannelResponse publicChannelReadOne(UUID id) {
+        Channel channel = channelRepository.findById(id);
+
+        if(channel.getChannelType().equals(Channel.ChannelType.Public)){
+            return ChannelResponse.fromEntity(channel);
+        }
+        return null;
+    }
+
+    @Override
     public ChannelResponse update(UUID id, ChannelRequest updateChannel) {
-        if(channelRepository.findById(id).getChannelType() == ChannelType.Private) {
+        if(channelRepository.findById(id).getChannelType() == Channel.ChannelType.Private) {
             System.out.println("Private Channel은 수정할수 없습니다.");
             return null;
         }

@@ -1,20 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
 
+
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.BaseRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.file.FileService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -51,16 +49,7 @@ public class BasicMessageService implements MessageService{
             throw new IllegalArgumentException("Either recipientId or channelId must be provided.");
         }
 
-
         repository.save(message);
-
-//        if(messageRequest.attachedFileId() != null){
-//            BinaryContent profileImage = binaryContentRepository.findById(messageRequest.attachedFileId());
-//            message.setAttachedFileId(profileImage);
-//        }else{
-//            BinaryContent profileImage = new BinaryContent(message.getId(), Mimetype.Message);
-//            message.setAttachedFileId(profileImage);
-//        }
 
         return MessageResponse.fromEntity(message);
     }

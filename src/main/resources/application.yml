@@ -9,7 +9,22 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: false
+  mvc:
+    contentnegotiation:
+      favor-path-extension: false
+      favor-parameter: false
+      media-types:
+        json: application/json
 
 repository:
   type : jcf  # jcf or file
 
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /api-docs
+  api-docs:
+    path: /openapi
+  override-with-generic-response: false
+  default-consumes-media-type: multipart/form-data
+  default-produces-media-type: application/json

@@ -35,7 +35,18 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public Channel modify(UUID id, Channel modifiedChannel) {
-        return data.replace(id, modifiedChannel);
+        Channel existingChannel = data.get(id);
+
+        if(existingChannel == null){
+            throw new IllegalArgumentException("Channel not found with id: " + id);
+        }
+
+        existingChannel.setName(modifiedChannel.getName());
+        existingChannel.setDescription(modifiedChannel.getDescription());
+
+        data.put(id, existingChannel);
+
+        return existingChannel;
     }
 
     @Override
@@ -51,18 +62,4 @@ public class JCFChannelRepository implements ChannelRepository {
         return false;
     }
 
-    @Override
-    public Channel ownerChange(UUID id, User Owner) {
-        return null;
-    }
-
-    @Override
-    public boolean memberJoin(UUID id, User user) {
-        return false;
-    }
-
-    @Override
-    public boolean memberWithdrawal(UUID id, User user) {
-        return false;
-    }
 }

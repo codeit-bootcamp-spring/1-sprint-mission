@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -15,13 +16,14 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/file")
+@RequestMapping("/api/files")
+@Tag(name = "Binary Content API" , description = "바이너리 컨텐츠 관리 API")
 public class BinaryContentRestController {
     private final BinaryContentService binaryContentService;
 
-    @GetMapping("/download/{fileId}")
-    public ResponseEntity<byte[]> downloadProfileImage(@PathVariable UUID fileId) {
-        BinaryContent profileImage = binaryContentService.findById(fileId);
+    @GetMapping("/download/{id}")
+    public ResponseEntity<byte[]> downloadProfileImage(@PathVariable UUID id) {
+        BinaryContent profileImage = binaryContentService.findById(id);
 
         if (profileImage == null || profileImage.getContentType() == null) {
             return ResponseEntity.notFound().build();

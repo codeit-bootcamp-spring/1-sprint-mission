@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 
-public record UserResponse(
+public record UserResponse (
         UUID id,
         String username,
         String email,

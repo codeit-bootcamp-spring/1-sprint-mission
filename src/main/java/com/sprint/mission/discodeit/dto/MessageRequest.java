@@ -8,7 +8,4 @@ public record MessageRequest(
         UUID recipientId,
         UUID channelId,
         UUID attachedFileId
-) {
-
-
-}
+) { }

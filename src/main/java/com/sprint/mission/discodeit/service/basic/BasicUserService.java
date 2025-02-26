@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.DataNotFoundException;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.exception.ValidationException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -18,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,12 +40,12 @@ public class BasicUserService implements UserService {
 
         if(!validator.isValidEmail(request.email())){
             System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println(new ValidationException("Invalid email format : " + request.email()));
+            throw new ValidationException("Invalid email format : " + request.email());
         }
 
         if(!validator.isValidPhoneNumber(request.phoneNumber())){
             System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
-            System.out.println(new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber()));
+            throw new ValidationException("Invalid phoneNumber format(000-0000-0000) : " + request.phoneNumber());
         }
 
         User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
@@ -68,10 +66,14 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse readOne(UUID id) {
-        User user = userRepository.findById(id);
-        boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
+        try {
+            User user = userRepository.findById(id);
+            boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
 
-        return UserResponse.fromEntity(user, isOnline);
+            return UserResponse.fromEntity(user, isOnline);
+        } catch (NullPointerException e){
+            throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
+        }
     }
 
     @Override
@@ -111,8 +113,8 @@ public class BasicUserService implements UserService {
             System.out.println("업데이트가 완료되었습니다.");
             return UserResponse.fromEntity(user, isOnline);
 
-        } catch (DataNotFoundException e){
-            throw new DataNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);
+        } catch (ResourceNotFoundException e){
+            throw new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디 입니다." + id);
         }
     }
 

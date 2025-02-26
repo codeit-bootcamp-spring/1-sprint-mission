@@ -42,7 +42,17 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public Message modify(UUID id, Message modifiedMessage) {
-        return data.replace(id, modifiedMessage);
+        Message existingMessage = data.get(id);
+
+        if(existingMessage == null){
+            throw new IllegalArgumentException("Message not found with id : " + id);
+        }
+
+        existingMessage.setContent(modifiedMessage.getContent());
+
+        data.put(id,existingMessage);
+
+        return existingMessage;
     }
 
     @Override

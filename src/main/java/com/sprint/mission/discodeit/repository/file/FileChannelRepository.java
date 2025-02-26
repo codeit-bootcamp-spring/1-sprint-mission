@@ -110,18 +110,4 @@ public class FileChannelRepository implements ChannelRepository, FileService<Cha
         return false;
     }
 
-    @Override
-    public Channel ownerChange(UUID id, User Owner) {
-        return null;
-    }
-
-    @Override
-    public boolean memberJoin(UUID id, User user) {
-        return false;
-    }
-
-    @Override
-    public boolean memberWithdrawal(UUID id, User user) {
-        return false;
-    }
 }

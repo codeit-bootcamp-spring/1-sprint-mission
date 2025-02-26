@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import java.util.UUID;
 
 public interface UserStatusRepository {
-    void save(UserStatus userStatus);
-    UserStatus findByUserId(UUID userid);
+    boolean save(UserStatus userStatus);
+    UserStatus findByUserId(UUID id);
 
 }

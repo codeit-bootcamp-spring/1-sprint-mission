@@ -36,7 +36,21 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public User modify(UUID id, User modifiedUser){
-        return data.replace(id, modifiedUser);
+        User existingUser = data.get(id);
+
+        if (existingUser == null){
+            throw new IllegalArgumentException("User not found with id: "+ id);
+        }
+
+        existingUser.setUsername(modifiedUser.getUsername());
+        existingUser.setPassword(modifiedUser.getPassword());
+        existingUser.setEmail(modifiedUser.getEmail());
+        existingUser.setPhoneNumber(modifiedUser.getPhoneNumber());
+        existingUser.update();
+
+        data.put(id, existingUser);
+
+        return existingUser;
     }
 
     @Override
