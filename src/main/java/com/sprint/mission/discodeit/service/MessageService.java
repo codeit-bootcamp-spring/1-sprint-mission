@@ -1,22 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;
 
-/*
- *  CRUD(생성, 읽기, 모두 읽기, 수정, 삭제) 기능을 선언한 인터페이스
- * */
-
 public interface MessageService {
-    void addMessage(Message message);
-
-    Message getMessage(UUID id);
-
-    List<Message> getAllMessages();
-
-    void updateMessage(UUID id, String newContent);
-
-    void deleteMessage(UUID id);
+    Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests);
+    Message find(UUID messageId);
+    List<Message> findAllByChannelId(UUID channelId);
+    Message update(UUID messageId, MessageUpdateRequest request);
+    void delete(UUID messageId);
 }

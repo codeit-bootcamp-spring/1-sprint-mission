@@ -2,69 +2,135 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserRepository implements UserRepository {
-    private final String filePath = "users.data";
-    private Map<UUID, User> data = new HashMap<>();
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        loadData();
+    public FileUserRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, User.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
-    public void save(User user) {
-        data.put(user.getId(), user);
-        saveData();
+    public User save(User user) {
+        Path path = resolvePath(user.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override
-    public User findById(UUID id) {
-        return data.get(id);
+    public Optional<User> findById(UUID id) {
+        User userNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                userNullable = (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(userNullable);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        if (username == null) {
+            return Optional.empty(); // username이 null인 경우 빈 Optional 반환
+        }
+        return this.findAll().stream()
+                .filter(user -> username.equals(user.getUsername())) // null-safe 비교
+                .findFirst();
     }
 
     @Override
     public List<User> findAll() {
-        return new ArrayList<>(data.values());
-    }
-
-    @Override
-    public void update(UUID id, User user) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
-        }
-        data.put(id, user);
-        saveData();
-    }
-
-    @Override
-    public void delete(UUID id) {
-        if (!data.containsKey(id)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
-        }
-        data.remove(id);
-        saveData();
-    }
-
-    private void saveData() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(data);
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save users data.", e);
+            throw new RuntimeException(e);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadData() {
-        File file = new File(filePath);
-        if (file.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                data = (Map<UUID, User>) ois.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("Failed to load users data.", e);
-            }
+    @Override
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        if (email == null) {
+            return false; // email이 null인 경우 false 반환
+        }
+        return this.findAll().stream()
+                .anyMatch(user -> email.equals(user.getEmail())); // null-safe 비교
+    }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        if (username == null) {
+            return false;
+        }
+        return this.findAll().stream()
+                .anyMatch(user -> username.equals(user.getUsername())); // null-safe 비교
     }
 }

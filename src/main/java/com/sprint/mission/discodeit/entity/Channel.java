@@ -1,47 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class Channel {
-    private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+@Getter
+public class Channel implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private UUID id;
+    private Instant createdAt;
+    private Instant updatedAt;
+    //
+    private ChannelType type;
     private String name;
-    private UUID ownerId;
+    private String description;
 
-    public Channel(String name, UUID ownerId) {
-        // 유효성 검사 추가
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("채널 이름이 비어 있습니다.");
-        }
-        if (ownerId == null) {
-            throw new IllegalArgumentException("소유자 ID가 비어 있습니다..");
-        }
-
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+        this.createdAt = Instant.now();
+        //
+        this.type = type;
         this.name = name;
-        this.ownerId = ownerId;
+        this.description = description;
     }
 
-    // 각 필드의 Getter 함수 정의
-    public UUID getId() { return id; }
-    public String getName() { return name; }
-    public long getCreatedAt() { return createdAt; }
-    public long getUpdatedAt() { return updatedAt; }
-    public UUID getOwnerId() { return ownerId; }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void updateName(String newName) {
-        // 업데이트 시에도 유효성 검사 추가
-        if (newName == null || newName.trim().isEmpty()) {
-            throw new IllegalArgumentException("새 채널 이름이 비어 있습니다.");
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
         }
-        this.name = newName;
-        this.updatedAt = System.currentTimeMillis();
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 }
