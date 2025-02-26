@@ -1,0 +1,21 @@
+app:
+  repository:
+    type: "file"
+  service:
+    type: "basic"
+  file:
+    base-dir: "fileDir/"
+    user-file: "${app.file.base-dir}users.ser"
+    channel-file: "${app.file.base-dir}channel.ser"
+    message-file: "${app.file.base-dir}message.ser"
+    user-status-file: "${app.file.base-dir}user_status.ser"
+    read-status-file: "${app.file.base-dir}read_status.ser"
+    binary-content-file: "${app.file.base-dir}binary_content.ser"
+
+
+springdoc:
+  default-flat-param-object: true
+  api-docs:
+    path: /api-docs  # OpenAPI 문서 접근 경로
+  swagger-ui:
+    path: /swagger-ui.html  # Swagger UI 경로 (기본값)
