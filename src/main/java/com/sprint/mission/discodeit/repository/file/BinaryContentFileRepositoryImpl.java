@@ -19,7 +19,7 @@ public class BinaryContentFileRepositoryImpl implements BinaryContentRepository 
     @Override
     public BinaryContent save(BinaryContentDto binaryContentDto) {
         Map<UUID, BinaryContent> temp = loadFromSer(FILE_NAME);
-        BinaryContent binaryContent = new BinaryContent(binaryContentDto.domainId(), binaryContentDto.file());
+        BinaryContent binaryContent = new BinaryContent(binaryContentDto.domainId(), binaryContentDto.multipartFile());
         temp.put(binaryContent.getId(), binaryContent);
         saveToSer(FILE_NAME, temp);
 
@@ -66,8 +66,8 @@ public class BinaryContentFileRepositoryImpl implements BinaryContentRepository 
     public void update(UUID id, BinaryContentDto binaryContentDto) {
         Map<UUID, BinaryContent> binaryContentMap = loadFromSer(FILE_NAME);
         BinaryContent existBinaryContent = binaryContentMap.get(id);
-        if (existBinaryContent.getFile() != null) {
-            existBinaryContent = existBinaryContent.update(binaryContentDto.file());
+        if (existBinaryContent.getMultipartFile() != null) {
+            existBinaryContent = existBinaryContent.update(binaryContentDto.multipartFile());
         }
         binaryContentMap.replace(id, existBinaryContent);
         saveToSer(FILE_NAME, binaryContentMap);

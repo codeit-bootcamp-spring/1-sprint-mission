@@ -44,11 +44,13 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelFindDto find(UUID id) {
         Channel channel = channelRepository.findById(id);
-        if(channel == null){
+        if (channel == null) {
             throw new IllegalStateException("채널을 찾을 수 없습니다.");
         }
-        List<Message> messagesById = messageRepository.findMessagesById(id);
-        if(messagesById.isEmpty()) {return new ChannelFindDto(channel, null);}
+        List<Message> messagesById = messageRepository.findMessagesByChannelId(id);
+        if (messagesById.isEmpty()) {
+            return new ChannelFindDto(channel, null);
+        }
         Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();//가장 최근의 메시지 시간 정보
 
         if (channel.getType() == ChannelType.PRIVATE) {
@@ -69,7 +71,7 @@ public class BasicChannelService implements ChannelService {
         for (UUID uuid : list) {
             List<Message> messagesById = messageRepository.findAll().stream().filter(s -> s.getChannelId().equals(uuid)).toList();
             //효율성? 고려해야될 듯
-            if(messagesById.isEmpty()) {
+            if (messagesById.isEmpty()) {
                 continue;
             }
             Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();
@@ -78,6 +80,9 @@ public class BasicChannelService implements ChannelService {
         List<List<UUID>> userList = new ArrayList<>();
         for (Channel channel : channels) {
             if (channel.getType() == ChannelType.PRIVATE) {
+                if (readStatusRepository.findAllByChannelId(channel.getId()) == null) {
+                    continue;
+                }
                 //Private 채널에 참여한 User의 ID 정보 포함
                 List<ReadStatus> privateChannelUsers = readStatusRepository.findAllByChannelId(channel.getId());
                 userList.add(privateChannelUsers.stream().map(ReadStatus::getUserId).toList());
@@ -89,12 +94,35 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelFindAllDto findAllByUserId(UUID userId) {
+        // ReadStatus 데이터를 한 번만 조회
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+
+        // ReadStatus에서 채널 ID를 추출해 해당 채널 객체를 가져옴
+        List<Channel> channels = readStatuses.stream().map(ReadStatus::getChannelId).map(channelRepository::findById).toList();
+        Map<UUID, Instant> latestMessagesInstant = new HashMap<>();
+
+        // 각 채널에 대해 가장 최신 메시지의 updatedAt을 조회
+        for (Channel channel : channels) {
+            UUID channelId = channel.getId();
+            List<Message> messages = messageRepository.findMessagesBySenderId(channelId);
+            Instant latestUpdate = messages.stream().max(Comparator.comparing(Message::getUpdatedAt)).orElseThrow(() -> new NoSuchElementException("No messages found for channel: " + channelId)).getUpdatedAt();
+            latestMessagesInstant.put(channelId, latestUpdate);
+        }
+
+        // 조회한 ReadStatus 데이터를 이용해 최신화 작업 수행
+        for (ReadStatus status : readStatuses) {
+            readStatusRepository.update(new ReadStatusDto(status), new ReadStatusDto(status, Instant.now()));
+        }
+        return new ChannelFindAllDto(channels, latestMessagesInstant, null);
+    }
+    /*@Override
+    public ChannelFindAllDto findAllByUserId(UUID userId) {
         List<Channel> channels = readStatusRepository.findAllByUserId(userId).stream().map(ReadStatus::getChannelId).map(channelRepository::findById).toList();
         Map<UUID, Instant> latestMessagesInstant = new HashMap<>();
         List<UUID> list = channels.stream().map(Channel::getId).toList(); //채널 ID
         for (UUID uuid : list) {
-            List<Message> messagesById = messageRepository.findMessagesById(uuid);
-            Instant updatedAt = messagesById.stream().min(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();
+            List<Message> messagesById = messageRepository.findMessagesBySenderId(uuid);
+            Instant updatedAt = messagesById.stream().max(Comparator.comparing(Message::getUpdatedAt)).get().getUpdatedAt();
             latestMessagesInstant.put(uuid, updatedAt);
         }
         //채널 속 해당 유저 ID에 대한 ReadStatus 값 최신화
@@ -103,7 +131,7 @@ public class BasicChannelService implements ChannelService {
             readStatusRepository.update(new ReadStatusDto(readStatus), new ReadStatusDto(readStatus, Instant.now()));
         }
         return new ChannelFindAllDto(channels, latestMessagesInstant, null);
-    }
+    }*/
 
     @Override
     public void updateChannel(ChannelDto dto) {
@@ -114,20 +142,21 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID id) {
         //채널과 관련된 메시지 삭제 (Message.ser 속 객체 )
         List<UUID> messages = channelRepository.findMessagesByChannelId(id);
-        if(!messages.isEmpty()) {
+        if (!messages.isEmpty()) {
             int count = 0;
             for (UUID message : messages) {
                 boolean delete = messageRepository.delete(message);
-                System.out.println("delete = " + delete+" message = " + message);
-                if (delete == true ) count++;
+                System.out.println("delete = " + delete + " message = " + message);
+                if (delete) count++;
             }
-            System.out.println("채널과 연관된 메시지 삭제 성공 - " + count+"개");
+            System.out.println("채널과 연관된 메시지 삭제 성공 - " + count + "개");
         }
         //채널 삭제 ( 내부 Map )
         channelRepository.delete(id);
         //채널과 관련된 ReadStatus 삭제
-        if(readStatusRepository.findAllByChannelId(id)==null) {
-            System.out.println("채널 속 유저 상태 정보가 없습니다."); return;
+        if (readStatusRepository.findAllByChannelId(id) == null) {
+            System.out.println("채널 속 유저 상태 정보가 없습니다.");
+            return;
         }
         readStatusRepository.deleteByChannelId(id);
     }
@@ -137,7 +166,7 @@ public class BasicChannelService implements ChannelService {
         //채널에 메시지 추가하기
         UUID senderId = messageDto.senderId();
         UUID channelId = messageDto.channelId();
-        if(senderId == null || channelId == null) {
+        if (senderId == null || channelId == null) {
             throw new IllegalStateException("아이디와 채널 아이디를 추가해주세요.");
         }
         UUID savedMessageId = messageRepository.save(senderId, channelId, messageDto.content());

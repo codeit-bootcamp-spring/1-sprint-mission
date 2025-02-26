@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.service.domain.UserStatusService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -165,7 +166,7 @@ public class DiscodeitApplication {
         System.out.println("update readStatus : 메시지를 유저 아이디를 통해 찾을 떄 UserStatus 업데이트 ");
         messageService.findAllByUserId(user3).forEach(System.out::println);
         System.out.println("====================================================");
-        System.out.println("두 값의 ID값은 변하지 않고 나머지는 바뀔 수 있는데 위 예시는 ChannelId가 가장 먼저 확인할 수 있다.");
+        System.out.println("두 값의 ID 값은 변하지 않고 나머지는 바뀔 수 있는데 위 예시는 ChannelId가 가장 먼저 확인할 수 있다.");
         System.out.println("readStatusByUserId = " + readStatusByUserId);
         System.out.println("readStatusByUserId.size() = " + readStatusByUserId.size());
         System.out.println("====================================================");
@@ -204,18 +205,18 @@ public class DiscodeitApplication {
         System.out.println("===================================================");
         System.out.println("BinaryContent 로직 확인 : 유저");
         File file = new File("C:\\Users\\ypd06\\codit\\files\\BinaryContentTest.txt");
-        UserDto userDto5 = userService.createUser(new UserDto("Ha", "HaPassword", "ha@naver.com", new BinaryContentDto(file)));
+        //UserDto userDto5 = userService.createUser(new UserDto("Ha", "HaPassword", "ha@naver.com", new BinaryContentDto((MultipartFile) file)));
         binaryContentService.findAll().forEach(System.out::println);
         System.out.println("===================================================");
         System.out.println("find By DomainId : 유저");
-        List<BinaryContentDto> binaryContentByDomainId = binaryContentService.findByDomainId(userDto5.id());
-        System.out.println("binaryContentByDomainId = " + binaryContentByDomainId);
+        //List<BinaryContentDto> binaryContentByDomainId = binaryContentService.findByDomainId(userDto5.id());
+        //System.out.println("binaryContentByDomainId = " + binaryContentByDomainId);
         System.out.println("===================================================");
         System.out.println("find By Id : 유저");
-        System.out.println("find By Id : " +binaryContentService.findById(binaryContentByDomainId.get(0).id()));
+        //System.out.println("find By Id : " +binaryContentService.findById(binaryContentByDomainId.get(0).id()));
         System.out.println("===================================================");
         System.out.println("delete By id : 유저 : 삭제 후 모든 BinaryContent 출력");
-        binaryContentService.delete(binaryContentByDomainId.get(0).id());
+        //binaryContentService.delete(binaryContentByDomainId.get(0).id());
         System.out.println("binaryContentService.findAll().isEmpty() : " + binaryContentService.findAll().isEmpty());
 
 

@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.domain.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.List;
@@ -24,10 +25,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public UUID create(MessageDto messageDto) {
         UUID savedId = messageRepository.save(messageDto.senderId(),messageDto.channelId(), messageDto.content()); //메시지 저장
-        if(messageDto.fileList()!=null && !messageDto.fileList().isEmpty()) {
-            List<File> files = messageDto.fileList();
-            for(File file : files) {
-                binaryContentRepository.save(new BinaryContentDto(savedId, file)); // 메시지와 함께 저장될 파일들
+        if(messageDto.multipartFiles()!=null && !messageDto.multipartFiles().isEmpty()) {
+            List<MultipartFile> multipartFiles = messageDto.multipartFiles();
+            for(MultipartFile multipartFile : multipartFiles) {
+                binaryContentRepository.save(new BinaryContentDto(savedId, multipartFile)); // 메시지와 함께 저장될 파일들
             }
         }
         return savedId;
@@ -41,7 +42,7 @@ public class BasicMessageService implements MessageService {
     public List<Message> findAllByUserId(UUID userId) {
         //UserId로 메시지 확인 행동은 사용자가 채널로 메시지를 확인했다고 볼 수 있을 것 같음
         readStatusService.findAllByUserId(userId);
-        return messageRepository.findMessagesById(userId);
+        return messageRepository.findMessagesBySenderId(userId);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class BasicMessageService implements MessageService {
     }
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return messageRepository.findMessagesById(channelId);
+        return messageRepository.findMessagesByChannelId(channelId);
     }
 
     @Override

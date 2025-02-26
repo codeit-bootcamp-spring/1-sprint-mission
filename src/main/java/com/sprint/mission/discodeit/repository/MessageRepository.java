@@ -21,7 +21,8 @@ public interface MessageRepository {
 
     UUID save(UUID sender,UUID channelId, String content);
     Message findMessageById(UUID id);
-    List<Message> findMessagesById(UUID id);
+    List<Message> findMessagesBySenderId(UUID id);
+    List<Message> findMessagesByChannelId(UUID id);
     List<Message> findAll();
     boolean delete(UUID messageId);
     void update(UUID id, String content);
