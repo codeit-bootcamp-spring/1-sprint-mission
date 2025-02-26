@@ -11,10 +11,9 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     private final Map<UUID, ReadStatus> data = new HashMap<>();
 
     @Override
-    public void saveReadStatus(List<ReadStatus> readStatuses) {
-        for (ReadStatus readStatus : readStatuses) {
-            data.put(UUID.randomUUID(), readStatus);
-        }
+    public ReadStatus save(ReadStatus readStatuses) {
+        this.data.put(readStatuses.getId(), readStatuses);
+        return readStatuses;
     }
 
     @Override
@@ -34,8 +33,24 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        List<ReadStatus> result = new ArrayList<>();
+        for (ReadStatus readStatus : data.values()) {
+            if (readStatus.getChannelId().equals(channelId)) {
+                result.add(readStatus);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public void deleteById(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 
     @Override

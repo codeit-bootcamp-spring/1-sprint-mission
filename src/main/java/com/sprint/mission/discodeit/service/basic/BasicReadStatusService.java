@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,7 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ReadStatusServiceImpl implements ReadStatusService {
+public class BasicReadStatusService implements ReadStatusService {
     @Autowired
     private final ReadStatusRepository readStatusRepository;
     @Autowired
@@ -38,8 +39,9 @@ public class ReadStatusServiceImpl implements ReadStatusService {
             throw new NoSuchElementException("user already has member of channel");
         }
 
-        ReadStatus readStatus=new ReadStatus(request.getUserid(),request.getChannelid());
-        readStatusRepository.saveReadStatus(List.of(readStatus));
+        Instant now=Instant.now();
+        ReadStatus readStatus=new ReadStatus(request.getUserid(),request.getChannelid(),now);
+        readStatusRepository.save(readStatus);
         return readStatus;
     }
 
@@ -55,16 +57,22 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UpdateReadStatusRequestDto request) {
-        ReadStatus readStatus=readStatusRepository.findById(request.getId())
+    public ReadStatus update(UUID readStatusId,UpdateReadStatusRequestDto request) {
+        ReadStatus readStatus=readStatusRepository.findById(readStatusId)
                 .orElseThrow(()->new NoSuchElementException("ReadStatus id not found"));
-        ReadStatus updateReadStatus=new ReadStatus(request.getId(),request.getChannelId());
-        readStatusRepository.saveReadStatus(List.of(readStatus));
-        return updateReadStatus;
+        readStatus.setLastReadAt(readStatus.getLastReadAt());
+        return readStatusRepository.save(readStatus);
+    }
+
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return readStatusRepository.findAllByChannelId(channelId);
     }
 
     @Override
     public void delete(UUID id) {
+        if (!readStatusRepository.existsById(id))
+            throw new NoSuchElementException("readStatus not found");
         readStatusRepository.deleteById(id);
     }
 

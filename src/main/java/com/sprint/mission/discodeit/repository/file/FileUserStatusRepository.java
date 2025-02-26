@@ -28,12 +28,13 @@ public class FileUserStatusRepository implements UserStatusRepository {
                 throw new RuntimeException("Failed to create directory: " + DIRECTORY, e);
             }
         }
-        this.data = new HashMap<>();
+        this.data = loadDataFromFile();
+
     }
 
     @Override
     public void save(UserStatus status) {
-        data.put(status.getId(), status);
+        data.put(status.getUserId(), status);
         saveDataToFile();
     }
 
@@ -55,7 +56,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return data.values().stream().filter(userStatus -> userStatus.getId().equals(userId)).findFirst();
+        return data.values().stream().filter(userStatus -> userStatus.getUserId().equals(userId)).findFirst();
     }
 
     @Override

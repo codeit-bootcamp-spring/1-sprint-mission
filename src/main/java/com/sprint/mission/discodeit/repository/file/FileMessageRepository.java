@@ -83,7 +83,7 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public void deleteByChannelId(UUID channelId) {
         List<UUID> messageIds = data.values().stream()
-                .filter(message -> message.getChannelId().equals(channelId))
+                .filter(message -> Objects.equals(message.getChannelId(),channelId))
                 .map(Message::getId)
                 .toList();
 

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -13,12 +13,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class BinaryContentServiceImpl implements BinaryContentService {
+public class BasicBinaryContentService implements BinaryContentService {
 
     @Autowired
     private BinaryContentRepository binaryContentRepository;
@@ -28,27 +27,41 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     private MessageRepository messageRepository;
 
     @Override
-    public void createProfile(BinaryContentCreateRequestDto request) throws IOException {
+    public BinaryContent createProfile(BinaryContentCreateRequestDto request) {
         if (!userRepository.existsById(request.getUserId())) {
             throw new NoSuchElementException("User not found");
         }
-        BinaryContent binaryContent = new BinaryContent(request.getUserId(), null, request.getMultipartFile().getBytes());
+        BinaryContent binaryContent = null;
+        try {
+            String contentType=request.getMultipartFile().getContentType();
+            binaryContent = new BinaryContent(request.getUserId(), null, request.getMultipartFile().getBytes(),contentType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         binaryContentRepository.save(binaryContent);
+        return binaryContent;
     }
 
     @Override
-    public void createMessage(BinaryContentCreateRequestDto request) throws IOException {
+    public void createMessage(BinaryContentCreateRequestDto request)  {
         if (!messageRepository.existsById(request.getMessageId())) {
             throw new NoSuchElementException("Message not found");
         }
 
-        BinaryContent binaryContent = new BinaryContent(null, request.getMessageId(), request.getMultipartFile().getBytes());
+        BinaryContent binaryContent = null;
+        String contentType=request.getMultipartFile().getContentType();
+        try {
+            binaryContent = new BinaryContent(null, request.getMessageId(), request.getMultipartFile().getBytes(), contentType);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         binaryContentRepository.save(binaryContent);
     }
 
     @Override
-    public Optional<BinaryContent> find(UUID id) {
-        return binaryContentRepository.findById(id);
+    public BinaryContent find(UUID id) {
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("BinaryContent id not found"));
     }
 
     @Override
@@ -69,5 +82,10 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     @Override
     public void deleteByUserId(UUID id) {
         binaryContentRepository.deleteByUserId(id);
+    }
+
+    @Override
+    public List<BinaryContent> findAll() {
+        return binaryContentRepository.findAll() ;
     }
 }

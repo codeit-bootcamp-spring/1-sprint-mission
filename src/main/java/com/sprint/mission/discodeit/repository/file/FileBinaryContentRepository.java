@@ -69,8 +69,13 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public void deleteByMessageId(UUID id) {
-        data.values().removeIf(message -> message.getMessageId().equals(id));
+        data.values().removeIf(message -> Objects.equals(message.getMessageId(),id));
         saveDataToFile();
+    }
+
+    @Override
+    public ArrayList<BinaryContent> findAll() {
+        return new ArrayList<>(data.values());
     }
 
     // 데이터를 파일에 저장

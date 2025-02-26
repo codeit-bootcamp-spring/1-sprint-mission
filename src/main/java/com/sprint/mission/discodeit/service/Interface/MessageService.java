@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(CreateMessageRequestDto request) throws Exception;
+    Message createMessage(CreateMessageRequestDto request);
     Optional<Message> getMessageById(UUID id);
     List<Message> getAllMessages();
     List<Message> findAllByChannelId(UUID channelID);
-    Message updateMessage(UpdateMessageRequestDto request);
+    Message updateMessage(UUID id,UpdateMessageRequestDto request);
     void deleteMessage(UUID id);
     void deleteByChannelId(UUID channelID);
 }

@@ -7,11 +7,10 @@ import java.util.UUID;
 
 @Getter
 public class PrivateChannelCreateRequestDto {
-    private final UUID userId;
     private final List<UUID> members;
+    private UUID userId;
 
-    public PrivateChannelCreateRequestDto(UUID userId, List<UUID> members) {
-        this.userId = userId;
+    public PrivateChannelCreateRequestDto(List<UUID> members) {
         this.members = members;
     }
 }
