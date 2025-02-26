@@ -18,7 +18,7 @@ public class Channel extends BaseEntity implements Serializable {
   private List<UUID> memberIds;
   
   // public channel
-  public Channel(UUID ownerId, String name, String description) {
+  public Channel(String name, String description) {
     this.name = name;
     this.description = description;
     this.type = ChannelType.PUBLIC;
@@ -32,8 +32,8 @@ public class Channel extends BaseEntity implements Serializable {
     this.memberIds = memberIds;
   }
   
-  public static Channel ofPublic(UUID ownerId, String name, String description) {
-    return new Channel(ownerId, name, description);
+  public static Channel ofPublic(String name, String description) {
+    return new Channel(name, description);
   }
   
   public static Channel ofPrivate(UUID ownerId, List<UUID> memberIds) {

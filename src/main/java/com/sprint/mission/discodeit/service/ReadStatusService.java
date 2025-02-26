@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
+
   void create(ReadStatusDto createReadStatusDto);
-  
+
   ReadStatus findById(UUID readStatusId);
-  
-  List<ReadStatus> findAllByUserId(UUID userId);
-  
-  void updateReadStatus(UUID readStatusId);
-  
+
+  List<ReadStatusDto> findAllByUserId(UUID userId);
+
+  void updateReadStatus(UUID userId, UUID channelId);
+
   void remove(UUID readStatusId);
 }

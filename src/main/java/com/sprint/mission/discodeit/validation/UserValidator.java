@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.validation;
 
-import com.sprint.mission.discodeit.dto.user.CreateUserDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class UserValidator {
         .noneMatch(u -> u.getEmail().equals(email));
   }
   
-  public boolean validateUser(CreateUserDto userDto) {
+  public boolean validateUser(UserCreateRequest userDto) {
     if (!isUniqueName(userDto.name())) {
       throw new IllegalArgumentException("This name already exists. name: " + userDto.name());
     }

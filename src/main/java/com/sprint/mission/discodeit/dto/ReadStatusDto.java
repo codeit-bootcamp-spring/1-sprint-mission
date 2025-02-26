@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record ReadStatusDto(
     UUID userId,
-    UUID channelId
+    UUID channelId,
+    Long lastReadAt
 ) {
 }
