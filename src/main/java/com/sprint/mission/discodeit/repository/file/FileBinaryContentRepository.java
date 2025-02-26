@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -77,8 +78,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
   }
 
   @Override
-  public ArrayList<BinaryContent> findAll() {
-    return new ArrayList<>(data.values());
+  public List<BinaryContent> findAll() {
+    return this.data.values().stream().toList();
   }
 
   // 데이터를 파일에 저장

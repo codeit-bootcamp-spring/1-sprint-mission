@@ -1,6 +1,6 @@
 discodeit:
   repository:
-    type: jcf
+    type: file
     file:
       storage-path: "file-data-map/"
 

@@ -54,8 +54,7 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
   }
 
   @Override
-  public ArrayList<BinaryContent> findAll() {
-
-    return null;
+  public List<BinaryContent> findAll() {
+    return this.data.values().stream().toList();
   }
 }

@@ -36,7 +36,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
   @Override
   public UserStatus save(UserStatus status) {
-    data.put(status.getUserId(), status);
+    data.put(status.getId(), status);
     saveDataToFile();
     return status;
   }
