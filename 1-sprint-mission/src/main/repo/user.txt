@@ -1,0 +1,22 @@
+{
+  "c3f94aaa-053f-4dfe-921b-c559f9097567" : {
+    "createdAt" : 1740118182591,
+    "email" : "johafa@example.com",
+    "name" : "삶은고구마",
+    "password" : -524301777283155042,
+    "selfImg" : "",
+    "updatedAt" : 0,
+    "userMessage" : [ ],
+    "userStatus" : ""
+  },
+  "e5acfce4-2f8b-4a39-b7a2-5e588184aeed" : {
+    "createdAt" : 1739773831468,
+    "email" : "1234",
+    "name" : "탕수육",
+    "password" : 1006007921581,
+    "selfImg" : "",
+    "updatedAt" : 0,
+    "userMessage" : [ ],
+    "userStatus" : "4aa5cfc9-ef42-4d32-bcde-98d057dff35b"
+  }
+}

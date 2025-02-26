@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: myApp
+logging:
+  level:
+    org.springframework: INFO
+    com.myapp: DEBUG
+
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: .discodeit
+
+
+

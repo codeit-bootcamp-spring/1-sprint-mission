@@ -1,0 +1,22 @@
+{
+  "b4fa0829-59b4-47aa-a3b0-ae20c69030d4" : {
+    "channelName" : "중식",
+    "channelType" : "PUBLIC",
+    "createdAt" : "1970-01-01T00:00:00Z",
+    "messageList" : [ ],
+    "readStatus" : { },
+    "updatedAt" : "1970-01-01T00:00:00Z",
+    "userList" : {
+      "e5acfce4-2f8b-4a39-b7a2-5e588184aeed" : "4aa5cfc9-ef42-4d32-bcde-98d057dff35b"
+    }
+  },
+  "f301cdc8-559d-481e-b1ff-e3693dfdb016" : {
+    "channelName" : "",
+    "channelType" : "PUBLIC",
+    "createdAt" : "1970-01-01T00:00:00Z",
+    "messageList" : [ ],
+    "readStatus" : { },
+    "updatedAt" : "1970-01-01T00:00:00Z",
+    "userList" : { }
+  }
+}
