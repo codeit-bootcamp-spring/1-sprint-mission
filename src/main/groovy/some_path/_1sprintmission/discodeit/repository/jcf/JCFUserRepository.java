@@ -33,6 +33,16 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsByUsername(String userName) {
+        return false;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return false;
+    }
+
+    @Override
     public void deleteById(UUID id) {
         this.data.remove(id);
     }
@@ -42,6 +52,11 @@ public class JCFUserRepository implements UserRepository {
     public boolean isDiscriminatorDuplicate(String username, int discriminator) {
         return this.data.values().stream()
                 .anyMatch(user -> Objects.equals(user.getDiscriminator(), discriminator));
+    }
+
+    @Override
+    public Optional<User> findByUserName(String userName) {
+        return Optional.empty();
     }
 }
 
