@@ -50,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     Channel channel = channelRepository.save(
-        new Channel(createPublicChannelDto.channelName(), ChannelType.PUBLIC,
+        new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
             ChannelCategory.TEXT, createPublicChannelDto.description()));
     return ChannelResponseDto.from(channel, null, null);
   }

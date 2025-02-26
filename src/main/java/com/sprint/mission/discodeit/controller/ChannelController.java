@@ -7,9 +7,7 @@ import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,28 +58,13 @@ public class ChannelController {
   //특정 사용자의 모든 채널 목록 조회
   //필터, 검색, 페이징에 해당하므로 쿼리파라미터로 수정
   @GetMapping
-  public ResponseEntity<List<ChannelResponseDto>> getChannel(@RequestParam String userId,
-      @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
-    List<ChannelResponseDto> allByUserId = channelService.findAllByUserId(userId);
-    String etag = "\"" + allByUserId.hashCode() + "\"";
-
-    if (etag.equals(ifNoneMatch)) {
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-    }
-    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-        .body(allByUserId);
+  public ResponseEntity<List<ChannelResponseDto>> getChannel(@RequestParam String userId) {
+    return ResponseEntity.ok().body(channelService.findAllByUserId(userId));
   }
 
   //특정 채널의 모든 메세지 조회
   @GetMapping("/{channelId}/messages")
-  public ResponseEntity<List<MessageResponseDto>> getAllMessages(@PathVariable String channelId,
-      @RequestHeader(value = "If-None-Match", required = false) String ifNoneMatch) {
-    List<MessageResponseDto> allMessages = channelService.findAllMessagesByChannelId(channelId);
-    String etag = "\"" + allMessages.hashCode() + "\"";
-    if (etag.equals(ifNoneMatch)) {
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-    }
-    return ResponseEntity.ok().eTag(etag).cacheControl(CacheControl.maxAge(60, TimeUnit.SECONDS))
-        .body(allMessages);
+  public ResponseEntity<List<MessageResponseDto>> getAllMessages(@PathVariable String channelId) {
+    return ResponseEntity.ok().body(channelService.findAllMessagesByChannelId(channelId));
   }
 }
