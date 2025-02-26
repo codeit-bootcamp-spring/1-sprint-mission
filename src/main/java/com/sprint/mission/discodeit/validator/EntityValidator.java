@@ -1,14 +1,12 @@
 package com.sprint.mission.discodeit.validator;
 
 
-import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.InvalidOperationException;
-import com.sprint.mission.discodeit.repository.*;
+import com.sprint.mission.discodeit.repository.BaseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
 

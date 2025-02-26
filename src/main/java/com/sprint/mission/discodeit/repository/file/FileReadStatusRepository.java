@@ -1,23 +1,24 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.FileException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.FileConstant.READ_STATUS_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
-public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository{
+public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus> implements ReadStatusRepository {
 
 
   public FileReadStatusRepository(@Value("${app.file.read-status-file}") String filePath) {
@@ -35,7 +36,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public Optional<ReadStatus> findById(String id) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
 
     return statuses.stream()
         .filter(status -> status.getUUID().equals(id))
@@ -44,7 +45,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public List<ReadStatus> findByUserId(String userId) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
 
     return statuses.stream()
         .filter(status -> status.getUserId().equals(userId))
@@ -53,7 +54,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public List<ReadStatus> findByChannelId(String id) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
     return statuses.stream()
         .filter(status -> status.getChannelId().equals(id))
         .toList();
@@ -61,7 +62,7 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public Optional<ReadStatus> findByChannelIdAndUserId(String channelId, String userId) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
 
     return statuses.stream()
         .filter(status -> status.getChannelId().equals(channelId)
@@ -76,21 +77,26 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public void deleteByUserId(String id) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
     statuses.removeIf(status -> status.getUserId().equals(id));
     saveAll(statuses);
   }
 
   @Override
   public void deleteByChannelId(String channelId) {
-    List<ReadStatus> statuses = loadAll(ReadStatus.class);;
+    List<ReadStatus> statuses = loadAll(ReadStatus.class);
     statuses.removeIf(status -> status.getChannelId().equals(channelId));
     saveAll(statuses);
   }
 
   @Override
-  public void clear(){
-    File file = new File(getFilePath());
-    if(file.exists()) file.delete();
+  public void clear() {
+    Path path = Paths.get(getFilePath());
+
+    try {
+      Files.deleteIfExists(path);
+    } catch (IOException e) {
+      throw new FileException();
+    }
   }
 }

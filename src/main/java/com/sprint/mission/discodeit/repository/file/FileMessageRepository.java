@@ -1,11 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -14,8 +12,6 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import static com.sprint.mission.discodeit.constant.FileConstant.MESSAGE_FILE;
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file")
@@ -42,7 +38,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   @Override
   public List<Message> findByChannel(String channelId) {
     List<Message> messages = loadAll(Message.class);
-    return messages.stream().filter(m -> m.getChannelUUID().equals(channelId)).toList();
+    return messages.stream().filter(m -> m.getChannelId().equals(channelId)).toList();
   }
 
   @Override
@@ -53,9 +49,8 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   @Override
   public Message findLatestChannelMessage(String channelId) {
     List<Message> messages = loadAll(Message.class);
-    return messages.stream().filter(m -> m.getChannelUUID().equals(channelId))
-        .max(Comparator.comparing(Message::getCreatedAt))
-        .orElse(null);
+    return messages.stream().filter(m -> m.getChannelId().equals(channelId))
+        .max(Comparator.comparing(Message::getCreatedAt)).orElse(null);
   }
 
   @Override
@@ -87,7 +82,7 @@ public class FileMessageRepository extends AbstractFileRepository<Message> imple
   public void deleteByChannel(String channelId) {
     List<Message> messages = loadAll(Message.class);
 
-    messages.removeIf(message -> message.getChannelUUID().equals(channelId));
+    messages.removeIf(message -> message.getChannelId().equals(channelId));
 
     saveAll(messages);
   }

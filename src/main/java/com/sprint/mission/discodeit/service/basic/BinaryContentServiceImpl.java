@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.binary_content.CreateBinaryContentDto;
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
@@ -14,7 +11,9 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,15 +27,19 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   private final EntityValidator validator;
 
   @Override
-  public BinaryContent create(CreateBinaryContentDto dto) {
+  public BinaryContent create(BinaryContent content) {
 
-    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
+    validator.findOrThrow(User.class, content.getUserId(), new UserNotFoundException());
 
-    BinaryContent binaryContent = dto.isProfile()
-        ? new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).isProfilePicture().build()
-        : new BinaryContent.BinaryContentBuilder(dto.userId(), dto.fileName(), dto.fileType(), dto.fileSize(), dto.data()).build();
+    // 기존에 존재하던 프로필 삭제. 그냥 교채로 바꿀수도?
+    if (content.isProfilePicture()) {
+      BinaryContent originalProfile = binaryContentRepository.findByUserId(content.getUserId()).stream().filter(BinaryContent::isProfilePicture).findFirst().orElse(null);
+      if (originalProfile != null) {
+        binaryContentRepository.deleteById(originalProfile.getUUID());
+      }
+    }
 
-    return binaryContentRepository.save(binaryContent);
+    return binaryContentRepository.save(content);
   }
 
   @Override
@@ -82,57 +85,47 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   }
 
   @Override
-  public List<BinaryContentDto> saveBinaryContentsForMessage(CreateMessageDto messageDto, String messageId) {
+  public List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents) {
+
     validator.findOrThrow(Message.class, messageId, new MessageNotFoundException());
 
-    if (messageDto.binaryContent() == null || messageDto.binaryContent().isEmpty()) {
+    if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();
     }
 
-    List<BinaryContentDto> binaryContentDtos = messageDto.binaryContent();
-    List<BinaryContent> binaryContents = new ArrayList<>();
-    for (BinaryContentDto binary : binaryContentDtos) {
-      BinaryContent content = new BinaryContent.BinaryContentBuilder(
-          messageDto.userId(),
-          binary.fileName(),
-          binary.fileType(),
-          binary.fileSize(),
-          binary.data()
-      )
-          .messageId(messageId)
-          .channelId(messageDto.channelId())
-          .build();
+    return binaryContentRepository.saveMultipleBinaryContent(contents);
+  }
 
-      binaryContents.add(content);
-    }
+  // TODO : 메시지 업데이트시 이미지는 없을 수도
+  @Override
+  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> newFiles) {
 
-    binaryContentRepository.saveMultipleBinaryContent(binaryContents);
-    return binaryContentDtos;
+    List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getUUID());
+
+    Set<String> newFileNames = newFiles.stream()
+        .map(BinaryContent::getFileName)
+        .collect(Collectors.toSet());
+
+    List<BinaryContent> filesToDelete = originalFiles.stream()
+        .filter(file -> !newFileNames.contains(file.getFileName()))
+        .toList();
+
+    // 기존 파일 삭제
+    filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getUUID()));
+
+    return binaryContentRepository.saveMultipleBinaryContent(newFiles);
   }
 
   @Override
-  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContentDto> binaryContentDtos) {
-    List<BinaryContent> originalBinaryContent = binaryContentRepository.findByMessageId(message.getUUID());
+  public BinaryContent updateProfile(String userId, BinaryContent profileImage) {
+    BinaryContent originalProfile = binaryContentRepository.findByUserIdAndIsProfilePictureTrue(userId);
 
-    // 기존 파일이 있는지 확인
-    for (BinaryContentDto dto : binaryContentDtos) {
-      BinaryContent existingContent = originalBinaryContent.stream()
-          .filter(content -> content.getFileName().equals(dto.fileName()))
-          .findFirst()
-          .orElse(null);
-
-      // 없다면 새 파일 추가
-      if (existingContent == null) {
-        BinaryContent newBinaryContent = new BinaryContent.BinaryContentBuilder(userId, dto.fileName(), dto.fileType(), dto.fileSize(), dto.data())
-            .messageId(message.getUUID())
-            .channelId(message.getChannelUUID())
-            .build();
-
-        originalBinaryContent.add(newBinaryContent);
-      }
-    }
-
-    return binaryContentRepository.saveMultipleBinaryContent(originalBinaryContent);
+    return Optional.ofNullable(originalProfile)
+        .map(profile -> {
+          binaryContentRepository.deleteById(profile.getUUID());
+          return binaryContentRepository.save(profileImage);
+        })
+        .orElseGet(() -> binaryContentRepository.save(profileImage));
   }
 
   /**
@@ -141,12 +134,18 @@ public class BinaryContentServiceImpl implements BinaryContentService {
    * @param channelId 채널 ID
    * @return messageId를 키로 하고, 해당하는 BinaryContent 목록을 값으로 갖는 Map
    */
+  // TODO : null 처리
   @Override
   public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
     return binaryContentRepository.findByChannel(channelId).stream()
-        .collect(Collectors.groupingBy(
-            BinaryContent::getMessageId,
+        .collect(Collectors.groupingBy( content ->
+            content.getMessageId() != null ? content.getMessageId() : "",
             Collectors.toList()
         ));
+  }
+
+  @Override
+  public List<BinaryContent> findAll(){
+    return binaryContentRepository.findAll();
   }
 }

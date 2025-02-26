@@ -1,9 +1,11 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.ReadStatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ReadStatusService {
   ReadStatus create(CreateReadStatusDto dto, boolean skipValidation);
@@ -11,6 +13,7 @@ public interface ReadStatusService {
   ReadStatus find(String id);
   List<ReadStatus> findAllByUserId(String userId);
   List<ReadStatus> findAllByChannelId(String channelId);
+  Map<String,List<String>> getUserIdsForChannelReadStatuses(List<Channel> channels);
   ReadStatus update(CreateReadStatusDto dto);
   void deleteByChannel(String id);
   void delete(String id);

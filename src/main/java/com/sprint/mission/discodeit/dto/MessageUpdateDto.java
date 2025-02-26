@@ -1,18 +1,22 @@
 package com.sprint.mission.discodeit.dto;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public record MessageUpdateDto (
+@Getter
+@Setter
+public class MessageUpdateDto {
+
     @NotNull
-    String messageId,
-    @NotNull
-    String userId,
+    private String userId;
     @NotBlank
-    String content,
-    List<BinaryContentDto> binaryContent
-){
+    private String content;
+    private List<MultipartFile> binaryContent;
+
+    public MessageUpdateDto(){}
 }

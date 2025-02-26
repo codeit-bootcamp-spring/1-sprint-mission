@@ -10,6 +10,7 @@ public record PrivateChannelResponseDto(
     String serverId,
     Channel.ChannelType channelType,
     Instant createdAt,
+    boolean isPrivate,
     List<String> participants
 
 ){

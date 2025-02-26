@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Update User</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; margin-top: 15px; cursor: pointer; width: 100%; }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">Update User</h2>
+
+<form th:action="@{/api/v1/user/{id}(id=${user.userId})}" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_method" value="put"/> <!-- PUT 요청을 가능하게 함 -->
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" th:value="${user.username}" minlength="2" maxlength="10"/>
+
+    <label for="inputPassword">Current Password:</label>
+    <input type="password" id="inputPassword" name="inputPassword" required/>
+
+    <label for="password">New Password (Optional):</label>
+    <input type="password" id="password" name="password"/>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" th:value="${user.email}"/>
+
+    <label for="nickname">Nickname:</label>
+    <input type="text" id="nickname" name="nickname" th:value="${user.nickname}"/>
+
+    <label for="phoneNumber">Phone:</label>
+    <input type="text" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}"/>
+
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" th:text="${user.description}"></textarea>
+
+    <label for="profileImage">Profile Image:</label>
+    <input type="file" id="profileImage" name="profileImage"/>
+
+    <button type="submit">Update</button>
+</form>
+
+</body>
+</html>

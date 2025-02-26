@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
-
-import java.util.Optional;
 
 @Getter
 public class ChannelUpdateDto {
-  @NotNull
-  private String channelId;
+
   @NotBlank
   @Size(min = 2, max = 10)
   private String channelName;
@@ -16,9 +16,7 @@ public class ChannelUpdateDto {
   @Max(50)
   private Integer maxNumberOfPeople;
 
-
-  public ChannelUpdateDto(String channelId, String channelName, Integer maxNumberOfPeople) {
-    this.channelId = channelId;
+  public ChannelUpdateDto(String channelName, Integer maxNumberOfPeople) {
     this.channelName = channelName;
     this.maxNumberOfPeople = maxNumberOfPeople;
   }

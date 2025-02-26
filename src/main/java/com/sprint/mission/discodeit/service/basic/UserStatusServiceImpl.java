@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user_status.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -13,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
@@ -26,16 +28,15 @@ public class UserStatusServiceImpl implements UserStatusService {
   private final EntityValidator validator;
 
   @Override
-  public UserStatus create(CreateUserStatusDto dto) {
+  public UserStatus create(UserStatus status) {
 
-    validator.findOrThrow(User.class, dto.userId(), new UserNotFoundException());
+    validator.findOrThrow(User.class, status.getUserId(), new UserNotFoundException());
 
-    if (userStatusRepository.findByUserId(dto.userId()).isPresent()) {
+    if (userStatusRepository.findByUserId(status.getUserId()).isPresent()) {
       throw new InvalidOperationException(DEFAULT_ERROR_MESSAGE);
     }
 
-    UserStatus userStatus = new UserStatus(dto.userId(), Instant.now());
-    return userStatusRepository.save(userStatus);
+    return userStatusRepository.save(status);
   }
 
   @Override
@@ -46,7 +47,7 @@ public class UserStatusServiceImpl implements UserStatusService {
   @Override
   public UserStatus findByUserId(String userId) {
     validator.findOrThrow(User.class, userId, new UserNotFoundException());
-    return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new CreateUserStatusDto(userId, Instant.now())));
+    return userStatusRepository.findByUserId(userId).orElseGet(() -> create(new UserStatus(userId, Instant.now())));
   }
 
   @Override
@@ -54,17 +55,6 @@ public class UserStatusServiceImpl implements UserStatusService {
     return userStatusRepository.findAll();
   }
 
-  @Override
-  public UserStatus update(UpdateUserStatusDto dto) {
-
-    UserStatus userStatus = find(dto.uuid());
-
-    userStatus.updateLastOnline();
-
-    userStatusRepository.save(userStatus);
-
-    return userStatus;
-  }
 
   @Override
   public UserStatus updateByUserId(String userId, UpdateUserStatusDto dto) {
@@ -75,7 +65,7 @@ public class UserStatusServiceImpl implements UserStatusService {
         () -> new InvalidOperationException(DEFAULT_ERROR_MESSAGE)
     );
 
-    status.updateLastOnline();
+    status.setUserStatus(dto.status());
 
     userStatusRepository.save(status);
 

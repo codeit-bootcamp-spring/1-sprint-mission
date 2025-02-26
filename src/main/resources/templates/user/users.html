@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User List</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        img { width: 50px; height: 50px; border-radius: 50%; }
+        button { padding: 5px 10px; margin-right: 5px; cursor: pointer; }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 300px;
+        }
+        .modal input {
+            padding: 8px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .modal button {
+            padding: 8px 12px;
+            margin-top: 10px;
+        }
+    </style>
+    <script>
+        let selectedUserId = null;
+
+        function openDeleteModal(button) {
+            selectedUserId = button.getAttribute("data-id");
+            console.log("선택된 유저 ID:", selectedUserId); // 🔥 디버깅 로그 추가
+
+            let modal = document.getElementById("deleteModal");
+            modal.style.display = "flex"; // 🔥 모달을 화면에 표시
+        }
+
+
+
+        function closeDeleteModal() {
+            document.getElementById("deleteModal").style.display = "none";
+        }
+
+        function deleteUser() {
+            if (!selectedUserId) {
+                alert("🚨 사용자 ID가 올바르지 않습니다!");
+                return;
+            }
+
+            let password = document.getElementById("passwordInput").value;
+            if (!password) {
+                alert("🔑 비밀번호를 입력하세요!");
+                return;
+            }
+
+            fetch(`/api/v1/user/${selectedUserId}?password=${encodeURIComponent(password)}`, {
+                method: "DELETE"
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        return response.text().then(errorMessage => {
+                            throw new Error(errorMessage || "❌ 삭제 실패!");
+                        });
+                    }
+                })
+                .then(redirectUrl => {
+                    alert("✅ 사용자가 삭제되었습니다.");
+                    window.location.href = redirectUrl;
+                })
+                .catch(error => {
+                    console.error("🚨 삭제 요청 중 오류 발생:", error);
+                    alert(error.message || "⚠️ 네트워크 오류가 발생했습니다.");
+                });
+        }
+
+
+
+    </script>
+</head>
+<body>
+
+<h2>User List</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Nickname</th>
+        <th>Phone</th>
+        <th>Created At</th>
+        <th>Last Online</th>
+        <th>Status</th>
+        <th>Profile Picture</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td>
+            <a th:href="@{/api/v1/user/{id}(id=${user.userId})}" th:text="${user.userId}" style="color: blue; text-decoration: underline; cursor: pointer;"></a>
+        </td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.nickname}"></td>
+        <td th:text="${user.phoneNumber}"></td>
+        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${#temporals.format(user.lastOnlineAt, 'yyyy-MM-dd HH:mm:ss')}"></td>
+        <td th:text="${user.userStatus}"></td>
+        <td>
+            <img th:if="${user.profilePictureBase64}" th:src="'data:image/png;base64,' + ${user.profilePictureBase64}" alt="Profile Image"/>
+            <span th:unless="${user.profilePictureBase64}">No Image</span>
+        </td>
+        <td>
+            <a th:href="@{/api/v1/user-update-form/{id}(id=${user.userId})}">
+                <button>수정</button>
+            </a>
+
+            <button th:data-id="${user.userId}" onclick="openDeleteModal(this)">삭제</button>
+
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- 🔥 삭제 확인 모달 -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>비밀번호 입력</h3>
+        <p>삭제하려면 비밀번호를 입력하세요.</p>
+        <input type="password" id="passwordInput" placeholder="비밀번호 입력">
+        <button onclick="deleteUser()">확인</button>
+        <button onclick="closeDeleteModal()">취소</button>
+    </div>
+</div>
+
+</body>
+</html>

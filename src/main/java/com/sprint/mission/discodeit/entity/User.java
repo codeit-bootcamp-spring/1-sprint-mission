@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.constant.UserConstant;
-import com.sprint.mission.discodeit.exception.UserValidationException;
 import com.sprint.mission.discodeit.util.UuidGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
@@ -21,76 +22,63 @@ public class User implements Serializable {
   private String email;
   private String nickname;
   private String phoneNumber;
-  private String binaryContentId;
   private String description;
-  private String userStatusId;
+
   private Instant createdAt;
   private Instant updatedAt;
+  private BinaryContent profileImage;
+  private UserStatus status;
 
-  private User(UserBuilder builder) {
-    this.UUID = UuidGenerator.generateUUID();
-    this.username = builder.username;
-    this.password = builder.password;
-    this.email = builder.email;
-    this.nickname = builder.nickname;
-    this.phoneNumber = builder.phoneNumber;
-    this.binaryContentId = builder.binaryContentId;
-    this.description = builder.description;
-    this.userStatusId = builder.userStatusId;
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
-  }
-
-  public static class UserBuilder {
-    private final String username;
-    private final String password;
-    private final String email;
-    private String userStatusId;
-    private String nickname;
-    private String phoneNumber;
-    private String binaryContentId;
-    private String description;
-
-    public UserBuilder(String username, String password, String email, String phoneNumber) throws UserValidationException {
-      this.username = username;
-      this.password = password;
-      this.email = email;
-      this.phoneNumber = phoneNumber;
-    }
-
-    public UserBuilder nickname(String nickname) throws UserValidationException {
-      this.nickname = nickname;
-      return this;
-    }
-
-    public UserBuilder binaryContentId(String binaryContentId ) {
-      this.binaryContentId = binaryContentId;
-      return this;
-    }
-
-    public UserBuilder description(String description) {
-      this.description = description;
-      return this;
-    }
-
-    public UserBuilder userStatusId(String id){
-      this.userStatusId = id;
-      return this;
-    }
-
-    public User build() {
-      return new User(this);
+  public static class UserBuilder{
+    private String UUID = UuidGenerator.generateUUID();
+    private Instant createdAt = Instant.now();
+    private Instant updatedAt = Instant.now();
+    private BinaryContent profileImage = null;
+    private UserStatus status = null;
+    public String getUUID(){
+      return this.UUID;
     }
   }
 
   @Override
   public String toString() {
-    return
-        "USER: username='" + username + '\'' +
-        ", email='" + email + '\'' +
-        ", nickname='" + nickname + '\'' +
-        ", phoneNumber='" + phoneNumber + '\'' + ", binaryID: " + binaryContentId +
-        '}';
+    return "User{"
+        + "UUID='" + UUID + '\''
+        + ", username='" + username + '\''
+        + ", email='" + email + '\''
+        + ", nickname='" + nickname + '\''
+        + ", phoneNumber='" + phoneNumber
+        + '\'' + ", description='" + description + '\''
+        + ", createdAt=" + createdAt
+        + ", updatedAt=" + updatedAt
+        + ", profileImage=" + (profileImage != null ? "Exists" : "None")
+        + ", status=" + status
+        + '}';
+  }
+
+  public void updateProfile(
+      String username,
+      String email,
+      String nickname,
+      String phoneNumber,
+      String description,
+      String password
+  ) {
+    if (username != null) this.username = username;
+    if (email != null && email.contains("@")) this.email = email;
+    if (nickname != null) this.nickname = nickname;
+    if (phoneNumber != null) this.phoneNumber = phoneNumber;
+    if (description != null) this.description = description;
+    if (password != null) this.password = password;
+    this.updatedAt = Instant.now();
+  }
+
+  public void updateStatus(UserStatus status){
+    this.status = status;
+  }
+
+  public void updateProfileImage(BinaryContent profileImage){
+    this.profileImage = profileImage;
   }
 
   @Override
