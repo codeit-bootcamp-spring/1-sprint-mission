@@ -47,6 +47,21 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
+  public List<Channel> findByParticipantId(String userId) {
+    List<Channel> load = findAll();
+
+    List<Channel> channels = new ArrayList<>();
+    for (Channel channel : load) {
+      if (channel.getChannelType() == ChannelType.PUBLIC ||
+          (channel.getChannelType() == ChannelType.PRIVATE &&
+              channel.getUserSet().contains(userId))) {
+        channels.add(channel);
+      }
+    }
+    return channels;
+  }
+
+  @Override
   public List<Channel> findAll() {
     return FileService.load(directory);
   }

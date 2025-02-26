@@ -15,6 +15,7 @@ public interface ChannelRepository {
   //search
   Channel findById(String id);
 
+  List<Channel> findByParticipantId(String userId);
 
   List<Channel> findAll();
 
