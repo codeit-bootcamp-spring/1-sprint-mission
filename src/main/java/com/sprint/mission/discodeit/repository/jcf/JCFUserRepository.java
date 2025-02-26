@@ -45,4 +45,24 @@ public class JCFUserRepository implements UserRepository {
     public void removeUserById(UUID userId) {
         userMap.remove(userId);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public void clearData() {
+        this.userMap.clear();
+    }
+
+    @Override
+    public void resetData() {
+        this.userMap = new HashMap<>();
+    }
+
+    @Override
+    public User findUserByName(String userName) {
+        return null;
+    }
 }

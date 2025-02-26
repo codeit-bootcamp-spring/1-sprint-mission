@@ -1,25 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.entity.binarycontent.BinaryContent;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentRequest;
 import com.sprint.mission.discodeit.entity.binarycontent.BinaryContentResponse;
-
-import java.util.Map;
+import com.sprint.mission.discodeit.entity.binarycontent.UploadBinaryContent;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface BinaryContentService {
-    BinaryContentResponse create(BinaryContentRequest request);
 
-    default BinaryContentResponse update(BinaryContentRequest binaryContent) {
-        return null;
-    }
+  List<UploadBinaryContent> create(BinaryContentRequest request) throws IOException;
 
-    BinaryContentResponse find(UUID id);
+  List<UploadBinaryContent> createFiles(List<MultipartFile> files, UUID messageId);
 
-    Map<UUID, BinaryContentResponse> findAllById(UUID id);
+  BinaryContentResponse find(String id);
 
-    default Map<UUID, BinaryContentResponse> findByUserId(UUID userId) {
-        return null;
-    }
+  BinaryContent findBinaryContentById(UUID id);
 
-    void delete(UUID userId);
+  Optional<BinaryContent> findBinaryContentByUserId(UUID userId);
+
+  List<BinaryContentResponse> findAllById(UUID id);
+
+  UUID delete(UUID id);
+
+  List<BinaryContentResponse> findAll(List<String> binaryContentIds);
 }

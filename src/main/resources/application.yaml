@@ -1,8 +1,27 @@
 spring:
   application:
     name: discodeit
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 500MB
+      enabled: true
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        period: 0
+
 
 discodeit:
   repository:
     type: file  # jcf or file
     file-directory: .discodeit
+
+file:
+  #dir: C:/Users/leeco/Desktop/codeit_sprint/mission/1-sprint-mission/data_storage/
+  dir: ${user.home}/app_uploads/
+
+server:
+  address: 0.0.0.0
+  port: 8080

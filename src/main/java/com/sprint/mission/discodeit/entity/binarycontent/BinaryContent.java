@@ -1,64 +1,50 @@
 package com.sprint.mission.discodeit.entity.binarycontent;
 
 import com.sprint.mission.discodeit.entity.ImmutableBaseObject;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
+import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BinaryContent extends ImmutableBaseObject {
-    private static final String TYPE_IMG = "image";
-    private static final String TYPE_BIN = "binary";
 
-    @NotEmpty
-    private final UUID userId;
+  private UUID fileId;
+  private String binaryContentName;
+  private Long size;
+  private String contentType;
+  private String bytes;
+  private UploadBinaryContent uploadFile;
+  private List<UploadBinaryContent> uploadFiles;
+  private List<UUID> attachmentIds;
 
-    @NotEmpty
-    private final UUID messageId;
+  public BinaryContent(UUID messageId, String uploadFileName, Long size,
+      List<UploadBinaryContent> uploadFiles, Object o) {
+  }
 
-    @NotEmpty
-    private String fileName;
+  public static BinaryContent createBinaryContent(UUID fileId, String name,
+      Long size, String contentType, String bytes, UploadBinaryContent file,
+      List<UploadBinaryContent> files) {
 
-    @NotEmpty
-    private String fileType;
+    return new BinaryContent(fileId, name, size, contentType, bytes, file, files, null);
+  }
 
-    @NotEmpty
-    private String filePath = "~/Desktop/";
+  public BinaryContent(UUID fileId, String binaryContentName, UploadBinaryContent uploadFile,
+      List<UUID> attachmentIds) {
+    this.fileId = fileId;
+    this.binaryContentName = binaryContentName;
+    this.uploadFile = uploadFile;
+    this.attachmentIds = attachmentIds;
+  }
 
-    private long fileSize;
-
-    public BinaryContent(UUID userId, UUID messageId, String fileName, String fileType) {
-        super();
-        this.userId = userId;
-        this.messageId = messageId;
-        this.fileName = fileName;
-        this.fileType = fileType;
-    }
-
-    public BinaryContent(UUID userId, String fileName, String fileType) {
-        this.userId = userId;
-        this.messageId = UUID.randomUUID();
-        this.fileName = fileName;
-        this.fileType = fileType;
-    }
-
-
-
-    public BinaryContent upload(String fileName, String fileType) {
-        this.fileName = fileName;
-        this.fileType = fileType;
-
-        return this;
-    }
-
-    /**
-     * @param fileSize
-     * @Description: 임시로 파일 크기 지정
-     */
-    public void calculateFileSize(long fileSize){
-        this.fileSize = fileSize;
-    }
+  public BinaryContent(UUID uuid, String uploadFileName, UploadBinaryContent file) {
+    this.fileId = uuid;
+    this.binaryContentName = uploadFileName;
+    this.uploadFile = file;
+  }
 }

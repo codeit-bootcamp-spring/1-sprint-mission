@@ -13,7 +13,7 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserStatusRepository implements UserStatusRepository {
 
-    private final Map<UUID, UserStatus> storage = new HashMap<>();
+    private Map<UUID, UserStatus> storage = new HashMap<>();
 
     @Override
     public UserStatus save(UserStatus userStatus) {
@@ -32,6 +32,16 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 //            throw new IllegalStateException("유저가 존재하지 않음 = " + userId);
 //        }
         return userStatus;
+    }
+
+    @Override
+    public UserStatus findByUserName(String username) {
+        return null;
+    }
+
+    @Override
+    public UserStatus updateState(String userName, UserStatus userStatus) {
+        return null;
     }
 
     @Override
@@ -66,5 +76,15 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         if (userId == null) {
             throw new IllegalArgumentException("UserId가 없음");
         }
+    }
+
+    @Override
+    public void clearData() {
+        this.storage.clear();
+    }
+
+    @Override
+    public void resetData() {
+        this.storage = new HashMap<>();
     }
 }

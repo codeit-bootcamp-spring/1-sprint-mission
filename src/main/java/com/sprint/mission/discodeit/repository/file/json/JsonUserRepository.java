@@ -45,4 +45,30 @@ public class JsonUserRepository extends JsonRepository<UUID, User> implements Us
     public void removeUserById(UUID userId) {
         removeById(userId);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return map.values().stream()
+                .filter(user -> user.getUserEmail().equals(email))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public User findUserByName(String userName) {
+        return map.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public void clearData() {
+        super.clearData();
+    }
+
+    @Override
+    public void resetData() {
+        super.resetData();
+    }
+
 }

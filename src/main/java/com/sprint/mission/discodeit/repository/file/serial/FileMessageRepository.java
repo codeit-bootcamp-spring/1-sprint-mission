@@ -44,4 +44,14 @@ public class FileMessageRepository implements MessageRepository, FileService<Mes
         return Optional.ofNullable(load(MESSAGE_PATH, messageMap))
                 .orElse(new HashMap<>());
     }
+
+    @Override
+    public void clearData() {
+
+    }
+
+    @Override
+    public void resetData() {
+
+    }
 }

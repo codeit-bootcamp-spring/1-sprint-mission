@@ -1,19 +1,15 @@
 package com.sprint.mission.discodeit.entity.message;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
+import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class MessageSendFileRequest{
-    private final UUID userId;
-    private final UUID messageId;
-    private final String fileName;
-    private final String fileType;
-    public MessageSendFileRequest(UUID userId, String fileName, String fileType) {
-        this.userId = userId;
-        this.messageId = UUID.randomUUID();
-        this.fileName = fileName;
-        this.fileType = fileType;
-    }
+    private String fileName;
+    private MultipartFile file;
+    private List<MultipartFile> files;
 }

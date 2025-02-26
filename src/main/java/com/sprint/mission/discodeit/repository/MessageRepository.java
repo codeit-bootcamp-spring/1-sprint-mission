@@ -17,4 +17,9 @@ public interface MessageRepository {
 
     // 모든 메세지 조회
     Map<UUID, Message> findAllMessage();
+
+
+    // 테스트용
+    void clearData();
+    void resetData();
 }

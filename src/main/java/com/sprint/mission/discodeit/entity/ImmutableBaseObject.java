@@ -15,7 +15,7 @@ public abstract class ImmutableBaseObject implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
-    @JsonProperty("userId")
+    @JsonProperty("id")
     private final UUID id;
 
     @JsonProperty("createdAt")

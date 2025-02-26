@@ -38,4 +38,24 @@ public class FileUserRepository implements UserRepository, FileService<User> {
 
         save(USER_PATH, userMap);
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public void clearData() {
+        this.userMap.clear();
+    }
+
+    @Override
+    public void resetData() {
+        this.userMap = new HashMap<>();
+    }
+
+    @Override
+    public User findUserByName(String userName) {
+        return null;
+    }
 }

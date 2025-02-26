@@ -7,6 +7,11 @@ build/
 *.ser
 *.json
 
+/data_storage
+
+/frontend
+/src/main/resources/static
+
 ### STS ###
 .apt_generated
 .classpath

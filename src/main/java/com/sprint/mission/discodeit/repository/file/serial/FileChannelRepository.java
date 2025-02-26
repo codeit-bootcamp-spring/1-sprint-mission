@@ -5,39 +5,57 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.file.FileService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository, FileService<Channel> {
-    private static final String CHANNEL_PATH = "channel.ser";
 
-    private Map<UUID, Channel> channelMap = new HashMap<>();
+  private static final String CHANNEL_PATH = "channel.ser";
 
-    @Override
-    public Channel saveChannel(Channel channel) {
-        Channel saveChannel = channelMap.put(channel.getId(), channel);
+  private Map<UUID, Channel> channelMap = new HashMap<>();
 
-        save(CHANNEL_PATH, channelMap);
+  @Override
+  public Channel saveChannel(Channel channel) {
+    Channel saveChannel = channelMap.put(channel.getId(), channel);
 
-        return channelMap.get(channel.getId());
-    }
+    save(CHANNEL_PATH, channelMap);
 
-    @Override
-    public void removeChannelById(UUID channelId) {
-        channelMap = findAllChannel();
-        channelMap.remove(channelId);
+    return channelMap.get(channel.getId());
+  }
 
-        save(CHANNEL_PATH, channelMap);
-    }
+  @Override
+  public void removeChannelById(UUID channelId) {
+    channelMap = findAllChannel();
+    channelMap.remove(channelId);
 
-    @Override
-    public Channel findChannelById(UUID channelId) {
-        channelMap = findAllChannel();
-        return channelMap.get(channelId);
-    }
+    save(CHANNEL_PATH, channelMap);
+  }
 
-    @Override
-    public Map<UUID, Channel> findAllChannel() {
-        return load(CHANNEL_PATH, channelMap);
-    }
+  @Override
+  public Channel findChannelById(UUID channelId) {
+    channelMap = findAllChannel();
+    return channelMap.get(channelId);
+  }
+
+  @Override
+  public Map<UUID, Channel> findAllChannel() {
+    return load(CHANNEL_PATH, channelMap);
+  }
+
+
+  @Override
+  public void clearData() {
+
+  }
+
+  @Override
+  public void resetData() {
+
+  }
+
+  @Override
+  public List<Channel> findAllChannelById(UUID channelId) {
+    return null;
+  }
 }

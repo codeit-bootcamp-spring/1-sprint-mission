@@ -17,4 +17,13 @@ public interface UserRepository {
 
     // 유저 삭제
     void removeUserById(UUID userId);
+
+    // 유저 이메일로 찾기
+    User findUserByEmail(String email);
+
+    // json 초기화
+    void clearData();
+    void resetData();
+
+    User findUserByName(String userName);
 }

@@ -36,4 +36,14 @@ public class JCFMessageRepository implements MessageRepository {
     public Map<UUID, Message> findAllMessage() {
         return messageMap;
     }
+
+    @Override
+    public void clearData() {
+
+    }
+
+    @Override
+    public void resetData() {
+
+    }
 }
