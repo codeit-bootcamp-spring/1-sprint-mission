@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.util;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -7,25 +8,33 @@ import java.util.HashMap;
 
 @Component
 public class SerializationUtil<K, V> {
-  private static final String FILE_PATH = "record.ser";
-  // Java에서는 기본 생성자를 명시적으로 작성해주지 않아도 자동으로 제공함
 
-  // 파일에 객체 직렬화하기
-  public void saveData(HashMap<K, V> data){
-    try (FileOutputStream fos = new FileOutputStream(FILE_PATH);
-         ObjectOutputStream oos = new ObjectOutputStream(fos);
-    ) {
+  private final String filePath;
+
+  public SerializationUtil(@Value("${serialization.file-path:record.ser}") String filePath) {
+    this.filePath = filePath;
+  }
+
+  public void saveData(HashMap<K, V> data) {
+    if (data == null) {
+      return;
+    }
+    try (FileOutputStream fos = new FileOutputStream(filePath);
+        ObjectOutputStream oos = new ObjectOutputStream(fos)) {
       oos.writeObject(data);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  // 파일에 객체 역직렬화하기
-  public HashMap<K, V> loadData(){
-    try (FileInputStream fis = new FileInputStream(FILE_PATH);
-         ObjectInputStream ois = new ObjectInputStream(fis)) {
-      return (HashMap<K, V>) ois.readObject(); // Object 타입으로 반환하므로 (List<T>)로 캐스팅해주고 있음.
+  public HashMap<K, V> loadData() {
+    File file = new File(filePath);
+    if (!file.exists()) {
+      return new HashMap<>();
+    }
+    try (FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis)) {
+      return (HashMap<K, V>) ois.readObject();
     } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
       return new HashMap<>();

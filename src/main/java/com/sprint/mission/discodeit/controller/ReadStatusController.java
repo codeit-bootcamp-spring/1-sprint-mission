@@ -7,42 +7,41 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
-@Controller
+@RestController
 @ResponseBody
-@RequestMapping("/api/readStatus")
+@RequestMapping("/api/read-statuses")
 public class ReadStatusController {
 
-    private final ReadStatusService readStatusService;
+  private final ReadStatusService readStatusService;
 
-    @RequestMapping(path = "create")
-    public ResponseEntity<ReadStatus> create(@ModelAttribute ReadStatusCreateRequest request) {
-        ReadStatus createdReadStatus = readStatusService.create(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdReadStatus);
-    }
+  @PostMapping
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
+    ReadStatus createdReadStatus = readStatusService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
+  }
 
-    @RequestMapping(path = "update")
-    public ResponseEntity<Void> update(@RequestParam("readStatusId") UUID readStatusId,
-                                             @ModelAttribute ReadStatusUpdateRequest request) {
-        readStatusService.update(readStatusId, request);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .build();
-    }
+  @PutMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
+    readStatusService.update(readStatusId, request);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .build();
+  }
 
-    @RequestMapping(path = "findAllByUserId")
-    public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
-        List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(readStatuses);
-    }
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam UUID userId) {
+    List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(readStatuses);
+  }
 }
