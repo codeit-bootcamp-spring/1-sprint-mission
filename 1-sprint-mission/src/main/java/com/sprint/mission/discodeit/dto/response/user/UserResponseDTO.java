@@ -6,11 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
-
-@Schema(name = "UserLoginResponseDTO", description = "사용자 로그인 응답 정보를 담은 DTO")
-public record UserLoginResponseDTO(
+@Schema(name = "UserResponseDTO", description = "사용자 응답 정보를 담은 DTO")
+public record UserResponseDTO(
     @Schema(description = "사용자 ID", example = "123e4567-e89b-12d3-a456-426614174000")
-    @NotNull(message = "User Id is required") UUID id,
+    @NotNull(message = "User Id is required") UUID userId,
 
     @Schema(description = "사용자 이름", example = "john_doe")
     @NotEmpty(message = "Username is required") String username,
@@ -25,7 +24,10 @@ public record UserLoginResponseDTO(
     Instant updatedAt,
 
     @Schema(description = "온라인 상태 여부", example = "true")
-    boolean isOnline
+    boolean isOnline,
+
+    @Schema(description = "프로필 ID", example = "123e4567-e89b-12d3-a456-426614174000")
+    UUID profileId
 ) {
 
 }

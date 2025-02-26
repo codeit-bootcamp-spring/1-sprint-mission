@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(force = true)

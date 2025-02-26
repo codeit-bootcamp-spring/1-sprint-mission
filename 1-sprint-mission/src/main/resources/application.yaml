@@ -1,4 +1,3 @@
-
 spring:
   application:
     name: discodeit
@@ -8,10 +7,15 @@ discodeit:
     type: file  #jcf | file
     file-directory: .discodeit
 
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 logging:
   level:
     org.springframework: info
 
 server:
-  port: 9090
+  port: 8080
