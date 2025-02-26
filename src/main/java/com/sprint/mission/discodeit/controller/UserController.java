@@ -48,7 +48,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(user); // 201
   }
 
-  @PutMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  @PatchMapping(value = "/{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> updateUser(@PathVariable UUID userId,
       @RequestPart(value = "userUpdateRequest") UserUpdateRequest userUpdateRequest,
       @RequestPart(value = "binaryContent", required = false) MultipartFile file) throws Exception {

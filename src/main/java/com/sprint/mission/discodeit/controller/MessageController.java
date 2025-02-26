@@ -43,7 +43,7 @@ public class MessageController {
         messageService.createMessage(messageCreateRequest, binaryContentCreateRequests));
   }
 
-  @PutMapping(value = "/{messageId}")
+  @PatchMapping(value = "/{messageId}")
   public ResponseEntity<Message> updateMessage(@PathVariable UUID messageId,
       @RequestBody MessageUpdateRequest messageUpdateRequest) {
     return ResponseEntity.ok(messageService.updateMessageText(messageId,

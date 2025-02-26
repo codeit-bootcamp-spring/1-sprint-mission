@@ -57,12 +57,18 @@
 
 - [x]  다음의 정적 리소스를 서빙하여 프론트엔드와 통합해보세요. API 스펙을 준수했다면 잘 동작할거예요.
   ![img.png](img.png)
+  ![img_3.png](img_3.png) 아래 스크린 샷은 Postman을 통해서 따로 Public Type의 Channel을 생성한 후 확인한 화면입니다.
 
-- [ ]  Railway.app을 활용하여 애플리케이션을 배포해보세요.
+- [x]  Railway.app을 활용하여 애플리케이션을 배포해보세요.
 - Railway.app은 애플리케이션을 쉽게 배포할 수 있도록 도와주는 PaaS입니다.
-    - [ ] Railway.app에 가입하고, 배포할 GitHub 레포지토리를 연결하세요.
-    - [ ] Settings > Network 섹션에서 Generate Domain 버튼을 통해 도메인을 생성하세요.
-    - [ ] 생성된 도메인에 접속해 배포된 애플리케이션을 테스트해보세요.
+    - [x] Railway.app에 가입하고, 배포할 GitHub 레포지토리를 연결하세요.
+    - [x] Settings > Network 섹션에서 Generate Domain 버튼을 통해 도메인을 생성하세요.
+    - [x] 생성된 도메인에 접속해 배포된 애플리케이션을 테스트해보세요.
+      ![img_1.png](img_1.png)
+      ![img_2.png](img_2.png)
+
+[1-sprint-mission-production-7400.up.railway.app
+](https://1-sprint-mission-production-7400.up.railway.app/)
 
 ## 주요 변경사항
 

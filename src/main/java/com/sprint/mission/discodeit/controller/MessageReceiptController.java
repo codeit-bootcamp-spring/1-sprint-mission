@@ -27,7 +27,7 @@ public class MessageReceiptController {
     return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
-  @PutMapping(value = "/{readStatusId}")
+  @PatchMapping(value = "/{readStatusId}")
   public ResponseEntity<ReadStatus> updateReadStatus(
       @PathVariable UUID readStatusId,
       @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {

@@ -31,7 +31,8 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel createPublicChannel(ChannelPublicRequest channelPublicRequest) {
 
-    Channel channel = new Channel(ChannelType.PUBLIC,
+    Channel channel = new Channel(
+        ChannelType.PUBLIC,
         channelPublicRequest.ownerId(),
         channelPublicRequest.name(),
         channelPublicRequest.description());
@@ -57,7 +58,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel createPrivateChannel(ChannelPrivateRequest channelPrivateRequest) {
     Channel channel = new Channel(
-        channelPrivateRequest.type(),
+        ChannelType.PRIVATE,
         channelPrivateRequest.ownerId(),
         "비공개 채널", // name과 description 속성은 생략합니다.
         "설명 없음");
