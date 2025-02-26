@@ -1,0 +1,17 @@
+
+spring:
+  application:
+    name: discodeit
+
+discodeit:
+  repository:
+    type: file  #jcf | file
+    file-directory: .discodeit
+
+
+logging:
+  level:
+    org.springframework: info
+
+server:
+  port: 9090

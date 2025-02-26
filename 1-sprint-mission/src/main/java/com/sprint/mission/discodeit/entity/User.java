@@ -1,66 +1,52 @@
 package com.sprint.mission.discodeit.entity;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-public class User {
-    final private UUID id;
-    final  private Long createdAt;
-    private Long updatedAt;
-    private String name;
+@Getter
+@NoArgsConstructor(force = true)
+public class User implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
+    private UUID id;
+    private final Instant createdAt = Instant.now();
+    private Instant updatedAt;
+    //
+    private String username;
+    private String email;
+    private String password;
 
-
-    private User(String name){
-        this.id=UUID.randomUUID();
-        this.createdAt= System.currentTimeMillis();
-        this.updatedAt=null;
-        this.name=name;
-    };
-
-    private User(UUID id, Long createdAt, Long updatedAt, String name){
-        this.id=id;
-        this.createdAt=createdAt;
-        this.updatedAt=updatedAt;
-        this.name=name;
-
-    }
-
-    public static User createDefaultUser(String name){
-        return new User(name);
-    }
-    public static User createUserAll(UUID id, Long createdAt, Long updatedAt, String name){
-        return new User(id,createdAt,updatedAt,name);
+    public User(String username, String email, String password) {
+        this.id = UUID.randomUUID();
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
 
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
 
-    public UUID getId() {
-        return id;
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
-
-    public long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-    public String getName(){
-        return name;
-    }
-
-    public void updateUpdatedAt() {
-        this.updatedAt= System.currentTimeMillis();
-    }
-    public void updateName(String name){
-        this.name= name;
-    }
-
-
-    @Override
-    public String toString(){
-        return "ID: "+getId()+" Name: "+getName()+" createdAt: "+getCreatedAt()+
-                " updatedAt: "+(getUpdatedAt() == null ? "없음" : String.valueOf(getUpdatedAt()))+"\n";
-    }
-
-
 }
