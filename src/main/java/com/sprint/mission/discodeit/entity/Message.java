@@ -1,20 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.io.File;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Entity
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
@@ -23,17 +19,16 @@ public class Message implements Serializable {
     //
     private UUID channelId;
     private UUID authorId;
+    private List<UUID> attachmentIds;
 
-    @OneToMany(mappedBy = "messageId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BinaryContent> attachedFiles;
-
-    public Message(String content, UUID channelId, UUID authorId) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         //
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
     public void update(String newContent) {
