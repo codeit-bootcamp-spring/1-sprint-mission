@@ -11,15 +11,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MessageService {
-    MessageResponse createMessage(CreateMessageRequest request);
 
-    List<MessageResponse> getMessages();
+  MessageResponse createMessage(CreateMessageRequest request);
 
-    List<MessageResponse> getMessagesByChannel(UUID ChannelID);
+  List<MessageResponse> getMessages();
 
-    Optional<MessageResponse> getMessage(UUID uuid);
+  List<MessageResponse> getMessagesByChannel(UUID ChannelID);
 
-    Optional<MessageResponse> updateMessage(UpdateMessageRequest request);
+  Optional<MessageResponse> getMessage(UUID uuid);
 
-    void deleteMessage(UUID uuid);
+  Optional<MessageResponse> updateMessage(UUID id, UpdateMessageRequest request);
+
+  void deleteMessage(UUID uuid);
 }

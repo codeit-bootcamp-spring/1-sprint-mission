@@ -13,25 +13,26 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public Optional<BinaryContent> getBinaryContent(UUID id) {
-        return binaryContentRepository.getBinaryContentById(id);
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent saveBinaryContent(BinaryContent binaryContent) {
-        return binaryContentRepository.save(binaryContent);
-    }
+  @Override
+  public Optional<BinaryContent> getBinaryContent(UUID id) {
+    return binaryContentRepository.findById(id);
+  }
 
-    @Override
-    public void deleteBinaryContent(UUID id) {
-        binaryContentRepository.deleteById(id);
-    }
+  @Override
+  public BinaryContent saveBinaryContent(BinaryContent binaryContent) {
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public List<BinaryContent> getBinaryContentListByIds(List<UUID> ids) {
-        return binaryContentRepository.getBinaryContentListByIds(ids);
-    }
+  @Override
+  public void deleteBinaryContent(UUID id) {
+    binaryContentRepository.deleteById(id);
+  }
+
+  @Override
+  public List<BinaryContent> getBinaryContentListByIds(List<UUID> ids) {
+    return binaryContentRepository.findAllByIdIn(ids);
+  }
 }

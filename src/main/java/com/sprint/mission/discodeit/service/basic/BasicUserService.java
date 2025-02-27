@@ -22,75 +22,76 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    private final UserRepository userRepository;
-    private final BinaryContentRepository binaryContentRepository;
-    private final UserStatusRepository userStatusRepository;
 
-    @Override
-    public UserResponse createUser(CreateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest) {
-        if (userRepository.existsByUsername(request.username()) || userRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
-        }
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
+  private final UserStatusRepository userStatusRepository;
 
-        User user = new User(request.username(), request.password(), request.email());
-        optionalRequest
-                .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                }).ifPresent(user::updateProfileImage);
-
-        UserStatus userStatus = new UserStatus(user.getId());
-        userStatus.updateStatus();
-        user.updateUserStatus(userStatus);
-
-        return UserResponse.fromEntity(userRepository.save(user));
+  @Override
+  public UserResponse createUser(CreateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest) {
+    if (userRepository.existsByUsername(request.username()) || userRepository.existsByEmail(
+        request.email())) {
+      throw new IllegalArgumentException("이미 사용 중인 username 또는 email입니다.");
     }
 
-    @Override
-    public List<UserResponse> findAllUsers() {
-        return userRepository.getAllUsers().stream()
-                .map(UserResponse::fromEntity)
-                .collect(Collectors.toList());
-    }
+    User user = new User(request.username(), request.password(), request.email());
+    optionalRequest
+        .map(this::saveBinaryContent)
+        .ifPresent(user::updateProfileImage);
 
-    @Override
-    public Optional<UserResponse> findUserById(UUID userId) {
-        return Optional.ofNullable(userRepository.getUserById(userId))
-                .map(UserResponse::fromEntity);
-    }
+    UserStatus userStatus = new UserStatus(user.getId());
+    userStatus.updateStatus();
+    user.updateUserStatus(userStatus);
 
-    @Override
-    public Optional<UserResponse> updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest) {
-        return Optional.ofNullable(userRepository.getUserById(request.id()))
-                .map(user -> {
-                    if (request.username() != null) {
-                        user.updateUsername(request.username());
-                    }
-                    optionalRequest
-                            .map(profileRequest -> {
-                                String fileName = profileRequest.fileName();
-                                String contentType = profileRequest.contentType();
-                                byte[] bytes = profileRequest.bytes();
-                                BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                                return binaryContentRepository.save(binaryContent).getId();
-                            }).ifPresent(user::updateProfileImage);
-                    userRepository.save(user);
+    return UserResponse.fromEntity(userRepository.save(user));
+  }
 
-                    return UserResponse.fromEntity(user);
-                });
-    }
+  @Override
+  public List<UserResponse> findAllUsers() {
+    return userRepository.getAllUsers().stream()
+        .map(UserResponse::fromEntity)
+        .collect(Collectors.toList());
+  }
 
-    @Override
-    public void deleteUser(UUID userId) {
-        Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
-            // 관련된 데이터 삭제
-            binaryContentRepository.deleteById(user.getProfileImage());
-            userStatusRepository.deleteById(user.getStatus().getId());
+  @Override
+  public Optional<UserResponse> findUserById(UUID userId) {
+    return Optional.ofNullable(userRepository.getUserById(userId))
+        .map(UserResponse::fromEntity);
+  }
 
-            userRepository.deleteById(user.getId());
+  @Override
+  public Optional<UserResponse> updateUser(UUID userId, UpdateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest) {
+    return Optional.ofNullable(userRepository.getUserById(userId))
+        .map(user -> {
+          if (request.username() != null) {
+            user.updateUsername(request.username());
+          }
+          optionalRequest
+              .map(this::saveBinaryContent)
+              .ifPresent(user::updateProfileImage);
+          userRepository.save(user);
+
+          return UserResponse.fromEntity(user);
         });
-    }
+  }
+
+  @Override
+  public void deleteUser(UUID userId) {
+    Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
+      binaryContentRepository.deleteById(user.getProfileImage());
+      userStatusRepository.deleteById(user.getStatus().getId());
+      userRepository.deleteById(user.getId());
+    });
+  }
+
+  private UUID saveBinaryContent(CreateBinaryContentRequest profileRequest) {
+    String fileName = profileRequest.fileName();
+    String contentType = profileRequest.contentType();
+    byte[] bytes = profileRequest.bytes();
+    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
+        contentType, bytes);
+    return binaryContentRepository.save(binaryContent).getId();
+  }
 }

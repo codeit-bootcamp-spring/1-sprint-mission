@@ -7,9 +7,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatus create(CreateReadStatusRequest request);
 
-    List<ReadStatus> findAllByUserId(UUID userId);
+  ReadStatus create(CreateReadStatusRequest request);
 
-    void updateReadStatus(UUID userId, UUID channelId);
+  List<ReadStatus> findAllByUserId(UUID userId);
+
+  void updateReadStatusByUserIdAndChannelId(UUID userId, UUID channelId);
+
+  ReadStatus findById(UUID readStatusId);
+
+  ReadStatus updateReadStatusById(UUID readStatusId);
 }

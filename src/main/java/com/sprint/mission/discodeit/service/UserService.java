@@ -12,13 +12,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponse createUser(CreateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest);
 
-    List<UserResponse> findAllUsers();
+  UserResponse createUser(CreateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest);
 
-    Optional<UserResponse> findUserById(UUID userId);
+  List<UserResponse> findAllUsers();
 
-    Optional<UserResponse> updateUser(UpdateUserRequest request, Optional<CreateBinaryContentRequest> optionalRequest);
+  Optional<UserResponse> findUserById(UUID userId);
 
-    void deleteUser(UUID uuid);
+  Optional<UserResponse> updateUser(UUID userId, UpdateUserRequest request,
+      Optional<CreateBinaryContentRequest> optionalRequest);
+
+  void deleteUser(UUID uuid);
 }

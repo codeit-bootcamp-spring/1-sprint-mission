@@ -10,21 +10,26 @@ import java.util.UUID;
 
 @Getter
 public class ReadStatus implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    @Setter
-    private Instant updatedAt;
-    private final UUID ownerId;
-    private final UUID channelId;
 
-    public ReadStatus(UUID ownerId, UUID channelId, Instant lastReadTime) {
-        this.ownerId = ownerId;
-        this.channelId = channelId;
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-    }
+  @Serial
+  private static final long serialVersionUID = 1L;
+  private final UUID id;
+  private final Instant createdAt;
+  @Setter
+  private Instant updatedAt;
+  private final UUID ownerId;
+  private final UUID channelId;
+
+  public ReadStatus(UUID ownerId, UUID channelId, Instant lastReadTime) {
+    this.ownerId = ownerId;
+    this.channelId = channelId;
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.updatedAt = createdAt;
+  }
+
+  public void update(Instant lastReadTime) {
+    updatedAt = Instant.now();
+  }
 
 }

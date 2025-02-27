@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -13,49 +14,51 @@ import java.util.UUID;
 
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-public class FileMessageRepository {
-    private final String filePath;
+public class FileMessageRepository implements MessageRepository {
 
-    public FileMessageRepository(@Value("${file.path.message}") String filePath) {
-        this.filePath = filePath;
-    }
+  private final String filePath;
 
-    public synchronized void save(Message message) {
-        List<Message> messages = load();
-        messages.removeIf(m -> m.getId().equals(message.getId())); // 중복 방지
-        messages.add(message);
-        saveToFile(messages);
-    }
+  public FileMessageRepository(@Value("${file.path.message}") String filePath) {
+    this.filePath = filePath;
+  }
 
-    public synchronized Optional<Message> getMessageById(UUID id) {
-        return load().stream().filter(m -> m.getId().equals(id)).findFirst();
-    }
+  public synchronized Message save(Message message) {
+    List<Message> messages = load();
+    messages.removeIf(m -> m.getId().equals(message.getId())); // 중복 방지
+    messages.add(message);
+    saveToFile(messages);
+    return message;
+  }
 
-    public synchronized void deleteById(UUID id) {
-        List<Message> messages = load();
-        messages.removeIf(m -> m.getId().equals(id));
-        saveToFile(messages);
-    }
+  public synchronized Optional<Message> getMessageById(UUID id) {
+    return load().stream().filter(m -> m.getId().equals(id)).findFirst();
+  }
 
-    public synchronized List<Message> getAllMessages() {
-        return load();
-    }
+  public synchronized void deleteById(UUID id) {
+    List<Message> messages = load();
+    messages.removeIf(m -> m.getId().equals(id));
+    saveToFile(messages);
+  }
 
-    private List<Message> load() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
-            return (List<Message>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            return new ArrayList<>();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메시지 데이터를 불러오는 데 실패했습니다.", e);
-        }
-    }
+  public synchronized List<Message> getAllMessages() {
+    return load();
+  }
 
-    private void saveToFile(List<Message> messages) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            oos.writeObject(messages);
-        } catch (IOException e) {
-            throw new RuntimeException("메시지 데이터를 저장하는 데 실패했습니다.", e);
-        }
+  private List<Message> load() {
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filePath))) {
+      return (List<Message>) ois.readObject();
+    } catch (FileNotFoundException e) {
+      return new ArrayList<>();
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("메시지 데이터를 불러오는 데 실패했습니다.", e);
     }
+  }
+
+  private void saveToFile(List<Message> messages) {
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath))) {
+      oos.writeObject(messages);
+    } catch (IOException e) {
+      throw new RuntimeException("메시지 데이터를 저장하는 데 실패했습니다.", e);
+    }
+  }
 }

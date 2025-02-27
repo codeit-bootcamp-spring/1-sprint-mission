@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.collection.Messages;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
@@ -12,30 +13,27 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFMessageRepository implements MessageRepository {
-    private final Messages messages = new Messages();
 
-    @Override
-    public Message save(Message message) {
-        messages.add(message.getId(), message);
-        return message;
-    }
+  private final Messages messages = new Messages();
 
-    @Override
-    public List<Message> getAllMessages() {
-        return messages.getMessagesList();
-    }
+  @Override
+  public Message save(Message message) {
+    messages.add(message.getId(), message);
+    return message;
+  }
 
-    @Override
-    public Message getMessageById(UUID uuid) {
-        return messages.get(uuid).orElse(null);
-    }
+  @Override
+  public List<Message> getAllMessages() {
+    return messages.getMessagesList();
+  }
 
-    @Override
-    public void deleteById(UUID uuid) {
-        messages.remove(uuid);
-    }
+  @Override
+  public Optional<Message> getMessageById(UUID uuid) {
+    return messages.get(uuid);
+  }
 
-    @Override
-    public void save() {
-    }
+  @Override
+  public void deleteById(UUID uuid) {
+    messages.remove(uuid);
+  }
 }
