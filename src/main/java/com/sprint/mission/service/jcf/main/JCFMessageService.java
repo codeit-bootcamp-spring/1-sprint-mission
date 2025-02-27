@@ -16,6 +16,7 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,7 +29,7 @@ import java.util.concurrent.*;
 public class JCFMessageService implements MessageService {
 
     // 가상스레드 생성
-    private final ExecutorService ves = Executors.newVirtualThreadPerTaskExecutor();
+    private final ExecutorService ves =  Executors.newVirtualThreadPerTaskExecutor();
 
     private final JCFMessageRepository messageRepository;
     private final JCFChannelRepository channelRepository;
@@ -36,12 +37,29 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
 
     @Override
-    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto){
+    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) throws InterruptedException, ExecutionException {
         UUID userId = responseDto.userId();
         UUID channelId = responseDto.channelId();
         long startTime = System.currentTimeMillis();
         log.info("start async");
+
+        //ves.invokeAll(List.of(task1, task2));
+
+        Future<Integer> future1 = ves.submit(() -> {
+            isExistUserForAsync(userId);
+            return 3;
+        });
+        Future<Integer> future2 = ves.submit(() -> {
+            isExistChannelForAsync(channelId);
+            return 32;
+        });
+        Integer result1 = future1.get();
+        Integer result2 = future2.get();
+        System.out.println(result1 + result2);
+
+
         try {
+            // 잘못된 예시다. 애초에 가상스레드는 동시성 처리를 위한 것이지, 비동기 처리를 위한 것이 아니다.
             CompletableFuture.allOf(
                     CompletableFuture.runAsync(() -> isExistUserForAsync(channelId), ves),
                     CompletableFuture.runAsync(() -> isExistChannelForAsync(channelId), ves)).get();
