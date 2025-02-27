@@ -11,7 +11,7 @@ public interface UserStatusRepository {
 
   UserStatus save(UserStatus userStatus);
 
-  UserStatus find(UUID id);
+  Optional<UserStatus> find(UUID id);
 
   List<UserStatus> findAll();
 

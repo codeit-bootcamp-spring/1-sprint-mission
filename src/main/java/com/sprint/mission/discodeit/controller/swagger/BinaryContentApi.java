@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.swagger;
 
+
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 
-@Tag(name = "BinaryContent", description = "바이터리 파일 조회 API")
+@Tag(name = "BinaryContent", description = "바이터리 파일 API")
 public interface BinaryContentApi {
 
   @Operation(summary = "바이터리 파일 조회")
@@ -31,6 +32,7 @@ public interface BinaryContentApi {
   ResponseEntity<BinaryContent> find(
       @Parameter(description = "조회할 첨부 파일 ID") UUID binaryContentId
   );
+
 
   @Operation(summary = "여러 바이터리 파일 조회")
   @ApiResponses(value = {

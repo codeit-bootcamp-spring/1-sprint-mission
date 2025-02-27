@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-
-import com.sprint.mission.discodeit.dto.ResponseDTO;
+import com.sprint.mission.discodeit.controller.swagger.UserApi;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
@@ -12,66 +11,64 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
-  @PostMapping
-  public ResponseDTO<User> create(@ModelAttribute UserCreateDTO requset) {
-    return ResponseDTO.<User>builder()
-        .code(HttpStatus.CREATED.value())
-        .message("사용자 등록 완료")
-        .data(userService.create(requset))
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<User> create(
+      @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(userService.create(userCreateRequest, profile));
+  }
+
+  @PatchMapping("{userId}")
+  public ResponseEntity<User> update(@PathVariable UUID userId,
+      @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userService.update(userId, userUpdateRequest, profile));
+  }
+
+  @DeleteMapping("{userId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
+    return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
         .build();
   }
 
   @GetMapping
-  public ResponseDTO<List<UserFindDTO>> findAll() {
-    return ResponseDTO.<List<UserFindDTO>>builder()
-        .code(HttpStatus.OK.value())
-        .message("모든 사용자 조회")
-        .data(userService.findAll())
-        .build();
+  public ResponseEntity<List<UserFindDTO>> findAll() {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userService.findAll());
   }
 
-  @PutMapping("{userId}")
-  public ResponseDTO<User> update(@PathVariable UUID userId,
-      @ModelAttribute UserUpdateDTO request) {
-    return ResponseDTO.<User>builder()
-        .code(HttpStatus.OK.value())
-        .message("사용자 수정 완료")
-        .data(userService.update(userId, request))
-        .build();
-  }
-
-  @DeleteMapping("{userId}")
-  public ResponseDTO<UUID> delete(@PathVariable UUID userId) {
-    return ResponseDTO.<UUID>builder()
-        .code(HttpStatus.NO_CONTENT.value())
-        .message("사용자 삭제 완료")
-        .data(userService.delete(userId))
-        .build();
-  }
-
-  @PutMapping("{userId}/status")
-  public ResponseDTO<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
+  @PatchMapping("{userId}/userStatus")
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID userId,
       @RequestBody UserStatusUpdateDTO request) {
-    UserStatus userStatus = userStatusService.update(userId, request);
-    return ResponseDTO.<UserStatus>builder()
-        .code(HttpStatus.OK.value())
-        .message("사용자 온라인 상태 업데이트 완료")
-        .data(userStatus)
-        .build();
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userStatusService.updateByUserId(userId, request.getNewLastActiveAt()));
   }
 
 }

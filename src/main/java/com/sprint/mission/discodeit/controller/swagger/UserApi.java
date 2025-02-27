@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.controller.swagger;
 
 import com.sprint.mission.discodeit.dto.ResponseDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +38,7 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject(value = "User with email {email} already exists"))
       ),
   })
-  ResponseDTO<User> create(
+  ResponseEntity<User> create(
       @Parameter(
           description = "User 생성 정보",
           content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
@@ -45,6 +48,7 @@ public interface UserApi {
           content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE)
       ) MultipartFile profile
   );
+
 
   @Operation(summary = "User 정보 수정")
   @ApiResponses(value = {
@@ -63,15 +67,17 @@ public interface UserApi {
   })
   ResponseEntity<User> update(
       @Parameter(description = "수정할 User ID") UUID userId,
-      @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
+      @Parameter(description = "수정할 User 정보") UserUpdateDTO userUpdateDTO,
       @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
   );
+
 
   @Operation(summary = "User 삭제")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "204",
-          description = "User가 성공적으로 삭제됨"
+          description = "User가 성공적으로 삭제됨",
+          content = @Content(schema = @Schema(implementation = UUID.class))
       ),
       @ApiResponse(
           responseCode = "404",
@@ -83,14 +89,16 @@ public interface UserApi {
       @Parameter(description = "삭제할 User ID") UUID userId
   );
 
+
   @Operation(summary = "전체 User 목록 조회")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "User 목록 조회 성공",
-          content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)))
+          content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserFindDTO.class)))
       )
   })
-  ResponseEntity<List<UserDto>> findAll();
+  ResponseEntity<List<UserFindDTO>> findAll();
+
 
   @Operation(summary = "User 온라인 상태 업데이트")
   @ApiResponses(value = {
@@ -105,6 +113,6 @@ public interface UserApi {
   })
   ResponseEntity<UserStatus> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
-      @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateRequest request
+      @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateDTO request
   );
 }

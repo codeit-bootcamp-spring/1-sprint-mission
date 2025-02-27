@@ -11,5 +11,5 @@ public class ResponseDTO<T> {
 
   private Integer code;
   private String message;
-  private T data;
+  private T content;
 }

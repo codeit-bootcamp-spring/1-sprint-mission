@@ -11,5 +11,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReadStatusUpdateDTO {
-    Instant time;
+
+  Instant newLastReadAt;
 }

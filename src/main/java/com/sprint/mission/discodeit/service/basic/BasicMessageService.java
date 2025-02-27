@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,14 +29,13 @@ public class BasicMessageService implements MessageService {
   private final MessageValidator messageValidator;
 
   @Override
-  public Message create(MessageCreateDTO dto) {
-    messageValidator.validateMessage(dto.getContent(), dto.getUserId(), dto.getChannelId());
-    Message message = new Message(dto.getContent(), dto.getUserId(), dto.getChannelId());
+  public Message create(MessageCreateDTO dto, List<MultipartFile> files) {
+    messageValidator.validateMessage(dto.getContent(), dto.getAuthorId(), dto.getChannelId());
+    Message message = new Message(dto.getContent(), dto.getAuthorId(), dto.getChannelId());
 
-    if (dto.getFiles() != null && !dto.getFiles().isEmpty()) {
-      for (MultipartFile file : dto.getFiles()) {
-        BinaryContent binaryContent = binaryContentService.create(
-            new BinaryContentCreateDTO(file));
+    if (files != null && !files.isEmpty()) {
+      for (MultipartFile file : files) {
+        BinaryContent binaryContent = binaryContentService.create(new BinaryContentCreateDTO(file));
         message.addBinaryContent(binaryContent.getId());
       }
     }
@@ -58,14 +56,14 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId);
+    return messageRepository.findAllByChannelId(channelId).stream().toList();
   }
 
   @Override
   public Message update(UUID id, MessageUpdateDTO dto) {
     Message findMessage = messageRepository.findOne(id);
 
-    findMessage.setMessage(dto.getContent());
+    findMessage.setMessage(dto.getNewContent());
     messageRepository.update(findMessage);
     return findMessage;
   }
@@ -74,7 +72,7 @@ public class BasicMessageService implements MessageService {
   public UUID delete(UUID id) {
     Message findMessage = messageRepository.findOne(id);
 
-    for (UUID binaryContentId : findMessage.getBinaryContentIds()) {
+    for (UUID binaryContentId : findMessage.getAttachmentIds()) {
       binaryContentService.delete(binaryContentId);
     }
     return messageRepository.delete(findMessage.getId());

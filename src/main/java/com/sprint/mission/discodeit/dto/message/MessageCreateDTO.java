@@ -15,9 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class MessageCreateDTO {
 
-    private String content;
-    private UUID userId;
-    private UUID channelId;
-    private List<MultipartFile> files;
-
+  private String content;
+  private UUID channelId;
+  private UUID authorId;
 }

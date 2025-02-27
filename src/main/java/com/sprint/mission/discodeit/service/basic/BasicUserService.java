@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +32,12 @@ public class BasicUserService implements UserService {
 
 
   @Override
-  public User create(UserCreateDTO dto) {
+  public User create(UserCreateDTO dto, MultipartFile file) {
     userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
     User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
-    if (dto.getFile() != null) {
-      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(dto.getFile());
+    if (file != null) {
+      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(file);
       BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDTO);
       user.updateBinaryContentId(binaryContent.getId());
     }
@@ -61,18 +62,19 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User update(UUID id, UserUpdateDTO dto) {
-    userValidator.validateUpdateUser(id, dto.getName(), dto.getEmail(), dto.getPassword());
+  public User update(UUID id, UserUpdateDTO dto, MultipartFile file) {
+    userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
+        dto.getNewPassword());
     User findUser = userRepository.findOne(id);
-    findUser.setUser(dto.getName(), dto.getEmail(), dto.getPassword());
+    findUser.setUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword());
 
     //기존 사진이 있다면 삭제하고 만들기
-    if (dto.getFile() != null) {
+    if (file != null) {
       if (findUser.getBinaryContentId() != null) {
         binaryContentService.delete(findUser.getBinaryContentId());
       }
       BinaryContent binaryContent = binaryContentService.create(
-          new BinaryContentCreateDTO(dto.getFile()));
+          new BinaryContentCreateDTO(file));
       findUser.updateBinaryContentId(binaryContent.getId());
     }
     userRepository.update(findUser);

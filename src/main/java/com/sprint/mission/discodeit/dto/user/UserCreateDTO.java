@@ -12,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 @NoArgsConstructor
 public class UserCreateDTO {
 
-    public String username;
-    public String email;
-    public String password;
-    public MultipartFile file;
-
+  public String username;
+  public String email;
+  public String password;
 }

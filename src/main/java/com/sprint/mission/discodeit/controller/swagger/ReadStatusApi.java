@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.controller.swagger;
 
-import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.ResponseDTO;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,8 +36,9 @@ public interface ReadStatusApi {
       )
   })
   ResponseEntity<ReadStatus> create(
-      @Parameter(description = "Message 읽음 상태 생성 정보") ReadStatusCreateRequest request
+      @Parameter(description = "Message 읽음 상태 생성 정보") ReadStatusCreateDTO request
   );
+
 
   @Operation(summary = "Message 읽음 상태 수정")
   @ApiResponses(value = {
@@ -51,8 +53,9 @@ public interface ReadStatusApi {
   })
   ResponseEntity<ReadStatus> update(
       @Parameter(description = "수정할 읽음 상태 ID") UUID readStatusId,
-      @Parameter(description = "수정할 읽음 상태 정보") ReadStatusUpdateRequest request
+      @Parameter(description = "수정할 읽음 상태 정보") ReadStatusUpdateDTO request
   );
+
 
   @Operation(summary = "User의 Message 읽음 상태 목록 조회")
   @ApiResponses(value = {

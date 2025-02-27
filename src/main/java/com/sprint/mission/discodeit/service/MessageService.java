@@ -7,12 +7,13 @@ import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService {
 
 
   //서비스 로직
-  Message create(MessageCreateDTO messageCreateDTO);
+  Message create(MessageCreateDTO dto, List<MultipartFile> files);
 
   Message find(UUID id);
 

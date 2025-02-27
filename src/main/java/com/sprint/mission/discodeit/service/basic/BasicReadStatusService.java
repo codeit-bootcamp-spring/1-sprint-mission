@@ -25,7 +25,8 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public ReadStatus create(ReadStatusCreateDTO dto) {
     readStatusValidator.validateReadStatus(dto.getUserId(), dto.getChannelId());
-    ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId());
+    ReadStatus readStatus = new ReadStatus(dto.getUserId(), dto.getChannelId(),
+        dto.getLastReadAt());
     readStatusRepository.save(readStatus);
     return readStatus;
   }
@@ -45,13 +46,15 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId);
+    return readStatusRepository.findAllByUserId(userId).stream().toList();
   }
 
   @Override
   public ReadStatus update(UUID id, ReadStatusUpdateDTO dto) {
     ReadStatus findReadStatus = readStatusRepository.findOne(id);
-    findReadStatus.updateReadStatus(dto.getTime());
+    Optional.ofNullable(findReadStatus).orElseThrow(
+        () -> new NotFoundException(ErrorCode.READ_STATUS_NOT_FOUND));
+    findReadStatus.updateReadStatus(dto.getNewLastReadAt());
     readStatusRepository.update(findReadStatus);
     return findReadStatus;
   }

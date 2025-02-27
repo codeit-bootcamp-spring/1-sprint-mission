@@ -10,53 +10,54 @@ import java.util.UUID;
 
 @Getter
 public class Message implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
 
-    private String content;
-    private UUID userId;
-    private UUID channelId;
-    private List<UUID> binaryContentIds;
+  private final UUID id;
+  private final Instant createdAt;
+  private Instant updatedAt;
 
-    public Message(String content, UUID userId, UUID channelId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+  private String content;
+  private UUID authorId;
+  private UUID channelId;
+  private List<UUID> attachmentIds;
 
-        this.content = content;
-        this.userId = userId;
-        this.channelId = channelId;
-        binaryContentIds = new ArrayList<>();
+  public Message(String content, UUID userId, UUID channelId) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+
+    this.content = content;
+    this.authorId = userId;
+    this.channelId = channelId;
+    attachmentIds = new ArrayList<>();
+  }
+
+  public void setUpdatedAt() {
+    this.updatedAt = Instant.now();
+  }
+
+  public void setMessage(String content) {
+    if (content != null && !content.equals(this.content)) {
+      this.content = content;
+    } else {
+      throw new IllegalArgumentException("입력한 메시지: " + content + "가 기존 값과 같습니다.");
     }
+    setUpdatedAt();
+  }
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
-    }
+  public void addBinaryContent(UUID binaryContentId) {
+    attachmentIds.add(binaryContentId);
+  }
 
-    public void setMessage(String content) {
-        if(content !=null && !content.equals(this.content)){
-            this.content = content;
-        }else{
-            throw new IllegalArgumentException("입력한 메시지: "+content+"가 기존 값과 같습니다.");
-        }
-        setUpdatedAt();
-    }
-
-    public void addBinaryContent(UUID binaryContentId) {
-        binaryContentIds.add(binaryContentId);
-    }
-
-    @Override
-    public String toString() {
-        return "Message{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", content='" + content + '\'' +
-                ", userId=" + userId +
-                ", channelId=" + channelId +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Message{" +
+        "id=" + id +
+        ", createdAt=" + createdAt +
+        ", updatedAt=" + updatedAt +
+        ", content='" + content + '\'' +
+        ", userId=" + authorId +
+        ", channelId=" + channelId +
+        '}';
+  }
 }

@@ -15,11 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 public class ChannelFindDTO {
-    private UUID id;
-    private ChannelType type;
-    private String name;
-    private String description;
-    private List<UUID> ids;
-    private Instant lastMessageAt;
+
+  private UUID id;
+  private ChannelType type;
+  private String name;
+  private String description;
+  private List<UUID> participantIds;
+  private Instant lastMessageAt;
 }
 

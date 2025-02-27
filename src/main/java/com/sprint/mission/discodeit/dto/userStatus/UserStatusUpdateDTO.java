@@ -11,5 +11,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserStatusUpdateDTO {
-    private Instant time;
+
+  private Instant newLastActiveAt;
 }

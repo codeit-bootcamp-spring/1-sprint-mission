@@ -8,17 +8,18 @@ import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
 
-  User create(UserCreateDTO userCreateDTO);
+  User create(UserCreateDTO dto, MultipartFile file);
 
   UserFindDTO find(UUID id);
 
   List<UserFindDTO> findAll();
 
-  User update(UUID userId, UserUpdateDTO dto);
+  User update(UUID id, UserUpdateDTO dto, MultipartFile file);
 
   UUID delete(UUID id);
 }

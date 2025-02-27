@@ -10,5 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MessageUpdateDTO {
-    private String content;
+
+  private String newContent;
 }

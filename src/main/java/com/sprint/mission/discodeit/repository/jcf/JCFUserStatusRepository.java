@@ -22,8 +22,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
   }
 
   @Override
-  public UserStatus find(UUID id) {
-    return data.get(id);
+  public Optional<UserStatus> find(UUID id) {
+    return Optional.ofNullable(data.get(id));
   }
 
   @Override

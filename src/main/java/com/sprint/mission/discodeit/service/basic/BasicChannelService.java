@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.*;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
@@ -10,11 +8,7 @@ import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validator.ChannelValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,8 +39,8 @@ public class BasicChannelService implements ChannelService {
     Channel channel = new Channel(null, null, ChannelType.PRIVATE);
     channelRepository.save(channel);
 
-    dto.getIds().stream()
-        .map(userId -> new ReadStatus(userId, channel.getId()))
+    dto.getParticipantIds().stream()
+        .map(userId -> new ReadStatus(userId, channel.getId(), Instant.MIN))
         .forEach(readStatusRepository::save);
 
     return channel;
@@ -67,8 +61,8 @@ public class BasicChannelService implements ChannelService {
         .map(ReadStatus::getChannelId).toList();
 
     return channelRepository.findAll().stream()
-        .filter(ch -> ch.getType().equals(ChannelType.PUBLIC) ||
-            channelIds.contains(ch.getId()))
+        .filter(ch -> ch.getType().equals(ChannelType.PUBLIC)
+            || channelIds.contains(ch.getId()))
         .map(this::toDTO)
         .toList();
   }
@@ -80,7 +74,7 @@ public class BasicChannelService implements ChannelService {
     if (findChannel.getType() == ChannelType.PRIVATE) {
       throw new BadRequestException(ErrorCode.PRIVATE_CHANNEL_IMMUTABLE);
     }
-    findChannel.setChannel(dto.getName(), dto.getDescription());
+    findChannel.setChannel(dto.getNewName(), dto.getNewDescription());
     channelRepository.update(findChannel);
     return findChannel;
   }
@@ -98,23 +92,24 @@ public class BasicChannelService implements ChannelService {
   }
 
   private ChannelFindDTO toDTO(Channel channel) {
-    List<UUID> ids = new ArrayList<>();
-    if (channel.getType() == ChannelType.PRIVATE) {
-      readStatusRepository.findAllByChannelId(channel.getId()).stream()
-          .map(ReadStatus::getUserId)
-          .forEach(ids::add);
-    }
-
     Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
         .map(Message::getCreatedAt)
         .max(Comparator.naturalOrder()).orElse(Instant.MIN);
+
+    List<UUID> participantIds = new ArrayList<>();
+    if (channel.getType() == ChannelType.PRIVATE) {
+      readStatusRepository.findAllByChannelId(channel.getId())
+          .stream()
+          .map(ReadStatus::getUserId)
+          .forEach(participantIds::add);
+    }
 
     return new ChannelFindDTO(
         channel.getId(),
         channel.getType(),
         channel.getName(),
         channel.getDescription(),
-        ids,
+        participantIds,
         lastMessageAt
     );
   }

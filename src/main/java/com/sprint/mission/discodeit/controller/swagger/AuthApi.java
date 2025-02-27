@@ -31,6 +31,6 @@ public interface AuthApi {
       )
   })
   ResponseEntity<User> login(
-      @Parameter(description = "로그인 정보") AuthLoginDTO authLoginDTO
+      @Parameter(description = "로그인 정보") AuthLoginDTO request
   );
 } 

@@ -12,8 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserUpdateDTO {
-    private String name;
-    private String email;
-    private String password;
-    private MultipartFile file;
+
+  private String newUsername;
+  private String newEmail;
+  private String newPassword;
 }
