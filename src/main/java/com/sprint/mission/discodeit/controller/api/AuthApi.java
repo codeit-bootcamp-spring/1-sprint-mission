@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 
@@ -23,6 +25,11 @@ public interface AuthApi {
                             )
                     )
             )
+    )
+    @ApiResponses(
+            {@ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "400", description = "User name not found",
+                    content = @Content(schema = @Schema(examples = "User name not found", implementation = String.class)))}
     )
     ResponseEntity<User> login(LoginRequest request);
 

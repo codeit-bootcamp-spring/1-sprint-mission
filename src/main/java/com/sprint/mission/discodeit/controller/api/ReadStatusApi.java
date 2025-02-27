@@ -5,9 +5,13 @@ import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +34,9 @@ public interface ReadStatusApi {
                     )
             )
     )
+    @ApiResponse(responseCode = "201", content = @Content(
+            schema = @Schema(implementation = ReadStatus.class)
+    ))
     ResponseEntity<ReadStatus> create(ReadStatusCreateRequest request);
 
     @Operation(
@@ -44,6 +51,19 @@ public interface ReadStatusApi {
                     )
             )
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = ReadStatus.class)
+                    )),
+                    @ApiResponse(
+                            responseCode = "404",
+                            content = @Content(examples = @ExampleObject(
+                                    value = "ReadStatus with id {readStatusId} not found")
+                            )
+                    )
+            }
+    )
     ResponseEntity<ReadStatus> update(UUID readStatusId, ReadStatusUpdateRequest request);
 
     @Operation(
@@ -55,6 +75,9 @@ public interface ReadStatusApi {
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             )
     )
+    @ApiResponse(responseCode = "200", content = @Content(
+            array = @ArraySchema(schema = @Schema(implementation = ReadStatus.class))
+    ))
     ResponseEntity<List<ReadStatus>> findAllByUserId(UUID userId);
 
 }

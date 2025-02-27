@@ -5,9 +5,13 @@ import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MessageApi {
 
     @Operation(summary = "메시지 요청과 첨부 파일 생성")
+    @ApiResponse(responseCode = "201", content = @Content(
+            schema = @Schema(implementation = Message.class)
+    ))
     ResponseEntity<Message> create(
             MessageCreateRequest request,
             List<MultipartFile> attachments
@@ -42,6 +49,14 @@ public interface MessageApi {
                     )
             )
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = Message.class)
+            )),
+            @ApiResponse(responseCode = "404", content = @Content(
+                    examples = @ExampleObject(value = "Message with id {messageId} not found")
+            ))
+    })
     ResponseEntity<Message> update(UUID messageId, MessageUpdateRequest request);
 
     @Operation(
@@ -53,6 +68,14 @@ public interface MessageApi {
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             )
     )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", content = @Content(
+                    schema = @Schema(implementation = Message.class)
+            )),
+            @ApiResponse(responseCode = "404", content = @Content(
+                    examples = @ExampleObject(value = "Message with id {messageId} not found")
+            ))
+    })
     ResponseEntity<Void> delete(UUID messageId);
 
     @Operation(
@@ -62,6 +85,12 @@ public interface MessageApi {
                     description = "조회하려는 채널 ID",
                     required = true,
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            )
+    )
+    @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                    array = @ArraySchema(schema = @Schema(implementation = Message.class))
             )
     )
     ResponseEntity<List<Message>> findAllByChannelId(UUID channelId);

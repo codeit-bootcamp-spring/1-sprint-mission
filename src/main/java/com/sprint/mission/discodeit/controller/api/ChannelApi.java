@@ -8,8 +8,11 @@ import com.sprint.mission.discodeit.entity.Channel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +32,14 @@ public interface ChannelApi {
                     required = true
             )
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            content = @Content(schema = @Schema(implementation = Channel.class))
+                    )
+            }
+    )
     ResponseEntity<Channel> create(PublicChannelCreateRequest request);
 
     @Operation(
@@ -40,6 +51,14 @@ public interface ChannelApi {
                     ),
                     required = true
             )
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "201",
+                            content = @Content(schema = @Schema(implementation = Channel.class))
+                    )
+            }
     )
     ResponseEntity<Channel> create(PrivateChannelCreateRequest request);
 
@@ -57,6 +76,18 @@ public interface ChannelApi {
                     )
             )
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            content = @Content(schema = @Schema(implementation = Channel.class))
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            content = @Content(examples = @ExampleObject(value = "Channel with id {channelId} not found"))
+                    )
+            }
+    )
     ResponseEntity<Channel> update(UUID channelId, PublicChannelUpdateRequest request);
 
     @Operation(
@@ -66,6 +97,14 @@ public interface ChannelApi {
                     name = "channelId",
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             )
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200"),
+                    @ApiResponse(
+                            responseCode = "404",
+                            content = @Content(examples = @ExampleObject(value = "Channel with id {channelId} not found")))
+            }
     )
     ResponseEntity<Void> delete(UUID channelId);
 
@@ -78,5 +117,6 @@ public interface ChannelApi {
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             )
     )
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = ChannelDto.class)))
     ResponseEntity<List<ChannelDto>> findAll(UUID userId);
 }

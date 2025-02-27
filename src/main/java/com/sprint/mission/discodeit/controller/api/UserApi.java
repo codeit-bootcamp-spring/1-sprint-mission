@@ -8,9 +8,13 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
@@ -27,9 +31,20 @@ public interface UserApi {
     @Operation(
             summary = "유저 등록"
     )
+    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = User.class)))
     ResponseEntity<User> create(UserCreateRequest userCreateRequest, MultipartFile profile);
 
     @Operation(summary = "유저 정보 수정")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = User.class)
+                    )),
+                    @ApiResponse(responseCode = "404", content = @Content(
+                            examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
+                    ))
+            }
+    )
     ResponseEntity<User> update(UUID userId, UserUpdateRequest request, MultipartFile profile);
 
     @Operation(
@@ -38,9 +53,20 @@ public interface UserApi {
                     example = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             )
     )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200"),
+                    @ApiResponse(responseCode = "404", content = @Content(
+                            examples = @ExampleObject(value = "User with userId {userId} not found")
+                    ))
+            }
+    )
     ResponseEntity<Void> delete(UUID userId);
 
     @Operation(summary = "모든 유저 조회")
+    @ApiResponse(responseCode = "200", content = @Content(
+            array = @ArraySchema(schema = @Schema(implementation = UserDto.class))
+    ))
     ResponseEntity<List<UserDto>> findAll();
 
     @Operation(
@@ -55,6 +81,16 @@ public interface UserApi {
                             schema = @Schema(implementation = UserStatusUpdateRequest.class)
                     )
             )
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", content = @Content(
+                            schema = @Schema(implementation = UserStatus.class)
+                    )),
+                    @ApiResponse(responseCode = "404", content = @Content(
+                            examples = @ExampleObject(value = "UserStatus with userId {userId} not found")
+                    ))
+            }
     )
     ResponseEntity<UserStatus> updateUserStatusByUserId(UUID userId, UserStatusUpdateRequest request);
 }
