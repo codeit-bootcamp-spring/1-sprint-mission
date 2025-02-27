@@ -1,5 +1,6 @@
 package com.sprint.mission.service.jcf.main;
 
+import com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
@@ -18,11 +19,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@TraceAnnotation
 public class JCFMessageService implements MessageService {
+
+    // 가상스레드 생성
+    private final ExecutorService ves = Executors.newVirtualThreadPerTaskExecutor();
 
     private final JCFMessageRepository messageRepository;
     private final JCFChannelRepository channelRepository;
@@ -30,24 +36,27 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
 
     @Override
-    public void create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
+    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto){
         UUID userId = responseDto.userId();
         UUID channelId = responseDto.channelId();
-
-        if(!userRepository.existsById(userId)){
-            throw new CustomException(ErrorCode.NO_SUCH_USER);
+        long startTime = System.currentTimeMillis();
+        log.info("start async");
+        try {
+            CompletableFuture.allOf(
+                    CompletableFuture.runAsync(() -> isExistUserForAsync(channelId), ves),
+                    CompletableFuture.runAsync(() -> isExistChannelForAsync(channelId), ves)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw e.getCause() instanceof CustomException ? (CustomException) e.getCause() : new RuntimeException(e);
         }
-        if(!channelRepository.existsById(channelId)){
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
+        long endTime = System.currentTimeMillis();
+        log.info("end async : 걸린시간 = {}", endTime - startTime);
 
         Message createdMessage = responseDto.toEntity();
 
         List<BinaryContentDto> bcdList = attachmentsDto.orElse(Collections.emptyList());
         log.info("attachmentsDto: {}", bcdList);
         if (!bcdList.isEmpty()) {
-            List<BinaryContentDto> binaryContentDtoList = attachmentsDto.get();
-            for (BinaryContentDto bcd : binaryContentDtoList) {
+            for (BinaryContentDto bcd : bcdList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
                 createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
             }
@@ -56,7 +65,19 @@ public class JCFMessageService implements MessageService {
         log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
         //writtenChannel.updateLastMessageTime();
         //channelRepository.save(writtenChannel);
-        messageRepository.save(createdMessage);
+        return messageRepository.save(createdMessage);
+    }
+
+    private void isExistUserForAsync(UUID channelId) {
+        if (!userRepository.existsById(channelId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_USER);
+        }
+    }
+
+    private void isExistChannelForAsync(UUID channelId) {
+        if (!channelRepository.existsById(channelId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
     }
 
     @Override

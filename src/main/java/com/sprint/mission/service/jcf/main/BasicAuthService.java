@@ -7,9 +7,11 @@ import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicAuthService implements com.sprint.mission.service.AuthService {
@@ -23,6 +25,9 @@ public class BasicAuthService implements com.sprint.mission.service.AuthService 
 
     User loginUser = userRepository.findByUsername(username)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER_MATCHING_NAME));
+
+    log.info("loginRequest password: {}", loginRequest.password());
+    log.info("User password: {}", loginUser.getPassword());
 
     if (!loginUser.getPassword().equals(password)) {
       throw new CustomException(ErrorCode.INCORRECT_PASSWORD);

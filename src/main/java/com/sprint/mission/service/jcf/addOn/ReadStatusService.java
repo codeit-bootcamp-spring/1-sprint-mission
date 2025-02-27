@@ -10,11 +10,13 @@ import com.sprint.mission.repository.ReadStatusRepository;
 import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
 import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReadStatusService {
@@ -28,7 +30,7 @@ public class ReadStatusService {
             throw new CustomException(ErrorCode.NO_SUCH_USER);
         }
 
-        if (!channelRepository.existsById(request.userId())) {
+        if (!channelRepository.existsById(request.channelId())) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
 
@@ -36,6 +38,7 @@ public class ReadStatusService {
             throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
         }
 
+        log.info("서비스 생성 userId : {}", request.userId());
         return readStatusRepository.save(request.toEntity());
     }
 

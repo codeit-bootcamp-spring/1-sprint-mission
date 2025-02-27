@@ -2,11 +2,13 @@ package com.sprint.mission.repository.jcf.addOn;
 
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.repository.ReadStatusRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
 public class JCFReadStatusRepository implements ReadStatusRepository {
@@ -18,6 +20,8 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
+        log.info("레포지토리 save readStatus의 userId: {}",readStatus.getUserId());
+
         this.data.put(readStatus.getId(), readStatus);
         return readStatus;
     }
@@ -29,6 +33,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
+        log.info("비교할 userId: {}",userId);
         return this.data.values().stream()
                 .filter(readStatus -> readStatus.getUserId().equals(userId))
                 .toList();

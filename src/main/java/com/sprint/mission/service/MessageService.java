@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface MessageService {
 //    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
 
-    void create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto);
+    Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) throws InterruptedException;
 
     void update(UUID messageId, MessageDtoForUpdate updateDto);
     List<Message> findAllByChannelId(UUID channelId);

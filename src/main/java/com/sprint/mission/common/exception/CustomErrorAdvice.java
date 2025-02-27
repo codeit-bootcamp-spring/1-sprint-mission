@@ -33,7 +33,7 @@ public class CustomErrorAdvice {
     public ResponseEntity<CustomErrorResponse> handleMethodValidationException(MethodArgumentNotValidException e, HttpServletRequest request) {
         FieldError fieldError = e.getBindingResult().getFieldError();
         String validationMessage = fieldError == null
-                ? "Invalid value"
+                ? "유효하지 않은 입력값입니다"
                 : fieldError.getDefaultMessage();
 
         return ResponseEntity

@@ -41,7 +41,7 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
-  public void save(Message message) {
+  public Message save(Message message) {
     Path msDirectPath = getMsDirectPath(message.getId());
     try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(
         getMsDirectPath(message.getId())))) {
@@ -49,6 +49,7 @@ public class FileMessageRepository implements MessageRepository {
     } catch (IOException e) {
       throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
     }
+    return message;
   }
 
   @Override
