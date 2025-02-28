@@ -13,7 +13,9 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
+
 import java.time.Instant;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.VirtualThreadTaskExecutor;
@@ -25,11 +27,10 @@ import java.util.concurrent.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@TraceAnnotation
 public class JCFMessageService implements MessageService {
 
-    // 가상스레드 생성
-    private final ExecutorService ves =  Executors.newVirtualThreadPerTaskExecutor();
+    // 가상스레드
+    private final ExecutorService ves;
 
     private final JCFMessageRepository messageRepository;
     private final JCFChannelRepository channelRepository;
@@ -37,37 +38,23 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
 
     @Override
-    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) throws InterruptedException, ExecutionException {
+    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
         UUID userId = responseDto.userId();
         UUID channelId = responseDto.channelId();
-        long startTime = System.currentTimeMillis();
-        log.info("start async");
-
-        //ves.invokeAll(List.of(task1, task2));
-
-        Future<Integer> future1 = ves.submit(() -> {
-            isExistUserForAsync(userId);
-            return 3;
-        });
-        Future<Integer> future2 = ves.submit(() -> {
-            isExistChannelForAsync(channelId);
-            return 32;
-        });
-        Integer result1 = future1.get();
-        Integer result2 = future2.get();
-        System.out.println(result1 + result2);
-
-
+        Future<?> isExistUserF = ves.submit(() -> {
+            if (!userRepository.existsById(channelId)) throw new CustomException(ErrorCode.NO_SUCH_USER);});
+        Future<?> isExistChannelF = ves.submit(() -> {
+            if (!channelRepository.existsById(channelId)) throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);});
         try {
-            // 잘못된 예시다. 애초에 가상스레드는 동시성 처리를 위한 것이지, 비동기 처리를 위한 것이 아니다.
-            CompletableFuture.allOf(
-                    CompletableFuture.runAsync(() -> isExistUserForAsync(channelId), ves),
-                    CompletableFuture.runAsync(() -> isExistChannelForAsync(channelId), ves)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw e.getCause() instanceof CustomException ? (CustomException) e.getCause() : new RuntimeException(e);
+            isExistUserF.get();
+            isExistChannelF.get();
+        } catch (ExecutionException e) {
+            throw e.getCause() instanceof CustomException
+                    ? (CustomException) e.getCause()
+                    : new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        long endTime = System.currentTimeMillis();
-        log.info("end async : 걸린시간 = {}", endTime - startTime);
 
         Message createdMessage = responseDto.toEntity();
 
@@ -79,23 +66,10 @@ public class JCFMessageService implements MessageService {
                 createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
             }
         }
-
         log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
         //writtenChannel.updateLastMessageTime();
         //channelRepository.save(writtenChannel);
         return messageRepository.save(createdMessage);
-    }
-
-    private void isExistUserForAsync(UUID channelId) {
-        if (!userRepository.existsById(channelId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_USER);
-        }
-    }
-
-    private void isExistChannelForAsync(UUID channelId) {
-        if (!channelRepository.existsById(channelId)) {
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
     }
 
     @Override
@@ -111,7 +85,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message findById(UUID channelId) {
         return messageRepository.findById(channelId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
     }
 
     @Override
@@ -125,12 +99,22 @@ public class JCFMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         Message deletingMessage = messageRepository.findById(messageId)
-            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
 
-        deletingMessage.getAttachmentIdList()
-            .forEach(binaryService::deleteById);
-
-        messageRepository.delete(deletingMessage.getId());
+        Future<?> deleteBinaryF = ves.submit(() -> {
+            deletingMessage.getAttachmentIdList()
+                    .forEach(binaryService::deleteById);
+        });
+        ves.submit(() -> messageRepository.delete(deletingMessage.getId()));
+        try {
+            deleteBinaryF.get();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw e.getCause() instanceof CustomException
+                    ? (CustomException) e.getCause()
+                    : new RuntimeException(e);
+        }
     }
 
 

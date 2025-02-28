@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -24,21 +27,32 @@ public class ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final JCFUserRepository userRepository;
     private final JCFChannelRepository channelRepository;
+    private final ExecutorService ves;
 
     public ReadStatus create(ReadStatusCreateRequest request){
-        if (!userRepository.existsById(request.userId())) {
-            throw new CustomException(ErrorCode.NO_SUCH_USER);
+
+        Future<?> isExistUserFuture = ves.submit(() -> {
+            if (!userRepository.existsById(request.userId()))
+                throw new CustomException(ErrorCode.NO_SUCH_USER);
+        });
+        Future<?> isExistChannelFuture = ves.submit(() -> {
+            if (!channelRepository.existsById(request.channelId()))
+                throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        });
+        Future<?> isExistReadStatusFuture = ves.submit(() -> {
+            if (readStatusRepository.existsById(request.userId()))
+                throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);});
+
+        try {
+            isExistUserFuture.get();
+            isExistChannelFuture.get();
+            isExistReadStatusFuture.get();
+        } catch (Exception e) {
+            throw e.getCause() instanceof CustomException
+                    ? (CustomException) e.getCause()
+                    : new RuntimeException(e);
         }
 
-        if (!channelRepository.existsById(request.channelId())) {
-            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        }
-
-        if (readStatusRepository.existsById(request.userId())) {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
-        }
-
-        log.info("서비스 생성 userId : {}", request.userId());
         return readStatusRepository.save(request.toEntity());
     }
 
