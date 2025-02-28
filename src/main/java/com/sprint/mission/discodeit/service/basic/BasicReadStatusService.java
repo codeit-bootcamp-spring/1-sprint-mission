@@ -23,8 +23,9 @@ public class BasicReadStatusService implements ReadStatusService {
     private final UserRepository userRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO, boolean isChannelExist) {
-        if(!isChannelExist &&  !userRepository.existByUserId(readStatusCreateDTO.userId())){
+    public ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO) {
+        if(!readStatusRepository.existByChannelId(readStatusCreateDTO.channelId())
+            &&  !userRepository.existByUserId(readStatusCreateDTO.userId())){
            throw new IllegalArgumentException("ReadStatus를 생성할 수 없습니다.");
         }
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,6 +32,15 @@ public class Channel implements Serializable  {
         this.type = type;
     }
 
+    //Pv 채널 생성
+    public Channel(PrivateChannelCreateDTO channelCreateDTO, ChannelType type){
+        this.id = UUID.randomUUID();
+        this.createdAt =  Instant.now();
+        this.updatedAt=createdAt;
+
+        this.channelName = channelCreateDTO.getName();
+        this.type = type;
+    }
 
     //update
     public void updateName(String name){

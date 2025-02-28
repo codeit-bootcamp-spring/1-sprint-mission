@@ -38,6 +38,11 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
+    public void saveExist(UserStatus userStatus) {
+        userStatusRepository.save(userStatus);
+    }
+
+    @Override
     public UserStatus find(UUID uuid) {
         UserStatus userStatus = userStatusRepository.findById(uuid);
         return userStatus;
@@ -56,16 +61,16 @@ public class BasicUserStatusService implements UserStatusService {
 
 
     @Override
-    public UserStatus update(UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus userStatus = find(userStatusUpdateDTO.id());
+    public UserStatus update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO) {
+        UserStatus userStatus = find(id);
         userStatus.update(userStatusUpdateDTO);
         userStatusRepository.save(userStatus);
         return userStatus;
     }
 
     @Override
-    public UserStatus updateByUserId(UserStatusUpdateDTO userStatusUpdateDTO) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userStatusUpdateDTO.userId());
+    public UserStatus updateByUserId(UUID userID, UserStatusUpdateDTO userStatusUpdateDTO) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userID);
         userStatus.update(userStatusUpdateDTO);
         userStatusRepository.save(userStatus);
         return userStatus;

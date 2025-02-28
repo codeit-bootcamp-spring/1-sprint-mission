@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
+import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -38,15 +40,12 @@ public class DiscodeitApplication {
 	static ChannelRepository channelRepository = new JCFChannelRepository();
 	static MessageRepository messageRepository = new JCFMessageRepository();
 
-	static User setupUser(UserService userService) {
-		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath"));
-		return user;
-	}
-
-//	static Channel setupChannel(ChannelService channelService) {
-//		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널", new ArrayList<>(userRepository.load().values())), ChannelType.PUBLIC);
-//		return channel;
+//	static User setupUser(UserService userService) {
+//
+//		return user;
 //	}
+//
+
 
 //	static void messageCreateTest(MessageService messageService, Channel channel, User author) {
 //		Message message = messageService.createMessage(author.getId(), channel.getId(), "안녕하세요");
@@ -68,22 +67,24 @@ public class DiscodeitApplication {
 
 
 		//셋업
-		User user = setupUser(userService);
+		User user = userService.createUser(new UserCreateDTO("홍길동", "1234", "dis@code.it", "filePath_gildong"));
+		User user2 = userService.createUser(new UserCreateDTO("김이박", "5678", "dis2@code.it", "filePath_kim"));
 
-		System.out.println(userService.findUserDTO(user.getId()));
-		System.out.println(userService.isNameExist(user.getUserName()));
 
-		List<UUID> userList = new ArrayList<>();
-		userList.add(user.getId());
+		List<String > privateUserList =	new ArrayList<>();
 
-		//Channel channel = setupChannel(channelService);
-		Channel channel = channelService.createPublicChannel(new ChannelCreateDTO("공개채널",userList), ChannelType.PUBLIC);
-		System.out.println(channelService.readChannel(channel.getId()) + " " + channel.getChannelName());
+		privateUserList.add(user2.getId().toString());
 
-		System.out.println(channelService.findDTO(channel.getId()) + " " + channel.getChannelName());
+		Channel PBChannel = channelService.createPublicChannel(new ChannelCreateDTO("공개 채널"));
+		Channel PVChannel = channelService.createPrivateChannel(new PrivateChannelCreateDTO("비공개 채널", privateUserList));
 
-		channelService.deleteChannel(channel.getId());
-		System.out.println(channelService.readAllChannel());
+		System.out.println(PBChannel.getId());
+		System.out.println(user2.getId());
+
+		Message message = messageService.createMessage(
+				new MessageCreateDTO(user.getId(), PBChannel.getId(), "hello", null));
+		Message message2 = messageService.createMessage(
+				new MessageCreateDTO(user2.getId(), PBChannel.getId(), "what up", null));
 
 
 	}

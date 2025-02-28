@@ -34,11 +34,16 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return userStatus;
     }
 
+    
+    //TODO Sprint 3 null 예외 사항 처리하기
     @Override
     public UserStatus findByUserId(UUID userId) {
         if (userId == null) {
             throw new IllegalArgumentException("Id is null.");
         }
+
+        Map<UUID, UserStatus> paramMap = userStatusMap;
+
         return userStatusMap.values().stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst()
@@ -59,6 +64,8 @@ public class JCFUserStatusRepository implements UserStatusRepository {
         return userStatusMap.values().stream()
                 .anyMatch(userStatus -> userStatus.getUserId().equals(userId));
     }
+
+
 
     @Override
     public void delete(UUID id) {

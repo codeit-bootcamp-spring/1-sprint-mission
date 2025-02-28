@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -37,7 +38,13 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusService readStatusService;
 
     @Override
-    public Channel createPrivateChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
+    public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO) {
+        Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
+        return channelRepository.save(channel);
+    }
+
+    @Override
+    public Channel createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
         Channel channel = new Channel(channelCreateDTO, ChannelType.PRIVATE);
 
         createReadStatus(channel, channelCreateDTO);
@@ -45,20 +52,14 @@ public class BasicChannelService implements ChannelService {
         return channelRepository.save(channel);
     }
 
-    @Override
-    public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
-        Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
 
-        createReadStatus(channel, channelCreateDTO);
-        return channelRepository.save(channel);
-    }
 
     //ReadStatus서비스에서 ReadStatus를 만드는 함수
-    private void createReadStatus(Channel channel, ChannelCreateDTO channelCreateDTO) {
-        List<UUID> userIDList = channelCreateDTO.userList();
+    private void createReadStatus(Channel channel, PrivateChannelCreateDTO channelCreateDTO) {
+        List<UUID> userIDList = channelCreateDTO.getUserList();
         for(UUID uuid :userIDList){
             System.out.println("ReadStatus created");
-            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid ), isChannelExist(channel.getId()));
+            readStatusService.create(new ReadStatusCreateDTO(channel.getId(), uuid ));
         }
     }
 
@@ -73,12 +74,15 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelFindDTO findDTO(UUID uuid) {
         Channel channel = readChannel(uuid);
-        Instant time = readStatusRepository.findLatestTimeByChannelId(uuid);
 
-        //private일 때 userIdList 생성, Public시 null list
+
+        //Public 일 때 userIdList , time은 null
+        //이 아이디리스트는 readStatus에서 찾아야함.
         List<UUID> userIdList = null;
+        Instant time = null;
         if(channel.getType()==ChannelType.PRIVATE){
-            userIdList = userRepository.findAllUserIdByChannelId(uuid);
+            userIdList = readStatusRepository.findAllUserIdByChannelId(uuid);
+            time = readStatusRepository.findLatestTimeByChannelId(uuid);
         }
         ChannelFindDTO channelFindDTO = new ChannelFindDTO(channel, time, userIdList);
         return channelFindDTO;
@@ -90,7 +94,7 @@ public class BasicChannelService implements ChannelService {
         List<ChannelFindDTO> channelFindDTOList = findAllDTO();
         List<ChannelFindDTO> userChannelFindDTOList = channelFindDTOList.stream()
                 .filter(channelFindDTO ->channelFindDTO.getType().equals(ChannelType.PUBLIC)
-                &&
+                ||
                         (channelFindDTO.getType().equals(ChannelType.PRIVATE) &&
                                 channelFindDTO.isUserExist(userId)))
                 .toList();
@@ -135,7 +139,10 @@ public class BasicChannelService implements ChannelService {
     public void deleteChannel(UUID id) {
         //관련된 도메인 삭제
         messageRepository.deleteByChannelId(id);
-        readStatusService.deleteByChannelId(id);
+        Channel  channel = readChannel(id);
+        if(channel.getType()==ChannelType.PRIVATE){
+            readStatusService.deleteByChannelId(id);
+        }
         channelRepository.delete(id);
     }
 }

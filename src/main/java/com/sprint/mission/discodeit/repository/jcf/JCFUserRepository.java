@@ -41,6 +41,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public List<UUID> findAllUserIdByChannelId(UUID uuid) {
+        //채널아이디 대상, 속해있는 유저 반환
         return List.of();
     }
 

@@ -9,15 +9,16 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-    UserStatus create(UserStatusCreateDTO userStatusCreateDTO);
-
+    UserStatus create(UserStatusCreateDTO userStatusCreateDTO); //새로운 생성
+    void saveExist(UserStatus userStatus); //존재하는 상태 저장(userCreate시 연동)
+    
     UserStatus find(UUID uuid);
 
     List<UserStatus> findAll();
 
-    UserStatus update(UserStatusUpdateDTO userStatusUpdateDTO);
+    UserStatus update(UUID id, UserStatusUpdateDTO userStatusUpdateDTO);
 
-    UserStatus updateByUserId(UserStatusUpdateDTO userStatusUpdateDTO);
+    UserStatus updateByUserId(UUID userID, UserStatusUpdateDTO userStatusUpdateDTO);
 
     void delete(UUID uuid);
 

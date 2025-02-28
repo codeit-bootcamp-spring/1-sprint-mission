@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-    ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO, boolean isChannelExist);
+    ReadStatus create(ReadStatusCreateDTO readStatusCreateDTO);
 
     ReadStatus findbyId(UUID uuid);
 
