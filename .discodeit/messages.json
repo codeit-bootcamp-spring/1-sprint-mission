@@ -1,29 +1,2 @@
 {
-  "2b4d893c-e13d-418c-a960-fd6fff77e5ba" : {
-    "id" : "2b4d893c-e13d-418c-a960-fd6fff77e5ba",
-    "createdAt" : 1740467462.124424800,
-    "updatedAt" : null,
-    "content" : "test massege",
-    "channelId" : "5e75c9c5-507a-4ef7-ae9f-ae461761e45e",
-    "authorId" : "c6b39480-b10a-4da6-87dd-787469652219",
-    "attachmentIds" : [ ]
-  },
-  "5ee8c143-1330-4eb0-8d3e-d421eb10778f" : {
-    "id" : "5ee8c143-1330-4eb0-8d3e-d421eb10778f",
-    "createdAt" : 1740467527.887544400,
-    "updatedAt" : null,
-    "content" : "test2 massege",
-    "channelId" : "32f6c517-7046-4a91-a2fa-ab9c973b0967",
-    "authorId" : "c6b39480-b10a-4da6-87dd-787469652219",
-    "attachmentIds" : [ "483d5a52-05dd-46fa-b766-fa3f9f58faa5" ]
-  },
-  "9254fc30-948e-45a4-9ee3-d295deca9a08" : {
-    "id" : "9254fc30-948e-45a4-9ee3-d295deca9a08",
-    "createdAt" : 1740467578.012907700,
-    "updatedAt" : null,
-    "content" : "private massge",
-    "channelId" : "51e1aa61-bd49-487b-b92e-728d3aa05562",
-    "authorId" : "c2b5cb04-1eaf-4efa-8690-32520a86d3f0",
-    "attachmentIds" : [ ]
-  }
 }
