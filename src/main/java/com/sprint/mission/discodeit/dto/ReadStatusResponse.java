@@ -13,7 +13,8 @@ public record ReadStatusResponse(
     Instant createdAt,
     Instant updatedAt,
     UUID userId,
-    UUID channelId
+    UUID channelId,
+    Instant lastReadAt
 ) {
 
   public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
@@ -23,6 +24,7 @@ public record ReadStatusResponse(
         .channelId(readStatus.getChannelId())
         .createdAt(readStatus.getCreatedAt())
         .updatedAt(readStatus.getUpdatedAt())
+        .lastReadAt(readStatus.getLastReadAt())
         .build();
   }
 }

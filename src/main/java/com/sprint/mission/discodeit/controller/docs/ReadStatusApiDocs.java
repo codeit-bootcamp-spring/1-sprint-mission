@@ -8,12 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "ReadStatus API", description = "ReadStatus 관련 API")
 public interface ReadStatusApiDocs {
@@ -24,7 +20,8 @@ public interface ReadStatusApiDocs {
       @ApiResponse(responseCode = "400", description = "수신 상태 생성 실패"),
       @ApiResponse(responseCode = "404", description = "해당 채널이나 유저가 존재하지 않습니다.")
   })
-  ReadStatusResponse createReadStatus(ReadStatusRequest readStatusRequest);
+  ReadStatusResponse createReadStatus(
+      @RequestBody ReadStatusRequest.Create readStatusRequest);
 
   @Operation(summary = "수신 상태 업데이트", description = "수신 상태를 업데이트 합니다.")
   @ApiResponses({
@@ -32,7 +29,9 @@ public interface ReadStatusApiDocs {
       @ApiResponse(responseCode = "400", description = "수신 상태 업데이트 실패"),
       @ApiResponse(responseCode = "404", description = "해당 수신 상태 정보가 존재하지 않습니다.")
   })
-  ReadStatusResponse updateReadStatus(UUID readStatusId);
+  ReadStatusResponse updateReadStatus(
+      @PathVariable UUID readStatusId,
+      @RequestBody ReadStatusRequest.Update readStatusRequest);
 
   @Operation(summary = "유저의 수신 상태 정보", description = "유저의 모든 채널에 대한 수신 상태를 가져옵니다.")
   @ApiResponses({

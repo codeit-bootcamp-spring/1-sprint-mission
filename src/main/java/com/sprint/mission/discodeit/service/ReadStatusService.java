@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-  ReadStatusResponse create(ReadStatusRequest request);
+  ReadStatusResponse create(ReadStatusRequest.Create request);
 
   ReadStatusResponse findById(UUID id);
 
@@ -19,7 +19,7 @@ public interface ReadStatusService {
 
   List<ReadStatusResponse> findAllByChannelId(UUID channelId);
 
-  ReadStatusResponse update(UUID id);
+  ReadStatusResponse update(UUID id, ReadStatusRequest.Update request);
 
   void deleteById(UUID id);
 

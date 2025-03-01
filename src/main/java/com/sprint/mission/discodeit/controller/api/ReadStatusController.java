@@ -19,14 +19,17 @@ public class ReadStatusController implements ReadStatusApiDocs {
 
   @PostMapping
   @Override
-  public ReadStatusResponse createReadStatus(@RequestBody ReadStatusRequest readStatusRequest) {
+  public ReadStatusResponse createReadStatus(
+      @RequestBody ReadStatusRequest.Create readStatusRequest) {
     return readStatusService.create(readStatusRequest);
   }
 
   @PutMapping("/{readStatusId}")
   @Override
-  public ReadStatusResponse updateReadStatus(@PathVariable UUID readStatusId) {
-    return readStatusService.update(readStatusId);
+  public ReadStatusResponse updateReadStatus(
+      @PathVariable UUID readStatusId,
+      @RequestBody ReadStatusRequest.Update readStatusRequest) {
+    return readStatusService.update(readStatusId, readStatusRequest);
   }
 
   @GetMapping

@@ -29,16 +29,19 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ChannelRepository channelRepository;
 
   @Override
-  public ReadStatusResponse create(ReadStatusRequest request) {
+  public ReadStatusResponse create(ReadStatusRequest.Create request) {
     User user = userRepository.findById(request.userId()).orElseThrow(
         () -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
     Channel channel = channelRepository.findById(request.channelId()).orElseThrow(
         () -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND,
             "channelId : " + request.channelId()));
+
     if (readStatusRepository.existsByUserIdAndChannelId(request.userId(), request.channelId())) {
       throw new RestApiException(ErrorCode.READ_IS_ALREADY_EXIST, "");
     }
-    ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId());
+    ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId(),
+        request.lastReadAt());
+
     readStatusRepository.save(newReadStatus);
     log.info("Create Read Status : {}", newReadStatus);
     return ReadStatusResponse.EntityToDto(newReadStatus);
@@ -70,9 +73,9 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
-  public ReadStatusResponse update(UUID id) {
+  public ReadStatusResponse update(UUID id, ReadStatusRequest.Update request) {
     ReadStatus readStatus = findByIdOrThrow(id);
-    readStatus.updateUpdateAt();
+    readStatus.updateUpdateAt(request.newLastReadAt());
     return ReadStatusResponse.EntityToDto(readStatusRepository.save(readStatus));
   }
 
