@@ -1,53 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.entity.constant.ChannelType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import java.io.Serializable;
-import java.util.List;
+import java.time.Instant;
 import java.util.UUID;
+import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class Channel extends BaseEntity implements Serializable {
+public class Channel implements Serializable {
+
   private static final long serialVersionUID = 1L;
-  private final UUID ownerId;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
   private ChannelType type;
   private String name;
   private String description;
-  private List<UUID> memberIds;
-  
-  // public channel
-  public Channel(String name, String description) {
+
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
     this.name = name;
     this.description = description;
-    this.type = ChannelType.PUBLIC;
-    this.ownerId = null;
   }
-  
-  // private channel
-  public Channel(UUID ownerId, List<UUID> memberIds) {
-    this.ownerId = ownerId;
-    this.type = ChannelType.PRIVATE;
-    this.memberIds = memberIds;
+
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
+    }
+
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
+    }
   }
-  
-  public static Channel ofPublic(String name, String description) {
-    return new Channel(name, description);
-  }
-  
-  public static Channel ofPrivate(UUID ownerId, List<UUID> memberIds) {
-    return new Channel(ownerId, memberIds);
-  }
-  
-  public void updateName(String name) {
-    this.name = name;
-    super.update();
-  }
-  
-  public void updateMembers(List<UUID> memberIds) {
-    this.memberIds = memberIds;
-    super.update();
-  }
-  
 }

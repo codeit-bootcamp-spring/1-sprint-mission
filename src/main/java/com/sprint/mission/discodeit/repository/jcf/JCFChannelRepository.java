@@ -2,44 +2,47 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
-  private final List<Channel> data = new ArrayList<>();
-  
-  @Override
-  public void save(Channel channel) {
-    data.add(channel);
+
+  private final Map<UUID, Channel> data;
+
+  public JCFChannelRepository() {
+    this.data = new HashMap<>();
   }
-  
+
+  @Override
+  public Channel save(Channel channel) {
+    this.data.put(channel.getId(), channel);
+    return channel;
+  }
+
   @Override
   public Optional<Channel> findById(UUID id) {
-    return data.stream()
-        .filter(c -> c.getId().equals(id))
-        .findFirst();
+    return Optional.ofNullable(this.data.get(id));
   }
-  
-  @Override
-  public Optional<Channel> findByName(String name) {
-    return data.stream()
-        .filter(c -> c.getName().equals(name))
-        .findFirst();
-  }
-  
+
   @Override
   public List<Channel> findAll() {
-    return new ArrayList<>(data);
+    return this.data.values().stream().toList();
   }
-  
+
   @Override
-  public void remove(UUID id) {
-    findById(id).ifPresent(data::remove);
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
   }
 }

@@ -2,54 +2,60 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Repository;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf")
 public class JCFUserStatusRepository implements UserStatusRepository {
-  List<UserStatus> data = new ArrayList<>();
-  
-  @Override
-  public void save(UserStatus userStatus) {
-    data.add(userStatus);
+
+  private final Map<UUID, UserStatus> data;
+
+  public JCFUserStatusRepository() {
+    this.data = new HashMap<>();
   }
-  
+
   @Override
-  public Optional<UserStatus> findById(UUID userStatusId) {
-    return data.stream()
-        .filter(u -> u.getId().equals(userStatusId))
-        .findFirst();
+  public UserStatus save(UserStatus userStatus) {
+    this.data.put(userStatus.getId(), userStatus);
+    return userStatus;
   }
-  
+
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
+
   @Override
   public Optional<UserStatus> findByUserId(UUID userId) {
-    return data.stream()
-        .filter(u -> u.getUserId().equals(userId))
+    return this.findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
         .findFirst();
   }
-  
+
   @Override
   public List<UserStatus> findAll() {
-    return new ArrayList<>(data);
+    return this.data.values().stream().toList();
   }
-  
+
   @Override
-  public boolean isOnline(UUID userId) {
-    if (findByUserId(userId).isPresent()) {
-      return findByUserId(userId).get().isOnline();
-    }
-    throw new NoSuchElementException("user status not found with user id: " + userId);
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
   }
-  
+
   @Override
-  public void remove(UUID userId) {
-    findByUserId(userId).ifPresent(data::remove);
+  public void deleteById(UUID id) {
+    this.data.remove(id);
   }
-  
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
+  }
 }

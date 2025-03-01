@@ -1,13 +1,14 @@
 package com.sprint.mission.discodeit.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@ControllerAdvice
 @ResponseBody
 public class GlobalExceptionHandler {
 
@@ -31,4 +32,19 @@ public class GlobalExceptionHandler {
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(e.getMessage());
   }
+
+  @ExceptionHandler(JsonProcessingException.class)
+  public ResponseEntity<String> handleException(JsonProcessingException e) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(e.getMessage());
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<String> handleException(RuntimeException e) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(e.getMessage());
+  }
+
 }

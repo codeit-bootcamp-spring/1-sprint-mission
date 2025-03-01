@@ -6,11 +6,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BinaryContentRepository {
-  void save(BinaryContent binaryContent);
-  
-  Optional<BinaryContent> findById(UUID binaryContentId);
-  
-  List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds);
-  
-  void remove(UUID binaryContentId);
+
+  BinaryContent save(BinaryContent binaryContent);
+
+  Optional<BinaryContent> findById(UUID id);
+
+  List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
+  boolean existsById(UUID id);
+
+  void deleteById(UUID id);
 }
