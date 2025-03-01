@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'application' // application 플러그인 추가
+    id 'org.springframework.boot' version '3.3.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sprint.mission'
+version = '1.0-SNAPSHOT'
+
+
+java {
+    // sourceCompatibility = JavaVersion.VERSION_17
+    // targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation platform('org.junit:junit-bom:5.10.0') // JUnit BOM 사용
+    implementation 'org.junit.jupiter:junit-jupiter' // JUnit API를 전체적으로 포함
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    //
+    implementation "org.mockito:mockito-core:4.6.1"
+    //
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    //
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    //
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // springdoc-openapi 라이브러리 추가
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+application {
+    // mainClass = 'com.sprint.mission.discodeit.JavaApplication' // Main 클래스 경로 설정
+    mainClass = 'com.sprint.mission.discodeit.DiscodeitApplication'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+

@@ -1,0 +1,150 @@
+[33mcommit 84eb68e8070a6ff9da93f3afc1846a1a4d3eab77[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mpart1-김경린[m[33m)[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 14:16:44 2025 +0900
+
+    refactor : getìrepository 인터페이스에서 getAll*  반환 자료형을 Map에서 Collection<*>으로 변경
+
+[33mcommit a1f560383ddaf8f3eba6c14f2abcb985181a0dd3[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 13:37:53 2025 +0900
+
+    refactor : BaseEntityãë ㅠBaseEntity 모델에ì,efreshUpdatedAt 메서드에서 시간을 ë매개변수로 받지 않고 내내부에서 변경하도록 변경
+
+[33mcommit ecdda09d8628fd28aae93ce71781f4f713063693[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 13:12:16 2025 +0900
+
+    refactor : getById 메메서드 메서드 반환형을 Optional 래퍼 클래스로 지정한 후 이용된 코드들 orElse, orElseGet, ifPresentë¥등으로 수정
+
+[33mcommit 3a6cc44110e7b25a6d6fcb98324e79c7472c436d[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 10:39:03 2025 +0900
+
+    refactor : BaseEntity 모델에서ãㅇ ã u ì 지정서드명 변경
+
+[33mcommit ffd80c97a31c2ccbc5632cf5b86f931da2d6be7f[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 10:18:59 2025 +0900
+
+    sprint mission 2 save
+
+[33mcommit 56f29dbf94437b6c15bdab50a796c8bc15b254e4[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Wed Jan 22 10:17:15 2025 +0900
+
+    sprint mission 2 save
+
+[33mcommit d30cf31803f0a6312992cb438d4d7e6e5ae223e5[m[33m ([m[1;31morigin/part1-김경린[m[33m)[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 21 17:15:00 2025 +0900
+
+    bug fix
+
+[33mcommit ecabf44e71f657f238941e9194d8ad6b796369af[m[33m ([m[1;33mtag: [m[1;33msprint-mission-1-done[m[33m)[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 17:28:18 2025 +0900
+
+    refactor : ìã 서비스 로직의 인터페이스에서 추ìabstract 생략
+
+[33mcommit 3167995dab51642b38576b1081c3bee196383d5e[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 17:21:19 2025 +0900
+
+    fix : User, Channel, Message 모델의 생성자에 예외 처리ë 추가해 null과 공백 닉네임을 방지
+
+[33mcommit a0efcd88c70a1f1f0a732b6d0bc2c615d0a4c8d2[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 16:43:35 2025 +0900
+
+    refactor : Channel 모델ë에서 'user'ãã변 수ã수명로 변경í
+
+[33mcommit 3da341a9a94afbc21479adbcdfc6153875a1984c[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 16:32:31 2025 +0900
+
+    refactor : Message Service 데이터 처리 부분을 Repository로 분리,  메서드 명및 메서드 내부 변경으로 인한 테스트 코드 수정
+
+[33mcommit 6d5baf17eb631838af06b8e27a9f8ec6e5c0fb33[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 15:12:56 2025 +0900
+
+    refactor : ChannelService 데이터 처리 부분을 Repository로 분리,  메서드 명및 메서드 내부 변경으로 인한 테스트 코드 수정
+
+[33mcommit 7ec3ec4c2c21534f5fb6cfc1f540ac2407077477[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 14:07:05 2025 +0900
+
+    refactor : UserService 데이터 처리 부분을 Repository로 분리,  메서드 명및 메서드 내부 변경으로 인한 테스트 코드 수정
+
+[33mcommit 0915d5471c0f33f7c22a959b76e2015497229a2e[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 11:32:23 2025 +0900
+
+    refactor : UserRepository와 구현체 InMemoryUserRepository 작성
+
+[33mcommit 62e4b178adfce51a17a5fb83912a47fdbe08c39d[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Tue Jan 14 10:24:41 2025 +0900
+
+    refactor : Service layer상에 존재하던 데이터 처리 분리를 위한 repository 패키지 생성
+
+[33mcommit ab41f348cb119bc3f1f1f5ef874be9154b99e056[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Mon Jan 13 19:16:02 2025 +0900
+
+    Test: JCFChannelService, JCFMessageService 단위 테스트 추가
+
+[33mcommit 32e4dba1fe94d33757ecec347ceda3a3b156b1f1[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Mon Jan 13 17:46:13 2025 +0900
+
+    Test: ãJCFUserService 단위 테스트 추가
+
+[33mcommit 6542a828bf23f5f8495bb322de1c66b6d6d9898b[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Mon Jan 13 17:41:04 2025 +0900
+
+    Refactor: 입출력 로직을 io 패í지로 분리
+
+[33mcommit bdce83b887f64e43ffbeefcd8258ac51b563ef8a[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Mon Jan 13 10:52:42 2025 +0900
+
+    Fix: BaseEntity. BaseEntity.java의 'id'와 'createdAt'을 final로 지정
+
+[33mcommit 916c1135c930bb4bbe52190da3f86883cd8b7190[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Mon Jan 13 10:44:36 2025 +0900
+
+    Fix: BaseEntity.java의파라미터 변수명을 소ë¬
+
+[33mcommit e077abe308899b87eb50e9d8716d1e08276a9c34[m[33m ([m[1;33mtag: [m[1;33msprint1-basic[m[33m)[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Thu Jan 9 18:26:07 2025 +0900
+
+    second commit
+
+[33mcommit 52ddddef418bf8bcffb98474624ae5ebcddc082a[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Thu Jan 9 17:36:54 2025 +0900
+
+    first commit
+
+[33mcommit dd197d02aff1b00a9ded62ed842eafeb0ee8d6fc[m
+Merge: d65d70e 2169d0d
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Thu Jan 9 16:33:37 2025 +0900
+
+    Merge branch 'master' into part1-김경린
+
+[33mcommit 2169d0d66f774334fa9dff940b2c0664ea253a0b[m[33m ([m[1;32mmaster[m[33m)[m
+Author: kyungrin Kim <0123jade0123@gmail.com>
+Date:   Thu Jan 9 16:11:48 2025 +0900
+
+    first commit
+
+[33mcommit d65d70ec52e7c610505444e8bbe409e187b56b58[m[33m ([m[1;31morigin/part4[m[33m, [m[1;31morigin/part3[m[33m, [m[1;31morigin/part2[m[33m, [m[1;31morigin/part1-허지웅[m[33m, [m[1;31morigin/part1-허원재[m[33m, [m[1;31morigin/part1-한성지[m[33m, [m[1;31morigin/part1-한상은[m[33m, [m[1;31morigin/part1-천세훈[m[33m, [m[1;31morigin/part1-조세은[m[33m, [m[1;31morigin/part1-정연경[m[33m, [m[1;31morigin/part1-전성삼[m[33m, [m[1;31morigin/part1-장태준[m[33m, [m[1;31morigin/part1-장건희[m[33m, [m[1;31morigin/part1-임수빈[m[33m, [m[1;31morigin/part1-이주녕[m[33m, [m[1;31morigin/part1-이유빈[m[33m, [m[1;31morigin/part1-이원길[m[33m, [m[1;31morigin/part1-이용구[m[33m, [m[1;31morigin/part1-이요한[m[33m, [m[1;31morigin/part1-이승주[m[33m, [m[1;31morigin/part1-이소영[m[33m, [m[1;31morigin/part1-이성근[m[33m, [m[1;31morigin/part1-이병규[m[33m, [m[1;31morigin/part1-이민주[m[33m, [m[1;31morigin/part1-이규석[m[33m, [m[1;31morigin/part1-유현석[m[33m, [m[1;31morigin/part1-유성욱[m[33m, [m[1;31morigin/part1-오하람[m[33m, [m[1;31morigin/part1-연예림[m[33m, [m[1;31morigin/part1-양병운[m[33m, [m[1;31morigin/part1-안대민[m[33m, [m[1;31morigin/part1-신은섭[m[33m, [m[1;31morigin/part1-손동혁[m[33m, [m[1;31morigin/part1-설유일[m[33m, [m[1;31morigin/part1-변희재[m[33m, [m[1;31morigin/part1-백재우[m[33m, [m[1;31morigin/part1-백승헌[m[33m, [m[1;31morigin/part1-배성환[m[33m, [m[1;31morigin/part1-박태식[m[33m, [m[1;31morigin/part1-박지현[m[33m, [m[1;31morigin/part1-박준한[m[33m, [m[1;31morigin/part1-박종우[m[33m, [m[1;31morigin/part1-박유진[m[33m, [m[1;31morigin/part1-박서연[m[33m, [m[1;31morigin/part1-민기[m[33m, [m[1;31morigin/part1-김희수[m[33m, [m[1;31morigin/part1-김효정[m[33m, [m[1;31morigin/part1-김태현[m[33m, [m[1;31morigin/part1-김창우[m[33m, [m[1;31morigin/part1-김준우[m[33m, [m[1;31morigin/part1-김주언[m[33m, [m[1;31morigin/part1-김재훈[m[33m, [m[1;31morigin/part1-김응진[m[33m, [m[1;31morigin/part1-김시온[m[33m, [m[1;31morigin/part1-김승찬[m[33m, [m[1;31morigin/part1-김성원[m[33m, [m[1;31morigin/part1-김상호[m[33m, [m[1;31morigin/part1-김도일[m[33m, [m[1;31morigin/part1-김건택[m[33m, [m[1;31morigin/part1-공병열[m[33m, [m[1;31morigin/part1-강소율[m[33m, [m[1;31morigin/part1-강병훈[m[33m, [m[1;31morigin/part1[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: jiwoo-im <jiwoo@codeit.com>
+Date:   Fri Dec 13 14:59:36 2024 +0900
+
+    init

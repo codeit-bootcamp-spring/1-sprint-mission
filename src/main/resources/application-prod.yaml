@@ -1,0 +1,8 @@
+logging:
+  level:
+    root: INFO
+spring:
+  datasource:
+    url: jdbc:mysql://prod-db:3306/mydb
+    username: prodUser
+    password: prodSecret
