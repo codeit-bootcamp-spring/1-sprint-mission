@@ -55,7 +55,8 @@ public class BasicChannelService implements ChannelService {
     channelRepository.save(newChannel);
 
     for (UUID userId : request.joinUsers()) {
-      readStatusService.create(new ReadStatusRequest(userId, newChannel.getId()));
+      readStatusService.create(
+          new ReadStatusRequest.Create(userId, newChannel.getId(), Instant.MIN));
     }
 
     log.info("Create Private Channel: {}", newChannel);
