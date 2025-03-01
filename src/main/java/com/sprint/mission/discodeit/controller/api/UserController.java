@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.controller.api;
 import com.sprint.mission.discodeit.controller.docs.UserApiDocs;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +57,13 @@ public class UserController implements UserApiDocs {
     return "delete ok";
   }
 
-  @PutMapping("/{userId}/status")
+  @PutMapping("/{userId}/userStatus")
   @Override
-  public String updateUserStatus(@PathVariable UUID userId) {
-    userStatusService.updateByUserId(userId);
-    return "user status update ok";
+  public UserStatusResponse updateUserStatus(
+      @PathVariable UUID userId,
+      @RequestBody UserStatusRequest.Update request
+  ) {
+    return userStatusService.updateByUserId(userId, request);
   }
 
 }

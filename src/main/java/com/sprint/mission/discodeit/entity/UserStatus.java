@@ -31,18 +31,15 @@ public class UserStatus implements Serializable {
     this.isOnline = online;
   }
 
-  public Boolean getIsOnline() {
-    updateStatus();
-    return this.isOnline;
-  }
-
-  public void updateStatus() {
-    Instant ValidTime = this.updatedAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
+  public void update(Instant lastActiveAt) {
+    this.lastActiveAt = lastActiveAt;
+    Instant ValidTime = this.lastActiveAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
     if (ValidTime.compareTo(Instant.now()) > 0) {
       this.isOnline = true;
     } else {
       this.isOnline = false;
     }
+    this.updatedAt = Instant.now();
   }
 
   @Override

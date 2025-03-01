@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.UserStatus;
 
 import java.util.List;
@@ -7,15 +9,15 @@ import java.util.UUID;
 
 public interface UserStatusService {
 
-  UserStatus create(UUID userId);
+  UserStatusResponse create(UUID userId);
 
-  UserStatus findById(UUID id);
+  UserStatusResponse findById(UUID id);
 
-  UserStatus findByUserId(UUID userId);
+  UserStatusResponse findByUserId(UUID userId);
 
-  UserStatus updateByUserId(UUID userId);
+  UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request);
 
-  List<UserStatus> findAll();
+  List<UserStatusResponse> findAll();
 
   void deleteById(UUID id);
 

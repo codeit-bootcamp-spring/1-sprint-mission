@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.controller.docs;
 
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -55,5 +57,6 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "400", description = "유저 상태 업데이트 실패, 잘못된 요청입니다."),
       @ApiResponse(responseCode = "404", description = "해당 유저가 존재하지 않습니다.")
   })
-  String updateUserStatus(UUID userId);
+  UserStatusResponse updateUserStatus(UUID userId, UserStatusRequest.Update request);
+
 }

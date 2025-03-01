@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.UserStatusRequest;
+import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
@@ -9,6 +11,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sun.jdi.request.DuplicateRequestException;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
   private final UserRepository userRepository;
 
   @Override
-  public UserStatus create(UUID userId) {
+  public UserStatusResponse create(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + userId));
     if (userStatusRepository.existsByUserId(userId)) {
@@ -34,32 +37,38 @@ public class BasicUserStatusService implements UserStatusService {
     }
     UserStatus newUserStatus = UserStatus.createUserStatus(userId);
     log.info("Create UserStatus: {}", newUserStatus);
-    return userStatusRepository.save(newUserStatus);
+    return UserStatusResponse.entityToDto(userStatusRepository.save(newUserStatus));
   }
 
   @Override
-  public UserStatus findById(UUID id) {
-    return userStatusRepository.findById(id)
+  public UserStatusResponse findById(UUID id) {
+    UserStatus userStatus = userStatusRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "id : " + id));
+    return UserStatusResponse.entityToDto(userStatus);
   }
 
   @Override
-  public UserStatus findByUserId(UUID userId) {
-    return userStatusRepository.findByUserId(userId)
+  public UserStatusResponse findByUserId(UUID userId) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
             () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
+    return UserStatusResponse.entityToDto(userStatus);
   }
 
   @Override
-  public UserStatus updateByUserId(UUID userId) {
-    UserStatus userStatus = findByUserId(userId);
-    userStatus.updateStatus();
-    return userStatusRepository.save(userStatus);
+  public UserStatusResponse updateByUserId(UUID userId, UserStatusRequest.Update request) {
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        .orElseThrow(
+            () -> new RestApiException(ErrorCode.USER_STATUS_NOT_FOUND, "userId : " + userId));
+    userStatus.update(request.newLastActiveAt());
+    return UserStatusResponse.entityToDto(userStatusRepository.save(userStatus));
   }
 
   @Override
-  public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
+  public List<UserStatusResponse> findAll() {
+    return userStatusRepository.findAll().stream()
+        .map(UserStatusResponse::entityToDto)
+        .collect(Collectors.toList());
   }
 
   @Override
