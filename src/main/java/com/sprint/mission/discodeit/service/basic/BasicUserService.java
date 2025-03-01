@@ -50,7 +50,7 @@ public class BasicUserService implements UserService {
       }
 
       log.info("Create User: {}", newUser);
-      return UserResponse.entityToDto(newUser, newUserStatus.getStatus(), newBinaryContentId);
+      return UserResponse.entityToDto(newUser, newUserStatus.getIsOnline(), newBinaryContentId);
     }
     return null;
   }
@@ -101,13 +101,13 @@ public class BasicUserService implements UserService {
   }
 
   private UserResponse entityToUserResponse(User user) {
-    UserStatus.Status userStatus = userStatusService.findByUserId(user.getId()).getStatus();
+    boolean isOnline = userStatusService.findByUserId(user.getId()).getIsOnline();
     UUID binaryContentId = null;
     BinaryContentResponse binaryContentResponse = binaryContentService.findByUserId(user.getId());
     if (binaryContentResponse != null) {
       binaryContentId = binaryContentResponse.id();
     }
-    return UserResponse.entityToDto(user, userStatus, binaryContentId);
+    return UserResponse.entityToDto(user, isOnline, binaryContentId);
   }
 
 }

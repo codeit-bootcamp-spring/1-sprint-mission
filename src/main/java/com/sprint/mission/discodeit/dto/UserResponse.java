@@ -15,11 +15,11 @@ public record UserResponse(
     Instant updatedAt,
     String name,
     String email,
-    UserStatus.Status status,
+    boolean online,
     UUID profileId
 ) {
 
-  public static UserResponse entityToDto(User user, UserStatus.Status userStatus,
+  public static UserResponse entityToDto(User user, boolean isOnline,
       UUID binaryContentId) {
     return UserResponse.builder()
         .id(user.getId())
@@ -27,7 +27,7 @@ public record UserResponse(
         .updatedAt(user.getUpdatedAt())
         .name(user.getName())
         .email(user.getEmail())
-        .status(userStatus)
+        .online(isOnline)
         .profileId(binaryContentId)
         .build();
   }

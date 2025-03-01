@@ -15,36 +15,33 @@ public class UserStatus implements Serializable {
   private Instant createdAt;
   private Instant updatedAt;
   private UUID userId;
-  private Status status;
-
-  public enum Status {
-    ONLINE,
-    OFFLINE,
-  }
+  private Instant lastActiveAt;
+  private Boolean isOnline;
 
   public static UserStatus createUserStatus(UUID userId) {
-    return new UserStatus(userId, Status.ONLINE);
+    return new UserStatus(userId, true);
   }
 
-  private UserStatus(UUID userId, Status status) {
+  private UserStatus(UUID userId, Boolean online) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     this.updatedAt = this.createdAt;
     this.userId = userId;
-    this.status = status;
+    this.lastActiveAt = Instant.now();
+    this.isOnline = online;
   }
 
-  public Status getStatus() {
+  public Boolean getIsOnline() {
     updateStatus();
-    return this.status;
+    return this.isOnline;
   }
 
   public void updateStatus() {
     Instant ValidTime = this.updatedAt.plusSeconds(ADDITIONAL_TIME_SECONDS);
     if (ValidTime.compareTo(Instant.now()) > 0) {
-      this.status = Status.ONLINE;
+      this.isOnline = true;
     } else {
-      this.status = Status.OFFLINE;
+      this.isOnline = false;
     }
   }
 
@@ -52,7 +49,8 @@ public class UserStatus implements Serializable {
   public String toString() {
     return "UserStatus{id:" + id
         + ",userId:" + userId
-        + ",status:" + status
+        + ",online:" + isOnline
+        + ",lastActiveAt:" + lastActiveAt
         + ",createdAt:" + createdAt
         + ",updateAt:" + updatedAt
         + "}";
