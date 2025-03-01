@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
+import com.sprint.mission.discodeit.dto.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -40,7 +41,7 @@ public class BasicUserService implements UserService {
       User newUser = User.createUser(request.name(), request.email(), request.password());
       userRepository.save(newUser);
 
-      UserStatus newUserStatus = userStatusService.create(newUser.getId());
+      UserStatusResponse newUserStatus = userStatusService.create(newUser.getId());
 
       UUID newBinaryContentId = null;
       if (userProfileImage != null) {
@@ -50,7 +51,7 @@ public class BasicUserService implements UserService {
       }
 
       log.info("Create User: {}", newUser);
-      return UserResponse.entityToDto(newUser, newUserStatus.getIsOnline(), newBinaryContentId);
+      return UserResponse.entityToDto(newUser, newUserStatus.online(), newBinaryContentId);
     }
     return null;
   }
@@ -101,7 +102,7 @@ public class BasicUserService implements UserService {
   }
 
   private UserResponse entityToUserResponse(User user) {
-    boolean isOnline = userStatusService.findByUserId(user.getId()).getIsOnline();
+    boolean isOnline = userStatusService.findByUserId(user.getId()).online();
     UUID binaryContentId = null;
     BinaryContentResponse binaryContentResponse = binaryContentService.findByUserId(user.getId());
     if (binaryContentResponse != null) {
