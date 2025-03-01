@@ -33,7 +33,13 @@ public class ChannelController {
           schema = @Schema(implementation = ChannelResponse.class)))
   @PostMapping("/public")
   public ResponseEntity<ChannelResponse> createChannel(@RequestBody CreateChannelRequest request) {
-    ChannelResponse response = channelService.createChannel(request);
+    ChannelResponse response = null;
+    try {
+      response = channelService.createChannel(request);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 

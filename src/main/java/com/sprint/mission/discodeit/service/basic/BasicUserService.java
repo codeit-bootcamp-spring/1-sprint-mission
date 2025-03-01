@@ -80,8 +80,12 @@ public class BasicUserService implements UserService {
   @Override
   public void deleteUser(UUID userId) {
     Optional.ofNullable(userRepository.getUserById(userId)).ifPresent(user -> {
-      binaryContentRepository.deleteById(user.getProfileImage());
-      userStatusRepository.deleteById(user.getStatus().getId());
+      if (user.getProfileImage() != null) {
+        binaryContentRepository.deleteById(user.getProfileImage());
+      }
+      if (user.getStatus() != null) {
+        userStatusRepository.deleteById(user.getStatus().getId());
+      }
       userRepository.deleteById(user.getId());
     });
   }

@@ -7,11 +7,10 @@ import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -28,15 +27,12 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public List<ChannelResponse> getChannels() {
-    return channelRepository.getAllChannels().stream()
-        .map(ChannelResponse::fromEntity)
-        .toList();
+    return channelRepository.getAllChannels().stream().map(ChannelResponse::fromEntity).toList();
   }
 
   @Override
   public Optional<ChannelResponse> getChannel(UUID uuid) {
-    return channelRepository.getChannelById(uuid)
-        .map(ChannelResponse::fromEntity);
+    return channelRepository.getChannelById(uuid).map(ChannelResponse::fromEntity);
   }
 
   @Override
@@ -63,16 +59,16 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(UUID uuid) {
-    channelRepository.getChannelById(uuid).map(channel -> {
+    channelRepository.getChannelById(uuid).ifPresent(channel -> {
       channelRepository.deleteChannel(uuid);
       channelRepository.save();
-      return null;
     });
   }
 
   @Override
   public ChannelResponse createPrivateChannel(CreatePrivateChannelRequest request) {
-    Channel channel = channelRepository.save(new Channel(true));
-    return ChannelResponse.fromEntity(channel);
+    Channel channel = new Channel(true);
+    request.userIds().forEach(channel::addUserToChannel);
+    return ChannelResponse.fromEntity(channelRepository.save(channel));
   }
 }
