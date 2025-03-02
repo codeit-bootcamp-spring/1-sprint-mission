@@ -78,7 +78,7 @@ public class JCFMessageService implements MessageService {
         Message updatingMessage = messageRepository.findById(messageId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
         updatingMessage.setContent(updateDto.newContent());
-        updatingMessage.setUpdateAt(Instant.now());
+        updatingMessage.refreshUpdateAt();
         messageRepository.save(updatingMessage);
     }
 

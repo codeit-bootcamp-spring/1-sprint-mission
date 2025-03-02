@@ -29,7 +29,7 @@ public record UserDtoForUpdate(
         user.setName(newName);
         user.setPassword(newPassword);
         user.setEmail(newEmail);
-        user.setUpdateAt(Instant.now());
+        user.refreshUpdateAt();
         return user;
     }
 }

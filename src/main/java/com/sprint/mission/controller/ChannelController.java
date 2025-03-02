@@ -122,9 +122,9 @@ public class ChannelController {
      * 응답 DTO (타입별)
      */
     private FindChannelDto getFindChannelDto(Channel findedChannel) {
-        return (findedChannel.getChannelType().equals(ChannelType.PRIVATE)
+        return (findedChannel.isPrivate())
                 ? new FindPrivateChannelDto(findedChannel)
-                : new FindPublicChannelDto(findedChannel));
+                : new FindPublicChannelDto(findedChannel);
     }
 }
 

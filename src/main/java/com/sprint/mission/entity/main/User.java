@@ -37,4 +37,8 @@ public class User implements Serializable {
         this.email = email;
         this.profileImgId = profileImgId;
     }
+
+    public void refreshUpdateAt() {
+        this.updateAt = Instant.now();
+    }
 }

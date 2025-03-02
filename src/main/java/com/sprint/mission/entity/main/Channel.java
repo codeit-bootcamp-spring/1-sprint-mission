@@ -37,4 +37,10 @@ public class Channel implements Serializable {
         this.description = dto.newDescription();
         this.updatedAt = Instant.now();
     }
+
+    public Boolean isPrivate(){
+        return channelType.equals(ChannelType.PRIVATE);
+    }
+
+
 }

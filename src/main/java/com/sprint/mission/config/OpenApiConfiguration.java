@@ -3,8 +3,10 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("dev") // dev profile에서만 swagger 사용
 public class OpenApiConfiguration {
 
     private static final String API_VERSION = "v1";

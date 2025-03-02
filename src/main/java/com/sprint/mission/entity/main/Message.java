@@ -47,4 +47,8 @@ public class Message implements Serializable {
             this.updateAt = Instant.now();
         }
     }
+
+    public void refreshUpdateAt() {
+        this.updateAt = Instant.now();
+    }
 }

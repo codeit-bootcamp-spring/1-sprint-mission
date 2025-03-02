@@ -48,7 +48,6 @@ public class BinaryContentController {
                 (OK, "BinaryContent 조회 성공", binaryContent);
     }
 
-
     @Operation(summary = "여러 첨부 파일 조회")
     @ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공",
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = BinaryContent.class))))
