@@ -126,12 +126,12 @@ public class UserController {
     public ResponseEntity<CommonResponse> findAll() {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
         log.info("statusMapByUser : {}", statusMapByUser);
-        List<FindUserDto> findUserDtos = statusMapByUser.keySet().stream()
+        List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
                 .map(user -> {
                     return FindUserDto.fromEntityAndStatus(user, statusMapByUser.get(user));
                 }).toList();
 
         return CommonResponse.toResponseEntity
-                (OK, "유저 리스트 조회 성공", findUserDtos);
+                (OK, "유저 리스트 조회 성공", findUserDtoList);
     }
 }
