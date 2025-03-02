@@ -4,8 +4,11 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.UserStatusService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,8 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
-
   private final UserService userService;
+  private final UserStatusService userStatusService;
 
   @PostMapping
   public ResponseEntity<User> create(@RequestPart UserCreateRequest userCreateRequest,
@@ -73,6 +77,14 @@ public class UserController {
     return ResponseEntity
         .status(HttpStatus.NO_CONTENT)
         .build();
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID id,
+      @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(userStatusService.updateByUserUd(id, userStatusUpdateRequest));
   }
 
   private Optional<BinaryContentRequest> resolveProfileRequest(MultipartFile profileFile) {
