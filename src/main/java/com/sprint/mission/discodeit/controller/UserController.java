@@ -79,7 +79,7 @@ public class UserController {
         .build();
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("user-statuses/{id}")
   public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable UUID id,
       @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
     return ResponseEntity
