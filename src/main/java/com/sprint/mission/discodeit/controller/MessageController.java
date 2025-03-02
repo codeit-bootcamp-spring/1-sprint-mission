@@ -22,63 +22,60 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Controller
 @ResponseBody
-@RequestMapping("/api/message")
+@RequestMapping("/api/messages")
 public class MessageController {
 
   private final MessageService messageService;
 
-  @RequestMapping(
-      path = "create",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-  )
+  @PostMapping
   public ResponseEntity<Message> create(
-      @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
+          @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+          @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
   ) {
     List<BinaryContentCreateRequest> attachmentRequests = Optional.ofNullable(attachments)
-        .map(files -> files.stream()
-            .map(file -> {
-              try {
-                return new BinaryContentCreateRequest(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    file.getBytes()
-                );
-              } catch (IOException e) {
-                throw new RuntimeException(e);
-              }
-            })
-            .toList())
-        .orElse(new ArrayList<>());
+            .map(files -> files.stream()
+                    .map(file -> {
+                      try {
+                        return new BinaryContentCreateRequest(
+                                file.getOriginalFilename(),
+                                file.getContentType(),
+                                file.getBytes()
+                        );
+                      } catch (IOException e) {
+                        throw new RuntimeException(e);
+                      }
+                    })
+                    .toList())
+            .orElse(new ArrayList<>());
     Message createdMessage = messageService.create(messageCreateRequest, attachmentRequests);
     return ResponseEntity
-        .status(HttpStatus.CREATED)
-        .body(createdMessage);
+            .status(HttpStatus.CREATED)
+            .body(createdMessage);
   }
 
-  @RequestMapping(path = "update")
-  public ResponseEntity<Message> update(@RequestParam("messageId") UUID messageId,
-      @RequestBody MessageUpdateRequest request) {
+  @PatchMapping("/{messageId}")
+  public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
+                                        @RequestBody MessageUpdateRequest request) {
     Message updatedMessage = messageService.update(messageId, request);
     return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(updatedMessage);
+            .status(HttpStatus.OK)
+            .body(updatedMessage);
   }
 
-  @RequestMapping(path = "delete")
-  public ResponseEntity<Void> delete(@RequestParam("messageId") UUID messageId) {
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
-        .build();
+            .status(HttpStatus.NO_CONTENT)
+            .build();
   }
 
-  @RequestMapping("findAllByChannelId")
+  @GetMapping
   public ResponseEntity<List<Message>> findAllByChannelId(
-      @RequestParam("channelId") UUID channelId) {
+          @RequestParam("channelId") UUID channelId) {
     List<Message> messages = messageService.findAllByChannelId(channelId);
     return ResponseEntity
-        .status(HttpStatus.OK)
-        .body(messages);
+            .status(HttpStatus.OK)
+            .body(messages);
   }
 }
