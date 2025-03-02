@@ -14,38 +14,38 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentCreateRequest request) {
-        String fileName = request.fileName();
-        byte[] bytes = request.file();
-        String contentType = request.contentType();
-        BinaryContent binaryContent = new BinaryContent(
-                fileName,
-                contentType,
-                bytes
-        );
-        return binaryContentRepository.save(binaryContent);
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent find(UUID binaryContentId) {
-        return binaryContentRepository.findById(binaryContentId)
-                .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
-    }
+  @Override
+  public BinaryContent create(BinaryContentCreateRequest request) {
+    Long size = (request.file() != null) ? (long) request.file().length : 0;
+    BinaryContent binaryContent = new BinaryContent(
+        request.fileName(),
+        request.contentType(),
+        request.file(),
+        size
+    );
+    return binaryContentRepository.save(binaryContent);
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-        return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-                .toList();
-    }
+  @Override
+  public BinaryContent find(UUID binaryContentId) {
+    return binaryContentRepository.findById(binaryContentId)
+        .orElseThrow(() -> new NoSuchElementException("파일이 존재하지 않습니다."));
+  }
 
-    @Override
-    public void delete(UUID binaryContentId) {
-        if (!binaryContentRepository.existsId(binaryContentId)) {
-            throw new NoSuchElementException("파일이 존재하지 않습니다.");
-        }
-        binaryContentRepository.deleteById(binaryContentId);
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
+    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
+        .toList();
+  }
+
+  @Override
+  public void delete(UUID binaryContentId) {
+    if (!binaryContentRepository.existsId(binaryContentId)) {
+      throw new NoSuchElementException("파일이 존재하지 않습니다.");
     }
+    binaryContentRepository.deleteById(binaryContentId);
+  }
 }

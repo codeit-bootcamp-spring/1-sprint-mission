@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +17,28 @@ import java.util.UUID;
 @RequestMapping("/api/readStatus")
 @RequiredArgsConstructor
 public class ReadStatusController {
-    private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest request) {
-        ReadStatus createdReadStatus = readStatusService.create(request);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdReadStatus);
-    }
+  private final ReadStatusService readStatusService;
 
-    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
-    public ResponseEntity<List<ReadStatus>> getUserReadStatuses(@PathVariable UUID userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(readStatusService.findAllByUserId(userId));
-    }
+  @PostMapping(value = "")
+  public ResponseEntity<ReadStatus> createReadStatus(
+      @Valid @RequestBody ReadStatusCreateRequest request) {
+    ReadStatus createdReadStatus = readStatusService.create(request);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdReadStatus);
+  }
 
-    @RequestMapping(value = "/update/{readStatusId}", method = RequestMethod.PUT)
-    public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId, @RequestBody ReadStatusUpdateRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(readStatusService.update(readStatusId, request));
-    }
+  @GetMapping(value = "/{userId}")
+  public ResponseEntity<List<ReadStatus>> getUserReadStatuses(@PathVariable UUID userId) {
+    return ResponseEntity.status(HttpStatus.OK).body(readStatusService.findAllByUserId(userId));
+  }
+
+  @PutMapping(value = "/{readStatusId}")
+  public ResponseEntity<ReadStatus> updateReadStatus(@PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(readStatusService.update(readStatusId, request));
+  }
 
 }

@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.dto;
 
+import java.util.UUID;
+
 public record MessageUpdateRequest(
-        String newContent
-) {}
+    UUID writerId,
+    String newContent
+) {
+
+}
