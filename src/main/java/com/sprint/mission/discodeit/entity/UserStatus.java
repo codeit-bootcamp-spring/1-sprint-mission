@@ -2,13 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 
 
 @Getter
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class UserStatus implements Serializable {
     private String userId;
     private Instant lastSeen;

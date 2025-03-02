@@ -10,8 +10,11 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ChannelDto {
     private String id;
+    @NotNull
     private String name;
+    @NotNull
     private String description;
+    @NotNull
     private String userId;
     private String channelId;
 
