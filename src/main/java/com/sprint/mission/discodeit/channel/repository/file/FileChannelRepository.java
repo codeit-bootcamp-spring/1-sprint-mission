@@ -4,18 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import com.sprint.mission.discodeit.channel.entity.Channel;
-import com.sprint.mission.discodeit.channel.entity.ChannelType;
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
 import com.sprint.mission.discodeit.global.util.FileStorage;
 import com.sprint.mission.discodeit.global.util.JsonFileStorage;
-import com.sprint.mission.discodeit.user.entity.User;
 
 public class FileChannelRepository implements ChannelRepository {
 	private final Path rootDir;
@@ -78,39 +74,15 @@ public class FileChannelRepository implements ChannelRepository {
 	}
 
 	@Override
-	public void delete(UUID id) {
+	public void deleteById(UUID id) {
 		List<Channel> channels = findAll();
 		channels.removeIf(channel -> channel.getId().equals(id));
 		fileStorage.save(rootDir.resolve(CHANNEL_FILE), channels);
 	}
 
 	@Override
-	public List<Channel> findAllPublicChannels() {
-		List<Channel> allChannels = findAll();
-		List<Channel> publicChannels = new ArrayList<>();
-		// 모든 채널 목록을 순회하면서 PUBLIC 채널인 경우 추가.
-		for (Channel channel : allChannels) {
-			if (channel.getChannelType() == ChannelType.PUBLIC) {
-				publicChannels.add(channel);
-			}
-		}
-		return publicChannels;
-	}
-
-	@Override
-	public List<Channel> findPrivateChannelsByUserId(UUID userId) {
-		List<Channel> allChannels = findAll();
-		List<Channel> privateChannels = new ArrayList<>();
-		// 모든 채널 목록을 순회하면서 채널 타입이 PRIVATE이고, 참여자 목록에 userId가 포함된 경우 추가.
-		for (Channel channel : allChannels) {
-			if (channel.getChannelType() == ChannelType.PRIVATE) {
-				Map<UUID, User> participants = channel.getParticipants();
-				if (participants != null && participants.containsKey(userId)) {
-					privateChannels.add(channel);
-				}
-			}
-		}
-		return privateChannels;
+	public boolean existsById(UUID id) {
+		return findById(id).isPresent();
 	}
 }
 

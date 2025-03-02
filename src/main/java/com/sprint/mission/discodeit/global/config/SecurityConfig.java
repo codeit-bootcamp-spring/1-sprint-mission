@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.global.config;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,22 +25,30 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/api/**").permitAll()
-				.anyRequest().authenticated()
+				.requestMatchers(
+					"/swagger-ui/**",
+					"/v3/api-docs/**",
+					"/swagger-ui.html",
+					//여기를 수정하니까 되네....
+					"/api-docs/**"
+				).permitAll()  // Swagger UI 관련 경로 허용
+				.anyRequest().permitAll()
 			)
-			.httpBasic(Customizer.withDefaults());
+			//Todo 원래 httpbasic이었는데 fromlogin으로 일시적인 수정
+			.formLogin(Customizer.withDefaults());
 
 		return http.build();
 	}
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:5500", "http://127.0.0.1:5500"));
-		configuration.addAllowedHeader("*");
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
-		configuration.setAllowCredentials(true);
+		CorsConfiguration config = new CorsConfiguration();
+		config.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:8080"));
+		config.addAllowedHeader("*");
+		config.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "DELETE"));
+		config.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
+		source.registerCorsConfiguration("/**", config);
 		return source;
 	}
 }

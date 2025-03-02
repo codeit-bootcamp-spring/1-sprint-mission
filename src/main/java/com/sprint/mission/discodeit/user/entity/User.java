@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.user.entity;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import com.sprint.mission.discodeit.global.entity.BaseEntity;
 
@@ -10,39 +11,47 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class User extends BaseEntity {
-	private String userid;
-	private String password;
 	private String username;
 	private String email;
+	private String password;
+	private UUID profileId;
 
-	public User(String userid, String password, String username, String email) {
-		this.userid = userid;
+	public User(String username, String email, String password, UUID profileId) {
+		super();
 		this.password = password;
 		this.username = username;
 		this.email = email;
+		this.profileId = profileId;
 	}
 
-	public void updateUsername(String username) {
-		this.username = username;
-	}
+	public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+		boolean anyValueUpdated = false;
+		if (newUsername != null && !newUsername.equals(this.username)) {
+			this.username = newUsername;
+			anyValueUpdated = true;
+		}
+		if (newEmail != null && !newEmail.equals(this.email)) {
+			this.email = newEmail;
+			anyValueUpdated = true;
+		}
+		if (newPassword != null && !newPassword.equals(this.password)) {
+			this.password = newPassword;
+			anyValueUpdated = true;
+		}
+		if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+			this.profileId = newProfileId;
+			anyValueUpdated = true;
+		}
 
-	public void updateUserEmail(String email) {
-		this.email = email;
-	}
-
-	public void updateUserid(String userid) {
-		this.userid = userid;
-	}
-
-	public void updatePassword(String password) {
-		this.password = password;
+		if (anyValueUpdated) {
+			this.updateTime();
+		}
 	}
 
 	@Override
 	public String toString() {
 		return "User{" +
 			"id='" + getId() + '\'' +
-			", userid='" + userid + '\'' +
 			", username='" + username + '\'' +
 			", email='" + email + '\'' +
 			'}';

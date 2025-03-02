@@ -2,12 +2,21 @@ package com.sprint.mission.discodeit.global.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.sprint.mission.discodeit.auth.controller.AuthController;
+import com.sprint.mission.discodeit.channel.controller.ChannelController;
 import com.sprint.mission.discodeit.global.dto.ErrorResponse;
+import com.sprint.mission.discodeit.message.controller.BinaryContentController;
+import com.sprint.mission.discodeit.message.controller.MessageController;
+import com.sprint.mission.discodeit.readStatus.controller.ReadStatusController;
+import com.sprint.mission.discodeit.user.controller.UserController;
 
-@ControllerAdvice
+@RestControllerAdvice(annotations = {RestController.class}, basePackageClasses = {UserController.class,
+	AuthController.class, ChannelController.class, MessageController.class, ReadStatusController.class,
+	BinaryContentController.class})
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(IllegalArgumentException.class)

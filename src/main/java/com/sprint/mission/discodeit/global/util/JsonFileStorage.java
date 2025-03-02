@@ -31,7 +31,6 @@ public class JsonFileStorage<T> implements FileStorage<T> {
 			if (!Files.exists(directory)) {
 				Files.createDirectories(directory);
 			} else if (!Files.isDirectory(directory)) {
-				log.error("🚨 오류: 저장 경로가 파일로 존재함. 삭제 후 디렉토리 생성.");
 				Files.delete(directory);
 				Files.createDirectories(directory);
 			}
@@ -44,11 +43,9 @@ public class JsonFileStorage<T> implements FileStorage<T> {
 	public void save(Path filePath, List<T> data) {
 		try {
 			if (Files.exists(filePath) && Files.isDirectory(filePath)) {
-				log.error("🚨 오류: {}가 디렉토리로 잘못 생성됨. 삭제 후 재생성합니다.", filePath);
 				Files.delete(filePath);
 			}
 			objectMapper.writeValue(filePath.toFile(), data);
-			log.info("📌 파일 저장 완료: {}", data);
 		} catch (IOException e) {
 			throw new RuntimeException("파일 저장 실패", e);
 		}
@@ -57,17 +54,14 @@ public class JsonFileStorage<T> implements FileStorage<T> {
 	@Override
 	public List<T> load(Path filePath) {
 		if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
-			log.info("⚠ 파일이 존재하지 않거나, 디렉토리로 잘못 생성됨: {}", filePath);
 			return new ArrayList<>();
 		}
 		try {
 			JavaType type = objectMapper.getTypeFactory()
 				.constructCollectionType(List.class, this.type);
 			List<T> data = objectMapper.readValue(filePath.toFile(), type);
-			log.info("✅ 파일 로드 성공: {}", data);
 			return data;
 		} catch (IOException e) {
-			log.error("❌ 파일 로드 실패: {}", e.getMessage());
 			return new ArrayList<>();
 		}
 	}

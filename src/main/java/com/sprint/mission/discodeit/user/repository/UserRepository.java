@@ -7,17 +7,22 @@ import java.util.UUID;
 import com.sprint.mission.discodeit.user.entity.User;
 
 public interface UserRepository {
+
 	User save(User user);
 
 	Optional<User> findById(UUID id);
 
-	Optional<User> findByUserid(String userid);
+	Optional<User> findByUsername(String username);
 
 	Optional<User> findByEmail(String email);
 
-	Optional<User> findByUsername(String username);
-
 	List<User> findAll();
 
-	void delete(UUID id);
+	boolean existsById(UUID id);
+
+	void deleteById(UUID id);
+
+	boolean existsByEmail(String email);
+
+	boolean existsByUsername(String username);
 }

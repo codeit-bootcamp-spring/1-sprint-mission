@@ -56,11 +56,11 @@ public class FileUserRepository implements UserRepository {
 	}
 
 	@Override
-	public Optional<User> findByUserid(String userid) {
+	public Optional<User> findByUsername(String username) {
 		List<User> users = findAll();
-		for (User u : users) {
-			if (u.getUserid().equals(userid)) {
-				return Optional.of(u);
+		for (User user : users) {
+			if (user.getUsername().equals(username)) {
+				return Optional.of(user);
 			}
 		}
 		return Optional.empty();
@@ -69,20 +69,9 @@ public class FileUserRepository implements UserRepository {
 	@Override
 	public Optional<User> findByEmail(String email) {
 		List<User> users = findAll();
-		for (User u : users) {
-			if (u.getEmail().equals(email)) {
-				return Optional.of(u);
-			}
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<User> findByUsername(String username) {
-		List<User> users = findAll();
-		for (User u : users) {
-			if (u.getUsername().equals(username)) {
-				return Optional.of(u);
+		for (User user : users) {
+			if (user.getEmail().equals(email)) {
+				return Optional.of(user);
 			}
 		}
 		return Optional.empty();
@@ -96,7 +85,22 @@ public class FileUserRepository implements UserRepository {
 	}
 
 	@Override
-	public void delete(UUID id) {
+	public boolean existsById(UUID id) {
+		return findById(id).isPresent();
+	}
+
+	@Override
+	public boolean existsByEmail(String email) {
+		return findByEmail(email).isPresent();
+	}
+
+	@Override
+	public boolean existsByUsername(String username) {
+		return findByUsername(username).isPresent();
+	}
+
+	@Override
+	public void deleteById(UUID id) {
 		List<User> users = findAll();
 		users.removeIf(u -> u.getId().equals(id));
 		fileStorage.save(rootDir.resolve(USER_FILE), users);

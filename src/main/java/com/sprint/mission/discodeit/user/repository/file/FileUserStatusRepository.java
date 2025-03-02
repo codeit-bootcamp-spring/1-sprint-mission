@@ -1,10 +1,7 @@
 package com.sprint.mission.discodeit.user.repository.file;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,27 +27,6 @@ public class FileUserStatusRepository implements UserStatusRepository {
 	}
 
 	/**
-	 * 내부적으로 파일에서 전체 UserStatus 목록을 가져옴.
-	 */
-	@Override
-	public List<UserStatus> findAll() {
-		Path filePath = rootDir.resolve(USERSTATUS_FILE);
-
-		// 파일이 디렉토리인지 체크 후 삭제
-		if (Files.exists(filePath) && Files.isDirectory(filePath)) {
-			log.error("🚨 오류: userstatus.json이 디렉토리로 생성됨. 삭제 후 재생성합니다.");
-			try {
-				Files.delete(filePath);
-			} catch (IOException e) {
-				throw new RuntimeException("디렉토리 삭제 실패: " + filePath, e);
-			}
-		}
-
-		List<UserStatus> userStatuses = fileStorage.load(filePath);
-		return userStatuses;
-	}
-
-	/**
 	 * 저장할 때 기존에 동일 id의 상태가 있으면 제거한 후, 새 상태를 추가합니다.
 	 */
 	@Override
@@ -60,6 +36,27 @@ public class FileUserStatusRepository implements UserStatusRepository {
 		statuses.add(userStatus);
 		fileStorage.save(rootDir.resolve(USERSTATUS_FILE), statuses);
 		return userStatus;
+	}
+
+	/**
+	 * 내부적으로 파일에서 전체 UserStatus 목록을 가져옴.
+	 */
+	@Override
+	public List<UserStatus> findAll() {
+		Path filePath = rootDir.resolve(USERSTATUS_FILE);
+
+	/*	// 파일이 디렉토리인지 체크 후 삭제
+		if (Files.exists(filePath)) {
+			log.error("🚨 오류: userstatus.json이 디렉토리로 생성됨. 삭제 후 재생성합니다.");
+			try {
+				Files.delete(filePath);
+			} catch (IOException e) {
+				throw new RuntimeException("디렉토리 삭제 실패: " + filePath, e);
+			}
+		}
+*/
+		List<UserStatus> userStatuses = fileStorage.load(filePath);
+		return userStatuses;
 	}
 
 	@Override
@@ -84,19 +81,16 @@ public class FileUserStatusRepository implements UserStatusRepository {
 		return Optional.empty();
 	}
 
-	/**
-	 * UserStatus의 isOnline() 메서드를 활용하여 현재 온라인 상태인 사용자만 필터링합니다.
-	 */
 	@Override
-	public List<UserStatus> findAllOnlineUsers() {
+	public boolean existsById(UUID id) {
+		return findById(id).isPresent();
+	}
+
+	@Override
+	public void deleteById(UUID id) {
 		List<UserStatus> statuses = findAll();
-		List<UserStatus> onlineStatuses = new ArrayList<>();
-		for (UserStatus s : statuses) {
-			if (s.isOnline()) {
-				onlineStatuses.add(s);
-			}
-		}
-		return onlineStatuses;
+		statuses.removeIf(status -> status.getId().equals(id));
+		fileStorage.save(rootDir.resolve(USERSTATUS_FILE), statuses);
 	}
 
 	@Override

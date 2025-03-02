@@ -16,13 +16,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  thymeleaf:
-    cache: false
-    prefix: classpath:/templates/
-    suffix: .html
-  web:
-    resources:
-      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,/WEB-INF/
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    enabled: true
 
 logging:
   level:

@@ -41,4 +41,9 @@ public class CommonResponse<T> {
 		return new CommonResponse<>("202", message, null, HttpStatus.ACCEPTED);
 	}
 
+	// 204 No Content
+	public static <T> CommonResponse<T> noContent(String message) {
+		return new CommonResponse<>("204", message, null, HttpStatus.NO_CONTENT);
+	}
+
 }

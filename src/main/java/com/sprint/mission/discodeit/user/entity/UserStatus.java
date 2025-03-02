@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.user.entity;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,29 +16,30 @@ import lombok.NoArgsConstructor;
 public class UserStatus extends BaseEntity {
 	private UUID userId;
 	private Instant lastActiveAt;
-	private UserStatusType statusType;
 
 	public UserStatus(UUID userId, Instant lastActiveAt) {
+		super();
 		this.userId = userId;
 		this.lastActiveAt = lastActiveAt;
-		this.statusType = UserStatusType.ONLINE;
 	}
 
 	// 마지막 활동 시간을 업데이트하는 메서드
 	public void updateLastActiveTime(Instant lastActiveAt) {
-		this.lastActiveAt = lastActiveAt;
-		this.statusType = UserStatusType.ONLINE;
-	}
+		boolean anyValueUpdated = false;
+		if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+			this.lastActiveAt = lastActiveAt;
+			anyValueUpdated = true;
+		}
 
-	public void setStatusType(UserStatusType statusType) {
-		this.statusType = statusType;
+		if (anyValueUpdated) {
+			this.updateTime();
+		}
 	}
 
 	// 현재 온라인 여부를 판단하는 메서드
 	public boolean isOnline() {
-		if (statusType == UserStatusType.OFFLINE) {
-			return false;
-		}
-		return lastActiveAt.isAfter(Instant.now().minusSeconds(300));
+		Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+		return lastActiveAt.isAfter(instantFiveMinutesAgo);
 	}
 }

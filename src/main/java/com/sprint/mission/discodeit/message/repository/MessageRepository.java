@@ -15,10 +15,10 @@ public interface MessageRepository {
 
 	List<Message> findAll();
 
-	void delete(UUID id);
+	boolean existsById(UUID id);
+
+	void deleteById(UUID id);
 
 	void deleteAllByChannelId(UUID channelId);
-
-	Optional<Message> findLatestMessageByChannelId(UUID channelId);
 
 }

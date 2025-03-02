@@ -1,22 +1,22 @@
 package com.sprint.mission.discodeit.user.service;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import com.sprint.mission.discodeit.user.dto.request.CreateUserStatusRequest;
-import com.sprint.mission.discodeit.user.dto.request.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.user.dto.request.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.user.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.user.entity.UserStatus;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 	private final UserStatusRepository userStatusRepository;
 	private final UserRepository userRepository;
-
-	public BasicUserStatusService(UserStatusRepository userStatusRepository, UserRepository userRepository) {
-		this.userStatusRepository = userStatusRepository;
-		this.userRepository = userRepository;
-	}
 
 	/**
 	 * 새로운 사용자 상태를 생성합니다.
@@ -24,11 +24,13 @@ public class BasicUserStatusService implements UserStatusService {
 	 * @return 생성된 사용자 상태
 	 */
 	@Override
-	public UserStatus create(CreateUserStatusRequest request) {
-		// 사용자 존재 여부 확인
-		userRepository.findById(request.userId())
-			.orElseThrow(() -> new IllegalArgumentException("User not found"));
+	public UserStatus create(UserStatusCreateRequest request) {
+		UUID userId = request.userId();
 
+		// 사용자 존재 여부 확인
+		if (!userRepository.existsById(userId)) {
+			throw new NoSuchElementException("User with id " + userId + " does not exist");
+		}
 		// 사용자 상태 중복 체크
 		if (userStatusRepository.findByUserId(request.userId()).isPresent()) {
 			throw new IllegalArgumentException("UserStatus already exists");
@@ -65,12 +67,13 @@ public class BasicUserStatusService implements UserStatusService {
 	 * @return 업데이트된 사용자 상태
 	 */
 	@Override
-	public UserStatus update(UpdateUserStatusRequest request) {
+	public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
+		Instant newLastActiveAt = request.newLastActiveAt();
 		// 사용자 상태 조회 및 업데이트
-		UserStatus userStatus = userStatusRepository.findById(request.userId())
+		UserStatus userStatus = userStatusRepository.findById(userStatusId)
 			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
-		userStatus.updateLastActiveTime(request.lastActiveAt());
+		userStatus.updateLastActiveTime(newLastActiveAt);
 		return userStatusRepository.save(userStatus);
 	}
 
@@ -79,28 +82,29 @@ public class BasicUserStatusService implements UserStatusService {
 	 * @param request 상태 업데이트 요청 정보
 	 * @return 업데이트된 사용자 상태
 	 */
-	//createUserRequest dto와 받는 파라미터들은 같은데 그냥 createUserRequest를 사용하는게 맞을까? 원래 dto UpdateUserStatusRequest
 	@Override
-	public UserStatus updateByUserId(UpdateUserStatusRequest request) {
+	public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+		Instant newLastActiveAt = request.newLastActiveAt();
 		// 사용자 상태 조회 및 업데이트
-		UserStatus userStatus = userStatusRepository.findByUserId(request.userId())
+		UserStatus userStatus = userStatusRepository.findByUserId(userId)
 			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
 
 		// 백엔드에서 시간을 now로 update하는것이 아닌 프론트 기준으로 보낸 시간을 update하는 걸로 수정
-		userStatus.updateLastActiveTime(request.lastActiveAt());
+		userStatus.updateLastActiveTime(newLastActiveAt);
 		return userStatusRepository.save(userStatus);
 	}
 
 	/**
 	 * 사용자 상태를 삭제합니다.
-	 * @param id 삭제할 사용자 상태 ID
+	 * @param userStatusId 삭제할 사용자 상태 ID
 	 */
 	@Override
-	public void deleteByUserId(UUID id) {
+	public void delete(UUID userStatusId) {
 		//사용자가 있는지 확인
 		//사용자 상태 존재 여부 확인 후 사용자 상태만 삭제하는 부분도 추가로 구현해야될까...?
-		userStatusRepository.findByUserId(id)
-			.orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
-		userStatusRepository.deleteByUserId(id);
+		if (!userStatusRepository.existsById(userStatusId)) {
+			throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
+		}
+		userStatusRepository.deleteById(userStatusId);
 	}
 }

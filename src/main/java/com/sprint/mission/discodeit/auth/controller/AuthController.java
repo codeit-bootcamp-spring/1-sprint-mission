@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.auth.controller;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,39 +9,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sprint.mission.discodeit.auth.dto.LoginUserRequest;
 import com.sprint.mission.discodeit.auth.service.AuthService;
-import com.sprint.mission.discodeit.global.dto.CommonResponse;
-import com.sprint.mission.discodeit.message.entity.BinaryContent;
-import com.sprint.mission.discodeit.message.service.BinaryContentService;
-import com.sprint.mission.discodeit.user.dto.response.UserResponse;
 import com.sprint.mission.discodeit.user.entity.User;
-import com.sprint.mission.discodeit.user.entity.UserStatus;
-import com.sprint.mission.discodeit.user.mapper.UserMapper;
-import com.sprint.mission.discodeit.user.service.UserStatusService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+@Tag(name = "Auth", description = "인증 관련 API")
 public class AuthController {
 
 	private final AuthService authService;
-	private final UserStatusService userStatusService;
-	private final BinaryContentService binaryContentService;
-	private final UserMapper userMapper;
 
-	public AuthController(AuthService authService, UserStatusService userStatusService,
-		BinaryContentService binaryContentService, UserMapper userMapper) {
-		this.authService = authService;
-		this.userStatusService = userStatusService;
-		this.binaryContentService = binaryContentService;
-		this.userMapper = userMapper;
-	}
-
+	@Operation(summary = "로그인", description = "회원 로그인 API")
 	@PostMapping(value = "/login")
-	public ResponseEntity<CommonResponse<UserResponse>> login(@RequestBody LoginUserRequest request) {
-		User loginUser = authService.login(request);
-		UserStatus userStatus = userStatusService.find(loginUser.getId());
-		Optional<BinaryContent> profile = binaryContentService.findProfileImageByAuthorId(loginUser.getId());
-
-		UserResponse response = userMapper.userToUserResponse(loginUser, userStatus, profile);
-		return new ResponseEntity<>(CommonResponse.success("Login successful", response), HttpStatus.OK);
+	public ResponseEntity<User> login(@RequestBody LoginUserRequest loginRequest) {
+		User user = authService.login(loginRequest);
+		return ResponseEntity.status(HttpStatus.OK).body(user);
 	}
 }

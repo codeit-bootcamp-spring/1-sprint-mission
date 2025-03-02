@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.sprint.mission.discodeit.channel.repository.ChannelRepository;
-import com.sprint.mission.discodeit.channel.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.channel.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.channel.repository.file.FileReadStatusRepository;
-import com.sprint.mission.discodeit.message.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.binaryContent.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.message.repository.MessageRepository;
-import com.sprint.mission.discodeit.message.repository.file.FileBinaryContentRepository;
-import com.sprint.mission.discodeit.message.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.binaryContent.repository.FileBinaryContentRepository;
+import com.sprint.mission.discodeit.message.repository.FileMessageRepository;
+import com.sprint.mission.discodeit.readStatus.repository.FileReadStatusRepository;
+import com.sprint.mission.discodeit.readStatus.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.user.repository.UserRepository;
 import com.sprint.mission.discodeit.user.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.user.repository.file.FileUserRepository;
