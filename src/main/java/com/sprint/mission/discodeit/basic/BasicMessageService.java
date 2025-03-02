@@ -35,13 +35,6 @@ public class BasicMessageService implements MessageService {
         message.setSenderId(messageDTO.getSenderId());
         message.setContent(messageDTO.getContent());
         message.setCreatedAt(LocalDateTime.now());
-//
-//        try {
-//            Channel channel = channelService.find();
-//            message.setChannelName(channel.getName());
-//        } catch (Exception e) {
-//            message.setChannelName("Unknown Channel");
-//        }
 
         try {
             UserDto user = userService.find(messageDTO.getSenderId());

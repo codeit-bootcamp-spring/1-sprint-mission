@@ -22,14 +22,8 @@ public class MessageController {
     @Operation(summary = "메시지 생성", description = "메시지 생성 / 공개/비공개 구현x")
     @PostMapping
     public ResponseEntity<MessageDto> create(@Valid @RequestBody MessageDto messageDTO) {
-        try {
-            MessageDto message = messageService.createMessage(messageDTO);
-
+        MessageDto message = messageService.createMessage(messageDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(message);
-        } catch (Exception e) {
-            log.error("메시지 생성 중 오류 발생: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
     }
 
     @Operation(summary = "메시지 목록 조회", description = "전체 메시지 조회")
