@@ -82,6 +82,8 @@ public class BasicUserService implements UserService {
         validator.checkEmailFormat(userUpdateRequest.newEmail());
         User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
+        validateDuplicateName(userUpdateRequest.newUsername());
+        validateDuplicateEmail(userUpdateRequest.newEmail());
 
         UUID binaryContentId = binaryContentRequest
                 .map(binaryContentService::create)
