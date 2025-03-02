@@ -8,7 +8,6 @@ import java.util.UUID;
 
 public interface MessageService {
 
-  // 추가된 메서드: multipart/form-data를 처리하기 위한 메서드
   Message create(UUID authorId, UUID channelId, String content,
       List<BinaryContentCreateRequest> attachments);
 
@@ -16,7 +15,7 @@ public interface MessageService {
 
   List<Message> getMessagesByChannel(UUID channelId);
 
-  List<Message> getMessagesByAuthor(UUID authorId);  // getMessagesBySender에서 변경
+  List<Message> getMessagesByAuthor(UUID authorId);
 
   Message updateMessageContent(UUID messageId, String newContent);
 

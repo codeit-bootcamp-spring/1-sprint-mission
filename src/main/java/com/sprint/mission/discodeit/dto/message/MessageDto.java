@@ -9,7 +9,7 @@ public record MessageDto(
     UUID id,
     String content,
     UUID channelId,
-    UUID authorId,  // senderId에서 authorId로 변경
+    UUID authorId,
     Instant createdAt,
     Instant updatedAt
 ) {
@@ -19,7 +19,7 @@ public record MessageDto(
         message.getId(),
         message.getContent(),
         message.getChannelId(),
-        message.getAuthorId(),  // getSenderId()에서 getAuthorId()로 변경
+        message.getAuthorId(),
         message.getCreatedAt(),
         message.getUpdatedAt()
     );

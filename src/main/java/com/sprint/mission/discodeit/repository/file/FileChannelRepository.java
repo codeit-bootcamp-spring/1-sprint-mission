@@ -34,9 +34,9 @@ public class FileChannelRepository implements ChannelRepository {
   }
 
   @Override
-  public Channel findByName(String name) { // findByChannelname에서 변경
+  public Channel findByName(String name) {
     for (Channel channel : channels.values()) {
-      if (channel.getName().equals(name)) { // getChannelName()에서 변경
+      if (channel.getName().equals(name)) {
         return channel;
       }
     }

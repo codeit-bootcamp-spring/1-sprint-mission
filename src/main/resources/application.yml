@@ -14,7 +14,6 @@ sprint-mission:
     type: file
     file-directory: .1-sprint-mission
 
-# Swagger/OpenAPI Configuration
 springdoc:
   api-docs:
     enabled: true

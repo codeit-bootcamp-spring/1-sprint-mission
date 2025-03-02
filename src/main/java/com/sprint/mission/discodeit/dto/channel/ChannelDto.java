@@ -10,7 +10,7 @@ import java.util.UUID;
 public record ChannelDto(
     UUID id,
     ChannelType type,
-    String name,  // channelName에서 name으로 변경
+    String name,
     String description,
     List<UUID> participantIds,
     Instant lastMessageAt

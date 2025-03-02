@@ -11,7 +11,7 @@ public class Channel implements Serializable {
 
   private static final long serialVersionUID = 1L;
   private final UUID id;
-  private String name;  // channelName에서 name으로 변경
+  private String name;
   private String description;
   private ChannelType type;
   private final Instant createdAt;
@@ -19,7 +19,7 @@ public class Channel implements Serializable {
 
   public Channel(ChannelType type, String name, String description) {
     this.id = UUID.randomUUID();
-    this.name = name;  // channelName에서 name으로 변경
+    this.name = name;
     this.type = type;
     this.description = description;
     this.createdAt = Instant.now();
@@ -27,7 +27,7 @@ public class Channel implements Serializable {
   }
 
   public void updateChannelName(String newName) {
-    this.name = newName;  // channelName에서 name으로 변경
+    this.name = newName;
     this.updatedAt = Instant.now();
   }
 

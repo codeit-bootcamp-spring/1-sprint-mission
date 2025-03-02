@@ -25,26 +25,20 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Test dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // Swagger OpenAPI (latest compatible version)
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 }
 
-// 일반 자바 애플리케이션 메인 클래스 지정
 application {
     mainClass = 'com.sprint.mission.discodeit.JavaApplication'
 }
 
-// 일반 자바 애플리케이션으로 실행하기 위한 task
 task runAsJava(type: JavaExec) {
     group = "application"
     description = "Run the application as a plain Java application"

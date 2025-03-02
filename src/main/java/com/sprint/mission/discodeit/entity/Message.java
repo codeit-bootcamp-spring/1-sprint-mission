@@ -14,7 +14,7 @@ public class Message implements Serializable {
   private static final long serialVersionUID = 1L;
   private final UUID id;
   private final UUID channelId;
-  private UUID authorId; // 이미 변경됨
+  private UUID authorId;
   private String content;
   private final Instant createdAt;
   private Instant updatedAt;
@@ -32,7 +32,7 @@ public class Message implements Serializable {
 
   public Message(UUID authorId, UUID channelId, String content, List<UUID> attachmentIds) {
     this.id = UUID.randomUUID();
-    this.authorId = authorId;  // senderId에서 authorId로 변경
+    this.authorId = authorId;
     this.channelId = channelId;
     this.content = content;
     this.createdAt = Instant.now();

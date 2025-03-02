@@ -32,7 +32,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelResponse createChannel(ChannelCreateRequest request) {
     Channel channel = new Channel(
         request.type(),
-        request.name(),  // channelName()에서 name()으로 변경
+        request.name(),
         request.description()
     );
     channelRepository.save(channel);
@@ -78,7 +78,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelResponse updateChannel(UUID channelId, ChannelUpdateRequest request) {
     Channel channel = channelRepository.findById(channelId);
     if (channel != null) {
-      // DTO 필드명 변경 반영
+
       if (request.newName() != null && !request.newName().isBlank()) {
         channel.updateChannelName(request.newName());
         consoleView.displaySuccess("채널 이름이 업데이트되었습니다: " + request.newName());

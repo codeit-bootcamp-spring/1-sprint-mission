@@ -10,7 +10,6 @@ import java.util.UUID;
 
 public interface ReadStatusService {
 
-  // messageId 파라미터를 lastReadAt으로 변경
   ReadStatus create(UUID userId, UUID channelId, Instant lastReadAt);
 
   ReadStatus findById(UUID id);

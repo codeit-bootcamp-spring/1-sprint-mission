@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto.channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 public record ChannelCreateRequest(
-    String name,  // channelName에서 name으로 변경
+    String name,
     String description,
     ChannelType type
 ) {
@@ -12,7 +12,7 @@ public record ChannelCreateRequest(
     return new ChannelCreateRequest(name, description, ChannelType.PUBLIC);
   }
 
-  public ChannelCreateRequest(String name, String description) {  // channelName에서 name으로 변경
+  public ChannelCreateRequest(String name, String description) {
     this(name, description, ChannelType.PUBLIC);
   }
 }

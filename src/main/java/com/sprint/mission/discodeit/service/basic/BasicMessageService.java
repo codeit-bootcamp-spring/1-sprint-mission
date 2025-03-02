@@ -45,10 +45,8 @@ public class BasicMessageService implements MessageService {
       return null;
     }
 
-    // 기본 메시지 생성
     Message message = new Message(authorId, channelId, content);
 
-    // 첨부파일 처리 및 연결
     if (attachments != null && !attachments.isEmpty()) {
       List<UUID> attachmentIds = new ArrayList<>();
 
@@ -57,7 +55,6 @@ public class BasicMessageService implements MessageService {
         attachmentIds.add(savedAttachment.getId());
       }
 
-      // 각 첨부 파일 ID를 메시지에 추가
       for (UUID attachmentId : attachmentIds) {
         message.addAttachment(attachmentId);
       }
@@ -79,8 +76,8 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<Message> getMessagesByAuthor(UUID authorId) {  // getMessagesBySender에서 변경
-    return messageRepository.findAllByAuthorId(authorId);  // findAllBySenderId에서 변경
+  public List<Message> getMessagesByAuthor(UUID authorId) {
+    return messageRepository.findAllByAuthorId(authorId);
   }
 
   @Override

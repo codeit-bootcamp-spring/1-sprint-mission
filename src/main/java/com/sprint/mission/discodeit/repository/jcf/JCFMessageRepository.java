@@ -39,10 +39,10 @@ public class JCFMessageRepository implements MessageRepository {
 //    }
 
   @Override
-  public List<Message> findAllByAuthorId(UUID authorId) { // findAllBySenderId에서 변경
+  public List<Message> findAllByAuthorId(UUID authorId) {
     List<Message> result = new ArrayList<>();
     for (Message message : messages.values()) {
-      if (message.getAuthorId().equals(authorId)) { // getSenderId()에서 변경
+      if (message.getAuthorId().equals(authorId)) {
         result.add(message);
       }
     }

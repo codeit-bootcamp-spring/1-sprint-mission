@@ -8,7 +8,7 @@ import java.util.UUID;
 public record MessageResponse(
     UUID id,
     String content,
-    UUID authorId,  // senderId에서 authorId로 변경
+    UUID authorId,
     UUID channelId,
     Instant createdAt
 ) {
@@ -17,7 +17,7 @@ public record MessageResponse(
     return new MessageResponse(
         message.getId(),
         message.getContent(),
-        message.getAuthorId(),  // getSenderId()에서 getAuthorId()로 변경
+        message.getAuthorId(),
         message.getChannelId(),
         message.getCreatedAt()
     );

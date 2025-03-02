@@ -7,14 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-
+@Repository
 public interface MessageRepository {
 
   Message save(Message message);
 
   Message findById(UUID messageId);
 
-  List<Message> findAllByAuthorId(UUID authorId);  // senderId에서 authorId로 변경
+  List<Message> findAllByAuthorId(UUID authorId);
 
   List<Message> findAllByChannelId(UUID channelId);
 

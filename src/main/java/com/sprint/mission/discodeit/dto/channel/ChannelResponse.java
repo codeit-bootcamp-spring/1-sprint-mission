@@ -9,7 +9,7 @@ import java.util.UUID;
 public record ChannelResponse(
     UUID id,
     ChannelType type,
-    String name,  // channelName에서 name으로 변경
+    String name,
     String description,
     Instant createdAt,
     Instant updatedAt
@@ -19,7 +19,7 @@ public record ChannelResponse(
     return new ChannelResponse(
         channel.getId(),
         channel.getType(),
-        channel.getName(),  // getChannelName()에서 getName()으로 변경
+        channel.getName(),
         channel.getDescription(),
         channel.getCreatedAt(),
         channel.getUpdatedAt()
