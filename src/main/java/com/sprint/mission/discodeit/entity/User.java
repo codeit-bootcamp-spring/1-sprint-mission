@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import lombok.Getter;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -27,8 +29,8 @@ public class User implements Serializable {
         this.profileId = profileId;
         this.username = username;
         this.email = email;
-//        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
-        this.password = password;
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
     }
 
     public void updateUpdatedAt() {
@@ -79,15 +81,13 @@ public class User implements Serializable {
         return true;
     }
 
-    public boolean updatePassword(String password) {
-//        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, password)) {
-//            return false;
-//        }
-//        this.password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-        if (password.isBlank() || this.password.equals(password)) {
+    public boolean updatePassword(String newPassword) {
+        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
+        if (newPassword.isBlank() || BCrypt.checkpw(newPassword, decodedPassword)) {
             return false;
         }
-        this.password = password;
+        String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+        this.password = Base64.getEncoder().encodeToString(hashedPassword.getBytes(StandardCharsets.UTF_8));
         return true;
     }
 
@@ -96,8 +96,8 @@ public class User implements Serializable {
     }
 
     public boolean isSamePassword(String password) {
-//        return BCrypt.checkpw(this.password, password);
-        return this.password.equals(password);
+        String decodedPassword = new String(Base64.getDecoder().decode(this.password), StandardCharsets.UTF_8);
+        return BCrypt.checkpw(password, decodedPassword);
     }
 
     public void validateDuplicateName(String name) {
