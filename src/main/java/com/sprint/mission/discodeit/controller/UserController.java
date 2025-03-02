@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +35,7 @@ public class UserController {
   private final UserService userService;
   private final UserStatusService userStatusService;
 
-  @PostMapping
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> create(@RequestPart UserCreateRequest userCreateRequest,
       @RequestPart(required = false) MultipartFile multipartFile) {
     Optional<BinaryContentRequest> binaryContentRequest = Optional.ofNullable(multipartFile)
@@ -59,7 +60,7 @@ public class UserController {
         .body(userService.findAll());
   }
 
-  @PutMapping("/{id}")
+  @PutMapping(value = "/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> update(@PathVariable UUID id,
       @RequestPart UserUpdateRequest userUpdateRequest,
       @RequestPart(required = false) MultipartFile multipartFile) {
