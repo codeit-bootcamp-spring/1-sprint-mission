@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface BinaryContentRepository {
 
-    BinaryContent save(BinaryContent binaryContent);
-    Optional<BinaryContent> findByMessageId(UUID messageId);
-    void deleteByMessageId(UUID messageId);
-    Optional<BinaryContent> findById(UUID id);
-    List<BinaryContent> findAllByIdIn(List<UUID> ids);
-    void deleteById(UUID id);
+  BinaryContent save(BinaryContent binaryContent);
+
+  Optional<BinaryContent> findByMessageId(UUID messageId);
+
+  void deleteByMessageId(UUID messageId);
+
+  Optional<BinaryContent> findById(UUID id);
+
+  List<BinaryContent> findAllByIdIn(List<UUID> ids);
+
+  void deleteById(UUID id);
 }

@@ -1,4 +1,4 @@
-package some_path._1sprintmission.discodeit.Controller;
+package some_path._1sprintmission.discodeit.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,18 +13,18 @@ import some_path._1sprintmission.discodeit.service.AuthService;
 @RequestMapping("/auth")
 public class BasicAuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    public BasicAuthController(AuthService authService) {
-        this.authService = authService;
-    }
+  public BasicAuthController(AuthService authService) {
+    this.authService = authService;
+  }
 
 
-    @PostMapping("/login")
-    public ResponseEntity userLogin(@RequestBody String username, String password){
-        UserDTO loginUser = authService.login(username, password);
+  @PostMapping("/login")
+  public ResponseEntity userLogin(@RequestBody String username, String password) {
+    UserDTO loginUser = authService.login(username, password);
 
-        return new ResponseEntity(loginUser, HttpStatus.OK);
-    }
+    return new ResponseEntity(loginUser, HttpStatus.OK);
+  }
 
 }
