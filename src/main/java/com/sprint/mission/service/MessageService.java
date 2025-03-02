@@ -10,11 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public interface MessageService {
 //    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
 
-    void create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto);
+    Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto);
 
     void update(UUID messageId, MessageDtoForUpdate updateDto);
     List<Message> findAllByChannelId(UUID channelId);

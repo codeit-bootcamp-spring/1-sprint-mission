@@ -15,8 +15,9 @@ public class JCFMessageRepository implements MessageRepository{
     private final Map<UUID, Message> data = new TreeMap<>();
 
     @Override
-    public void save(Message message){
+    public Message save(Message message){
         data.put(message.getId(), message);
+        return message;
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,7 +43,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
     @GetMapping("/login")
-    public ResponseEntity<CommonResponse> login(@Valid LoginRequest request) {
+    public ResponseEntity<CommonResponse> login(@RequestBody @Valid LoginRequest request) {
         User user = authService.login(request);
         return CommonResponse.toResponseEntity
                 (OK, "로그인 성공", user);

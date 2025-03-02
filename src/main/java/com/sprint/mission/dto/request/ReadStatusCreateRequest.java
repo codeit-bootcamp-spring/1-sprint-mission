@@ -15,6 +15,6 @@ public record ReadStatusCreateRequest(
         @NotNull(message = "마지막 읽은 시간은 필수입니다.")
         Instant lastReadAt) {
     public ReadStatus toEntity() {
-        return new ReadStatus(channelId, userId, lastReadAt);
+        return new ReadStatus(userId, channelId, lastReadAt);
     }
 }

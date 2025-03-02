@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.Locked;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.HttpStatus.*;
 
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/readStatuses")
@@ -49,6 +51,7 @@ public class ReadStatusController {
     })
     @PostMapping
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid ReadStatusCreateRequest request) {
+        log.info("컨트롤러 생성 userId : {}", request.userId());
         ReadStatus createdReadStatus = readStatusService.create(request);
         return CommonResponse.toResponseEntity
                 (CREATED, "읽음 상태가 생성되었습니다.", createdReadStatus);
@@ -63,7 +66,7 @@ public class ReadStatusController {
     })
     @PatchMapping("{id}")
     public ResponseEntity<CommonResponse> update(
-            @Parameter(description = "수정할 읽음 상태 ID") @RequestParam("id") UUID readStatusId,
+            @Parameter(description = "수정할 읽음 상태 ID") @PathVariable("id") UUID readStatusId,
             @RequestBody @Valid ReadStatusUpdateRequest request) {
         ReadStatus updatedReadStatus = readStatusService.update(readStatusId, request);
         return CommonResponse.toResponseEntity

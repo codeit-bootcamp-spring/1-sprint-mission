@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
@@ -28,6 +31,7 @@ public class JCFUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusService userStatusService;
     private final BinaryService profileService;
+    private final ExecutorService ves;
 
     @Override
     public User create(UserDtoForCreate requestDTO, Optional<BinaryContentDto> profileDTO) {
@@ -52,11 +56,18 @@ public class JCFUserService implements UserService {
     @Override
     public User update(UUID userId, UserDtoForUpdate requestDTO) {
         isDuplicateNameEmail(requestDTO.newName(), requestDTO.newEmail());
+        User updatingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        return userRepository.findById(userId).map(user -> {
-            User updatedUser = requestDTO.toUpdateEntity(user);
-            return userRepository.save(updatedUser);
-        }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+        updatingUser.setName(requestDTO.newName());
+        updatingUser.setEmail(requestDTO.newEmail());
+        updatingUser.setPassword(requestDTO.newPassword());
+
+        return userRepository.save(updatingUser);
+//        return userRepository.findById(userId).map(user -> {
+//            User updatedUser = requestDTO.toUpdateEntity(user);
+//            return userRepository.save(updatedUser);
+//        }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
     @Override
@@ -78,10 +89,10 @@ public class JCFUserService implements UserService {
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        profileService.deleteById(deletingUser.getProfileImgId());
-        userStatusService.deleteByUserId(userId);
-        userRepository.delete(userId);
-
+        ves.submit(() -> profileService.deleteById(deletingUser.getProfileImgId()));
+        ves.submit(() -> userStatusService.deleteByUserId(userId));
+        ves.submit(() -> userRepository.delete(userId));
+        // delete관련된건 실패해도 오류나지 않으니
     }
 
     //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
@@ -89,11 +100,34 @@ public class JCFUserService implements UserService {
     @Override
     public void isDuplicateNameEmail(String name, String email) {
         List<User> allUser = userRepository.findAll();
-        boolean isDuplicateName = allUser.stream()
-                .anyMatch(user -> name.equals(user.getName()));
-        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
 
-        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
-        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+        Future<?> isDuplicateNameF = ves.submit(() -> {
+            boolean isDuplicateName = allUser.stream()
+                    .anyMatch(user -> name.equals(user.getName()));
+            if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
+        });
+
+        Future<?> isDuplicateEmailF = ves.submit(() -> {
+            boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
+            if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
+        });
+
+        try {
+            isDuplicateNameF.get();
+            isDuplicateEmailF.get();
+        } catch (ExecutionException e) {
+            throw e.getCause() instanceof CustomException
+                    ? (CustomException) e.getCause()
+                    : new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+//        boolean isDuplicateName = allUser.stream()
+//                .anyMatch(user -> name.equals(user.getName()));
+//        if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
+//
+//        boolean isDuplicateEmail = allUser.stream().anyMatch(user -> email.equals(user.getEmail()));
+//        if (isDuplicateEmail) throw new CustomException(ErrorCode.ALREADY_EXIST_EMAIL);
     }
 }

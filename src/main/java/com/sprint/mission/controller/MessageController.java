@@ -66,9 +66,10 @@ public class MessageController {
                 .flatMap(Optional::stream)
                 .toList());
 
-        messageService.create(requestDTO, binaryContentDtoList);
+
+        Message createdMessage = messageService.create(requestDTO, binaryContentDtoList);
         return CommonResponse.toResponseEntity
-                (CREATED, "메시지가 성공적으로 생성되었습니다.", null);
+                (CREATED, "메시지가 성공적으로 생성되었습니다.", FindMessageDto.fromEntity(createdMessage));
     }
 
 
