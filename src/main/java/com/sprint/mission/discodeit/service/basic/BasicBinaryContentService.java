@@ -70,8 +70,8 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public List<BinaryContentResponse> findAllByIdIn(List<UUID> ids) {
-    return ids.stream()
-        .map(this::findByIdOrThrow)
+    return binaryContentRepository.findAllByIdIn(ids).stream()
+        .map(BinaryContentResponse::entityToDto)
         .collect(Collectors.toList());
   }
 
