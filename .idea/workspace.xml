@@ -6,6 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+=======
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+>>>>>>> practice-virtual-Thread
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +104,11 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Spring Boot.DiscodeitApplication.executor&quot;: &quot;Run&quot;,
+<<<<<<< HEAD
     &quot;git-widget-placeholder&quot;: &quot;part1-이요한-sprint5&quot;,
+=======
+    &quot;git-widget-placeholder&quot;: &quot;practice-virtual-Thread&quot;,
+>>>>>>> practice-virtual-Thread
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/gym/build.gradle&quot;,
@@ -221,6 +229,8 @@
       <workItem from="1740470391944" duration="2459000" />
       <workItem from="1740616300713" duration="1180000" />
       <workItem from="1740629192893" duration="5852000" />
+      <workItem from="1740664441104" duration="11115000" />
+      <workItem from="1740707473440" duration="1426000" />
     </task>
     <servers />
   </component>

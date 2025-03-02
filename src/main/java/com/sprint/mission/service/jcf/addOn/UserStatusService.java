@@ -11,75 +11,89 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserStatusService {
 
-  private final UserStatusRepository userStatusRepository;
-  private final JCFUserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
+    private final JCFUserRepository userRepository;
+    private final ExecutorService ves;
 
-  // DTO로 파라미터 그룹화
-  public UserStatus create(UUID userId) {
-    if (userStatusRepository.existsById(userId)) {
-      throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
+    // DTO로 파라미터 그룹화
+    public UserStatus create(UUID userId) {
+        Future<?> isExistUserStatusFuture = ves.submit(() -> {
+            if (userStatusRepository.existsById(userId))
+                throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
+        });
+
+        Future<?> isExistUserFuture = ves.submit(() -> {
+            if (!userRepository.existsById(userId)) {
+                throw new CustomException(ErrorCode.NO_SUCH_USER);
+            }
+        });
+
+        try {
+            isExistUserStatusFuture.get();
+            isExistUserFuture.get();
+        } catch (Exception e) {
+            throw e.getCause() instanceof CustomException
+                    ? (CustomException) e.getCause()
+                    : new RuntimeException(e);
+        }
+        return userStatusRepository.save(new UserStatus(userId));
     }
-    if (userRepository.existsById(userId)) {
-      throw new CustomException(ErrorCode.NO_SUCH_USER);
+
+    public Optional<UserStatus> findById(UUID userStatusId) {
+        return userStatusRepository.findById(userStatusId);
     }
 
-    return userStatusRepository.save(new UserStatus(userId));
-
-  }
-
-  public Optional<UserStatus> findById(UUID userStatusId) {
-    return userStatusRepository.findById(userStatusId);
-  }
-
-  public List<UserStatus> findAll() {
-    return userStatusRepository.findAll();
-  }
+    public List<UserStatus> findAll() {
+        return userStatusRepository.findAll();
+    }
 //
 //    public Map<User, UserStatus> findStatusMapByUserList(List<User> userList){
 //        return userStatusRepository.findByUserId(userList);
 //    }
 
-  // 이건 DTO가 필요없는거 같은데
-  //[ ] userId 로 특정 User의 객체를 업데이트합니다.
-  // ??? 오타인걸로 생각 userstatus 업데이트
-  public UserStatus updateByUserId(UUID userId) {
-    UserStatus updatingUserStatus = userStatusRepository.findByUserId(userId)
-        .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
-    updatingUserStatus.update();
-    return userStatusRepository.save(updatingUserStatus);
-  }
-
-  public void delete(UUID statusId) {
-    if (userStatusRepository.existsById(statusId)) {
-      throw new CustomException(ErrorCode.NO_SUCH_USER_STATUS);
-    } else {
-      userStatusRepository.deleteById(statusId);
+    // 이건 DTO가 필요없는거 같은데
+    //[ ] userId 로 특정 User의 객체를 업데이트합니다.
+    // ??? 오타인걸로 생각 userstatus 업데이트
+    public UserStatus updateByUserId(UUID userId) {
+        UserStatus updatingUserStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_STATUS_MATCHING_USER));
+        updatingUserStatus.update();
+        return userStatusRepository.save(updatingUserStatus);
     }
-  }
 
-  public void deleteByUserId(UUID userId) {
-    userStatusRepository.deleteByUserId(userId);
-  }
+    public void delete(UUID statusId) {
+        if (userStatusRepository.existsById(statusId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_USER_STATUS);
+        } else {
+            userStatusRepository.deleteById(statusId);
+        }
+    }
 
-  public Map<User, Boolean> findStatusMapByUserList() {
-    Map<User, Boolean> userStatusMap = new HashMap<>();
-    userRepository.findAll().forEach((user) -> {
-      Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
-      userStatus.ifPresentOrElse(status ->
-          {
-            userStatusMap.put(user, status.isOnline());
-          },
-          () -> {
-            userStatusMap.put(user, false);
-          });
-    });
-    return userStatusMap;
-  }
+    public void deleteByUserId(UUID userId) {
+        userStatusRepository.deleteByUserId(userId);
+    }
+
+    public Map<User, Boolean> findStatusMapByUserList() {
+        Map<User, Boolean> userStatusMap = new HashMap<>();
+        userRepository.findAll().forEach((user) -> {
+            Optional<UserStatus> userStatus = userStatusRepository.findByUserId(user.getId());
+            userStatus.ifPresentOrElse(status ->
+                    {
+                        userStatusMap.put(user, status.isOnline());
+                    },
+                    () -> {
+                        userStatusMap.put(user, false);
+                    });
+        });
+        return userStatusMap;
+    }
 };
 
