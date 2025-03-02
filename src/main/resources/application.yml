@@ -4,3 +4,12 @@ server:
 spring:
   application:
     name: 1-sprint-mission
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 30MB
+
+sprint-mission:
+  repository:
+    type: file
+    file-directory: .1-sprint-mission

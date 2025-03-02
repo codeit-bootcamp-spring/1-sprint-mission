@@ -18,14 +18,16 @@ public class User implements Serializable {
     private String password;
     private final Instant createdAt;
     private Instant updatedAt;
+    private UUID profileId;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password,  UUID profileId) {
         this.id = UUID.randomUUID();
         this.username = username;
         this.email = email;
         this.password = password;
         this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.profileId = profileId;
+
     }
 
     public void updateUsername(String newUsername) {
@@ -40,6 +42,11 @@ public class User implements Serializable {
 
     public void updatePassword(String newPassword) {
         this.password = newPassword;
+        this.updatedAt = Instant.now();
+    }
+
+    public void updateProfileId(UUID newProfileId) {
+        this.profileId = newProfileId;
         this.updatedAt = Instant.now();
     }
 

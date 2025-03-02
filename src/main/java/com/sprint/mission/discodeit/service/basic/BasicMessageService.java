@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -26,16 +26,16 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message createMessage(UUID userId, UUID channelId, String content) {
-        Channel channel = channelService.getChannelById(channelId);
+        ChannelResponse channel = channelService.getChannelById(channelId);
 
         if (channel == null) {
-            logger.warn("Channel을 찾을 수 없습니다!");
+            logger.error("Channel을 찾을 수 없습니다!");
             return null;
         }
 
         UserResponse user = userService.getUserById(userId);
         if (user == null) {
-            logger.warn("유저를 찾을 수 없습니다");
+            logger.error("유저를 찾을 수 없습니다");
             return null;
         }
 
@@ -47,22 +47,18 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message getMessageById(UUID messageId) {
-        return messageRepository.findByMessageId(messageId);
+        return messageRepository.findById(messageId);
     }
 
-    @Override
-    public List<Message> getAllMessages() {
-        return messageRepository.findAll();
-    }
 
     @Override
     public List<Message> getMessagesByChannel(UUID channelId) {
-        return messageRepository.findByChannelId(channelId);
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override
     public List<Message> getMessagesBySender(UUID senderId) {
-        return messageRepository.findBySenderId(senderId);
+        return messageRepository.findAllBySenderId(senderId);
     }
 
     @Override
@@ -73,7 +69,7 @@ public class BasicMessageService implements MessageService {
             messageRepository.save(message);
             logger.info("메시지 수정 완료");
         } else {
-            logger.warn("메시지 수정 실패: 존재하지 않는 messageId");
+            logger.error("메시지 수정 실패: 존재하지 않는 messageId");
         }
         return message;
     }
@@ -87,7 +83,7 @@ public class BasicMessageService implements MessageService {
             logger.info("메시지 삭제 완료");
             return true;
         } else {
-            logger.warn("메시지 삭제 실패: 존재하지 않는 messageId");
+            logger.error("메시지 삭제 실패: 존재하지 않는 messageId");
         }
         return false;
     }

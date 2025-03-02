@@ -11,7 +11,7 @@ public interface MessageService {
 
     Message getMessageById(UUID messageId);
 
-    List<Message> getAllMessages();
+//    List<Message> getAllMessages();
 
     List<Message> getMessagesByChannel(UUID channelId);
 

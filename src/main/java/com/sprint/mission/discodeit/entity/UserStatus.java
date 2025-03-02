@@ -16,22 +16,28 @@ public class UserStatus implements Serializable {
     private Instant updatedAt;
     private Instant lastActivityAt;
     private final UUID userId;
+    private boolean online;
 
-    public UserStatus(UUID userId) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
         this.userId = userId;
-        this.lastActivityAt = Instant.now();
+        this.lastActivityAt = lastActiveAt != null ? lastActiveAt : Instant.now();
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
+        this.online = true;
     }
 
     public void updateLastActivityAt(Instant lastActivityAt) {
-        this.lastActivityAt = Instant.now();
+        this.lastActivityAt = lastActivityAt != null ? lastActivityAt : Instant.now();
         this.updatedAt = Instant.now();
+        this.online = true;
     }
 
     public boolean isCurrentlyLoggedIn() {
         return lastActivityAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
     }
 
+    public boolean isOnline() {
+        return isCurrentlyLoggedIn(); // 기존 로직 활용
+    }
 }

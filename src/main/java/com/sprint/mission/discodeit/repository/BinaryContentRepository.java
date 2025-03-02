@@ -6,17 +6,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-
+@Repository
 public interface BinaryContentRepository {
     BinaryContent save(BinaryContent binaryContent);
 
     BinaryContent findById(UUID id);
-
-    List<BinaryContent> findAll();
-
-    BinaryContent findByUserId(UUID userId);
-
-    BinaryContent findByMessageId(UUID messageId);
 
     List<BinaryContent> findAllByIdIn(List<UUID> ids);
 

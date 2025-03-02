@@ -5,53 +5,33 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.time.Instant;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
-    private static final Logger logger = LoggerFactory.getLogger(BasicAuthService.class);
-
     private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-
 
     @Override
-    public UserResponse login(LoginRequest request) {
-        if (request.email() == null || request.email().trim().isEmpty()) {
-            logger.warn("로그인 실패: 이메일이 입력되지 않았음");
-            throw new IllegalArgumentException("이메일을 입력하세요.");
-        }
+    public UserResponse login(LoginRequest loginRequest) {
+        String email = loginRequest.email();
+        String password = loginRequest.password();
 
-        if (request.password() == null || request.password().trim().isEmpty()) {
-            logger.warn("로그인 실패: 비밀번호가 입력되지 않았음");
-            throw new IllegalArgumentException("비밀번호를 입력하세요.");
-        }
-
-        User user = userRepository.findByUsername(request.email());
+        User user = userRepository.findByEmail(email);
         if (user == null) {
-            logger.warn("로그인 실패: 존재하지 않는 이메일");
-            throw new IllegalArgumentException("가입되지 않은 이메일입니다: " + request.email());
+            throw new NoSuchElementException("User with email " + email + " not found");
         }
 
-        if (!user.getPassword().equals(request.password())) {
-            logger.warn("로그인 실패: 잘못된 비밀번호 입력");
-            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
+        if (!user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Wrong password");
         }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
-        if (userStatus == null) {
-            userStatus = new UserStatus(user.getId());
-        }
-        userStatus.updateLastActivityAt(java.time.Instant.now());
-        userStatusRepository.save(userStatus);
-
-        return UserResponse.from(user, userStatus);
+        UserStatus status = new UserStatus(user.getId(), Instant.now());
+        return UserResponse.from(user, status);
     }
 }

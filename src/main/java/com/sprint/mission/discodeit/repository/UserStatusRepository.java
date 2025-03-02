@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-
+@Repository
 public interface UserStatusRepository {
 
     UserStatus save(UserStatus userStatus);
@@ -23,4 +23,3 @@ public interface UserStatusRepository {
 
     void deleteByUserId(UUID userId);
 }
-

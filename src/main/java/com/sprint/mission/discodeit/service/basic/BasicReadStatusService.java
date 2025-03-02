@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
@@ -23,29 +24,29 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateRequest request) {
-        User user = userRepository.findByUserId(request.userId());
+    public ReadStatus create(UUID userId, UUID channelId, UUID messageId) {
+        User user = userRepository.findById(userId);
         if (user == null) {
-            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + request.userId());
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다: " + userId);
         }
 
-        Channel channel = channelRepository.findByChannelId(request.channelId());
+        Channel channel = channelRepository.findById(channelId);
         if (channel == null) {
-            throw new IllegalArgumentException("채널을 찾을 수 없습니다: " + request.channelId());
+            throw new IllegalArgumentException("채널을 찾을 수 없습니다: " + channelId);
         }
 
-        List<ReadStatus> userReadStatuses = readStatusRepository.findAllByUserId(request.userId());
+        List<ReadStatus> userReadStatuses = readStatusRepository.findAllByUserId(userId);
         for (int i = 0; i < userReadStatuses.size(); i++) {
             ReadStatus status = userReadStatuses.get(i);
-            if (status.getChannelId().equals(request.channelId())) {
+            if (status.getChannelId().equals(channelId)) {
                 throw new IllegalStateException(
-                        "이미 존재하는 시용지: " + request.userId() +
-                                "이미 존재하는 채널: " + request.channelId()
+                        "이미 존재하는 사용자: " + userId +
+                                "이미 존재하는 채널: " + channelId
                 );
             }
         }
 
-        ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId());
+        ReadStatus readStatus = new ReadStatus(userId, channelId);
         return readStatusRepository.save(readStatus);
     }
 

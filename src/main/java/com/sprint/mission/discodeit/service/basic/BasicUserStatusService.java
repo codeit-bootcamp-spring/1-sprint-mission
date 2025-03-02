@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.userStatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -11,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus create(UserStatusCreateRequest request) {
-        User user = userRepository.findByUserId(request.userId());
+        User user = userRepository.findById(request.userId());
         if (user == null) {
             throw new IllegalArgumentException("User not found with id: " + request.userId());
         }
@@ -32,13 +32,22 @@ public class BasicUserStatusService implements UserStatusService {
             throw new IllegalStateException("UserStatus already exists for user: " + request.userId());
         }
 
-        UserStatus userStatus = new UserStatus(request.userId());
+        Instant lastActivityAt = request.lastActivityAt() != null ?
+                request.lastActivityAt() :
+                Instant.now();
+
+        UserStatus userStatus = new UserStatus(request.userId(), lastActivityAt);
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus findById(UUID id) {
         return userStatusRepository.findById(id);
+    }
+
+    @Override
+    public UserStatus findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId);
     }
 
     @Override

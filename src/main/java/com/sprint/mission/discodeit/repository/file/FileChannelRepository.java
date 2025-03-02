@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,40 +11,31 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
     private static final String FILE_PATH = "files/channels.ser";
-
-    private List<Channel> channels;
+    private Map<UUID, Channel> channels;
 
     public FileChannelRepository() {
         this.channels = loadFromFile();
     }
 
     @Override
-    public void save(Channel channel) {
-        channels.add(channel);
+    public Channel save(Channel channel) {
+        channels.put(channel.getId(), channel);
         saveToFile();
+        return channel;
     }
-
 
     @Override
     public Channel findByChannelname(String channelname) {
-        for (Channel channel : channels) {
+        for (Channel channel : channels.values()) {
             if (channel.getChannelName().equals(channelname)) {
-                return channel;
-            }
-        }
-        throw new IllegalArgumentException("Channel not found with name: " + channelname);
-    }
-
-    @Override
-    public Channel findByChannelId(UUID id){
-        for (Channel channel : channels) {
-            if (channel.getId().equals(id)){
                 return channel;
             }
         }
@@ -51,21 +43,25 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
+    public Channel findById(UUID id) {
+        return channels.get(id);
+    }
+
+    @Override
     public List<Channel> findAll() {
-        return new ArrayList<>(channels);
+        return new ArrayList<>(channels.values());
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return channels.containsKey(id);
     }
 
     @Override
     public void deleteById(UUID id) {
-        for (int i = 0; i < channels.size(); i++) {
-            if (channels.get(i).getId().equals(id)) {
-                channels.remove(i);
-                break;
-            }
-        }
+        channels.remove(id);
         saveToFile();
     }
-
 
     private void saveToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
@@ -75,11 +71,11 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    private List<Channel> loadFromFile() {
+    private Map<UUID, Channel> loadFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            return (List<Channel>) ois.readObject();
+            return (Map<UUID, Channel>) ois.readObject();
         } catch (Exception e) {
-            return new ArrayList<>();
+            return new HashMap<>();
         }
     }
 }
