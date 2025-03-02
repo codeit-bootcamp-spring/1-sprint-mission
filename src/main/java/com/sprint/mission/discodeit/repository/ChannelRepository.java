@@ -13,7 +13,7 @@ public interface ChannelRepository {
 
   Channel findByName(String name);
 
-  Channel findById(UUID id); // findByChannelId에서 변경
+  Channel findById(UUID id);
 
   List<Channel> findAll();
 
