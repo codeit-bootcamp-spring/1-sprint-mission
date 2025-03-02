@@ -26,6 +26,8 @@ public class MessageController {
 
   private final MessageService messageService;
 
+
+  // TODO찐 : attachment 첨부 안했는데 왜 아이디 들어가있지 포스트맨?
   @PostMapping(
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE
   )

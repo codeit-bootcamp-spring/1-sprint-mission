@@ -1,8 +1,22 @@
-spring:
-  application:
-    name: discodeit
-
 discodeit:
   repository:
     type: file  # jcf | file
     file-directory: .discodeit
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+#spring:
+#  application:
+#    name: discodeit
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/postgres
+#    username: postgres
+#    password: 458600
+#  jpa:
+#    hibernate:
+#      ddl-auto: update  # 테이블 자동 업데이트 (기존 데이터 유지)
+#    show-sql: true  # SQL 로그 출력

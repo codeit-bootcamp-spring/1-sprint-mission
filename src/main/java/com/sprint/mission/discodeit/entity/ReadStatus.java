@@ -1,44 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class ReadStatus implements Serializable {
-    private static final long serialVersionUID = 1L;
 
-    private final UUID id = UUID.randomUUID();
-    private final Instant createdAt = Instant.now();
-    // TODO : 롬복 생성자 대상이 아닌데 = null 초기화 안해줘도 되나?
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
 
-    private final UUID userId;
-    private final UUID channelId;
-    @NonNull
-    private Instant lastReadAt;
+  private final UUID id = UUID.randomUUID();
+  private final Instant createdAt = Instant.now();
+  private Instant updatedAt;
 
-    public void update(Instant newLastReadAt) {
-        boolean anyValueUpdated = false;
-        if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-            this.lastReadAt = newLastReadAt;
-            anyValueUpdated = true;
-        }
-        if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
-        }
+  private UUID userId;
+  private UUID channelId;
+  private Instant lastReadAt;
+
+  public void update(Instant newLastReadAt) {
+    boolean anyValueUpdated = false;
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
+      anyValueUpdated = true;
     }
-
-    @Override
-    // TODO : toString()
-    public String toString() {
-        return "ReadStatus{" +
-                "updatedAt=" + updatedAt +
-                "}";
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
+
+  @Override
+  // TODO : toString()
+  public String toString() {
+    return "ReadStatus{" +
+        "updatedAt=" + updatedAt +
+        "}";
+  }
 }

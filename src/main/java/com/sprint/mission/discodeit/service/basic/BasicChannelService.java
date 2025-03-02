@@ -31,17 +31,28 @@ public class BasicChannelService implements ChannelService {
     // 1. 파라미터 예외처리, 변수에 넣기 2. 객체 만들기 3. repository.save
     String channelName = request.name();
     String channelTopic = request.topic();
-    Channel channel = new Channel(channelName, channelTopic, ChannelType.PUBLIC);
+    Channel channel = Channel.builder()
+        .name(channelName)
+        .topic(channelTopic)
+        .type(ChannelType.PUBLIC)
+        .build();
     return channelRepository.save(channel);
   }
 
   @Override
   public Channel createPrivateChannel(PrivateChannelCreateRequest request) {
-    Channel channel = new Channel(null, null, ChannelType.PRIVATE);
+    Channel channel = Channel.builder()
+        .name(null)
+        .topic(null)
+        .type(ChannelType.PRIVATE)
+        .build();
     Channel createdChannel = channelRepository.save(channel);
     for (UUID userId : request.participantIds()) {
-      ReadStatus readStatus = new ReadStatus(userId, createdChannel.getId(),
-          Instant.MIN); // Instant.Min : 초기값
+      ReadStatus readStatus = ReadStatus.builder()
+          .userId(userId)
+          .channelId(createdChannel.getId())
+          .lastReadAt(Instant.MIN)
+          .build();
       readStatusRepository.save(readStatus);
     }
     return createdChannel;

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -89,6 +90,16 @@ public class UserController {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(allUsers);
+  }
+
+  @PostMapping("/user-status")
+  public ResponseEntity<Void> createUserStatusByUserId(
+      @RequestBody UserStatusCreateRequest userStatusCreateRequest
+  ) {
+    userStatusService.create(userStatusCreateRequest);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .build();
   }
 
   @PutMapping("/{userId}/user-status")
