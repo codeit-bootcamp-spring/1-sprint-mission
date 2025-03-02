@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelDto(
-        UUID id,
-        ChannelType type,
-        String channelName,
-        String description,
-        List<UUID> participantIds,
-        Instant lastMessageAt
+    UUID id,
+    ChannelType type,
+    String name,  // channelName에서 name으로 변경
+    String description,
+    List<UUID> participantIds,
+    Instant lastMessageAt
 ) {
 
 }

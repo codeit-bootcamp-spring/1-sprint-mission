@@ -9,20 +9,18 @@ import java.util.UUID;
 
 
 public interface MessageRepository {
-    Message save(Message message);
 
-    Message findById(UUID messageId);
+  Message save(Message message);
 
-//    Message findBySenderId(UUID senderId);
+  Message findById(UUID messageId);
 
-    List<Message> findAllBySenderId(UUID senderId);
+  List<Message> findAllByAuthorId(UUID authorId);  // senderId에서 authorId로 변경
 
+  List<Message> findAllByChannelId(UUID channelId);
 
-    List<Message> findAllByChannelId(UUID channelId);
+  boolean existsById(UUID id);
 
-    boolean existsById(UUID id);
+  void deleteById(UUID id);
 
-    void deleteById(UUID id);
-
-    void deleteAllByChannelId(UUID channelId);
+  void deleteAllByChannelId(UUID channelId);
 }

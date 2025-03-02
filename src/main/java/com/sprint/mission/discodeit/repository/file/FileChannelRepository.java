@@ -18,64 +18,65 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository {
-    private static final String FILE_PATH = "files/channels.ser";
-    private Map<UUID, Channel> channels;
 
-    public FileChannelRepository() {
-        this.channels = loadFromFile();
-    }
+  private static final String FILE_PATH = "files/channels.ser";
+  private Map<UUID, Channel> channels;
 
-    @Override
-    public Channel save(Channel channel) {
-        channels.put(channel.getId(), channel);
-        saveToFile();
+  public FileChannelRepository() {
+    this.channels = loadFromFile();
+  }
+
+  @Override
+  public Channel save(Channel channel) {
+    channels.put(channel.getId(), channel);
+    saveToFile();
+    return channel;
+  }
+
+  @Override
+  public Channel findByName(String name) { // findByChannelname에서 변경
+    for (Channel channel : channels.values()) {
+      if (channel.getName().equals(name)) { // getChannelName()에서 변경
         return channel;
+      }
     }
+    return null;
+  }
 
-    @Override
-    public Channel findByChannelname(String channelname) {
-        for (Channel channel : channels.values()) {
-            if (channel.getChannelName().equals(channelname)) {
-                return channel;
-            }
-        }
-        return null;
-    }
+  @Override
+  public Channel findById(UUID id) {
+    return channels.get(id);
+  }
 
-    @Override
-    public Channel findById(UUID id) {
-        return channels.get(id);
-    }
+  @Override
+  public List<Channel> findAll() {
+    return new ArrayList<>(channels.values());
+  }
 
-    @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(channels.values());
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return channels.containsKey(id);
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return channels.containsKey(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    channels.remove(id);
+    saveToFile();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        channels.remove(id);
-        saveToFile();
+  private void saveToFile() {
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+      oos.writeObject(channels);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
 
-    private void saveToFile() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
-            oos.writeObject(channels);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+  private Map<UUID, Channel> loadFromFile() {
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
+      return (Map<UUID, Channel>) ois.readObject();
+    } catch (Exception e) {
+      return new HashMap<>();
     }
-
-    private Map<UUID, Channel> loadFromFile() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            return (Map<UUID, Channel>) ois.readObject();
-        } catch (Exception e) {
-            return new HashMap<>();
-        }
-    }
+  }
 }

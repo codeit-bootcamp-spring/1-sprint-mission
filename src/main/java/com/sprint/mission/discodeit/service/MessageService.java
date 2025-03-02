@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -7,17 +8,17 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message createMessage(UUID userId, UUID channelId, String content);
+  // 추가된 메서드: multipart/form-data를 처리하기 위한 메서드
+  Message create(UUID authorId, UUID channelId, String content,
+      List<BinaryContentCreateRequest> attachments);
 
-    Message getMessageById(UUID messageId);
+  Message getMessageById(UUID messageId);
 
-//    List<Message> getAllMessages();
+  List<Message> getMessagesByChannel(UUID channelId);
 
-    List<Message> getMessagesByChannel(UUID channelId);
+  List<Message> getMessagesByAuthor(UUID authorId);  // getMessagesBySender에서 변경
 
-    List<Message> getMessagesBySender(UUID senderId);
+  Message updateMessageContent(UUID messageId, String newContent);
 
-    Message updateMessageContent(UUID messageId, String newContent);
-
-    boolean deleteMessage(UUID messageId);
+  boolean deleteMessage(UUID messageId);
 }

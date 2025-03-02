@@ -13,3 +13,14 @@ sprint-mission:
   repository:
     type: file
     file-directory: .1-sprint-mission
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha

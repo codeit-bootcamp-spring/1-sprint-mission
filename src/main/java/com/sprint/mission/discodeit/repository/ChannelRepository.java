@@ -6,18 +6,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-
 public interface ChannelRepository {
-    Channel save(Channel channel);
 
-    Channel findByChannelname (String channelname);
+  Channel save(Channel channel);
 
-    Channel findByChannelId(UUID id);
+  Channel findByName(String name);  // 이미 변경됨
 
-    List<Channel> findAll();
+  Channel findById(UUID id); // findByChannelId에서 변경
 
-    boolean existsById(UUID id);
+  List<Channel> findAll();
 
-    void deleteById(UUID id);
-    
+  boolean existsById(UUID id);
+
+  void deleteById(UUID id);
 }

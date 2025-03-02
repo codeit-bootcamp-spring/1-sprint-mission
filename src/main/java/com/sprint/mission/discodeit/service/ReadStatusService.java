@@ -4,17 +4,20 @@ import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public interface ReadStatusService {
-    ReadStatus create(UUID userId, UUID channelId, UUID messageId);
 
-    ReadStatus findById(UUID id);
+  // messageId 파라미터를 lastReadAt으로 변경
+  ReadStatus create(UUID userId, UUID channelId, Instant lastReadAt);
 
-    List<ReadStatus> findAllByUserId(UUID userId);
+  ReadStatus findById(UUID id);
 
-    ReadStatus update(UUID id, ReadStatusUpdateRequest request);
+  List<ReadStatus> findAllByUserId(UUID userId);
 
-    void deleteById(UUID id);
+  ReadStatus update(UUID id, ReadStatusUpdateRequest request);
+
+  void deleteById(UUID id);
 }

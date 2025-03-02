@@ -14,41 +14,42 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "sprint-mission.repository.type", havingValue = "jcf")
 public class JCFChannelRepository implements ChannelRepository {
-    private final Map<UUID, Channel> channels = new HashMap<>();
 
-    @Override
-    public Channel save(Channel channel) {
-        channels.put(channel.getId(), channel);
+  private final Map<UUID, Channel> channels = new HashMap<>();
+
+  @Override
+  public Channel save(Channel channel) {
+    channels.put(channel.getId(), channel);
+    return channel;
+  }
+
+  @Override
+  public Channel findByName(String name) { // findByChannelname에서 변경
+    for (Channel channel : channels.values()) {
+      if (channel.getName().equals(name)) { // getChannelName()에서 변경
         return channel;
+      }
     }
+    return null;
+  }
 
-    @Override
-    public Channel findByChannelname(String channelname) {
-        for (Channel channel : channels.values()) {
-            if (channel.getChannelName().equals(channelname)) {
-                return channel;
-            }
-        }
-        return null;
-    }
+  @Override
+  public Channel findById(UUID id) {
+    return channels.get(id);
+  }
 
-    @Override
-    public Channel findById(UUID id) {
-        return channels.get(id);
-    }
+  @Override
+  public List<Channel> findAll() {
+    return new ArrayList<>(channels.values());
+  }
 
-    @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(channels.values());
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return channels.containsKey(id);
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return channels.containsKey(id);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        channels.remove(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    channels.remove(id);
+  }
 }
