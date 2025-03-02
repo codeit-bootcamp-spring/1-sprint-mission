@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.MessageApi;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -21,11 +22,12 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/message")
-public class MessageController {
+@RequestMapping("/api/messages")
+public class MessageController implements MessageApi {
 
   private final MessageService messageService;
 
+  @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<Message> create(
       @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
@@ -52,6 +54,7 @@ public class MessageController {
         .body(createdMessage);
   }
 
+  @Override
   @PatchMapping(path = "{messageId}")
   public ResponseEntity<Message> update(@PathVariable("messageId") UUID messageId,
       @RequestBody MessageUpdateRequest request) {
@@ -61,6 +64,7 @@ public class MessageController {
         .body(updatedMessage);
   }
 
+  @Override
   @DeleteMapping(path = "{messageId}")
   public ResponseEntity<Void> delete(@PathVariable("messageId") UUID messageId) {
     messageService.delete(messageId);
@@ -69,6 +73,7 @@ public class MessageController {
         .build();
   }
 
+  @Override
   @GetMapping
   public ResponseEntity<List<Message>> findAllByChannelId(
       @RequestParam("channelId") UUID channelId) {

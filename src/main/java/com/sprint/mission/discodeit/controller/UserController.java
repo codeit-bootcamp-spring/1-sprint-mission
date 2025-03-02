@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.openapi.UserApi;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -24,12 +25,13 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/users")
+public class UserController implements UserApi {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
 
+  @Override
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> create(
       @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
@@ -43,10 +45,8 @@ public class UserController {
         .body(createdUser);
   }
 
-  @PatchMapping(
-      path = "{userId}",
-      consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}
-  )
+  @Override
+  @PatchMapping(path = "{userId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public ResponseEntity<User> update(
       @PathVariable("userId") UUID userId,
       @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
@@ -60,6 +60,7 @@ public class UserController {
         .body(updatedUser);
   }
 
+  @Override
   @DeleteMapping(path = "{userId}")
   public ResponseEntity<Void> delete(@PathVariable("userId") UUID userId) {
     userService.delete(userId);
@@ -68,6 +69,7 @@ public class UserController {
         .build();
   }
 
+  @Override
   @GetMapping
   public ResponseEntity<List<UserDto>> findAll() {
     List<UserDto> users = userService.findAll();
@@ -76,7 +78,8 @@ public class UserController {
         .body(users);
   }
 
-  @PatchMapping(path = "{userId}/userStatus")
+  @Override
+  @PatchMapping(path = "{userId}/user-status")
   public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
       @RequestBody UserStatusUpdateRequest request) {
     UserStatus updatedUserStatus = userStatusService.updateByUserId(userId, request);
