@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OpenApiConfiguration {
+public class qOpenApiConfiguration {
 
     private static final String API_VERSION = "v1";
     private static final String API_NAME = "Discodeit API 문서";
