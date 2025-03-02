@@ -2,7 +2,7 @@
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
   USERS: `${API_BASE_URL}/users`,
-  BINARY_CONTENT: `${API_BASE_URL}/binary-contents`
+  BINARY_CONTENT: `${API_BASE_URL}/binaryContents`
 };
 
 // Initialize the application
@@ -23,14 +23,14 @@ async function fetchAndRenderUsers() {
 }
 
 // Fetch user profile image
-async function fetchUserProfile(binaryContentId) {
+async function fetchUserProfile(profileId) {
   try {
-    const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}/${binaryContentId}`);
+    const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}/${profileId}`);
     if (!response.ok) throw new Error('Failed to fetch profile');
     const profile = await response.json();
 
     // Convert base64 encoded bytes to data URL
-    return `data:${profile.contentType};base64,${profile.data}`;
+    return `data:${profile.contentType};base64,${profile.bytes}`;
   } catch (error) {
     console.error('Error fetching profile:', error);
     return '/default-avatar.png'; // Fallback to default avatar
@@ -47,18 +47,18 @@ async function renderUserList(users) {
     userElement.className = 'user-item';
 
     // Get profile image URL
-    const profileUrl = user.binaryContentId ?
-        await fetchUserProfile(user.binaryContentId) :
+    const profileUrl = user.profileId ?
+        await fetchUserProfile(user.profileId) :
         '/default-avatar.png';
 
     userElement.innerHTML = `
-            <img src="${profileUrl}" alt="${user.name}" class="user-avatar">
+            <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
             <div class="user-info">
-                <div class="user-name">${user.name}</div>
+                <div class="user-name">${user.username}</div>
                 <div class="user-email">${user.email}</div>
             </div>
-            <div class="status-badge ${user.onlineStatus.toString() === 'ONLINE' ? 'online' : 'offline'}">
-                ${user.onlineStatus.toString() === 'ONLINE' ? '온라인' : '오프라인'}
+            <div class="status-badge ${user.online ? 'online' : 'offline'}">
+                ${user.online ? '온라인' : '오프라인'}
             </div>
         `;
 

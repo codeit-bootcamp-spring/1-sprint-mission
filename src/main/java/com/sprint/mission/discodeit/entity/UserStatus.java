@@ -41,11 +41,10 @@ public class UserStatus implements Serializable {
         }
     }
 
-    public OnlineStatus calculateOnlineStatus() {
-        if (Duration.between(lastActiveAt, Instant.now()).toMinutes() >= 5) {
-            return OnlineStatus.OFFLINE;
-        }
-        return OnlineStatus.ONLINE;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 
     public boolean isSameUserId(UUID userId) {

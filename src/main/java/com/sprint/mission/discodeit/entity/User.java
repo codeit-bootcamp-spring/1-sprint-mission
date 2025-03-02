@@ -15,17 +15,17 @@ public class User implements Serializable {
     private Instant createdAt;
     private Instant updatedAt;
 
-    private UUID binaryContentId;
-    private String name;
+    private UUID profileId;
+    private String username;
     private String email;
     private String password;
 
-    public User(UUID binaryContentId, String name, String email, String password) {
+    public User(UUID profileId, String username, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
-        this.binaryContentId = binaryContentId;
-        this.name = name;
+        this.profileId = profileId;
+        this.username = username;
         this.email = email;
 //        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
         this.password = password;
@@ -55,19 +55,19 @@ public class User implements Serializable {
         }
     }
 
-    public boolean updateBinaryContentId(UUID binaryContentId) {
-        if (binaryContentId == null || this.binaryContentId.equals(binaryContentId)) {
+    public boolean updateBinaryContentId(UUID profileId) {
+        if (profileId == null || this.profileId.equals(profileId)) {
             return false;
         }
-        this.binaryContentId = binaryContentId;
+        this.profileId = profileId;
         return true;
     }
 
-    public boolean updateName(String name) {
-        if (name.isBlank() || this.name.equals(name)) {
+    public boolean updateName(String username) {
+        if (username.isBlank() || this.username.equals(username)) {
             return false;
         }
-        this.name = name;
+        this.username = username;
         return true;
     }
 
@@ -92,7 +92,7 @@ public class User implements Serializable {
     }
 
     public boolean isSameName(String name) {
-        return this.name.equals(name);
+        return this.username.equals(name);
     }
 
     public boolean isSamePassword(String password) {
@@ -101,7 +101,7 @@ public class User implements Serializable {
     }
 
     public void validateDuplicateName(String name) {
-        if (this.name.equals(name)) {
+        if (this.username.equals(name)) {
             throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름입니다.");
         }
     }
@@ -115,8 +115,8 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return String.format(
-                name + "님의 정보입니다." + System.lineSeparator()
-                        + "Name: " + name + System.lineSeparator()
+                username + "님의 정보입니다." + System.lineSeparator()
+                        + "Name: " + username + System.lineSeparator()
                         + "Email: " + email + System.lineSeparator()
         );
     }

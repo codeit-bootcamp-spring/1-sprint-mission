@@ -13,7 +13,7 @@ public interface UserStatusService {
     UserStatus find(UUID userStatusId);
     UserStatus findByUserId(UUID userId);
     List<UserStatus> findAll();
-    OnlineStatus getOnlineStatus(UUID userId);
+    Boolean getOnlineStatus(UUID userId);
     UserStatus update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest);
     UserStatus updateByUserUd(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest);
     void delete(UUID userStatusId);

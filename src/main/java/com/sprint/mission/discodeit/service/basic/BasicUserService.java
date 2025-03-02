@@ -34,20 +34,19 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest userRequest, Optional<BinaryContentRequest> binaryContentRequest) {
-        validator.validate(userRequest.name(), userRequest.email());
-        validateDuplicateName(userRequest.name());
+        validator.validate(userRequest.username(), userRequest.email());
+        validateDuplicateName(userRequest.username());
         validateDuplicateEmail(userRequest.email());
 
         UUID binaryContentId = binaryContentRequest
                 .map(binaryContentService::create)
                 .map(BinaryContent::getId)
                 .orElse(null);
-        User user = userRepository.save(new User(binaryContentId, userRequest.name(), userRequest.email(), userRequest.password()));
+        User user = userRepository.save(new User(binaryContentId, userRequest.username(), userRequest.email(), userRequest.password()));
         userStatusService.create(UserStatusCreateRequest.from(user.getId()));
 
         return user;
     }
-
 
     @Override
     public UserResponse find(UUID userId) {
@@ -69,20 +68,18 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse getUserInfo(User user) {
         UUID binaryContentId = null;
-        String fileUrl = null;
-        if (user.getBinaryContentId() != null) {
-            BinaryContent binaryContent = binaryContentService.find(user.getBinaryContentId());
+        if (user.getProfileId() != null) {
+            BinaryContent binaryContent = binaryContentService.find(user.getProfileId());
             binaryContentId = binaryContent.getId();
-            fileUrl = binaryContent.generateImageUrl();
         }
-        OnlineStatus onlineStatus = userStatusService.getOnlineStatus(user.getId());
+        Boolean online = userStatusService.getOnlineStatus(user.getId());
 
-        return UserResponse.from(user, binaryContentId, fileUrl, onlineStatus);
+        return UserResponse.from(user, binaryContentId, online);
     }
 
     @Override
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentRequest> binaryContentRequest) {
-        validator.validate(userUpdateRequest.name(), userUpdateRequest.email());
+        validator.checkEmailFormat(userUpdateRequest.newEmail());
         User user = Optional.ofNullable(userRepository.find(userId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다."));
 
@@ -90,7 +87,7 @@ public class BasicUserService implements UserService {
                 .map(binaryContentService::create)
                 .map(BinaryContent::getId)
                 .orElse(null);
-        user.update(binaryContentId, userUpdateRequest.name(), userUpdateRequest.email(), userUpdateRequest.password());
+        user.update(binaryContentId, userUpdateRequest.newUsername(), userUpdateRequest.newEmail(), userUpdateRequest.newPassword());
 
         return userRepository.save(user);
     }
@@ -100,7 +97,7 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 유저입니다.");
         }
-        binaryContentService.delete(userRepository.find(userId).getBinaryContentId());
+        binaryContentService.delete(userRepository.find(userId).getProfileId());
         userStatusService.deleteByUserId(userId);
         userRepository.delete(userId);
     }

@@ -10,38 +10,40 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/read-statuses")
+@RequestMapping("/api/readStatuses")
 public class ReadStatusController {
   private final ReadStatusService readStatusService;
 
   @PostMapping
-  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+  public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(readStatusService.create(readStatusCreateRequest));
+        .body(readStatusService.create(request));
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<ReadStatus> update(@PathVariable UUID id,
-      @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
+  @PatchMapping("/{readStatusId}")
+  public ResponseEntity<ReadStatus> update(@PathVariable UUID readStatusId,
+      @RequestBody ReadStatusUpdateRequest request) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(readStatusService.update(id, readStatusUpdateRequest));
+        .body(readStatusService.update(readStatusId, request));
   }
 
-  @GetMapping("/{id}")
-  public ResponseEntity<List<ReadStatus>> getAllByUserId(@PathVariable UUID id) {
+  @GetMapping()
+  public ResponseEntity<List<ReadStatus>> findAllByUserId(@RequestParam("userId") UUID userId) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(readStatusService.findAllByUserId(id));
+        .body(readStatusService.findAllByUserId(userId));
   }
 }

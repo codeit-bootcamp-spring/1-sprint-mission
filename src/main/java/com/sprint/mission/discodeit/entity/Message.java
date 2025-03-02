@@ -19,9 +19,9 @@ public class Message implements Serializable {
     private final UUID channelId;
 
     private String content;
-    private List<UUID> binaryContentData;
+    private List<UUID> attachmentsIds;
 
-    public Message(String content, UUID authorId, UUID channelId, List<UUID> binaryContentData) {
+    public Message(String content, UUID authorId, UUID channelId, List<UUID> attachmentsIds) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
@@ -29,7 +29,7 @@ public class Message implements Serializable {
         this.channelId = channelId;
 
         this.content = content;
-        this.binaryContentData = binaryContentData;
+        this.attachmentsIds = attachmentsIds;
     }
 
     public void updateUpdatedAt() {

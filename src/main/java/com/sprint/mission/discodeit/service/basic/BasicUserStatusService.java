@@ -57,22 +57,22 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public OnlineStatus getOnlineStatus(UUID userId) {
+    public Boolean getOnlineStatus(UUID userId) {
         UserStatus userStatus = findByUserId(userId);
-        return userStatus.calculateOnlineStatus();
+        return userStatus.isOnline();
     }
 
     @Override
     public UserStatus update(UUID userStatusId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = find(userStatusId);
-        userStatus.update(userStatusUpdateRequest.lastActiveAt());
+        userStatus.update(userStatusUpdateRequest.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus updateByUserUd(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = findByUserId(userId);
-        userStatus.update(userStatusUpdateRequest.lastActiveAt());
+        userStatus.update(userStatusUpdateRequest.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 

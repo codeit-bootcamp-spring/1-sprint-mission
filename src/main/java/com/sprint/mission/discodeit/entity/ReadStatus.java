@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -18,13 +19,13 @@ public class ReadStatus implements Serializable {
     private UUID userId;
     private Instant lastReadAt;
 
-    public ReadStatus(UUID channelId, UUID userId) {
+    public ReadStatus(UUID channelId, UUID userId, Instant lastReadAt) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
 
         this.channelId = channelId;
         this.userId = userId;
-        this.lastReadAt = Instant.now();
+        this.lastReadAt = lastReadAt;
     }
 
     public void updateUpdatedAt() {

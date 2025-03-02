@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/binary-contents")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
-  @GetMapping("/{id}")
-  public ResponseEntity<BinaryContent> find(@PathVariable UUID id) {
+  @GetMapping("/{binaryContentId}")
+  public ResponseEntity<BinaryContent> find(@PathVariable UUID binaryContentId) {
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(binaryContentService.find(id));
+        .body(binaryContentService.find(binaryContentId));
   }
 
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> getAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
+  public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> binaryContentIds) {
     List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
     return ResponseEntity
         .status(HttpStatus.OK)

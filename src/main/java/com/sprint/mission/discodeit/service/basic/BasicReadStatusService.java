@@ -39,7 +39,9 @@ public class BasicReadStatusService implements ReadStatusService {
                     }
                 });
 
-        return readStatusRepository.save(new ReadStatus(readStatusCreateRequest.channelId(), readStatusCreateRequest.userId()));
+        return readStatusRepository.save(new ReadStatus(readStatusCreateRequest.channelId(),
+            readStatusCreateRequest.userId(),
+            readStatusCreateRequest.lastReadAt()));
     }
 
     @Override
@@ -56,7 +58,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest readStatusUpdateRequest) {
         ReadStatus readStatus = find(readStatusId);
-        readStatus.update(readStatusUpdateRequest.lastReadAt());
+        readStatus.update(readStatusUpdateRequest.newLastReadAt());
         return readStatusRepository.save(readStatus);
     }
 

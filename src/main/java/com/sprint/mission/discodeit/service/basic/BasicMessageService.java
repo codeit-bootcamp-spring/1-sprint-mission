@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,13 +10,12 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validator.MessageValidator;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -40,14 +38,14 @@ public class BasicMessageService implements MessageService {
         }
         validator.validate(messageCreateRequest.content());
 
-        List<UUID> binaryContentIds = binaryContentRequests.stream()
+        List<UUID> attachmentsIds = binaryContentRequests.stream()
                 .map(binaryContentRequest -> binaryContentService.create(binaryContentRequest).getId())
                 .toList();
 
         return messageRepository.save(new Message(messageCreateRequest.content(),
                 messageCreateRequest.authorId(),
                 messageCreateRequest.channelId(),
-                binaryContentIds));
+            attachmentsIds));
     }
 
     @Override
@@ -81,7 +79,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.find(messageId);
-        message.updateContent(messageUpdateRequest.content());
+        message.updateContent(messageUpdateRequest.newContent());
 
         return messageRepository.save(message);
     }
@@ -91,7 +89,7 @@ public class BasicMessageService implements MessageService {
         Message message = Optional.ofNullable(messageRepository.find(messageId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 메시지입니다."));
 
-        message.getBinaryContentData().forEach(binaryContentService::delete);
+        message.getAttachmentsIds().forEach(binaryContentService::delete);
         messageRepository.delete(messageId);
     }
 }

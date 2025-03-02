@@ -16,11 +16,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,8 +35,8 @@ public class MessageController {
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Message> create(@RequestPart("messageCreateRequest")MessageCreateRequest messageCreateRequest,
-        @RequestPart(required = false) List<MultipartFile> multipartFiles) {
-        List<BinaryContentRequest> binaryContentRequests = Optional.ofNullable(multipartFiles)
+        @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
+        List<BinaryContentRequest> binaryContentRequests = Optional.ofNullable(attachments)
             .map(files -> files.stream()
                 .map(file -> {
                     try {
@@ -55,11 +57,26 @@ public class MessageController {
             .body(messageService.create(messageCreateRequest, binaryContentRequests));
     }
 
-    @GetMapping("/channels/{id}")
-    public ResponseEntity<List<Message>> getAllMessagesByChannelId(@PathVariable UUID id) {
+    @PatchMapping("/{messageId}")
+    public ResponseEntity<Message> update(@PathVariable UUID messageId, @RequestBody MessageUpdateRequest request) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(messageService.findAllByChannelId(id));
+            .body(messageService.update(messageId, request));
+    }
+
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID messageId) {
+        messageService.delete(messageId);
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .build();
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<Message>> findAllByChannelId(@RequestParam("channelId") UUID channelId) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(messageService.findAllByChannelId(channelId));
     }
 
     @GetMapping("/users/{id}")
@@ -67,20 +84,5 @@ public class MessageController {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(messageService.findAllByAuthorId(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Message> update(@PathVariable UUID id, @RequestBody MessageUpdateRequest messageUpdateRequest) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(messageService.update(id, messageUpdateRequest));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        messageService.delete(id);
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .build();
     }
 }

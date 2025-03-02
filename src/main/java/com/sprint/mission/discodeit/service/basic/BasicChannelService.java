@@ -43,7 +43,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.save(new Channel(ChannelType.PRIVATE, null, null));
 
         privateChannelCreateRequest.participantsIds().stream()
-                .map(userId -> ReadStatusCreateRequest.from(channel.getId(), userId))
+                .map(userId -> ReadStatusCreateRequest.from(channel.getId(), userId, Instant.MIN))
                 .forEach(readStatusService::create);
 
         return channel;
@@ -91,18 +91,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponse getChannelInfo(Channel channel, Instant lastMessageTime, List<UUID> participantIds) {
+    public ChannelResponse getChannelInfo(Channel channel, Instant lastMessageAt, List<UUID> participantIds) {
         return ChannelResponse.from(channel.getId(), channel.getType(),
-                channel.getName(), channel.getDescription(), lastMessageTime, participantIds);
+                channel.getName(), channel.getDescription(), lastMessageAt, participantIds);
     }
 
     @Override
     public Channel update(UUID channelId, PublicChannelUpdateRequest channelUpdateRequest) {
-        validator.validate(channelUpdateRequest.name(), channelUpdateRequest.description());
+        validator.validate(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
         Channel channel = Optional.ofNullable(channelRepository.find(channelId))
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 채널입니다."));
 
-        channel.update(channelUpdateRequest.name(), channelUpdateRequest.description());
+        channel.update(channelUpdateRequest.newName(), channelUpdateRequest.newDescription());
         return channelRepository.save(channel);
     }
 
