@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -109,12 +110,14 @@ public class JCFChannelService implements ChannelService {
             readStatusRepository.deleteAllByChannelId(channelId);
         }
 
+        Future<?> submit1 = ves.submit(() -> messageService.deleteAllByChannelId(channelId));
+        Future<?> submit2 = ves.submit(() -> channelRepository.delete(channelId));
         try {
-            Future<?> submit1 = ves.submit(() -> messageService.deleteAllByChannelId(channelId));
-            Future<?> submit2 = ves.submit(() -> channelRepository.delete(channelId));
             submit1.get();
             submit2.get();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw e.getCause() instanceof CustomException
                     ? (CustomException) e.getCause()
                     : new RuntimeException(e);

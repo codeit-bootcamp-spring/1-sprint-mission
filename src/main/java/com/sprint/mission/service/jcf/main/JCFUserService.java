@@ -56,11 +56,18 @@ public class JCFUserService implements UserService {
     @Override
     public User update(UUID userId, UserDtoForUpdate requestDTO) {
         isDuplicateNameEmail(requestDTO.newName(), requestDTO.newEmail());
+        User updatingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        return userRepository.findById(userId).map(user -> {
-            User updatedUser = requestDTO.toUpdateEntity(user);
-            return userRepository.save(updatedUser);
-        }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+        updatingUser.setName(requestDTO.newName());
+        updatingUser.setEmail(requestDTO.newEmail());
+        updatingUser.setPassword(requestDTO.newPassword());
+
+        return userRepository.save(updatingUser);
+//        return userRepository.findById(userId).map(user -> {
+//            User updatedUser = requestDTO.toUpdateEntity(user);
+//            return userRepository.save(updatedUser);
+//        }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
     }
 
     @Override

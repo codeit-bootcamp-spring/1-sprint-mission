@@ -41,6 +41,7 @@ public class JCFMessageService implements MessageService {
     public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
         UUID userId = responseDto.userId();
         UUID channelId = responseDto.channelId();
+
         Future<?> isExistUserF = ves.submit(() -> {
             if (!userRepository.existsById(userId)) throw new CustomException(ErrorCode.NO_SUCH_USER);});
         Future<?> isExistChannelF = ves.submit(() -> {

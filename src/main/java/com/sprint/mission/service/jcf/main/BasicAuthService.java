@@ -24,12 +24,8 @@ public class BasicAuthService implements AuthService {
     String username = loginRequest.username();
     String password = loginRequest.password();
 
-
     User loginUser = userRepository.findByUsername(username)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER_MATCHING_NAME));
-
-    log.info("loginRequest password: {}", loginRequest.password());
-    log.info("User password: {}", loginUser.getPassword());
 
     if (!loginUser.getPassword().equals(password)) {
       throw new CustomException(ErrorCode.INCORRECT_PASSWORD);

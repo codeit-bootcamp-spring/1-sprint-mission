@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -28,7 +29,7 @@ public class ReadStatusService {
     private final JCFChannelRepository channelRepository;
     private final ExecutorService ves;
 
-    public ReadStatus create(ReadStatusCreateRequest request){
+    public ReadStatus create(ReadStatusCreateRequest request) {
 
         Future<?> isExistUserFuture = ves.submit(() -> {
             if (!userRepository.existsById(request.userId()))
@@ -40,13 +41,16 @@ public class ReadStatusService {
         });
         Future<?> isExistReadStatusFuture = ves.submit(() -> {
             if (readStatusRepository.existsById(request.userId()))
-                throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);});
+                throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
+        });
 
         try {
             isExistUserFuture.get();
             isExistChannelFuture.get();
             isExistReadStatusFuture.get();
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw e.getCause() instanceof CustomException
                     ? (CustomException) e.getCause()
                     : new RuntimeException(e);
@@ -81,7 +85,7 @@ public class ReadStatusService {
     }
 
     public void delete(UUID readStatusId) {
-        if (readStatusRepository.existsById(readStatusId)){
+        if (readStatusRepository.existsById(readStatusId)) {
             readStatusRepository.deleteById(readStatusId);
         } else {
             throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS);
