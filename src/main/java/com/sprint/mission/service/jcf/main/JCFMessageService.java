@@ -90,9 +90,9 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-//        if (channelRepository.existsById(channelId)){
-//            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-//        }
+        if (channelRepository.existsById(channelId)){
+            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+        }
         return messageRepository.findAllByChannel(channelId);
     }
 
