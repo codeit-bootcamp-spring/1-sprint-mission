@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.FileDTO;
+import com.sprint.mission.discodeit.dto.FileResponse;
 import com.sprint.mission.discodeit.entity.FileEntity;
 import com.sprint.mission.discodeit.repository.FileRepository;
 import com.sprint.mission.discodeit.service.FileService;
@@ -52,10 +52,10 @@ public class BasicFileService implements FileService {
 
     // ✅ 여러 개 파일 정보 조회
     @Override
-    public List<FileDTO> getFiles(List<UUID> fileIds) {
+    public List<FileResponse> getFiles(List<UUID> fileIds) {
         List<FileEntity> files = fileRepository.findByIdIn(fileIds);
         return files.stream()
-                .map(file -> new FileDTO(file.getId(), file.getFilename(), file.getFileType()))
+                .map(file -> new FileResponse(file.getId(), file.getFilename(), file.getFileType()))
                 .collect(Collectors.toList());
     }
 

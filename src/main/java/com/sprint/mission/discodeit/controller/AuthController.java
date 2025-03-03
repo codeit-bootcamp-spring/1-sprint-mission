@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.AuthRequestDTO;
-import com.sprint.mission.discodeit.dto.AuthResponseDTO;
+import com.sprint.mission.discodeit.dto.AuthRequest;
+import com.sprint.mission.discodeit.dto.AuthResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +18,10 @@ public class AuthController {
 
     // ✅ 로그인 API (단순 로그인 방식)
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO authRequestDTO) {
-        Optional<AuthResponseDTO> authResponse = authService.login(authRequestDTO);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
+        Optional<AuthResponse> authResponse = authService.login(authRequest);
 
         return authResponse.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(401).body(new AuthResponseDTO(null, "로그인 실패")));
+                .orElseGet(() -> ResponseEntity.status(401).body(new AuthResponse(null, "로그인 실패")));
     }
 }

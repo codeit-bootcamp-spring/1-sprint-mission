@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.dto.MessageCreateDTO;
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,26 +13,26 @@ import java.util.*;
 @RequiredArgsConstructor
 public class JCFMessageService implements MessageService {
 
-    private final Map<UUID, MessageDTO> messageStorage = new HashMap<>();
+    private final Map<UUID, MessageResponse> messageStorage = new HashMap<>();
 
     @Override
-    public MessageDTO create(MessageCreateDTO messageCreateDTO) {
-        MessageDTO messageDTO = new MessageDTO(
+    public MessageResponse create(MessageCreateRequest messageCreateRequest) {
+        MessageResponse messageResponse = new MessageResponse(
                 UUID.randomUUID(),
-                messageCreateDTO.getContent(),
-                messageCreateDTO.getSenderId(),
-                messageCreateDTO.getChannelId(),
+                messageCreateRequest.getContent(),
+                messageCreateRequest.getAuthorId(),
+                messageCreateRequest.getChannelId(),
                 null
         );
-        messageStorage.put(messageDTO.getId(), messageDTO);
-        return messageDTO; // ✅ 반환값 추가
+        messageStorage.put(messageResponse.getId(), messageResponse);
+        return messageResponse; // ✅ 반환값 추가
     }
 
     @Override
-    public void update(UUID messageId, MessageUpdateDTO messageUpdateDTO) {
-        MessageDTO messageDTO = messageStorage.get(messageId);
-        if (messageDTO != null) {
-            messageDTO.setContent(messageUpdateDTO.getContent());
+    public void update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+        MessageResponse messageResponse = messageStorage.get(messageId);
+        if (messageResponse!= null) {
+            messageResponse.setContent(messageUpdateRequest.getContent());
         }
     }
 
@@ -42,9 +42,9 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> readAllByChannel(UUID channelId) {
-        List<MessageDTO> result = new ArrayList<>();
-        for (MessageDTO message : messageStorage.values()) {
+    public List<MessageResponse> readAllByChannel(UUID channelId) {
+        List<MessageResponse> result = new ArrayList<>();
+        for (MessageResponse message : messageStorage.values()) {
             if (message.getChannelId().equals(channelId)) {
                 result.add(message);
             }
@@ -53,7 +53,7 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> readAll() {
+    public List<MessageResponse> readAll() {
         return new ArrayList<>(messageStorage.values());
     }
 }

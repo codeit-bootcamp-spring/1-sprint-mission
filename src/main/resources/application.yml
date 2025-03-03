@@ -40,7 +40,7 @@ spring:
       mode: always  # ✅ 애플리케이션 시작 시 SQL 스크립트 실행
 
 server:
-  port: 8090  # ✅ 서버 포트 설정
+  port: 8080  # ✅ 서버 포트 설정
 
 logging:
   level:
@@ -54,3 +54,13 @@ servlet:
     enabled: true
     max-file-size: 50MB
     max-request-size: 50MB
+
+# ✅ OpenAPI (Swagger) 설정 추가
+springdoc:
+  api-docs:
+    enabled: true  # API 문서 활성화
+    path: /v3/api-docs  # OpenAPI 문서 경로
+  swagger-ui:
+    enabled: true  # Swagger UI 활성화
+    path: /swagger-ui.html  # Swagger UI 접근 경로 설정
+  packages-to-scan: com.sprint.mission  # API 문서를 생성할 패키지 지정

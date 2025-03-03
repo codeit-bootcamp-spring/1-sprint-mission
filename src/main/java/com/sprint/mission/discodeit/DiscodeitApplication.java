@@ -33,31 +33,40 @@ public class DiscodeitApplication {
     ) {
         System.out.println("✅ CommandLineRunner 실행됨!");
 
-        UserCreateDTO userDTO = new UserCreateDTO("Amy", "amy@example.com", null, "password123");
+        // ✅ 사용자 생성
+        UserCreateRequest userDTO = new UserCreateRequest("Amy", "amy@example.com", null, "password123");
         userService.create(userDTO);
 
-        List<UserReadDTO> users = userService.readAll();
+        List<UserReadResponse> users = userService.readAll();
         if (users.isEmpty()) {
             throw new RuntimeException("🚨 사용자 생성 실패: User 목록이 비어 있음");
         }
 
-        UserReadDTO createdUser = users.stream()
+        UserReadResponse createdUser = users.stream()
                 .filter(u -> u.getEmail().equals(userDTO.getEmail()))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("🚨 사용자 생성 실패: Email 일치 사용자 없음"));
 
         UUID userId = createdUser.getId();
 
-        ChannelCreateDTO channelCreateDTO = new ChannelCreateDTO(
-                "Second 채널", "업데이트된 채널 설명", userId, false, List.of()
+        // ✅ 채널 생성 (isPrivate 여부에 따라 다르게 처리)
+        ChannelCreateRequest channelCreateRequest = new ChannelCreateRequest(
+                "Second 채널", "업데이트된 채널 설명", userId, false, List.of(UUID.randomUUID())
         );
-        channelService.createChannel(channelCreateDTO);
 
-        MessageCreateDTO messageCreateDTO = new MessageCreateDTO(userId, UUID.randomUUID(), "안녕하세요, 첫 번째 메시지입니다!");
-        messageService.create(messageCreateDTO);
+        ChannelResponse createdChannel;
+        if (channelCreateRequest.isPrivate()) {
+            createdChannel = channelService.createPrivateChannel(channelCreateRequest);
+        } else {
+            createdChannel = channelService.createPublicChannel(channelCreateRequest);
+        }
+
+        // ✅ 메시지 생성
+        MessageCreateRequest messageCreateRequest = new MessageCreateRequest(userId, createdChannel.getId(), "안녕하세요, 첫 번째 메시지입니다!");
+        messageService.create(messageCreateRequest);
 
         System.out.println("📌 현재 등록된 메시지 목록:");
-        List<MessageDTO> messages = messageService.readAllByChannel(UUID.randomUUID());
+        List<MessageResponse> messages = messageService.readAllByChannel(createdChannel.getId());
         messages.forEach(m -> System.out.printf("   - [%s] %s (by %s)%n",
                 m.getChannelId(), m.getContent(), createdUser.getUsername()));
     }

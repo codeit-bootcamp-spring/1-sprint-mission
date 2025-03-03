@@ -23,20 +23,21 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'  // Spring Data JPA
     implementation 'org.springframework.boot:spring-boot-starter-validation'  // Validation starter
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
+
+    // ✅ Jackson (JSON 직렬화/역직렬화)
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // Java 8+ DateTime 지원
+
     // ✅ Lombok (컴파일 및 애너테이션 프로세서 설정)
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    dependencies {
-        // Swagger/OpenAPI 의존성 추가 (springdoc-openapi)
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
-        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    }
+    // ✅ Swagger/OpenAPI 최신 버전 (Spring Boot 3.x 지원)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
+    // ✅ Jakarta Servlet API
     implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
-    // H2 Database (Optional, used for testing)
+
+    // ✅ H2 Database (테스트용)
     runtimeOnly 'com.h2database:h2'
 
     // ✅ Spring Boot Test (JUnit 5 지원)
@@ -44,9 +45,9 @@ dependencies {
 }
 
 java {
-    // ✅ JDK 17 또는 JDK 21을 지원하도록 설정
-    sourceCompatibility = JavaVersion.VERSION_21 // JDK 17 버전 사용
-    targetCompatibility = JavaVersion.VERSION_21 // JDK 17 버전 사용
+    // ✅ JDK 21 사용 (Spring Boot 3.x 이상 지원)
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 tasks.withType(JavaExec).configureEach {

@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.UserReadDTO;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserReadResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.RequiredArgsConstructor;
@@ -18,32 +18,53 @@ public class FileUserService {
     private final Map<UUID, User> userData = new HashMap<>();
     private final Map<UUID, UserStatus> userStatusData = new HashMap<>();
 
-    public void create(UserCreateDTO userDTO) {
+    public void create(UserCreateRequest userDTO) {
         if (existsByUsername(userDTO.getUsername()) || existsByEmail(userDTO.getEmail())) {
             throw new IllegalArgumentException("이미 존재하는 username 또는 email입니다.");
         }
 
         UUID userId = UUID.randomUUID();
-        User user = new User(userId, userDTO.getUsername(), userDTO.getEmail(), userDTO.getProfileImageId(), userDTO.getPassword());
+        UUID profileImageId = null;
+        if (userDTO.getProfileImageId() != null && !userDTO.getProfileImageId().isEmpty()) {
+            profileImageId = UUID.fromString(userDTO.getProfileImageId());
+        }
+
+        // User 생성자: User(UUID, String, String, UUID, String)
+        User user = new User(userId, userDTO.getUsername(), userDTO.getEmail(), profileImageId, userDTO.getPassword());
         userData.put(userId, user);
 
         userStatusData.put(userId, new UserStatus(userId, Instant.now()));
     }
 
-    public Optional<UserReadDTO> read(UUID id) {
+    public Optional<UserReadResponse> read(UUID id) {
         return Optional.ofNullable(userData.get(id)).map(user -> {
             UserStatus status = userStatusData.get(id);
             boolean isOnline = status != null && status.isOnline();
-            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+            // 순서: id, username, email, profileImageId, lastActive, online
+            return new UserReadResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getProfileImageId(),
+                    status != null ? status.getLastActiveAt() : null,
+                    isOnline
+            );
         });
     }
 
-    public List<UserReadDTO> readAll() {
+    public List<UserReadResponse> readAll() {
         return userData.values().stream()
                 .map(user -> {
                     UserStatus status = userStatusData.get(user.getId());
                     boolean isOnline = status != null && status.isOnline();
-                    return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getProfileImageId(), isOnline, status != null ? status.getLastActiveAt() : null);
+                    return new UserReadResponse(
+                            user.getId(),
+                            user.getUsername(),
+                            user.getEmail(),
+                            user.getProfileImageId(),
+                            status != null ? status.getLastActiveAt() : null,
+                            isOnline
+                    );
                 })
                 .collect(Collectors.toList());
     }

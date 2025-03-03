@@ -13,8 +13,9 @@ public class JCFChannelRepository implements ChannelRepository {
     private final Map<UUID, Channel> channels = new ConcurrentHashMap<>();
 
     @Override
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         channels.put(channel.getId(), channel);
+        return channel;
     }
 
     @Override
@@ -35,7 +36,19 @@ public class JCFChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllPrivateChannelsByUserId(UUID userId) {
         return channels.values().stream()
-                .filter(channel -> !channel.isPublic() && channel.getMembers().contains(userId))
+                .filter(channel -> channel.isPrivate() && channel.getMembers().contains(userId))
                 .toList();
+    }
+
+    @Override
+    public List<Channel> findAllChannelsForUser(UUID userId) {
+        return channels.values().stream()
+                .filter(channel -> channel.isPublic() || channel.getMembers().contains(userId))
+                .toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return channels.containsKey(id);
     }
 }

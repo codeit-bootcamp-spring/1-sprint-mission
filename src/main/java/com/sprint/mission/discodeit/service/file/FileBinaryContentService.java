@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -20,15 +20,15 @@ public class FileBinaryContentService implements BinaryContentService {
     private final Map<UUID, BinaryContent> fileStorage = new HashMap<>();
 
     @Override
-    public Optional<BinaryContentDTO> read(UUID id) {
+    public Optional<BinaryContentResponse> read(UUID id) {
         return Optional.ofNullable(fileStorage.get(id))
-                .map(file -> new BinaryContentDTO(file.getId(), file.getFileName(), file.getData(), file.getOwnerId()));
+                .map(file -> new BinaryContentResponse(file.getId(), file.getFileName(), file.getData(), file.getOwnerId()));
     }
 
     @Override
-    public List<BinaryContentDTO> readAll() {
+    public List<BinaryContentResponse> readAll() {
         return fileStorage.values().stream()
-                .map(file -> new BinaryContentDTO(file.getId(), file.getFileName(), file.getData(), file.getOwnerId()))
+                .map(file -> new BinaryContentResponse(file.getId(), file.getFileName(), file.getData(), file.getOwnerId()))
                 .collect(Collectors.toList());
     }
 

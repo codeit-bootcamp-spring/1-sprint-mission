@@ -5,16 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadStatusReadDTO {
-    private UUID id;
-    private UUID userId;
-    private UUID messageId;
-    private Instant readAt;
+public class UserUpdateRequest {
+    private String newUsername;
+    private String newEmail;
+    private String newPassword;
 }

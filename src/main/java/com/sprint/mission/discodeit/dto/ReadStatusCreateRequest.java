@@ -12,10 +12,13 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageReceiptDTO {
-    private UUID id;
+public class ReadStatusCreateRequest {
+    private UUID userId;
     private UUID messageId;
-    private UUID receiverId;
-    private UUID channelId;
-    private Instant receivedAt;
+    private Instant readAt;
+
+    // ✅ Lombok이 정상적으로 작동하지 않을 경우 직접 getter 추가
+    public Instant getReadAt() {
+        return readAt;
+    }
 }

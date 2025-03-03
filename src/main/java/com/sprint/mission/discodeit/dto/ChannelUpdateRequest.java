@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStatusCreateDTO {
-    private UUID userId;
+public class ChannelUpdateRequest {
+    private String name;
+    private String description;
 }

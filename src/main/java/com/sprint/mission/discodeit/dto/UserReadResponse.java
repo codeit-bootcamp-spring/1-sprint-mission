@@ -1,23 +1,26 @@
 package com.sprint.mission.discodeit.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.UUID;
+
 import java.time.Instant;
-
 import java.util.UUID;
 
-// ✅ UserReadDTO (사용자 조회 시 필요한 데이터)
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class UserReadDTO {
+public class UserReadResponse {
     private UUID id;
     private String username;
     private String email;
     private UUID profileImageId;
-    private boolean isOnline; // 온라인 상태 포함
-    private Instant lastActive; // 마지막 접속 시간 포함
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Instant lastActive;
+
+    private boolean online;
 }

@@ -11,14 +11,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageCreateDTO {
-    private UUID senderId;
+public class MessageCreateRequest {
+    // 변경: senderId → authorId
+    private UUID authorId;
     private UUID channelId;
     private String content;
-    private UUID attachmentId;
+    private UUID attachmentId; // 첨부파일은 선택 사항
 
-    public MessageCreateDTO(UUID senderId, UUID channelId, String content) {
-        this.senderId = senderId;
+    public MessageCreateRequest(UUID authorId, UUID channelId, String content) {
+        this.authorId = authorId;
         this.channelId = channelId;
         this.content = content;
         this.attachmentId = null;

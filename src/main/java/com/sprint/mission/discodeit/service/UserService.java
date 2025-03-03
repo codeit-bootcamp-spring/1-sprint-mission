@@ -1,24 +1,19 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.UserReadDTO;
-import com.sprint.mission.discodeit.dto.UserUpdateDTO;
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserReadResponse;
+import com.sprint.mission.discodeit.dto.UserUpdateRequest;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    // 생성 후 새 사용자 정보를 반환하도록 수정
-    UserReadDTO create(UserCreateDTO userDTO);
-    Optional<UserReadDTO> read(UUID id);
-    List<UserReadDTO> readAll();
-    void update(UUID id, UserUpdateDTO userDTO);
+    UserReadResponse create(UserCreateRequest userDTO);
+    Optional<UserReadResponse> read(UUID id);
+    List<UserReadResponse> readAll();
+    void update(UUID id, UserUpdateRequest userDTO);
     void delete(UUID id);
-
-    // 사용자의 마지막 활동 시간 업데이트
     boolean updateLastSeen(UUID userId);
-
-    // 프로필 이미지 업데이트
     void updateProfileImage(UUID userId, UUID imageId);
 }

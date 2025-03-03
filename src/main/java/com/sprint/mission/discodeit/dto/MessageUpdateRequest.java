@@ -5,17 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageDTO {
-    private UUID id;
+public class MessageUpdateRequest {
     private String content;
-    private UUID senderId;
-    private UUID channelId;
-    private Instant createdAt;
 }

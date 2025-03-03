@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserStatusReadDTO {
+public class UserStatusCreateRequest {
     private UUID userId;
-    private boolean isOnline;
-    private Instant lastActiveAt;
 }

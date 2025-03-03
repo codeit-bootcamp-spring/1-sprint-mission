@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
-import com.sprint.mission.discodeit.dto.MessageCreateDTO;
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -22,30 +22,26 @@ public class FileMessageService implements MessageService {
     private final @Qualifier("fileMessageRepository") MessageRepository messageRepository;
 
     @Override
-    public MessageDTO create(MessageCreateDTO messageCreateDTO) {
+    public MessageResponse create(MessageCreateRequest messageCreateRequest) {
+        // 수정: getSenderId() → getAuthorId()
         Message message = new Message(
                 UUID.randomUUID(),
-                messageCreateDTO.getContent(),
-                messageCreateDTO.getSenderId(),
-                messageCreateDTO.getChannelId(),
+                messageCreateRequest.getContent(),
+                messageCreateRequest.getAuthorId(),
+                messageCreateRequest.getChannelId(),
                 Instant.now()
         );
         messageRepository.save(message);
-        return new MessageDTO(
-                message.getId(),
-                message.getContent(),
-                message.getSenderId(),
-                message.getChannelId(),
-                message.getCreatedAt()
-        );
+        // 수정: 엔티티 기반 생성자를 사용하여 응답 객체 생성
+        return new MessageResponse(message);
     }
 
     @Override
-    public void update(UUID messageId, MessageUpdateDTO messageUpdateDTO) {
+    public void update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
         if (optionalMessage.isPresent()) {
             Message message = optionalMessage.get();
-            message.setContent(messageUpdateDTO.getContent());
+            message.setContent(messageUpdateRequest.getContent());
             messageRepository.save(message);
         } else {
             throw new IllegalArgumentException("해당 ID의 메시지를 찾을 수 없습니다.");
@@ -58,28 +54,16 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> readAllByChannel(UUID channelId) {
+    public List<MessageResponse> readAllByChannel(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId).stream()
-                .map(message -> new MessageDTO(
-                        message.getId(),
-                        message.getContent(),
-                        message.getSenderId(),
-                        message.getChannelId(),
-                        message.getCreatedAt()
-                ))
+                .map(message -> new MessageResponse(message)) // 엔티티 기반 생성자 사용
                 .toList();
     }
 
     @Override
-    public List<MessageDTO> readAll() {
+    public List<MessageResponse> readAll() {
         return messageRepository.findAll().stream()
-                .map(message -> new MessageDTO(
-                        message.getId(),
-                        message.getContent(),
-                        message.getSenderId(),
-                        message.getChannelId(),
-                        message.getCreatedAt()
-                ))
+                .map(message -> new MessageResponse(message)) // 엔티티 기반 생성자 사용
                 .toList();
     }
 }

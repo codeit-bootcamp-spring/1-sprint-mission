@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageCreateDTO;
-import com.sprint.mission.discodeit.dto.MessageDTO;
-import com.sprint.mission.discodeit.dto.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,33 +18,35 @@ import java.util.*;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final Map<UUID, MessageDTO> messages = new HashMap<>();
+    private final Map<UUID, MessageResponse> messages = new HashMap<>();
 
     @Override
-    public MessageDTO create(MessageCreateDTO messageCreateDTO) {
-        if (messageCreateDTO.getSenderId() == null || messageCreateDTO.getChannelId() == null) {
-            throw new IllegalArgumentException("SenderId와 ChannelId는 필수입니다.");
+    public MessageResponse create(MessageCreateRequest messageCreateRequest) {
+        if (messageCreateRequest.getAuthorId() == null || messageCreateRequest.getChannelId() == null) {
+            throw new IllegalArgumentException("AuthorId와 ChannelId는 필수입니다.");
         }
 
-        // ✅ 메시지 생성 시 현재 시간을 저장
-        MessageDTO messageDTO = new MessageDTO(
+        // 수정: 엔티티 기반 생성자가 있으면 엔티티를 통해 MessageResponse를 생성하는 방식 사용
+        // 여기서는 직접 MessageResponse를 생성하는 대신, 생성한 응답 객체를 저장합니다.
+        MessageResponse messageResponse = new MessageResponse(
                 UUID.randomUUID(),
-                messageCreateDTO.getContent(),
-                messageCreateDTO.getSenderId(),
-                messageCreateDTO.getChannelId(),
-                Instant.now()  // ✅ 현재 시간을 저장
+                messageCreateRequest.getContent(),
+                messageCreateRequest.getAuthorId(),
+                messageCreateRequest.getChannelId(),
+                null  // attachmentIds 등은 null 처리 (생성 후 나중에 업데이트 가능)
         );
-
-        messages.put(messageDTO.getId(), messageDTO);
-        log.info("✅ 메시지 생성 완료: {}", messageDTO);
-        return messageDTO;
+        // 현재 시간 저장 (생성 시각 업데이트)
+        messageResponse.setCreatedAt(Instant.now());
+        messages.put(messageResponse.getId(), messageResponse);
+        log.info("✅ 메시지 생성 완료: {}", messageResponse);
+        return messageResponse;
     }
 
     @Override
-    public void update(UUID messageId, MessageUpdateDTO messageUpdateDTO) {
-        MessageDTO messageDTO = messages.get(messageId);
-        if (messageDTO != null) {
-            messageDTO.setContent(messageUpdateDTO.getContent());
+    public void update(UUID messageId, MessageUpdateRequest messageUpdateRequest) {
+        MessageResponse messageResponse = messages.get(messageId);
+        if (messageResponse != null) {
+            messageResponse.setContent(messageUpdateRequest.getContent());
             log.info("✅ 메시지 수정 완료: {}", messageId);
         } else {
             log.warn("❌ 메시지 수정 실패: 메시지를 찾을 수 없음.");
@@ -58,9 +60,9 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> readAllByChannel(UUID channelId) {
-        List<MessageDTO> result = new ArrayList<>();
-        for (MessageDTO message : messages.values()) {
+    public List<MessageResponse> readAllByChannel(UUID channelId) {
+        List<MessageResponse> result = new ArrayList<>();
+        for (MessageResponse message : messages.values()) {
             if (message.getChannelId().equals(channelId)) {
                 result.add(message);
             }
@@ -69,7 +71,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> readAll() {
+    public List<MessageResponse> readAll() {
         return new ArrayList<>(messages.values());
     }
 }

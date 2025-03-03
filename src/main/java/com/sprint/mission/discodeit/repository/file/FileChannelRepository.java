@@ -26,11 +26,12 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void save(Channel channel) {
+    public Channel save(Channel channel) {
         List<Channel> channels = loadFromFile();
         channels.removeIf(ch -> ch.getId().equals(channel.getId())); // 기존 채널 삭제 후 추가
         channels.add(channel);
         saveToFile(channels);
+        return channel;
     }
 
     @Override
@@ -55,11 +56,22 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public List<Channel> findAllPrivateChannelsByUserId(UUID userId) {
         return loadFromFile().stream()
-                .filter(channel -> !channel.isPublic() && channel.getMembers().contains(userId))
+                .filter(channel -> channel.isPrivate() && channel.getMembers().contains(userId))
                 .toList();
     }
 
-    /** JSON 파일 저장 */
+    @Override
+    public List<Channel> findAllChannelsForUser(UUID userId) {
+        return loadFromFile().stream()
+                .filter(channel -> channel.isPublic() || channel.getMembers().contains(userId))
+                .toList();
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return loadFromFile().stream().anyMatch(channel -> channel.getId().equals(id));
+    }
+
     private void saveToFile(List<Channel> channels) {
         try {
             objectMapper.writeValue(new File(FILE_PATH), channels);
@@ -68,7 +80,6 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    /** JSON 파일에서 데이터 로드 */
     private List<Channel> loadFromFile() {
         File file = new File(FILE_PATH);
         if (!file.exists()) return new ArrayList<>();
@@ -80,7 +91,6 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    /** JSON 파일 없으면 생성 */
     private void ensureFileExists() {
         File file = new File(FILE_PATH);
         if (!file.exists()) {

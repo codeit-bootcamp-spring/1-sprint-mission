@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.BinaryContentDTO;
+import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,14 +21,14 @@ public class BinaryContentController {
 
     // ✅ 특정 파일 조회
     @GetMapping("/{fileId}")
-    public ResponseEntity<BinaryContentDTO> getFile(@PathVariable UUID fileId) {
-        Optional<BinaryContentDTO> file = binaryContentService.read(fileId);
+    public ResponseEntity<BinaryContentResponse> getFile(@PathVariable UUID fileId) {
+        Optional<BinaryContentResponse> file = binaryContentService.read(fileId);
         return file.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // ✅ 모든 파일 조회
     @GetMapping
-    public ResponseEntity<List<BinaryContentDTO>> getAllFiles() {
+    public ResponseEntity<List<BinaryContentResponse>> getAllFiles() {
         return ResponseEntity.ok(binaryContentService.readAll());
     }
 

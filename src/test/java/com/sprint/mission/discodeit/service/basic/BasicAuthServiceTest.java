@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.AuthRequestDTO;
-import com.sprint.mission.discodeit.dto.AuthResponseDTO;
+import com.sprint.mission.discodeit.dto.AuthRequest;
+import com.sprint.mission.discodeit.dto.AuthResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,10 +19,10 @@ class BasicAuthServiceTest {
         String password = "testPassword";
         String userId = "1234-abcd"; // ✅ UUID 대신 String 사용
 
-        AuthResponseDTO mockResponse = new AuthResponseDTO(userId, "로그인 성공");
-        when(authService.login(any(AuthRequestDTO.class))).thenReturn(Optional.of(mockResponse));
+        AuthResponse mockResponse = new AuthResponse(userId, "로그인 성공");
+        when(authService.login(any(AuthRequest.class))).thenReturn(Optional.of(mockResponse));
 
-        Optional<AuthResponseDTO> response = authService.login(new AuthRequestDTO(username, password));
+        Optional<AuthResponse> response = authService.login(new AuthRequest(username, password));
 
         assertTrue(response.isPresent());
         assertEquals(userId, response.get().getUserId()); // ✅ getUserId() 사용

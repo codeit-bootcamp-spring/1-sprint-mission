@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReadStatusUpdateDTO {
+public class ReadStatusUpdateRequest {
     private UUID id;
     private Instant readAt;
 

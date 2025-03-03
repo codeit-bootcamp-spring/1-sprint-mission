@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor // ✅ 기본 생성자
 @AllArgsConstructor // ✅ username, password를 받는 생성자 추가
-public class AuthRequestDTO {
+public class AuthRequest {
     private String username;
     private String password;
 }

@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ReadStatusCreateDTO;
-import com.sprint.mission.discodeit.dto.ReadStatusReadDTO;
-import com.sprint.mission.discodeit.dto.ReadStatusUpdateDTO;
+import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusReadResponse;
+import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,19 +24,19 @@ public class ReadStatusController {
 
     // ✅ 1. 특정 채널의 메시지 수신 정보 생성
     @PostMapping
-    public void createReadStatus(@RequestBody ReadStatusCreateDTO readStatusCreateDTO) {
-        readStatusService.create(readStatusCreateDTO);
+    public void createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+        readStatusService.create(readStatusCreateRequest);
     }
 
     // ✅ 2. 특정 채널의 메시지 수신 정보 수정
     @PutMapping("/{id}")
-    public void updateReadStatus(@PathVariable UUID id, @RequestBody ReadStatusUpdateDTO readStatusUpdateDTO) {
-        readStatusService.update(id, readStatusUpdateDTO);
+    public void updateReadStatus(@PathVariable UUID id, @RequestBody ReadStatusUpdateRequest readStatusUpdateRequest) {
+        readStatusService.update(id, readStatusUpdateRequest);
     }
 
     // ✅ 3. 특정 사용자의 메시지 수신 정보 조회
     @GetMapping("/users/{userId}")
-    public List<ReadStatusReadDTO> getReadStatusByUser(@PathVariable UUID userId) {
+    public List<ReadStatusReadResponse> getReadStatusByUser(@PathVariable UUID userId) {
         return readStatusService.readByUserId(userId);
     }
 }

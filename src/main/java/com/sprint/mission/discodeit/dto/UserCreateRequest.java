@@ -2,18 +2,17 @@ package com.sprint.mission.discodeit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class UserCreateDTO {
+public class UserCreateRequest {
     private String username;
     private String email;
-    private UUID profileImageId;
-    private String password; // ✅ 추가
-
-    // ✅ 기본 생성자 추가 (Lombok으로 자동 생성)
+    // profileImageId는 UUID 형식의 문자열 (선택사항)
+    private String profileImageId;
+    private String password;
 }

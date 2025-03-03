@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.MessageReceiptCreateDTO;
-import com.sprint.mission.discodeit.dto.MessageReceiptDTO;
-import com.sprint.mission.discodeit.dto.MessageReceiptUpdateDTO;
+import com.sprint.mission.discodeit.dto.MessageReceiptCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageReceiptResponse;
+import com.sprint.mission.discodeit.dto.MessageReceiptUpdateRequest;
 import com.sprint.mission.discodeit.entity.MessageReceipt;
 import com.sprint.mission.discodeit.repository.MessageReceiptRepository;
 import com.sprint.mission.discodeit.service.MessageReceiptService;
@@ -25,7 +25,7 @@ public class BasicMessageReceiptService implements MessageReceiptService {
     private final MessageReceiptRepository receiptRepository;
 
     @Override
-    public MessageReceiptDTO create(MessageReceiptCreateDTO createDTO) {
+    public MessageReceiptResponse create(MessageReceiptCreateRequest createDTO) {
         MessageReceipt receipt = new MessageReceipt(
                 createDTO.getMessageId(),
                 createDTO.getReceiverId(),
@@ -35,7 +35,7 @@ public class BasicMessageReceiptService implements MessageReceiptService {
         receiptRepository.save(receipt);
         log.info("✅ 메시지 수신 정보 생성 완료: {}", receipt);
 
-        return new MessageReceiptDTO(
+        return new MessageReceiptResponse(
                 receipt.getId(),
                 receipt.getMessageId(),
                 receipt.getReceiverId(),
@@ -45,7 +45,7 @@ public class BasicMessageReceiptService implements MessageReceiptService {
     }
 
     @Override
-    public void update(UUID receiptId, MessageReceiptUpdateDTO updateDTO) {
+    public void update(UUID receiptId, MessageReceiptUpdateRequest updateDTO) {
         Optional<MessageReceipt> optionalReceipt = receiptRepository.findById(receiptId);
 
         if (optionalReceipt.isPresent()) {
@@ -59,9 +59,9 @@ public class BasicMessageReceiptService implements MessageReceiptService {
     }
 
     @Override
-    public List<MessageReceiptDTO> getReceiptsByUser(UUID userId) {
+    public List<MessageReceiptResponse> getReceiptsByUser(UUID userId) {
         return receiptRepository.findAllByReceiverId(userId).stream()
-                .map(receipt -> new MessageReceiptDTO(receipt.getId(), receipt.getMessageId(), receipt.getReceiverId(), receipt.getChannelId(), receipt.getReceivedAt()))
+                .map(receipt -> new MessageReceiptResponse(receipt.getId(), receipt.getMessageId(), receipt.getReceiverId(), receipt.getChannelId(), receipt.getReceivedAt()))
                 .collect(Collectors.toList());
     }
 }

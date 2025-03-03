@@ -11,7 +11,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor  // ✅ 기본 생성자 추가
 @AllArgsConstructor  // ✅ 모든 필드를 포함한 생성자 추가
-public class BinaryContentDTO {
+public class BinaryContentResponse {
     private UUID id;
     private String fileName;
     private byte[] data;

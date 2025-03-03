@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDTO {
-    private String userId; // ✅ 기존 getUsername()이 아니라 getUserId() 사용
-    private String message;
+public class MessageReceiptCreateRequest {
+    private UUID messageId;
+    private UUID receiverId;
+    private UUID channelId;
 }
