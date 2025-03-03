@@ -1,165 +1,124 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-
-
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.*;
 
-/**
- * Hence Circular Reference, deprecate use JCFs as memberfield of JCF.
- * Instead of composition, refactor JCFs using Singleton pattern.
- */
+@RequiredArgsConstructor
+@Service
 public class BasicChannelService implements ChannelService {
-    private static BasicChannelService instance;
-    private Map<UUID, Channel> ChannelList;
+    private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
+    private final MessageRepository messageRepository;
 
-    public BasicChannelService() {
-        this.ChannelList = new HashMap<>();
-    }
-
-    public static BasicChannelService getInstance() {
-        if (instance == null) {
-            instance = new BasicChannelService();
-        }
-        return instance;
-    }
-
-    public void participateChannel(User user, UUID chId) {
-        BasicUserService.getInstance().getUserList().get(user.getId()).setAttending(chId);
-        ChannelList.get(chId).getChannelUserList().add(user);
-    }
-
-    public List<User> getParticipants(UUID chId) {
-        return ChannelList.get(chId).getChannelUserList();
-    }
-
-    public List<Message> getMessagesFromChannel(UUID chId) {
-        return ChannelList.get(chId).getChannelMessageList();
-    }
     @Override
-    public Map<UUID, Channel> getChannelList() {
-        return ChannelList;
+    public Channel createChannel(PublicChannelCreateRequest request) {
+        String name = request.name();
+        String description = request.description();
+        Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+
+        return channelRepository.save(channel);
     }
 
-    public void setChannelList(Map<UUID, Channel> channelList) {
-        this.ChannelList = channelList;
-    }
     @Override
-    public void createChannel(Channel channel) {
-        ChannelList.put(channel.getId(), channel); //JCFChannelList update
-        participateChannel(channel.getOwner(), channel.getId());
-        //participate's == below two lines
-//        ChannelList.get(channel.getId()).getChannelUserList().add(channel.getOwner()); //channel's attending userList update
-//        JCFUserService.getInstance().getUserList().get(channel.getOwner()).getAttending().add(channel.getId()); //owner attending
+    public Channel createChannel(PrivateChannelCreateRequest request) {
+        Channel channel = new Channel(ChannelType.PRIVATE, null, null);
+        Channel createdChannel = channelRepository.save(channel);
+
+        request.participantIds().stream()
+                .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+                .forEach(readStatusRepository::save);
+
+        return createdChannel;
     }
+
     @Override
-    public Channel readChannelInfo(UUID id) {
-        Channel ch = ChannelList.get(id);
-        return ch;
+    public ChannelDto readChannelById(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .map(this::toDto)
+                .orElseThrow(() -> new NoSuchElementException(channelId + " not found"));
     }
+
     @Override
-    public <T> void updateChannelField(UUID channelId, String fieldName, T contents) {
-        String filePath = "/Users/kimsangho/Desktop/sprintMission/1-sprint-mission/src/main/java/com/sprint/mission/discodeit/properties/UpdatableChannelField.txt";
-        //String filePath = "../../properties/UpdatableChannelField.txt";
-        Channel channel = ChannelList.get(channelId);
-        if (channel == null) {
-            System.out.println("Channel doesn't exist!");
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String existingFieldName;
-            while ((existingFieldName = br.readLine()) != null) {
-                if (existingFieldName.equals(fieldName)) {
-                    String setterMethodName = "set" + Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-                    Method setterMethod = channel.getClass().getMethod(setterMethodName, contents.getClass());
-                    setterMethod.invoke(channel, contents);
-                    channel.setUpdatedAt();
-                    break;
-                }
+    public List<ChannelDto> readAllByUserId(UUID userId) {
+        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId)
+                .toList();
 
+        List<ChannelDto> result = new ArrayList<>();
+        List<Channel> allChannels = channelRepository.readAllContents();
 
-
-            }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
-
-    @Override //erase channel : 1. erase channel. 2. erase messages(JCFmsgList) source from this channel. 3. erase user's attending
-    public void deleteChannel(UUID idOfChannel) {
-        Channel ch = ChannelList.get(idOfChannel);
-        List<Message> srcMsg = ch.getChannelMessageList();
-        List<User> relatedUser = ch.getChannelUserList();
-
-
-
-
-        BasicMessageService.getInstance().getMessageList().removeIf(msg -> srcMsg.contains(msg));
-
-
-        ChannelList.remove(idOfChannel);
-
-//        srcMsg.stream()
-//                .map(msg -> msg.getId())
-//                .forEach(JCFMessageService.getInstance()::deleteMessage);
-        //delete messages source from this channel <- JCFMsgList
-
-        //빌트인 함수가 최적화도 잘되고, 빠르겠지만, relatedUsr수가 매우 많다면? findFirst가 일종의 break기능?
-        for (User usr : relatedUser) {
-            //usr.getAttending().removeIf(ch_name -> ch_name.equals(idOfChannel));
-            //VS below
-            UUID tmp = usr.getAttending().stream()
-                    .filter(channel -> channel.equals(idOfChannel))
-                    .findFirst().orElse(null);
-
-            if (tmp != null) {
-                usr.getAttending().remove(tmp);
+        for (Channel channel : allChannels) {
+            if (channel.getType().equals(ChannelType.PUBLIC) || mySubscribedChannelIds.contains(channel.getId())) {
+                result.add(toDto(channel));
             }
         }
+        return result;
+
     }
 
-//        for(Message msg : relatedmsg) {
-//            MessageService.deleteMessage(msg.getId());
-//        }
-
-//        for (User ulist: ch.getChannelUserList()) {
-//            UserService.deleteUserById(ulist.getId());
-//        }
-
-
-
-
-
-
-//        MessageList.entrySet().removeIf(entry -> entry.getValue().getSource().equals(idOfChannel));
-//        List<User> userList = ch.getChannelUserList();
-//        for (User user : userList) {
-//            user.getAttending().removeIf(channelName -> channelName.equals(ch.getChannelName()));
-//            EveryMessageOfUser.remove(user.getId());
-//        }
-//        ChannelMessage.remove(idOfChannel);
-
-
-    public void printing() {
-        ChannelList.entrySet().stream()
-                .map(entry->entry.getValue().toString())
-                .forEach(s -> System.out.println(s));
+    @Override
+    public Channel updateChannelField(UUID channelId, PublicChannelUpdateRequest request) {
+        String newName = request.newName();
+        String newDescription = request.newDescription();
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException(channelId + " not found"));
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            throw new IllegalArgumentException("This channel is private.");
+        }
+        channel.update(newName, newDescription);
+        return channelRepository.save(channel);
     }
 
+    @Override
+    public void deleteChannelById(UUID channelId) {
+        Channel channel = channelRepository.findById(channelId)
+                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
 
+        messageRepository.deleteAllByChannelId(channel.getId());
+        readStatusRepository.deleteAllByChannelId(channel.getId());
+
+        channelRepository.deleteById(channelId);
+    }
+
+    private ChannelDto toDto(Channel channel) {
+        Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId())
+                .stream()
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .map(Message::getCreatedAt)
+                .limit(1)
+                .findFirst()
+                .orElse(Instant.MIN);
+
+        List<UUID> participantIds = new ArrayList<>();
+        if (channel.getType().equals(ChannelType.PRIVATE)) {
+            readStatusRepository.findAllByChannelId(channel.getId())
+                    .stream()
+                    .map(ReadStatus::getUserId)
+                    .forEach(participantIds::add);
+        }
+
+        return new ChannelDto(
+                channel.getId(),
+                channel.getType(),
+                channel.getName(),
+                channel.getDescription(),
+                participantIds,
+                lastMessageAt
+        );
+    }
 }
-
