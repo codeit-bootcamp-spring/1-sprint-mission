@@ -1,0 +1,35 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeitdb
+    username: root
+    password: Abcd123@
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database: postgresql
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: ASC
+    enabled: true
+
+logging:
+  level:
+    root: info
+discodeit:
+  repository:
+    type: file     # jcf | file
+    file-directory: .discodeit

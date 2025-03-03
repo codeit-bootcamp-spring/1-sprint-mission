@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:devDB
+    username: dev
+    password: 1234
+logging:
+  level:
+    root: debug
