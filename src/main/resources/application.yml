@@ -1,0 +1,29 @@
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB # 요청 파일 하나당 허용 사이즈
+      max-request-size: 100MB  #multipart/form-data 요청에서 전체 파일의 허용 사이즈
+  threads:
+    virtual:
+      enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  default-consumes-media-type: application/json
+
+discodeit:
+  repository:
+    type: jcf
+    file-directory: .discodeit
+
+
+
+logging:
+  level:
+    com.sprint: TRACE
