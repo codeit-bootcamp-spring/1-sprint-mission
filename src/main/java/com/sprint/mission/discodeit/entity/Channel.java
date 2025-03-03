@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -29,6 +31,7 @@ public class Channel implements Serializable {
         if (newName != null && !newName.equals(this.name)) {
             this.name = newName;
             flag = true;
+
         }
         if (newDescription != null && !newDescription.equals(this.description)) {
             this.description = newDescription;

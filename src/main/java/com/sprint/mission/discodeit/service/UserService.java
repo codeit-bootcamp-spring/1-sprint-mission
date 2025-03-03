@@ -18,5 +18,6 @@ public interface UserService {
     List<UserDto> readAll();
     User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
     void deleteUserById(UUID userId);
-
+    Map<UUID, User> getUserList();
+    void setUserList(Map<UUID, User> userList);
 }
