@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+}
+
+application {
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+}
+
+task runAsJava(type: JavaExec) {
+    group = "application"
+    description = "Run the application as a plain Java application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.sprint.mission.discodeit.JavaApplication'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
