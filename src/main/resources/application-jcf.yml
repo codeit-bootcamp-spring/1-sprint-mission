@@ -1,0 +1,4 @@
+discodeit:
+  repository:
+    type: jcf   # jcf | file
+    file-directory: .discodeit
