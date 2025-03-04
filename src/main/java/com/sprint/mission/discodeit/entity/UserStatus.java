@@ -1,36 +1,46 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
-public class UserStatus {
+@Getter
+public class UserStatus implements Serializable {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private UUID userId;
+  private Instant lastActiveAt;
 
-    private UUID userId;
-    private Instant lastOnlineAt;
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
 
-    public UserStatus(UUID id, Instant lastOnlineAt) {
-        this.id = id;
-        this.lastOnlineAt = lastOnlineAt;
-
-        id = UUID.randomUUID();
-        createdAt = Instant.now();
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    public void update(Instant updateOnlineAt) {
-        if (updateOnlineAt!= null && !updateOnlineAt.equals(lastOnlineAt)) {
-            lastOnlineAt = updateOnlineAt;
-            updatedAt = Instant.now();
-        }
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public boolean isOnline() {
-        Instant minus = Instant.now().minus(Duration.ofMinutes(5));
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-        return lastOnlineAt.isAfter(minus);
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }
