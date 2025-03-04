@@ -1,0 +1,81 @@
+package com.sprint.mission.discodeit.controller.message;
+
+import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
+import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
+import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
+import com.sprint.mission.discodeit.service.interfacepac.MessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+//네이밍, HTTP 메서드, 상태 코드, 응답 구조 일관성
+@RestController
+@RequestMapping("/api/messages")
+@Validated
+@Tag(name = "Message Controller", description = "메세지 관련 API 엔드포인트 관리")
+public class MessageController {
+
+  private final MessageService messageService;
+
+  public MessageController(MessageService messageService) {
+    this.messageService = messageService;
+  }
+
+  @Operation(summary = "메세지 등록", description = " 새로운 메세지 등록 및 메세지 정보 반환")
+  @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<MessageResponseDTO> createMessage(
+      @RequestPart("message-create-dto") @Valid MessageCreateDTO messageCreateDTO,
+      @RequestPart("binary-content-create-request") MultipartFile binaryContentCreateRequest
+  ) {
+    BinaryContentCreateRequest binaryContent = null;
+    if (Objects.nonNull(binaryContentCreateRequest)) {
+      try {
+        binaryContent = new BinaryContentCreateRequest(
+            binaryContentCreateRequest.getOriginalFilename(),
+            binaryContentCreateRequest.getContentType(),
+            binaryContentCreateRequest.getBytes()
+        );
+      } catch (IOException exception) {
+        throw new IllegalArgumentException(exception);
+      }
+    }
+    MessageResponseDTO messageResponseDTO = messageService.create(messageCreateDTO, binaryContent);
+    return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
+  }
+
+  @Operation(summary = "메세지 정보 수정", description = "메세지 정보 수정 및 수정된 메세지 정보 반환")
+  @PatchMapping("/modify")
+  public ResponseEntity<MessageResponseDTO> modifyMessage(
+      @RequestBody @Valid MessageUpdateDTO messageUpdateDTO) {
+    MessageResponseDTO update = messageService.update(messageUpdateDTO);
+    return ResponseEntity.ok(update);
+  }
+
+  @Operation(summary = "메세지 삭제", description = "메세지 삭제")
+  @DeleteMapping("/{messageId}")
+  public ResponseEntity<Void> deleteMessage(@PathVariable UUID messageId) {
+    messageService.delete(messageId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Operation(summary = "특정 채널의 메세지 목록 조회", description = "채널 아이디로 특정 채널의 모든 메시지 목록을 조회 후 반환")
+  @GetMapping("/{channelId}")
+  public ResponseEntity<List<MessageResponseDTO>> getListMessages(@PathVariable UUID channelId) {
+    List<MessageResponseDTO> messagesByChannelId = messageService.findMessagesByChannelId(
+        channelId);
+    return ResponseEntity.ok(messagesByChannelId);
+  }
+
+}
