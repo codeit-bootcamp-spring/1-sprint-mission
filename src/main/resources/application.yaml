@@ -1,0 +1,10 @@
+discodeit:
+  repository:
+    type: file   # jcf | file
+    file-directory: file-data-map
+    User: ${discodeit.repository.file-directory}/User
+    Channel: ${discodeit.repository.file-directory}/Channel
+    Message: ${discodeit.repository.file-directory}/Message
+    UserStatus: ${discodeit.repository.file-directory}/UserStatus
+    ReadStatus: ${discodeit.repository.file-directory}/ReadStatus
+    BinaryContent: ${discodeit.repository.file-directory}/BinaryContent
