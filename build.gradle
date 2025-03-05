@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.sprint.mission'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot 웹 애플리케이션 개발을 위한 기본 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    // OpenAPI 문서 생성을 위한 의존성 (Swagger UI 포함)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    // Lombok: 코드 자동 생성 (Getter, Setter 등)
+    compileOnly 'org.projectlombok:lombok'
+    // Lombok 어노테이션 처리기
+    annotationProcessor 'org.projectlombok:lombok'
+    // 테스트용 의존성 (JUnit, Spring Test)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // JUnit 플랫폼 런처 (테스트 실행)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
