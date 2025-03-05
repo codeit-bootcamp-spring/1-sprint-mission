@@ -33,8 +33,10 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public UserRepository userRepositoryFile() {
-    return new FileUserRepository(fileDirectory);
+  public UserRepository userRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileUserRepository(fileDirectory, objectMapper);
   }
 
   //ChannelRepository Bean 등록
@@ -46,8 +48,10 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public ChannelRepository channelRepositoryFile() {
-    return new FileChannelRepository(fileDirectory);
+  public ChannelRepository channelRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileChannelRepository(fileDirectory, objectMapper);
   }
 
   //MessageRepository Bean 등록
@@ -59,8 +63,10 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public MessageRepository messageRepositoryFile() {
-    return new FileMessageRepository(fileDirectory);
+  public MessageRepository messageRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileMessageRepository(fileDirectory, objectMapper);
   }
 
   //UserStatusRepository Bean 등록
@@ -72,8 +78,10 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public UserStatusRepository userStatusRepositoryFile() {
-    return new FileUserStatusRepository(fileDirectory);
+  public UserStatusRepository userStatusRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileUserStatusRepository(fileDirectory, objectMapper);
   }
 
   //BinaryContentRepository Bean 등록
@@ -100,7 +108,9 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public ReadStatusRepository readStatusRepositoryFile() {
-    return new FileReadStatusRepository(fileDirectory);
+  public ReadStatusRepository readStatusRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileReadStatusRepository(fileDirectory, objectMapper);
   }
 }

@@ -22,17 +22,23 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 public class FileChannelRepository implements ChannelRepository {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(
-      new JavaTimeModule());
+  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
+  private static final String FILE_NAME = "channel.json";
+  private static final String FILE_SEPARATOR = "/";
+
+
+  private final ObjectMapper objectMapper;
   private final String filePath;
   private final Map<UUID, List<Channel>> channelData;
 
   public FileChannelRepository(
-      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
-    if (!fileDirectory.endsWith("/")) {
-      fileDirectory += "/";
+      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
+          + "}") String fileDirectory, ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
+    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
+      fileDirectory += FILE_SEPARATOR;
     }
-    this.filePath = fileDirectory + "channel.json";
+    this.filePath = fileDirectory + FILE_NAME;
     ensureDirectoryExists(this.filePath);
     this.channelData = loadFromFile();
   }

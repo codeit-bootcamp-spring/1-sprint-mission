@@ -19,19 +19,24 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
+  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
+  private static final String FILE_NAME = "binary_content.json";
+  private static final String FILE_SEPARATOR = "/";
+
   private final ObjectMapper objectMapper;
   private final String filePath;
   private final Map<UUID, BinaryContent> binaryContentData;
 
 
   public FileBinaryContentRepository(
-      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
+          + "}") String fileDirectory,
       ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith("/")) {
-      fileDirectory += "/";
+    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
+      fileDirectory += FILE_SEPARATOR;
     }
-    this.filePath = fileDirectory + "binary_content.json";
+    this.filePath = fileDirectory + FILE_NAME;
 
     ensureDirectoryExists(this.filePath);
     this.binaryContentData = loadFromFile();
