@@ -1,0 +1,691 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /api/users:
+    get:
+      tags:
+        - user-controller
+      operationId: findAll
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+    put:
+      tags:
+        - user-controller
+      operationId: update
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                userUpdateRequest:
+                  $ref: '#/components/schemas/UserUpdateRequest'
+                profile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+    post:
+      tags:
+        - user-controller
+      operationId: create
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                userCreateRequest:
+                  $ref: '#/components/schemas/UserCreateRequest'
+                profile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/users/{userId}/user-status:
+    put:
+      tags:
+        - user-controller
+      operationId: updateUserStatusByUserId
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatusUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+  /api/read-statuses/{readStatusId}:
+    put:
+      tags:
+        - read-status-controller
+      operationId: update_1
+      parameters:
+        - name: readStatusId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadStatusUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReadStatus'
+  /api/messages/{messageId}:
+    put:
+      tags:
+        - message-controller
+      operationId: update_2
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      tags:
+        - message-controller
+      operationId: delete_1
+      parameters:
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: requesterId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  /api/channels/{channelId}:
+    put:
+      tags:
+        - channel-controller
+      operationId: update_3
+      parameters:
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChannelUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Channel'
+    delete:
+      tags:
+        - channel-controller
+      operationId: delete_2
+      parameters:
+        - name: channelId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+  /api/users/user-status:
+    post:
+      tags:
+        - user-controller
+      operationId: createUserStatusByUserId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserStatusCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+  /api/read-statuses:
+    get:
+      tags:
+        - read-status-controller
+      operationId: findAllByUserId
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReadStatus'
+    post:
+      tags:
+        - read-status-controller
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadStatusCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReadStatus'
+  /api/messages:
+    get:
+      tags:
+        - message-controller
+      operationId: findAllByChannelId
+      parameters:
+        - name: channelId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      tags:
+        - message-controller
+      operationId: create_2
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                messageCreateRequest:
+                  $ref: '#/components/schemas/MessageCreateRequest'
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Message'
+  /api/channels/public:
+    post:
+      tags:
+        - channel-controller
+      operationId: create_3
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicChannelCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Channel'
+  /api/channels/private:
+    post:
+      tags:
+        - channel-controller
+      operationId: create_4
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrivateChannelCreateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Channel'
+  /api/auth/login:
+    post:
+      tags:
+        - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/channels/{userId}:
+    get:
+      tags:
+        - channel-controller
+      operationId: findAll_1
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChannelDto'
+  /api/binary-contents:
+    get:
+      tags:
+        - binary-content-controller
+      operationId: findAllByIdIn
+      parameters:
+        - name: contentIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BinaryContent'
+  /api/binary-contents/{contentId}:
+    get:
+      tags:
+        - binary-content-controller
+      operationId: find
+      parameters:
+        - name: contentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BinaryContent'
+  /api/users/{userId}:
+    delete:
+      tags:
+        - user-controller
+      operationId: delete
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    UserUpdateRequest:
+      type: object
+      properties:
+        newUsername:
+          type: string
+        newEmail:
+          type: string
+        newPassword:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        profileId:
+          type: string
+          format: uuid
+    UserStatusUpdateRequest:
+      type: object
+      properties:
+        newLastActiveAt:
+          type: string
+          format: date-time
+    ReadStatusUpdateRequest:
+      type: object
+      properties:
+        newLastReadAt:
+          type: string
+          format: date-time
+    ReadStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        userId:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        lastReadAt:
+          type: string
+          format: date-time
+    MessageUpdateRequest:
+      type: object
+      properties:
+        newContent:
+          type: string
+        requesterId:
+          type: string
+          format: uuid
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        content:
+          type: string
+        authorId:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        attachmentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    ChannelUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+    Channel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        name:
+          type: string
+        topic:
+          type: string
+        type:
+          type: string
+          enum:
+            - PUBLIC
+            - PRIVATE
+    UserCreateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    UserStatusCreateRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        lastActiveAt:
+          type: string
+          format: date-time
+    ReadStatusCreateRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        channelId:
+          type: string
+          format: uuid
+        lastReadAt:
+          type: string
+          format: date-time
+    MessageCreateRequest:
+      type: object
+      properties:
+        content:
+          type: string
+        channelId:
+          type: string
+          format: uuid
+        authorId:
+          type: string
+          format: uuid
+    PublicChannelCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+    PrivateChannelCreateRequest:
+      type: object
+      properties:
+        participantIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        username:
+          type: string
+        email:
+          type: string
+        profileId:
+          type: string
+          format: uuid
+        online:
+          type: boolean
+    ChannelDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+            - PUBLIC
+            - PRIVATE
+        name:
+          type: string
+        description:
+          type: string
+        participantIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        lastMessageAt:
+          type: string
+          format: date-time
+    BinaryContent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        fileName:
+          type: string
+        size:
+          type: integer
+          format: int64
+        contentType:
+          type: string
+        bytes:
+          type: array
+          items:
+            type: string
+            format: byte
+        userId:
+          type: string
+          format: uuid
+        messageId:
+          type: string
+          format: uuid
