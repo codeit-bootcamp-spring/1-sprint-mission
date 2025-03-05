@@ -150,7 +150,6 @@ public class UserStatusService {
     //삭제
     userStatusRepository.deleteById(userStatusId);
 
-    System.out.println("UserStatus deleted: " + userStatusId);
   }
 
 }

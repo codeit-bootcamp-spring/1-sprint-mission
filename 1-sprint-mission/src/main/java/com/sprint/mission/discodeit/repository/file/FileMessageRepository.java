@@ -33,7 +33,6 @@ public class FileMessageRepository implements MessageRepository {
       fileDirectory += "/";
     }
     this.filePath = fileDirectory + "message.json";
-    log.info("***** FileMessageRepository CONSTRUCTOR CALLED *****"); // 활성화 됐는지 확인
     ensureDirectoryExists(this.filePath);
     this.messageData = loadFromFile();
   }
@@ -109,7 +108,7 @@ public class FileMessageRepository implements MessageRepository {
           }
       );
     } catch (IOException e) {
-      System.err.println(e.getMessage());
+      log.error(e.getMessage());
       return new ConcurrentHashMap<>();
     }
   }

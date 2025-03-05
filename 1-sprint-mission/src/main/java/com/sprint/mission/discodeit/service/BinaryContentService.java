@@ -76,7 +76,5 @@ public class BinaryContentService {
     //파일 삭제
     binaryContentRepository.delete(binaryContent);
 
-    System.out.println("BinaryContent deleted: " + binaryContentId);
-    log.error("BinaryContent deleted: {}", binaryContentId);
   }
 }

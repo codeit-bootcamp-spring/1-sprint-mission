@@ -14,124 +14,129 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-
+@Slf4j
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-    private final String filePath;
-    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private final Map<UUID, ReadStatus> readStatusData;
+  private final String filePath;
+  private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(
+      new JavaTimeModule());
+  private final Map<UUID, ReadStatus> readStatusData;
 
-    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
-        if(!fileDirectory.endsWith("/")) {
-            fileDirectory += "/";
-        }
-        this.filePath = fileDirectory + "read_status.json";
-        ensureDirectoryExists(this.filePath);
-        this.readStatusData = loadFromFile();
+  public FileReadStatusRepository(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+    if (!fileDirectory.endsWith("/")) {
+      fileDirectory += "/";
     }
+    this.filePath = fileDirectory + "read_status.json";
+    ensureDirectoryExists(this.filePath);
+    this.readStatusData = loadFromFile();
+  }
 
-    @Override
-    public void save(ReadStatus readStatus) {
-        readStatusData.put(readStatus.getId(), readStatus);
-        saveToFile();
+  @Override
+  public void save(ReadStatus readStatus) {
+    readStatusData.put(readStatus.getId(), readStatus);
+    saveToFile();
+  }
+
+  @Override
+  public List<ReadStatus> findAllByChannel(Channel channel) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> channel.equals(readStatus.getChannel()))
+        .toList();
+  }
+
+  @Override
+  public List<ReadStatus> findAllByUser(User user) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> user.equals(readStatus.getUser()))
+        .toList();
+  }
+
+  @Override
+  public List<Channel> findChannelsByUser(User owner) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> owner.equals(readStatus.getUser()))
+        .map(ReadStatus::getChannel)
+        .distinct()
+        .toList();
+  }
+
+  @Override
+  public List<UUID> findUserIdsByChannel(Channel channel) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> channel.equals(readStatus.getChannel()))
+        .map(readStatus -> readStatus.getUser().getId())
+        .distinct()
+        .toList();
+  }
+
+  @Override
+  public Optional<ReadStatus> findById(UUID id) {
+    return Optional.ofNullable(readStatusData.get(id));
+  }
+
+  @Override
+  public Optional<ReadStatus> findByUserAndChannel(User user, Channel channel) {
+    return readStatusData.values().stream()
+        .filter(readStatus -> user.equals(readStatus.getUser()) && channel.equals(
+            readStatus.getChannel()))
+        .findFirst();
+  }
+
+  @Override
+  public boolean existsByUserAndChannel(User user, Channel channel) {
+    return readStatusData.values().stream()
+        .anyMatch(readStatus -> user.equals(readStatus.getUser()) && channel.equals(
+            readStatus.getChannel()));
+  }
+
+  @Override
+  public void deleteByChannel(Channel channel) {
+    readStatusData.values()
+        .removeIf(readStatus -> channel.equals(readStatus.getChannel()));
+    saveToFile();
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    readStatusData.remove(id);
+    saveToFile();
+  }
+
+  private void ensureDirectoryExists(String directoryPath) {
+    File directory = new File(directoryPath);
+    File parentDirectory = directory.getParentFile();
+    if (!parentDirectory.exists()) {
+      parentDirectory.mkdirs();
     }
+  }
 
-    @Override
-    public List<ReadStatus> findAllByChannel(Channel channel) {
-        return readStatusData.values().stream()
-                .filter(readStatus -> channel.equals(readStatus.getChannel()))
-                .toList();
+  private Map<UUID, ReadStatus> loadFromFile() {
+    File file = new File(filePath);
+    if (!file.exists()) {
+      return new ConcurrentHashMap<>();
     }
-
-    @Override
-    public List<ReadStatus> findAllByUser(User user) {
-        return readStatusData.values().stream()
-                .filter(readStatus -> user.equals(readStatus.getUser()))
-                .toList();
+    try {
+      return objectMapper.readValue(file,
+          new TypeReference<Map<UUID, ReadStatus>>() {
+          });
+    } catch (IOException e) {
+      log.error(e.getMessage());
+      return new ConcurrentHashMap<>();
     }
+  }
 
-    @Override
-    public List<Channel> findChannelsByUser(User owner) {
-        return readStatusData.values().stream()
-                .filter(readStatus -> owner.equals(readStatus.getUser()))
-                .map(ReadStatus::getChannel)
-                .distinct()
-                .toList();
+  private void saveToFile() {
+    File file = new File(filePath);
+    try {
+      objectMapper.writeValue(file, readStatusData);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to save read status data to file.", e);
     }
-
-    @Override
-    public List<UUID> findUserIdsByChannel(Channel channel) {
-        return readStatusData.values().stream()
-                .filter(readStatus -> channel.equals(readStatus.getChannel()))
-                .map(readStatus -> readStatus.getUser().getId())
-                .distinct()
-                .toList();
-    }
-
-    @Override
-    public Optional<ReadStatus> findById(UUID id) {
-        return Optional.ofNullable(readStatusData.get(id));
-    }
-
-    @Override
-    public Optional<ReadStatus> findByUserAndChannel(User user, Channel channel) {
-        return readStatusData.values().stream()
-                .filter(readStatus -> user.equals(readStatus.getUser()) && channel.equals(readStatus.getChannel()))
-                .findFirst();
-    }
-
-    @Override
-    public boolean existsByUserAndChannel(User user, Channel channel) {
-        return readStatusData.values().stream()
-                .anyMatch(readStatus -> user.equals(readStatus.getUser()) && channel.equals(readStatus.getChannel()));
-    }
-
-    @Override
-    public void deleteByChannel(Channel channel) {
-        readStatusData.values()
-                .removeIf(readStatus -> channel.equals(readStatus.getChannel()));
-        saveToFile();
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        readStatusData.remove(id);
-        saveToFile();
-    }
-
-    private void ensureDirectoryExists(String directoryPath) {
-        File directory = new File(directoryPath);
-        File parentDirectory = directory.getParentFile();
-        if (!parentDirectory.exists()) {
-            parentDirectory.mkdirs();
-        }
-    }
-
-    private Map<UUID, ReadStatus> loadFromFile() {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            return new ConcurrentHashMap<>();
-        }
-        try {
-            return objectMapper.readValue(file,
-                    new TypeReference<Map<UUID, ReadStatus>>(){});
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return new ConcurrentHashMap<>();
-        }
-    }
-
-    private void saveToFile(){
-        File file = new File(filePath);
-        try {
-           objectMapper.writeValue(file, readStatusData);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save read status data to file.", e);
-        }
-    }
-
+  }
 
 
 }

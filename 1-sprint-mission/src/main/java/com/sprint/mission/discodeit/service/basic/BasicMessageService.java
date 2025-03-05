@@ -104,7 +104,7 @@ public class BasicMessageService implements MessageService {
           .findFirst()
           .orElseThrow(() -> new UserNotFoundException(user + " not exists"));
     } catch (UserNotFoundException e) {
-      System.out.println("Failed to read message: " + e.getMessage());
+      log.error(e.getMessage());
       return null;
     }
   }
@@ -119,8 +119,8 @@ public class BasicMessageService implements MessageService {
       }
       return messages;
 
-    } catch (IllegalArgumentException e) {
-      System.out.println("Failed to read all messages: " + e.getMessage());
+    } catch (IllegalStateException e) {
+      log.error("Failed to read all messages: " + e.getMessage());
     }
 
     return List.of();
@@ -217,8 +217,6 @@ public class BasicMessageService implements MessageService {
     binaryContentRepository.deleteByMessageId(messageId);
     //메시지 삭제
     messageRepository.deleteById(messageId);
-
-    log.info("Message deleted: {}", messageId);
 
   }
 }

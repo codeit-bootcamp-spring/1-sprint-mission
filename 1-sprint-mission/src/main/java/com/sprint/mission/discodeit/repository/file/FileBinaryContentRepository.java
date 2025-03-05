@@ -13,9 +13,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
-
+@Slf4j
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
   private final ObjectMapper objectMapper;
@@ -120,7 +121,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
           new TypeReference<Map<UUID, BinaryContent>>() {
           });
     } catch (IOException e) {
-      System.err.println(e.getMessage());
+      log.error(e.getMessage());
       return new ConcurrentHashMap<>();
     }
   }
