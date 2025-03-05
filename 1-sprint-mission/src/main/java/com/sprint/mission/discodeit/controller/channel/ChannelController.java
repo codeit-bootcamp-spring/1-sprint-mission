@@ -62,7 +62,7 @@ public class ChannelController {
 
   //특정 사용자가 볼 수 있는 모든 채널 목록을 조회
   @Operation(summary = "특정 사용자가 볼 수 있는 채널 조회", description = "유저 아이디를 통해 특정 사용자가 볼 수 있는 모든 채널 목록을 조회")
-  @GetMapping("/{userId}/list")
+  @GetMapping("/{userId}")
   public ResponseEntity<List<ChannelResponseDTO>> getUserAllChannels(@PathVariable UUID userId) {
     List<ChannelResponseDTO> userChannelList = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(userChannelList);

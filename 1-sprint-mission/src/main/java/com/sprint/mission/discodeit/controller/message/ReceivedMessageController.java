@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/received_messages")
+@RequestMapping("/api/received-messages")
 @Tag(name = "Received Message Controller", description = "메세지 수신 정보 관련 API 앤드포인트 관리")
 public class ReceivedMessageController {
 
