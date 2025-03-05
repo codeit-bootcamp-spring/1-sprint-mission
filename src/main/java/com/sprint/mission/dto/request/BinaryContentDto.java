@@ -7,10 +7,6 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +25,7 @@ public record BinaryContentDto(
         return new BinaryContent(fileName, contentType, bytes);
     }
 
-    public static Optional<BinaryContentDto> fileToBinaryContentDto(MultipartFile file) {
+    public static Optional<BinaryContentDto> convertToBinaryContentDto(MultipartFile file) {
         log.info("file : {}", file);
         if (file == null || file.isEmpty()) {
             return Optional.empty();

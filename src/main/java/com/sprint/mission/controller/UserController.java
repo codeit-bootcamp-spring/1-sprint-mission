@@ -2,8 +2,6 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.common.exception.CustomException;
-import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
@@ -13,10 +11,8 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.service.jcf.addOn.UserStatusService;
-import com.sprint.mission.service.jcf.main.JCFUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,8 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +52,7 @@ public class UserController {
     public ResponseEntity<CommonResponse> create(
             @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.fileToBinaryContentDto(profile);
+        Optional<BinaryContentDto> binaryContentDto = BinaryContentDto.convertToBinaryContentDto(profile);
         User user = userService.create(requestDTO, binaryContentDto);
         return CommonResponse.toResponseEntity
                 (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
@@ -96,8 +90,8 @@ public class UserController {
             @Parameter(description = "삭제할 User ID")
             @PathVariable("id") UUID userId) {
         userService.delete(userId);
-        return CommonResponse.toResponseEntity
-                (NO_CONTENT, "성공적으로 삭제되었습니다", null);
+        return CommonResponse.toResponseEntityWithoutData
+                (NO_CONTENT, "성공적으로 삭제되었습니다");
     }
 
 

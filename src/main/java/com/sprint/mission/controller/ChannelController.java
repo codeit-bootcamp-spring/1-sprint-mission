@@ -114,8 +114,8 @@ public class ChannelController {
             @Parameter(description = "삭제할 Channel ID") @PathVariable("id") UUID channelId) {
 
         channelService.delete(channelId);
-        return CommonResponse.toResponseEntity
-                (NO_CONTENT, "성공적으로 삭제되었습니다", null);
+        return CommonResponse.toResponseEntityWithoutData
+                (NO_CONTENT, "성공적으로 삭제되었습니다");
     }
 
     /**

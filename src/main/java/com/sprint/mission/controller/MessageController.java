@@ -8,10 +8,6 @@ import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.dto.response.FindMessageDto;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.service.MessageService;
-import com.sprint.mission.service.jcf.addOn.BinaryService;
-import com.sprint.mission.service.jcf.main.JCFChannelService;
-import com.sprint.mission.service.jcf.main.JCFMessageService;
-import com.sprint.mission.service.jcf.main.JCFUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -23,8 +19,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,14 +53,16 @@ public class MessageController {
             @Parameter(description = "Message 첨부 파일들")
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
+
         Optional<List<BinaryContentDto>> binaryContentDtoList = attachments == null || attachments.isEmpty()
                 ? Optional.empty()
                 : Optional.of(attachments.stream()
-                .map(BinaryContentDto::fileToBinaryContentDto)
+                .map(BinaryContentDto::convertToBinaryContentDto)
                 .flatMap(Optional::stream)
                 .toList());
 
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoList);
+
         return CommonResponse.toResponseEntity
                 (CREATED, "메시지가 성공적으로 생성되었습니다.", FindMessageDto.fromEntity(createdMessage));
     }
@@ -115,7 +111,7 @@ public class MessageController {
     @DeleteMapping("{id}")
     public ResponseEntity<CommonResponse> delete(@RequestParam("id") UUID messageId) {
         messageService.delete(messageId);
-        return CommonResponse.toResponseEntity
-                (NO_CONTENT, "메시지가 성공적으로 삭제되었습니다.", null);
+        return CommonResponse.toResponseEntityWithoutData
+                (NO_CONTENT, "메시지가 성공적으로 삭제되었습니다.");
     }
 }

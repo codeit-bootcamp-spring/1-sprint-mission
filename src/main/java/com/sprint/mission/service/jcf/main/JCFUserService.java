@@ -45,10 +45,10 @@ public class JCFUserService implements UserService {
             createdUser.setProfileImgId(binaryContent.getId());
         }
 
+        userRepository.save(createdUser);
         // UserStatus 생성
         userStatusService.create(createdUser.getId());
-
-        return userRepository.save(createdUser);
+        return createdUser;
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기
