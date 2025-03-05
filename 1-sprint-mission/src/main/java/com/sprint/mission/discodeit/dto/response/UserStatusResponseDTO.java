@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.response;
 
+import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -17,4 +18,11 @@ public record UserStatusResponseDTO(
     Instant lastActiveAt
 ) {
 
+  public static UserStatusResponseDTO fromEntity(UserStatus userStatus) {
+    return new UserStatusResponseDTO(
+        userStatus.getId(),
+        userStatus.getUser().getId(),
+        userStatus.getLastSeenAt()
+    );
+  }
 }

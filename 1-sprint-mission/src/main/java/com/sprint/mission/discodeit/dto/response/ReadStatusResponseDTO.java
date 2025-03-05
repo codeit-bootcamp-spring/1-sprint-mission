@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.response;
 
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -19,5 +20,14 @@ public record ReadStatusResponseDTO(
     @Schema(description = "마지막 읽은 시간", example = "2021-09-01T12:00:00Z")
     Instant lastReadAt
 ) {
+
+  public static ReadStatusResponseDTO fromEntity(ReadStatus readStatus) {
+    return new ReadStatusResponseDTO(
+        readStatus.getId(),
+        readStatus.getUser().getId(),
+        readStatus.getChannel().getId(),
+        readStatus.getLastReadAt()
+    );
+  }
 
 }

@@ -44,12 +44,7 @@ public class ReadStatusService {
     ReadStatus readStatus = new ReadStatus(user, channel, createDTO.lastReadAt());
     readStatusRepository.save(readStatus);
     //응답 DTO 변환 후 반환
-    return new ReadStatusResponseDTO(
-        readStatus.getId(),
-        readStatus.getUser().getId(),
-        readStatus.getChannel().getId(),
-        readStatus.getLastReadAt()
-    );
+    return ReadStatusResponseDTO.fromEntity(readStatus);
   }
 
   public ReadStatusResponseDTO find(UUID readStatusId) {
@@ -58,12 +53,7 @@ public class ReadStatusService {
         .orElseThrow(() -> new IllegalArgumentException("ReadStatus not found"));
 
     //ReadStatus DTO로 변환 후 반환
-    return new ReadStatusResponseDTO(
-        readStatus.getId(),
-        readStatus.getUser().getId(),
-        readStatus.getChannel().getId(),
-        readStatus.getLastReadAt()
-    );
+    return ReadStatusResponseDTO.fromEntity(readStatus);
   }
 
   public List<ReadStatusResponseDTO> findAllByUserId(UUID userId) {
@@ -74,12 +64,7 @@ public class ReadStatusService {
     List<ReadStatus> readStatusList = readStatusRepository.findAllByUser(user); // 나중에 구현
     //readStatus 리스트 DTO 변환 후 반환
     return readStatusList.stream()
-        .map(readStatus -> new ReadStatusResponseDTO(
-            readStatus.getId(),
-            readStatus.getUser().getId(),
-            readStatus.getChannel().getId(),
-            readStatus.getLastReadAt()
-        ))
+        .map(ReadStatusResponseDTO::fromEntity)
         .toList();
   }
 
@@ -92,12 +77,7 @@ public class ReadStatusService {
     //업데이트된 readStatus 저장
     readStatusRepository.save(readStatus);
     //readStatus DTO 변환 후 반환
-    return new ReadStatusResponseDTO(
-        readStatus.getId(),
-        readStatus.getUser().getId(),
-        readStatus.getChannel().getId(),
-        readStatus.getLastReadAt()
-    );
+    return ReadStatusResponseDTO.fromEntity(readStatus);
   }
 
   public void delete(UUID readStatusId) {

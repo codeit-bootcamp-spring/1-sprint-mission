@@ -1,9 +1,13 @@
 package com.sprint.mission.discodeit.dto.response.user;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Schema(name = "UserResponseDTO", description = "사용자 응답 정보를 담은 DTO")
@@ -29,5 +33,20 @@ public record UserResponseDTO(
     @Schema(description = "프로필 ID", example = "123e4567-e89b-12d3-a456-426614174000")
     UUID profileId
 ) {
+
+  public static UserResponseDTO fromEntity(User user, UserStatus userStatus,
+      Optional<BinaryContent> profileContentOpt) {
+    boolean isOnline = userStatus != null && userStatus.isOnline();
+    UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
+    return new UserResponseDTO(
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
+        isOnline,
+        profileId
+    );
+  }
 
 }

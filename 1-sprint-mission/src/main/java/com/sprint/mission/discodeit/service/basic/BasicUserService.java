@@ -69,22 +69,14 @@ public class BasicUserService implements UserService {
       );
       BinaryContent profileContent = binaryContentRepository.save(binaryContent);
       profileId = profileContent.getId();
+
     }
     //사용자 상태 생성, 저장
     UserStatus userStatus = new UserStatus(newUser, null);
     userStatusRepository.save(userStatus);
 
-    boolean isOnline = userStatus.isOnline();
-
-    return new UserResponseDTO(
-        newUser.getId(),
-        newUser.getUsername(),
-        newUser.getEmail(),
-        newUser.getCreatedAt(),
-        newUser.getUpdatedAt(),
-        isOnline,
-        profileId
-    );
+    return UserResponseDTO.fromEntity(newUser, userStatus,
+        binaryContentRepository.findByUserId(newUser.getId()));
   }
 
   @Override
@@ -92,44 +84,21 @@ public class BasicUserService implements UserService {
     //사용자 찾고
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    // 온라인 상태 확인
-    boolean isOnline = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(false);
-    // 프로필 이미지 ID 조회
-    Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
-    UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
+    //사용자 상태 확인
+    UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
+
     //변환 반환
-    return new UserResponseDTO(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        isOnline,
-        profileId
-    );
+    return UserResponseDTO.fromEntity(user, userStatus,
+        binaryContentRepository.findByUserId(user.getId()));
   }
 
   @Override
   public List<UserResponseDTO> findAll() {
     return userRepository.findAll().stream()
         .map(user -> {
-          boolean isOnline = userStatusRepository.findByUserId(user.getId())
-              .map(UserStatus::isOnline)
-              .orElse(false);
-          Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(
-              user.getId());
-          UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
-          return new UserResponseDTO(
-              user.getId(),
-              user.getUsername(),
-              user.getEmail(),
-              user.getCreatedAt(),
-              user.getUpdatedAt(),
-              isOnline,
-              profileId
-          );
+          UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
+          return UserResponseDTO.fromEntity(user, userStatus,
+              binaryContentRepository.findByUserId(user.getId()));
         })
         .toList();
   }
@@ -166,21 +135,9 @@ public class BasicUserService implements UserService {
       );
       binaryContentRepository.save(binaryContent);
     }
-    boolean isOnline = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(false);
-
-    Optional<BinaryContent> profileContentOpt = binaryContentRepository.findByUserId(user.getId());
-    UUID profileId = profileContentOpt.map(BinaryContent::getId).orElse(null);
-
-    return new UserResponseDTO(user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        isOnline,
-        profileId
-    );
+    UserStatus userStatus = userStatusRepository.findByUserId(user.getId()).orElse(null);
+    return UserResponseDTO.fromEntity(user, userStatus,
+        binaryContentRepository.findByUserId(user.getId()));
   }
 
   @Override
@@ -198,7 +155,6 @@ public class BasicUserService implements UserService {
 
     //user 삭제
     userRepository.deleteById(userId);
-    log.info("User: {} deleted", userId);
   }
 
 

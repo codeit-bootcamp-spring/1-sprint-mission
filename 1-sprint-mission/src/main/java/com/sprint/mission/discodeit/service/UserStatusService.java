@@ -40,11 +40,7 @@ public class UserStatusService {
     UserStatus userStatus = new UserStatus(user, createDTO.lastActiveAt());
     userStatusRepository.save(userStatus);
 
-    return new UserStatusResponseDTO(
-        userStatus.getId(),
-        userStatus.getUser().getId(),
-        userStatus.getLastSeenAt()
-    );
+    return UserStatusResponseDTO.fromEntity(userStatus);
   }
 
   public UserResponseDTO find(UUID userId) {
@@ -111,11 +107,7 @@ public class UserStatusService {
     //저장
     userStatusRepository.save(userStatus);
     // 응답 DTO 변환 후 반환
-    return new UserStatusResponseDTO(
-        userStatus.getId(),
-        userStatus.getUser().getId(),
-        userStatus.getLastSeenAt()
-    );
+    return UserStatusResponseDTO.fromEntity(userStatus);
   }
 
   public UserStatusResponseDTO updateByUserId(UUID userId) {
