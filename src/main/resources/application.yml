@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: discodeit
+  web:
+    locale: ko_KR
+  mvc:
+    log-request-details: true
+    cors:
+      allowed-origins: "*"  # 모든 도메인 허용 (테스트용)
+      allowed-methods: "*"   # 모든 HTTP 메서드 허용
+      allowed-headers: "*"   # 모든 헤더 허용
+      allow-credentials: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false  # ✅ Instant 타입을 ISO 형식으로 변환
+    default-property-inclusion: non_null  # ✅ null 값인 필드는 직렬화하지 않음
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        show_sql: true
+
+  security:
+    user:
+      name: admin  # 기본 사용자 이름
+      password: 1234  # 기본 사용자 비밀번호 (테스트용)
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always  # ✅ 애플리케이션 시작 시 SQL 스크립트 실행
+
+server:
+  port: 8080  # ✅ 서버 포트 설정
+
+logging:
+  level:
+    org.springframework.security: DEBUG  # ✅ Spring Security 디버깅 활성화
+    org.springframework.web: DEBUG  # ✅ 웹 요청 로깅 활성화
+    org.hibernate.SQL: DEBUG  # ✅ SQL 실행 로그 활성화
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE  # ✅ SQL 바인딩 값 로깅
+
+servlet:
+  multipart:
+    enabled: true
+    max-file-size: 20MB
+    max-request-size: 20MB
+
+# ✅ OpenAPI (Swagger) 설정 추가
+springdoc:
+  api-docs:
+    enabled: true  # API 문서 활성화
+    path: /v3/api-docs  # OpenAPI 문서 경로
+  swagger-ui:
+    enabled: true  # Swagger UI 활성화
+    path: /swagger-ui.html  # Swagger UI 접근 경로 설정
+  packages-to-scan: com.sprint.mission  # API 문서를 생성할 패키지 지정
+
+file:
+  upload:
+    max-size: 5MB
