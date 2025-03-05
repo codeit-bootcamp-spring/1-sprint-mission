@@ -15,7 +15,7 @@ public record FindMessageDto (
     List<UUID> attachmentIdList,
     String content) {
 
-    public static FindMessageDto fromEntity(Message message) {
+    public static FindMessageDto toDto(Message message) {
         return new FindMessageDto(
             message.getWriterId(),
             message.getChannelId(),

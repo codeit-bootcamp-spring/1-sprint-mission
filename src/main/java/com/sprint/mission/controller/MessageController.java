@@ -7,7 +7,6 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.dto.response.FindMessageDto;
 import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -57,16 +57,15 @@ public class MessageController {
 
         // 컬렉션을 DTO로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
         List<BinaryContentDto> binaryContentDtoList = attachments == null || attachments.isEmpty()
-                ? List.of()
-                : attachments.stream()
-                .map(BinaryContentDto::convertToBinaryContentDto)
-                .flatMap(Optional::stream)
+                ? Collections.emptyList()
+                : attachments.stream().map(BinaryContentDto::convertToBinaryContentDto)
+                .flatMap(Optional::stream) // 비어있는 Optional은 무시
                 .toList();
 
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoList);
 
         return CommonResponse.toResponseEntity
-                (CREATED, "메시지가 성공적으로 생성되었습니다.", FindMessageDto.fromEntity(createdMessage));
+                (CREATED, "메시지가 성공적으로 생성되었습니다.", FindMessageDto.toDto(createdMessage));
     }
 
 
@@ -79,7 +78,7 @@ public class MessageController {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         log.info("Attachments: {}", messageList.get(0).getAttachmentIdList());
         List<FindMessageDto> dtoList = messageList.stream()
-                .map(FindMessageDto::fromEntity).toList();
+                .map(FindMessageDto::toDto).toList();
 
         return CommonResponse.toResponseEntity
                 (OK, "메시지 목록을 성공적으로 조회했습니다.", dtoList);

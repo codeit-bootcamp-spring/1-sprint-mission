@@ -73,9 +73,7 @@ public class ReadStatusService {
     }
 
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
-        ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
-
+        ReadStatus readStatus = this.findById(readStatusId);
         readStatus.update(request.newLastReadAt());
         return readStatusRepository.save(readStatus);
     }

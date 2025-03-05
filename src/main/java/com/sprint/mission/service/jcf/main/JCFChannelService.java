@@ -89,22 +89,20 @@ public class JCFChannelService implements ChannelService {
 
     @Override
     public void update(UUID channelId, ChannelDtoForUpdate dto) {
-        Channel updatingChannel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
-
+        Channel updatingChannel = this.findById(channelId);
         if (updatingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
             throw new CustomException(ErrorCode.CANNOT_UPDATE_PRIVATE_CHANNEL);
         }
 
-        updatingChannel.updateByDTO(dto);
+        updatingChannel.update(dto.newName(), dto.newDescription());
+        // updatingChannel.updateByDTO(dto); dto는 변경이 잦기에 엔티티와 분리
         channelRepository.save(updatingChannel);
     }
 
 
     @Override
     public void delete(UUID channelId) {
-        Channel deletingChannel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
+        Channel deletingChannel = this.findById(channelId);
 
         if (deletingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
             readStatusRepository.deleteAllByChannelId(channelId);

@@ -74,8 +74,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void update(UUID messageId, MessageDtoForUpdate updateDto) {
-        Message updatingMessage = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+        Message updatingMessage = this.findById(messageId);
         updatingMessage.setContent(updateDto.newContent());
         updatingMessage.setUpdateAt(Instant.now());
         messageRepository.save(updatingMessage);
@@ -98,8 +97,7 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public void delete(UUID messageId) {
-        Message deletingMessage = messageRepository.findById(messageId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_MESSAGE));
+        Message deletingMessage = this.findById(messageId);
 
         Future<?> deleteBinaryF = ves.submit(() -> {
             deletingMessage.getAttachmentIdList()

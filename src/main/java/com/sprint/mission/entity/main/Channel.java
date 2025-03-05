@@ -32,9 +32,9 @@ public class Channel implements Serializable {
         this.createdAt = Instant.now();
     }
 
-    public void updateByDTO(ChannelDtoForUpdate dto){
-        this.name = dto.newName();
-        this.description = dto.newDescription();
+    public void update(String newName, String newDescription) {
+        this.name = newName;
+        this.description = newDescription;
         this.updatedAt = Instant.now();
     }
 }
