@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 public interface MessageService {
 //    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
 
-    Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto);
+    Message create(MessageDtoForCreate responseDto, List<BinaryContentDto> attachmentsDto);
 
     void update(UUID messageId, MessageDtoForUpdate updateDto);
     List<Message> findAllByChannelId(UUID channelId);

@@ -38,7 +38,7 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
 
     @Override
-    public Message create(MessageDtoForCreate responseDto, Optional<List<BinaryContentDto>> attachmentsDto) {
+    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDto> binaryContentDtoList) {
         UUID userId = responseDto.userId();
         UUID channelId = responseDto.channelId();
 
@@ -59,10 +59,9 @@ public class JCFMessageService implements MessageService {
 
         Message createdMessage = responseDto.toEntity();
 
-        List<BinaryContentDto> bcdList = attachmentsDto.orElse(Collections.emptyList());
-        log.info("attachmentsDto: {}", bcdList);
-        if (!bcdList.isEmpty()) {
-            for (BinaryContentDto bcd : bcdList) {
+        log.info("attachmentsDto: {}", binaryContentDtoList);
+        if (!binaryContentDtoList.isEmpty()) {
+            for (BinaryContentDto bcd : binaryContentDtoList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
                 createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
             }

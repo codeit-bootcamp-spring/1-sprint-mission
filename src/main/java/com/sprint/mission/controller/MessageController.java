@@ -55,12 +55,13 @@ public class MessageController {
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
 
 
-        Optional<List<BinaryContentDto>> binaryContentDtoList = attachments == null || attachments.isEmpty()
-                ? Optional.empty()
-                : Optional.of(attachments.stream()
+        // 컬렉션을 DTO로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
+        List<BinaryContentDto> binaryContentDtoList = attachments == null || attachments.isEmpty()
+                ? List.of()
+                : attachments.stream()
                 .map(BinaryContentDto::convertToBinaryContentDto)
                 .flatMap(Optional::stream)
-                .toList());
+                .toList();
 
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoList);
 
