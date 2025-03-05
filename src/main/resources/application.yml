@@ -1,0 +1,12 @@
+discodeit:
+  repository:
+    type: file
+    file:
+      storage-path: "file-data-map/"
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB  # 업로드할 파일 최대 크기
+      max-request-size: 10MB
