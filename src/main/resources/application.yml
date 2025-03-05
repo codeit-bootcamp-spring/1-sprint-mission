@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: Discodeit
+
+server:
+  port: 8080
+
+discodeit:
+  repository:
+    type: jcf
+    file-directory: tmp
+
+logging:
+  #  file:
+  #    name: ${user.dir}/log/test.log
+  level:
+    com.sprint.mission.discodeit: info
+
+# swagger
+springdoc:
+  api-docs:
+    path: /api-docs     # OpenAPI 명세서의 엔드포인트 설정 (default: /v3/api-docs)
+  default-consumes-media-type: application/json   # 기본 요청 Content-Type
+  default-produces-media-type: application/json   # 기본 응답 Content-Type
+  swagger-ui:
+    operations-sorter: alpha    # API 메서드 알파벳 순 정렬
+    tags-sorter: alpha          # API 태그 알파벳 순 정렬
+    path: /swagger-ui
+    display-request-duration: true
+    doc-expansion: none
+    filter: true
+    show-extensions: true
