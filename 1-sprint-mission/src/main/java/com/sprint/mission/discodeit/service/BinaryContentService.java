@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class BinaryContentService {
   public BinaryContentResponseDTO create(BinaryContentCreateDTO createDTO) {
     // 관련된 유저 확인
     User user = userRepository.findById(createDTO.userId())
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     //새로운 binaryContent 생성, 저장
     BinaryContent binaryContent = new BinaryContent(

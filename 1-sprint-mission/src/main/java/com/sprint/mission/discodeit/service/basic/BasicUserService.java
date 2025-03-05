@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.dto.response.user.UserResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
@@ -39,10 +41,11 @@ public class BasicUserService implements UserService {
   public UserResponseDTO create(UserCreateDTO userCreateDTO,
       BinaryContentCreateRequest binaryContentCreateRequest) {
     if (userRepository.existsByEmail(userCreateDTO.email())) {
-      throw new IllegalArgumentException("User email " + userCreateDTO.email() + " already exists");
+      throw new UserAlreadyExistsException(
+          "User email " + userCreateDTO.email() + " already exists");
     }
     if (userRepository.existsByUsername(userCreateDTO.username())) {
-      throw new IllegalArgumentException(
+      throw new UserAlreadyExistsException(
           "UserName " + userCreateDTO.username() + " already exists");
     }
     // 새 사용자 생성, 저장
@@ -72,8 +75,6 @@ public class BasicUserService implements UserService {
     userStatusRepository.save(userStatus);
 
     boolean isOnline = userStatus.isOnline();
-    log.info("User created: {} (email: {}) , User Online : {} ", userCreateDTO.username(),
-        userCreateDTO.email(), isOnline);
 
     return new UserResponseDTO(
         newUser.getId(),
@@ -138,7 +139,7 @@ public class BasicUserService implements UserService {
       BinaryContentCreateRequest binaryContentCreateRequest) {
     //사용자 찾고
     User user = userRepository.findById(userUpdateDTO.id())
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     //중복체크
     if (!user.getEmail().equals(userUpdateDTO.newEmail()) &&
@@ -186,7 +187,7 @@ public class BasicUserService implements UserService {
   public void delete(UUID userId) {
     //사용자 찾고
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //관련 데이터 삭제(첨부파일, 유저 상태)
     if (binaryContentRepository.existsByUserId(userId)) {
       binaryContentRepository.deleteByUserId(user.getId());

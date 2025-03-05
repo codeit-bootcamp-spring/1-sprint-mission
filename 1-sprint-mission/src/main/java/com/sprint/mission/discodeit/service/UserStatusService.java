@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.user.UserResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
@@ -30,7 +31,7 @@ public class UserStatusService {
   public UserStatusResponseDTO create(UserStatusCreateDTO createDTO) {
     //사용자 조회
     User user = userRepository.findById(createDTO.userId())
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //중복 체크
     if (userStatusRepository.existsByUser(user)) {
       throw new IllegalArgumentException("UserStatus already exists");
@@ -49,7 +50,7 @@ public class UserStatusService {
   public UserResponseDTO find(UUID userId) {
     //사용자 확인
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //사용자 상태 조회(온라인 여부 확인)
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElse(new UserStatus(user, Instant.EPOCH));
@@ -120,7 +121,7 @@ public class UserStatusService {
   public UserStatusResponseDTO updateByUserId(UUID userId) {
     //id로 사용자 조회
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //userStatus 조회 (없으면 새로 생성)
     UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
         .orElseGet(() -> {

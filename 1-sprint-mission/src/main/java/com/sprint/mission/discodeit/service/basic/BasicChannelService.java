@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
@@ -38,11 +39,11 @@ public class BasicChannelService implements ChannelService {
   public ChannelResponseDTO createPrivateChannel(PrivateChannelCreateDTO requestDTO) {
     //채널 소유자 확인
     User owner = userRepository.findById(requestDTO.ownerId())
-        .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
-    // 참여멤버 조회?? 너무 데이터베이스 성능이 저하될꺼 같음..
+        .orElseThrow(() -> new UserNotFoundException("Owner not found"));
+
     List<User> members = requestDTO.memberIds().stream()
         .map(id -> userRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("User not found")))
+            .orElseThrow(() -> new UserNotFoundException("User not found")))
         .toList();
     //멤버가 한명이상이어야 됨.
     if (members.isEmpty()) {
@@ -55,7 +56,7 @@ public class BasicChannelService implements ChannelService {
 
     for (User member : members) {
       ReadStatus readStatus = new ReadStatus(member, privateChannel, Instant.now());
-      readStatusRepository.save(readStatus); // 레포지토리 구현 해야함 확인!
+      readStatusRepository.save(readStatus);
     }
     List<UUID> memberIds = members.stream()
         .map(User::getId)
@@ -70,7 +71,7 @@ public class BasicChannelService implements ChannelService {
     log.info("Received PublicChannelCreateDTO with ownerId: {}", requestDTO.ownerId());
     //채널 소유자 확인
     User owner = userRepository.findById(requestDTO.ownerId())
-        .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
+        .orElseThrow(() -> new UserNotFoundException("Owner not found"));
     //Public 채널 생성
     Channel publicChannel = new Channel(owner, requestDTO.name(), requestDTO.description(),
         ChannelType.PUBLIC);
@@ -110,7 +111,7 @@ public class BasicChannelService implements ChannelService {
   public List<ChannelResponseDTO> findAllByUserId(UUID userId) {
     //사용자 조회
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //private 채널 조회(사용자가 참여한 채널 + 사용자가 소유한 채널)
     List<Channel> privateChannels = readStatusRepository.findChannelsByUser(user);
     channelRepository.findAllByOwnerAndType(user, ChannelType.PRIVATE);

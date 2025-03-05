@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.response.ReadStatusResponseDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
@@ -28,7 +29,7 @@ public class ReadStatusService {
   public ReadStatusResponseDTO create(ReadStatusCreateDTO createDTO) {
     // user 조회
     User user = userRepository.findById(createDTO.userId())
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     // 채널 조회
     Channel channel = channelRepository.findById(createDTO.channelId())
         .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
@@ -68,7 +69,7 @@ public class ReadStatusService {
   public List<ReadStatusResponseDTO> findAllByUserId(UUID userId) {
     //사용자 조회
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> new UserNotFoundException("User not found"));
     //특정 사용자 모든 readStatus 조회
     List<ReadStatus> readStatusList = readStatusRepository.findAllByUser(user); // 나중에 구현
     //readStatus 리스트 DTO 변환 후 반환

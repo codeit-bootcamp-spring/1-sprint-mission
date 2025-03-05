@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.dto.response.message.MessageResponseDTO;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.interfacepac.*;
 import com.sprint.mission.discodeit.service.interfacepac.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ public class BasicMessageService implements MessageService {
     //사용자 조회
     User user = userRepository.findById(messageCreateDTO.userId())
         .orElseThrow(
-            () -> new IllegalArgumentException("User not found" + messageCreateDTO.userId()));
+            () -> new UserNotFoundException("User not found" + messageCreateDTO.userId()));
     //채널 조회
     Channel channel = channelRepository.findById(messageCreateDTO.channelId())
         .orElseThrow(
@@ -101,8 +102,8 @@ public class BasicMessageService implements MessageService {
       return messageRepository.findAll().stream()
           .filter(message -> message.getUser().equals(user))
           .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(user + " not exists"));
-    } catch (IllegalArgumentException e) {
+          .orElseThrow(() -> new UserNotFoundException(user + " not exists"));
+    } catch (UserNotFoundException e) {
       System.out.println("Failed to read message: " + e.getMessage());
       return null;
     }
