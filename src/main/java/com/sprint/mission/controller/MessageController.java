@@ -7,6 +7,7 @@ import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.dto.response.FindMessageDto;
 import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

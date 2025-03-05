@@ -40,7 +40,7 @@ public class JCFUserService implements UserService {
 
         User createdUser = requestDTO.toEntity();
         // 선택적 프로필 생성
-        if (profileDTO.isPresent()) {
+        if (profileDTO.isPresent()) { // 고치기
             BinaryContent binaryContent = profileService.create(profileDTO.get());
             createdUser.setProfileImgId(binaryContent.getId());
         }
