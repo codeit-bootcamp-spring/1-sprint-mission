@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: discodeit
+  servlet:
+    multipart:
+      enabled: true
+      maxFileSize: 100MB # 파일 하나의 최대 크기
+      maxRequestSize: 500MB  # 한 번에 최대 업로드 가능 용량
+
+
+discodeit:
+  repository:
+    type: file #jcf | file
+    file-directory: .discodeit
