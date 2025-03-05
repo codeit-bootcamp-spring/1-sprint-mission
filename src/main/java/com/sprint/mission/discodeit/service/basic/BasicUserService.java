@@ -1,0 +1,114 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
+import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.ErrorCode;
+import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.validator.UserValidator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+@RequiredArgsConstructor
+public class BasicUserService implements UserService {
+
+  private final UserRepository userRepository;
+  private final UserStatusRepository userStatusRepository;
+
+  private final BinaryContentService binaryContentService;
+  private final UserValidator userValidator;
+
+
+  @Override
+  public User create(UserCreateDTO dto, MultipartFile file) {
+    userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
+    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
+
+    if (file != null) {
+      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(file);
+      BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDTO);
+      user.updateBinaryContentId(binaryContent.getId());
+    }
+    User saveUser = userRepository.save(user);
+    userStatusRepository.save(new UserStatus(saveUser.getId()));
+    return saveUser;
+  }
+
+  @Override
+  public UserFindDTO find(UUID id) {
+    User findUser = userRepository.findOne(id);
+    Optional.ofNullable(findUser)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+    return toDTO(findUser);
+  }
+
+  @Override
+  public List<UserFindDTO> findAll() {
+    List<User> users = userRepository.findAll();
+    return users.stream()
+        .map(this::toDTO).toList();
+  }
+
+  @Override
+  public User update(UUID id, UserUpdateDTO dto, MultipartFile file) {
+    userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
+        dto.getNewPassword());
+    User findUser = userRepository.findOne(id);
+    findUser.setUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword());
+
+    //기존 사진이 있다면 삭제하고 만들기
+    if (file != null) {
+      if (findUser.getBinaryContentId() != null) {
+        binaryContentService.delete(findUser.getBinaryContentId());
+      }
+      BinaryContent binaryContent = binaryContentService.create(
+          new BinaryContentCreateDTO(file));
+      findUser.updateBinaryContentId(binaryContent.getId());
+    }
+    userRepository.update(findUser);
+    return findUser;
+  }
+
+  @Override
+  public UUID delete(UUID id) {
+    User findUser = userRepository.findOne(id);
+    Optional.ofNullable(findUser)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+
+    userStatusRepository.deleteByUserId(id);
+
+    Optional.ofNullable(findUser.getBinaryContentId())
+        .ifPresent(binaryContentService::delete);
+
+    return userRepository.delete(findUser.getId());
+  }
+
+  private UserFindDTO toDTO(User user) {
+    Boolean online = userStatusRepository.findByUserId(user.getId())
+        .map(UserStatus::isOnline)
+        .orElse(null);
+
+    return new UserFindDTO(
+        user.getId(),
+        user.getUsername(),
+        user.getEmail(),
+        online,
+        user.getBinaryContentId(),
+        user.getCreatedAt(),
+        user.getUpdatedAt()
+    );
+  }
+
+}
