@@ -16,7 +16,7 @@ import java.util.UUID;
 @Tag(name = "BinaryContent Controller", description = "바이너리 파일 관련 API 앤드포인트 관리")
 public class BinaryContentController {
 
-  final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
   public BinaryContentController(BinaryContentService binaryContentService) {
     this.binaryContentService = binaryContentService;
