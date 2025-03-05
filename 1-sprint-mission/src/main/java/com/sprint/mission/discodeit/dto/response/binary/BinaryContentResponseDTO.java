@@ -8,8 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
-@Schema(name = "BinaryContentResponseData", description = "파일 바이너리 콘텐츠의 상세 응답 정보를 담은 DTO")
-public record BinaryContentResponseData(
+@Schema(name = "BinaryContentResponseDTO", description = "파일 바이너리 콘텐츠의 상세 응답 정보를 담은 DTO")
+public record BinaryContentResponseDTO(
     @Schema(description = "바이너리 콘텐츠 ID", example = "123e4567-e89b-12d3-a456-426614174000")
     @NotNull(message = "BinaryContentId is required") UUID binaryContentId,
 
@@ -26,8 +26,8 @@ public record BinaryContentResponseData(
     Instant createdAt
 ) {
 
-  public static BinaryContentResponseData fromEntity(BinaryContent binaryContent) {
-    return new BinaryContentResponseData(
+  public static BinaryContentResponseDTO fromEntity(BinaryContent binaryContent) {
+    return new BinaryContentResponseDTO(
         binaryContent.getId(),
         binaryContent.getUserId(),
         binaryContent.getFilename(),

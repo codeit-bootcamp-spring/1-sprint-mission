@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.response.binary.BinaryContentDTO;
 import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateDTO;
-import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseData;
+import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
@@ -23,7 +23,7 @@ public class BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final UserRepository userRepository;
 
-  public BinaryContentResponseData create(BinaryContentCreateDTO createDTO) {
+  public BinaryContentResponseDTO create(BinaryContentCreateDTO createDTO) {
     // 관련된 유저 확인
     User user = userRepository.findById(createDTO.userId())
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -40,7 +40,7 @@ public class BinaryContentService {
     binaryContentRepository.save(binaryContent);
 
     // DTO 변환 반환
-    return BinaryContentResponseData.fromEntity(binaryContent);
+    return BinaryContentResponseDTO.fromEntity(binaryContent);
   }
 
   public BinaryContentDTO find(UUID binaryContentId) {
@@ -52,18 +52,18 @@ public class BinaryContentService {
   }
 
 
-  public List<BinaryContentResponseData> findAllByIdIn(List<UUID> binaryContentIds) {
+  public List<BinaryContentResponseDTO> findAllByIdIn(List<UUID> binaryContentIds) {
     if (binaryContentIds.isEmpty()) {
       return List.of();
     }
     return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-        .map(BinaryContentResponseData::fromEntity)
+        .map(BinaryContentResponseDTO::fromEntity)
         .toList();
   }
 
-  public List<BinaryContentResponseData> findAllByUserId(UUID userId) {
+  public List<BinaryContentResponseDTO> findAllByUserId(UUID userId) {
     return binaryContentRepository.findAllByUserId(userId).stream()
-        .map(BinaryContentResponseData::fromEntity)
+        .map(BinaryContentResponseDTO::fromEntity)
         .toList();
   }
 

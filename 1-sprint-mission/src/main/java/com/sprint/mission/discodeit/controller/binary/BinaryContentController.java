@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller.binary;
 
 import com.sprint.mission.discodeit.dto.response.binary.BinaryContentDTO;
-import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseData;
+import com.sprint.mission.discodeit.dto.response.binary.BinaryContentResponseDTO;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,9 +33,9 @@ public class BinaryContentController {
   //userId로 binaryResponseContentDTO 찾기-> messageId & fileData 포함 X DTO
   @Operation(summary = "유저 ID로 바이너리 파일 찾기", description = " messageId & fileData 포함 되어 있지 않은 DTO로 반환")
   @GetMapping("/list/{userId}")
-  public ResponseEntity<List<BinaryContentResponseData>> getBinaryContentsUserById(
+  public ResponseEntity<List<BinaryContentResponseDTO>> getBinaryContentsUserById(
       @PathVariable UUID userId) {
-    List<BinaryContentResponseData> binaryList = binaryContentService.findAllByUserId(userId);
+    List<BinaryContentResponseDTO> binaryList = binaryContentService.findAllByUserId(userId);
     return ResponseEntity.ok(binaryList);
   }
 
