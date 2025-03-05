@@ -1,0 +1,4 @@
+# application.yaml
+discodeit:
+  repository:
+    type: jcf   # jcf | file
