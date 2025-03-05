@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.repository.file.*;
 import com.sprint.mission.discodeit.repository.interfacepac.*;
 import com.sprint.mission.discodeit.repository.jcf.*;
@@ -13,6 +16,13 @@ public class RepositoryConfig {
 
   @Value("${discodeit.repository.file-directory:.discodeit}")
   private String fileDirectory;
+
+  @Bean
+  public ObjectMapper objectMapper() {
+    return new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+  }
 
   //UserRepository Bean 등록
   @Bean
@@ -75,8 +85,10 @@ public class RepositoryConfig {
 
   @Bean
   @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
-  public BinaryContentRepository binaryContentRepositoryFile() {
-    return new FileBinaryContentRepository(fileDirectory);
+  public BinaryContentRepository binaryContentRepositoryFile(
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    return new FileBinaryContentRepository(fileDirectory, objectMapper);
   }
 
   //ReadStatusRepository Bean 등록

@@ -18,13 +18,15 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-  private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(
-      new JavaTimeModule());
+  private final ObjectMapper objectMapper;
   private final String filePath;
   private final Map<UUID, BinaryContent> binaryContentData;
 
+
   public FileBinaryContentRepository(
-      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+      @Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
+      ObjectMapper objectMapper) {
+    this.objectMapper = objectMapper;
     if (!fileDirectory.endsWith("/")) {
       fileDirectory += "/";
     }
