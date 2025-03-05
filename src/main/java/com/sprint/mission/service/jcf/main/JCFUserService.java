@@ -17,6 +17,7 @@ import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -34,16 +35,18 @@ public class JCFUserService implements UserService {
     private final ExecutorService ves;
 
     @Override
-    public User create(UserDtoForCreate requestDTO, Optional<BinaryContentDto> profileDTO) {
+    public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
 
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
-
         User createdUser = requestDTO.toEntity();
+
+
+        Optional<BinaryContentDto> profileDto = BinaryContentDto.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
-        if (profileDTO.isPresent()) { // 고치기
-            BinaryContent binaryContent = profileService.create(profileDTO.get());
+        profileDto.ifPresent((dto) -> {
+            BinaryContent binaryContent = profileService.create(dto);
             createdUser.setProfileImgId(binaryContent.getId());
-        }
+        });
 
         userRepository.save(createdUser);
         // UserStatus 생성

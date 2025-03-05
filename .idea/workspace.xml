@@ -6,10 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/MessageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindMessageDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/response/FindMessageDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/Channel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFChannelService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -229,7 +228,7 @@
       <workItem from="1740707473440" duration="1426000" />
       <workItem from="1741094498044" duration="7886000" />
       <workItem from="1741135374673" duration="37000" />
-      <workItem from="1741179202979" duration="6710000" />
+      <workItem from="1741179202979" duration="7366000" />
     </task>
     <servers />
   </component>
