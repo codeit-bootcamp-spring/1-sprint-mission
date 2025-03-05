@@ -2,9 +2,10 @@ package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.service.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.List;
@@ -12,25 +13,21 @@ import java.util.UUID;
 
 @SpringBootApplication
 @EnableJpaRepositories("com.sprint.mission.discodeit.repository")
-public class DiscodeitApplication {
+@RequiredArgsConstructor
+public class DiscodeitApplication implements CommandLineRunner {
+
+    private final UserService userService;
+    private final ChannelService channelService;
+    private final MessageService messageService;
+    private final ReadStatusService readStatusService;
+
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+        SpringApplication.run(DiscodeitApplication.class, args);
         System.out.println("🚀 DiscodeitApplication 실행 완료!");
-
-        UserService userService = context.getBean(UserService.class);
-        ChannelService channelService = context.getBean(ChannelService.class);
-        MessageService messageService = context.getBean(MessageService.class);
-        ReadStatusService readStatusService = context.getBean(ReadStatusService.class);
-
-        runApplication(userService, channelService, messageService, readStatusService);
     }
 
-    private static void runApplication(
-            UserService userService,
-            ChannelService channelService,
-            MessageService messageService,
-            ReadStatusService readStatusService
-    ) {
+    @Override
+    public void run(String... args) {
         System.out.println("✅ CommandLineRunner 실행됨!");
 
         // ✅ 사용자 생성
@@ -49,9 +46,9 @@ public class DiscodeitApplication {
 
         UUID userId = createdUser.getId();
 
-        // ✅ 채널 생성 (isPrivate 여부에 따라 다르게 처리)
+        // ✅ 채널 생성 (공개/비공개 여부에 따라 처리)
         ChannelCreateRequest channelCreateRequest = new ChannelCreateRequest(
-                "Second 채널", "업데이트된 채널 설명", userId, false, List.of(UUID.randomUUID())
+                "Second 채널", "업데이트된 채널 설명", userId, false, List.of(userId)
         );
 
         ChannelResponse createdChannel;

@@ -52,8 +52,8 @@ logging:
 servlet:
   multipart:
     enabled: true
-    max-file-size: 50MB
-    max-request-size: 50MB
+    max-file-size: 20MB
+    max-request-size: 20MB
 
 # ✅ OpenAPI (Swagger) 설정 추가
 springdoc:
@@ -64,3 +64,7 @@ springdoc:
     enabled: true  # Swagger UI 활성화
     path: /swagger-ui.html  # Swagger UI 접근 경로 설정
   packages-to-scan: com.sprint.mission  # API 문서를 생성할 패키지 지정
+
+file:
+  upload:
+    max-size: 5MB
