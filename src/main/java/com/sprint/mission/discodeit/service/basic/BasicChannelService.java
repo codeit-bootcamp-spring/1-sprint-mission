@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  //
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
 
@@ -46,10 +45,12 @@ public class BasicChannelService implements ChannelService {
 
     request.participantIds().stream()
         .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+        .map(userId -> new ReadStatus(userId, createdChannel.getId(), channel.getCreatedAt()))
         .forEach(readStatusRepository::save);
 
     return createdChannel;
   }
+
 
   @Override
   public ChannelDto find(UUID channelId) {
