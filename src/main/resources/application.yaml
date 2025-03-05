@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: 1-sprint-mission
+  servlet:
+    multipart:
+      enabled: true
+      maxFileSize: 10MB
+      maxRequestSize: 30MB
+
+file:
+  path:
+    user: data/users.dat
+    channel: data/channels.dat
+    message: data/messages.dat
+    binarycontent: data/binarycontents
+    readstatus: data/readstatus.dat
+    userstatus: data/userstatus.dat
+
+discodeit:
+  repository:
+    type: file
