@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Discodeit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #313338;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 48px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .list-group {
+            background-color: #2B2D31;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .list-group-item {
+            padding: 16px 20px;
+            color: #B5BAC1;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #1E1F22;
+            transition: background-color 0.2s;
+        }
+
+        .list-group-item:hover {
+            background-color: #404249;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="mb-4">Discodeit</h1>
+    <div class="list-group">
+        <a href="/users/register" class="list-group-item list-group-item-action">
+            회원가입
+        </a>
+        <a href="/users" class="list-group-item list-group-item-action">
+            유저 목록
+        </a>
+
+        <a href="/auth/login" class="list-group-item list-group-item-action">
+            로그인
+        </a>
+
+        <a href="/channels/create" class="list-group-item list-group-item-action">
+            채널 생성
+        </a>
+        <a href="/channels" class="list-group-item list-group-item-action">
+            채널 목록 조회
+        </a>
+
+        <a href="/messages/create" class="list-group-item list-group-item-action">
+            메시지 보내기
+        </a>
+        <a href="/messages/list" class="list-group-item list-group-item-action">
+            메시지 목록 조회
+        </a>
+
+        <a href="/read-status" class="list-group-item list-group-item-action">
+            메시지 수신 정보 관리
+        </a>
+
+        <a href="/files" class="list-group-item list-group-item-action">
+            바이너리 파일 조회
+        </a>
+    </div>
+</div>
+</body>
+</html>

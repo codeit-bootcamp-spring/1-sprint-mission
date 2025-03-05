@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채널 목록 | Discord Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #313338;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .header h2 {
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #5865F2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #4752C4;
+        }
+
+        .btn-danger {
+            background-color: #ED4245;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #D83C3E;
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .channel-card {
+            background-color: #2B2D31;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .channel-name {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .channel-type {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background-color: #5865F2;
+            color: #fff;
+        }
+
+        .channel-description {
+            color: #B5BAC1;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .channel-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .channel-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>채널 목록</h2>
+        <div class="button-group">
+            <a href="/channels/create" class="btn btn-primary">채널 생성</a>
+            <a href="/" class="btn btn-primary">홈</a>
+        </div>
+    </div>
+
+    <div class="channel-grid">
+        <div th:each="ch : ${channels}" class="channel-card">
+            <div class="channel-name">
+                # <span th:text="${ch.name}">채널명</span>
+                <span class="channel-type" th:text="${ch.type}">타입</span>
+            </div>
+            <div class="channel-description" th:text="${ch.description}">설명</div>
+            <div class="channel-actions">
+                <a th:href="@{|/channels/delete/${ch.id}|}" class="btn btn-danger">삭제</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
