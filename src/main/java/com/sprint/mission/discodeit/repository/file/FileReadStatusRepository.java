@@ -33,26 +33,48 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus save(ReadStatus readStatus) {
-        try (
-                FileOutputStream fos = new FileOutputStream(DIRECTORY.toFile(), true);
-                ObjectOutputStream oos = new ObjectOutputStream(fos) {
-                    @Override
-                    protected void writeStreamHeader() throws IOException {
-                        if (fos.getChannel().position() == 0) {
-                            super.writeStreamHeader();
-                        } else {
-                            reset();
-                        } //역직렬화 헤더 오류 해결 코드. 파일에 한번만 헤더 들어갈 수 있도록
-                    }
+        List<ReadStatus> readStatuses = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+            while (true) {
+                try {
+                    ReadStatus existingReadStatus = (ReadStatus) ois.readObject();
+                    readStatuses.add(existingReadStatus);
+                } catch (EOFException e) {
+                    break;
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-        ) {
-            oos.writeObject(readStatus);
+            }
+        } catch (FileNotFoundException e) {
+            // 파일이 없는 경우, 새 파일 생성 후 저장
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 읽음 상태 업데이트 또는 추가
+        boolean readStatusUpdated = false;
+        for (int i = 0; i < readStatuses.size(); i++) {
+            if (readStatuses.get(i).getUserId().equals(readStatus.getUserId()) &&
+                    readStatuses.get(i).getChannelId().equals(readStatus.getChannelId())) {
+                readStatuses.set(i, readStatus);
+                readStatusUpdated = true;
+                break;
+            }
+        }
+        if (!readStatusUpdated) {
+            readStatuses.add(readStatus);
+        }
+
+        // 파일에 다시 쓰기
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DIRECTORY.toFile()))) {
+            for (ReadStatus rs : readStatuses) {
+                oos.writeObject(rs);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return readStatus;
     }
-
     @Override
     public Optional<ReadStatus> findById(UUID id) {
         List<ReadStatus> allContents = readAllContents();

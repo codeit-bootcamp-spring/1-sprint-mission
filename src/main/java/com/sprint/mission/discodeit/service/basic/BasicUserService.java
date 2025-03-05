@@ -49,6 +49,7 @@ public class BasicUserService implements UserService {
                 })
                 .orElse(null);
         String password = userCreateRequest.password();
+        //map + orElse사용해서 param으로 optional 사용해도 내가 직접 isPresent로직 작성안함. (map안에 로직 이미 들어있는 상태)
 
         User user = new User(username, email, password, profileId);
         User createdUser = userRepository.save(user);

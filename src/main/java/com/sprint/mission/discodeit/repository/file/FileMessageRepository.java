@@ -33,20 +33,42 @@ public class FileMessageRepository implements MessageRepository {
 
     @Override
     public Message save(Message message) {
-        try (
-                FileOutputStream fos = new FileOutputStream(DIRECTORY.toFile(), true);
-                ObjectOutputStream oos = new ObjectOutputStream(fos) {
-                    @Override
-                    protected void writeStreamHeader() throws IOException {
-                        if (fos.getChannel().position() == 0) {
-                            super.writeStreamHeader();
-                        } else {
-                            reset();
-                        } //역직렬화 헤더 오류 해결 코드. 파일에 한번만 헤더 들어갈 수 있도록
-                    }
+        List<Message> messages = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+            while (true) {
+                try {
+                    Message existingMessage = (Message) ois.readObject();
+                    messages.add(existingMessage);
+                } catch (EOFException e) {
+                    break;
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-        ) {
-            oos.writeObject(message);
+            }
+        } catch (FileNotFoundException e) {
+            // 파일이 없는 경우, 새 파일 생성 후 저장
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 메시지 업데이트 또는 추가
+        boolean messageUpdated = false;
+        for (int i = 0; i < messages.size(); i++) {
+            if (messages.get(i).getId().equals(message.getId())) {
+                messages.set(i, message);
+                messageUpdated = true;
+                break;
+            }
+        }
+        if (!messageUpdated) {
+            messages.add(message);
+        }
+
+        // 파일에 다시 쓰기
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DIRECTORY.toFile()))) {
+            for (Message m : messages) {
+                oos.writeObject(m);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

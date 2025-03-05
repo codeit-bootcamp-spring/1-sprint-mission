@@ -33,26 +33,44 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        try (
-                FileOutputStream fos = new FileOutputStream(DIRECTORY.toFile(), true);
-                ObjectOutputStream oos = new ObjectOutputStream(fos) {
-                    @Override
-                    protected void writeStreamHeader() throws IOException {
-                        if (fos.getChannel().position() == 0) {
-                            super.writeStreamHeader();
-                        } else {
-                            reset();
-                        } //역직렬화 헤더 오류 해결 코드. 파일에 한번만 헤더 들어갈 수 있도록
-                    }
+        List<User> users = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+            while (true) {
+                try {
+                    User existingUser = (User) ois.readObject();
+                    users.add(existingUser);
+                } catch (EOFException e) {
+                    break;
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-        ) {
-            oos.writeObject(user);
+            }
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        boolean userUpdated = false;
+        for (int i = 0; i < users.size(); i++) {
+            if (users.get(i).getId().equals(user.getId())) {
+                users.set(i, user);
+                userUpdated = true;
+                break;
+            }
+        }
+        if (!userUpdated) {
+            users.add(user);
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DIRECTORY.toFile()))) {
+            for (User u : users) {
+                oos.writeObject(u);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return user;
     }
-
     @Override
     public Optional<User> findById(UUID id) {
         List<User> allContents = readAllContents();
