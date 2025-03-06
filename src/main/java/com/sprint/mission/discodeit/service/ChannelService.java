@@ -25,7 +25,7 @@ public interface ChannelService {
 
   //읽기
   //단건 조회 - UUID
-  ChannelResponseDto findById(String channelId);
+  ChannelResponseDto findById(String channelId, String userId);
 
   //다건 조회 - name
   List<ChannelResponseDto> findAllByChannelName(String channelName);

@@ -43,7 +43,7 @@ public class BasicMessageService implements MessageService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    ChannelResponseDto channel = channelService.findById(createMessageDto.channelId());
+    ChannelResponseDto channel = channelService.findById(createMessageDto.channelId(), user.id());
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
@@ -70,7 +70,7 @@ public class BasicMessageService implements MessageService {
     if (files == null || files.isEmpty()) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
     }
-    
+
     List<String> binaryContentIds = new ArrayList<>();
     for (MultipartFile file : files) {
       ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
@@ -120,8 +120,8 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageResponseDto> findAllByChannelId(String channelId) {
-    ChannelResponseDto byId = channelService.findById(channelId);
+  public List<MessageResponseDto> findAllByChannelId(String channelId, String userId) {
+    ChannelResponseDto byId = channelService.findById(channelId, userId); //change Sign
     if (byId == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }

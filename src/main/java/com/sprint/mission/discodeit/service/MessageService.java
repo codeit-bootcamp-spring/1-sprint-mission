@@ -32,7 +32,7 @@ public interface MessageService {
   List<MessageResponseDto> findAllByCreatedAt(Instant createdAt);
 
   //다건 조회 - 특정 채널
-  List<MessageResponseDto> findAllByChannelId(String channelId);
+  List<MessageResponseDto> findAllByChannelId(String channelId, String userId);
 
   //수정
   MessageResponseDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);

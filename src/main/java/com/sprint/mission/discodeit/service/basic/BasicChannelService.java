@@ -78,33 +78,14 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public List<ChannelResponseDto> findAllByUserId(String userId) {
-    //todo - 개선
-    //- 사용자가 속해 있는 private 채널
-    //- 모든 public 채널
-    // 부터 가져와서 반환하는 걸로 수정하기
     User user = userRepository.findById(userId);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
+    List<Channel> channels = channelRepository.findByParticipantId(userId);
 
-    List<ChannelResponseDto> channelResponseDtos = new ArrayList<>();
-
-    for (Channel channel : channelRepository.findAll()) {
-      //PRIVATE 채널인데, 해당 채널에 유저가 참여하고 있지 않다면 조회 결과 담지 않음
-      if (channel.getChannelType().equals(ChannelType.PRIVATE) && !channel.getUserSet()
-          .contains(userId)) {
-        continue;
-      }
-
-      List<String> userIds = (channel.getChannelType() == ChannelType.PRIVATE ? channel.getUserSet()
-          .stream().toList() : null);
-
-      channelResponseDtos.add(
-          ChannelResponseDto.from(channel, getLastMessageTimestamp(channel), userIds));
-
-    }
-
-    return channelResponseDtos;
+    return channels.stream().map(c -> ChannelResponseDto.from(c, getLastMessageTimestamp(c),
+        c.getUserSet().stream().toList())).toList();
   }
 
   @Override
@@ -118,12 +99,15 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public ChannelResponseDto findById(String channelId) throws CustomException {
-    //todo - private는 채널 구성원들만 조회할 수 있도록 수정
-    //그러면 조회하는 사람 id도 파라미터로 필요함!
+  public ChannelResponseDto findById(String channelId, String userId) throws CustomException {
     Channel channel = channelRepository.findById(channelId);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+    }
+
+    //해당 채널이 private인 경우 조회하는 user가 속해있는지 검사
+    if (!channel.getUserSet().contains(userId)) {
+      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);// todo-에러코드 적절한걸로 수정해야함
     }
 
     List<String> userIds = (channel.getChannelType() == ChannelType.PRIVATE ? channel.getUserSet()
@@ -225,7 +209,9 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public boolean addUserToChannel(String channelId, String userId) throws CustomException {
-    //todo - map 노출 수정
+    //todo - set 노출 수정 - how?
+    //여기 검사하는 로직 if문으로 판별하도록 전부 수정하기
+
     try {
       //해당 채널이 DB에 존재하는 채널인지 검사
       Channel c = channelRepository.findById(channelId);
