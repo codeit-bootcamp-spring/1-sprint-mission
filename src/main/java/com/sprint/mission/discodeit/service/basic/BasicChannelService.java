@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.event.ChannelDeletedEvent;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -24,6 +26,7 @@ import java.util.UUID;
 public class BasicChannelService implements ChannelService {
 
     private final ChannelRepository channelRepository;
+    private final UserService userService;
     private final ApplicationEventPublisher eventPublisher;
 
     // 채널 생성
@@ -32,6 +35,8 @@ public class BasicChannelService implements ChannelService {
     public UUID createPublic(CreatePublicChannelRequestDto createPublicChannelRequestDto) {
 
         UUID ownerId = createPublicChannelRequestDto.ownerId();
+        userService.userIsExist(ownerId);
+
         String name = createPublicChannelRequestDto.name();
         String explanation = createPublicChannelRequestDto.explanation();
 
@@ -47,6 +52,7 @@ public class BasicChannelService implements ChannelService {
     public UUID createPrivate(CreatePrivateChannelRequestDto createPrivateChannelRequestDto) {
 
         UUID ownerId = createPrivateChannelRequestDto.ownerId();
+        userService.userIsExist(ownerId);
 
         Channel channel = new Channel(ownerId);
 
@@ -60,6 +66,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public FindChannelResponseDto find(UUID id) {
 
+        channelIsExist(id);
+
         Channel channel = channelRepository.load().get(id);
         if (channel.isPublic()) {
             return FindPublicChannelResponseDto.fromEntity(channel);
@@ -71,6 +79,8 @@ public class BasicChannelService implements ChannelService {
     // 모든 유저의 모든 채널 반환
     @Override
     public List<FindChannelResponseDto> findAllByUserId(UUID userId) {
+
+        userService.userIsExist(userId);
 
         return channelRepository.load().values().stream()
                 .map(channel -> {
@@ -89,6 +99,8 @@ public class BasicChannelService implements ChannelService {
     @Override
     public FindChannelResponseDto updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
 
+        channelIsExist(updatePublicChannelRequestDto.id());
+
         Channel updateChannel = channelRepository.load().get(updatePublicChannelRequestDto.id());
 
         if (updateChannel.isPublic()) {
@@ -105,11 +117,13 @@ public class BasicChannelService implements ChannelService {
             return find(updateChannel.getId());
         }
 
-        throw new IllegalArgumentException("채널이 존재하지 않습니다.");
+        throw new NoSuchElementException("채널이 존재하지 않습니다.");
     }
 
     @Override
     public void addMember(UUID id, UUID memberId) {
+
+        channelIsExist(id);
 
         Channel channel = channelRepository.load().get(id);
         channel.addMember(memberId);
@@ -118,6 +132,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteMember(UUID id, UUID memberId) {
+
+        channelIsExist(id);
 
         Channel channel = channelRepository.load().get(id);
 
@@ -151,7 +167,7 @@ public class BasicChannelService implements ChannelService {
         Map<UUID, Channel> channels = channelRepository.load();
 
         if (!channels.containsKey(id)) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+            throw new NoSuchElementException("존재하지 않는 채널입니다.");
         }
     }
 

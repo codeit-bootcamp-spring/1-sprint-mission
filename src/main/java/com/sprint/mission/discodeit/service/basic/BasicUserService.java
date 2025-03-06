@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -84,6 +85,9 @@ public class BasicUserService implements UserService {
     // 데이터 수정
     @Override
     public void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) throws IOException {
+
+        userIsExist(id);
+
         User updateUser = userRepository.load().get(id);
 
         // 업데이트 시 해당 데이터가 null이면 기존 정보를, 아니면 새로운 정보를 저장
@@ -124,7 +128,7 @@ public class BasicUserService implements UserService {
         Map<UUID, User> users = userRepository.load();
 
         if (!users.containsKey(id)) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+            throw new NoSuchElementException("존재하지 않는 유저입니다.");
         }
     }
 

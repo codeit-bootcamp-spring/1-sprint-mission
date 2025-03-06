@@ -1,13 +1,25 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.controller.api.ChannelApi;
+import com.sprint.mission.discodeit.dto.binarycontent.FindBinaryContentResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
 import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequestDto;
 import com.sprint.mission.discodeit.service.ChannelService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,22 +32,19 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/channel")
 @RequiredArgsConstructor
-public class ChannelController {
+public class ChannelController implements ChannelApi {
 
     private final ChannelService channelService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/public")
-    public ResponseEntity<FindChannelResponseDto> createPublicChannel(@RequestParam UUID ownerId,
-                                                                      @RequestParam String name,
-                                                                      @RequestParam String explanation) {
+    @PostMapping("/public")
+    public ResponseEntity<FindChannelResponseDto> createPublicChannel(@RequestBody CreatePublicChannelRequestDto createPublicChannelRequestDto) {
 
-        CreatePublicChannelRequestDto createPublicChannelDto = new CreatePublicChannelRequestDto(ownerId, name, explanation);
-        UUID id = channelService.createPublic(createPublicChannelDto);
+        UUID id = channelService.createPublic(createPublicChannelRequestDto);
 
         return ResponseEntity.created(URI.create("/api/channel/" + id)).body(channelService.find(id));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/private")
+    @PostMapping("/private")
     public ResponseEntity<FindChannelResponseDto> createPrivateChannel(@RequestParam UUID ownerId) {
 
         CreatePrivateChannelRequestDto createPrivateChannelDto = new CreatePrivateChannelRequestDto(ownerId);
@@ -44,25 +53,21 @@ public class ChannelController {
         return ResponseEntity.created(URI.create("/api/channel/" + id)).body(channelService.find(id));
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-    public ResponseEntity<FindChannelResponseDto> updatePublicChannel(@PathVariable UUID id,
-                                                                      @RequestParam String category,
-                                                                      @RequestParam String name,
-                                                                      @RequestParam String explanation) {
-        UpdatePublicChannelRequestDto updatePublicChannelDto = new UpdatePublicChannelRequestDto(id, category, name, explanation);
-        FindChannelResponseDto findChannelResponseDto = channelService.updateChannel(updatePublicChannelDto);
+    @PutMapping("/{id}")
+    public ResponseEntity<FindChannelResponseDto> updatePublicChannel(@RequestBody UpdatePublicChannelRequestDto updatePublicChannelRequestDto) {
+        FindChannelResponseDto findChannelResponseDto = channelService.updateChannel(updatePublicChannelRequestDto);
 
         return ResponseEntity.ok(findChannelResponseDto);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable UUID id) {
         channelService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<List<FindChannelResponseDto>> findChannel(@PathVariable UUID userId) {
         List<FindChannelResponseDto> channels = channelService.findAllByUserId(userId);
 

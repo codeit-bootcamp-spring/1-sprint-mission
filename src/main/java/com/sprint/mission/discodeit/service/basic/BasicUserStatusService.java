@@ -52,6 +52,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void update(UUID id) {
+
         UserStatus userStatus = userStatusRepository.load().get(id);
         userStatus.updateLastAccessTime();
 
@@ -60,6 +61,9 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public FindUserResponseDto updateByUserId(UUID userId) {
+
+        userService.userIsExist(userId);
+
         User user = userRepository.load().get(userId);
 
         UserStatus userStatus = user.getUserStatus();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -38,7 +39,11 @@ public class BasicMessageService implements MessageService {
     public FindMessageResponseDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException {
 
         UUID channelId = createMessageRequestDto.channelId();
+        channelService.channelIsExist(channelId);
+
         UUID writerId = createMessageRequestDto.writerId();
+        userService.userIsExist(writerId);
+
         String context = createMessageRequestDto.context();
         List<MultipartFile> images = createMessageRequestDto.images();
 
@@ -93,6 +98,8 @@ public class BasicMessageService implements MessageService {
     @Override
     public FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto) {
 
+        messageIsExist(updateMessageRequestDto.id());
+
         Message message = messageRepository.load().get(updateMessageRequestDto.id());
 
         message.updateContext(updateMessageRequestDto.context());
@@ -122,7 +129,7 @@ public class BasicMessageService implements MessageService {
         Map<UUID, Message> messages = messageRepository.load();
 
         if (!messages.containsKey(id)) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+            throw new NoSuchElementException("존재하지 않는 메시지입니다.");
         }
     }
 }
