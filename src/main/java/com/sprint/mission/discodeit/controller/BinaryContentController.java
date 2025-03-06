@@ -12,11 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@RequiredArgsConstructor
 @Controller
 @ResponseBody
 @RequestMapping("/binarycontent")
+@RequiredArgsConstructor
 public class BinaryContentController {
+
   private final BinaryContentService binaryContentService;
 
   @RequestMapping(path = "find")

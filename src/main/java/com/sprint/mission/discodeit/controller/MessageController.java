@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,13 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/message")
+@RequiredArgsConstructor
 public class MessageController {
 
   private final MessageService messageService;
-
-  public MessageController(MessageService messageService) {
-    this.messageService = messageService;
-  }
 
   @PostMapping
   public String sendMessage(@RequestBody MessageCreateDTO messageCreateDTO) {
@@ -32,7 +30,8 @@ public class MessageController {
   }
 
   @PatchMapping("/{id}")
-  public String updateMessage(@PathVariable("id") UUID id, @RequestBody MessageUpdateDTO messageUpdateDTO) {
+  public String updateMessage(@PathVariable("id") UUID id,
+      @RequestBody MessageUpdateDTO messageUpdateDTO) {
     messageService.update(messageUpdateDTO);
     return messageUpdateDTO.toString();
   }
