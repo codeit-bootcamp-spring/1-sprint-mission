@@ -11,9 +11,6 @@ import java.util.UUID;
 @Schema(name = "UserUpdateDTO", description = "사용자 정보 업데이트 요청 정보를 담은 DTO")
 public record UserUpdateDTO(
 
-    @Schema(description = "사용자 ID", example = "123e4567-e89b-12d3-a456-426614174000")
-    @NotNull(message = "UserId is required") UUID id,
-
     @Schema(description = "사용자 이름", example = "john_doe")
     @NotBlank(message = "Username is required") String newUsername,
 

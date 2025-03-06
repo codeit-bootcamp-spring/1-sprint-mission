@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -101,10 +100,10 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public UserResponseDTO update(UserUpdateDTO userUpdateDTO,
+  public UserResponseDTO update(UUID userId, UserUpdateDTO userUpdateDTO,
       BinaryContentCreateRequest binaryContentCreateRequest) {
     //사용자 찾고
-    User user = userRepository.findById(userUpdateDTO.id())
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found"));
 
     //중복체크

@@ -97,13 +97,15 @@ public class UserStatusService {
         .toList();
   }
 
-  public UserStatusResponseDTO update(UserStatusUpdateDTO updateDTO) {
+  public UserStatusResponseDTO update(UUID userStatusId, UserStatusUpdateDTO request) {
+
+    Instant newLastActiveAt = request.newLastActiveAt();
+
     //userStatus 조회
-    UserStatus userStatus = userStatusRepository.findById(updateDTO.userId())
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new IllegalArgumentException("UserStatus not found : update fail"));
     //현재 시간 업데이트
-    Instant now = Instant.now();
-    userStatus.updateLastSeenAt(now);
+    userStatus.updateLastSeenAt(newLastActiveAt);
     //저장
     userStatusRepository.save(userStatus);
     // 응답 DTO 변환 후 반환
