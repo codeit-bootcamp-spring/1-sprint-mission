@@ -17,7 +17,7 @@ public record MessageResponse(
     Instant updatedAt
 ) {
 
-  public static MessageResponse EntityToDto(Message message) {
+  public static MessageResponse entityToDto(Message message) {
     return MessageResponse.builder()
         .id(message.getId())
         .userId(message.getUserId())

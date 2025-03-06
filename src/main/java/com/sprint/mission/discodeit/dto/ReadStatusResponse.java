@@ -17,7 +17,7 @@ public record ReadStatusResponse(
     Instant lastReadAt
 ) {
 
-  public static ReadStatusResponse EntityToDto(ReadStatus readStatus) {
+  public static ReadStatusResponse entityToDto(ReadStatus readStatus) {
     return ReadStatusResponse.builder()
         .id(readStatus.getId())
         .userId(readStatus.getUserId())

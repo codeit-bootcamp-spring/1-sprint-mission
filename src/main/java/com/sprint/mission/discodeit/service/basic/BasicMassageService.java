@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,7 +52,7 @@ public class BasicMassageService implements MessageService {
             file -> binaryContentService.createMessageFile(file, newMessage.getId()));
       }
       log.info("Create Message: {}", newMessage);
-      return MessageResponse.EntityToDto(newMessage);
+      return MessageResponse.entityToDto(newMessage);
     }
     return null;
   }
@@ -62,13 +60,13 @@ public class BasicMassageService implements MessageService {
   @Override
   public List<MessageResponse> findAllByChannelId(UUID channelId) {
     return messageRepository.findAllByChannelId(channelId).stream()
-        .map(MessageResponse::EntityToDto)
+        .map(MessageResponse::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public MessageResponse findById(UUID id) {
-    return MessageResponse.EntityToDto(findByIdOrThrow(id));
+    return MessageResponse.entityToDto(findByIdOrThrow(id));
   }
 
   @Override
@@ -83,7 +81,7 @@ public class BasicMassageService implements MessageService {
         messageFiles.forEach(file -> binaryContentService.createMessageFile(file, id));
       }
       log.info("update message: {}", message);
-      return MessageResponse.EntityToDto(message);
+      return MessageResponse.entityToDto(message);
     }
     return null;
   }

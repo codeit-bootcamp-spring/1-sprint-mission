@@ -44,12 +44,12 @@ public class BasicReadStatusService implements ReadStatusService {
 
     readStatusRepository.save(newReadStatus);
     log.info("Create Read Status : {}", newReadStatus);
-    return ReadStatusResponse.EntityToDto(newReadStatus);
+    return ReadStatusResponse.entityToDto(newReadStatus);
   }
 
   @Override
   public ReadStatusResponse findById(UUID id) {
-    return ReadStatusResponse.EntityToDto(findByIdOrThrow(id));
+    return ReadStatusResponse.entityToDto(findByIdOrThrow(id));
   }
 
   @Override
@@ -61,14 +61,14 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public List<ReadStatusResponse> findAllByUserId(UUID userId) {
     return readStatusRepository.findAllUserId(userId).stream()
-        .map(ReadStatusResponse::EntityToDto)
+        .map(ReadStatusResponse::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<ReadStatusResponse> findAllByChannelId(UUID channelId) {
     return readStatusRepository.findAllChannelId(channelId).stream()
-        .map(ReadStatusResponse::EntityToDto)
+        .map(ReadStatusResponse::entityToDto)
         .collect(Collectors.toList());
   }
 
@@ -76,7 +76,7 @@ public class BasicReadStatusService implements ReadStatusService {
   public ReadStatusResponse update(UUID id, ReadStatusRequest.Update request) {
     ReadStatus readStatus = findByIdOrThrow(id);
     readStatus.updateUpdateAt(request.newLastReadAt());
-    return ReadStatusResponse.EntityToDto(readStatusRepository.save(readStatus));
+    return ReadStatusResponse.entityToDto(readStatusRepository.save(readStatus));
   }
 
   @Override
