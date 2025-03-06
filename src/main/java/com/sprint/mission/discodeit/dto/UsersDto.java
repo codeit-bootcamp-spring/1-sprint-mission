@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Builder
+import java.util.UUID;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Getter
+@Getter @Builder
 public class UsersDto {
-    private String id;
+    private UUID id;
     @NotNull
     private String name;
     @NotNull

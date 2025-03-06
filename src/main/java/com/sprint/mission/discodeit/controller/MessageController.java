@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -50,7 +51,7 @@ public class MessageController {
 
     @Operation(summary = "메시지 삭제", description = "메시지 삭제")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMessage(@PathVariable String id) {
+    public ResponseEntity<Void> deleteMessage(@PathVariable UUID id) {
         messageService.deleteMessage(id);
         return ResponseEntity.noContent().build();
     }
@@ -58,7 +59,7 @@ public class MessageController {
     @Operation(summary = "메시지 수정", description = "메시지 수정")
     @PatchMapping("/{id}")
     public ResponseEntity<MessageDto> updateMessage(
-            @PathVariable String id,
+            @PathVariable UUID id,
             @Valid @RequestBody MessageDto messageDto) {
         try {
             MessageDto updateMessage = messageService.updateMessage(id, messageDto);

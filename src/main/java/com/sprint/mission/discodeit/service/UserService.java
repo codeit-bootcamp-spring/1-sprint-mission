@@ -5,12 +5,14 @@ import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
     UsersDto create(UsersDto usersDTO, byte[] profileImage);
-    UsersDto update(String id, UsersDto usersDTO, byte[] profileImage);
-    void delete(String id);
-    UserDto find(String id);
+    UsersDto update(UUID id, UsersDto usersDTO, byte[] profileImage);
+    void delete(UUID id);
+    UserDto find(UUID id);
     List<UsersDto> findAll();
-    void updateOnlineStatus(String userId, boolean online);
+    void updateOnlineStatus(UUID userId, boolean online);
+    UserDto findByEmail(String email);
 }

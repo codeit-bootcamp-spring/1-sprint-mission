@@ -5,19 +5,20 @@ import jakarta.persistence.Enumerated;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
 
-@Builder
+import java.util.UUID;
+
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Data @Builder
 public class ChannelDto {
-    private String id;
+    private UUID id;
     @NotNull
     private String name;
     @NotNull
     private String description;
     @NotNull
-    private String userId;
-    private String channelId;
+    private UUID userId;
+    private UUID channelId;
 
     @Enumerated(EnumType.STRING)
     @NotNull

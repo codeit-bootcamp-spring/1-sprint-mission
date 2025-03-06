@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,23 +21,24 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatusDto create(UserStatusDto userStatusDTO) {
         UserStatus userStatus = new UserStatus(userStatusDTO.getUserId(), Instant.now());
         userStatusRepository.save(userStatus);
-        return new UserStatusDto(userStatus.getUserId(), userStatus.getLastSeen());
+        return new UserStatusDto(userStatus.getId(), userStatus.getLastSeen());
     }
 
     @Override
-    public UserStatusDto find(String userId) {
+    public UserStatusDto find(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
-        return new UserStatusDto(userStatus.getUserId(), userStatus.getLastSeen());
+        return new UserStatusDto(userStatus.getId(), userStatus.getLastSeen());
     }
 
     @Override
-    public void delete(String userId) {
+    public void delete(UUID userId) {
         userStatusRepository.deleteByUserId(userId);
     }
 
     @Override
-    public UserStatusType getUserOnlineStatus(String userId) {
+    public UserStatusType getUserOnlineStatus(UUID userId) {
+        // 수정: UUID 대신 userId 변수 사용
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("UserStatus not found"));
         return onOffStatus(userStatus.getLastSeen());

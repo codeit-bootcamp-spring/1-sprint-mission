@@ -4,22 +4,23 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Builder
-@Entity
+@Entity @Builder
 @Getter @Setter
 @Table(name = "messages")
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
     @Column(name = "channel_id")
-    private String channelId;
+    private UUID channelId;
 
     @Column(name = "sender_id")
-    private String senderId;
+    private UUID senderId;
 
     @Column(name = "sender_name")
     private String senderName;

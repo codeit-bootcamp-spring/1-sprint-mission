@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import java.time.LocalDateTime;
+import lombok.*;
 
-@Builder
-@Getter
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Getter @Builder
+@AllArgsConstructor
 public class MessageDto {
-    private String id;
-    private String channelId;
-    private String senderId;
+    private UUID id;
+    private UUID channelId;
+    private UUID senderId;
     @NotNull
     private String senderName;
     @NotNull

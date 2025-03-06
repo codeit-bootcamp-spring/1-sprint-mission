@@ -30,7 +30,7 @@ public class BasicMessageService implements MessageService {
     @Transactional
     public MessageDto createMessage(MessageDto messageDTO) {
         Message message = Message.builder()
-                .id((UUID.randomUUID().toString()))
+                .id(UUID.randomUUID())
                 .channelId(messageDTO.getChannelId())
                 .senderId(messageDTO.getSenderId())
                 .content(messageDTO.getContent())
@@ -63,7 +63,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDto> getChannelMessages(String channelId) {
+    public List<MessageDto> getChannelMessages(UUID channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
                 .map(this::convertToDTO)
@@ -72,7 +72,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public MessageDto updateMessage(String id, MessageDto messageDTO) {
+    public MessageDto updateMessage(UUID id, MessageDto messageDTO) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Message not found"));
 
@@ -84,7 +84,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<MessageDto> findAllByChannelId(String channelId) {
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId)
                 .stream()
                 .map(this::convertToDTO)
@@ -93,11 +93,9 @@ public class BasicMessageService implements MessageService {
 
     @Override
     @Transactional
-    public void deleteMessage(String id) {
+    public void deleteMessage(UUID id) {
         messageRepository.deleteById(id);
     }
-
-
 
     @Override
     public List<MessageDto> findAll() {

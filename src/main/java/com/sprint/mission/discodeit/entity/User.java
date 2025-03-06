@@ -15,14 +15,14 @@ import java.util.Set;
 import java.util.UUID;
 
 @Getter @Setter
-@Builder
-@Entity
-@RequiredArgsConstructor
+@Entity @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private UUID id;
 
     @NotBlank(message = "이름은 필수입니다.")
     @Size(min = 2, max = 20, message = "2자 이상 20자 이하로 입력해주세요.")
@@ -44,7 +44,7 @@ public class User {
     private Set<Channel> channels = new HashSet<>();
 
     public User(String name, String email, String password) {
-        this.id = UUID.randomUUID().toString();
+        this.id = UUID.randomUUID();
         this.name = name;
         this.email = email;
         this.password = password;

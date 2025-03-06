@@ -1,24 +1,22 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@Getter
-@Setter
-@Entity
+@Getter @Setter
+@Entity @Builder
 @Table(name = "channels")
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class Channel{
 
-    @Id
-    private String id;
+    @Id @GeneratedValue
+    private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -26,14 +24,10 @@ public class Channel{
     private String description;
     private ChannelType type;
 
-    public Channel(String name, String description, ChannelType channelType) {
-        this.id = UUID.randomUUID().toString();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-
+    public Channel(String name, String description, ChannelType type) {
         this.name = name;
         this.description = description;
-        this.type = channelType;
+        this.type = type;
     }
 
     public void update(String name, String description, ChannelType channelType) {

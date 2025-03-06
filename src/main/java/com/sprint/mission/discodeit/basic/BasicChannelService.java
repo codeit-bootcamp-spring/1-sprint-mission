@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final RestClient.Builder builder;
 
     @Override
     public ChannelDto create(ChannelDto channelDTO) {
@@ -51,7 +50,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto find(String id) {
+    public ChannelDto find(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
@@ -61,7 +60,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Map<User, Channel> join(ChannelJoinDto joinDTO) {
 
-        Channel channel = channelRepository.findById(joinDTO.getChannelName())
+        Channel channel = channelRepository.findById(joinDTO.getChannelId())
                 .orElseThrow(() -> new IllegalArgumentException("Channel Not Found"));
 
         User user = userRepository.findById(joinDTO.getUserId())
@@ -74,7 +73,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto update(String id, ChannelDto channelDTO) {
+    public ChannelDto update(UUID id, ChannelDto channelDTO) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
@@ -98,7 +97,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(UUID id) {
         channelRepository.deleteById(id);
     }
 

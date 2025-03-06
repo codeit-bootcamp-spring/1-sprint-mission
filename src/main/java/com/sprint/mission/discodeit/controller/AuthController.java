@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -39,11 +40,11 @@ public class AuthController {
         }
 
         try {
-            UserDto userDTO = userService.find(loginRequest.getEmail());
+            UserDto userDTO = userService.findByEmail(loginRequest.getEmail());
 
             if (userDTO != null && userDTO.getPassword().equals(loginRequest.getPassword())) {
                 session.setAttribute("userId", userDTO.getId().toString());
-                userService.updateOnlineStatus(userDTO.getId().toString(), true);
+                userService.updateOnlineStatus(userDTO.getId(), true);
 
                 response.put("success", true);
                 response.put("userId", userDTO.getId());
@@ -56,7 +57,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            log.error("로그인 처리 중 오류 발생", e);
+            log.error("로그인 처리 중 오류 발생: {} ", e.getMessage() , e);
             response.put("success", false);
             response.put("message", "로그인 처리 중 오류가 발생했습니다");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -72,7 +73,7 @@ public class AuthController {
             String userId = (String) session.getAttribute("userId");
 
             if (userId != null) {
-                userService.updateOnlineStatus(userId, false);
+                userService.updateOnlineStatus(UUID.fromString(userId), false);
                 session.invalidate();
 
                 response.put("success", true);
@@ -84,7 +85,7 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            log.error("로그아웃 처리 중 오류 발생", e);
+            log.error("로그아웃 처리 중 오류 발생 : {}", e.getMessage(), e);
             response.put("success", false);
             response.put("message", "로그아웃 처리 중 오류가 발생했습니다");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

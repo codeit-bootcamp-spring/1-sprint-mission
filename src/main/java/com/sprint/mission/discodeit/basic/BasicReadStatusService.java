@@ -20,8 +20,6 @@ import java.util.UUID;
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
-    private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
 
     @Override
     public ReadStatus create(ReadStatusCreateRequest request) {

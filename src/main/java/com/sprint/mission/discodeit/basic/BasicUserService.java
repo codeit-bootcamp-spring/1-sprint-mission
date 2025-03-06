@@ -11,12 +11,14 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-@Builder
 @Slf4j
 @Primary
 @Service
@@ -29,7 +31,7 @@ public class BasicUserService implements UserService {
     public UsersDto create(UsersDto dto, byte[] profileImage) {
 
         User user = User.builder()
-                .id(UUID.randomUUID().toString())
+                .id(UUID.randomUUID())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .password(dto.getPassword())
@@ -62,7 +64,7 @@ public class BasicUserService implements UserService {
 
     @Transactional
     @Override
-    public UsersDto update(String id, UsersDto usersDTO, byte[] profileImage) {
+    public UsersDto update(UUID id, UsersDto usersDTO, byte[] profileImage) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -82,18 +84,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(UUID id) {
         userRepository.deleteById(id);
-        UUID userUUID = UUID.fromString(id);
-        if (binaryContentRepository.existsById(userUUID)) {
-            binaryContentRepository.deleteById(userUUID);
+        if (binaryContentRepository.existsById(id)) {
+            binaryContentRepository.deleteById(id);
         }
     }
 
     @Override
-    public UserDto find(String id) {
+    public UserDto find(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
+    }
+
+    @Override
+    public UserDto findByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found for email: " + email));
         return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
@@ -114,24 +122,28 @@ public class BasicUserService implements UserService {
         }
         return dto;
     }
-
     @Override
     public List<UsersDto> findAll() {
         try {
-            List<UsersDto> users = userRepository.findAll();
+            List<User> users = userRepository.findAll();
+
             if (users == null) {
-               log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
+                log.warn("경고: userRepository.findAll()이 null을 반환했습니다.");
                 return new ArrayList<>();
             }
-            return users;
+
+            return users.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
             log.error("사용자 목록 조회 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
+            ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             return new ArrayList<>();
         }
     }
 
-    public void updateOnlineStatus(String userId, boolean online) {
+    public void updateOnlineStatus(UUID userId, boolean online) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));
 
