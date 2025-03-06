@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.user;
 
+import com.sprint.mission.discodeit.converter.ToBinaryContentConverter;
 import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.user.*;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponseDTO;
@@ -29,11 +30,14 @@ public class UserController {
 
   private final UserService userService;
   private final UserStatusService userStatusService;
+  private final ToBinaryContentConverter toBinaryContentConverter;
 
-  public UserController(UserService userService, UserStatusService userStatusService) {
+  public UserController(UserService userService, UserStatusService userStatusService,
+      ToBinaryContentConverter toBinaryContentConverter) {
     this.userService = userService;
 
     this.userStatusService = userStatusService;
+    this.toBinaryContentConverter = toBinaryContentConverter;
   }
 
   @Operation(summary = "사용자 등록", description = "새로운 사용자 등록 및 사용자 정보 반환")
@@ -42,19 +46,8 @@ public class UserController {
       @RequestPart(name = "user-create-dto") @Valid UserCreateDTO userCreateDTO,
       @RequestPart(name = "binary-content-create-request", required = false) MultipartFile binaryContentCreateRequest
   ) {
-    BinaryContentCreateRequest binaryContent = null;
-    if (Objects.nonNull(binaryContentCreateRequest)) {
-      try {
-        binaryContent = new BinaryContentCreateRequest(
-            binaryContentCreateRequest.getOriginalFilename(),
-            binaryContentCreateRequest.getContentType(),
-            binaryContentCreateRequest.getBytes()
-        );
-      } catch (IOException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-    }
-
+    BinaryContentCreateRequest binaryContent = toBinaryContentConverter.convert(
+        binaryContentCreateRequest);
     UserResponseDTO creatUser = userService.create(userCreateDTO, binaryContent);
     return ResponseEntity.status(HttpStatus.CREATED).body(creatUser);
   }
@@ -65,18 +58,8 @@ public class UserController {
       @RequestPart(name = "user-update-dto") @Valid UserUpdateDTO updateDTO,
       @RequestPart(value = "binary-content-update-request", required = false) MultipartFile binaryContentUpdateRequest
   ) {
-    BinaryContentCreateRequest binaryContent = null;
-    if (Objects.nonNull(binaryContentUpdateRequest)) {
-      try {
-        binaryContent = new BinaryContentCreateRequest(
-            binaryContentUpdateRequest.getOriginalFilename(),
-            binaryContentUpdateRequest.getContentType(),
-            binaryContentUpdateRequest.getBytes()
-        );
-      } catch (IOException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-    }
+    BinaryContentCreateRequest binaryContent = toBinaryContentConverter.convert(
+        binaryContentUpdateRequest);
     UserResponseDTO updateUser = userService.update(updateDTO, binaryContent);
     return ResponseEntity.ok(updateUser);
   }

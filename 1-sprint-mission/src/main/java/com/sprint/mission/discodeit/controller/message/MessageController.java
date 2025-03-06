@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller.message;
 
+import com.sprint.mission.discodeit.converter.ToBinaryContentConverter;
 import com.sprint.mission.discodeit.dto.request.binary.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.request.message.MessageUpdateDTO;
@@ -28,9 +29,12 @@ import java.util.UUID;
 public class MessageController {
 
   private final MessageService messageService;
+  private final ToBinaryContentConverter toBinaryContentConverter;
 
-  public MessageController(MessageService messageService) {
+  public MessageController(MessageService messageService,
+      ToBinaryContentConverter toBinaryContentConverter) {
     this.messageService = messageService;
+    this.toBinaryContentConverter = toBinaryContentConverter;
   }
 
   @Operation(summary = "메세지 등록", description = " 새로운 메세지 등록 및 메세지 정보 반환")
@@ -39,18 +43,8 @@ public class MessageController {
       @RequestPart("message-create-dto") @Valid MessageCreateDTO messageCreateDTO,
       @RequestPart("binary-content-create-request") MultipartFile binaryContentCreateRequest
   ) {
-    BinaryContentCreateRequest binaryContent = null;
-    if (Objects.nonNull(binaryContentCreateRequest)) {
-      try {
-        binaryContent = new BinaryContentCreateRequest(
-            binaryContentCreateRequest.getOriginalFilename(),
-            binaryContentCreateRequest.getContentType(),
-            binaryContentCreateRequest.getBytes()
-        );
-      } catch (IOException exception) {
-        throw new IllegalArgumentException(exception);
-      }
-    }
+    BinaryContentCreateRequest binaryContent = toBinaryContentConverter.convert(
+        binaryContentCreateRequest);
     MessageResponseDTO messageResponseDTO = messageService.create(messageCreateDTO, binaryContent);
     return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
   }
