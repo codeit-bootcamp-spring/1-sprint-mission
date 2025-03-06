@@ -8,10 +8,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final RestClient.Builder builder;
 
     @Override
     public ChannelDto create(ChannelDto channelDTO) {
@@ -39,12 +42,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     private ChannelDto convertToDTO(Channel channel) {
-        ChannelDto dto = new ChannelDto();
-        dto.setId(channel.getId());
-        dto.setName(channel.getName());
-        dto.setDescription(channel.getDescription());
-        dto.setType(channel.getType().toString());
-        return dto;
+        return ChannelDto.builder()
+                .id(channel.getId())
+                .name(channel.getName())
+                .description(channel.getDescription())
+                .type(channel.getType().toString())
+                .build();
     }
 
     @Override

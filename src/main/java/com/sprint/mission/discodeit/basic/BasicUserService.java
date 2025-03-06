@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+@Builder
 @Slf4j
 @Primary
 @Service
@@ -25,26 +27,31 @@ public class BasicUserService implements UserService {
 
     @Override
     public UsersDto create(UsersDto dto, byte[] profileImage) {
-        User user = new User();
-        user.setId(UUID.randomUUID().toString());
-        user.setName(dto.getName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setOnline(true);
+
+        User user = User.builder()
+                .id(UUID.randomUUID().toString())
+                .name(dto.getName())
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .online(dto.isOnline())
+                .build();
         if (profileImage != null && profileImage.length > 0) {
             user.setProfileImage(profileImage);
         }
         User saved = userRepository.save(user);
-        return convertToDTO(saved);  // User 엔티티를 UsersDTO로 변환해서 반환
+        return convertToDTO(saved);  // User 엔티티를 UsersDto로 변환해서 반환
     }
 
     private UsersDto convertToDTO(User user) {
-        UsersDto dto = new UsersDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setOnline(user.isOnline());
+
+        UsersDto dto = UsersDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .online(user.isOnline())
+                .build();
+
         if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
             dto.setProfileImage(Base64.getEncoder().encodeToString(user.getProfileImage()));
         } else {
@@ -91,12 +98,13 @@ public class BasicUserService implements UserService {
     }
 
     private UsersDto toDTO(User user) {
-        UsersDto dto = new UsersDto();
-        dto.setId(user.getId());
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPassword(user.getPassword());
-        dto.setOnline(user.isOnline());
+        UsersDto dto = UsersDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .online(user.isOnline())
+                .build();
 
         if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
             String base64Str = Base64.getEncoder().encodeToString(user.getProfileImage());

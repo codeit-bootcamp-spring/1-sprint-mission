@@ -5,6 +5,7 @@ import jakarta.persistence.Enumerated;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

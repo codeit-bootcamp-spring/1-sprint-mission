@@ -29,18 +29,20 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto createMessage(MessageDto messageDTO) {
-        Message message = new Message();
-        message.setId(UUID.randomUUID().toString());
-        message.setChannelId(messageDTO.getChannelId());
-        message.setSenderId(messageDTO.getSenderId());
-        message.setContent(messageDTO.getContent());
-        message.setCreatedAt(LocalDateTime.now());
+        Message message = Message.builder()
+                .id((UUID.randomUUID().toString()))
+                .channelId(messageDTO.getChannelId())
+                .senderId(messageDTO.getSenderId())
+                .content(messageDTO.getContent())
+                .createdAt(LocalDateTime.now())
+                .build();
 
+        String senderName;
         try {
             UserDto user = userService.find(messageDTO.getSenderId());
-            message.setSenderName(user.getName());
+            senderName = user.getName();
         } catch (Exception e) {
-            message.setSenderName("Unknown Sender");
+            senderName = "unknown Sender";
         }
 
         Message savedMessage = messageRepository.save(message);
@@ -48,16 +50,16 @@ public class BasicMessageService implements MessageService {
     }
 
     private MessageDto convertToDTO(Message message) {
-        MessageDto dto = new MessageDto();
-        dto.setId(message.getId());
-        dto.setChannelId(message.getChannelId());
-        dto.setChannelName(message.getChannelName());
-        dto.setSenderId(message.getSenderId());
-        dto.setSenderName(message.getSenderName());
-        dto.setContent(message.getContent());
-        dto.setCreatedAt(message.getCreatedAt());
-        dto.setUpdatedAt(message.getUpdatedAt());
-        return dto;
+
+        return MessageDto.builder()
+                .id(message.getId())
+                .channelId(message.getChannelId())
+                .senderId(message.getSenderId())
+                .senderName(message.getSenderName())
+                .content(message.getContent())
+                .createdAt(message.getCreatedAt())
+                .updatedAt(message.getUpdatedAt())
+                .build();
     }
 
     @Override

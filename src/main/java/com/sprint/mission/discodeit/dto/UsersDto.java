@@ -3,11 +3,11 @@ package com.sprint.mission.discodeit.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class UsersDto {
     private String id;
     @NotNull

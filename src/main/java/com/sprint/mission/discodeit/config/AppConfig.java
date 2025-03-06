@@ -47,9 +47,9 @@ public class AppConfig {
         return new BasicUserService(userRepository, binaryContentRepository);
     }
 
-    @Bean
-    public ChannelService channelService(ChannelRepository channelRepository, UserRepository userRepository) {
-        return new BasicChannelService(channelRepository, userRepository);
-    }
+//    @Bean
+//    public ChannelService channelService(ChannelRepository channelRepository, UserRepository userRepository) {
+//        return new BasicChannelService(channelRepository, userRepository);
+//    }
 
 }
