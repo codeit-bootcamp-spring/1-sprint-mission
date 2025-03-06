@@ -1,127 +1,123 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.repository.interfacepac.UserStatusRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserStatusRepository implements UserStatusRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "user_status.json";
-  private static final String FILE_SEPARATOR = "/";
-
-  private final ObjectMapper objectMapper;
-  private final String filePath;
-  private final Map<UUID, UserStatus> userStatusData;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileUserStatusRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory, ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        UserStatus.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
-    ensureDirectoryExists(this.filePath);
-    this.userStatusData = loadFromFile();
+  }
+
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
-  public void save(UserStatus userStatus) {
-    userStatusData.put(userStatus.getId(), userStatus);
-    saveToFile();
+  public UserStatus save(UserStatus userStatus) {
+    Path path = resolvePath(userStatus.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(userStatus);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return userStatus;
+  }
+
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    UserStatus userStatusNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        userStatusNullable = (UserStatus) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(userStatusNullable);
   }
 
   @Override
   public Optional<UserStatus> findByUserId(UUID userId) {
-    return userStatusData.values().stream()
-        .filter(status -> userId.equals(status.getUser().getId()))
+    return findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
         .findFirst();
   }
 
   @Override
-  public Optional<UserStatus> findById(UUID userStatusId) {
-    return Optional.ofNullable(userStatusData.get(userStatusId));
+  public List<UserStatus> findAll() {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (UserStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
-  public boolean existsByUser(User user) {
-    return userStatusData.values().stream()
-        .anyMatch(status -> user.equals(status.getUser()));
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
   }
 
   @Override
-  public boolean existsByUserStatusId(UUID userStatusId) {
-    return userStatusData.containsKey(userStatusId);
-  }
-
-  @Override
-  public boolean existByUserId(UUID userId) {
-    return userStatusData.values().stream()
-        .anyMatch(status -> userId.equals(status.getUser().getId()));
-  }
-
-  @Override
-  public void delete(UserStatus userStatus) {
-    userStatusData.remove(userStatus.getId());
-    saveToFile();
-  }
-
-  @Override
-  public void deleteById(UUID userStatusId) {
-    userStatusData.remove(userStatusId);
-    saveToFile();
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public void deleteByUserId(UUID userId) {
-    userStatusData.values()
-        .removeIf(status -> userId.equals(status.getUser().getId()));
-    saveToFile();
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteById(userStatus.getId()));
   }
-
-  private void ensureDirectoryExists(String directoryPath) {
-    File directory = new File(directoryPath);
-    File parentDirectory = directory.getParentFile();
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
-    }
-  }
-
-  private Map<UUID, UserStatus> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
-    try {
-      return objectMapper.readValue(file, new TypeReference<Map<UUID, UserStatus>>() {
-      });
-    } catch (IOException e) {
-      log.error(e.getMessage());
-      return new ConcurrentHashMap<>();
-    }
-  }
-
-  private void saveToFile() {
-    File file = new File(filePath);
-    try {
-      objectMapper.writeValue(file, userStatusData);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to save user status data to file.", e);
-    }
-  }
-
-
 }

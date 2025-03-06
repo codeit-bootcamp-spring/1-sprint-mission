@@ -1,158 +1,110 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.interfacepac.ChannelRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileChannelRepository implements ChannelRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "channel.json";
-  private static final String FILE_SEPARATOR = "/";
-
-
-  private final ObjectMapper objectMapper;
-  private final String filePath;
-  private final Map<UUID, List<Channel>> channelData;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileChannelRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory, ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        Channel.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
-    ensureDirectoryExists(this.filePath);
-    this.channelData = loadFromFile();
+  }
+
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
   public Channel save(Channel channel) {
-    UUID ownerId = channel.getOwner().getId();
-    List<Channel> channels = channelData.computeIfAbsent(ownerId, k -> new ArrayList<>());
-    Optional<Channel> existingChannelOpt = channels.stream()
-        .filter(ch -> channel.getId().equals(ch.getId()))
-        .findFirst();
-    if (existingChannelOpt.isPresent()) {
-      int index = channels.indexOf(existingChannelOpt.get());
-      channels.set(index, channel);
-    } else {
-      channels.add(channel);
+    Path path = resolvePath(channel.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(channel);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
-    saveToFile();
     return channel;
   }
 
   @Override
   public Optional<Channel> findById(UUID id) {
-    return channelData.values().stream()
-        .flatMap(List::stream)
-        .filter(channel -> channel.getId().equals(id))
-        .findFirst();
+    Channel channelNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        channelNullable = (Channel) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(channelNullable);
   }
 
   @Override
   public List<Channel> findAll() {
-    return channelData.values().stream()
-        .flatMap(List::stream)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public List<Channel> findAllByType(ChannelType type) {
-    return channelData.values().stream()
-        .flatMap(List::stream)
-        .filter(channel -> channel.getType() == type)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public void deleteByChannel(Channel channel) {
-    UUID ownerId = channel.getOwner().getId();
-    List<Channel> channels = channelData.get(ownerId);
-    if (channels != null) {
-      channels.remove(channel);
-      if (channels.isEmpty()) {
-        channelData.remove(ownerId);
-      }
-      saveToFile();
-    }
-  }
-
-  @Override
-  public boolean existsByUser(User user) {
-    return channelData.containsKey(user.getId());
-  }
-
-  @Override
-  public List<Channel> findAllByOwnerAndType(User owner, ChannelType type) {
-    UUID ownerId = owner.getId();
-    return channelData.getOrDefault(ownerId, new ArrayList<>())
-        .stream()
-        .filter(channel -> channel.getType() == type)
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public List<Channel> findAllByUserId(UUID userId) {
-    return channelData.values().stream()
-        .flatMap(List::stream)
-        .filter(channel -> channel.getOwner().getId().equals(userId) ||
-            (channel.getType() == ChannelType.PRIVATE))
-        .collect(Collectors.toList());
-  }
-
-
-  private void ensureDirectoryExists(String fileDirectory) {
-    File directory = new File(fileDirectory);
-    File parentDirectory = directory.getParentFile();
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
-    }
-  }
-
-  private Map<UUID, List<Channel>> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
-    try {
-      return objectMapper.readValue(
-          file,
-          new TypeReference<Map<UUID, List<Channel>>>() {
-          }
-      );
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
     } catch (IOException e) {
-      log.error(e.getMessage());
-      return new ConcurrentHashMap<>();
+      throw new RuntimeException(e);
     }
   }
 
-  private void saveToFile() {
-    File file = new File(filePath);
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
     try {
-      objectMapper.writeValue(file, channelData);
+      Files.delete(path);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to save channel to file.", e);
+      throw new RuntimeException(e);
     }
   }
-
-
 }

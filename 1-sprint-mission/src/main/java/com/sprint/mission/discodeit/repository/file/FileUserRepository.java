@@ -1,117 +1,129 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileUserRepository implements UserRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "users.json";
-  private static final String FILE_SEPARATOR = "/";
-
-  private final ObjectMapper objectMapper;
-  private final String filePath;
-  private final Map<UUID, User> userdata;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileUserRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory, ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        User.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
-    ensureDirectoryExists(this.filePath);
-    this.userdata = loadFromFile();
   }
 
-
-  @Override
-  public boolean existsByUsername(String username) {
-    return userdata.values().stream()
-        .anyMatch(user -> user.getUsername().equals(username));
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
   public User save(User user) {
-    userdata.put(user.getId(), user);
-    saveToFile();
+    Path path = resolvePath(user.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(user);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return user;
   }
 
   @Override
   public Optional<User> findById(UUID id) {
-    return Optional.ofNullable(userdata.get(id));
+    User userNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        userNullable = (User) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(userNullable);
+  }
+
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
   }
 
   @Override
   public List<User> findAll() {
-    return new ArrayList<>(userdata.values());
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (User) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
   }
 
   @Override
   public void deleteById(UUID id) {
-    userdata.remove(id);
-    saveToFile();
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
   public boolean existsByEmail(String email) {
-    return userdata.values().stream()
+    return this.findAll().stream()
         .anyMatch(user -> user.getEmail().equals(email));
   }
 
   @Override
-  public Optional<User> findByEmail(String email) {
-    return userdata.values().stream()
-        .filter(user -> user.getEmail().equals(email))
-        .findFirst();
-  }
-
-
-  private Map<UUID, User> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
-    try {
-      return objectMapper.readValue(file, new TypeReference<Map<UUID, User>>() {
-      });
-    } catch (IOException e) {
-      log.error("Error loading users: " + e.getMessage());
-      return new ConcurrentHashMap<>();
-    }
-  }
-
-  private void saveToFile() {
-    File file = new File(filePath);
-    try {
-      objectMapper.writeValue(file, userdata);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to save user to file.", e);
-    }
-  }
-
-  private void ensureDirectoryExists(String directoryPath) {
-    File directory = new File(directoryPath);
-    File parentDirectory = directory.getParentFile();
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
-    }
+  public boolean existsByUsername(String username) {
+    return this.findAll().stream()
+        .anyMatch(user -> user.getUsername().equals(username));
   }
 }
-

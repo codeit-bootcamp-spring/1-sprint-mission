@@ -1,147 +1,139 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
-import java.io.File;
-import java.io.IOException;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileReadStatusRepository implements ReadStatusRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "read_status.json";
-  private static final String FILE_SEPARATOR = "/";
-
-  private final String filePath;
-  private final ObjectMapper objectMapper;
-  private final Map<UUID, ReadStatus> readStatusData;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileReadStatusRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory, ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        ReadStatus.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
-    ensureDirectoryExists(this.filePath);
-    this.readStatusData = loadFromFile();
+  }
+
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
-  public void save(ReadStatus readStatus) {
-    readStatusData.put(readStatus.getId(), readStatus);
-    saveToFile();
-  }
-
-  @Override
-  public List<ReadStatus> findAllByChannel(Channel channel) {
-    return readStatusData.values().stream()
-        .filter(readStatus -> channel.equals(readStatus.getChannel()))
-        .toList();
-  }
-
-  @Override
-  public List<ReadStatus> findAllByUser(User user) {
-    return readStatusData.values().stream()
-        .filter(readStatus -> user.equals(readStatus.getUser()))
-        .toList();
-  }
-
-  @Override
-  public List<Channel> findChannelsByUser(User owner) {
-    return readStatusData.values().stream()
-        .filter(readStatus -> owner.equals(readStatus.getUser()))
-        .map(ReadStatus::getChannel)
-        .distinct()
-        .toList();
-  }
-
-  @Override
-  public List<UUID> findUserIdsByChannel(Channel channel) {
-    return readStatusData.values().stream()
-        .filter(readStatus -> channel.equals(readStatus.getChannel()))
-        .map(readStatus -> readStatus.getUser().getId())
-        .distinct()
-        .toList();
+  public ReadStatus save(ReadStatus readStatus) {
+    Path path = resolvePath(readStatus.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(readStatus);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return readStatus;
   }
 
   @Override
   public Optional<ReadStatus> findById(UUID id) {
-    return Optional.ofNullable(readStatusData.get(id));
+    ReadStatus readStatusNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        readStatusNullable = (ReadStatus) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(readStatusNullable);
   }
 
   @Override
-  public Optional<ReadStatus> findByUserAndChannel(User user, Channel channel) {
-    return readStatusData.values().stream()
-        .filter(readStatus -> user.equals(readStatus.getUser()) && channel.equals(
-            readStatus.getChannel()))
-        .findFirst();
+  public List<ReadStatus> findAllByUserId(UUID userId) {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (ReadStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .filter(readStatus -> readStatus.getUserId().equals(userId))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
-  public boolean existsByUserAndChannel(User user, Channel channel) {
-    return readStatusData.values().stream()
-        .anyMatch(readStatus -> user.equals(readStatus.getUser()) && channel.equals(
-            readStatus.getChannel()));
+  public List<ReadStatus> findAllByChannelId(UUID channelId) {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (ReadStatus) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
-  public void deleteByChannel(Channel channel) {
-    readStatusData.values()
-        .removeIf(readStatus -> channel.equals(readStatus.getChannel()));
-    saveToFile();
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
   }
 
   @Override
   public void deleteById(UUID id) {
-    readStatusData.remove(id);
-    saveToFile();
-  }
-
-  private void ensureDirectoryExists(String directoryPath) {
-    File directory = new File(directoryPath);
-    File parentDirectory = directory.getParentFile();
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
-    }
-  }
-
-  private Map<UUID, ReadStatus> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
+    Path path = resolvePath(id);
     try {
-      return objectMapper.readValue(file,
-          new TypeReference<Map<UUID, ReadStatus>>() {
-          });
+      Files.delete(path);
     } catch (IOException e) {
-      log.error(e.getMessage());
-      return new ConcurrentHashMap<>();
+      throw new RuntimeException(e);
     }
   }
 
-  private void saveToFile() {
-    File file = new File(filePath);
-    try {
-      objectMapper.writeValue(file, readStatusData);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to save read status data to file.", e);
-    }
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    this.findAllByChannelId(channelId)
+        .forEach(readStatus -> this.deleteById(readStatus.getId()));
   }
-
-
 }

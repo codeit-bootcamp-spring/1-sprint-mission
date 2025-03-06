@@ -1,143 +1,111 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.Comparator;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "binary_content.json";
-  private static final String FILE_SEPARATOR = "/";
-
-  private final ObjectMapper objectMapper;
-  private final String filePath;
-  private final Map<UUID, BinaryContent> binaryContentData;
-
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileBinaryContentRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory,
-      ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        BinaryContent.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
+  }
 
-    ensureDirectoryExists(this.filePath);
-    this.binaryContentData = loadFromFile();
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
   public BinaryContent save(BinaryContent binaryContent) {
-    binaryContentData.put(binaryContent.getId(), binaryContent);
-    saveToFile();
+    Path path = resolvePath(binaryContent.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(binaryContent);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return binaryContent;
   }
 
   @Override
-  public List<BinaryContent> findAllByUserId(UUID userId) {
-    return binaryContentData.values().stream()
-        .filter(content -> userId.equals(content.getUserId()))
-        .toList();
-  }
-
-  @Override
-  public List<BinaryContent> findAllByMessageId(UUID messageId) {
-    return binaryContentData.values().stream()
-        .filter(content -> messageId.equals(content.getMessageId()))
-        .toList();
-  }
-
-  @Override
-  public Optional<BinaryContent> findById(UUID binaryContentId) {
-    return Optional.ofNullable(binaryContentData.get(binaryContentId));
+  public Optional<BinaryContent> findById(UUID id) {
+    BinaryContent binaryContentNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        binaryContentNullable = (BinaryContent) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(binaryContentNullable);
   }
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-    return binaryContentData.values().stream()
-        .filter(content -> ids.contains(content.getId()))
-        .toList();
-  }
-
-  @Override
-  public Optional<BinaryContent> findByUserId(UUID userId) {
-    // 생성시간이 가장 최근인 항목 선택 반환
-    return binaryContentData.values().stream()
-        .filter(content -> userId.equals(content.getUserId()))
-        .max(Comparator.comparing(BinaryContent::getCreatedAt));
-  }
-
-  @Override
-  public void delete(BinaryContent binaryContent) {
-    binaryContentData.remove(binaryContent.getId());
-    saveToFile();
-  }
-
-  @Override
-  public void deleteByMessageId(UUID messageId) {
-    binaryContentData.values().removeIf(content -> messageId.equals(content.getMessageId()));
-    saveToFile();
-  }
-
-  @Override
-  public void deleteByUserId(UUID userId) {
-    binaryContentData.values().removeIf(content -> userId.equals(content.getUserId()));
-    saveToFile();
-  }
-
-  @Override
-  public boolean existsByUserId(UUID userId) {
-    return binaryContentData.values().stream()
-        .anyMatch(content -> userId.equals(content.getUserId()));
-  }
-
-
-  private void ensureDirectoryExists(String directoryPath) {
-    File directory = new File(directoryPath);
-    File parentDirectory = directory.getParentFile();
-    if (!parentDirectory.exists()) {
-      parentDirectory.mkdirs();
-    }
-  }
-
-  private Map<UUID, BinaryContent> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
-    try {
-      return objectMapper.readValue(file,
-          new TypeReference<Map<UUID, BinaryContent>>() {
-          });
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .filter(content -> ids.contains(content.getId()))
+          .toList();
     } catch (IOException e) {
-      log.error(e.getMessage());
-      return new ConcurrentHashMap<>();
+      throw new RuntimeException(e);
     }
   }
 
-  private void saveToFile() {
-    File file = new File(filePath);
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
     try {
-      objectMapper.writeValue(file, binaryContentData);
+      Files.delete(path);
     } catch (IOException e) {
-      throw new RuntimeException("Failed to save binary content data.", e);
+      throw new RuntimeException(e);
     }
   }
-
 }

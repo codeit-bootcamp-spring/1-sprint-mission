@@ -1,86 +1,47 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.repository.interfacepac.BinaryContentRepository;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+import java.util.*;
+
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-  private final Map<UUID, BinaryContent> storage = new ConcurrentHashMap<>();
+  private final Map<UUID, BinaryContent> data;
 
+  public JCFBinaryContentRepository() {
+    this.data = new HashMap<>();
+  }
 
   @Override
   public BinaryContent save(BinaryContent binaryContent) {
-    return storage.put(binaryContent.getId(), binaryContent);
+    this.data.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
   }
 
   @Override
-  public Optional<BinaryContent> findById(UUID binaryContentId) {
-    return Optional.ofNullable(storage.get(binaryContentId));
-  }
-
-  @Override
-  public List<BinaryContent> findAllByUserId(UUID userId) {
-    return storage.values().stream()
-        .filter(content -> content.getUserId().equals(userId))
-        .collect(Collectors.toList());
-  }
-
-  @Override
-  public List<BinaryContent> findAllByMessageId(UUID messageId) {
-    return storage.values().stream()
-        .filter(
-            content -> content.getMessageId() != null && content.getMessageId().equals(messageId))
-        .collect(Collectors.toList());
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
   }
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-    return ids.stream()
-        .map(storage::get)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+    return this.data.values().stream()
+        .filter(content -> ids.contains(content.getId()))
+        .toList();
   }
 
   @Override
-  public Optional<BinaryContent> findByUserId(UUID userId) {
-    BinaryContent latestContent = null;
-    for (BinaryContent content : storage.values()) {
-      if (userId.equals(content.getUserId())) {
-        if (latestContent == null || content.getCreatedAt().isAfter(latestContent.getCreatedAt())) {
-          latestContent = content;
-        }
-      }
-    }
-    return Optional.ofNullable(latestContent);
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
   }
 
   @Override
-  public void delete(BinaryContent binaryContent) {
-    storage.remove(binaryContent.getId());
-  }
-
-  @Override
-  public void deleteByUserId(UUID userId) {
-    storage.values().removeIf(content -> content.getUserId().equals(userId));
-  }
-
-  @Override
-  public void deleteByMessageId(UUID messageId) {
-    storage.values()
-        .removeIf(
-            content -> content.getMessageId() != null && content.getMessageId().equals(messageId));
-  }
-
-  @Override
-  public boolean existsByUserId(UUID userId) {
-    return storage.values().stream()
-        .anyMatch(content -> content.getUserId().equals(userId));
+  public void deleteById(UUID id) {
+    this.data.remove(id);
   }
 }

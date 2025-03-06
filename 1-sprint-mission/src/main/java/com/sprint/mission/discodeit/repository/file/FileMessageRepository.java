@@ -1,129 +1,117 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import java.util.stream.Stream;
 
-@Slf4j
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
 public class FileMessageRepository implements MessageRepository {
 
-  private static final String DEFAULT_FILE_DIRECTORY = ".discodeit";
-  private static final String FILE_NAME = "message.json";
-  private static final String FILE_SEPARATOR = "/";
-
-  private final ObjectMapper objectMapper;
-  private final String filePath;
-  private final Map<UUID, List<Message>> messageData;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
 
   public FileMessageRepository(
-      @Value("${discodeit.repository.file-directory:" + DEFAULT_FILE_DIRECTORY
-          + "}") String fileDirectory, ObjectMapper objectMapper) {
-    this.objectMapper = objectMapper;
-    if (!fileDirectory.endsWith(FILE_SEPARATOR)) {
-      fileDirectory += FILE_SEPARATOR;
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        Message.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    this.filePath = fileDirectory + FILE_NAME;
-    ensureDirectoryExists(this.filePath);
-    this.messageData = loadFromFile();
+  }
+
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
   }
 
   @Override
   public Message save(Message message) {
-    UUID userId = message.getUser().getId();
-    List<Message> messages = messageData.computeIfAbsent(userId, k -> new ArrayList<>());
-    messages.removeIf(m -> m.getId().equals(message.getId()));
-
-    messages.add(message);
-    saveToFile();
+    Path path = resolvePath(message.getId());
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
+    ) {
+      oos.writeObject(message);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return message;
   }
 
   @Override
   public Optional<Message> findById(UUID id) {
-    return messageData.values().stream()
-        .flatMap(List::stream)
-        .filter(msg -> msg.getId().equals(id))
-        .findFirst();
-
-  }
-
-  @Override
-  public List<Message> findAll() {
-    return messageData.values().stream()
-        .flatMap(List::stream)
-        .collect(Collectors.toList());
+    Message messageNullable = null;
+    Path path = resolvePath(id);
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        messageNullable = (Message) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return Optional.ofNullable(messageNullable);
   }
 
   @Override
   public List<Message> findAllByChannelId(UUID channelId) {
-    return messageData.values().stream()
-        .flatMap(List::stream)
-        .filter(message -> message.getChannel().getId().equals(channelId))
-        .collect(Collectors.toList());
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            try (
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+              return (Message) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .filter(message -> message.getChannelId().equals(channelId))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
-
 
   @Override
-  public void deleteByChannel(Channel channel) {
-    messageData.values().forEach(messages ->
-        messages.removeIf(message -> message.getChannel().equals(channel)));
-    saveToFile();
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
   }
 
   @Override
-  public void deleteById(UUID messageId) {
-    messageData.values().forEach(messages ->
-        messages.removeIf(message -> message.getId().equals(messageId)));
-    saveToFile();
-  }
-
-
-  private void ensureDirectoryExists(String fileDirectory) {
-    File directory = new File(fileDirectory);
-    File parentDir = directory.getParentFile();
-    if (!parentDir.exists()) {
-      parentDir.mkdirs();
-    }
-  }
-
-  private Map<UUID, List<Message>> loadFromFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-      return new ConcurrentHashMap<>();
-    }
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
     try {
-      return objectMapper.readValue(
-          file,
-          new TypeReference<Map<UUID, List<Message>>>() {
-          }
-      );
+      Files.delete(path);
     } catch (IOException e) {
-      log.error(e.getMessage());
-      return new ConcurrentHashMap<>();
+      throw new RuntimeException(e);
     }
   }
 
-  private void saveToFile() {
-    File file = new File(filePath);
-    try {
-      objectMapper.writeValue(file, messageData);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to save message to file.", e);
-    }
+  @Override
+  public void deleteAllByChannelId(UUID channelId) {
+    this.findAllByChannelId(channelId)
+        .forEach(message -> this.deleteById(message.getId()));
   }
-
 }

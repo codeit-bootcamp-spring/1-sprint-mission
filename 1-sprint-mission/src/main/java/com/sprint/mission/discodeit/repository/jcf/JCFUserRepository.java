@@ -1,65 +1,62 @@
 package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
+@Repository
 public class JCFUserRepository implements UserRepository {
-    private final Map<UUID, User> userData;
 
-    public JCFUserRepository() {
-        this.userData = new HashMap<>();
-    }
+  private final Map<UUID, User> data;
 
-    @Override
-    public User save(User user) {
-        userData.put(user.getId(), user);
-        return user;
-    }
+  public JCFUserRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public boolean existsByUsername(String username) {
-        return userData.values().stream()
-                .anyMatch(user -> user.getUsername().equals(username));
-    }
+  @Override
+  public User save(User user) {
+    this.data.put(user.getId(), user);
+    return user;
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
-        return Optional.ofNullable(userData.values().stream()
-                .filter(user -> user.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not found User")));
-    }
+  @Override
+  public Optional<User> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-    @Override
-    public List<User> findAll() {
-        return new ArrayList<>(userData.values());
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
+  @Override
+  public List<User> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public void deleteById(UUID id) {
-        userData.remove(id);
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        return Optional.ofNullable(userData.values().stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Not User Found")));
-    }
+  @Override
+  public boolean existsByEmail(String email) {
+    return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+  }
 
-    @Override
-    public boolean existsByEmail(String email) {
-        return userData.values().stream().anyMatch(user -> user.getEmail().equals(email));
-    }
-
+  @Override
+  public boolean existsByUsername(String username) {
+    return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
+  }
 }
