@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.main;
 
+import com.sprint.mission.config.BaseTimeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,15 +13,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Setter
-@Schema(description = "메시지 엔티티")
-public class Message implements Serializable {
+@Setter @Schema(description = "메시지 엔티티")
+public class Message  extends BaseTimeEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final UUID id;
-    private final Instant createAt;
-    private Instant updateAt;
 
     private UUID writerId;
     private UUID channelId;
@@ -32,19 +30,12 @@ public class Message implements Serializable {
         this.channelId = channelId;
         this.writerId = userId;
         this.content = content;
-        this.createAt = Instant.now();
         this.attachmentIdList = new ArrayList<>();
     }
 
     public void update(String newContent) {
-        boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
-            anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updateAt = Instant.now();
         }
     }
 }

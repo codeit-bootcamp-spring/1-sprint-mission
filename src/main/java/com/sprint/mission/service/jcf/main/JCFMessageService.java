@@ -76,7 +76,6 @@ public class JCFMessageService implements MessageService {
     public void update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = this.findById(messageId);
         updatingMessage.setContent(updateDto.newContent());
-        updatingMessage.setUpdateAt(Instant.now());
         messageRepository.save(updatingMessage);
     }
 

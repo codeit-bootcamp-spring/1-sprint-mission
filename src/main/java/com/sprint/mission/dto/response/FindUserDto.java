@@ -18,11 +18,11 @@ public record FindUserDto(
     UUID profileImgId,
     boolean isOnline) {
 
-  public static FindUserDto fromEntityAndStatus(User user, Boolean isOnline) {
+  public static FindUserDto toDtoFromEntityAndStatus(User user, Boolean isOnline) {
     return new FindUserDto(
         user.getId(),
-        user.getCreateAt(),
-        user.getUpdateAt(),
+        user.getCreatedAt(),
+        user.getUpdatedAt(),
         user.getName(),
         user.getEmail(),
         user.getProfileImgId(),

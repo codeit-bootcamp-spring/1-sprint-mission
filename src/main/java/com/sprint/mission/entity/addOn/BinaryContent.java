@@ -1,5 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
+import com.sprint.mission.config.BaseTimeEntity;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -11,19 +12,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @Schema(description = "바이너리 컨텐츠")
-public class BinaryContent {
+public class BinaryContent extends BaseTimeEntity {
 
     private static final long serialVersionUID = 1L;
     private UUID id;
-    private Instant createdAt;
     private String fileName;
     private String contentType;
     private byte[] bytes;
 
     public BinaryContent(String fileName, String contentType, byte[] bytes) {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-
         this.fileName = fileName;
         this.contentType = contentType;
         this.bytes = bytes;

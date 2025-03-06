@@ -2,7 +2,6 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.dto.response.FindUserDto;
@@ -121,7 +120,7 @@ public class UserController {
         log.info("statusMapByUser : {}", statusMapByUser);
         List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
                 .map(user -> {
-                    return FindUserDto.fromEntityAndStatus(user, statusMapByUser.get(user));
+                    return FindUserDto.toDtoFromEntityAndStatus(user, statusMapByUser.get(user));
                 }).toList();
 
         return CommonResponse.toResponseEntity

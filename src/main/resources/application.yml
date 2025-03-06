@@ -1,3 +1,6 @@
+
+
+
 spring:
   profiles:
     active: dev
@@ -9,6 +12,22 @@ spring:
   threads:
     virtual:
       enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        #show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
 
 springdoc:
   api-docs:

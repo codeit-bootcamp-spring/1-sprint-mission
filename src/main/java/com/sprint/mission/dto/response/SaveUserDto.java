@@ -16,8 +16,8 @@ public record SaveUserDto(
     public static SaveUserDto fromEntity(User user) {
         return new SaveUserDto(
                 user.getId(),
-                user.getCreateAt(),
-                user.getUpdateAt(),
+                user.getCreatedAt(),
+                user.getUpdatedAt(),
                 user.getName(),
                 user.getEmail(),
                 user.getProfileImgId()

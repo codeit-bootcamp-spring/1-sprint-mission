@@ -146,8 +146,8 @@ public class JCFChannelService implements ChannelService {
     private FindChannelAllDto toDto(Channel channel) {
         Instant lastMessageAt = messageService.findAllByChannelId(channel.getId())
                 .stream()
-                .sorted(Comparator.comparing(Message::getCreateAt).reversed())
-                .map(Message::getCreateAt)
+                .sorted(Comparator.comparing(Message::getCreatedAt).reversed())
+                .map(Message::getCreatedAt)
                 .limit(1)
                 .findFirst()
                 .orElse(Instant.MIN);
