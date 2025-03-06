@@ -37,6 +37,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     Channel channel = new Channel(ChannelType.PUBLIC, publicChannelCreateRequest.channelName(),
+        publicChannelCreateRequest.description(),
         user);
     return channelRepository.save(channel);
   }
@@ -46,13 +47,8 @@ public class BasicChannelService implements ChannelService {
     User user = userRepository.findById(privateChannelCreateRequest.adminId())
         .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    if (channelRepository.existsName(privateChannelCreateRequest.channelName())) {
-      throw new IllegalArgumentException("이미 존재하는 채널 이름입니다.");
-    }
-
-    Channel channel = new Channel(ChannelType.PRIVATE, privateChannelCreateRequest.channelName(),
-        user);
-    channel.addMember(user);
+    Channel channel = new Channel(ChannelType.PRIVATE, null, null, user);
+    channel.addMember(user.getId());
     return channelRepository.save(channel);
   }
 
@@ -81,12 +77,12 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public Channel update(UUID channelId, UUID adminId,
+  public Channel update(UUID channelId,
       PublicChannelUpdateRequest publicChannelUpdateRequest) {
     Channel channel = channelRepository.findById(channelId)
         .orElseThrow(() -> new NoSuchElementException("채널이 존재하지 않습니다."));
 
-    if (!channel.getAdmin().getId().equals(adminId)) {
+    if (!channel.getAdmin().getId().equals(publicChannelUpdateRequest.adminId())) {
       throw new IllegalArgumentException("관리자만 수정할 수 있습니다.");
     }
 
@@ -125,7 +121,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("채널의 관리자만 사용자의 참여를 승인할 수 있습니다.");
     }
 
-    channel.addMember(user);
+    channel.addMember(user.getId());
     channelRepository.save(channel);
   }
 
@@ -145,7 +141,7 @@ public class BasicChannelService implements ChannelService {
       throw new IllegalArgumentException("채널의 관리자는 채널을 떠날 수 없습니다.");
     }
 
-    channel.deleteMember(user);
+    channel.deleteMember(user.getId());
     channelRepository.save(channel);
   }
 }

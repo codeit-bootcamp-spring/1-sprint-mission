@@ -12,14 +12,15 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binarycontents")
+@RequestMapping("/api/binary-contents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
 
   @GetMapping(value = "/{binaryContentId}")
-  public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable UUID binaryContentId) {
+  public ResponseEntity<BinaryContent> getBinaryContent(
+      @PathVariable("binaryContentId") UUID binaryContentId) {
     return ResponseEntity.status(HttpStatus.OK).body(binaryContentService.find(binaryContentId));
   }
 

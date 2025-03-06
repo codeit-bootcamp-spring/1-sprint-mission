@@ -30,30 +30,29 @@ public class ChannelController {
 
   @PostMapping(value = "/private")
   public ResponseEntity<ChannelDTO> create(
-      @Valid @RequestBody PrivateChannelCreateRequest request) {
+      @RequestBody PrivateChannelCreateRequest request) {
     Channel channel = channelService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(ChannelDTO.fromEntity(channel));
   }
 
-  @PutMapping(value = "/{channelId}/{adminId}")
+  @PutMapping(value = "/{channelId}")
   public ResponseEntity<ChannelDTO> updateChannel(
-      @PathVariable UUID channelId,
-      @PathVariable UUID adminId,
-      @RequestBody PublicChannelUpdateRequest request) {
-    Channel channel = channelService.update(channelId, adminId, request);
+      @PathVariable("channelId") UUID channelId,
+      @Valid @RequestBody PublicChannelUpdateRequest request) {
+    Channel channel = channelService.update(channelId, request);
     return ResponseEntity.status(HttpStatus.OK).body(ChannelDTO.fromEntity(channel));
   }
 
-  @DeleteMapping(value = "/{channelId}/{adminId}")
+  @DeleteMapping(value = "/{channelId}")
   public ResponseEntity<Void> deleteChannel(
-      @PathVariable UUID channelId,
-      @PathVariable UUID adminId) {
+      @PathVariable("channelId") UUID channelId,
+      @RequestParam UUID adminId) {
     channelService.delete(channelId, adminId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping(value = "/{userId}")
-  public ResponseEntity<List<ChannelDTO>> getUserChannels(@PathVariable UUID userId) {
+  public ResponseEntity<List<ChannelDTO>> getUserChannels(@PathVariable("userId") UUID userId) {
     return ResponseEntity.status(HttpStatus.OK).body(channelService.findAllByUserId(userId));
   }
 
@@ -64,7 +63,7 @@ public class ChannelController {
 
   @PostMapping(value = "/{channelId}/join")
   public ResponseEntity<Void> joinPrivateChannel(
-      @PathVariable UUID channelId,
+      @PathVariable("channelId") UUID channelId,
       @RequestParam UUID adminId,
       @RequestParam UUID userId) {
     channelService.joinPrivateChannel(channelId, adminId, userId);
@@ -73,7 +72,7 @@ public class ChannelController {
 
   @PostMapping(value = "/{channelId}/leave")
   public ResponseEntity<Void> leavePrivateChannel(
-      @PathVariable UUID channelId,
+      @PathVariable("channelId") UUID channelId,
       @RequestParam UUID userId) {
     channelService.leavePrivateChannel(channelId, userId);
     return ResponseEntity.status(HttpStatus.OK).build();

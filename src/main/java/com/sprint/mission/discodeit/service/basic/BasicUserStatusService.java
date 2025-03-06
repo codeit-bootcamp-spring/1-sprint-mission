@@ -43,6 +43,11 @@ public class BasicUserStatusService implements UserStatusService {
         .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
   }
 
+  @Override
+  public UserStatus findByUserId(UUID userId) {
+    return userStatusRepository.findByUserId(userId)
+        .orElseThrow(() -> new NoSuchElementException("유저상태가 존재하지 않습니다."));
+  }
 
   @Override
   public List<UserStatus> findAll() {
@@ -60,7 +65,6 @@ public class BasicUserStatusService implements UserStatusService {
 
     return userStatusRepository.save(userStatus);
   }
-
 
   @Override
   public void delete(UUID userStatusId) {

@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,10 +29,10 @@ public class MessageController {
     return ResponseEntity.status(HttpStatus.CREATED).body(MessageDTO.fromEntity(message));
   }
 
-  @PutMapping(value = "/{messageId}")
+  @PatchMapping(value = "/{messageId}")
   public ResponseEntity<MessageDTO> updateMessage(
-      @PathVariable UUID messageId,
-      @Valid @RequestBody MessageUpdateRequest request
+      @PathVariable("messageId") UUID messageId,
+      @RequestBody MessageUpdateRequest request
   ) {
     Message message = messageService.update(messageId, request);
     return ResponseEntity.status(HttpStatus.OK).body(MessageDTO.fromEntity(message));
@@ -41,14 +40,15 @@ public class MessageController {
 
   @DeleteMapping(value = "/{messageId}/{writerId}")
   public ResponseEntity<Void> deleteMessage(
-      @PathVariable UUID messageId,
-      @PathVariable UUID writerId) {
+      @PathVariable("messageId") UUID messageId,
+      @PathVariable("writerId") UUID writerId) {
     messageService.delete(messageId, writerId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
   @GetMapping(value = "/{channelId}")
-  public ResponseEntity<List<MessageDTO>> getChannelMessages(@PathVariable UUID channelId) {
+  public ResponseEntity<List<MessageDTO>> getChannelMessages(
+      @PathVariable("channelId") UUID channelId) {
     return ResponseEntity.status(HttpStatus.OK).body(messageService.findByChannel(channelId));
   }
 

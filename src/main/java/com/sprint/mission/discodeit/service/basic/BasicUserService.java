@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이메일 형식이 올바르지 않습니다.");
     }
 
-    if (userRepository.existsName(userUpdateRequest.newUsername())) {
+    if (userRepository.existsName(userUpdateRequest.newUserName())) {
       throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다.");
     }
 
@@ -115,18 +115,17 @@ public class BasicUserService implements UserService {
       binaryContentRepository.save(binaryContent);
     }
 
-    user.update(userUpdateRequest.newUsername(), userUpdateRequest.newEmail());
+    user.update(userUpdateRequest.newUserName(), userUpdateRequest.newEmail());
     return userRepository.save(user);
   }
 
   @Override
   public void delete(UUID userId) {
-    if (!userRepository.existsId(userId)) {
-      throw new NoSuchElementException("유저가 존재하지 않습니다.");
-    }
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("유저가 존재하지 않습니다."));
 
-    if (binaryContentRepository.existsId(userId)) {
-      binaryContentRepository.deleteById(userId);
+    if (binaryContentRepository.existsId(user.getProfileId())) {
+      binaryContentRepository.deleteById(user.getProfileId());
     }
 
     userStatusRepository.deleteByUserId(userId);

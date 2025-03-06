@@ -21,8 +21,7 @@ public interface ChannelService {
 
   List<ChannelDTO> findPublicAll();
 
-  Channel update(UUID channelId, UUID adminId,
-      PublicChannelUpdateRequest publicChannelUpdateRequest);
+  Channel update(UUID channelId, PublicChannelUpdateRequest publicChannelUpdateRequest);
 
   void delete(UUID channelId, UUID adminId);
 

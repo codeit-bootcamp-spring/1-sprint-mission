@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.dto;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record UserStatusUpdateRequest(
-        Instant newLastActiveAt
+    @NotNull(message = "시간은 필수 입력 값입니다.")
+    Instant newLastActiveAt
 ) {
+
 }
