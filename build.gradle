@@ -29,7 +29,7 @@ dependencies {
 
     // Spring Data JPA 추가 (데이터베이스 연동)
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
+    implementation 'org.postgresql:postgresql'
     // Bean Validation (데이터 검증)
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -43,11 +43,14 @@ dependencies {
     // 테스트 라이브러리
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
     // springdoc-openapi Swagger기반의 API
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+
 }
+
 tasks.named('test') {
     useJUnitPlatform()
 }
