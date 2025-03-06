@@ -1,20 +1,38 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import java.util.Map;
-import java.util.Optional;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelRequestDto;
+import com.sprint.mission.discodeit.dto.channel.FindChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdatePublicChannelRequestDto;
+
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public interface ChannelService {
-    Channel createChannel(String channelName);
+public interface ChannelService {// 생성
 
-    Map<UUID, Channel> getChannels();
+    UUID createPublic(CreatePublicChannelRequestDto createPublicChannelRequestDto);
+    UUID createPrivate(CreatePrivateChannelRequestDto createPrivateChannelRequestDto);
 
-    Optional<Channel> getChannel(UUID uuid);
+    // 읽기
+    FindChannelResponseDto find(UUID id);
 
-    Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID);
+    // 모두 읽기
+    List<FindChannelResponseDto> findAllByUserId(UUID userId);
 
-    Optional<Channel> updateChannel(UUID uuid, String channelName);
+    // 수정
+    FindChannelResponseDto updateChannel(UpdatePublicChannelRequestDto updatePublicChannelRequestDto);
 
-    Optional<Channel> deleteChannel(UUID uuid);
+    // 멤버 수정
+    // 멤버가 List에 있을 경우 멤버 삭제, 없을 경우 추가
+    void addMember(UUID id, UUID memberId);
+    void deleteMember(UUID id, UUID memberId);
+
+    // 삭제
+    void delete(UUID id);
+
+    // 채널 존재 여부 확인
+    void channelIsExist(UUID id);
+
+    void updateLastMessageTime(UUID channelID, Instant lastMessageTime);
 }

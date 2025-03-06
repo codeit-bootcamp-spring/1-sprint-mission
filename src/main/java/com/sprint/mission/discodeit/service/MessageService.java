@@ -1,18 +1,30 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Message;
-import java.util.Map;
-import java.util.Optional;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
+import com.sprint.mission.discodeit.dto.message.FindMessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message createMessage(UUID authorID, UUID channelID, String text);
+    // 생성
+    FindMessageResponseDto create(CreateMessageRequestDto createMessageRequestDto) throws IOException;
 
-    Map<UUID, Message> getMessages();
+    // 읽기
+    FindMessageResponseDto find(UUID id);
 
-    Optional<Message> getMessage(UUID uuid);
+    // 모두 읽기
+    List<FindMessageResponseDto> findAllByChannelId(UUID channelId);
+    List<FindMessageResponseDto> findAllByUserId(UUID userId);
 
-    Optional<Message> updateMessage(UUID uuid, String text);
+    // 수정
+    FindMessageResponseDto updateContext(UpdateMessageRequestDto updateMessageRequestDto);
+    
+    // 삭제
+    void delete(UUID id);
 
-    Optional<Message> deleteMessage(UUID uuid);
+    // 메시지 존재 여부 확인
+    void messageIsExist(UUID id);
 }

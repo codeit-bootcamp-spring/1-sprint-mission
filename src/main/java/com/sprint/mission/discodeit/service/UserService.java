@@ -1,18 +1,29 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.User;
-import java.util.Map;
-import java.util.Optional;
+import com.sprint.mission.discodeit.dto.user.CreateUserRequestDto;
+import com.sprint.mission.discodeit.dto.user.FindUserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UpdateUserRequestDto;
+
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(String username);
+    // 생성
+    UUID create(CreateUserRequestDto createUserDto) throws IOException;
 
-    Map<UUID, User> getUsers();
+    // 읽기
+    FindUserResponseDto find(UUID id);
 
-    Optional<User> getUser(UUID uuid);
+    // 모두 읽기
+    List<FindUserResponseDto> findAll();
 
-    Optional<User> updateUser(UUID uuid, String username);
+    // 수정
+    void updateUser(UUID id, UpdateUserRequestDto updateUserRequestDto) throws IOException;
 
-    Optional<User> deleteUser(UUID uuid);
+    // 삭제
+    void delete(UUID id);
+
+    // 유저 존재 여부 확인
+    void userIsExist(UUID id);
 }

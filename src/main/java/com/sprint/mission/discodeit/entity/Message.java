@@ -1,56 +1,65 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import lombok.Getter;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
-public class Message {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+@Getter
+public class Message implements Serializable {                  // 메시지 (게시물)
 
-    private String text;
-    private final UUID authorId;
-    private final UUID channelId;
+    @Serial
+    private static final long serialVersionUID = 1L;
 
-    public void updateText(String text) {
-        this.text = text;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-    }
+    // 공통 필드
+    private final UUID id;              // pk
+    private final Instant createdAt;    // 생성 시간
+    private Instant updatedAt;          // 수정 시간
 
-    public UUID getId() {
-        return id;
-    }
+    private final UUID channelId;       // 메시지가 속해있는 채널
+    private final UUID writerId;        // 작성자 id
+    private String context;             // 메시지 내용
+    private List<UUID> imagesId;       // 첨부 이미지 id
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
+    // 생성자
+    public Message(UUID channelId, UUID writerId, String context, List<UUID> imagesId){
+        id = UUID.randomUUID();
+        createdAt = Instant.now();
 
-    public String getText() {
-        return text;
-    }
-    public String toString(){
-        return "\nuuid: "+ id + " text: " + text + " authorId: " + authorId;
-    }
-
-    public Message(String text, UUID authorId, UUID channelId){
-        this.authorId = authorId;
         this.channelId = channelId;
-        this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        this.updatedAt = createdAt;
-        this.text = text;
+        validationAndSetContext(context);
+        this.writerId = writerId;
+        this.imagesId = imagesId;
     }
 
-    public UUID getAuthorId() {
-        return authorId;
+
+    // update 함수
+    public void updateContext(String context) {
+        validationAndSetContext(context);
+        updateUpdateAt();
     }
 
-    public UUID getChannelId() {
-        return channelId;
+    public void updateImagesId(List<UUID> imagesId) {
+        this.imagesId = this.imagesId;
+    }
+
+    public void updateUpdateAt(){
+        this.updatedAt = Instant.now();
+    }
+
+
+    // 메시지 내용 유효성 검사 및 세팅
+    private void validationAndSetContext(String context) {
+        if (context == null || context.isBlank()) {
+            throw new IllegalArgumentException("메시지 내용을 입력해주세요.");
+        }
+
+        context = context.trim();
+
+        this.context = context;
     }
 }
