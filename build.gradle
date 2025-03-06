@@ -43,8 +43,9 @@ dependencies {
     // 테스트 라이브러리
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
+    // springdoc-openapi Swagger기반의 API
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 tasks.named('test') {
