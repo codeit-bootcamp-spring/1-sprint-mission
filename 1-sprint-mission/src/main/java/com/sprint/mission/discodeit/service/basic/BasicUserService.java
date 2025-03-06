@@ -54,7 +54,6 @@ public class BasicUserService implements UserService {
     userRepository.save(newUser);
 
     // 프로필 이미지 저장 (선택적)
-    UUID profileId = null;
     if (binaryContentCreateRequest != null &&
         binaryContentCreateRequest.bytes() != null
         && binaryContentCreateRequest.bytes().length > 0) {
@@ -68,8 +67,6 @@ public class BasicUserService implements UserService {
 
       );
       BinaryContent profileContent = binaryContentRepository.save(binaryContent);
-      profileId = profileContent.getId();
-
     }
     //사용자 상태 생성, 저장
     UserStatus userStatus = new UserStatus(newUser, null);

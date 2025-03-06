@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.converter.ChannelResponseConverter;
 import com.sprint.mission.discodeit.dto.request.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.request.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.request.channel.PublicChannelCreateDTO;
@@ -14,6 +15,7 @@ import com.sprint.mission.discodeit.repository.interfacepac.MessageRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.interfacepac.UserRepository;
 import com.sprint.mission.discodeit.service.interfacepac.ChannelService;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class BasicChannelService implements ChannelService {
   private final UserRepository userRepository;
   private final MessageRepository messageRepository;
   private final ReadStatusRepository readStatusRepository;
+  private final ChannelResponseConverter channelResponseConverter;
 
 
   @Override
@@ -90,7 +93,7 @@ public class BasicChannelService implements ChannelService {
     //Private 채널이면 사용자 id 목록 포함
     List<UUID> memberIds = null;
     if (channel.getType() == ChannelType.PRIVATE) {
-      memberIds = readStatusRepository.findAllByChannel(channel) // 이부분 개선가능 성능 향상
+      memberIds = readStatusRepository.findAllByChannel(channel)
           .stream()
           .map(readStatus -> readStatus.getUser().getId())
           .toList();
@@ -102,7 +105,7 @@ public class BasicChannelService implements ChannelService {
         channel.getType() == ChannelType.PUBLIC ? channel.getDescription() : null,
         channel.getType(),
         memberIds,
-        channel.getLastMessageAt() != null ? channel.getLastMessageAt() : Instant.EPOCH //null 방지..?
+        channel.getLastMessageAt() != null ? channel.getLastMessageAt() : Instant.EPOCH
     );
 
   }
@@ -112,46 +115,23 @@ public class BasicChannelService implements ChannelService {
     //사용자 조회
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException("User not found"));
-    //private 채널 조회(사용자가 참여한 채널 + 사용자가 소유한 채널)
-    List<Channel> privateChannels = readStatusRepository.findChannelsByUser(user);
-    channelRepository.findAllByOwnerAndType(user, ChannelType.PRIVATE);
 
-    //중복제거
-    HashSet<Channel> uniquePrivateChannels = new HashSet<>(privateChannels);
-    uniquePrivateChannels.addAll(privateChannels);
+    //private 채널 조회(사용자가 참여한 채널 + 사용자가 소유한 채널)
+    HashSet<Channel> privateChannels = new HashSet<>(readStatusRepository.findChannelsByUser(user));
+    privateChannels.addAll(channelRepository.findAllByOwnerAndType(user, ChannelType.PRIVATE));
 
     //public 채널 조회 (모든 사용자가 접근 가능)
     List<Channel> publicChannels = channelRepository.findAllByType(ChannelType.PUBLIC);
 
     //private 채널 응답 반환
-    List<ChannelResponseDTO> privateChannelResponses = uniquePrivateChannels.stream()
-        .map(channel -> new ChannelResponseDTO(
-            channel.getId(),
-            null,
-            null,
-            ChannelType.PRIVATE,
-            readStatusRepository.findUserIdsByChannel(channel),
-            channel.getLastMessageAt() != null ? channel.getLastMessageAt() : Instant.EPOCH
-        ))
-        .toList();
-
+    List<ChannelResponseDTO> privateChannelResponses = channelResponseConverter.convertChannels(
+        new ArrayList<>(privateChannels), ChannelType.PRIVATE);
     //public 채널 응답 반환
-    List<ChannelResponseDTO> publicChannelResponses = publicChannels.stream()
-        .map(channel -> new ChannelResponseDTO(
-            channel.getId(),
-            channel.getName(),
-            channel.getDescription(),
-            ChannelType.PUBLIC,
-            null,
-            channel.getLastMessageAt() != null ? channel.getLastMessageAt() : Instant.EPOCH
-        ))
-        .toList();
+    List<ChannelResponseDTO> publicChannelResponses = channelResponseConverter.convertChannels(
+        publicChannels, ChannelType.PUBLIC);
     // public 채널 + private 채널 -> 전체 목록
-    List<ChannelResponseDTO> allChannels = new ArrayList<>();
-    allChannels.addAll(privateChannelResponses);
-    allChannels.addAll(publicChannelResponses);
-
-    return allChannels;
+    return Stream.concat(privateChannelResponses.stream(), publicChannelResponses.stream())
+        .toList();
   }
 
   @Override
