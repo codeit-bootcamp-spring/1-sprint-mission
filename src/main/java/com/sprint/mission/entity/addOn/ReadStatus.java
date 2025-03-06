@@ -2,19 +2,24 @@ package com.sprint.mission.entity.addOn;
 
 import com.sprint.mission.config.BaseTimeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@ToString @Getter
 @Schema(description = "메시지 읽음 상태 정보")
-@Getter
 public class ReadStatus extends BaseTimeEntity implements Serializable {
+
+    @ToString.Exclude
     private static final long serialVersionUID = 1L;
     private UUID id;
-//    private Instant createdAt;
-//    private Instant updatedAt;
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;

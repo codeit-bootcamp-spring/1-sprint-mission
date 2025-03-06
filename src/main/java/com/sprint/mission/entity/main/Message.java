@@ -2,9 +2,7 @@ package com.sprint.mission.entity.main;
 
 import com.sprint.mission.config.BaseTimeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -12,13 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter @Schema(description = "메시지 엔티티")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(callSuper = false)
+@ToString @Getter @Setter
+@Schema(description = "메시지 엔티티")
 public class Message  extends BaseTimeEntity implements Serializable {
 
+    @ToString.Exclude
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
+    private UUID id;
 
     private UUID writerId;
     private UUID channelId;

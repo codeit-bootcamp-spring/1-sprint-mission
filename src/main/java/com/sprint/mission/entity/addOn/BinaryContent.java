@@ -3,18 +3,22 @@ package com.sprint.mission.entity.addOn;
 import com.sprint.mission.config.BaseTimeEntity;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
+@ToString @Getter
 @Schema(description = "바이너리 컨텐츠")
-public class BinaryContent extends BaseTimeEntity {
+public class BinaryContent extends BaseTimeEntity implements Serializable {
 
+    @ToString.Exclude
     private static final long serialVersionUID = 1L;
+
     private UUID id;
     private String fileName;
     private String contentType;

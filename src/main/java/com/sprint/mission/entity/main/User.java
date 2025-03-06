@@ -10,14 +10,16 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = false)
+@ToString @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "유저")
 public class User extends BaseTimeEntity implements Serializable {
 
+    @ToString.Exclude
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
+    private UUID id;
     private String name;
     private String email;
     private String password;
@@ -38,6 +40,5 @@ public class User extends BaseTimeEntity implements Serializable {
         this.password = password;
         this.email = email;
     }
-
 
 }

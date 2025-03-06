@@ -7,6 +7,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
