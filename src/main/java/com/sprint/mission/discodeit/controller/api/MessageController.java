@@ -1,11 +1,14 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.MessageApiDocs;
+import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,34 +25,40 @@ public class MessageController implements MessageApiDocs {
   @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
   @Override
-  public MessageResponse createMessage(
+  public ResponseEntity<CustomApiResponse<MessageResponse>> createMessage(
       @RequestPart MessageRequest.Create messageRequest,
       @RequestPart(value = "files", required = false) List<MultipartFile> files
   ) {
-    return messageService.createMessage(messageRequest, files);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CustomApiResponse.created(messageService.createMessage(messageRequest, files)));
   }
 
   @PutMapping(value = "/{messageId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,
       MediaType.APPLICATION_JSON_VALUE})
   @Override
-  public MessageResponse updateMessage(
+  public ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
       @PathVariable UUID messageId,
       @RequestPart MessageRequest.Update messageRequest,
       @RequestPart(value = "files", required = false) List<MultipartFile> files
   ) {
-    return messageService.update(messageId, messageRequest, files);
+    return ResponseEntity.ok(
+        CustomApiResponse.success(messageService.update(messageId, messageRequest, files))
+    );
   }
 
   @DeleteMapping("/{messageId}")
   @Override
-  public String deleteMessage(@PathVariable UUID messageId) {
+  public ResponseEntity<CustomApiResponse<Void>> deleteMessage(@PathVariable UUID messageId) {
     messageService.deleteById(messageId);
-    return "delete ok";
+    return ResponseEntity.ok(CustomApiResponse.success("Message deleted successfully"));
   }
 
   @GetMapping
   @Override
-  public List<MessageResponse> getMessageListByChannel(@RequestParam("channelId") UUID channelId) {
-    return messageService.findAllByChannelId(channelId);
+  public ResponseEntity<CustomApiResponse<List<MessageResponse>>> getMessageListByChannel(
+      @RequestParam("channelId") UUID channelId) {
+    return ResponseEntity.ok(
+        CustomApiResponse.success(messageService.findAllByChannelId(channelId))
+    );
   }
 }

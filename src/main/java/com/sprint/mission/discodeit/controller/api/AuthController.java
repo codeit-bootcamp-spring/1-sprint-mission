@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.controller.docs.AuthApiDocs;
+import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +21,8 @@ public class AuthController implements AuthApiDocs {
 
   @PostMapping("/login")
   @Override
-  public UserResponse login(@RequestBody UserRequest.Login userRequestLogin) {
-    return authService.login(userRequestLogin);
+  public ResponseEntity<CustomApiResponse<UserResponse>> login(
+      @RequestBody UserRequest.Login userRequestLogin) {
+    return ResponseEntity.ok(CustomApiResponse.success(authService.login(userRequestLogin)));
   }
 }
