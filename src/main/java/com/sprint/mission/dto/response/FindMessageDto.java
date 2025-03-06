@@ -15,11 +15,19 @@ public record FindMessageDto (
     List<UUID> attachmentIdList,
     String content) {
 
-    public static FindMessageDto toDto(Message message) {
-        return new FindMessageDto(
+    public FindMessageDto(Message message) {
+        this(
             message.getWriterId(),
             message.getChannelId(),
             message.getAttachmentIdList(),
             message.getContent());
     }
+
+    //    public static FindMessageDto toDto(Message message) {
+//        return new FindMessageDto(
+//            message.getWriterId(),
+//            message.getChannelId(),
+//            message.getAttachmentIdList(),
+//            message.getContent());
+//    }
 }

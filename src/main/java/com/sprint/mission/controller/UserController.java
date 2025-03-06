@@ -52,8 +52,9 @@ public class UserController {
             @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         User user = userService.create(requestDTO, profile);
+
         return CommonResponse.toResponseEntity
-                (CREATED, "유저가 성공적으로 생성되었습니다.", SaveUserDto.fromEntity(user));
+                (CREATED, "유저가 성공적으로 생성되었습니다.", new SaveUserDto(user));
     }
 
     @Operation(summary = "User 정보 수정")
@@ -118,10 +119,11 @@ public class UserController {
     public ResponseEntity<CommonResponse> findAll() {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
         log.info("statusMapByUser : {}", statusMapByUser);
+
+
         List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
-                .map(user -> {
-                    return FindUserDto.toDtoFromEntityAndStatus(user, statusMapByUser.get(user));
-                }).toList();
+                .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
+                .toList();
 
         return CommonResponse.toResponseEntity
                 (OK, "유저 리스트 조회 성공", findUserDtoList);

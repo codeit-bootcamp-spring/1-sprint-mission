@@ -62,10 +62,12 @@ public class MessageController {
                 .flatMap(Optional::stream) // 비어있는 Optional은 무시
                 .toList();
 
+
+
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoList);
 
         return CommonResponse.toResponseEntity
-                (CREATED, "메시지가 성공적으로 생성되었습니다.", FindMessageDto.toDto(createdMessage));
+                (CREATED, "메시지가 성공적으로 생성되었습니다.", new FindMessageDto(createdMessage));
     }
 
 
@@ -78,7 +80,7 @@ public class MessageController {
         List<Message> messageList = messageService.findAllByChannelId(channelId);
         log.info("Attachments: {}", messageList.get(0).getAttachmentIdList());
         List<FindMessageDto> dtoList = messageList.stream()
-                .map(FindMessageDto::toDto).toList();
+                .map(FindMessageDto::new).toList();
 
         return CommonResponse.toResponseEntity
                 (OK, "메시지 목록을 성공적으로 조회했습니다.", dtoList);

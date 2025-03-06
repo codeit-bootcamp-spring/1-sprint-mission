@@ -14,4 +14,5 @@ public record PrivateChannelCreateDTO(
     public Channel toChannel() {
         return new Channel(null, null, ChannelType.PRIVATE);
     }
+    // 나중에
 }

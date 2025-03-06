@@ -23,7 +23,7 @@ public record UserDtoForCreate(
         String email) {
 
     public User toEntity() {
-        return new User(username, password, email, null);
+        return new User(username, password, email);
     }
 }
 ;

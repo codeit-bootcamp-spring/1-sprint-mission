@@ -13,14 +13,14 @@ public record SaveUserDto(
         String email,
         UUID profileImgId){
 
-    public static SaveUserDto fromEntity(User user) {
-        return new SaveUserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getName(),
-                user.getEmail(),
-                user.getProfileImgId()
+    public SaveUserDto(User user) {
+        this(
+            user.getId(),
+            user.getCreatedAt(),
+            user.getUpdatedAt(),
+            user.getName(),
+            user.getEmail(),
+            user.getProfileImgId()
         );
     }
 }

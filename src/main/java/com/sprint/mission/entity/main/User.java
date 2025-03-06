@@ -4,10 +4,7 @@ package com.sprint.mission.entity.main;
 import com.sprint.mission.config.BaseTimeEntity;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -34,4 +31,13 @@ public class User extends BaseTimeEntity implements Serializable {
         this.email = email;
         this.profileImgId = profileImgId;
     }
+
+    public User(String name, String password, String email) {
+        this.id = UUID.randomUUID();
+        this.name = name;
+        this.password = password;
+        this.email = email;
+    }
+
+
 }
