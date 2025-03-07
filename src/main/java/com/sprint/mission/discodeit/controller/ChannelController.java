@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,21 +26,25 @@ import java.util.UUID;
 @RequestMapping("/channel")
 @RequiredArgsConstructor
 public class ChannelController {
+  //TODO: 컨트롤러단 RequestEntity 로 수정하기.Dto로
 
   private final ChannelService channelService;
 
   //공개 채널 생성
   @PostMapping
   public String createPublicChannel(@RequestBody ChannelCreateDTO channelCreateDTO) {
-    channelService.createPublicChannel(channelCreateDTO);
+    Channel createdChannel = channelService.createPublicChannel(channelCreateDTO);
     return "Public channel created";
   }
 
   //비공개 채널 생성
   @PostMapping("/private")
-  public String createPrivateChannel(@RequestBody PrivateChannelCreateDTO channelCreateDTO) {
-    channelService.createPrivateChannel(channelCreateDTO);
-    return "Private channel created";
+  public ResponseEntity<Channel> createPrivateChannel(
+      @RequestBody PrivateChannelCreateDTO channelCreateDTO) {
+    Channel createdChannel = channelService.createPrivateChannel(channelCreateDTO);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(createdChannel);
   }
 
   //공개 채널 정보 수정

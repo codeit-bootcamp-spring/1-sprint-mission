@@ -69,6 +69,8 @@ public class DiscodeitApplication {
 
     System.out.println(PBChannel.getId());
     System.out.println(user2.getId());
+    System.out.println(user2.getBinaryContent().getId());
+    System.out.println(user.getBinaryContent().getId());
 
     Message message = messageService.createMessage(
         new MessageCreateDTO(user.getId(), PBChannel.getId(), "hello", null));
