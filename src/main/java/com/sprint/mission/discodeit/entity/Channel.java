@@ -4,9 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter @Setter
 @Entity @Builder
@@ -16,12 +14,15 @@ import java.util.UUID;
 public class Channel{
 
     @Id @GeneratedValue
+    @Column(name = "channel_id")
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;
 
     private String name;
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private ChannelType type;
 
     public Channel(String name, String description, ChannelType type) {
@@ -42,9 +43,9 @@ public class Channel{
             joinColumns = @JoinColumn(name = "channel_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<User> members = new HashSet<>();
+    private List<User> users = new ArrayList<>();
 
-    public void addMember(User user) {
-        this.members.add(user);
+    public void addUser(User user) {
+        this.users.add(user);
     }
 }

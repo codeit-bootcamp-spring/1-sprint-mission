@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +13,13 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "read_statuses")
 public class ReadStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id @GeneratedValue
+    @Column(name = "read_status_id")
     private UUID id;
     private Instant createdAt;
     private Instant updatedAt;

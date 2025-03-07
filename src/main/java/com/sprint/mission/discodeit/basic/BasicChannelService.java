@@ -35,7 +35,7 @@ public class BasicChannelService implements ChannelService {
                 channelDTO.getDescription(),
                 ChannelType.valueOf(channelDTO.getType().toUpperCase()));
 
-        channel.addMember(creator);
+        channel.addUser(creator);
         Channel saved = channelRepository.save(channel);
         return convertToDTO(saved);
     }
@@ -66,7 +66,7 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(joinDTO.getUserId())
                 .orElseThrow(()-> new IllegalArgumentException("User Not Found"));
 
-        channel.addMember(user);
+        channel.addUser(user);
         channelRepository.save(channel);
 
         return Map.of(user, channel);
