@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.CustomException;
@@ -33,17 +33,17 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentService binaryContentService;
 
   @Override
-  public MessageResponseDto create(CreateMessageDto createMessageDto) throws CustomException {
+  public MessageDto create(CreateMessageDto createMessageDto) throws CustomException {
     if (createMessageDto.content() == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
     }
 
-    UserResponseDto user = userService.findById(createMessageDto.authorId());
+    UserDto user = userService.findById(createMessageDto.authorId());
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    ChannelResponseDto channel = channelService.findById(createMessageDto.channelId(), user.id());
+    ChannelDto channel = channelService.findById(createMessageDto.channelId(), user.id());
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
@@ -58,14 +58,14 @@ public class BasicMessageService implements MessageService {
         createMessageDto.channelId());
     Message saved = messageRepository.save(message);
 
-    return MessageResponseDto.from(saved);
+    return MessageDto.from(saved);
 
   }
 
   @Override
-  public MessageResponseDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
+  public MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files)
       throws CustomException {
-    MessageResponseDto messageDto = create(createMessageDto);
+    MessageDto messageDto = create(createMessageDto);
 
     if (files == null || files.isEmpty()) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
@@ -73,8 +73,8 @@ public class BasicMessageService implements MessageService {
 
     List<String> binaryContentIds = new ArrayList<>();
     for (MultipartFile file : files) {
-      ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
-      binaryContentIds.add(responseBinaryContentDto.id());
+      BinaryContentDto binaryContentDto = binaryContentService.create(file);
+      binaryContentIds.add(binaryContentDto.id());
     }
 
     Message message = messageRepository.findById(messageDto.id());
@@ -83,55 +83,55 @@ public class BasicMessageService implements MessageService {
 
     messageRepository.save(message);
 
-    return MessageResponseDto.from(message);
+    return MessageDto.from(message);
   }
 
   @Override
-  public List<MessageResponseDto> findAll() {
-    return messageRepository.findAll().stream().map(MessageResponseDto::from).toList();
+  public List<MessageDto> findAll() {
+    return messageRepository.findAll().stream().map(MessageDto::from).toList();
   }
 
   @Override
-  public MessageResponseDto findById(String messageId) {
-    return MessageResponseDto.from(messageRepository.findById(messageId));
+  public MessageDto findById(String messageId) {
+    return MessageDto.from(messageRepository.findById(messageId));
   }
 
   @Override
-  public List<MessageResponseDto> findAllContainsContent(String content) {
+  public List<MessageDto> findAllContainsContent(String content) {
     return messageRepository.findAll().stream().filter(m -> m.getContent().contains(content))
-        .map(MessageResponseDto::from).toList();
+        .map(MessageDto::from).toList();
   }
 
   @Override
-  public List<MessageResponseDto> findAllBySenderId(String senderId) {
-    UserResponseDto byId = userService.findById(senderId);
+  public List<MessageDto> findAllBySenderId(String senderId) {
+    UserDto byId = userService.findById(senderId);
     if (byId == null) {
       //todo - 고민: 메세지를 검색할때 유저 아이디가 없다고 에러를 출력해야할까?
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return messageRepository.findAll().stream().filter(m -> m.getSenderId().equals(senderId))
-        .map(MessageResponseDto::from).toList();
+    return messageRepository.findAll().stream().filter(m -> m.getAuthorId().equals(senderId))
+        .map(MessageDto::from).toList();
   }
 
   @Override
-  public List<MessageResponseDto> findAllByCreatedAt(Instant createdAt) {
+  public List<MessageDto> findAllByCreatedAt(Instant createdAt) {
     return messageRepository.findAll().stream().filter(m -> m.getCreatedAt().equals(createdAt))
-        .map(MessageResponseDto::from).toList();
+        .map(MessageDto::from).toList();
   }
 
   @Override
-  public List<MessageResponseDto> findAllByChannelId(String channelId, String userId) {
-    ChannelResponseDto byId = channelService.findById(channelId, userId); //change Sign
+  public List<MessageDto> findAllByChannelId(String channelId, String userId) {
+    ChannelDto byId = channelService.findById(channelId, userId); //change Sign
     if (byId == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
     return messageRepository.findAll().stream().filter(m -> m.getChannelId().equals(channelId))
-        .map(MessageResponseDto::from).toList();
+        .map(MessageDto::from).toList();
   }
 
   @Override
-  public MessageResponseDto updateMessage(String messageId, UpdateMessageDto updateMessageDto)
+  public MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto)
       throws CustomException {
     Message message = messageRepository.findById(messageId);
     if (message == null) {
@@ -140,7 +140,7 @@ public class BasicMessageService implements MessageService {
     if (updateMessageDto.newContent().isEmpty()) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "Content is empty");
     }
-    if (!message.getSenderId().equals(updateMessageDto.userId())) {
+    if (!message.getAuthorId().equals(updateMessageDto.userId())) {
       throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
 
@@ -158,7 +158,7 @@ public class BasicMessageService implements MessageService {
     //message.addImages(updateMessageDto.binaryContentIds());
     //}
 
-    return MessageResponseDto.from(messageRepository.save(message));
+    return MessageDto.from(messageRepository.save(message));
   }
 
   @Override
@@ -167,7 +167,7 @@ public class BasicMessageService implements MessageService {
     if (message == null) {
       throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND);
     }
-    if (!message.getSenderId().equals(userId)) {
+    if (!message.getAuthorId().equals(userId)) {
       throw new CustomException(ErrorCode.MESSAGE_OWNER_NOT_MATCH);
     }
 

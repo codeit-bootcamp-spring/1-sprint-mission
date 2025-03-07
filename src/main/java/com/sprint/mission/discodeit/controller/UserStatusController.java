@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class UserStatusController {
   private final UserStatusService userStatusService;
 
   @GetMapping
-  public List<UserStatusResponseDto> getAllUserStatus() {
+  public List<UserStatusDto> getAllUserStatus() {
     return userStatusService.findAll();
   }
 }

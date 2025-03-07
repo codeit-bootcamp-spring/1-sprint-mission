@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -19,7 +19,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public ResponseBinaryContentDto create(MultipartFile file) throws RuntimeException {
+  public BinaryContentDto create(MultipartFile file) throws RuntimeException {
     try {
       BinaryContent binaryContent = new BinaryContent(
           file.getName(),
@@ -28,22 +28,22 @@ public class BasicBinaryContentService implements BinaryContentService {
           file.getSize()
       );
       BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-      return ResponseBinaryContentDto.from(savedContent);
+      return BinaryContentDto.from(savedContent);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public ResponseBinaryContentDto findById(String contentId) {
-    return ResponseBinaryContentDto.from(binaryContentRepository.findById(contentId));
+  public BinaryContentDto findById(String contentId) {
+    return BinaryContentDto.from(binaryContentRepository.findById(contentId));
   }
 
   @Override
-  public List<ResponseBinaryContentDto> findAllByIdIn(List<String> contentIds) {
+  public List<BinaryContentDto> findAllByIdIn(List<String> contentIds) {
     List<BinaryContent> list = binaryContentRepository.findAll().stream()
         .filter(binaryContent -> contentIds.contains(binaryContent.getId())).toList();
-    return list.stream().map(ResponseBinaryContentDto::from).toList();
+    return list.stream().map(BinaryContentDto::from).toList();
   }
 
   @Override

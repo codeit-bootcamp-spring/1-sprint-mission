@@ -6,10 +6,11 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-public record ChannelResponseDto(
+public record ChannelDto(
     //채널 id
-    String id,
+    UUID id,
     //채널명
     String name,
     //채널 종류 - 공개, 비공개
@@ -34,9 +35,9 @@ public record ChannelResponseDto(
         participantIds != null ? participantIds.stream().toList() : "Public Channel") + "]";
   }
 
-  public static ChannelResponseDto from(Channel channel, Instant lastMessageTimestamp,
+  public static ChannelDto from(Channel channel, Instant lastMessageTimestamp,
       List<String> participantIds) {
-    return new ChannelResponseDto(
+    return new ChannelDto(
         channel.getId(),
         channel.getChannelName(),
         channel.getChannelType(),

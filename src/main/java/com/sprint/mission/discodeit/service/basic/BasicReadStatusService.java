@@ -2,8 +2,9 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
 import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
-import com.sprint.mission.discodeit.dto.readStatus.ReadStatusResponseDto;
+import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -15,6 +16,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,38 +34,41 @@ public class BasicReadStatusService implements ReadStatusService {
   private final MessageRepository messageRepository;
 
   @Override
-  public ReadStatusResponseDto create(CreateReadStatusDto createReadStatusDto)
+  public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
       throws CustomException {
 
     if (createReadStatusDto == null || createReadStatusDto.channelId() == null
         || createReadStatusDto.userId() == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
-    Channel channel = channelRepository.findById(createReadStatusDto.channelId());
+    Channel channel = channelRepository.findById(UUID.fromString(createReadStatusDto.channelId()))
+        .orElse(null);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    User user = userRepository.findById(createReadStatusDto.userId());
+    User user = userRepository.findById(UUID.fromString(createReadStatusDto.userId())).orElse(null);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    if (readStatusRepository.findByChannelIdWithUserId(createReadStatusDto.channelId(),
-        createReadStatusDto.userId()) != null) {
+    ReadStatus readStatus = readStatusRepository.findByChannelIdAndUserId(
+        UUID.fromString(createReadStatusDto.channelId()),
+        UUID.fromString(createReadStatusDto.userId())).orElse(null);
+
+    if (readStatus != null) {
       throw new CustomException(ErrorCode.READ_STATUS_ALREADY_EXIST);
     }
 
-    ReadStatus readStatus = new ReadStatus(channel.getId(), user.getId(),
-        createReadStatusDto.lastReadAt());
+    readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt());
     ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
 
-    return ReadStatusResponseDto.from(savedReadStatus, isNewMessage(readStatus));
+    return ReadStatusDto.from(savedReadStatus, isNewMessage(readStatus));
   }
 
   @Override
-  public List<ReadStatusResponseDto> createByChannelId(String channelId) throws CustomException {
-    Channel channel = channelRepository.findById(channelId);
+  public List<ReadStatusDto> createByChannelId(String channelId) throws CustomException {
+    Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
@@ -74,35 +79,40 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     //todo - 리팩토링
-    List<String> userIds = List.of();
+    List<UserDto> userDtos = List.of();
 
+    //channel에 set이 필요없는게, readstatus 조회하면 됨... n:1 1:n관계로 쪼갠게 readStatus니까
+    //이거 수정하면 한세월 걸릴것 같은데...
+    //일단해보자
+    //private이면 미리 생성하고
+    //public이면 채널 id로 생성하도록?
     if (channel.getChannelType() == ChannelType.PUBLIC) {
-      userIds = userRepository.findAll().stream().map(User::getId).toList();
+      userDtos = .findAll().stream().toList();
     } else if (channel.getChannelType() == ChannelType.PRIVATE) {
-      userIds = channel.getUserSet().stream().toList();
+      userDtos = channel.getUserSet().stream().toList();
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
-    for (String userId : userIds) {
-      ReadStatus readStatus = new ReadStatus(channelId, userId, Instant.now());
+    for (UserDto userDto : userDtos) {
+      ReadStatus readStatus = new ReadStatus(channel, user, Instant.now());
       ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
 
-      readStatusResponseDtos.add(
-          ReadStatusResponseDto.from(savedReadStatus, isNewMessage(readStatus)));
+      readStatusDtos.add(
+          ReadStatusDto.from(savedReadStatus, isNewMessage(readStatus)));
     }
 
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
   @Override
-  public ReadStatusResponseDto findById(String readStatusId) {
+  public ReadStatusDto findById(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(readStatusId);
-    return ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus));
+    return ReadStatusDto.from(readStatus, isNewMessage(readStatus));
   }
 
   @Override
-  public ReadStatusResponseDto update(String readStatusId,
+  public ReadStatusDto update(String readStatusId,
       UpdateReadStatusDto updateReadStatusDto) {
 
     if (updateReadStatusDto == null) {
@@ -117,20 +127,20 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
     readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
 
-    return ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus));
+    return ReadStatusDto.from(readStatus, isNewMessage(readStatus));
   }
 
   @Override
-  public List<ReadStatusResponseDto> updateByUserId(String userId,
+  public List<ReadStatusDto> updateByUserId(String userId,
       UpdateReadStatusDto updateReadStatusDto) {
 
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+    List<ReadStatus> readStatuses = readStatusRepository.findByUserId(userId);
 
     if (readStatuses == null || readStatuses.isEmpty()) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
     //기능 미사용으로 임시 주석처리
 //    for (ReadStatus readStatus : readStatuses) {
@@ -142,11 +152,11 @@ public class BasicReadStatusService implements ReadStatusService {
 //            ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus)));
 //      }
 //    }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
   @Override
-  public List<ReadStatusResponseDto> updateByChannelId(String channelId,
+  public List<ReadStatusDto> updateByChannelId(String channelId,
       UpdateReadStatusDto updateReadStatusDto) {
 
     Channel channel = channelRepository.findById(channelId);
@@ -154,40 +164,40 @@ public class BasicReadStatusService implements ReadStatusService {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(channelId);
+    List<ReadStatus> readStatuses = readStatusRepository.findByChannelId(channelId);
     if (readStatuses == null || readStatuses.isEmpty()) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
     for (ReadStatus readStatus : readStatuses) {
       readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
-      readStatusResponseDtos.add(ReadStatusResponseDto.from(readStatusRepository.save(readStatus),
+      readStatusDtos.add(ReadStatusDto.from(readStatusRepository.save(readStatus),
           isNewMessage(readStatus)));
     }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
-  public List<ReadStatusResponseDto> findAllByUserId(String userId) {
+  public List<ReadStatusDto> findAllByUserId(String userId) {
 
-    List<ReadStatus> allReadStatusByUserId = readStatusRepository.findAllByUserId(userId);
+    List<ReadStatus> allReadStatusByUserId = readStatusRepository.findByUserId(userId);
 
     if (allReadStatusByUserId == null) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
 
-    List<ReadStatusResponseDto> readStatusResponseDtos = new ArrayList<>();
+    List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
     for (ReadStatus readStatus : allReadStatusByUserId) {
-      readStatusResponseDtos.add(ReadStatusResponseDto.from(readStatus, isNewMessage(readStatus)));
+      readStatusDtos.add(ReadStatusDto.from(readStatus, isNewMessage(readStatus)));
     }
-    return readStatusResponseDtos;
+    return readStatusDtos;
   }
 
   @Override
-  public List<ReadStatusResponseDto> findAllByChannelId(String channelId) {
-    return readStatusRepository.findAllByChannelId(channelId).stream()
-        .map(r -> ReadStatusResponseDto.from(r, isNewMessage(r))).toList();
+  public List<ReadStatusDto> findAllByChannelId(String channelId) {
+    return readStatusRepository.findByChannelId(channelId).stream()
+        .map(r -> ReadStatusDto.from(r, isNewMessage(r))).toList();
   }
 
   @Override
@@ -196,10 +206,9 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   public boolean isNewMessage(ReadStatus readStatus) throws CustomException {
-    Instant lastMessageTimestamp = messageRepository.findAllByChannelId(readStatus.getChannelId())
-        .stream()
-        .map(Message::getCreatedAt)
-        .max(Instant::compareTo).orElse(null);
+    Instant lastMessageTimestamp = messageRepository.findAllByChannelId(
+            readStatus.getChannel().getId().toString())
+        .stream().map(Message::getCreatedAt).max(Instant::compareTo).orElse(null);
 
     if (lastMessageTimestamp == null) {
       return false;

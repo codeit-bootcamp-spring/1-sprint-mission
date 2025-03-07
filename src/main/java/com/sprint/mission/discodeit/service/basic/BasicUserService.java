@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.code.ErrorCode;
-import com.sprint.mission.discodeit.dto.binaryContent.ResponseBinaryContentDto;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
-import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
 import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusResponseDto;
+import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -29,9 +30,10 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public UserResponseDto create(CreateUserDto createUserDto) {
+  public UserDto create(CreateUserDto createUserDto) {
 
     boolean userEmailExists = userRepository.findByEmail(createUserDto.email()) != null;
     if (userEmailExists) {
@@ -52,34 +54,34 @@ public class BasicUserService implements UserService {
         createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
     userRepository.save(user);
 
-    UserStatusResponseDto userStatusDto = userStatusService.create(
-        new CreateUserStatusDto(user.getId()));
+    UserStatusDto userStatusDto = userStatusService.create(
+        new CreateUserStatusDto(user.getId().toString()));
 
-    return UserResponseDto.from(user, userStatusDto.isOnline());
+    return UserDto.from(user, userStatusDto.isOnline());
   }
 
   @Override
-  public UserResponseDto create(CreateUserDto createUserDto, MultipartFile file)
+  public UserDto create(CreateUserDto createUserDto, MultipartFile file)
       throws CustomException {
-    UserResponseDto userDto = create(createUserDto);
+    UserDto userDto = create(createUserDto);
     User user = userRepository.findById(userDto.id());
 
-    ResponseBinaryContentDto responseBinaryContentDto = binaryContentService.create(file);
-    user.setProfileImageId(responseBinaryContentDto.id());
+    BinaryContentDto binaryContentDto = binaryContentService.create(file);
+    user.setProfile(binaryContentDto.);
     userRepository.save(user);
 
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return UserDto.from(user, userStatusService.findById(user.getId().toString()).isOnline());
   }
 
   @Override
-  public List<UserResponseDto> findAll() {
+  public List<UserDto> findAll() {
     return userRepository.findAll().stream()
-        .map(u -> UserResponseDto.from(u, userStatusService.findById(u.getId()).isOnline()))
+        .map(u -> UserDto.from(u, userStatusService.findById(u.getId()).isOnline()))
         .toList();
   }
 
   @Override
-  public UserResponseDto findById(String userId) throws CustomException {
+  public UserDto findById(String userId) throws CustomException {
     if (userId == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "USER ID is null");
     }
@@ -88,40 +90,40 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return UserDto.from(user, userStatusService.findById(user.getId().toString()).isOnline());
   }
 
   @Override
-  public UserResponseDto findByEmail(String email) throws CustomException {
+  public UserDto findByEmail(String email) throws CustomException {
     User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
         .findFirst().orElse(null);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with email %s not found", email));
     }
-    return UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline());
+    return UserDto.from(user, userStatusService.findById(user.getId().toString()).isOnline());
   }
 
   @Override
-  public List<UserResponseDto> findAllContainsNickname(String nickname) {
+  public List<UserDto> findAllContainsNickname(String nickname) {
     return userRepository.findAll().stream()
         .filter(user -> user.getNickname().contains(nickname))
         .map(
-            user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
+            user -> UserDto.from(user, userStatusService.findById(user.getId().toString()).isOnline()))
         .toList();
   }
 
   @Override
-  public List<UserResponseDto> findAllByAccountStatus(AccountStatus accountStatus) {
+  public List<UserDto> findAllByAccountStatus(AccountStatus accountStatus) {
     return userRepository.findAll().stream()
         .filter(user -> user.getAccountStatus().equals(accountStatus))
         .map(
-            user -> UserResponseDto.from(user, userStatusService.findById(user.getId()).isOnline()))
+            user -> UserDto.from(user, userStatusService.findById(user.getId()).isOnline()))
         .toList();
   }
 
   @Override
-  public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto)
+  public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
       throws CustomException {
 
     if (updateUserDto == null) {
@@ -140,15 +142,15 @@ public class BasicUserService implements UserService {
     }
 
     User savedUser = userRepository.save(user);
-    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
+    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
         new UpdateUserStatusDto(Instant.now()));
 
-    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
+    return UserDto.from(savedUser, userStatusDto.isOnline());
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
   @Override
-  public UserResponseDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
+  public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
       throws CustomException {
     User user = userRepository.findById(userId);
     //todo - 유저 조회를 두 번 한다. 수정 필요
@@ -158,18 +160,18 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    if (user.getProfileImageId() != null && !user.getProfileImageId().isEmpty()) {
-      binaryContentService.deleteById(user.getProfileImageId());
+    if (user.getProfile() != null) {
+      binaryContentService.deleteById(user.getProfile().id());
     }
 
-    user.setProfileImageId(binaryContentService.create(file).id());
+    user.setProfile(binaryContentService.create(file));
     user.setUpdatedAt(updateUserDto.updatedAt());
 
     User savedUser = userRepository.save(user);
-    UserStatusResponseDto userStatusResponseDto = userStatusService.updateByUserId(userId,
+    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
         new UpdateUserStatusDto(Instant.now()));
 
-    return UserResponseDto.from(savedUser, userStatusResponseDto.isOnline());
+    return UserDto.from(savedUser, userStatusDto.isOnline());
   }
 
 
@@ -183,7 +185,7 @@ public class BasicUserService implements UserService {
     }
 
     //todo - userStatus가 삭제되지 않았다면?
-    userStatusService.delete(user.getId());
+    userStatusService.delete(user.getId().toString());
 
     return userRepository.delete(userId);
   }

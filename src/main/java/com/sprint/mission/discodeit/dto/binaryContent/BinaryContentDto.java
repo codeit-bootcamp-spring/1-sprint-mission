@@ -3,9 +3,10 @@ package com.sprint.mission.discodeit.dto.binaryContent;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.time.Instant;
+import java.util.UUID;
 
-public record ResponseBinaryContentDto(
-    String id,
+public record BinaryContentDto(
+    UUID id,
     String fileName,
     byte[] bytes,
     String contentType,
@@ -13,8 +14,8 @@ public record ResponseBinaryContentDto(
     long size
 ) {
 
-  public static ResponseBinaryContentDto from(BinaryContent binaryContent) {
-    return new ResponseBinaryContentDto(
+  public static BinaryContentDto from(BinaryContent binaryContent) {
+    return new BinaryContentDto(
         binaryContent.getId(),
         binaryContent.getFilename(),
         binaryContent.getBinaryImage(),

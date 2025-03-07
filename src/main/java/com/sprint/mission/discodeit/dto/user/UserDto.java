@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.dto.user;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
+import java.util.UUID;
 
-public record UserResponseDto(
+public record UserDto(
     //객체 식별용 id
-    String id,
+    UUID id,
     //아이디
     String username,
     //닉네임
@@ -19,11 +21,11 @@ public record UserResponseDto(
     //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
     AccountStatus accountStatus,
     //사용자 프로필 사진
-    String profileId
+    BinaryContentDto profileId
 ) {
 
-  public static UserResponseDto from(User user, boolean isActive) {
-    return new UserResponseDto(
+  public static UserDto from(User user, boolean isActive) {
+    return new UserDto(
         user.getId(),
         user.getUsername(),
         user.getNickname(),
@@ -31,7 +33,7 @@ public record UserResponseDto(
         isActive,
         user.getStatusMessage(),
         user.getAccountStatus(),
-        user.getProfileImageId()
+        user.getProfile()
     );
   }
 

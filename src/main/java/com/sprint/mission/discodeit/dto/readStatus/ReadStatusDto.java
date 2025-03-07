@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.status.ReadStatus;
 
 import java.time.Instant;
 
-public record ReadStatusResponseDto(
+public record ReadStatusDto(
     String id,
     String channelId,
     String userId,
@@ -14,8 +14,8 @@ public record ReadStatusResponseDto(
     boolean isNewMessage
 ) {
 
-  public static ReadStatusResponseDto from(ReadStatus readStatus, boolean isNewMessage) {
-    return new ReadStatusResponseDto(
+  public static ReadStatusDto from(ReadStatus readStatus, boolean isNewMessage) {
+    return new ReadStatusDto(
         readStatus.getId(),
         readStatus.getChannelId(),
         readStatus.getUserId(),

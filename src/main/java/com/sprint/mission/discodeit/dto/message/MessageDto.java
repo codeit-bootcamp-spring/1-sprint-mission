@@ -4,10 +4,11 @@ import com.sprint.mission.discodeit.entity.Message;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
-public record MessageResponseDto(
+public record MessageDto(
     //객체 식별 id
-    String id,
+    UUID id,
     //생성 날짜
     Instant createdAt,
     //수정 시간
@@ -22,12 +23,12 @@ public record MessageResponseDto(
     List<String> attachmentIds
 ) {
 
-  public static MessageResponseDto from(Message message) {
-    return new MessageResponseDto(
+  public static MessageDto from(Message message) {
+    return new MessageDto(
         message.getId(),
         message.getCreatedAt(),
         message.getUpdatedAt(),
-        message.getSenderId(),
+        message.getAuthorId(),
         message.getContent(),
         message.getChannelId(),
         message.getAttachmentImageIds()

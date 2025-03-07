@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class ChannelController {
 
   //공개 채널 생성
   @PostMapping("/public")
-  public ResponseEntity<ChannelResponseDto> creatPublicChannel(
+  public ResponseEntity<ChannelDto> creatPublicChannel(
       @RequestBody CreatePublicChannelDto createPublicChannelDto) {
     return ResponseEntity.status(HttpStatus.CREATED).body(channelService.create(
         createPublicChannelDto));
@@ -32,7 +32,7 @@ public class ChannelController {
 
   //비공개 채널 생성
   @PostMapping("/private")
-  public ResponseEntity<ChannelResponseDto> creatPrivateChannel(
+  public ResponseEntity<ChannelDto> creatPrivateChannel(
       @RequestBody CreatePrivateChannelDTo createPrivateChannelDTo) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(channelService.create(createPrivateChannelDTo));
@@ -41,7 +41,7 @@ public class ChannelController {
 
   //공개 채널 정보 수정
   @PatchMapping("/{channelId}")
-  public ChannelResponseDto updatePublicChannel(@PathVariable String channelId,
+  public ChannelDto updatePublicChannel(@PathVariable String channelId,
       @RequestBody UpdateChannelDto updateChannelDto) {
     return channelService.updateChannel(channelId, updateChannelDto);
   }
@@ -58,13 +58,13 @@ public class ChannelController {
   //특정 사용자의 모든 채널 목록 조회
   //필터, 검색, 페이징에 해당하므로 쿼리파라미터로 수정
   @GetMapping
-  public ResponseEntity<List<ChannelResponseDto>> getChannel(@RequestParam String userId) {
+  public ResponseEntity<List<ChannelDto>> getChannel(@RequestParam String userId) {
     return ResponseEntity.ok().body(channelService.findAllByUserId(userId));
   }
 
   //특정 채널의 모든 메세지 조회
   @GetMapping("/{channelId}/messages")
-  public ResponseEntity<List<MessageResponseDto>> getAllMessages(@PathVariable String channelId) {
+  public ResponseEntity<List<MessageDto>> getAllMessages(@PathVariable String channelId) {
     return ResponseEntity.ok().body(channelService.findAllMessagesByChannelId(channelId));
   }
 }

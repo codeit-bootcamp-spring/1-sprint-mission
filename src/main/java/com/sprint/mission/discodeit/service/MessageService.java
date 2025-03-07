@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
+import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageDto;
 
 import java.time.Instant;
@@ -12,30 +12,30 @@ public interface MessageService {
 
 
   //생성
-  MessageResponseDto create(CreateMessageDto createMessageDto);
+  MessageDto create(CreateMessageDto createMessageDto);
 
-  MessageResponseDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
+  MessageDto create(CreateMessageDto createMessageDto, List<MultipartFile> files);
 
   //모두 읽기
-  List<MessageResponseDto> findAll();
+  List<MessageDto> findAll();
 
   //읽기
-  MessageResponseDto findById(String messageId);
+  MessageDto findById(String messageId);
 
   //다건 조회 - 내용
-  List<MessageResponseDto> findAllContainsContent(String content);
+  List<MessageDto> findAllContainsContent(String content);
 
   //다건 조회 - 작성자
-  List<MessageResponseDto> findAllBySenderId(String senderId);
+  List<MessageDto> findAllBySenderId(String senderId);
 
   //다건 조회 - 날짜
-  List<MessageResponseDto> findAllByCreatedAt(Instant createdAt);
+  List<MessageDto> findAllByCreatedAt(Instant createdAt);
 
   //다건 조회 - 특정 채널
-  List<MessageResponseDto> findAllByChannelId(String channelId, String userId);
+  List<MessageDto> findAllByChannelId(String channelId, String userId);
 
   //수정
-  MessageResponseDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
+  MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
 
   //삭제
   boolean delete(String messageId, String userId);
