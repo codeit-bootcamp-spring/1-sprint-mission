@@ -9,6 +9,28 @@ spring:
       maxFilesize: 10MB # 파일 하나의 최대 크기
       maxRequestSize: 30MB #  한 번에 최대 업로드 가능 용량
 
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
+  jpa:
+    hibernate:
+      ddl_auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true  # SQL을 보기 좋게 정렬
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # PostgreSQL 최적화
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG  # 실행되는 SQL을 출력
+        type: TRACE # SQL 바인딩된 값도 출력
+
 discodeit:
   repository:
     type: file  # 파일 저장소 설정 유지

@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -89,6 +92,18 @@ public class FileMessageRepository implements MessageRepository {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Page<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+        List<Message> allMessages = findAllByChannelId(channelId);
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), allMessages.size());
+
+        List<Message> pageContent = allMessages.subList(start, end);
+
+        return new PageImpl<>(pageContent, pageable, allMessages.size());
     }
 
     @Override

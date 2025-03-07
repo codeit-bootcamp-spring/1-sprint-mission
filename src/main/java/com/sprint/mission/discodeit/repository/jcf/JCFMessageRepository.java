@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
@@ -30,6 +33,19 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
         return this.data.values().stream().filter(message -> message.getChannelId().equals(channelId)).toList();
+    }
+
+    @Override
+    public Page<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+        List<Message> filtered = this.data.values().stream()
+            .filter(message -> message.getChannelId().equals(channelId))
+            .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filtered.size());
+
+        List<Message> pageContent = filtered.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, filtered.size());
     }
 
     @Override
