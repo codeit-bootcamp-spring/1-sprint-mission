@@ -1,19 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
+import com.sprint.mission.discodeit.entity.status.UserStatus;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
+public class User extends BaseUpdatableEntity implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  //객체 식별용 id
-  private final String id;
   //로그인 아이디
   private String username;
   //닉네임
@@ -22,29 +21,24 @@ public class User implements Serializable {
   private String email;
   //비밀번호
   private String password;
-  //생성 날짜 - 유닉스 타임스탬프
-  private final Instant createdAt;
-  //수정 시간
-  private Instant updatedAt;
   //사용자 설정 상태 메세지
   private String statusMessage;
   //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
   private AccountStatus accountStatus;
   //사용자 프로필 사진
-  private String profileImageId;
+  private BinaryContentDto profile;
+
+  private UserStatus userStatus;
 
   public User(String username, String nickname, String email, String password, String statusMessage,
-      AccountStatus accountStatus, String profileImageId) {
-    this.id = UUID.randomUUID().toString();
-    this.createdAt = Instant.now();
-    this.updatedAt = createdAt;
+      AccountStatus accountStatus, BinaryContentDto profile) {
     this.username = username;
     this.nickname = nickname;
     this.email = email;
     this.password = password;
     this.statusMessage = statusMessage;
     this.accountStatus = accountStatus;
-    this.profileImageId = profileImageId;
+    this.profile = profile;
   }
 
   public void setNickname(String nickname) {
@@ -59,12 +53,6 @@ public class User implements Serializable {
     this.password = password;
   }
 
-  //사용자가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-
-  public void setUpdatedAt(Instant updatedAt) {
-    this.updatedAt = updatedAt;
-  }
-
   public void setAccountStatus(AccountStatus accountStatus) {
     this.accountStatus = accountStatus;
   }
@@ -73,27 +61,10 @@ public class User implements Serializable {
     this.statusMessage = statusMessage;
   }
 
-  public void setProfileImageId(String profileImageId) {
-    this.profileImageId = profileImageId;
+  public void setProfile(BinaryContentDto profile) {
+    this.profile = profile;
   }
 
-  public String toFullString() {
-    return this.toShortString() + " / updatedAt: " + updatedAt + " / accountStatus: "
-        + accountStatus + " / statusMessage: " + statusMessage;
-  }
-
-  public String toShortString() {
-    return "[User] id: " + id + " / nickname: " + nickname + " / email:  " + email
-        + " / createdAt: " + createdAt;
-  }
-
-  public void displayShortInfo() {
-    System.out.println(toShortString());
-  }
-
-  public void displayFullInfo() {
-    System.out.println(toFullString());
-  }
 
   public boolean isUpdated(UpdateUserDto updateUserDto) {
     if (updateUserDto == null) {
