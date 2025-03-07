@@ -1,15 +1,12 @@
-package com.sprint.mission.discodeit.dto.channel;
+package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
 
-public record ChannelResponse(UUID channelId, String channel, Boolean isPrivate,
-                              Instant lastMessageTime, List<UserResponse> userList) {
+public class ChannelMapper {
 
-  public static ChannelResponse fromEntity(Channel channel) {
+  public static ChannelResponse toDto(Channel channel) {
     return new ChannelResponse(
         channel.getId(),
         channel.getChannelName(),
