@@ -11,7 +11,9 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityNotFoundException;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,7 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public UserResponse createUser(CreateUserRequest request,
@@ -93,7 +96,12 @@ public class BasicUserService implements UserService {
     String fileName = profileRequest.fileName();
     String contentType = profileRequest.contentType();
     byte[] bytes = profileRequest.bytes();
-    BinaryContent binaryContent = new BinaryContent(fileName, contentType, bytes);
+    BinaryContent binaryContent = new BinaryContent(fileName, contentType);
+    try {
+      UUID fileUUID = binaryContentStorage.put(binaryContent.getId(), bytes);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
     return binaryContentRepository.save(binaryContent);
   }
 }

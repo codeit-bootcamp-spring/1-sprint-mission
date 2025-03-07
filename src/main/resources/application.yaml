@@ -35,3 +35,7 @@ file:
 discodeit:
   repository:
     type: file
+  storage:
+    type: local
+    local:
+      root-path: /path/to/storage/directory

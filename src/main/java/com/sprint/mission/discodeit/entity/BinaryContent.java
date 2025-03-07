@@ -30,34 +30,27 @@ public class BinaryContent extends BaseEntity implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private Message message;
 
-  @Lob // Binary 데이터 저장
-  private byte[] bytes;
-
   @Builder
-  public BinaryContent(String fileName, String mimeType, String filePath, byte[] bytes) {
+  public BinaryContent(String fileName, String mimeType, String filePath) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = mimeType;
     this.filePath = filePath;
-    this.bytes = bytes;
   }
 
-  public BinaryContent(UUID fileId, String fileName, String mimeType, String filePath,
-      byte[] bytes) {
+  public BinaryContent(UUID fileId, String fileName, String mimeType, String filePath) {
     this.id = fileId;
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = mimeType;
     this.filePath = filePath;
-    this.bytes = bytes;
   }
 
-  public BinaryContent(String fileName, String contentType, byte[] bytes) {
+  public BinaryContent(String fileName, String contentType) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = contentType;
-    this.bytes = bytes;
   }
 }

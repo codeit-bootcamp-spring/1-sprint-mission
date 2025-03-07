@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 public class BinaryContentMapper {
 
   public static BinaryContentResponse toDto(BinaryContent bc) {
-    return new BinaryContentResponse(bc.getId(), bc.getFileName(), bc.getSize(), bc.getMimeType(),
-        bc.getBytes());
+    return new BinaryContentResponse(bc.getId(), bc.getFileName(), bc.getSize(), bc.getMimeType());
   }
 }

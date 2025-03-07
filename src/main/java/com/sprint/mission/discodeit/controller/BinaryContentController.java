@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,8 +26,7 @@ public class BinaryContentController {
   private final BinaryContentService binaryContentService;
 
   @Operation(summary = "바이너리 파일 조회", description = "바이너리 파일을 조회한다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "조회 성공"),
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"),
       @ApiResponse(responseCode = "404", description = "조회 실패")})
   @GetMapping("/{id}")
   public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable UUID id) {
@@ -37,8 +35,7 @@ public class BinaryContentController {
   }
 
   @Operation(summary = "바이너리 파일 추가", description = "바이너리 파일을 추가한다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "추가 성공"),
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "추가 성공"),
       @ApiResponse(responseCode = "500", description = "추가 실패")})
   @PostMapping
   public ResponseEntity<BinaryContent> saveBinaryContent(@RequestBody BinaryContent binaryContent) {
@@ -47,8 +44,7 @@ public class BinaryContentController {
   }
 
   @Operation(summary = "바이너리 파일 삭제", description = "바이너리 파일을 삭제한다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "204", description = "삭제 성공"),
+  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "삭제 성공"),
       @ApiResponse(responseCode = "500", description = "삭제 실패")})
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteBinaryContent(@PathVariable UUID id) {
@@ -64,5 +60,10 @@ public class BinaryContentController {
       @RequestBody List<UUID> ids) {
     List<BinaryContent> binaryContents = binaryContentService.getBinaryContentListByIds(ids);
     return ResponseEntity.ok(binaryContents);
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  public ResponseEntity<?> downloadBinaryContent(@PathVariable UUID binaryContentId) {
+    return binaryContentService.downloadBinaryContent(binaryContentId);
   }
 }
