@@ -1,48 +1,58 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
-public class User implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private String username;
-    private String email;
-    private String password;
-    private UserStatus status;
-    private Map<UUID, ReadStatus> readStatuses;
-    private UUID profileImage;
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+public class User extends BaseUpdateEntity implements Serializable {
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-    }
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public void updateUsername(String username) {
-        this.username = username;
-        this.updatedAt = Instant.now();
-    }
+  @Id
+  @GeneratedValue
+  private UUID id;
 
-    public void updateProfileImage(UUID newProfileImage) {
-        this.profileImage = newProfileImage;
-        this.updatedAt = Instant.now();
-    }
+  private String username;
+  private String email;
+  private String password;
 
-    public void updateUserStatus(UserStatus newStatus) {
-        this.status = newStatus;
-        this.updatedAt = Instant.now();
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "profile_image_id")
+  private BinaryContent profileImage;
+
+  @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<ReadStatus> readStatuses = new HashSet<>() {
+  };
+
+  @ManyToMany(mappedBy = "users")
+  private List<Channel> channels = new ArrayList<>();
+
+  @OneToOne
+  private UserStatus userStatus;
+
+  public User(String username, String email, String password) {
+    this.id = UUID.randomUUID();
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.createdAt = Instant.now();
+    this.updatedAt = createdAt;
+  }
+
+  public void setUserStatus(UserStatus userStatus) {
+    if (this.userStatus != null) {
+      this.userStatus = userStatus;
+      userStatus.setUser(this);
     }
+  }
 }

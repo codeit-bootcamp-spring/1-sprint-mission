@@ -14,15 +14,16 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 @Service
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
 
-    @Override
-    public UserResponse login(LoginRequest request) {
-        User user = userRepository.getUserByEmail(request.email())
-                .orElseThrow(()->new NoSuchElementException("User not found"));
-        if (!user.getPassword().equals(request.password())){
-            throw new IllegalArgumentException("Wrong password");
-        }
-        return UserResponse.fromEntity(user);
+  private final UserRepository userRepository;
+
+  @Override
+  public UserResponse login(LoginRequest request) {
+    User user = userRepository.findByEmail(request.email())
+        .orElseThrow(() -> new NoSuchElementException("User not found"));
+    if (!user.getPassword().equals(request.password())) {
+      throw new IllegalArgumentException("Wrong password");
     }
+    return UserResponse.fromEntity(user);
+  }
 }

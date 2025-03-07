@@ -1,80 +1,90 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
-public class Channel implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private String channelName;
-    private final List<UUID> messageList;
-    private final List<UUID> userList;
-    private final boolean isPrivate;
-    private final Map<UUID, ReadStatus> readStatuses;
-    private final Instant lastMessageTime;
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+public class Channel extends BaseUpdateEntity implements Serializable {
 
-    public Channel(String channelName){
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-        this.channelName = channelName;
-        this.messageList = new ArrayList<>();
-        this.userList = new ArrayList<>();
-        this.isPrivate = false;
-        this.readStatuses = new HashMap<>();
-        this.lastMessageTime = Instant.now();
-    }
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public Channel(boolean isPrivate){
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-        this.channelName = "";
-        this.messageList = new ArrayList<>();
-        this.userList = new ArrayList<>();
-        this.isPrivate = isPrivate;
-        this.readStatuses = new HashMap<>();
-        this.lastMessageTime = Instant.now();
-    }
+  @Id
+  @GeneratedValue
+  private UUID id;
 
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-        this.updatedAt = Instant.now();
-    }
+  private String channelName;
+  private boolean isPrivate;
+  private Instant lastMessageTime;
 
-    public UUID addMessageToChannel(UUID messageUUID) {
-        messageList.add(messageUUID);
-        return messageUUID;
-    }
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Message> messages = new ArrayList<>();
 
-    public UUID addUserToChannel(UUID userUUID) {
-        userList.add(userUUID);
-        return userUUID;
-    }
+  @ManyToMany
+  @JoinTable(
+      name = "channel_users",
+      joinColumns = @JoinColumn(name = "channel_id"),
+      inverseJoinColumns = @JoinColumn(name = "user_id")
+  )
+  private List<User> users = new ArrayList<>();
 
-    public void setReadStatus(ReadStatus readStatus) {
-        this.readStatuses.put(readStatus.getOwnerId(), readStatus);
-    }
+  @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> readStatuses = new ArrayList<>();
 
-    public void setReadStatuses(List<ReadStatus> readStatus) {
-        for(ReadStatus status : readStatus){
-            setReadStatus(status);
-        }
-    }
+  public Channel(String channelName, boolean isPrivate) {
+    this.id = UUID.randomUUID();
+    this.channelName = channelName;
+    this.isPrivate = isPrivate;
+    this.lastMessageTime = Instant.now();
+  }
 
-    public String toString(){
-        return "\nuuid: "+ id + " channelName: " + channelName;
+  public Channel(boolean isPrivate) {
+    this.id = UUID.randomUUID();
+    this.isPrivate = isPrivate;
+    this.lastMessageTime = Instant.now();
+  }
+
+  public void updateChannelName(String channelName) {
+    this.channelName = channelName;
+  }
+
+  public void addMessageToChannel(Message message) {
+    if (!messages.contains(message)) {
+      messages.add(message);
     }
+  }
+
+  public void addUserToChannel(User user) {
+    if (!users.contains(user)) {
+      users.add(user);  // 중복을 방지하고 유저를 추가
+    }
+  }
+
+  public void setReadStatus(ReadStatus readStatus) {
+    if (!readStatuses.contains(readStatus)) {
+      readStatuses.add(readStatus);
+    }
+  }
+
+  public void setReadStatuses(List<ReadStatus> readStatus) {
+    for (ReadStatus status : readStatus) {
+      setReadStatus(status);
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "\nuuid: " + id + " channelName: " + channelName;
+  }
 }

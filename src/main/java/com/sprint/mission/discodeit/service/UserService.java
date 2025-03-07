@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,4 +23,6 @@ public interface UserService {
       Optional<CreateBinaryContentRequest> optionalRequest);
 
   void deleteUser(UUID uuid);
+
+  User getUserById(UUID uuid);
 }

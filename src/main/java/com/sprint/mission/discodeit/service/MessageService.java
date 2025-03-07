@@ -18,9 +18,9 @@ public interface MessageService {
 
   List<MessageResponse> getMessagesByChannel(UUID ChannelID);
 
-  Optional<MessageResponse> getMessage(UUID uuid);
+  MessageResponse getMessage(UUID uuid);
 
-  Optional<MessageResponse> updateMessage(UUID id, UpdateMessageRequest request);
+  MessageResponse updateMessage(UUID id, UpdateMessageRequest request);
 
   void deleteMessage(UUID uuid);
 }

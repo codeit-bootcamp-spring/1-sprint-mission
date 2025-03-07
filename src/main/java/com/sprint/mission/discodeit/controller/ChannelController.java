@@ -60,7 +60,7 @@ public class ChannelController {
           schema = @Schema(implementation = ChannelResponse.class)))
   @GetMapping
   public ResponseEntity<List<ChannelResponse>> getChannels() {
-    List<ChannelResponse> channels = channelService.getChannels();
+    List<ChannelResponse> channels = channelService.getChannelsResponse();
     return ResponseEntity.ok(channels);
   }
 
@@ -74,9 +74,7 @@ public class ChannelController {
   @GetMapping("/{id}")
   public ResponseEntity<ChannelResponse> getChannel(
       @Parameter(description = "조회할 채널의 ID", required = true) @PathVariable UUID id) {
-    return channelService.getChannel(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.ok(channelService.getChannelResponse(id));
   }
 
   @Operation(summary = "채널 정보 수정", description = "채널의 이름을 변경합니다.")
@@ -90,9 +88,7 @@ public class ChannelController {
   public ResponseEntity<ChannelResponse> updateChannel(
       @Parameter(description = "수정할 채널의 ID", required = true) @PathVariable UUID id,
       @RequestBody UpdateChannelRequest request) {
-    return channelService.updateChannel(id, request)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.ok(channelService.updateChannel(id, request));
   }
 
   @Operation(summary = "채널 삭제", description = "채널 ID를 이용하여 채널을 삭제합니다.")

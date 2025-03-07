@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Data;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -9,44 +9,55 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@Data
-public class BinaryContent implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+public class BinaryContent extends BaseEntity implements Serializable {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final String fileName;
-    private final String mimeType;
-    private final String filePath;
-    private Long size;
-    private byte[] bytes;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public BinaryContent(String fileName, String mimeType, String filePath, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.fileName = fileName;
-        this.mimeType = mimeType;
-        this.filePath = filePath;
-        this.bytes = bytes;
-    }
+  @Id
+  @GeneratedValue
+  private UUID id;
 
-    public BinaryContent(UUID id, String fileName, String filePath, String mimeType, byte[] data) {
-        this.id = id;
-        this.createdAt = Instant.now();
-        this.fileName = fileName;
-        this.mimeType = mimeType;
-        this.filePath = filePath;
-        this.bytes = data;
-    }
+  private String fileName;
+  private String mimeType;
+  private String filePath;
+  private Long size;
 
-    public BinaryContent(String fileName, long length, String contentType, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.fileName = fileName;
-        this.mimeType = contentType;
-        this.filePath = fileName;
-        this.bytes = bytes;
-        this.size = length;
-    }
+  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  private Message message;
+
+  @Lob // Binary 데이터 저장
+  private byte[] bytes;
+
+  @Builder
+  public BinaryContent(String fileName, String mimeType, String filePath, byte[] bytes) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.fileName = fileName;
+    this.mimeType = mimeType;
+    this.filePath = filePath;
+    this.bytes = bytes;
+  }
+
+  public BinaryContent(UUID fileId, String fileName, String mimeType, String filePath,
+      byte[] bytes) {
+    this.id = fileId;
+    this.createdAt = Instant.now();
+    this.fileName = fileName;
+    this.mimeType = mimeType;
+    this.filePath = filePath;
+    this.bytes = bytes;
+  }
+
+  public BinaryContent(String fileName, String contentType, byte[] bytes) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.fileName = fileName;
+    this.mimeType = contentType;
+    this.bytes = bytes;
+  }
 }

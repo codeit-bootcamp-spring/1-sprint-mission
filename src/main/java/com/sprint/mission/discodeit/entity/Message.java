@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
+import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
+import jakarta.persistence.*;
+import java.util.List;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -8,31 +11,42 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-    private final UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
-    private String text;
-    private final UUID authorId;
-    private final UUID channelId;
+@Setter
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
+public class Message extends BaseUpdateEntity implements Serializable {
 
-    public Message(String text, UUID authorId, UUID channelId){
-        this.authorId = authorId;
-        this.channelId = channelId;
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = createdAt;
-        this.text = text;
-    }
+  @Serial
+  private static final long serialVersionUID = 1L;
 
-    public void updateText(String text) {
-        this.text = text;
-        this.updatedAt = Instant.now();
-    }
+  @Id
+  @GeneratedValue
+  private UUID id;
 
-    public String toString(){
-        return "\nuuid: "+ id + " text: " + text + " authorId: " + authorId;
-    }
+  private String text;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
+
+  @ManyToOne
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL)
+  private List<BinaryContent> attachments;
+
+  public Message(String text, User author, Channel channel) {
+    this.text = text;
+    this.author = author;
+    this.channel = channel;
+    this.createdAt = Instant.now();
+    this.updatedAt = createdAt;
+  }
+
+  public void updateText(String text) {
+    this.text = text;
+    this.updatedAt = Instant.now();
+  }
 }

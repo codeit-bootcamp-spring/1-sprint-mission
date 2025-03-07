@@ -5,10 +5,13 @@ import com.sprint.mission.discodeit.dto.channel.CreateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,57 +21,66 @@ import org.springframework.stereotype.Service;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
+  private final UserService userService;
 
   @Override
   public ChannelResponse createChannel(CreateChannelRequest request) {
-    Channel channel = channelRepository.save(new Channel(request.channelName()));
+    Channel channel = channelRepository.save(new Channel(request.channelName(), false));
     return ChannelResponse.fromEntity(channel);
   }
 
   @Override
-  public List<ChannelResponse> getChannels() {
-    return channelRepository.getAllChannels().stream().map(ChannelResponse::fromEntity).toList();
-  }
-
-  @Override
-  public Optional<ChannelResponse> getChannel(UUID uuid) {
-    return channelRepository.getChannelById(uuid).map(ChannelResponse::fromEntity);
-  }
-
-  @Override
-  public Optional<ChannelResponse> addMessageToChannel(UUID channelUUID, UUID messageUUID) {
-    return channelRepository.getChannelById(channelUUID).map(channel -> {
-      channel.addMessageToChannel(messageUUID);
-      return channelRepository.save(channel);
-    }).map(ChannelResponse::fromEntity);
-  }
-
-  @Override
-  public List<UUID> getMessagesUUIDFromChannel(UUID uuid) {
-    return channelRepository.getChannelById(uuid).orElseThrow().getMessageList();
+  public List<ChannelResponse> getChannelsResponse() {
+    return channelRepository.findAll().stream().map(ChannelResponse::fromEntity).toList();
   }
 
 
   @Override
-  public Optional<ChannelResponse> updateChannel(UUID uuid, UpdateChannelRequest request) {
-    return channelRepository.getChannelById(uuid).map(channel -> {
-      channel.updateChannelName(request.newName());
-      return channelRepository.save(channel);
-    }).map(ChannelResponse::fromEntity);
+  public ChannelResponse getChannelResponse(UUID uuid) {
+    return channelRepository.findById(uuid).map(ChannelResponse::fromEntity)
+        .orElseThrow(EntityNotFoundException::new);
+  }
+
+  @Override
+  public Channel getChannel(UUID uuid) {
+    return channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+  }
+
+  @Override
+  public ChannelResponse addMessageToChannel(UUID channelUUID, Message message) {
+    Channel channel = channelRepository.findById(channelUUID)
+        .orElseThrow(EntityNotFoundException::new);
+    channel.addMessageToChannel(message);
+    channelRepository.save(channel);
+    return ChannelResponse.fromEntity(channel);
+  }
+
+  @Override
+  public List<Message> getMessagesFromChannel(UUID uuid) {
+    return channelRepository.findById(uuid).orElseThrow().getMessages();
+  }
+
+  @Override
+  public ChannelResponse updateChannel(UUID uuid, UpdateChannelRequest request) {
+    Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+    channel.updateChannelName(request.newName());
+    channelRepository.save(channel);
+    return ChannelResponse.fromEntity(channel);
   }
 
   @Override
   public void deleteChannel(UUID uuid) {
-    channelRepository.getChannelById(uuid).ifPresent(channel -> {
-      channelRepository.deleteChannel(uuid);
-      channelRepository.save();
-    });
+    channelRepository.findById(uuid).ifPresent(channelRepository::delete);
   }
 
   @Override
   public ChannelResponse createPrivateChannel(CreatePrivateChannelRequest request) {
     Channel channel = new Channel(true);
-    request.userIds().forEach(channel::addUserToChannel);
+
+    List<User> users = request.userIds().stream().map(userService::getUserById).toList();
+
+    users.forEach(channel::addUserToChannel);
+
     return ChannelResponse.fromEntity(channelRepository.save(channel));
   }
 }

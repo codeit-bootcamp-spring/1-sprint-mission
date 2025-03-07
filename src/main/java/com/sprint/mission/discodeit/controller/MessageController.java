@@ -47,9 +47,7 @@ public class MessageController {
   @GetMapping("/{id}")
   public ResponseEntity<MessageResponse> getMessageById(
       @Parameter(description = "조회할 메시지의 ID", required = true) @PathVariable UUID id) {
-    return messageService.getMessage(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.ok(messageService.getMessage(id));
   }
 
   @Operation(summary = "채널별 메시지 조회", description = "특정 채널의 모든 메시지를 조회합니다.")
@@ -69,9 +67,7 @@ public class MessageController {
   public ResponseEntity<MessageResponse> updateMessage(
       @Parameter(description = "업데이트할 메시지의 ID", required = true) @PathVariable UUID id,
       @RequestBody UpdateMessageRequest request) {
-    return messageService.updateMessage(id, request)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return ResponseEntity.ok(messageService.updateMessage(id, request));
   }
 
   @Operation(summary = "메시지 삭제", description = "메시지 ID를 이용하여 메시지를 삭제합니다.")

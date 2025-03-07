@@ -3,14 +3,17 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -21,52 +24,48 @@ public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
   private final ChannelService channelService;
+  private final UserService userService;
 
   @Override
   public MessageResponse createMessage(CreateMessageRequest request) {
-    return channelService.getChannel(request.channelID())
-        .map(channel -> {
-          Message newMessage = new Message(request.text(), request.authorID(), request.channelID());
-          messageRepository.save(newMessage);
-          return new MessageResponse(newMessage.getId(), newMessage.getText(),
-              newMessage.getAuthorId(), newMessage.getChannelId());
-        }).orElse(null);
+    Channel channel = channelService.getChannel(request.channelID());
+    User author = userService.getUserById(request.authorID());
+    Message newMessage = new Message(request.text(), author, channel);
+    return MessageResponse.fromEntity(messageRepository.save(newMessage));
   }
 
   @Override
   public List<MessageResponse> getMessages() {
-    return messageRepository.getAllMessages().stream()
-        .map(message -> new MessageResponse(message.getId(), message.getText(),
-            message.getAuthorId(), message.getChannelId()))
+    return messageRepository.findAll().stream()
+        .map(MessageResponse::fromEntity)
         .toList();
   }
 
   @Override
   public List<MessageResponse> getMessagesByChannel(UUID ChannelID) {
-    return channelService.getMessagesUUIDFromChannel(ChannelID).stream()
-        .map(messageRepository::getMessageById)
-        .flatMap(Optional::stream)
-        .map(message -> new MessageResponse(message.getId(), message.getText(),
-            message.getAuthorId(), message.getChannelId()))
+    return channelService.getMessagesFromChannel(ChannelID).stream()
+        .map(MessageResponse::fromEntity)
         .collect(Collectors.toList());
   }
 
   @Override
-  public Optional<MessageResponse> getMessage(UUID uuid) {
-    return messageRepository.getMessageById(uuid)
-        .map(message -> new MessageResponse(message.getId(), message.getText(),
-            message.getAuthorId(), message.getChannelId()));
+  public MessageResponse getMessage(UUID uuid) {
+    return messageRepository.findById(uuid)
+        .map(MessageResponse::fromEntity).orElseThrow(
+            () -> new EntityNotFoundException("Message not found")
+        );
   }
 
   @Override
-  public Optional<MessageResponse> updateMessage(UUID id, UpdateMessageRequest request) {
-    return messageRepository.getMessageById(id)
+  public MessageResponse updateMessage(UUID id, UpdateMessageRequest request) {
+    return messageRepository.findById(id)
         .map(message -> {
           message.updateText(request.text());
           return messageRepository.save(message);
         })
-        .map(message -> new MessageResponse(message.getId(), message.getText(),
-            message.getAuthorId(), message.getChannelId()));
+        .map(MessageResponse::fromEntity).orElseThrow(
+            () -> new EntityNotFoundException("Message not found")
+        );
   }
 
   @Override
