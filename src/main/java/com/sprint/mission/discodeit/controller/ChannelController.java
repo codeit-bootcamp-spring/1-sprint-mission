@@ -27,7 +27,7 @@ public class ChannelController {
     }
 
 
-    @Operation(summary = "채널 생성", description = "채널 생성 / 공개/비공개 구현x")
+    @Operation(summary = "채널 생성", description = "채널 생성 / 공개(PUBLIC)/비공개(PRIVATE) 타입 지정 가능")
     @PostMapping
     public ResponseEntity<ChannelDto> createChannel(@Valid @RequestBody ChannelDto channelDTO) {
         ChannelDto channel = channelService.create(channelDTO);

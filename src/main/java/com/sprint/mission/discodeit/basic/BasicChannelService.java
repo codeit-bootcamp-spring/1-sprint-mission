@@ -9,7 +9,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +27,21 @@ public class BasicChannelService implements ChannelService {
         User creator = userRepository.findById(channelDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
 
+        ChannelType channelType;
+        try {
+            if (channelDTO.getType() == null || channelDTO.getType().isEmpty()) {
+                channelType = ChannelType.PUBLIC;
+            } else {
+                channelType = ChannelType.valueOf(channelDTO.getType().toUpperCase());
+            }
+        } catch (IllegalArgumentException e) {
+            channelType = ChannelType.PUBLIC;
+        }
+
         Channel channel = new Channel(
                 channelDTO.getName(),
                 channelDTO.getDescription(),
-                ChannelType.valueOf(channelDTO.getType().toUpperCase()));
+                channelType);
 
         Channel saved = channelRepository.save(channel);
         return convertToDTO(saved);
@@ -73,15 +83,17 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        String channelTypeStr = Optional.ofNullable(channelDTO.getType())
-                .map(String::toUpperCase)
-                .orElseThrow(() -> new IllegalArgumentException("Channel type cannot be null"));
-
-        if (!EnumUtils.isValidEnum(ChannelType.class, channelTypeStr)) {
-            throw new IllegalArgumentException("Invalid channel type: " + channelTypeStr);
+        // 채널 타입 처리 - 타입이 제공되지 않은 경우 기존 타입 유지
+        ChannelType channelType = channel.getType(); // 기본값으로 기존 타입 사용
+        
+        if (channelDTO.getType() != null && !channelDTO.getType().isEmpty()) {
+            try {
+                channelType = ChannelType.valueOf(channelDTO.getType().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("유효하지 않은 채널 타입입니다: " + channelDTO.getType());
+            }
         }
 
-        ChannelType channelType = ChannelType.valueOf(channelTypeStr);
         channel.update(
                 channelDTO.getName(),
                 channelDTO.getDescription(),
