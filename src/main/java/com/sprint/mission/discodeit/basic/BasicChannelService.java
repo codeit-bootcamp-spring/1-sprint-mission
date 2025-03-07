@@ -8,12 +8,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,7 +33,6 @@ public class BasicChannelService implements ChannelService {
                 channelDTO.getDescription(),
                 ChannelType.valueOf(channelDTO.getType().toUpperCase()));
 
-        channel.addUser(creator);
         Channel saved = channelRepository.save(channel);
         return convertToDTO(saved);
     }
@@ -66,7 +63,6 @@ public class BasicChannelService implements ChannelService {
         User user = userRepository.findById(joinDTO.getUserId())
                 .orElseThrow(()-> new IllegalArgumentException("User Not Found"));
 
-        channel.addUser(user);
         channelRepository.save(channel);
 
         return Map.of(user, channel);

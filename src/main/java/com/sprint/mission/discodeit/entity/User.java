@@ -33,8 +33,27 @@ public class User {
     @Lob
     private byte[] profileImage;
 
-    @ManyToMany(mappedBy = "channel_id")
-    private List<Channel> channels = new ArrayList<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReadStatus> readStatuses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Message> messages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserStatus> userStatuses = new ArrayList<>();
 
 
+    public void addUserStatus(UserStatus status) {
+        userStatuses.add(status);
+        status.setUser(this);
+    }
+
+    public void removeUserStatus(UserStatus status) {
+        userStatuses.remove(status);
+        status.setUser(null);
+    }
 }

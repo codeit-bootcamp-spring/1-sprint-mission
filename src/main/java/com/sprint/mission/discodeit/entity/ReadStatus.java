@@ -1,42 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
+@Getter @Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "read_statuses")
-public class ReadStatus implements Serializable {
+public class ReadStatus {
 
-    private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue
     @Column(name = "read_status_id")
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    
-    private UUID userId;
-    private UUID channelId;
-    private Instant lastReadAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.userId = userId;
-        this.channelId = channelId;
-        this.lastReadAt = lastReadAt;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    public void update(Instant newLastReadAt) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+    private Timestamp lastReadAt;
+
+
+    public void update(Timestamp newLastReadAt) {
         boolean anyValueUpdated = false;
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
@@ -44,7 +41,7 @@ public class ReadStatus implements Serializable {
         }
 
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+            this.updatedAt = newLastReadAt;
         }
     }
 }

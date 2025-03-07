@@ -25,6 +25,12 @@ public class Channel{
     @Enumerated(EnumType.STRING)
     private ChannelType type;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    private List<Message> messages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    private List<ReadStatus> readStatuses = new ArrayList<>();
+
     public Channel(String name, String description, ChannelType type) {
         this.name = name;
         this.description = description;
@@ -36,16 +42,5 @@ public class Channel{
         this.description = description;
         this.updatedAt = Instant.now();
         this.type = channelType;
-    }
-    @ManyToMany
-    @JoinTable(
-            name = "channel_members",
-            joinColumns = @JoinColumn(name = "channel_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users = new ArrayList<>();
-
-    public void addUser(User user) {
-        this.users.add(user);
     }
 }

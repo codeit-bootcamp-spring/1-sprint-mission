@@ -7,32 +7,39 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "binary_contents")
 public class BinaryContent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id @GeneratedValue
-    @Column(name = "binary_content_id")
+    @Column(name = "profile_id")
     private UUID id;
+
     private Instant createdAt;
     private String fileName;
     private Long size;
     private String contentType;
-    private byte[] bytes;
+    @Lob
+    private byte[] content;
 
-    public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
+    @OneToOne(mappedBy = "profile")
+    private User user;
+
+    @OneToMany(mappedBy = "binaryContent", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<MessageAttachment> messageAttachments = new ArrayList<>();
+
+    public BinaryContent(String fileName, Long size, String contentType, byte[] content) {
         this.fileName = fileName;
         this.size = size;
         this.contentType = contentType;
-        this.bytes = bytes;
+        this.content = content;
     }
 }

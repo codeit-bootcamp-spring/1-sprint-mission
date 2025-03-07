@@ -31,8 +31,6 @@ public class BasicMessageService implements MessageService {
     public MessageDto createMessage(MessageDto messageDTO) {
         Message message = Message.builder()
                 .id(UUID.randomUUID())
-                .channelId(messageDTO.getChannelId())
-                .senderId(messageDTO.getSenderId())
                 .content(messageDTO.getContent())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -53,9 +51,6 @@ public class BasicMessageService implements MessageService {
 
         return MessageDto.builder()
                 .id(message.getId())
-                .channelId(message.getChannelId())
-                .senderId(message.getSenderId())
-                .senderName(message.getSenderName())
                 .content(message.getContent())
                 .createdAt(message.getCreatedAt())
                 .updatedAt(message.getUpdatedAt())

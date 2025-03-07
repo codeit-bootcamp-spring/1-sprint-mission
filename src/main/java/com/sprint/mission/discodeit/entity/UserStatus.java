@@ -1,17 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 
-@Getter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -21,7 +18,11 @@ public class UserStatus {
     @Id @GeneratedValue
     @Column(name = "user_status_id")
     private UUID id;
-    private UUID userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private Instant lastSeen;
     private Instant createdAt;
 
