@@ -16,15 +16,12 @@ public class BasicAuthService implements AuthService {
 
     @Override
     public User login(LoginRequest loginRequest) {
-        // username과 password를 DTO에서 가져오기
         String username = loginRequest.username();
         String password = loginRequest.password();
 
-        // 사용자 조회
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("User with username " + username + " not found"));
 
-        // BCrypt로 비밀번호 비교
         if (!user.getPassword().equals(password)) {
             throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }

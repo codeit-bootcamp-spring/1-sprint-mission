@@ -28,7 +28,7 @@ public class BasicMessageService implements MessageService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public Message createMessage(MessageCreateRequest messageCreateRequest,
+  public Message create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
@@ -41,7 +41,7 @@ public class BasicMessageService implements MessageService {
     }
 
     List<UUID> attachmentIds =
-        (binaryContentCreateRequests != null) ? binaryContentCreateRequests.stream()
+        binaryContentCreateRequests.stream()
             .map(attachmentRequest -> {
               String fileName = attachmentRequest.fileName();
               String contentType = attachmentRequest.contentType();
@@ -52,8 +52,7 @@ public class BasicMessageService implements MessageService {
               BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
               return createdBinaryContent.getId();
             })
-            .toList()
-            : List.of();
+            .toList();
 
     String content = messageCreateRequest.content();
     Message message = new Message(
@@ -79,22 +78,17 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Message updateMessage(UUID messageId, MessageUpdateRequest request) {
+  public Message update(UUID messageId, MessageUpdateRequest request) {
+    String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
-
-    String newContent = request.newContent();
-    if (newContent != null && newContent.equals(message.getContent())) {
       message.update(newContent);
       return messageRepository.save(message);
-    }
-
-    return message;
   }
 
   @Override
-  public void deleteMessage(UUID messageId) {
+  public void delete(UUID messageId) {
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));

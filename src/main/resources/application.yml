@@ -4,19 +4,12 @@ server:
 spring:
   application:
     name: discodeit
-
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  servlet:
+    multipart:
+      maxFilesize: 10MB # 파일 하나의 최대 크기
+      maxRequestSize: 30MB #  한 번에 최대 업로드 가능 용량
 
 discodeit:
   repository:
-    type: jcf
+    type: file  # 파일 저장소 설정 유지
     file-directory: .discodeit

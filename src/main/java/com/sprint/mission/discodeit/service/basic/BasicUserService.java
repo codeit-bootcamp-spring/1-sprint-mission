@@ -30,7 +30,7 @@ public class BasicUserService implements UserService {
   private final UserStatusRepository userStatusRepository;
 
   @Override
-  public User createUser(UserCreateRequest userCreateRequest,
+  public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
@@ -80,7 +80,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User updateUser(UUID userId, UserUpdateRequest userUpdateRequest,
+  public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
 
     User user = userRepository.findById(userId)
@@ -117,7 +117,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public void deleteUser(UUID userId) {
+  public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
