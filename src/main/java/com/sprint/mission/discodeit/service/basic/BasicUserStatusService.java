@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +25,25 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public UserStatusDto findById(String userStatusId) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId);
+    UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
+        .orElse(null);
     if (userStatus == null) {
       throw new IllegalArgumentException("userStatus not found");
     }
 
+    return UserStatusDto.from(userStatus);
+  }
+
+  @Override
+  public UserStatusDto findByUserId(String userId) {
+    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
+    if (user == null) {
+      throw new IllegalArgumentException("user not found");
+    }
+    UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("User Status not found");
+    }
     return UserStatusDto.from(userStatus);
   }
 
@@ -40,14 +55,15 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatusDto create(CreateUserStatusDto createUserStatusDto)
       throws CustomException {
-    User user = userRepository.findById(createUserStatusDto.userId());
+    User user = userRepository.findById(createUserStatusDto.getUserId()).orElse(null);
     if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    if (userStatusRepository.findByUserId(createUserStatusDto.userId()) != null) {
+    UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
+    if (userStatus != null) {
       throw new IllegalArgumentException("userStatus already exists");
     }
-    UserStatus userStatus = new UserStatus();
+    userStatus = new UserStatus(user);
 
     return UserStatusDto.from(userStatusRepository.save(userStatus));
   }
@@ -55,10 +71,11 @@ public class BasicUserStatusService implements UserStatusService {
   @Override
   public UserStatusDto updateByUserId(String id, UpdateUserStatusDto updateUserStatusDto) {
 
-    if (userRepository.findById(id) == null) {
+    User user = userRepository.findById(UUID.fromString(id)).orElse(null);
+    if (user == null) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    UserStatus userStatus = userStatusRepository.findById(id);
+    UserStatus userStatus = userStatusRepository.findById(UUID.fromString(id)).orElse(null);
     if (userStatus == null) {
       throw new IllegalArgumentException("userStatus not found");
     }
@@ -70,6 +87,13 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public boolean delete(String userStatusId) {
-    return userStatusRepository.delete(userStatusId);
+    UserStatus userStatus = userStatusRepository.findById(UUID.fromString(userStatusId))
+        .orElse(null);
+    if (userStatus == null) {
+      throw new IllegalArgumentException("User status not found");
+    }
+    userStatusRepository.delete(userStatus);
+
+    return true;
   }
 }

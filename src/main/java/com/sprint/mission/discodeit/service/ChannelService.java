@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.CreatePublicChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDTo;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
-import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 
@@ -27,24 +25,17 @@ public interface ChannelService {
   //단건 조회 - UUID
   ChannelDto findById(String channelId, String userId);
 
-  //다건 조회 - name
-  List<ChannelDto> findAllByChannelName(String channelName);
-
-  //다건 조회 - 채널 타입
-  List<ChannelDto> findByChannelType(ChannelType channelType);
-
   //수정
   ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto);
 
   //삭제
   boolean delete(String channelId);
 
-  List<UserDto> findAllUserInChannel(String channelId);
-
-  boolean addUserToChannel(String channelId, String userId);
-
-  boolean deleteUserFromChannel(String channelId, String userId);
-
-  boolean isUserInChannel(String channelId, String userId);
+  //미사용 메서드 임시 주석처리
+//  boolean addUserToChannel(String channelId, String userId);
+//
+//  boolean deleteUserFromChannel(String channelId, String userId);
+//
+//  boolean isUserInChannel(String channelId, String userId);
 
 }

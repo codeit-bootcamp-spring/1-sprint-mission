@@ -10,6 +10,8 @@ public interface UserStatusService {
 
   UserStatusDto findById(String userStatusId);
 
+  UserStatusDto findByUserId(String userId);
+
   List<UserStatusDto> findAll();
 
   UserStatusDto create(CreateUserStatusDto createUserStatusDto);

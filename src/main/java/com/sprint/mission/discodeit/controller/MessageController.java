@@ -58,7 +58,7 @@ public class MessageController {
   @GetMapping("/users")
   public ResponseEntity<List<MessageDto>> getMessagesByUserId(@RequestParam String userId) {
     //@RequestHeader(value = "If-None-Match") String ifNoneMatch) {
-    List<MessageDto> allBySenderId = messageService.findAllBySenderId(userId);
+    List<MessageDto> allBySenderId = messageService.findAllByAuthorId(userId);
 
     String etag = "\"" + allBySenderId + "\"";
 

@@ -10,8 +10,6 @@ public interface ReadStatusService {
 
   ReadStatusDto create(CreateReadStatusDto createReadStatusDto);
 
-  List<ReadStatusDto> createByChannelId(String channelId);
-
   ReadStatusDto findById(String userStatusId);
 
   List<ReadStatusDto> findAllByUserId(String userId);
@@ -23,7 +21,6 @@ public interface ReadStatusService {
   List<ReadStatusDto> updateByUserId(String userId, UpdateReadStatusDto updateReadStatusDto);
 
   List<ReadStatusDto> updateByChannelId(String channelId, UpdateReadStatusDto updateReadStatusDto);
-
 
   boolean delete(String userStatusId);
 }

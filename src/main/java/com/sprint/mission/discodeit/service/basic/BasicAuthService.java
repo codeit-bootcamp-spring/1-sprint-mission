@@ -28,14 +28,14 @@ public class BasicAuthService implements AuthService {
         || userLoginDto.password() == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
-    User user = userRepository.findByUsername(userLoginDto.username());
+    User user = userRepository.findByUsername(userLoginDto.username()).orElse(null);
     if (user == null || !user.getPassword().equals(userLoginDto.password())) {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
     // 이것도 마찬가지로 어할 수 없는 값이라 이 방식을 쓰면 안되는지?
-    UserStatusDto userStatusDto = userStatusService.updateByUserId(user.getId(),
+    UserStatusDto userStatusDto = userStatusService.updateByUserId(user.getId().toString(),
         new UpdateUserStatusDto(Instant.now()));
 
-    return UserDto.from(user, userStatusDto.isOnline());
+    return UserDto.from(user, user.getUserStatus().isActive());
   }
 }

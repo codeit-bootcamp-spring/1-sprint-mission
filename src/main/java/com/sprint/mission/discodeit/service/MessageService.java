@@ -26,7 +26,7 @@ public interface MessageService {
   List<MessageDto> findAllContainsContent(String content);
 
   //다건 조회 - 작성자
-  List<MessageDto> findAllBySenderId(String senderId);
+  List<MessageDto> findAllByAuthorId(String senderId);
 
   //다건 조회 - 날짜
   List<MessageDto> findAllByCreatedAt(Instant createdAt);

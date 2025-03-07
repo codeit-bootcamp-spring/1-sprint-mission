@@ -48,14 +48,6 @@ public class ReadStatusController {
     return readStatusService.findAllByUserId(userId);
   }
 
-  //특정 채널의 메세지 수신 정보 생성
-  @PostMapping("/{channelId}")
-  public ResponseEntity<List<ReadStatusDto>> createReadStatusByChannelId(
-      @PathVariable String channelId) {
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(readStatusService.createByChannelId(channelId));
-  }
-
   //특정 채널의 메세지 수신 정보 수정
   @PatchMapping
   public ResponseEntity<List<ReadStatusDto>> updateChannelReadStatus(
