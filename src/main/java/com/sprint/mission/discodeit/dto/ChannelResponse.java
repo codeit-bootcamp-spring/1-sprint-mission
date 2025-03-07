@@ -24,9 +24,9 @@ public record ChannelResponse(
       List<UUID> joinUsers) {
     return ChannelResponse.builder()
         .id(channel.getId())
-        .title(channel.getTitle())
+        .title(channel.getName())
         .description(channel.getDescription())
-        .channelType(channel.getChannelType())
+        .channelType(channel.getType())
         .createdAt(channel.getCreatedAt())
         .updatedAt(channel.getUpdatedAt())
         .lastMessageTime(lastMessageTime)

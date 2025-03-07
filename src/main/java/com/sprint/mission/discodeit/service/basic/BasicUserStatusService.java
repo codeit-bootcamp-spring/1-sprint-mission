@@ -35,7 +35,7 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatusRepository.existsByUserId(userId)) {
       throw new DuplicateRequestException("UserStatus already exists");
     }
-    UserStatus newUserStatus = UserStatus.createUserStatus(userId);
+    UserStatus newUserStatus = UserStatus.createUserStatus(user);
     log.info("Create UserStatus: {}", newUserStatus);
     return UserStatusResponse.entityToDto(userStatusRepository.save(newUserStatus));
   }

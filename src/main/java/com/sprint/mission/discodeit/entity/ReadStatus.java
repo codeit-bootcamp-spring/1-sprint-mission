@@ -1,32 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-public class ReadStatus implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "user_id")
+  private User user;
+
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  @Column(columnDefinition = "timestamp with time zone", nullable = false)
   private Instant lastReadAt;
 
-  public static ReadStatus createReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    return new ReadStatus(userId, channelId, lastReadAt);
+  public static ReadStatus createReadStatus(User user, Channel channel, Instant lastReadAt) {
+    return new ReadStatus(user, channel, lastReadAt);
   }
 
-  private ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.updatedAt = createdAt;
-    this.userId = userId;
-    this.channelId = channelId;
+  private ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 
@@ -37,12 +47,11 @@ public class ReadStatus implements Serializable {
 
   @Override
   public String toString() {
-    return "ReadStatus{id:" + id
-        + ",userId:" + userId
-        + ",channelId:" + channelId
-        + ",createdAt:" + createdAt
-        + ",updateAt:" + updatedAt
-        + "}";
+    return "ReadStatus{" +
+        "user=" + user +
+        ", channel=" + channel +
+        ", lastReadAt=" + lastReadAt +
+        ", updatedAt=" + updatedAt +
+        '}';
   }
-
 }

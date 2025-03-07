@@ -1,29 +1,45 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
+  @Column(length = 50, unique = true, nullable = false)
   private String username;
+
+  @Column(length = 100, unique = true, nullable = false)
   private String email;
+
+  @Column(length = 60, nullable = false)
   private transient String password;
+
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user")
+  private UserStatus status;
 
   public static User createUser(String name, String email, String password) {
     return new User(name, email, password);
   }
 
   private User(String name, String email, String password) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
     this.username = name;
     this.email = email;
     this.password = password;
@@ -51,12 +67,13 @@ public class User implements Serializable {
 
   @Override
   public String toString() {
-    return "User{id:" + id
-        + ",name:" + username
-        + ",email:" + email
-        + ",createdAt:" + createdAt
-        + ",updateAt:" + updatedAt
-        + "}";
+    return "User{" +
+        "username='" + username + '\'' +
+        ", email='" + email + '\'' +
+        ", password='" + password + '\'' +
+        ", profile=" + profile +
+        ", status=" + status +
+        ", updatedAt=" + updatedAt +
+        '}';
   }
-
 }

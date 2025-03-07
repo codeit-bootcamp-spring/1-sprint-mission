@@ -1,32 +1,52 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "messages")
 @Getter
-public class Message implements Serializable {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private final UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
+  @Column(columnDefinition = "TEXT")
   private String content;
-  private UUID channelId;
-  private UUID authorId;
 
-  public static Message createMessage(String content, UUID channelId, UUID userId) {
-    return new Message(content, channelId, userId);
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne
+  @JoinColumn(name = "author_id")
+  private User author;
+
+  @OneToMany(orphanRemoval = true)
+  @JoinTable(name = "message_attachments",
+      joinColumns = @JoinColumn(name = "message_id"),
+      inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+  private List<BinaryContent> attachments;
+
+  public static Message createMessage(String content, Channel channel, User user) {
+    return new Message(content, channel, user);
   }
 
-  private Message(String content, UUID channelId, UUID authorId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
+  private Message(String content, Channel channel, User author) {
     this.content = content;
-    this.channelId = channelId;
-    this.authorId = authorId;
+    this.channel = channel;
+    this.author = author;
   }
 
   public void update(String newContent) {
@@ -43,8 +63,11 @@ public class Message implements Serializable {
 
   @Override
   public String toString() {
-    return "Message{id:" + id + ",channel:" + channelId + ",user:" + authorId + ",content:" + content
-        + ",createdAt:" + createdAt + ",updatedAt:" + updatedAt + "}";
+    return "Message{" +
+        "content='" + content + '\'' +
+        ", channel=" + channel +
+        ", author=" + author +
+        ", attachments=" + attachments +
+        '}';
   }
-  
 }

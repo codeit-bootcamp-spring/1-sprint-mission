@@ -6,13 +6,11 @@ import com.sprint.mission.discodeit.dto.ReadStatusRequest;
 import com.sprint.mission.discodeit.dto.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
 import java.util.Comparator;
@@ -22,10 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.util.comparator.Comparators;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +81,7 @@ public class BasicChannelService implements ChannelService {
   public ChannelResponse update(UUID id, ChannelRequest.Update request) {
     Channel channel = findByIdOrThrow(id);
 
-    if (channel.getChannelType() == Channel.ChannelType.PRIVATE) {
+    if (channel.getType() == Channel.ChannelType.PRIVATE) {
       throw new RestApiException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED, "id : " + id);
     } else if (channelValidator.isValidTitle(request.title()) && channelValidator.isValidTitle(
         request.description())) {
