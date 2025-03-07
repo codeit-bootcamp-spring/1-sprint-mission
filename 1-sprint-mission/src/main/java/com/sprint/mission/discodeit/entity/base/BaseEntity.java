@@ -26,7 +26,7 @@ public abstract class BaseEntity {
 
   @CreatedDate
   @Column(nullable = false, updatable = false)
-  private LocalDateTime createdAt;
+  private Instant createdAt;
 
   @PrePersist
   public void prePersist() {

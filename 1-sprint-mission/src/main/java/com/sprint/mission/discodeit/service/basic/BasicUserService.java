@@ -19,19 +19,22 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  //
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
 
+
+  @Transactional
   @Override
   public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+
     String username = userCreateRequest.username();
     String email = userCreateRequest.email();
 
@@ -42,33 +45,26 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("User with username " + username + " already exists");
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
-        })
+    BinaryContent profile = optionalProfileCreateRequest
+        .map(profileRequest -> new BinaryContent(
+            profileRequest.fileName(),
+            (long) profileRequest.bytes().length,
+            profileRequest.contentType(),
+            profileRequest.bytes()
+        ))
         .orElse(null);
-    String password = userCreateRequest.password();
 
-    User user = new User(username, email, password, nullableProfileId);
-    User createdUser = userRepository.save(user);
+    User user = new User(username, email, userCreateRequest.password(), profile);
 
-    Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createdUser.getId(), now);
-    userStatusRepository.save(userStatus);
-
-    return createdUser;
+    user.setStatus(new UserStatus(user, Instant.now()));
+    return userRepository.save(user);
   }
 
   @Override
   public UserDto find(UUID userId) {
-    return userRepository.findById(userId)
-        .map(this::toDto)
-        .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+    User user = userRepository.findById(userId).orElseThrow(
+        () -> new NoSuchElementException("User with id " + userId + " not found"));
+    return toDto(user);
   }
 
   @Override
@@ -79,6 +75,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @Transactional
   @Override
   public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -87,58 +84,53 @@ public class BasicUserService implements UserService {
 
     String newUsername = userUpdateRequest.newUsername();
     String newEmail = userUpdateRequest.newEmail();
-    if (userRepository.existsByEmail(newEmail)) {
+    if (userRepository.existsByEmail(newEmail) && !user.getEmail().equals(newEmail)) {
       throw new IllegalArgumentException("User with email " + newEmail + " already exists");
     }
-    if (userRepository.existsByUsername(newUsername)) {
+    if (userRepository.existsByUsername(newUsername) && !user.getUsername().equals(newUsername)) {
       throw new IllegalArgumentException("User with username " + newUsername + " already exists");
     }
 
-    UUID nullableProfileId = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
-              .ifPresent(binaryContentRepository::deleteById);
+    optionalProfileCreateRequest
+        .ifPresent(
+            profileRequest -> {
+              if (user.getProfile() != null) {
+                binaryContentRepository.delete(user.getProfile());
+              }
+              BinaryContent newProfile = new BinaryContent(
+                  profileRequest.fileName(),
+                  (long) profileRequest.bytes().length,
+                  profileRequest.contentType(),
+                  profileRequest.bytes()
+              );
+              user.setProfile(newProfile);
+            });
 
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
-        })
-        .orElse(null);
+    user.update(newUsername, newEmail, userUpdateRequest.newPassword(), user.getProfile());
 
-    String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfileId);
-
-    return userRepository.save(user);
+    return user;
   }
 
+  @Transactional
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    Optional.ofNullable(user.getProfileId())
-        .ifPresent(binaryContentRepository::deleteById);
-    userStatusRepository.deleteByUserId(userId);
-
+    Optional.ofNullable(user.getProfile())
+        .ifPresent(binaryContentRepository::delete);
     userRepository.deleteById(userId);
   }
 
   private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
-
     return new UserDto(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfileId(),
-        online
+        user.getProfile() != null ? user.getProfile().getId() : null,
+        user.getStatus() != null && user.getStatus().isOnline()
     );
   }
 }
