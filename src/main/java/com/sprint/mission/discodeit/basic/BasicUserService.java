@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UsersDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserMapper userMapper;
 
     @Override
     public UsersDto create(UsersDto dto, byte[] profileImage) {
@@ -40,25 +42,7 @@ public class BasicUserService implements UserService {
             user.setProfileImage(profileImage);
         }
         User saved = userRepository.save(user);
-        return convertToDTO(saved);  // User 엔티티를 UsersDto로 변환해서 반환
-    }
-
-    private UsersDto convertToDTO(User user) {
-
-        UsersDto dto = UsersDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .online(user.isOnline())
-                .build();
-
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            dto.setProfileImage(Base64.getEncoder().encodeToString(user.getProfileImage()));
-        } else {
-            dto.setProfileImage("");
-        }
-        return dto;
+        return userMapper.toDto(saved);
     }
 
     @Transactional
@@ -104,23 +88,6 @@ public class BasicUserService implements UserService {
         return new UserDto(user.getId(), user.getName(), user.getEmail(), user.getPassword());
     }
 
-    private UsersDto toDTO(User user) {
-        UsersDto dto = UsersDto.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .online(user.isOnline())
-                .build();
-
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            String base64Str = Base64.getEncoder().encodeToString(user.getProfileImage());
-            dto.setProfileImage(base64Str);
-        } else {
-            dto.setProfileImage("");
-        }
-        return dto;
-    }
     @Override
     public List<UsersDto> findAll() {
         try {
@@ -132,7 +99,7 @@ public class BasicUserService implements UserService {
             }
 
             return users.stream()
-                    .map(this::convertToDTO)
+                    .map(userMapper::toDto)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {

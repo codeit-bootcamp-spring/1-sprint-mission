@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter @Builder
@@ -11,13 +11,13 @@ import java.util.UUID;
 public class MessageDto {
     private UUID id;
     private UUID channelId;
-    private UUID senderId;
+    private UUID AuthorId;
     @NotNull
     private String senderName;
     @NotNull
     private String channelName;
     @NotNull
     private String content;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

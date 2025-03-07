@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.ChannelJoinDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     public ChannelDto create(ChannelDto channelDTO) {
@@ -44,16 +46,7 @@ public class BasicChannelService implements ChannelService {
                 channelType);
 
         Channel saved = channelRepository.save(channel);
-        return convertToDTO(saved);
-    }
-
-    private ChannelDto convertToDTO(Channel channel) {
-        return ChannelDto.builder()
-                .id(channel.getId())
-                .name(channel.getName())
-                .description(channel.getDescription())
-                .type(channel.getType().toString())
-                .build();
+        return channelMapper.toDto(saved);
     }
 
     @Override
@@ -61,7 +54,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        return convertToDTO(channel);
+        return channelMapper.toDto(channel);
     }
 
     @Override
@@ -101,7 +94,7 @@ public class BasicChannelService implements ChannelService {
         );
 
         Channel saved = channelRepository.save(channel);
-        return convertToDTO(saved);
+        return channelMapper.toDto(saved);
     }
 
     @Override
@@ -114,7 +107,7 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelDto> findAll() {
         return channelRepository.findAll()
                 .stream()
-                .map(this::convertToDTO)
+                .map(channelMapper::toDto)
                 .collect(Collectors.toList());
     }
 

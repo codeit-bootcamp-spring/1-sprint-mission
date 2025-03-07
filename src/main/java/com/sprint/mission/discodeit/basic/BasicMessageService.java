@@ -2,10 +2,9 @@ package com.sprint.mission.discodeit.basic;
 
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,7 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final UserService userService;
+    private final MessageMapper messageMapper;
 
     @Override
     @Transactional
@@ -33,29 +33,21 @@ public class BasicMessageService implements MessageService {
 
         String senderName;
         try {
-            UserDto user = userService.find(messageDTO.getSenderId());
+            UserDto user = userService.find(messageDTO.getAuthorId());
             senderName = user.getName();
         } catch (Exception e) {
             senderName = "unknown Sender";
         }
 
         Message savedMessage = messageRepository.save(message);
-        return convertToDTO(savedMessage);
-    }
-
-    private MessageDto convertToDTO(Message message) {
-
-        return MessageDto.builder()
-                .id(message.getId())
-                .content(message.getContent())
-                .build();
+        return messageMapper.toDto(savedMessage);
     }
 
     @Override
     public List<MessageDto> getChannelMessages(UUID channelId) {
         List<Message> messages = messageRepository.findAllByChannelId(channelId);
         return messages.stream()
-                .map(this::convertToDTO)
+                .map(messageMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -68,14 +60,14 @@ public class BasicMessageService implements MessageService {
         message.setContent(messageDTO.getContent());
 
         Message updatedMessage = messageRepository.save(message);
-        return convertToDTO(updatedMessage);
+        return messageMapper.toDto(updatedMessage);
     }
 
     @Override
     public List<MessageDto> findAllByChannelId(UUID channelId) {
         return messageRepository.findAllByChannelId(channelId)
                 .stream()
-                .map(this::convertToDTO)
+                .map(messageMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -89,7 +81,7 @@ public class BasicMessageService implements MessageService {
     public List<MessageDto> findAll() {
         return messageRepository.findAll()
                 .stream()
-                .map(this::convertToDTO)
+                .map(messageMapper::toDto)
                 .collect(Collectors.toList());
     }
 }
