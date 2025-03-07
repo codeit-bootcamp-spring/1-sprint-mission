@@ -20,7 +20,7 @@ public record MessageResponse(
   public static MessageResponse entityToDto(Message message) {
     return MessageResponse.builder()
         .id(message.getId())
-        .userId(message.getUserId())
+        .userId(message.getAuthorId())
         .channelId(message.getChannelId())
         .content(message.getContent())
         .createdAt(message.getCreatedAt())

@@ -34,7 +34,7 @@ public class FileUserRepository implements UserRepository {
   @Override
   public Optional<User> findByName(String name) {
     return loadUserMapToFile().values().stream()
-        .filter(user -> user.getName().equals(name)).findAny();
+        .filter(user -> user.getUsername().equals(name)).findAny();
   }
 
   @Override
@@ -57,7 +57,7 @@ public class FileUserRepository implements UserRepository {
   @Override
   public boolean existsByName(String name) {
     return loadUserMapToFile().values().stream()
-        .anyMatch(user -> user.getName().equals(name));
+        .anyMatch(user -> user.getUsername().equals(name));
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 
@@ -25,7 +24,7 @@ public record UserResponse(
         .id(user.getId())
         .createdAt(user.getCreatedAt())
         .updatedAt(user.getUpdatedAt())
-        .name(user.getName())
+        .name(user.getUsername())
         .email(user.getEmail())
         .online(isOnline)
         .profileId(binaryContentId)
