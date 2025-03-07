@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 
 import java.util.List;
@@ -15,6 +16,8 @@ public interface MessageService {
   MessageResponse createMessage(CreateMessageRequest request);
 
   List<MessageResponse> getMessages();
+
+  PageResponse<MessageResponse> getPageMessages(int page, int size);
 
   List<MessageResponse> getMessagesByChannel(UUID ChannelID);
 

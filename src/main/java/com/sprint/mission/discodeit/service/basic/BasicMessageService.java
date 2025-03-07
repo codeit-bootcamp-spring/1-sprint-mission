@@ -3,9 +3,11 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -16,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,6 +44,13 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findAll().stream()
         .map(MessageResponse::fromEntity)
         .toList();
+  }
+
+  @Override
+  public PageResponse<MessageResponse> getPageMessages(int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Message> messages = messageRepository.findAll(pageable);
+    return PageResponseMapper.fromPage(messages.map(MessageResponse::fromEntity));
   }
 
   @Override
