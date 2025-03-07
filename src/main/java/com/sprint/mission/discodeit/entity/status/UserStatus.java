@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity.status;
 
-import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.JoinColumn;
@@ -17,17 +16,17 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
   @OneToOne
   @JoinColumn(name = "user_id")
-  private UserDto user;
+  private User user;
   private Instant lastActiveAt;
 
-  public UserStatus(UserDto user) {
+  public UserStatus(User user) {
     this.user = user;
   }
 
   private static final int USER_ACTIVE_TIMEOUT_SECONDS = 5 * 60;
 
   public boolean isActive() {
-    return Instant.now().minusSeconds(USER_ACTIVE_TIMEOUT_SECONDS).isBefore(this.getUpdatedAt());
+    return Instant.now().minusSeconds(USER_ACTIVE_TIMEOUT_SECONDS).isBefore(this.getLastActiveAt());
   }
 
   // 이 메소드가 왜 필요한지 생각해보자.

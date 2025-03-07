@@ -4,42 +4,32 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public class Message extends BaseUpdatableEntity implements Serializable {
-
-  private static final long serialVersionUID = 1L;
-  //객체 식별 id
+public class Message extends BaseUpdatableEntity {
 
   //메세지 작성자
-  private final String authorId;
+  private final User author;
   //메세지 내용
   private String content;
   //메세지가 생성된 채널
-  private final String channelId;
+  private final Channel channel;
   //첨부 이미지 목록
-  private final List<String> attachmentImageIds;
+  private final List<BinaryContent> attachments;
 
-  public Message(String authorId, String content, String channelId) {
-    this.authorId = authorId;
+  public Message(User author, String content, Channel channel) {
+    this.author = author;
     this.content = content;
-    this.channelId = channelId;
-    this.attachmentImageIds = new ArrayList<>();
+    this.channel = channel;
+    this.attachments = new ArrayList<>();
   }
 
   public void setContent(String content) {
     this.content = content;
   }
 
-  //메세지가 생성된 이후, 생성 시간을 변경할 수 없으므로 update 미구현
-
-  //메세지가 생성된 이후, 메세지를 보낸 채널을 변경할 수 없으므로 update 미구현
-
-  public void addImages(String imageId) {
-    this.attachmentImageIds.add(imageId);
+  public void addFile(BinaryContent binaryContent) {
+    this.attachments.add(binaryContent);
   }
 
   //추후에 추가할 것

@@ -1,18 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import lombok.Getter;
 
-import java.io.Serializable;
-
 @Getter
-public class User extends BaseUpdatableEntity implements Serializable {
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
   //로그인 아이디
   private String username;
   //닉네임
@@ -26,12 +22,12 @@ public class User extends BaseUpdatableEntity implements Serializable {
   //계정 상태 - 인증완료, 미인증, 정지, 휴면 등
   private AccountStatus accountStatus;
   //사용자 프로필 사진
-  private BinaryContentDto profile;
-
+  private BinaryContent profile;
+  //유저 상태
   private UserStatus userStatus;
 
   public User(String username, String nickname, String email, String password, String statusMessage,
-      AccountStatus accountStatus, BinaryContentDto profile) {
+      AccountStatus accountStatus, BinaryContent profile) {
     this.username = username;
     this.nickname = nickname;
     this.email = email;
@@ -61,10 +57,13 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.statusMessage = statusMessage;
   }
 
-  public void setProfile(BinaryContentDto profile) {
+  public void setProfile(BinaryContent profile) {
     this.profile = profile;
   }
 
+  public void setUserStatus(UserStatus userStatus) {
+    this.userStatus = userStatus;
+  }
 
   public boolean isUpdated(UpdateUserDto updateUserDto) {
     if (updateUserDto == null) {

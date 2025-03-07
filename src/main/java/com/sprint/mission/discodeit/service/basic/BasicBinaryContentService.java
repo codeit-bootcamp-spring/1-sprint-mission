@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +37,17 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public BinaryContentDto findById(String contentId) {
-    return BinaryContentDto.from(binaryContentRepository.findById(contentId));
+    BinaryContent binaryContent = binaryContentRepository.findById(UUID.fromString(contentId))
+        .orElse(null);
+    if (binaryContent == null) {
+      throw new RuntimeException("Content not found");
+    }
+    return BinaryContentDto.from(binaryContent);
   }
 
   @Override
   public List<BinaryContentDto> findAllByIdIn(List<String> contentIds) {
+
     List<BinaryContent> list = binaryContentRepository.findAll().stream()
         .filter(binaryContent -> contentIds.contains(binaryContent.getId())).toList();
     return list.stream().map(BinaryContentDto::from).toList();
@@ -48,6 +55,13 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public boolean deleteById(String contentId) {
-    return binaryContentRepository.delete(contentId);
+    BinaryContent binaryContent = binaryContentRepository.findById(UUID.fromString(contentId))
+        .orElse(null);
+
+    if (binaryContent == null) {
+      throw new RuntimeException("Binary Content not found");
+    }
+    binaryContentRepository.deleteById(UUID.fromString(contentId));
+    return true;
   }
 }

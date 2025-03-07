@@ -7,11 +7,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 @Getter
-public class ReadStatus extends BaseUpdatableEntity implements Serializable {
+public class ReadStatus extends BaseUpdatableEntity {
 
   private static final long serialVersionUID = 1L;
 

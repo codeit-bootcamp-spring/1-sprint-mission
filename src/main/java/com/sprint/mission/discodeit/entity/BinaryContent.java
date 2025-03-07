@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent extends BaseEntity implements Serializable {
+public class BinaryContent extends BaseEntity {
 
   private static final long serialVersionUID = 1L;
   private String filename;

@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
-
-public enum ChannelCategory implements Serializable {
-    TEXT,
-    VOICE
+public enum ChannelCategory {
+  TEXT,
+  VOICE
 }

@@ -4,12 +4,8 @@ import com.sprint.mission.discodeit.dto.channel.UpdateChannelDto;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.*;
-
 @Getter
-public class Channel extends BaseUpdatableEntity implements Serializable {
+public class Channel extends BaseUpdatableEntity {
 
   private static final long serialVersionUID = 1L;
   //채널명
