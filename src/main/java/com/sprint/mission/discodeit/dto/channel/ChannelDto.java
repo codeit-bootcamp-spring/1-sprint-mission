@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.channel;
 
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -24,19 +25,11 @@ public record ChannelDto(
     //최근 메세지의 시간 정보
     Instant lastMessageAt,
     //참여한 유저 정보
-    List<String> participantIds
+    List<UserDto> participants
 ) {
 
-  @Override
-  public String toString() {
-    return "[ChannelResponseDto] {id: " + id + " name: " + name + " type: "
-        + type + " channelCategory: " + channelCategory + " description: " + description +
-        " lastMessageAt: " + lastMessageAt + " participantIds: " + (
-        participantIds != null ? participantIds.stream().toList() : "Public Channel") + "]";
-  }
-
   public static ChannelDto from(Channel channel, Instant lastMessageTimestamp,
-      List<String> participantIds) {
+      List<UserDto> participants) {
     return new ChannelDto(
         channel.getId(),
         channel.getChannelName(),
@@ -45,7 +38,7 @@ public record ChannelDto(
         channel.getDescription(),
         channel.getCreatedAt(),
         lastMessageTimestamp,
-        participantIds
+        participants
     );
   }
 

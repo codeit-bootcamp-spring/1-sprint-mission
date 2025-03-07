@@ -11,7 +11,7 @@ public record BinaryContentDto(
     byte[] bytes,
     String contentType,
     Instant createdAt,
-    long size
+    Long size
 ) {
 
   public static BinaryContentDto from(BinaryContent binaryContent) {

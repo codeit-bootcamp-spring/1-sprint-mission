@@ -33,19 +33,7 @@ public record UserDto(
         isActive,
         user.getStatusMessage(),
         user.getAccountStatus(),
-        user.getProfile()
+        BinaryContentDto.from(user.getProfile())
     );
-  }
-
-  @Override
-  public String toString() {
-    return "[UserResponseDto] {" +
-        "id: " + id +
-        " nickname: " + nickname
-        + " email: " + email
-        + " online: " + online
-        + " statusMessage: " + statusMessage
-        + " accountStatus: " + accountStatus
-        + " profileId: " + profileId + "}";
   }
 }

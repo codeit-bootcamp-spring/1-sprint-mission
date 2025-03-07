@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.dto.message;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Message;
 
+import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -14,13 +17,13 @@ public record MessageDto(
     //수정 시간
     Instant updatedAt,
     //메세지 작성자
-    String authorId,
+    UserDto author,
     //메세지 내용
     String content,
     //메세지가 생성된 채널
-    String channelId,
+    UUID channelId,
     //첨부파일
-    List<String> attachmentIds
+    List<BinaryContentDto> attachments
 ) {
 
   public static MessageDto from(Message message) {
@@ -28,21 +31,10 @@ public record MessageDto(
         message.getId(),
         message.getCreatedAt(),
         message.getUpdatedAt(),
-        message.getAuthorId(),
+        UserDto.from(message.getAuthor(), message.getAuthor().getUserStatus().isActive()),
         message.getContent(),
-        message.getChannelId(),
-        message.getAttachmentImageIds()
+        message.getChannel().getId(),
+        message.getAttachments().stream().map(BinaryContentDto::from).toList()
     );
-  }
-
-  @Override
-  public String toString() {
-    return "[MessageResponseDto] " +
-        "{id:" + id
-        + " authorId:" + authorId
-        + " content:" + content
-        + " channelId:" + channelId
-        + " createdAt:" + createdAt
-        + " updatedAt:" + updatedAt;
   }
 }
