@@ -8,8 +8,8 @@ import java.util.UUID;
 public record ChannelRequest(
         String name,
         String description,
-        List<UUID> member,
-        UUID owner,
+//        List<UUID> member,
+//        UUID owner,
         Channel.ChannelType channelType
 ) {
 }

@@ -1,30 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.io.Serializable;
+
 import java.time.Instant;
 import java.util.UUID;
 
-//@Entity
-@Getter
-public abstract class BaseEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
-//    @Id
-    private UUID id;
-    private Long createdAt;
-    private Long updatedAt;
 
-    public BaseEntity(){
-        this.id = id != null ? id : UUID.randomUUID();
-//        System.out.println("새로 생성된 UUID: " + this.id); // 로그 추가
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = createdAt;
+@MappedSuperclass
+@Getter
+public abstract class BaseEntity {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @Column(name="created_at", updatable = false, nullable = false)
+    private Instant createdAt;
+
+    @Column(name="updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = this.createdAt;
     }
 
-    public void update(){
-        this.updatedAt = System.currentTimeMillis();
+    @PreUpdate
+    protected void update() {
+        this.updatedAt = Instant.now();
     }
 }

@@ -5,6 +5,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -56,12 +57,14 @@ public class BasicMessageService implements MessageService{
 
     @Override
     public MessageResponse readOne(UUID id) {
-        return MessageResponse.fromEntity(repository.findById(id));
+        Message message = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다. : " + id));
+        return MessageResponse.fromEntity(message);
     }
 
     @Override
     public List<MessageResponse> readAll() {
-        List<Message> messages = repository.readAll();
+        List<Message> messages = repository.findAll();
         List<MessageResponse> responses = messages.stream()
                             .map(message -> MessageResponse.fromEntity(message))
                             .collect(Collectors.toList());
@@ -71,7 +74,7 @@ public class BasicMessageService implements MessageService{
 
     @Override
     public List<MessageResponse> channelMessageReadAll(UUID channelId) {
-        List<Message> messages = repository.readAll();
+        List<Message> messages = repository.findAll();
         List<MessageResponse> responses = messages.stream()
                 .filter(message -> message.getChannelId() !=null && message.getChannelId().equals(channelId))
                 .map(message -> MessageResponse.fromEntity(message))
@@ -87,13 +90,28 @@ public class BasicMessageService implements MessageService{
 
         Message modifiMessage = new Message(messageRequest.content(), messageRequest.senderId(), null, messageRequest.channelId());
 
-        Message message = repository.modify(id, modifiMessage);
+        Message message = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다. : " + id));
+
+        message.setContent(modifiMessage.getContent());
+        message.setSenderId(modifiMessage.getSenderId());
+        message.setRecipientId(modifiMessage.getRecipientId());
+        message.setChannelId(modifiMessage.getChannelId());
+
+        repository.save(message);
+
+
         return MessageResponse.fromEntity(message);
     }
 
     @Override
     public boolean delete(UUID id) {
-        return repository.deleteById(id);
+        if(!repository.existsById(id)){
+            throw new ResourceNotFoundException("해당 ID의 사용자가 존재하지 않습니다 : " + id);
+        }
+
+        repository.deleteById(id);
+        return true;
     }
 
 }

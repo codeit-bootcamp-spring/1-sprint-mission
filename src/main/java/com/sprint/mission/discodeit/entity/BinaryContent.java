@@ -1,28 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
 
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
+@Entity
+@Table(name = "binary_contents")
 @Getter
-public class BinaryContent implements Serializable {
-    private static final long getSerialVersionUID = 1L;
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BinaryContent{
+    @Id
+    @GeneratedValue
     private UUID id;
-    private final Instant createdAt;
-    private final UUID typeId;
-    private final String originalFilename;
-    private final String contentType;
-    private final byte[] bytes;
 
-    public BinaryContent(UUID typeId, String originalFilename, String contentType, byte[] bytes) {
-        this.id = (id != null) ? id : UUID.randomUUID();
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "type_id")
+    private UUID typeId;
+
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "size")
+    private Long size;
+
+    @Column(name = "content_type")
+    private String contentType;
+
+//    @Lob
+//    @JdbcTypeCode(SqlTypes.BINARY)
+//    @Column(name = "bytes", columnDefinition = "BYTEA")
+//    private byte[] bytes;
+
+//    protected BinaryContent() { }
+
+    //, byte[] bytes
+    public BinaryContent(UUID typeId, String originalFilename, Long size, String contentType) {
+        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.typeId = typeId;
-        this.originalFilename = originalFilename;
+        this.fileName = originalFilename;
+        this.size = size;
         this.contentType = contentType;
-        this.bytes = bytes;
+//        this.bytes = bytes;
     }
 }

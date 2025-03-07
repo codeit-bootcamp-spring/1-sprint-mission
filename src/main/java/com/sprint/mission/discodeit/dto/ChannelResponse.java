@@ -9,8 +9,8 @@ public record ChannelResponse(
     UUID id,
     String name,
     String description,
-    List<UUID> member,
-    UUID owner,
+//    List<UUID> member,
+//    UUID owner,
     Channel.ChannelType channelType
 ) {
     public static ChannelResponse fromEntity(Channel channel){
@@ -18,8 +18,8 @@ public record ChannelResponse(
                 channel.getId(),
                 channel.getName(),
                 channel.getDescription(),
-                channel.getMember(),
-                channel.getOwner(),
+//                channel.getMember(),
+//                channel.getOwner(),
                 channel.getChannelType()
         );
     }

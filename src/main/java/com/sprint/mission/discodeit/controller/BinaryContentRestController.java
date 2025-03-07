@@ -22,7 +22,8 @@ public class BinaryContentRestController {
     private final BinaryContentService binaryContentService;
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<byte[]> downloadProfileImage(@PathVariable UUID id) {
+    public ResponseEntity downloadProfileImage(@PathVariable UUID id) {
+        //<byte[]>
         BinaryContent profileImage = binaryContentService.findById(id);
 
         if (profileImage == null || profileImage.getContentType() == null) {
@@ -31,7 +32,9 @@ public class BinaryContentRestController {
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(profileImage.getContentType()))  // 파일 타입 지정
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + profileImage.getOriginalFilename() + "\"") // 파일 다운로드
-                .body(profileImage.getBytes());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + profileImage.getFileName() + "\"") // 파일 다운로드
+                .body("");
+
+//        profileImage.getBytes()
     }
 }

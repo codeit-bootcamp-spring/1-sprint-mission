@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,7 +38,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse create(UserRequest request, MultipartFile file) {
+    public UserResponse create(UserRequest request, MultipartFile file) throws IOException {
 
         if(!validator.isValidEmail(request.email())){
             System.out.println(request.username() + "님의 사용자 등록이 완료되지 않았습니다.");
@@ -53,8 +55,10 @@ public class BasicUserService implements UserService {
 
         BinaryContent profileImage = null;
         if(file != null && !file.isEmpty()){
-            profileImage = binaryContentRepository.save(file, user.getId());
-            System.out.println(profileImage.getId());
+            BinaryContent binaryContent = new BinaryContent(user.getId(), file.getOriginalFilename(), file.getSize(), file.getContentType());
+            //, file.getBytes()
+
+            profileImage = binaryContentRepository.save(binaryContent);
             user.setProfileImageId(profileImage.getId());
         }
 
@@ -67,7 +71,8 @@ public class BasicUserService implements UserService {
     @Override
     public UserResponse readOne(UUID id) {
         try {
-            User user = userRepository.findById(id);
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
             boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
 
             return UserResponse.fromEntity(user, isOnline);
@@ -78,7 +83,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public List<UserResponse> readAll() {
-        List<User> users = userRepository.readAll();
+        List<User> users = userRepository.findAll();
 
         List<UserResponse> responses = users.stream().map(user -> {
                     try {
@@ -107,7 +112,16 @@ public class BasicUserService implements UserService {
                 return null;
             }
 
-            User user = userRepository.modify(id, new User(updatedUserReq.username(), updatedUserReq.password(), updatedUserReq.email(), updatedUserReq.phoneNumber()));
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
+
+            user.setUsername(updatedUserReq.username());
+            user.setPassword(updatedUserReq.password());
+            user.setEmail(updatedUserReq.email());
+            user.setPhoneNumber(updatedUserReq.phoneNumber());
+
+            userRepository.save(user);
+
             boolean isOnline = userStatusRepository.findByUserId(id).isOnline();
 
             System.out.println("업데이트가 완료되었습니다.");
@@ -120,6 +134,11 @@ public class BasicUserService implements UserService {
 
     @Override
     public boolean delete(UUID id) {
-        return userRepository.deleteById(id);
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("해당 ID의 사용자가 존재하지 않습니다 : " + id);
+        }
+
+        userRepository.deleteById(id);
+        return true;
     }
 }
