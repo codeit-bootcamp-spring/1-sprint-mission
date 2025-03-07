@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,12 +14,7 @@ import java.util.UUID;
 @Table(name = "messages")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Message {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "message_id")
-    private UUID id;
+public class Message extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "channel_id", nullable = false)
@@ -34,6 +30,4 @@ public class Message {
     @Column(name = "content", nullable = false)
     private String content;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

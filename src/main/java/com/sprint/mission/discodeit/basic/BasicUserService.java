@@ -31,7 +31,6 @@ public class BasicUserService implements UserService {
     public UsersDto create(UsersDto dto, byte[] profileImage) {
 
         User user = User.builder()
-                .id(UUID.randomUUID())
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .password(dto.getPassword())

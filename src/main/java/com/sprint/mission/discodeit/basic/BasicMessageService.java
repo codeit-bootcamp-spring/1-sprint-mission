@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -23,16 +22,13 @@ import java.util.stream.Collectors;
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-    private final ChannelService channelService;
     private final UserService userService;
 
     @Override
     @Transactional
     public MessageDto createMessage(MessageDto messageDTO) {
         Message message = Message.builder()
-                .id(UUID.randomUUID())
                 .content(messageDTO.getContent())
-                .createdAt(LocalDateTime.now())
                 .build();
 
         String senderName;
@@ -52,8 +48,6 @@ public class BasicMessageService implements MessageService {
         return MessageDto.builder()
                 .id(message.getId())
                 .content(message.getContent())
-                .createdAt(message.getCreatedAt())
-                .updatedAt(message.getUpdatedAt())
                 .build();
     }
 
@@ -72,7 +66,6 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() -> new RuntimeException("Message not found"));
 
         message.setContent(messageDTO.getContent());
-        message.setUpdatedAt(LocalDateTime.now());
 
         Message updatedMessage = messageRepository.save(message);
         return convertToDTO(updatedMessage);

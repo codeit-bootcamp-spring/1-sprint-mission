@@ -19,7 +19,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusDto create(UserStatusDto userStatusDTO) {
-        UserStatus userStatus = new UserStatus(userStatusDTO.getUserId(), Instant.now());
+        UserStatus userStatus = new UserStatus(Instant.now());
         userStatusRepository.save(userStatus);
         return new UserStatusDto(userStatus.getId(), userStatus.getLastSeen());
     }

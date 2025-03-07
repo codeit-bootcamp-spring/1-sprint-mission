@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,11 +15,7 @@ import java.util.UUID;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageAttachment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "message_attachment_id")
-    private UUID id;
+public class MessageAttachment extends BaseUpdatableEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "message_id")

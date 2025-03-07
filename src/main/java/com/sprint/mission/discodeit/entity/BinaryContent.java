@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,15 +16,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @Table(name = "binary_contents")
-public class BinaryContent implements Serializable {
+public class BinaryContent extends BaseUpdatableEntity {
 
-    private static final long serialVersionUID = 1L;
-
-    @Id @GeneratedValue
-    @Column(name = "profile_id")
-    private UUID id;
-
-    private Instant createdAt;
     private String fileName;
     private Long size;
     private String contentType;

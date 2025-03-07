@@ -51,8 +51,6 @@ public class BasicReadStatusService implements ReadStatusService {
                 .user(user)
                 .channel(channel)
                 .lastReadAt(lastReadAtTimestamp)
-                .createdAt(now)
-                .updatedAt(now)
                 .build();
 
         ReadStatus savedReadStatus = readStatusRepository.save(readStatus);

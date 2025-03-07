@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,23 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_statuses")
-public class UserStatus {
+public class UserStatus extends BaseUpdatableEntity {
 
-    @Id @GeneratedValue
-    @Column(name = "user_status_id")
-    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     private Instant lastSeen;
-    private Instant createdAt;
 
-    public UserStatus(UUID id, Instant lastSeen) {
-        this.id = id;
+    public UserStatus(Instant lastSeen) {
         this.lastSeen = lastSeen;
-        this.createdAt = Instant.now();
     }
 
     public Instant getLastSeen() {

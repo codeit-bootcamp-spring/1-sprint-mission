@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,14 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "read_statuses")
-public class ReadStatus {
+public class ReadStatus extends BaseUpdatableEntity {
 
-
-    @Id @GeneratedValue
-    @Column(name = "read_status_id")
-    private UUID id;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,10 +33,6 @@ public class ReadStatus {
         if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
             this.lastReadAt = newLastReadAt;
             anyValueUpdated = true;
-        }
-
-        if (anyValueUpdated) {
-            this.updatedAt = newLastReadAt;
         }
     }
 }
