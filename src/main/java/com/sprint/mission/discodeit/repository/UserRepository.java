@@ -3,19 +3,13 @@ package com.sprint.mission.discodeit.repository;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    User save(User user);
+  User findByUsername(String username);
 
-    boolean delete(String userId);
-
-    User findById(String id);
-
-    User findByUsername(String username);
-
-    User findByEmail(String email);
-
-    List<User> findAll();
+  User findByEmail(String email);
 
 }
