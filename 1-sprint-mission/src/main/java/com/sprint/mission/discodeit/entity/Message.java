@@ -64,10 +64,8 @@ public class Message extends BaseUpdatableEntity {
   }
 
   public void update(String newContent) {
-    boolean anyValueUpdated = false;
     if (newContent != null && !newContent.equals(this.content)) {
       this.content = newContent;
-      updateTimestamp();
     }
   }
 }
