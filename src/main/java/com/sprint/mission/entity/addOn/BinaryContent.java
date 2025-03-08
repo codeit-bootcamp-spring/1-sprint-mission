@@ -1,31 +1,23 @@
 package com.sprint.mission.entity.addOn;
 
-import com.sprint.mission.config.BaseTimeEntity;
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.entity.main.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "바이너리 컨텐츠")
-public class BinaryContent extends BaseTimeEntity implements Serializable {
+public class BinaryContent extends BaseEntity {
 
-    @ToString.Exclude
-    private static final long serialVersionUID = 1L;
-
-    private UUID id;
     private String fileName;
     private String contentType;
     private byte[] bytes;
 
     public BinaryContent(String fileName, String contentType, byte[] bytes) {
-        this.id = UUID.randomUUID();
         this.fileName = fileName;
         this.contentType = contentType;
         this.bytes = bytes;
@@ -36,5 +28,4 @@ public class BinaryContent extends BaseTimeEntity implements Serializable {
     // 수정 불가능한 도메인 모델
     // updateAt 필드는 정의 X
     // id 참조 필드 추가 (user, message)
-
 }

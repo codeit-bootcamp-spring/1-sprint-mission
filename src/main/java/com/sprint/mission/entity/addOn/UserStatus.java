@@ -1,6 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
-import com.sprint.mission.config.BaseTimeEntity;
+import com.sprint.mission.entity.main.BaseUpdatableEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,18 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "유저 상태")
-public class UserStatus extends BaseTimeEntity implements Serializable {
+public class UserStatus extends BaseUpdatableEntity {
 
-    @ToString.Exclude
-    private static final long serialVersionUID = 1L;
-    private UUID id;
-//    private Instant createdAt;
-//    private Instant updatedAt;
     private UUID userId;
     private Instant lastActiveAt;
 
     public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
         this.userId = userId;
         this.lastActiveAt = Instant.now();
     }

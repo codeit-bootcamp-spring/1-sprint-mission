@@ -1,6 +1,6 @@
 package com.sprint.mission.entity.addOn;
 
-import com.sprint.mission.config.BaseTimeEntity;
+import com.sprint.mission.entity.main.BaseUpdatableEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,17 +15,13 @@ import java.util.UUID;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "메시지 읽음 상태 정보")
-public class ReadStatus extends BaseTimeEntity implements Serializable {
+public class ReadStatus extends BaseUpdatableEntity {
 
-    @ToString.Exclude
-    private static final long serialVersionUID = 1L;
-    private UUID id;
     private UUID userId;
     private UUID channelId;
     private Instant lastReadAt;
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-        this.id = UUID.randomUUID();
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt;
