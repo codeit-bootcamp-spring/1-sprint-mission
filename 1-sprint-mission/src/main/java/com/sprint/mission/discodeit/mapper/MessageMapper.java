@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MessageMapper {
 
   public MessageDto toDto(Message entity) {
