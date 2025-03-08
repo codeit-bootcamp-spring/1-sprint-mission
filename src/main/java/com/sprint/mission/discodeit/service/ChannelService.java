@@ -7,9 +7,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
-
 import java.util.Map;
-
 import java.util.UUID;
 
 public interface ChannelService {
@@ -20,9 +18,4 @@ public interface ChannelService {
     List<ChannelDto> readAllByUserId(UUID userId);
     Channel updateChannelField(UUID channelId, PublicChannelUpdateRequest request);
     void deleteChannelById(UUID channelId);
-
-
-
-
-
 }

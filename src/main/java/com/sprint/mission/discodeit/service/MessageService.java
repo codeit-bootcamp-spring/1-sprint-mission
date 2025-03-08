@@ -13,8 +13,4 @@ public interface MessageService {
     List<Message> readAllByChannelId(UUID channelId);
     Message updateMessageField(UUID messageId, MessageUpdateRequest request);
     void deleteMessageById(UUID messageId);
-
-
-
-
 }

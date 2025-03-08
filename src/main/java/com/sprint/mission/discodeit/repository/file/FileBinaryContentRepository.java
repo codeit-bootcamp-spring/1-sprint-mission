@@ -33,20 +33,42 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
-        try (
-                FileOutputStream fos = new FileOutputStream(DIRECTORY.toFile(), true);
-                ObjectOutputStream oos = new ObjectOutputStream(fos) {
-                    @Override
-                    protected void writeStreamHeader() throws IOException {
-                        if (fos.getChannel().position() == 0) {
-                            super.writeStreamHeader();
-                        } else {
-                            reset();
-                        } //역직렬화 헤더 오류 해결 코드. 파일에 한번만 헤더 들어갈 수 있도록
-                    }
+        List<BinaryContent> binaryContents = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+            while (true) {
+                try {
+                    BinaryContent existingBinaryContent = (BinaryContent) ois.readObject();
+                    binaryContents.add(existingBinaryContent);
+                } catch (EOFException e) {
+                    break;
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-        ) {
-            oos.writeObject(binaryContent);
+            }
+        } catch (FileNotFoundException e) {
+            // 파일이 없는 경우, 새 파일 생성 후 저장
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 이진 콘텐츠 업데이트 또는 추가
+        boolean binaryContentUpdated = false;
+        for (int i = 0; i < binaryContents.size(); i++) {
+            if (binaryContents.get(i).getId().equals(binaryContent.getId())) {
+                binaryContents.set(i, binaryContent);
+                binaryContentUpdated = true;
+                break;
+            }
+        }
+        if (!binaryContentUpdated) {
+            binaryContents.add(binaryContent);
+        }
+
+        // 파일에 다시 쓰기
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DIRECTORY.toFile()))) {
+            for (BinaryContent bc : binaryContents) {
+                oos.writeObject(bc);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

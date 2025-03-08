@@ -34,6 +34,7 @@ public class Message implements Serializable {
             this.content = newContent;
             flag = true;
 
+
         }
 
         if (flag) {

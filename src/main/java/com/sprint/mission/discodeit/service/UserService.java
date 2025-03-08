@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Optional;
-
 import java.util.UUID;
 
 public interface UserService {
@@ -21,6 +20,4 @@ public interface UserService {
     void deleteUserById(UUID userId);
     Map<UUID, User> getUserList();
     void setUserList(Map<UUID, User> userList);
-
-
 }
