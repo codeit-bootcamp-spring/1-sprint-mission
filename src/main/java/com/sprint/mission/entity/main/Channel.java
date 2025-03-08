@@ -3,6 +3,7 @@ package com.sprint.mission.entity.main;
 import com.sprint.mission.config.BaseTimeEntity;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
 import java.io.Serializable;
@@ -20,6 +21,7 @@ public class Channel  extends BaseTimeEntity implements Serializable {
 
     private UUID id;
     private ChannelType channelType;
+
     private String name;
     private String description;
 
@@ -33,5 +35,10 @@ public class Channel  extends BaseTimeEntity implements Serializable {
     public void update(String newName, String newDescription) {
         this.name = newName;
         this.description = newDescription;
+    }
+
+    @AssertTrue(message = "채널 이름은 설명보다 짧아야 합니다.")
+    public boolean nameValidCheck() {
+        return this.name.length() < this.description.length();
     }
 }

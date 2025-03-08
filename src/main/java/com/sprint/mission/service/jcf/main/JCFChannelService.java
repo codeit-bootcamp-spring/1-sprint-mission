@@ -49,7 +49,7 @@ public class JCFChannelService implements ChannelService {
     public Channel createPrivateChannel(PrivateChannelCreateDTO request) {
         Channel createdChannel = channelRepository.save(request.toChannel());
         request.participantIds().stream()
-                .map(userId -> new ReadStatus(userId, createdChannel.getId(), Instant.MIN))
+                .map(userId -> new ReadStatus(userId, createdChannel.getId(), createdChannel.getCreatedAt()))
                 .forEach(readStatusRepository::save);
         return createdChannel;
     }

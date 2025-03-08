@@ -18,9 +18,6 @@ public class JacksonConverterConfig {
         List<MediaType> supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
         supportedMediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
         converter.setSupportedMediaTypes(supportedMediaTypes);
-//        List<MediaType> supportedMediaTypes = converter.getSupportedMediaTypes();
-        // 이게 불변 객체 반환이라 불가능
-//        supportedMediaTypes.add(MediaType.APPLICATION_OCTET_STREAM);
         return converter;
     }
 }
