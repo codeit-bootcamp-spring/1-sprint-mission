@@ -23,6 +23,7 @@ public class Channel implements Serializable {
   private String channelName;
   private ChannelType type;
 
+  //TODO Spring3 ENtitiy가 DTo에 의존하면 안된다. 파라미터로 수정, build로 만들기
   public Channel(ChannelCreateDTO channelCreateDTO, ChannelType type) {
     this.id = UUID.randomUUID();
     this.createdAt = Instant.now();

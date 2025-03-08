@@ -9,20 +9,20 @@ import java.util.UUID;
 @Getter
 @Setter
 public class BaseEntity {
-    //추후 엔티티 공통 분모 extends 처리 예정
+  //TODO: 시간되면 추후 엔티티 공통 분모 extends 처리하기?
 
-    private UUID id ;
-    private Instant createdAt;
-    private Instant updatedAt;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
 
-    BaseEntity(){
-        this.id = UUID.randomUUID();
-        this.createdAt =  Instant.now();
-        this.updatedAt=this.createdAt;
-    }
+  BaseEntity() {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    this.updatedAt = this.createdAt;
+  }
 
-    void update(){
-        updatedAt =  Instant.now();
-    }
+  void update() {
+    updatedAt = Instant.now();
+  }
 
 }

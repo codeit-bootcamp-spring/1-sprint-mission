@@ -13,29 +13,30 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor //final 혹은 @NotNull이 붙은 필드의 생성자를 자동 생성하는 롬복 어노테이션
 public class BasicBinaryContentService implements BinaryContentService {
-    private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent create(BinaryContentCreateDTO binaryContentCreateDTO) {
-        BinaryContent binaryContent = new BinaryContent(binaryContentCreateDTO);
-        binaryContentRepository.save(binaryContent);
-        return binaryContent;
-    }
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public BinaryContent findById(UUID uuid) {
-        BinaryContent binaryContent = binaryContentRepository.findById(uuid);
-        return binaryContent;
-    }
+  @Override
+  public BinaryContent create(String filePath) {
+    BinaryContent binaryContent = new BinaryContent(filePath);
+    binaryContentRepository.save(binaryContent);
+    return binaryContent;
+  }
 
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> uuidList) {
-        List<BinaryContent> binaryContentList = binaryContentRepository.findAllByIdIn(uuidList);
-        return binaryContentList;
-    }
+  @Override
+  public BinaryContent findById(UUID uuid) {
+    BinaryContent binaryContent = binaryContentRepository.findById(uuid);
+    return binaryContent;
+  }
 
-    @Override
-    public void delete(UUID uuid) {
-        binaryContentRepository.delete(uuid);
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> uuidList) {
+    List<BinaryContent> binaryContentList = binaryContentRepository.findAllByIdIn(uuidList);
+    return binaryContentList;
+  }
+
+  @Override
+  public void delete(UUID uuid) {
+    binaryContentRepository.delete(uuid);
+  }
 }
