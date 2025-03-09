@@ -6,6 +6,7 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
@@ -46,9 +47,9 @@ public class JCFUserService implements UserService {
             createdUser.setProfile(binaryContent);
         });
 
-        userRepository.save(createdUser);
-        // UserStatus 생성
-        userStatusService.create(createdUser);
+        userRepository.save(createdUser); // SAVE해야 UUID 생성
+        UserStatus userStatus = userStatusService.create(createdUser);
+        createdUser.setStatus(userStatus);
         return createdUser;
     }
 

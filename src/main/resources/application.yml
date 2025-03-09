@@ -20,10 +20,13 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
-
+#        jdbc:
+#            batch_size: 50
+#        order_inserts: true
+#        order_updates: true
         format_sql: true
         #show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -49,5 +52,5 @@ decorator:
 logging:
   level:
     org.hibernate.sql : DEBUG
-    org.hibernate.type.descriptor.sql : TRACE
+#    org.hibernate.type.descriptor.sql : TRACE
 

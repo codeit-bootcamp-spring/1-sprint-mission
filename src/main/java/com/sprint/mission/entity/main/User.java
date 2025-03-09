@@ -15,7 +15,8 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@ToString @Getter @Setter
+@ToString(of = {"username", "email", "password"})
+@Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "유저")
 @Table(name = "users")

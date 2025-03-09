@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
@@ -16,8 +17,10 @@ import static jakarta.persistence.CascadeType.*;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString @Getter @Setter
+@ToString(of = {"channelType", "name", "description"})
+@Getter @Setter
 @Schema(description = "채널")
+@Table(name = "channels")
 public class Channel extends BaseUpdatableEntity{
 
     private ChannelType channelType;

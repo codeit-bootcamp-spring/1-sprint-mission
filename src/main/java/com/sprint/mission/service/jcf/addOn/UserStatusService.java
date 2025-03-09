@@ -27,12 +27,14 @@ public class UserStatusService {
     public UserStatus create(User user) {
         if (userStatusRepository.existsById(user.getId()))
             throw new CustomException(ErrorCode.ALREADY_EXIST_USER_STATUS);
-        return userStatusRepository.save(new UserStatus(user));
+        return new UserStatus(user);
+        //return userStatusRepository.save(new UserStatus(user));
     }
 
     // 나중에 바꾸기
-    public Optional<UserStatus> findById(UUID userStatusId) {
-        return userStatusRepository.findById(userStatusId);
+    public UserStatus findById(UUID userStatusId) {
+        return userStatusRepository.findById(userStatusId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER_STATUS));
     }
 
     public List<UserStatus> findAll() {

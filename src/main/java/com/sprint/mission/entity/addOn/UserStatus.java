@@ -3,10 +3,7 @@ package com.sprint.mission.entity.addOn;
 import com.sprint.mission.entity.main.BaseUpdatableEntity;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,8 +19,10 @@ import static jakarta.persistence.FetchType.*;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-@ToString @Getter
+@ToString(of = "lastActiveAt")
+@Getter
 @Schema(description = "유저 상태")
+@Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
     @OneToOne(fetch = LAZY)

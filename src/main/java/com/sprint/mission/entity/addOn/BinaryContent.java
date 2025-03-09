@@ -3,6 +3,7 @@ package com.sprint.mission.entity.addOn;
 import com.sprint.mission.entity.main.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "바이너리 컨텐츠")
+@Table(name = "binary_contents")
 public class BinaryContent extends BaseEntity {
 
     private String fileName;

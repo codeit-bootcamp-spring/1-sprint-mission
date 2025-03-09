@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-@Aspect
+//@Aspect
 @RequiredArgsConstructor
 public class BasicTrace {
 
