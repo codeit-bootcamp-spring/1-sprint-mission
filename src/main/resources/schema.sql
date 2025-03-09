@@ -86,6 +86,7 @@ CREATE TABLE public.read_statuses (
 	channel_id uuid NULL,
 	last_read_at timestamp NOT NULL,
 	CONSTRAINT read_statuses_pkey PRIMARY KEY (id),
+	CONSTRAINT unique_user_channel UNIQUE (user_id, channel_id),
 	CONSTRAINT fk_channel_id FOREIGN KEY (channel_id) REFERENCES public.channels(id) ON DELETE CASCADE,
 	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
