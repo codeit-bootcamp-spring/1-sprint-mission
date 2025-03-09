@@ -2,11 +2,12 @@ package com.sprint.mission.entity.addOn;
 
 import com.sprint.mission.entity.main.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Entity;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.UUID;
-
+@Entity
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter

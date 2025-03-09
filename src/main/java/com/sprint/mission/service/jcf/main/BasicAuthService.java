@@ -5,7 +5,6 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.LoginRequest;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

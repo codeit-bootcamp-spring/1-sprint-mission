@@ -20,7 +20,7 @@ public record SaveUserDto(
             user.getUpdatedAt(),
             user.getName(),
             user.getEmail(),
-            user.getProfileImgId()
+            user.getProfile().getId()
         );
     }
 }

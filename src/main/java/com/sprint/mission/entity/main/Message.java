@@ -13,9 +13,10 @@ import java.util.UUID;
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
-@ToString @Getter @Setter
+@ToString @Getter
 @Schema(description = "메시지 엔티티")
 public class Message  extends BaseUpdatableEntity{
 
@@ -46,5 +47,10 @@ public class Message  extends BaseUpdatableEntity{
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
         }
+    }
+
+    public void addAttachment(BinaryContent attachment) {
+        attachments.add(attachment);
+        //일단은 단방향이니
     }
 }

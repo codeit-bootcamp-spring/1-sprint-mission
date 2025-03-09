@@ -8,8 +8,6 @@ import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
-import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
@@ -49,7 +47,7 @@ public class JCFUserService implements UserService {
 
         userRepository.save(createdUser);
         // UserStatus 생성
-        userStatusService.create(createdUser.getId());
+        userStatusService.create(createdUser);
         return createdUser;
     }
 
@@ -82,6 +80,7 @@ public class JCFUserService implements UserService {
 
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+        userRepository.delete(deletingUser);
 
 //        ves.submit(() -> profileService.deleteById(deletingUser.()));
 //        ves.submit(() -> userStatusService.deleteByUserId(userId));

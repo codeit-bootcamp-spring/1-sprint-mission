@@ -6,9 +6,11 @@ import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.main.Channel;
+import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
-import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
+import com.sprint.mission.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,38 +27,22 @@ import java.util.concurrent.Future;
 public class ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
-    private final JCFUserRepository userRepository;
-    private final JCFChannelRepository channelRepository;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
     private final ExecutorService ves;
 
     public ReadStatus create(ReadStatusCreateRequest request) {
+        User user = userRepository.findById(request.userId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        Future<?> isExistUserFuture = ves.submit(() -> {
-            if (!userRepository.existsById(request.userId()))
-                throw new CustomException(ErrorCode.NO_SUCH_USER);
-        });
-        Future<?> isExistChannelFuture = ves.submit(() -> {
-            if (!channelRepository.existsById(request.channelId()))
-                throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
-        });
-        Future<?> isExistReadStatusFuture = ves.submit(() -> {
-            if (readStatusRepository.existsById(request.userId()))
-                throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
-        });
+        Channel channel = channelRepository.findById(request.channelId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
 
-        try {
-            isExistUserFuture.get();
-            isExistChannelFuture.get();
-            isExistReadStatusFuture.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
+        if (readStatusRepository.existsById(user.getStatus().getId())) {
+            throw new CustomException(ErrorCode.ALREADY_EXIST_READ_STATUS);
         }
 
-        return readStatusRepository.save(request.toEntity());
+        return readStatusRepository.save(new ReadStatus(user, channel, request.lastReadAt()));
     }
 
     public ReadStatus findById(UUID readStatusId) {
@@ -64,13 +50,13 @@ public class ReadStatusService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_READ_STATUS));
     }
 
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
-    }
-
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return readStatusRepository.findAllByChannelId(channelId);
-    }
+//    public List<ReadStatus> findAllByUserId(UUID userId) {
+//        return readStatusRepository.findAllByUserId(userId);
+//    }  // 안써도 될 듯한데 user에서 꺼내면 될 것 같은데
+//
+//    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+//        return readStatusRepository.findAllByChannelId(channelId);
+//    }
 
     public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = this.findById(readStatusId);

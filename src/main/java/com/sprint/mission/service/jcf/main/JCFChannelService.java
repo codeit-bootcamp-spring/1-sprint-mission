@@ -39,7 +39,6 @@ public class JCFChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
-    private final ExecutorService ves;
     private final UserRepository userRepository;
 
     @Override
@@ -75,15 +74,18 @@ public class JCFChannelService implements ChannelService {
     // 카피
     @Override
     public List<FindChannelAllDto> findAllByUserId(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        List<UUID> mySubscribedChannelIds = readStatusRepository.findAllByUserId(userId).stream()
-                .map(ReadStatus::getChannelId)
-                .toList();
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUser(user);
+        List<UUID> subscribedChannelIdList = readStatusList.stream().map(readStatus -> {
+            return readStatus.getChannel().getId();
+        }).toList();
 
         return channelRepository.findAll().stream()
                 .filter(channel ->
                         channel.getChannelType().equals(ChannelType.PUBLIC)
-                                || mySubscribedChannelIds.contains(channel.getId())
+                                || subscribedChannelIdList.contains(channel.getId())
                 )
                 .map(this::toDto)
                 .toList();
@@ -112,21 +114,10 @@ public class JCFChannelService implements ChannelService {
         Channel deletingChannel = this.findById(channelId);
 
         if (deletingChannel.getChannelType().equals(ChannelType.PRIVATE)) {
-            readStatusRepository.deleteAllByChannelId(channelId);
+            readStatusRepository.deleteAllByChannel(deletingChannel);
         }
-
-        Future<?> submit1 = ves.submit(() -> messageService.deleteAllByChannelId(channelId));
-        Future<?> submit2 = ves.submit(() -> channelRepository.delete(channelId));
-        try {
-            submit1.get();
-            submit2.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
-        }
+        messageService.deleteAllByChannelId(channelId);
+        channelRepository.delete(deletingChannel);
     }
 
     /**
@@ -161,9 +152,8 @@ public class JCFChannelService implements ChannelService {
 
         List<UUID> participantIds = new ArrayList<>();
         if (channel.getChannelType().equals(ChannelType.PRIVATE)) {
-            readStatusRepository.findAllByChannelId(channel.getId())
-                    .stream()
-                    .map(ReadStatus::getUserId)
+            readStatusRepository.findAllByChannelId(channel.getId()).stream()
+                    .map((readStatus) -> readStatus.getUser().getId())
                     .forEach(participantIds::add);
         }
 

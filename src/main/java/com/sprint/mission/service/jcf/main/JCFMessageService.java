@@ -5,10 +5,12 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
-import com.sprint.mission.repository.jcf.main.JCFChannelRepository;
-import com.sprint.mission.repository.jcf.main.JCFMessageRepository;
-import com.sprint.mission.repository.jcf.main.JCFUserRepository;
+import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.ChannelRepository;
+import com.sprint.mission.repository.MessageRepository;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
@@ -18,10 +20,10 @@ import java.time.Instant;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.task.VirtualThreadTaskExecutor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -29,45 +31,30 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 public class JCFMessageService implements MessageService {
 
-    // 가상스레드
-    private final ExecutorService ves;
-
-    private final JCFMessageRepository messageRepository;
-    private final JCFChannelRepository channelRepository;
-    private final JCFUserRepository userRepository;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final UserRepository userRepository;
     private final BinaryService binaryService;
 
     @Override
     public Message create(MessageDtoForCreate responseDto, List<BinaryContentDto> binaryContentDtoList) {
-        UUID userId = responseDto.userId();
-        UUID channelId = responseDto.channelId();
 
-        Future<?> isExistUserF = ves.submit(() -> {
-            if (!userRepository.existsById(userId)) throw new CustomException(ErrorCode.NO_SUCH_USER);});
-        Future<?> isExistChannelF = ves.submit(() -> {
-            if (!channelRepository.existsById(channelId)) throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);});
-        try {
-            isExistUserF.get();
-            isExistChannelF.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
-        }
+        User author = userRepository.findById(responseDto.userId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        Message createdMessage = responseDto.toEntity();
+        Channel writtenPlace = channelRepository.findById(responseDto.channelId())
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_CHANNEL));
+
+        Message createdMessage = new Message(writtenPlace, author, responseDto.content());
 
         log.info("attachmentsDto: {}", binaryContentDtoList);
         if (!binaryContentDtoList.isEmpty()) {
             for (BinaryContentDto bcd : binaryContentDtoList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
-                createdMessage.getAttachmentIdList().add(createdBinaryContent.getId());
+                createdMessage.addAttachment(createdBinaryContent);
             }
         }
-        log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
-        //writtenChannel.updateLastMessageTime();
+        //log.info("createdMessage 채널 : {}", createdMessage.getChannelId());
         //channelRepository.save(writtenChannel);
         return messageRepository.save(createdMessage);
     }
@@ -75,7 +62,7 @@ public class JCFMessageService implements MessageService {
     @Override
     public void update(UUID messageId, MessageDtoForUpdate updateDto) {
         Message updatingMessage = this.findById(messageId);
-        updatingMessage.setContent(updateDto.newContent());
+        updatingMessage.update(updateDto.newContent());
         messageRepository.save(updatingMessage);
     }
 
@@ -88,29 +75,20 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        if (channelRepository.existsById(channelId)){
+        if (channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        return messageRepository.findAllByChannel(channelId);
+        return messageRepository.findAllByChannelId(channelId);
     }
 
     @Override
     public void delete(UUID messageId) {
-        Message deletingMessage = this.findById(messageId);
-
-        Future<?> deleteBinaryF = ves.submit(() -> {
-            deletingMessage.getAttachmentIdList()
-                    .forEach(binaryService::deleteById);
-        });
-        ves.submit(() -> messageRepository.delete(deletingMessage.getId()));
-        try {
-            deleteBinaryF.get();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } catch (ExecutionException e) {
-            throw e.getCause() instanceof CustomException
-                    ? (CustomException) e.getCause()
-                    : new RuntimeException(e);
+        //Message deletingMessage = this.findById(messageId);
+        // BinaryContent랑 cascade Remove관계라
+        if (!messageRepository.existsById(messageId)) {
+            throw new CustomException(ErrorCode.NO_SUCH_MESSAGE);
+        } else {
+            messageRepository.deleteById(messageId);
         }
     }
 

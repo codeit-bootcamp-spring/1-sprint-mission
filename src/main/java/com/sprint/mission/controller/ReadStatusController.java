@@ -2,9 +2,13 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.jcf.addOn.ReadStatusService;
 
 import java.util.List;
@@ -39,6 +43,7 @@ public class ReadStatusController {
 
     // 카피
     private final ReadStatusService readStatusService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "Message 읽음 상태 생성")
     @ApiResponses({
@@ -79,8 +84,12 @@ public class ReadStatusController {
     @GetMapping
     public ResponseEntity<CommonResponse> findAllByUserId(
             @Parameter(description = "조회할 User ID", required = true) @RequestParam("userId") UUID userId) {
-        List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
+        List<ReadStatus> readStatusList = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER))
+                .getReadStatus();
+
+        //List<ReadStatus> readStatuses = readStatusService.findAllByUserId(userId);
         return CommonResponse.toResponseEntity
-                (OK, "읽음 상태 목록이 조회되었습니다.", readStatuses);
+                (OK, "읽음 상태 목록이 조회되었습니다.", readStatusList);
     }
 }

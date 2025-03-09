@@ -25,7 +25,7 @@ public record FindUserDto(
         user.getUpdatedAt(),
         user.getName(),
         user.getEmail(),
-        user.getProfileImgId(),
+        user.getProfile().getId(),
         isOnline
     );
   }

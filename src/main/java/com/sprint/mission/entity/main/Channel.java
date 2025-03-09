@@ -3,6 +3,7 @@ package com.sprint.mission.entity.main;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
@@ -12,6 +13,7 @@ import java.util.*;
 
 import static jakarta.persistence.CascadeType.*;
 
+@Entity
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString @Getter @Setter

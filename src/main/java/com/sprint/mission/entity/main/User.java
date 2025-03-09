@@ -4,10 +4,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.*;
 
+@Entity
 @EqualsAndHashCode(callSuper = false)
 @ToString @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,11 +26,11 @@ public class User extends BaseUpdatableEntity{
     private String password;
 
     //변경가능하니
-    @OneToOne(cascade = REMOVE, orphanRemoval = true)
+    @OneToOne(fetch = LAZY, cascade = REMOVE, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
     private BinaryContent profile;
 
-    @OneToOne(mappedBy = "user", cascade = REMOVE)
+    @OneToOne(fetch = LAZY, mappedBy = "user", cascade = ALL)
     private UserStatus status;
 
     // REMOVE => user가 삭제되면 readStatus도 삭제됨

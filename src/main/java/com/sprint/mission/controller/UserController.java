@@ -66,7 +66,6 @@ public class UserController {
             @ApiResponse(responseCode = "409", description = "같은 email 또는 username를 사용하는 User가 이미 존재함",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
-
     @PatchMapping("/{id}")
     public ResponseEntity<CommonResponse> update(
             @Parameter(description = "수정할 User ID") @PathVariable("id") UUID userId,

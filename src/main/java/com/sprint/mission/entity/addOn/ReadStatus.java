@@ -4,10 +4,7 @@ import com.sprint.mission.entity.main.BaseUpdatableEntity;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +15,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static jakarta.persistence.FetchType.*;
-
+@Entity
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter

@@ -3,6 +3,7 @@ package com.sprint.mission.entity.addOn;
 import com.sprint.mission.entity.main.BaseUpdatableEntity;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 import static jakarta.persistence.FetchType.*;
 
+@Entity
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
