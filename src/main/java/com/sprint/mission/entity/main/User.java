@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,13 +14,14 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @ToString @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "유저")
+@Table(name = "users")
 public class User extends BaseUpdatableEntity{
 
-    private String name;
+    private String username;
     private String email;
     private String password;
 
@@ -37,21 +37,21 @@ public class User extends BaseUpdatableEntity{
     @OneToMany(mappedBy = "user", cascade = REMOVE, orphanRemoval = true)
     private List<ReadStatus> readStatus = new ArrayList<>();
 
-    public User(String name, String password, String email, BinaryContent profile) {
-        this.name = name;
+    public User(String username, String password, String email, BinaryContent profile) {
+        this.username = username;
         this.password = password;
         this.email = email;
         this.profile = profile;
     }
 
-    public User(String name, String password, String email) {
-        this.name = name;
+    public User(String username, String password, String email) {
+        this.username = username;
         this.password = password;
         this.email = email;
     }
 
     public void update(String newName, String newEmail, String newPassword) {
-        this.name = newName;
+        this.username = newName;
         this.email = newEmail;
         this.password = newPassword;
     }

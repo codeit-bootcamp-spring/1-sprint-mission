@@ -15,6 +15,7 @@ import com.sprint.mission.service.jcf.addOn.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -22,9 +23,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-@Slf4j
-@Service
+@Slf4j @Service
 @RequiredArgsConstructor
+@Transactional
 public class JCFUserService implements UserService {
 
     private final UserRepository userRepository;
@@ -96,7 +97,7 @@ public class JCFUserService implements UserService {
 
         Future<?> isDuplicateNameF = ves.submit(() -> {
             boolean isDuplicateName = allUser.stream()
-                    .anyMatch(user -> name.equals(user.getName()));
+                    .anyMatch(user -> name.equals(user.getUsername()));
             if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
         });
 

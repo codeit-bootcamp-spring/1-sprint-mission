@@ -15,7 +15,7 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @ToString @Getter
 @Schema(description = "메시지 엔티티")
 public class Message  extends BaseUpdatableEntity{

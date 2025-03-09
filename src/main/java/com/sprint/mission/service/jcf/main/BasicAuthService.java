@@ -23,7 +23,7 @@ public class BasicAuthService implements AuthService {
     String username = loginRequest.username();
     String password = loginRequest.password();
 
-    User loginUser = userRepository.findByName(username)
+    User loginUser = userRepository.findByUsername(username)
         .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER_MATCHING_NAME));
 
     if (!loginUser.getPassword().equals(password)) {

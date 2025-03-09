@@ -1,13 +1,10 @@
 package com.sprint.mission.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
-import java.time.Instant;
 
 @Schema(description = "USER 수정 정보 DTO")
 public record UserDtoForUpdate(
@@ -26,7 +23,7 @@ public record UserDtoForUpdate(
         String newEmail) {
 
     public User toUpdateEntity(User user) {
-        user.setName(newName);
+        user.setUsername(newName);
         user.setPassword(newPassword);
         user.setEmail(newEmail);
         return user;

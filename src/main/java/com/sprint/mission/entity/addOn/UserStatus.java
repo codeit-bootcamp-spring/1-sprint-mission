@@ -20,7 +20,7 @@ import java.util.UUID;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "유저 상태")

@@ -16,7 +16,7 @@ import java.util.UUID;
 
 import static jakarta.persistence.FetchType.*;
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "메시지 읽음 상태 정보")

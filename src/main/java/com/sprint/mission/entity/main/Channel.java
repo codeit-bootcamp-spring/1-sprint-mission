@@ -14,7 +14,7 @@ import java.util.*;
 import static jakarta.persistence.CascadeType.*;
 
 @Entity
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString @Getter @Setter
 @Schema(description = "채널")

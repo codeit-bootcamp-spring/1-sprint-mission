@@ -23,7 +23,7 @@ public record FindUserDto(
         user.getId(),
         user.getCreatedAt(),
         user.getUpdatedAt(),
-        user.getName(),
+        user.getUsername(),
         user.getEmail(),
         user.getProfile().getId(),
         isOnline
