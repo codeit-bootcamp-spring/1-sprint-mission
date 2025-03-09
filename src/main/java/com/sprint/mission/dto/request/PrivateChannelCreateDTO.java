@@ -12,7 +12,7 @@ public record PrivateChannelCreateDTO(
         List<UUID> participantIds
 ) {
     public Channel toChannel() {
-        return new Channel(null, null, ChannelType.PRIVATE);
+        return new Channel(ChannelType.PRIVATE);
     }
     // 나중에
 }

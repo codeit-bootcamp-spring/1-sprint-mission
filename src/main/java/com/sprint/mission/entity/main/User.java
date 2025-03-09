@@ -1,10 +1,20 @@
 package com.sprint.mission.entity.main;
 
+import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.entity.addOn.ReadStatus;
+import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.*;
 
 @EqualsAndHashCode(callSuper = false)
 @ToString @Getter @Setter
@@ -16,13 +26,23 @@ public class User extends BaseUpdatableEntity{
     private String email;
     private String password;
 
-    private UUID profileImgId;
+    //변경가능하니
+    @OneToOne(cascade = REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
 
-    public User(String name, String password, String email, UUID profileImgId) {
+    @OneToOne(mappedBy = "user", cascade = REMOVE)
+    private UserStatus status;
+
+    // REMOVE => user가 삭제되면 readStatus도 삭제됨
+    @OneToMany(mappedBy = "user", cascade = REMOVE, orphanRemoval = true)
+    private List<ReadStatus> readStatus = new ArrayList<>();
+
+    public User(String name, String password, String email, BinaryContent profile) {
         this.name = name;
         this.password = password;
         this.email = email;
-        this.profileImgId = profileImgId;
+        this.profile = profile;
     }
 
     public User(String name, String password, String email) {
@@ -31,4 +51,9 @@ public class User extends BaseUpdatableEntity{
         this.email = email;
     }
 
+    public void update(String newName, String newEmail, String newPassword) {
+        this.name = newName;
+        this.email = newEmail;
+        this.password = newPassword;
+    }
 }

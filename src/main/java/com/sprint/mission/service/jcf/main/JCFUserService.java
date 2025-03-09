@@ -40,12 +40,11 @@ public class JCFUserService implements UserService {
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
         User createdUser = requestDTO.toEntity();
 
-
         Optional<BinaryContentDto> profileDto = BinaryContentDto.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
         profileDto.ifPresent((dto) -> {
             BinaryContent binaryContent = profileService.create(dto);
-            createdUser.setProfileImgId(binaryContent.getId());
+            createdUser.setProfile(binaryContent);
         });
 
         userRepository.save(createdUser);
@@ -61,16 +60,8 @@ public class JCFUserService implements UserService {
         isDuplicateNameEmail(requestDTO.newName(), requestDTO.newEmail());
         User updatingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-
-        updatingUser.setName(requestDTO.newName());
-        updatingUser.setEmail(requestDTO.newEmail());
-        updatingUser.setPassword(requestDTO.newPassword());
-
-        return userRepository.save(updatingUser);
-//        return userRepository.findById(userId).map(user -> {
-//            User updatedUser = requestDTO.toUpdateEntity(user);
-//            return userRepository.save(updatedUser);
-//        }).orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+        updatingUser.update(requestDTO.newName(), requestDTO.newEmail(), requestDTO.newPassword());
+        return updatingUser;
     }
 
     @Override
@@ -92,10 +83,10 @@ public class JCFUserService implements UserService {
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
 
-        ves.submit(() -> profileService.deleteById(deletingUser.getProfileImgId()));
-        ves.submit(() -> userStatusService.deleteByUserId(userId));
-        ves.submit(() -> userRepository.delete(userId));
-        // delete관련된건 실패해도 오류나지 않으니
+//        ves.submit(() -> profileService.deleteById(deletingUser.()));
+//        ves.submit(() -> userStatusService.deleteByUserId(userId));
+//        ves.submit(() -> userRepository.delete(userId));
+//        // delete관련된건 실패해도 오류나지 않으니
     }
 
     //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현

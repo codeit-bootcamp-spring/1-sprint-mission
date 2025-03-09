@@ -1,12 +1,17 @@
 package com.sprint.mission.entity.main;
 
+import com.sprint.mission.entity.addOn.BinaryContent;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static jakarta.persistence.CascadeType.*;
+import static jakarta.persistence.FetchType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
@@ -17,16 +22,24 @@ public class Message  extends BaseUpdatableEntity{
 //    @ToString.Exclude
 //    private static final long serialVersionUID = 1L;
 
-    private UUID writerId;
-    private UUID channelId;
-    private List<UUID> attachmentIdList;
     private String content;
 
-    public Message(UUID channelId, UUID userId, String content) {
-        this.channelId = channelId;
-        this.writerId = userId;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
+    // 메시지는 user가 삭제되도 남기기?
+    @ManyToOne(fetch = LAZY)
+    private User author;
+
+    @OneToMany(cascade = REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "message_id")
+    private List<BinaryContent> attachments = new ArrayList<>();
+
+    public Message(Channel channel, User user, String content) {
         this.content = content;
-        this.attachmentIdList = new ArrayList<>();
+        this.channel = channel;
+        this.author = user;
     }
 
     public void update(String newContent) {

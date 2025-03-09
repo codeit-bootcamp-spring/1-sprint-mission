@@ -1,11 +1,16 @@
 package com.sprint.mission.entity.main;
 
+import com.sprint.mission.entity.addOn.ReadStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
 import java.io.Serializable;
 import java.util.*;
+
+import static jakarta.persistence.CascadeType.*;
 
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -13,18 +18,23 @@ import java.util.*;
 @Schema(description = "채널")
 public class Channel extends BaseUpdatableEntity{
 
-    //@ToString.Exclude
-    //private static final long serialVersionUID = 2L;
     private ChannelType channelType;
-
     private String name;
     private String description;
+
+    @OneToMany(mappedBy = "channel", cascade = REMOVE, orphanRemoval = true)
+    private List<ReadStatus> readStatus = new ArrayList<>();
 
     public Channel(String name, String description, ChannelType channelType) {
         this.name = name;
         this.channelType = channelType;
         this.description = description;
     }
+
+    public Channel(ChannelType channelType) {
+        this.channelType = channelType;
+    }
+
 
     public void update(String newName, String newDescription) {
         this.name = newName;

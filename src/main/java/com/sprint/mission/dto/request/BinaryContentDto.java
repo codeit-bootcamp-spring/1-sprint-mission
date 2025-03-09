@@ -20,10 +20,11 @@ public record BinaryContentDto(
         @Schema(example = "zessy")
         String fileName,
         String contentType,
+        Long size,
         byte[] bytes) {
 
     public BinaryContent toEntity() {
-        return new BinaryContent(fileName, contentType, bytes);
+        return new BinaryContent(fileName, contentType, size, bytes);
     }
 
     public static Optional<BinaryContentDto> convertToBinaryContentDto(MultipartFile file) {
@@ -33,7 +34,7 @@ public record BinaryContentDto(
         }
         try {
             BinaryContentDto binaryContentDto = new BinaryContentDto(file.getName(),
-                    file.getContentType(), file.getBytes());
+                    file.getContentType(), file.getSize(), file.getBytes());
             return Optional.of(binaryContentDto);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);

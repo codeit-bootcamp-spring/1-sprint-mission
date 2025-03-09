@@ -1,7 +1,11 @@
 package com.sprint.mission.entity.addOn;
 
 import com.sprint.mission.entity.main.BaseUpdatableEntity;
+import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,17 +15,23 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+
+import static jakarta.persistence.FetchType.*;
+
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "유저 상태")
 public class UserStatus extends BaseUpdatableEntity {
 
-    private UUID userId;
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.userId = userId;
+    public UserStatus(User user) {
+        this.user = user;
         this.lastActiveAt = Instant.now();
     }
 

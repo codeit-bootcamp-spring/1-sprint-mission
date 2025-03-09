@@ -10,8 +10,10 @@ import com.sprint.mission.entity.addOn.ReadStatus;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.entity.main.Message;
+import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.ReadStatusRepository;
+import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.ChannelService;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.response.FindChannelDto;
@@ -38,6 +40,7 @@ public class JCFChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final MessageService messageService;
     private final ExecutorService ves;
+    private final UserRepository userRepository;
 
     @Override
     public Channel createPublicChannel(PublicChannelCreateDTO request) {
@@ -49,7 +52,11 @@ public class JCFChannelService implements ChannelService {
     public Channel createPrivateChannel(PrivateChannelCreateDTO request) {
         Channel createdChannel = channelRepository.save(request.toChannel());
         request.participantIds().stream()
-                .map(userId -> new ReadStatus(userId, createdChannel.getId(), createdChannel.getCreatedAt()))
+                .map(userId -> {
+                    User participatingUser = userRepository.findById(userId)
+                            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
+                    return new ReadStatus(participatingUser, createdChannel, createdChannel.getCreatedAt());
+                })
                 .forEach(readStatusRepository::save);
         return createdChannel;
     }
