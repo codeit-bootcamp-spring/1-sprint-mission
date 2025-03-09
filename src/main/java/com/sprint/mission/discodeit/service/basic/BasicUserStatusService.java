@@ -25,7 +25,10 @@ public class BasicUserStatusService implements UserStatusService {
     if (userStatusRepository.existsByUser(user)) {
       throw new NoSuchElementException("Userstatus already exists");
     }
-    return new UserStatus(user, request.lastActiveTime());
+    UserStatus status = new UserStatus(request.lastActiveTime());
+    status.setUser(user);
+
+    return userStatusRepository.save(status);
   }
 
   @Override
@@ -35,8 +38,9 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
-  public UserStatus update(UUID userStatusId, UpdateUserStatusRequest request) {
-    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+  public UserStatus update(UUID userId, UpdateUserStatusRequest request) {
+    User user = userService.getUserById(userId);
+    UserStatus userStatus = userStatusRepository.findByUser(user)
         .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
     userStatus.updateLastActiveAt(request.lastActiveAt());
     return userStatusRepository.save(userStatus);

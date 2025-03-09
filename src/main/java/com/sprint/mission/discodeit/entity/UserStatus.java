@@ -15,7 +15,6 @@ import static com.sprint.mission.discodeit.entity.Status.CONNECTED;
 import static com.sprint.mission.discodeit.entity.Status.DISCONNECTED;
 
 @Getter
-@Setter
 @Entity
 @NoArgsConstructor
 public class UserStatus extends BaseUpdateEntity implements Serializable {
@@ -29,12 +28,12 @@ public class UserStatus extends BaseUpdateEntity implements Serializable {
 
   private Instant lastActiveAt;
 
-  @OneToOne(mappedBy = "userStatus")
-  @JoinColumn(name = "user_id", nullable = false)
+  @Setter
+  @OneToOne
+  @JoinColumn(name = "user_id")
   private User user;
 
-  public UserStatus(User user, Instant instant) {
-    this.user = user;
+  public UserStatus(Instant instant) {
     this.createdAt = instant;
     this.updatedAt = createdAt;
     this.lastActiveAt = updatedAt;
@@ -52,4 +51,5 @@ public class UserStatus extends BaseUpdateEntity implements Serializable {
       return DISCONNECTED;
     }
   }
+
 }

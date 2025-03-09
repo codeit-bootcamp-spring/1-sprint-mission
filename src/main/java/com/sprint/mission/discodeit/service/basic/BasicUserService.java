@@ -41,9 +41,10 @@ public class BasicUserService implements UserService {
 
     User user = new User(request.username(), request.password(), request.email());
     optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
-
-    UserStatus userStatus = new UserStatus(user, Instant.now());
+    UserStatus userStatus = new UserStatus(Instant.now());
+    userStatus.setUser(user);
     user.setUserStatus(userStatus);
+    userStatusRepository.save(userStatus);
 
     return UserResponse.fromEntity(userRepository.save(user));
   }

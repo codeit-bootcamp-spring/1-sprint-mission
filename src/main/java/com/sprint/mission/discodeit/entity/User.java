@@ -13,13 +13,13 @@ import java.util.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
 public class User extends BaseUpdateEntity implements Serializable {
 
   @Serial
   private static final long serialVersionUID = 1L;
 
   @Id
-  @GeneratedValue
   private UUID id;
 
   private String username;
@@ -37,7 +37,8 @@ public class User extends BaseUpdateEntity implements Serializable {
   @ManyToMany(mappedBy = "users")
   private List<Channel> channels = new ArrayList<>();
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "status_id")
   private UserStatus userStatus;
 
   public User(String username, String email, String password) {
