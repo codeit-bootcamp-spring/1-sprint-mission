@@ -3,12 +3,11 @@ package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
-import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
@@ -41,7 +40,7 @@ public class JCFUserService implements UserService {
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
         User createdUser = requestDTO.toEntity();
 
-        Optional<BinaryContentDto> profileDto = BinaryContentDto.convertToBinaryContentDto(profile);
+        Optional<BinaryContentDtoForCreate> profileDto = BinaryContentDtoForCreate.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
         profileDto.ifPresent((dto) -> {
             BinaryContent binaryContent = profileService.create(dto);

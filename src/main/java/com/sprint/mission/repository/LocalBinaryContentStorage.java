@@ -1,15 +1,16 @@
 package com.sprint.mission.repository;
 
-import com.sprint.mission.dto.request.BinaryContentDto;
-import jakarta.annotation.PostConstruct;
-import lombok.SneakyThrows;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -83,15 +84,39 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         return id;
     }
 
+    /**
+     * 키 정보를 바탕으로 byte[] 데이터를 읽어 InputStream 타입으로 반환합니다.
+     * UUID는 BinaryContent의 Id 입니다.
+     */
     @Override
     public InputStream get(UUID id) {
-        return null;
+        Path binaryPath = this.resolvePath(id);
+        try {
+            return Files.newInputStream(binaryPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    /**
+     * HTTP API로 다운로드 기능을 제공합니다.
+     * BinaryContentDto 정보를 바탕으로 파일을 다운로드할 수 있는 응답을 반환
+     * get 메소드를 통해 파일의 바이너리 데이터를 조회합니다.
+     * BinaryContentDto와 바이너리 데이터를 활용해 ResponseEntity<Resource> 응답을 생성 후 반환
+     */
     @Override
-    public ResponseEntity<?> download(BinaryContentDto content) {
-        //content.fileName();
-        return null;
+    public ResponseEntity<Resource> download(BinaryContentDto content) {
+        InputStream inputStream = this.get(content.id());
+        Resource resource = new InputStreamResource(inputStream);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + content.fileName());
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource);
     }
 
     /**

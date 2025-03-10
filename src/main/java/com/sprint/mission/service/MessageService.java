@@ -1,21 +1,18 @@
 package com.sprint.mission.service;
 
 
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.entity.main.Message;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 public interface MessageService {
 //    void create(MessageDtoForCreate responseDto, Optional<BinaryContentDto> attachmentsDto);
 
-    Message create(MessageDtoForCreate responseDto, List<BinaryContentDto> attachmentsDto);
+    Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
 
     void update(UUID messageId, MessageDtoForUpdate updateDto);
     List<Message> findAllByChannelId(UUID channelId);

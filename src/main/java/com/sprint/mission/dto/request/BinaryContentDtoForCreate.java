@@ -7,7 +7,6 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import java.util.Optional;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +14,7 @@ import java.io.IOException;
 
 
 @Slf4j
-public record BinaryContentDto(
+public record BinaryContentDtoForCreate(
 
         @Schema(example = "zessy")
         String fileName,
@@ -27,15 +26,15 @@ public record BinaryContentDto(
         return new BinaryContent(fileName, contentType, size);
     }
 
-    public static Optional<BinaryContentDto> convertToBinaryContentDto(MultipartFile file) {
+    public static Optional<BinaryContentDtoForCreate> convertToBinaryContentDto(MultipartFile file) {
         log.info("file : {}", file);
         if (file == null || file.isEmpty()) {
             return Optional.empty();
         }
         try {
-            BinaryContentDto binaryContentDto = new BinaryContentDto(file.getName(),
+            BinaryContentDtoForCreate binaryContentDtoForCreate = new BinaryContentDtoForCreate(file.getName(),
                     file.getContentType(), file.getSize(), file.getBytes());
-            return Optional.of(binaryContentDto);
+            return Optional.of(binaryContentDtoForCreate);
         } catch (IOException e) {
             throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
         }

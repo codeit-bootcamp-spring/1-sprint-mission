@@ -2,7 +2,9 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.dto.response.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,6 +35,7 @@ import static org.springframework.http.HttpStatus.*;
 public class BinaryContentController {
 
     private final BinaryService binaryContentService;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Operation(summary = "첨부 파일 조회")
     @ApiResponses({
@@ -62,10 +66,8 @@ public class BinaryContentController {
 
     // 파일 다운로드 로직 넣기
     @GetMapping("/{id}/download")
-    public String download(@PathVariable("id") UUID binaryContentId) {
-
-
-        return "text";
+    public ResponseEntity<Resource> download(@PathVariable("id") UUID binaryContentId) {
+        BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
+        return binaryContentStorage.download(new BinaryContentDto(binaryContent));
     }
-
 }

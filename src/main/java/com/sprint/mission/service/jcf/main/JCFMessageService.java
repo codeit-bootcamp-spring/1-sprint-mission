@@ -1,9 +1,8 @@
 package com.sprint.mission.service.jcf.main;
 
-import com.sprint.mission.aop.notUsedAOP.annotation.TraceAnnotation;
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
@@ -16,15 +15,12 @@ import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
 
-import java.time.Instant;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.*;
 
 @Slf4j
 @Service
@@ -37,7 +33,7 @@ public class JCFMessageService implements MessageService {
     private final BinaryService binaryService;
 
     @Override
-    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDto> binaryContentDtoList) {
+    public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
 
         User author = userRepository.findById(responseDto.userId())
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
@@ -47,9 +43,9 @@ public class JCFMessageService implements MessageService {
 
         Message createdMessage = new Message(writtenPlace, author, responseDto.content());
 
-        log.info("attachmentsDto: {}", binaryContentDtoList);
-        if (!binaryContentDtoList.isEmpty()) {
-            for (BinaryContentDto bcd : binaryContentDtoList) {
+        log.info("attachmentsDto: {}", binaryContentDtoForCreateList);
+        if (!binaryContentDtoForCreateList.isEmpty()) {
+            for (BinaryContentDtoForCreate bcd : binaryContentDtoForCreateList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
                 createdMessage.addAttachment(createdBinaryContent);
             }

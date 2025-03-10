@@ -2,14 +2,16 @@ package com.sprint.mission.service.jcf.addOn;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
-import com.sprint.mission.dto.request.BinaryContentDto;
+import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.BinarycontentRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,7 @@ public class BinaryService {
     private final BinaryContentStorage binaryContentStorage;
 
 
-    public BinaryContent create(BinaryContentDto request){
+    public BinaryContent create(BinaryContentDtoForCreate request){
         BinaryContent savedBinaryContent = binaryContentRepository.save(request.toEntity());
         binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
         return savedBinaryContent;
@@ -34,6 +36,11 @@ public class BinaryService {
 
 //    public List<BinaryContent> findAllByIdList(List<UUID> idList) {
 //        return binaryContentRepository.findAllById(idList);
+//    }
+//    public ResponseEntity<Resource> download(UUID binaryId) {
+//        BinaryContent downlodingBinaryContent = binaryContentRepository.findById(binaryId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
+//
 //    }
 
     public void deleteById(UUID binaryId) {
