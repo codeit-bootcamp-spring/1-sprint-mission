@@ -15,6 +15,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    open-in-view: false
     database: postgresql
     hibernate:
       ddl-auto: create

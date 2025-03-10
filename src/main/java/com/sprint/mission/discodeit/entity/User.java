@@ -31,12 +31,12 @@ public class User extends BaseUpdateEntity implements Serializable {
   private BinaryContent profileImage;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-  private Set<ReadStatus> readStatuses = new HashSet<>() {
-  };
+  private List<ReadStatus> readStatuses = new ArrayList<>();
 
   @ManyToMany(mappedBy = "users")
   private List<Channel> channels = new ArrayList<>();
 
+  @Setter
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "status_id")
   private UserStatus userStatus;
@@ -48,12 +48,5 @@ public class User extends BaseUpdateEntity implements Serializable {
     this.password = password;
     this.createdAt = Instant.now();
     this.updatedAt = createdAt;
-  }
-
-  public void setUserStatus(UserStatus userStatus) {
-    if (this.userStatus != null) {
-      this.userStatus = userStatus;
-      userStatus.setUser(this);
-    }
   }
 }

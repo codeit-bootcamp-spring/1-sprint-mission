@@ -29,8 +29,7 @@ public class UserStatus extends BaseUpdateEntity implements Serializable {
   private Instant lastActiveAt;
 
   @Setter
-  @OneToOne
-  @JoinColumn(name = "user_id")
+  @OneToOne(mappedBy = "userStatus")
   private User user;
 
   public UserStatus(Instant instant) {
