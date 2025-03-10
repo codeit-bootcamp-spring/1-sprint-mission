@@ -32,7 +32,7 @@ public class BasicAuthService implements AuthService {
   private final UserService userService;
 
   public UserResponse login(UserRequest.Login request) {
-    User findUser = userRepository.findByName(request.name())
+    User findUser = userRepository.findByUsername(request.name())
         .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED,
             "User does not exist, or entered the wrong ID"));
 

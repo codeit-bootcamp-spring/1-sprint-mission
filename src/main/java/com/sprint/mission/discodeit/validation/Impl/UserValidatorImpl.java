@@ -25,7 +25,7 @@ public class UserValidatorImpl implements UserValidator {
     } else if (name.length() < 2) {
       throw new RestApiException(ErrorCode.USER_NAME_TOO_SHORT,
           "name=" + name);
-    } else if (userRepository.existsByName(name)) {
+    } else if (userRepository.existsByUsername(name)) {
       throw new RestApiException(ErrorCode.USER_NAME_ALREADY_EXIST,
           "name= " + name);
     }
