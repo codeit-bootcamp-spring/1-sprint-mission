@@ -19,4 +19,8 @@ public abstract class BaseEntity {
 
   @CreatedDate
   private Instant createdAt;
+
+  public BaseEntity() {
+    this.id = UUID.randomUUID();
+  }
 }
