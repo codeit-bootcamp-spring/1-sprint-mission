@@ -44,7 +44,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public List<UserStatus> findAll() {
-        return userStatusRepository.readAllContents().stream()
+        return userStatusRepository.findAll().stream()
                 .toList();
     }
 

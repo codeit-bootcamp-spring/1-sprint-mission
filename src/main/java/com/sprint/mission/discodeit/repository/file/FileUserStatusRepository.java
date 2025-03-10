@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,21 +35,30 @@ public class FileUserStatusRepository implements UserStatusRepository {
     @Override
     public UserStatus save(UserStatus userStatus) {
         List<UserStatus> userStatuses = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
-            while (true) {
-                try {
-                    UserStatus existingUserStatus = (UserStatus) ois.readObject();
-                    userStatuses.add(existingUserStatus);
-                } catch (EOFException e) {
-                    break;
-                } catch (ClassNotFoundException e) {
+        try {
+            if (Files.exists(DIRECTORY) && Files.size(DIRECTORY) > 0) { // 파일이 존재하고 내용이 있는 경우에만 읽기
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+                    while (true) {
+                        try {
+                            UserStatus existingUserStatus = (UserStatus) ois.readObject();
+                            userStatuses.add(existingUserStatus);
+                        } catch (EOFException e) {
+                            break;
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
-        } catch (FileNotFoundException e) {
-            // 파일이 없는 경우, 새 파일 생성 후 저장
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // Files.size()에서 발생하는 IOException 처리
+            if (e instanceof NoSuchFileException) {
+                // 파일이 존재하지 않는 경우, 빈 리스트 유지
+            } else {
+                throw new RuntimeException(e);
+            }
         }
 
         // 사용자 상태 업데이트 또는 추가
@@ -77,7 +86,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
     @Override
     public Optional<UserStatus> findById(UUID id) {
-        List<UserStatus> allContents = readAllContents();
+        List<UserStatus> allContents = findAll();
         return allContents.stream()
                 .filter(content -> content.getId().equals(id))
                 .findFirst();
@@ -85,7 +94,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public List<UserStatus> findAllByIdIn(List<UUID> ids) {
-        List<UserStatus> allContents = readAllContents();
+        List<UserStatus> allContents = findAll();
         return allContents.stream()
                 .filter(content -> ids.contains(content.getId()))
                 .toList();
@@ -93,7 +102,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public Optional<UserStatus> findByUserId(UUID userId) {
-        return this.readAllContents().stream()
+        return this.findAll().stream()
                 .filter(userStatus -> userStatus.getUserId().equals(userId))
                 .findFirst();
     }
@@ -120,28 +129,27 @@ public class FileUserStatusRepository implements UserStatusRepository {
 //        }
 //        return contents;
 //    }
-    @Override
-    public List<UserStatus> readAllContents() {
-        List<UserStatus> contents = new ArrayList<>();
-        if (Files.exists(DIRECTORY)) {
-            try (
-                    FileInputStream fis = new FileInputStream(DIRECTORY.toFile());
-                    ObjectInputStream ois = new ObjectInputStream(fis)
-            ) {
-                while (true) {
-                    try {
-                        UserStatus userStatus = (UserStatus) ois.readObject();
-                        contents.add(userStatus);
-                    } catch (EOFException e) {
-                        break;
-                    }
+@Override
+public List<UserStatus> findAll() {
+    List<UserStatus> contents = new ArrayList<>();
+
+    if (Files.exists(DIRECTORY)) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+            while (true) {
+                try {
+                    UserStatus userStatus = (UserStatus) ois.readObject();
+                    contents.add(userStatus);
+                } catch (EOFException e) {
+                    break;
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return contents;
     }
+
+    return contents;
+}
 
     @Override
     public boolean existsById(UUID id) {
@@ -150,7 +158,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
     @Override
     public void deleteById(UUID id) {
-        List<UserStatus> allStatuses = readAllContents();
+        List<UserStatus> allStatuses = findAll();
         List<UserStatus> updatedStatuses = allStatuses.stream()
                 .filter(status -> !status.getId().equals(id))
                 .toList();

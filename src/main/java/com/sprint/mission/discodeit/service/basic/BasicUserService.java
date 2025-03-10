@@ -28,9 +28,10 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User createUser(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest) {
+    public User createUser(UserCreateRequest userCreateRequest, BinaryContentCreateRequest profileCreateRequest) {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
+        final UUID profileId;
 
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException(email + " already exists");
@@ -39,15 +40,17 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException(username + " already exists");
         }
 
-        UUID profileId = profileCreateRequest
-                .map(profileRequest -> {
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+        if (profileCreateRequest != null) {
+            profileId = binaryContentRepository.save(new BinaryContent(
+                    profileCreateRequest.fileName(),
+                    (long) profileCreateRequest.bytes().length,
+                    profileCreateRequest.contentType(),
+                    profileCreateRequest.bytes()
+            )).getId();
+        } else {
+            profileId = null;
+        }
+
         String password = userCreateRequest.password();
         //map + orElse사용해서 param으로 optional 사용해도 내가 직접 isPresent로직 작성안함. (map안에 로직 이미 들어있는 상태)
 
@@ -77,12 +80,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentCreateRequest optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
+        final UUID nullableProfileId;
         if (userRepository.existsByEmail(newEmail)) {
             throw new IllegalArgumentException("User with email " + newEmail + " already exists");
         }
@@ -90,18 +94,31 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
-        UUID nullableProfileId = optionalProfileCreateRequest
-                .map(profileRequest -> {
-                    Optional.ofNullable(user.getProfileId())
-                            .ifPresent(binaryContentRepository::deleteById);
+        if (optionalProfileCreateRequest != null) {
+            nullableProfileId = binaryContentRepository.save(new BinaryContent(
+                    optionalProfileCreateRequest.fileName(),
+                    (long) optionalProfileCreateRequest.bytes().length,
+                    optionalProfileCreateRequest.contentType(),
+                    optionalProfileCreateRequest.bytes()
+            )).getId();
+        } else {
+            nullableProfileId = null;
+        }
 
-                    String fileName = profileRequest.fileName();
-                    String contentType = profileRequest.contentType();
-                    byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
-                })
-                .orElse(null);
+
+
+//        UUID nullableProfileId = optionalProfileCreateRequest
+//                .map(profileRequest -> {
+//                    Optional.ofNullable(user.getProfileId())
+//                            .ifPresent(binaryContentRepository::deleteById);
+//
+//                    String fileName = profileRequest.fileName();
+//                    String contentType = profileRequest.contentType();
+//                    byte[] bytes = profileRequest.bytes();
+//                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+//                    return binaryContentRepository.save(binaryContent).getId();
+//                })
+//                .orElse(null);
 
         String newPassword = userUpdateRequest.newPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfileId);

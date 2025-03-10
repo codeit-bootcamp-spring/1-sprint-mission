@@ -13,11 +13,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    User createUser(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
+    User createUser(UserCreateRequest userCreateRequest, BinaryContentCreateRequest profileCreateRequest);
     UserDto readUserById(UUID userId);
     List<UserDto> readAll();
-    User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> profileCreateRequest);
+    User updateUserField(UUID userId, UserUpdateRequest userUpdateRequest, BinaryContentCreateRequest profileCreateRequest);
     void deleteUserById(UUID userId);
-    Map<UUID, User> getUserList();
-    void setUserList(Map<UUID, User> userList);
+    //Map<UUID, User> getUserList();
+    //void setUserList(Map<UUID, User> userList);
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -34,20 +35,30 @@ public class FileUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         List<User> users = new ArrayList<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
-            while (true) {
-                try {
-                    User existingUser = (User) ois.readObject();
-                    users.add(existingUser);
-                } catch (EOFException e) {
-                    break;
-                } catch (ClassNotFoundException e) {
+        try {
+            if (Files.exists(DIRECTORY) && Files.size(DIRECTORY) > 0) { // 파일이 존재하고 내용이 있는 경우에만 읽기
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DIRECTORY.toFile()))) {
+                    while (true) {
+                        try {
+                            User existingUser = (User) ois.readObject();
+                            users.add(existingUser);
+                        } catch (EOFException e) {
+                            break;
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
-        } catch (FileNotFoundException e) {
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // Files.size()에서 발생하는 IOException 처리
+            if (e instanceof NoSuchFileException) {
+                // 파일이 존재하지 않는 경우, 빈 리스트 유지
+            } else {
+                throw new RuntimeException(e);
+            }
         }
 
         boolean userUpdated = false;

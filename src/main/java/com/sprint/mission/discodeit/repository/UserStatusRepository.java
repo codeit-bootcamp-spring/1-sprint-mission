@@ -11,7 +11,7 @@ public interface UserStatusRepository {
     Optional<UserStatus> findById(UUID id);
     Optional<UserStatus> findByUserId(UUID userId);
     //List<UserStatus> readAllUserStatus();
-    List<UserStatus> readAllContents();
+    List<UserStatus> findAll();
 
     List<UserStatus> findAllByIdIn(List<UUID> ids);
     boolean existsById(UUID id);
