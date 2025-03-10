@@ -28,41 +28,38 @@ public class User extends BaseUpdatableEntity {
   @Column(length = 60, nullable = false)
   private transient String password;
 
-  @OneToOne(cascade = CascadeType.REMOVE)
+  @OneToOne(orphanRemoval = true) // 참조 제거 시 제거?
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
   @OneToOne(mappedBy = "user")
   private UserStatus status;
 
-  public static User createUser(String name, String email, String password) {
-    return new User(name, email, password);
+  public static User createUser(String name, String email, String password, BinaryContent profile) {
+    return new User(name, email, password, profile);
   }
 
-  private User(String name, String email, String password) {
+  private User(String name, String email, String password, BinaryContent profile) {
     this.username = name;
     this.email = email;
     this.password = password;
+    this.profile = profile;
   }
 
-  public void update(String newName, String newEmail, String newPassword) {
-    boolean isChanged = false;
-    if (!newName.equals(this.username)) {
-      this.username = newName;
-      isChanged = true;
-    }
-    if (!newEmail.equals(this.email)) {
-      this.email = newEmail;
-      isChanged = true;
-    }
-    if (!newPassword.equals(this.password)) {
-      this.password = newPassword;
-      isChanged = true;
-    }
+  public void updateName(String username) {
+    this.username = username;
+  }
 
-    if (isChanged) {
-      this.updatedAt = Instant.now();
-    }
+  public void updateEmail(String email) {
+    this.email = email;
+  }
+
+  public void updatePassword(String password) {
+    this.password = password;
+  }
+
+  public void updateProfile(BinaryContent profile) {
+    this.profile = profile;
   }
 
   @Override

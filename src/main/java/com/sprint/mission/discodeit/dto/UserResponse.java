@@ -14,20 +14,17 @@ public record UserResponse(
     Instant updatedAt,
     String name,
     String email,
-    boolean online,
     UUID profileId
 ) {
 
-  public static UserResponse entityToDto(User user, boolean isOnline,
-      UUID binaryContentId) {
+  public static UserResponse entityToDto(User user) {
     return UserResponse.builder()
         .id(user.getId())
         .createdAt(user.getCreatedAt())
         .updatedAt(user.getUpdatedAt())
         .name(user.getUsername())
         .email(user.getEmail())
-        .online(isOnline)
-        .profileId(binaryContentId)
+        .profileId(user.getProfile().getId())
         .build();
   }
 }

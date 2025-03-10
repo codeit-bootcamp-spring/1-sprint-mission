@@ -16,8 +16,6 @@ public interface UserService {
 
   UserResponse findById(UUID id);
 
-  User findByIdOrThrow(UUID id);
-
   UserResponse update(UUID id, UserRequest request, MultipartFile userProfileImage);
 
   void deleteById(UUID id);
