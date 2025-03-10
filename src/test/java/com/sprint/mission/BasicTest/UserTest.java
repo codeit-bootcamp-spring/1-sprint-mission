@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 public class UserTest {
@@ -35,8 +37,10 @@ public class UserTest {
 
     @Autowired
     private EntityManager em;
+    @Autowired
+    private UserStatusRepository userStatusRepository;
 
-    @BeforeEach
+    //@BeforeEach
     void createTest(){
         for (int i = 0; i < 20; i++) {
             UserDtoForCreate createDto = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
@@ -47,11 +51,11 @@ public class UserTest {
     @Test
     void setUpTest(){
         List<User> users = userRepository.findAll();
-        Assertions.assertThat(users).isNotEmpty();
-        Assertions.assertThat(users.size()).isEqualTo(20);
+        assertThat(users).isNotEmpty();
+        assertThat(users.size()).isEqualTo(20);
         users.forEach(user -> {
             UserStatus findUserstatus = userStatusService.findById(user.getStatus().getId());
-            Assertions.assertThat(findUserstatus.getUser()).isEqualTo(user);
+            assertThat(findUserstatus.getUser()).isEqualTo(user);
         });
     }
 
@@ -59,15 +63,32 @@ public class UserTest {
     void cascadeUserAndUserStatusTest(){
         List<User> userList = userService.findAll();
         List<UserStatus> userStatusList = userStatusService.findAll();
-        Assertions.assertThat(userList.size()).isEqualTo(20);
-        Assertions.assertThat(userList.size()).isEqualTo(userStatusList.size());
+        assertThat(userList.size()).isEqualTo(20);
+        assertThat(userList.size()).isEqualTo(userStatusList.size());
     }
+
+    @Test
+    void userEqualsHashCodeTest(){
+        System.out.println("============================userEqualsHashCodeTest===========================");
+        UserDtoForCreate createDto1 = new UserDtoForCreate("test 유저 1", "test 패스워드 1", "test 이메일 1");
+        User createdUser1 = userService.create(createDto1, null);
+        User user = new User(createdUser1.getUsername(), createdUser1.getPassword(), createdUser1.getEmail());
+        user.setId(createdUser1.getId());
+        em.flush();
+        em.clear();
+        assertThat(user).isEqualTo(createdUser1);
+        // Equals, HashCode를 정의하지 않으면 false
+        System.out.println("=======================================================");
+
+    }
+
+
 
     @Test
     void find(){
         List<User> all = userRepository.findAll();
-        Assertions.assertThat(all).isNotEmpty();
-        Assertions.assertThat(all.size()).isEqualTo(20);
+        assertThat(all).isNotEmpty();
+        assertThat(all.size()).isEqualTo(20);
     }
 
     @Test

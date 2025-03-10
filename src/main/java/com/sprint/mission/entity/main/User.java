@@ -14,7 +14,7 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(of = "{id, username, email, password}")
 @ToString(of = {"username", "email", "password"})
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

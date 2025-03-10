@@ -119,7 +119,6 @@ public class UserController {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
         log.info("statusMapByUser : {}", statusMapByUser);
 
-
         List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
                 .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
                 .toList();
