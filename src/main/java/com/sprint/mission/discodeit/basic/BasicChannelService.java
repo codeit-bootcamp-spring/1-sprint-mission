@@ -5,34 +5,30 @@ import com.sprint.mission.discodeit.dto.ChannelJoinDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.ResourceNotFoundException;
-import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Primary
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-    private final ChannelMapper channelMapper;
 
     @Override
     public ChannelDto create(ChannelDto channelDTO) {
         User creator = userRepository.findById(channelDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("사용자", "id", channelDTO.getUserId()));
+                .orElseThrow(() -> new IllegalArgumentException("User Not Found"));
 
+        // 채널 타입 처리 - 타입이 없거나 유효하지 않은 경우 기본값으로 PUBLIC 설정
         ChannelType channelType;
         try {
             if (channelDTO.getType() == null || channelDTO.getType().isEmpty()) {
@@ -41,7 +37,7 @@ public class BasicChannelService implements ChannelService {
                 channelType = ChannelType.valueOf(channelDTO.getType().toUpperCase());
             }
         } catch (IllegalArgumentException e) {
-            log.warn("유효하지 않은 채널 타입: {}, 기본값 PUBLIC으로 설정합니다.", channelDTO.getType());
+            // 유효하지 않은 타입인 경우 기본값으로 PUBLIC 설정
             channelType = ChannelType.PUBLIC;
         }
 
@@ -51,24 +47,34 @@ public class BasicChannelService implements ChannelService {
                 channelType);
 
         Channel saved = channelRepository.save(channel);
-        return channelMapper.toDto(saved);
+        return convertToDTO(saved);
+    }
+
+    private ChannelDto convertToDTO(Channel channel) {
+        return ChannelDto.builder()
+                .id(channel.getId())
+                .name(channel.getName())
+                .description(channel.getDescription())
+                .type(channel.getType().toString())
+                .build();
     }
 
     @Override
     public ChannelDto find(UUID id) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("채널", "id", id));
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        return channelMapper.toDto(channel);
+        return convertToDTO(channel);
     }
 
     @Override
     public Map<User, Channel> join(ChannelJoinDto joinDTO) {
+
         Channel channel = channelRepository.findById(joinDTO.getChannelId())
-                .orElseThrow(() -> new ResourceNotFoundException("채널", "id", joinDTO.getChannelId()));
+                .orElseThrow(() -> new IllegalArgumentException("Channel Not Found"));
 
         User user = userRepository.findById(joinDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("사용자", "id", joinDTO.getUserId()));
+                .orElseThrow(()-> new IllegalArgumentException("User Not Found"));
 
         channelRepository.save(channel);
 
@@ -78,15 +84,16 @@ public class BasicChannelService implements ChannelService {
     @Override
     public ChannelDto update(UUID id, ChannelDto channelDTO) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("채널", "id", id));
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found"));
 
-        ChannelType channelType = channel.getType();
+        // 채널 타입 처리 - 타입이 제공되지 않은 경우 기존 타입 유지
+        ChannelType channelType = channel.getType(); // 기본값으로 기존 타입 사용
         
         if (channelDTO.getType() != null && !channelDTO.getType().isEmpty()) {
             try {
                 channelType = ChannelType.valueOf(channelDTO.getType().toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new BadRequestException("유효하지 않은 채널 타입입니다: " + channelDTO.getType());
+                throw new IllegalArgumentException("유효하지 않은 채널 타입입니다: " + channelDTO.getType());
             }
         }
 
@@ -97,22 +104,23 @@ public class BasicChannelService implements ChannelService {
         );
 
         Channel saved = channelRepository.save(channel);
-        return channelMapper.toDto(saved);
+        return convertToDTO(saved);
     }
 
     @Override
     public void delete(UUID id) {
-        if (!channelRepository.existsById(id)) {
-            throw new ResourceNotFoundException("채널", "id", id);
-        }
         channelRepository.deleteById(id);
     }
+
 
     @Override
     public List<ChannelDto> findAll() {
         return channelRepository.findAll()
                 .stream()
-                .map(channelMapper::toDto)
+                .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+
+
 }

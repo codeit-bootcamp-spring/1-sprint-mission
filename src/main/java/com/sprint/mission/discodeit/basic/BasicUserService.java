@@ -28,6 +28,7 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
     private final UserMapper userMapper;
 
+    @Transactional
     @Override
     public UserDto create(UserDto dto, byte[] profileImage) {
 

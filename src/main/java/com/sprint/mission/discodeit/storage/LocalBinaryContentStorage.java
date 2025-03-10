@@ -6,12 +6,12 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.core.io.Resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
     }
 
     @Override
-    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) throws IOException {
+    public ResponseEntity<?> download(BinaryContentDto binaryContentDto) throws IOException{
         try {
             UUID uuid = binaryContentDto.getId(); // DTO에서 UUID 가져옴
             Path filePath = resolvePath(uuid);

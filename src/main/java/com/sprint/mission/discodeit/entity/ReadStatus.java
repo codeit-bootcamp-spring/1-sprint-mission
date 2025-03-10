@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter @Builder
-@Entity
+@Entity @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "read_statuses")

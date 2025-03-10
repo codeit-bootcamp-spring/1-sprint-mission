@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@Entity @SuperBuilder
+@Entity @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "binary_contents")

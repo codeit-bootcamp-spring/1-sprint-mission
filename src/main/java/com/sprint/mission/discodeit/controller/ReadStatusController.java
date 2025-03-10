@@ -26,21 +26,21 @@ public class ReadStatusController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReadStatus> get(@PathVariable("id") UUID readStatusId) {
-        ReadStatus readStatus = readStatusService.find(readStatusId);
+    public ResponseEntity<ReadStatusDto> get(@PathVariable("id") UUID readStatusId) {
+        ReadStatusDto readStatus = readStatusService.find(readStatusId);
         return ResponseEntity.ok(readStatus);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReadStatus>> getAllByUserId(@PathVariable("userId") UUID userId) {
-        List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
+    public ResponseEntity<List<ReadStatusDto>> getAllByUserId(@PathVariable("userId") UUID userId) {
+        List<ReadStatusDto> statuses = readStatusService.findAllByUserId(userId);
         return ResponseEntity.ok(statuses);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReadStatus> update(@PathVariable("id") UUID readStatusId,
+    public ResponseEntity<ReadStatusDto> update(@PathVariable("id") UUID readStatusId,
                                              @RequestBody ReadStatusUpdateRequest request) {
-        ReadStatus updatedStatus = readStatusService.update(readStatusId, request);
+        ReadStatusDto updatedStatus = readStatusService.update(readStatusId, request);
         return ResponseEntity.ok(updatedStatus);
     }
 
