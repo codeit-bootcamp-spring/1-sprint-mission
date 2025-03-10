@@ -18,8 +18,6 @@ public class BinaryContent extends BaseEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
   private UUID id;
 
   private String fileName;

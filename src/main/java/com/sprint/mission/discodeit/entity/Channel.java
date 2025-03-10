@@ -20,10 +20,6 @@ public class Channel extends BaseUpdateEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
-  private UUID id;
-
   private String channelName;
   private boolean isPrivate;
   private Instant lastMessageTime;

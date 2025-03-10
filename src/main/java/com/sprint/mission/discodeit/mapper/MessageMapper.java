@@ -11,6 +11,8 @@ public class MessageMapper {
         message.getId(),
         message.getText(),
         UserResponse.fromEntity(message.getAuthor()),
-        message.getChannel().getId());
+        message.getChannel().getId(),
+        message.getCreatedAt()
+    );
   }
 }

@@ -19,9 +19,6 @@ public class User extends BaseUpdateEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  @Id
-  private UUID id;
-
   private String username;
   private String email;
   private String password;

@@ -19,10 +19,6 @@ public class ReadStatus extends BaseUpdateEntity implements Serializable {
   @Serial
   private static final long serialVersionUID = 1L;
 
-  @Id
-  @GeneratedValue
-  private UUID id;
-
   private Instant lastReadTime;
 
   @ManyToOne

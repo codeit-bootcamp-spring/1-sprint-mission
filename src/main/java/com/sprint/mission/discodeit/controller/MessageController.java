@@ -3,13 +3,16 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.CursorResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +50,15 @@ public class MessageController {
       @RequestParam int page, @RequestParam int size
   ) {
     return ResponseEntity.ok(messageService.getPageMessages(page, size));
+  }
+
+  @Operation(summary = "전체 메시지 커서 조회", description = "저장된 모든 메시지를 커서 페이징으로 조회합니다.")
+  @ApiResponse(responseCode = "200", description = "메시지 목록 조회 성공")
+  @GetMapping("/cursor")
+  public ResponseEntity<CursorResponse<Message>> getAllCursorMessages(
+      @RequestParam Instant cursor, @RequestParam int size
+  ) {
+    return ResponseEntity.ok(messageService.getCursorPages(cursor, size));
   }
 
   @Operation(summary = "특정 메시지 조회", description = "메시지 ID를 이용하여 특정 메시지를 조회합니다.")

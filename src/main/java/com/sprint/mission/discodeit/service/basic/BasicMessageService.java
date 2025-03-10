@@ -3,16 +3,20 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.message.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.response.CursorResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.CursorResponseMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import java.awt.Cursor;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -51,6 +55,13 @@ public class BasicMessageService implements MessageService {
     Pageable pageable = PageRequest.of(page, size);
     Page<Message> messages = messageRepository.findAll(pageable);
     return PageResponseMapper.fromPage(messages.map(MessageResponse::fromEntity));
+  }
+
+  @Override
+  public CursorResponse<Message> getCursorPages(Instant cursor, int size) {
+    Pageable pageable = PageRequest.of(0, size);
+    Page<Message> messages = messageRepository.findAllByCursor(cursor, pageable);
+    return CursorResponseMapper.fromPage(messages);
   }
 
   @Override
