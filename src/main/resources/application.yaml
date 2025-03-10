@@ -2,8 +2,27 @@ spring:
   application:
     name: discodeit
 
+  datasource:
+    url: jdbc:postgresql://localhost:8080/your_database
+    username: user
+    password: pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+
 discodeit:
   repository:
     type: file
     file:
       path: "file-data-map/"
+
+logging:
+  level:
+    org.hibernate.SQL: debug
