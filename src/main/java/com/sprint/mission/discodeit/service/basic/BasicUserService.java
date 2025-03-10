@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.validation.Impl.ValidatorImpl;
 import com.sprint.mission.discodeit.validation.Validator;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
     private final Validator validator = new ValidatorImpl();
@@ -37,6 +39,7 @@ public class BasicUserService implements UserService {
         return null;
     }
 
+    @Transactional
     @Override
     public UserResponse create(UserRequest request, MultipartFile file) throws IOException {
 
@@ -52,13 +55,14 @@ public class BasicUserService implements UserService {
 
         User user = new User(request.username(), request.password(), request.email(), request.phoneNumber());
         userRepository.save(user);
+//        userRepository.flush();
 
         BinaryContent profileImage = null;
         if(file != null && !file.isEmpty()){
-            BinaryContent binaryContent = new BinaryContent(user.getId(), file.getOriginalFilename(), file.getSize(), file.getContentType());
+            profileImage = new BinaryContent(user.getId(), file.getOriginalFilename(), file.getSize(), file.getContentType());
             //, file.getBytes()
 
-            profileImage = binaryContentRepository.save(binaryContent);
+            binaryContentRepository.save(profileImage);
             user.setProfileImageId(profileImage.getId());
         }
 
@@ -73,7 +77,7 @@ public class BasicUserService implements UserService {
         try {
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("저장되지 않았거나, 삭제된 아이디입니다." + id));
-            boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
+            boolean isOnline = userStatusRepository.findByUserid(user.getId()).isOnline();
 
             return UserResponse.fromEntity(user, isOnline);
         } catch (NullPointerException e){
@@ -87,7 +91,7 @@ public class BasicUserService implements UserService {
 
         List<UserResponse> responses = users.stream().map(user -> {
                     try {
-                        boolean isOnline = userStatusRepository.findByUserId(user.getId()).isOnline();
+                        boolean isOnline = userStatusRepository.findByUserid(user.getId()).isOnline();
                         return UserResponse.fromEntity(user, isOnline);
                     } catch (NullPointerException e){
                         throw new NullPointerException("user id 값이 null 입니다." + e.getMessage());
@@ -122,7 +126,7 @@ public class BasicUserService implements UserService {
 
             userRepository.save(user);
 
-            boolean isOnline = userStatusRepository.findByUserId(id).isOnline();
+            boolean isOnline = userStatusRepository.findByUserid(id).isOnline();
 
             System.out.println("업데이트가 완료되었습니다.");
             return UserResponse.fromEntity(user, isOnline);

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
@@ -10,13 +9,24 @@ import java.util.UUID;
 @Table(name = "messages")
 @Getter @Setter
 @Builder
-@AllArgsConstructor
+//@AllArgsConstructor
 public class Message extends BaseEntity{
+
+    @Column(name = "content")
     private String content;
+
+    @Column(name = "sender_id")
     private UUID senderId;
+
+    @Column(name = "recipient_id")
     private UUID recipientId;
+
+    @Column(name = "channel_id")
     private UUID channelId;
-    private BinaryContent attachedFileId;
+
+//    @ManyToOne
+//    @JoinColumn(name = "binary_content_id")
+//    private BinaryContent attachedFileId;
 
     protected Message() { }
 

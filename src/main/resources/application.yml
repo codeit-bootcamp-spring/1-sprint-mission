@@ -12,7 +12,7 @@ spring:
     password: discodeit1234
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
       jdbc:
         lob:
           non_contextual_creation: true
@@ -35,3 +35,14 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /api-docs
+  api-docs:
+    path: /openapi
+  override-with-generic-response: false
+  default-consumes-media-type: multipart/form-data
+  default-produces-media-type: application/json

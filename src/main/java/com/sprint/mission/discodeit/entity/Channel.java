@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -15,10 +16,15 @@ import java.util.UUID;
 public class Channel extends BaseEntity{
     public enum ChannelType {Private, Public};
 
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "discription")
     private String description;
 //    private List<UUID> member;
 //    private UUID owner;
+
+    @Column(name = "type")
     private ChannelType channelType;
 
     protected Channel() { }

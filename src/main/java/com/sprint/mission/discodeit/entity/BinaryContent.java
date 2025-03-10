@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "binary_contents")
-@Getter
+@Getter @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -42,7 +42,6 @@ public class BinaryContent{
 
     //, byte[] bytes
     public BinaryContent(UUID typeId, String originalFilename, Long size, String contentType) {
-        this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.typeId = typeId;
         this.fileName = originalFilename;

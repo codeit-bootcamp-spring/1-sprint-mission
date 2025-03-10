@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
 //    boolean save(UserStatus userStatus);
-    UserStatus findByUserId(UUID id);
+    UserStatus findByUserid(UUID id);
 
 }

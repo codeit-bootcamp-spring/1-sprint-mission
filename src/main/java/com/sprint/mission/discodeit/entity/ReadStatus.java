@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 
@@ -7,26 +12,31 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-public class ReadStatus{
-    private final UUID id;
-    private final UUID userId;
-    private final UUID channelId;
-    private final UUID messageId;
-    private boolean isRead;
-    private Instant readAt;
+@Builder
+@AllArgsConstructor
+public class ReadStatus extends BaseEntity{
+    @Column(name = "user_id")
+    private UUID userId;
 
-    public ReadStatus(UUID userId, UUID channelId, UUID messageId) {
-        this.id = UUID.randomUUID();
+    @Column(name = "channel_id")
+    private UUID channelId;
+
+    @Column(name = "last_read_at")
+    private Instant lastRead_at;
+
+    protected ReadStatus() { }
+
+    public ReadStatus(UUID userId, UUID channelId) {
+        super();
         this.userId = userId;
         this.channelId = channelId;
-        this.messageId  = messageId;
-        this.isRead = false;
-        this.readAt = null;
+        this.lastRead_at = null;
     }
 
     public void markAsRead() {
-        this.isRead = true;
-        this.readAt = Instant.ofEpochMilli(System.currentTimeMillis());
+        this.lastRead_at = Instant.ofEpochMilli(System.currentTimeMillis());
     }
 }

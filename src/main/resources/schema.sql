@@ -5,7 +5,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(60) NOT NULL,
-    profileImageId UUID
+    profile_image_id UUID
 );
 
 CREATE TABLE binary_contents (
@@ -50,3 +50,27 @@ DROP TABLE binary_contents CASCADE;
 SELECT column_name, data_type
 FROM information_schema.columns
 WHERE table_name = 'binary_contents';
+
+ALTER TABLE users ADD COLUMN phone_number VARCHAR(20);
+
+CREATE TABLE read_statuses (
+    id UUID PRIMARY KEY ,
+    created_at TIMESTAMPTZ NOT NULL ,
+    updated_at TIMESTAMPTZ ,
+    user_id UUID NOT NULL ,
+    channel_id UUID NOT NULL ,
+    last_read_at TIMESTAMPTZ NOT NULL ,
+    UNIQUE (user_id, channel_id)
+);
+
+ALTER TABLE users
+    ADD CONSTRAINT fk_user_profile_image
+        FOREIGN KEY (profile_image_id)
+            REFERENCES binary_contents(id)
+            ON DELETE CASCADE;
+
+SELECT * FROM binary_contents;
+
+SELECT schemaname, tablename FROM pg_tables WHERE tablename = 'binary_contents';
+
+SELECT current_database();
