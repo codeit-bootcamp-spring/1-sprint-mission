@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
+import jakarta.persistence.Column;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -15,6 +16,8 @@ public class ReadStatus extends BaseUpdatableEntity {
 
   private UUID userId;
   private UUID channelId;
+
+  @Column(nullable = false)
   private Instant lastReadAt;
 
   public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {

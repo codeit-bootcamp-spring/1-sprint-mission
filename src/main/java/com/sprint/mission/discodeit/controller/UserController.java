@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.swagger.UserApi;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
@@ -9,6 +10,8 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,9 +36,11 @@ public class UserController implements UserApi {
       @RequestPart("userCreateRequest") UserCreateDTO userCreateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
     return ResponseEntity
         .status(HttpStatus.CREATED)
-        .body(userService.create(userCreateRequest, profile));
+        .body(userService.create(userCreateRequest, profileRequest));
   }
 
   @PatchMapping("{userId}")
@@ -43,9 +48,11 @@ public class UserController implements UserApi {
       @RequestPart("userUpdateDTO") UserUpdateDTO userUpdateRequest,
       @RequestPart(value = "profile", required = false) MultipartFile profile
   ) {
+    Optional<BinaryContentCreateRequest> profileRequest = Optional.ofNullable(profile)
+        .flatMap(this::resolveProfileRequest);
     return ResponseEntity
         .status(HttpStatus.OK)
-        .body(userService.update(userId, userUpdateRequest, profile));
+        .body(userService.update(userId, userUpdateRequest, profileRequest));
   }
 
   @DeleteMapping("{userId}")
@@ -69,6 +76,23 @@ public class UserController implements UserApi {
     return ResponseEntity
         .status(HttpStatus.OK)
         .body(userStatusService.updateByUserId(userId, request.getNewLastActiveAt()));
+  }
+
+  private Optional<BinaryContentCreateRequest> resolveProfileRequest(MultipartFile profileFile) {
+    if (profileFile.isEmpty()) {
+      return Optional.empty();
+    } else {
+      try {
+        BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+            profileFile.getOriginalFilename(),
+            profileFile.getContentType(),
+            profileFile.getBytes()
+        );
+        return Optional.of(binaryContentCreateRequest);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
 }

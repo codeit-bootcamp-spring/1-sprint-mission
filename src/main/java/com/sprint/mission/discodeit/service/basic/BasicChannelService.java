@@ -48,7 +48,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelFindDTO find(UUID id) {
-    Channel findChannel = channelRepository.findOne(id);
+    Channel findChannel = channelRepository.findById(id);
     Optional.ofNullable(findChannel)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -68,7 +68,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   public Channel update(UUID id, ChannelUpdateDTO dto) {
-    Channel findChannel = channelRepository.findOne(id);
+    Channel findChannel = channelRepository.findById(id);
     Optional.ofNullable(findChannel)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
     if (findChannel.getType() == ChannelType.PRIVATE) {
@@ -81,7 +81,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public UUID delete(UUID id) {
-    Channel findChannel = channelRepository.findOne(id);
+    Channel findChannel = channelRepository.findById(id);
     Optional.ofNullable(findChannel)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
@@ -94,7 +94,8 @@ public class BasicChannelService implements ChannelService {
   private ChannelFindDTO toDTO(Channel channel) {
     Instant lastMessageAt = messageRepository.findAllByChannelId(channel.getId()).stream()
         .map(Message::getCreatedAt)
-        .max(Comparator.naturalOrder()).orElse(Instant.MIN);
+        .max(Comparator.naturalOrder())
+        .orElse(Instant.MIN);
 
     List<UUID> participantIds = new ArrayList<>();
     if (channel.getType() == ChannelType.PRIVATE) {

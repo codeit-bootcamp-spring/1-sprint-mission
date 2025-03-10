@@ -9,7 +9,7 @@ public interface MessageRepository {
 
   Message save(Message message);
 
-  Message findOne(UUID id);
+  Message findById(UUID id);
 
   List<Message> findAll();
 

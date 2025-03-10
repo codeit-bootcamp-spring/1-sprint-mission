@@ -9,7 +9,7 @@ public interface ChannelRepository {
 
   Channel save(Channel channel);
 
-  Channel findOne(UUID id);
+  Channel findById(UUID id);
 
   List<Channel> findAll();
 

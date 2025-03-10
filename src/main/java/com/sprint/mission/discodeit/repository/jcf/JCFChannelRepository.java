@@ -21,7 +21,7 @@ public class JCFChannelRepository implements ChannelRepository {
     return channel;
   }
 
-  public Channel findOne(UUID id) {
+  public Channel findById(UUID id) {
     return data.get(id);
   }
 

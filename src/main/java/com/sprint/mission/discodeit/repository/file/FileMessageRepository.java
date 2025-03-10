@@ -92,7 +92,7 @@ public class FileMessageRepository implements MessageRepository {
   }
 
   @Override
-  public Message findOne(UUID id) {
+  public Message findById(UUID id) {
     return data.get(id);
   }
 

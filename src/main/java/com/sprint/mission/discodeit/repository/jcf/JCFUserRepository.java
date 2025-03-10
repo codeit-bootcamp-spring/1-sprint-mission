@@ -21,7 +21,7 @@ public class JCFUserRepository implements UserRepository {
     return user;
   }
 
-  public User findOne(UUID id) {
+  public User findById(UUID id) {
     return data.get(id);
   }
 

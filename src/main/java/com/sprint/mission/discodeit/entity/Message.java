@@ -11,17 +11,16 @@ import java.util.UUID;
 @Getter
 public class Message extends BaseUpdatableEntity {
 
-
   private String content;
   private UUID authorId;
   private UUID channelId;
   private List<UUID> attachmentIds;
 
-  public Message(String content, UUID userId, UUID channelId) {
+  public Message(String content, UUID userId, UUID channelId, List<UUID> attachmentIds) {
     this.content = content;
     this.authorId = userId;
     this.channelId = channelId;
-    attachmentIds = new ArrayList<>();
+    attachmentIds = attachmentIds;
   }
 
 
@@ -31,10 +30,6 @@ public class Message extends BaseUpdatableEntity {
     } else {
       throw new IllegalArgumentException("입력한 메시지: " + content + "가 기존 값과 같습니다.");
     }
-  }
-
-  public void addBinaryContent(UUID binaryContentId) {
-    attachmentIds.add(binaryContentId);
   }
 
 

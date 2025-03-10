@@ -90,7 +90,7 @@ public class FileUserRepository implements UserRepository {
     return user;
   }
 
-  public User findOne(UUID id) {
+  public User findById(UUID id) {
     return data.get(id);
   }
 

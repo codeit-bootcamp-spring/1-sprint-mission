@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateDTO;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDTO;
 import com.sprint.mission.discodeit.entity.Message;
@@ -12,8 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MessageService {
 
 
-  //서비스 로직
-  Message create(MessageCreateDTO dto, List<MultipartFile> files);
+  Message create(MessageCreateDTO dto,
+      List<BinaryContentCreateRequest> binaryContentCreateRequests);
 
   Message find(UUID id);
 
@@ -23,5 +24,5 @@ public interface MessageService {
 
   Message update(UUID id, MessageUpdateDTO messageUpdateDTO);
 
-  UUID delete(UUID id);
+  void delete(UUID id);
 }

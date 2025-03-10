@@ -29,13 +29,13 @@ public class ReadStatusValidator {
   }
 
   public void validateUserId(UUID userId) {
-    User findUser = userRepository.findOne(userId);
+    User findUser = userRepository.findById(userId);
     Optional.ofNullable(findUser)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
   }
 
   public void validateChannelId(UUID channelId) {
-    Channel findChannel = channelRepository.findOne(channelId);
+    Channel findChannel = channelRepository.findById(channelId);
     Optional.ofNullable(findChannel)
         .orElseThrow(() -> new NotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
   }

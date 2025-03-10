@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
 import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -26,21 +26,20 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserStatusRepository userStatusRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
   private final BinaryContentService binaryContentService;
   private final UserValidator userValidator;
 
 
   @Override
-  public User create(UserCreateDTO dto, MultipartFile file) {
+  public User create(UserCreateDTO dto,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     userValidator.validateUser(dto.getUsername(), dto.getEmail(), dto.getPassword());
-    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword());
 
-    if (file != null) {
-      BinaryContentCreateDTO binaryContentCreateDTO = new BinaryContentCreateDTO(file);
-      BinaryContent binaryContent = binaryContentService.create(binaryContentCreateDTO);
-      user.updateBinaryContentId(binaryContent.getId());
-    }
+    UUID nullableProfileId = saveBinaryFileAndReturnId(optionalProfileCreateRequest);
+
+    User user = new User(dto.getUsername(), dto.getEmail(), dto.getPassword(), nullableProfileId);
     User saveUser = userRepository.save(user);
     userStatusRepository.save(new UserStatus(saveUser.getId()));
     return saveUser;
@@ -48,7 +47,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public UserFindDTO find(UUID id) {
-    User findUser = userRepository.findOne(id);
+    User findUser = userRepository.findById(id);
     Optional.ofNullable(findUser)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     return toDTO(findUser);
@@ -62,34 +61,33 @@ public class BasicUserService implements UserService {
   }
 
   @Override
-  public User update(UUID id, UserUpdateDTO dto, MultipartFile file) {
+  public User update(UUID id, UserUpdateDTO dto,
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
     userValidator.validateUpdateUser(id, dto.getNewUsername(), dto.getNewEmail(),
         dto.getNewPassword());
-    User findUser = userRepository.findOne(id);
-    findUser.setUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword());
+    User findUser = userRepository.findById(id);
 
-    //기존 사진이 있다면 삭제하고 만들기
-    if (file != null) {
-      if (findUser.getBinaryContentId() != null) {
-        binaryContentService.delete(findUser.getBinaryContentId());
-      }
-      BinaryContent binaryContent = binaryContentService.create(
-          new BinaryContentCreateDTO(file));
-      findUser.updateBinaryContentId(binaryContent.getId());
+    if (findUser.getProfileId() != null) {
+      binaryContentRepository.delete(findUser.getProfileId());
     }
+
+    UUID nullableProfileId = saveBinaryFileAndReturnId(optionalProfileCreateRequest);
+
+    findUser.updateUser(dto.getNewUsername(), dto.getNewEmail(), dto.getNewPassword(),
+        nullableProfileId);
     userRepository.update(findUser);
     return findUser;
   }
 
   @Override
   public UUID delete(UUID id) {
-    User findUser = userRepository.findOne(id);
+    User findUser = userRepository.findById(id);
     Optional.ofNullable(findUser)
         .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
     userStatusRepository.deleteByUserId(id);
 
-    Optional.ofNullable(findUser.getBinaryContentId())
+    Optional.ofNullable(findUser.getProfileId())
         .ifPresent(binaryContentService::delete);
 
     return userRepository.delete(findUser.getId());
@@ -105,10 +103,23 @@ public class BasicUserService implements UserService {
         user.getUsername(),
         user.getEmail(),
         online,
-        user.getBinaryContentId(),
+        user.getProfileId(),
         user.getCreatedAt(),
         user.getUpdatedAt()
     );
+  }
+
+  private UUID saveBinaryFileAndReturnId(
+      Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    return optionalProfileCreateRequest
+        .map(profileRequest -> {
+          String fileName = profileRequest.getFileName();
+          String contentType = profileRequest.getContentType();
+          byte[] bytes = profileRequest.getBytes();
+          return binaryContentRepository.save(
+              new BinaryContent(bytes, fileName, contentType, (long) bytes.length)).getId();
+        })
+        .orElse(null);
   }
 
 }

@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,59 +15,59 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserValidator {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    public void validateUser(String username, String email, String password){
-        validateUsername(username);
-        validateEmail(email);
-        validatePassword(password);
-        checkDuplicateUser(username, email);
-    }
+  public void validateUser(String username, String email, String password) {
+    validateUsername(username);
+    validateEmail(email);
+    validatePassword(password);
+    checkDuplicateUser(username, email);
+  }
 
-    public void validateUpdateUser(UUID userId, String username, String email, String password){
-        validateUserId(userId);
-        validateUsername(username);
-        validateEmail(email);
-        validatePassword(password);
-        checkDuplicateUser(username, email);
-    }
+  public void validateUpdateUser(UUID userId, String username, String email, String password) {
+    validateUserId(userId);
+    validateUsername(username);
+    validateEmail(email);
+    validatePassword(password);
+    checkDuplicateUser(username, email);
+  }
 
-    public void validateUserId(UUID userId){
-        User findUser = userRepository.findOne(userId);
-        Optional.ofNullable(findUser)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-    }
+  public void validateUserId(UUID userId) {
+    User findUser = userRepository.findById(userId);
+    Optional.ofNullable(findUser)
+        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+  }
 
-    public void validateUsername(String username){
-        if (username == null || username.trim().isEmpty() ) {
-            throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
-        }
-        if (!username.matches("^[a-zA-Z0-9_]{1,20}$")) {
-            throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
-        }
+  public void validateUsername(String username) {
+    if (username == null || username.trim().isEmpty()) {
+      throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
     }
+    if (!username.matches("^[a-zA-Z0-9_]{1,20}$")) {
+      throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
+    }
+  }
 
-    public void validateEmail(String email){
-        if (email == null || email.trim().isEmpty()) {
-            throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
-        }
-        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
-        }
+  public void validateEmail(String email) {
+    if (email == null || email.trim().isEmpty()) {
+      throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
     }
+    if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+      throw new BadRequestException(ErrorCode.INPUT_VALUE_MISMATCH);
+    }
+  }
 
-    public void validatePassword(String password){
-        if (password == null || password.trim().isEmpty()) {
-            throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
-        }
+  public void validatePassword(String password) {
+    if (password == null || password.trim().isEmpty()) {
+      throw new BadRequestException(ErrorCode.INPUT_VALUE_INVALID);
     }
+  }
 
-    public void checkDuplicateUser(String username, String email) {
-        boolean present = userRepository.findAll().stream()
-                .anyMatch(user -> user.getUsername().equals(username) || user.getEmail().equals(email));
-        if (present) {
-            throw new BadRequestException(ErrorCode.USER_DUPLICATE);
-        }
+  public void checkDuplicateUser(String username, String email) {
+    boolean present = userRepository.findAll().stream()
+        .anyMatch(user -> user.getUsername().equals(username) || user.getEmail().equals(email));
+    if (present) {
+      throw new BadRequestException(ErrorCode.USER_DUPLICATE);
     }
+  }
 
 }
