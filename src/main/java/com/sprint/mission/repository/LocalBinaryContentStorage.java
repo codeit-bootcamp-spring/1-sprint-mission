@@ -1,5 +1,6 @@
 package com.sprint.mission.repository;
 
+import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.response.BinaryContentDto;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,15 +53,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     //루트 디렉토리를 초기화합니다.
     //Bean이 생성되면 자동으로 호출되도록
-    void init(){
-        if (!Files.exists(root)){
+    void init() {
+        if (!Files.exists(root)) {
             try {
                 Files.createDirectories(root);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
-            try (Stream<Path> list = Files.list(root)){
+            try (Stream<Path> list = Files.list(root)) {
                 list.forEach(path -> {
                     try {
                         Files.deleteIfExists(path);
@@ -125,11 +126,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "[discodeit] " + content.fileName());
+        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(content.size()));
 
-        return ResponseEntity
-                .ok()
+        MediaType mediaType = content.contentType() == null
+                ? MediaType.APPLICATION_OCTET_STREAM
+                : MediaType.valueOf(content.contentType());
+
+        return ResponseEntity.ok()
                 .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM) // 임시로 기본 바이너리 타입
+                .contentType(mediaType)
                 .body(resource);
     }
 
