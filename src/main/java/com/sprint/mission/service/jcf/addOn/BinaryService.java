@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,9 +25,8 @@ public class BinaryService {
 
 
     public BinaryContent create(BinaryContentDtoForCreate request){
-        BinaryContent savedBinaryContent = binaryContentRepository.save(request.toEntity());
-        binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
-        return savedBinaryContent;
+        //binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
+        return binaryContentRepository.save(request.toEntity());
     }
 
     public BinaryContent findById(UUID id){

@@ -11,8 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,6 +76,18 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     @Override
     public UUID put(UUID id, byte[] content) {
+
+//        String mimeType;
+//        try (ByteArrayInputStream bais = new ByteArrayInputStream(content)){
+//            mimeType = URLConnection.guessContentTypeFromStream(bais);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        if (mimeType == null) {
+//            mimeType = "application/octet-stream"; // 기본 MIME 타입
+//        }
+//
+
         Path path = resolvePath(id);
         try {
             Files.createFile(path);
@@ -110,12 +124,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         Resource resource = new InputStreamResource(inputStream);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + content.fileName());
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + "[discodeit] " + content.fileName());
 
         return ResponseEntity
                 .ok()
                 .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM) // 임시로 기본 바이너리 타입
                 .body(resource);
     }
 

@@ -5,6 +5,7 @@ import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
 import com.sprint.mission.entity.main.Message;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,8 @@ public interface MessageService {
     Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> attachmentsDto);
 
     void update(UUID messageId, MessageDtoForUpdate updateDto);
-    List<Message> findAllByChannelId(UUID channelId);
+    List<Message> findAllByChannelId(UUID channelId, Pageable pageable);
+    //List<Message> findAllByChannelId(UUID channelId);
     //List<Message> findAll();
     void delete(UUID messageId);
 

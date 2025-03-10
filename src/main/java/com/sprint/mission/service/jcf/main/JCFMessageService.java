@@ -7,6 +7,7 @@ import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.Channel;
 import com.sprint.mission.entity.main.Message;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.ChannelRepository;
 import com.sprint.mission.repository.MessageRepository;
 import com.sprint.mission.repository.UserRepository;
@@ -17,6 +18,10 @@ import com.sprint.mission.service.jcf.addOn.BinaryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +36,8 @@ public class JCFMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryService binaryService;
+    private final BinaryContentStorage binaryContentStorage;
+
 
     @Override
     public Message create(MessageDtoForCreate responseDto, List<BinaryContentDtoForCreate> binaryContentDtoForCreateList) {
@@ -47,6 +54,7 @@ public class JCFMessageService implements MessageService {
         if (!binaryContentDtoForCreateList.isEmpty()) {
             for (BinaryContentDtoForCreate bcd : binaryContentDtoForCreateList) {
                 BinaryContent createdBinaryContent = binaryService.create(bcd);
+                binaryContentStorage.put(createdBinaryContent.getId(), bcd.bytes());
                 createdMessage.addAttachment(createdBinaryContent);
             }
         }
@@ -70,12 +78,28 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
+    public List<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
         if (channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-        return messageRepository.findAllByChannelId(channelId);
+
+        Page<Message> paging = (Page<Message>) pageable;
+        do {
+            Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, paging);
+            paging = sliceMessage.getPageable();
+        } while (paging.hasNext());
+
+        Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, pageable);
+        sliceMessage.getNumberOfElements()
     }
+
+//    @Override
+//    public List<Message> findAllByChannelId(UUID channelId) {
+//        if (channelRepository.existsById(channelId)) {
+//            throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
+//        }
+//        return messageRepository.findAllByChannelId(channelId);
+//    }
 
     @Override
     public void delete(UUID messageId) {

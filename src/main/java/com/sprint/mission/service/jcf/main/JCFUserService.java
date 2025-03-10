@@ -8,6 +8,7 @@ import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;
@@ -33,6 +34,7 @@ public class JCFUserService implements UserService {
     private final UserStatusService userStatusService;
     private final BinaryService profileService;
     private final ExecutorService ves;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
@@ -43,8 +45,9 @@ public class JCFUserService implements UserService {
         Optional<BinaryContentDtoForCreate> profileDto = BinaryContentDtoForCreate.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
         profileDto.ifPresent((dto) -> {
-            BinaryContent binaryContent = profileService.create(dto);
-            createdUser.setProfile(binaryContent);
+            BinaryContent createdBinaryContent = profileService.create(dto);
+            binaryContentStorage.put(createdBinaryContent.getId(), dto.bytes());
+            createdUser.setProfile(createdBinaryContent);
         });
 
         userRepository.save(createdUser); // SAVE해야 UUID 생성

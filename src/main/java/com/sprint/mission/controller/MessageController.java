@@ -23,10 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
@@ -53,7 +50,7 @@ public class MessageController {
             @RequestPart("messageCreateDto") @Valid MessageDtoForCreate requestDTO,
             @Parameter(description = "Message 첨부 파일들")
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments) {
-
+        //  MultipartFile[] : 배열로 여러 파일 받는 방법 in 공식문서 (기존 사용하던 것 : List<MultipartFile>)
 
         // 컬렉션을 DTO로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
         List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = attachments == null || attachments.isEmpty()
@@ -61,8 +58,6 @@ public class MessageController {
                 : attachments.stream().map(BinaryContentDtoForCreate::convertToBinaryContentDto)
                 .flatMap(Optional::stream) // 비어있는 Optional은 무시
                 .toList();
-
-
 
         Message createdMessage = messageService.create(requestDTO, binaryContentDtoForCreateList);
 

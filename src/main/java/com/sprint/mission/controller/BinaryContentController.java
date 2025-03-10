@@ -68,6 +68,6 @@ public class BinaryContentController {
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable("id") UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-        return binaryContentStorage.download(new BinaryContentDto(binaryContent));
+        return (ResponseEntity<Resource>) binaryContentStorage.download(new BinaryContentDto(binaryContent));
     }
 }
