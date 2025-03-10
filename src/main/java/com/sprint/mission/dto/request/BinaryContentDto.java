@@ -24,7 +24,7 @@ public record BinaryContentDto(
         byte[] bytes) {
 
     public BinaryContent toEntity() {
-        return new BinaryContent(fileName, contentType, size, bytes);
+        return new BinaryContent(fileName, contentType, size);
     }
 
     public static Optional<BinaryContentDto> convertToBinaryContentDto(MultipartFile file) {

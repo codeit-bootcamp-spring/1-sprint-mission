@@ -59,4 +59,13 @@ public class BinaryContentController {
         return CommonResponse.toResponseEntity
                 (OK, "BinaryContent 목록 조회 성공", binaryContents);
     }
+
+    // 파일 다운로드 로직 넣기
+    @GetMapping("/{id}/download")
+    public String download(@PathVariable("id") UUID binaryContentId) {
+
+
+        return "text";
+    }
+
 }

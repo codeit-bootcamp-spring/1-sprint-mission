@@ -27,10 +27,8 @@ spring:
 #        order_inserts: true
 #        order_updates: true
         format_sql: true
-        #show_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        #dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
-
 
 springdoc:
   api-docs:
@@ -40,9 +38,13 @@ springdoc:
   default-consumes-media-type: application/json
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: .discodeit
+  storage:
+    type: local
+    local.root-path : "C:\\binary-storage"
+  #repository:
+    #type: jcf
+    #file-directory: .discodeit
+
 
 decorator:
   datasource:

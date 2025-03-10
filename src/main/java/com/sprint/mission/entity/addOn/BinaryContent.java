@@ -19,13 +19,13 @@ public class BinaryContent extends BaseEntity {
     private String fileName;
     private String contentType;
     private Long size;
-    private byte[] bytes;
+    //private byte[] bytes;
 
-    public BinaryContent(String fileName, String contentType, Long size, byte[] bytes) {
+    public BinaryContent(String fileName, String contentType, Long size) {
         this.fileName = fileName;
         this.contentType = contentType;
         this.size = size;
-        this.bytes = bytes;
+        //this.bytes = bytes;
     }
 
     // 이미지, 파일 등 바이너리 데이터를 표현하는 도메인 모델

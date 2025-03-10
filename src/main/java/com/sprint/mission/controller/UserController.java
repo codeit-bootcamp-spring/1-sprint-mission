@@ -53,8 +53,6 @@ public class UserController {
             @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         User user = userService.create(requestDTO, profile);
-        Optional<BinaryContent> profile1 = user.getProfile();
-
         return CommonResponse.toResponseEntity
                 (CREATED, "유저가 성공적으로 생성되었습니다.", new SaveUserDto(user));
     }

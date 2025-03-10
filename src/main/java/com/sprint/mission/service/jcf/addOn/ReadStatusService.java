@@ -75,4 +75,8 @@ public class ReadStatusService {
             throw new CustomException(ErrorCode.NO_SUCH_READ_STATUS);
         }
     }
+
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUserId(userId);
+    }
 }
