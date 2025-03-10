@@ -8,6 +8,7 @@ import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
+import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.UserRepository;
 import com.sprint.mission.service.UserService;
 import com.sprint.mission.dto.request.UserDtoForCreate;

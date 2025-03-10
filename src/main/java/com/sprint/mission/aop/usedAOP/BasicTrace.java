@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-//@Aspect
+@Aspect
 @RequiredArgsConstructor
 public class BasicTrace {
 
@@ -24,18 +24,23 @@ public class BasicTrace {
   public void controllerMethod() {
   }
 
-  @Pointcut("execution(* com.sprint.mission.service.jcf..*(..))")
+  @Pointcut("execution(* com.sprint.mission.service..*(..))")
   public void serviceMethod() {
   }
 
-  @Pointcut("execution(* com.sprint.mission.repository.jcf..*(..))")
+  @Pointcut("execution(* com.sprint.mission.repository..*(..))")
   public void repositoryMethod() {
   }
+
+  @Pointcut("!within(com.sprint.mission.repository.BinaryContentStorage)" +
+      " && !within(com.sprint.mission.repository.LocalBinaryContentStorage)")
+  public void excludeBinaryContentStorage() {}
+
 
 //    @Pointcut("execution(* com.sprint.mission.repository.jcf..create(..))")
 //    public void jcfCreateMethod(){} // 테스트 1회성
 
-  @Around("serviceMethod() || repositoryMethod() || controllerMethod()")
+  @Around("(serviceMethod() || repositoryMethod() || controllerMethod()) && excludeBinaryContentStorage()")
   public Object doTrace(ProceedingJoinPoint joinPoint) {
 
     TraceStatus status = null;

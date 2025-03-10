@@ -4,6 +4,7 @@ import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
 import com.sprint.mission.dto.request.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
+import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.repository.BinarycontentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,9 +18,13 @@ import java.util.UUID;
 public class BinaryService {
 
     private final BinarycontentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+
 
     public BinaryContent create(BinaryContentDto request){
-        return binaryContentRepository.save(request.toEntity());
+        BinaryContent savedBinaryContent = binaryContentRepository.save(request.toEntity());
+        binaryContentStorage.put(savedBinaryContent.getId(), request.bytes());
+        return savedBinaryContent;
     }
 
     public BinaryContent findById(UUID id){

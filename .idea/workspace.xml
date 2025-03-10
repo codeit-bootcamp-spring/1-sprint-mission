@@ -5,18 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/BinaryContentStorage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/sprint/mission/BasicTest/StatusTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/BinaryContentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ReadStatusController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/ReadStatusController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/dto/request/BinaryContentDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/addOn/BinaryContent.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/ReadStatusRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/ReadStatusService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/ReadStatusService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/aop/usedAOP/BasicTrace.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/aop/usedAOP/BasicTrace.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/addOn/BinaryService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFUserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,7 +317,7 @@
       <workItem from="1741515487941" duration="3705000" />
       <workItem from="1741528860119" duration="2833000" />
       <workItem from="1741565112447" duration="8844000" />
-      <workItem from="1741579880188" duration="1519000" />
+      <workItem from="1741579880188" duration="4929000" />
     </task>
     <servers />
   </component>
