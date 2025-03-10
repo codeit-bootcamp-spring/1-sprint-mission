@@ -17,19 +17,19 @@ spring:
   sql:
     init:
       mode: always  # 애플리케이션 실행 시 항상 schema.sql 실행
-
   jpa:
     hibernate:
       ddl-auto: create
     properties:
       hibernate:
-#        jdbc:
-#            batch_size: 50
-#        order_inserts: true
-#        order_updates: true
+        jdbc:
+            batch_size: 50
+        order_inserts: true
+        order_updates: true
         format_sql: true
         #show_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: true
 
 
 springdoc:

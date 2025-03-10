@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,6 +36,7 @@ public class UserTest {
 
     @Autowired
     private EntityManager em;
+
     @Autowired
     private UserStatusRepository userStatusRepository;
 
@@ -61,28 +61,57 @@ public class UserTest {
 
     @Test
     void cascadeUserAndUserStatusTest(){
+        for (int i = 0; i < 20; i++) {
+            UserDtoForCreate createDto = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
+            userService.create(createDto, null);
+        }
+
         List<User> userList = userService.findAll();
         List<UserStatus> userStatusList = userStatusService.findAll();
+
         assertThat(userList.size()).isEqualTo(20);
         assertThat(userList.size()).isEqualTo(userStatusList.size());
     }
 
     @Test
     void userEqualsHashCodeTest(){
-        System.out.println("============================userEqualsHashCodeTest===========================");
         UserDtoForCreate createDto1 = new UserDtoForCreate("test 유저 1", "test 패스워드 1", "test 이메일 1");
         User createdUser1 = userService.create(createDto1, null);
         User user = new User(createdUser1.getUsername(), createdUser1.getPassword(), createdUser1.getEmail());
         user.setId(createdUser1.getId());
+
         em.flush();
         em.clear();
+
         assertThat(user).isEqualTo(createdUser1);
         // Equals, HashCode를 정의하지 않으면 false
-        System.out.println("=======================================================");
-
     }
 
+    @Test
+    void duplicateUserTest(){
+        User user = new User("test 유저 1", "test 패스워드 1", "test 이메일 1");
+        userRepository.save(user);
 
+        User nameDuplicatedUser = new User("test 유저 1", "test 패스워드 1", "test 이메일1111");
+        assertThatThrownBy(() -> userService.isDuplicateNameEmail(nameDuplicatedUser.getUsername(), nameDuplicatedUser.getEmail()))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateUser(){
+        User beforeUpdateUser = new User("업데이트 전 이름", "업데이트 전 비밀번호", "업데이트 전 이메일");
+        userRepository.save(beforeUpdateUser);
+        em.flush();
+        em.clear();
+        User updatingUser = userRepository.findById(beforeUpdateUser.getId()).get();
+        updatingUser.update("업데이트 후 이름", "업데이트 후 비밀번호", "업데이트 후 이메일");
+        em.flush();
+        em.clear();
+        User updatedUser = userRepository.findById(beforeUpdateUser.getId()).get();
+        assertThat(updatedUser.getUsername()).isEqualTo("업데이트 후 이름");
+        assertThat(updatedUser.getPassword()).isEqualTo("업데이트 후 비밀번호");
+        assertThat(updatedUser.getEmail()).isEqualTo("업데이트 후 이메일");
+    }
 
     @Test
     void find(){
@@ -92,14 +121,47 @@ public class UserTest {
     }
 
     @Test
-    void update(){
-        User beforeUpdateUser = new User("업데이트 전 이름", "업데이트 전 비밀번호", "업데이트 전 이메일");
-        userRepository.save(beforeUpdateUser);
+    void delete(){
+        User beforeDeleteUser = new User("삭제 전 이름", "삭제 전 비밀번호", "삭제 전 이메일");
+        userRepository.save(beforeDeleteUser);
         em.flush();
         em.clear();
 
-        User updatingUser = userRepository.findById(beforeUpdateUser.getId()).orElseThrow();
-        
+        Optional<User> savedUser = userRepository.findById(beforeDeleteUser.getId());
+        assertThat(savedUser).isPresent();
 
+        userService.delete(beforeDeleteUser.getId());
+        assertThatThrownBy(() -> userService.findById(beforeDeleteUser.getId()))
+                .isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void findStatusMap(){
+        for (int i = 0; i < 3; i++) {
+            UserDtoForCreate userDtoForCreate = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
+            userService.create(userDtoForCreate, null);
+        }
+        em.flush();
+        em.clear();
+        Map<User, Boolean> statusMapByUserList = userStatusService.findStatusMapByUserList();
+        assertThat(statusMapByUserList.size()).isEqualTo(3);
+        for (Map.Entry<User, Boolean> entry : statusMapByUserList.entrySet()) {
+            User user = entry.getKey();
+            Boolean status = entry.getValue();
+            assertThat(user).isNotNull();
+            assertThat(status).isNotNull();
+        }
+    }
+
+    @Test
+    void findAllWithStatusTest() {
+        for (int i = 0; i < 3; i++) {
+            UserDtoForCreate userDtoForCreate = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
+            userService.create(userDtoForCreate, null);
+        }
+        em.flush();
+        em.clear();
+
+        List<User> all = userRepository.findAllFetch();
     }
 }

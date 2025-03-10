@@ -83,22 +83,17 @@ public class JCFUserService implements UserService {
         User deletingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
         userRepository.delete(deletingUser);
-
-//        ves.submit(() -> profileService.deleteById(deletingUser.()));
-//        ves.submit(() -> userStatusService.deleteByUserId(userId));
-//        ves.submit(() -> userRepository.delete(userId));
-//        // delete관련된건 실패해도 오류나지 않으니
     }
 
     //사용자가 채널 별 마지막으로 메시지를 읽은 시간을 표현
 
     @Override
-    public void isDuplicateNameEmail(String name, String email) {
+    public void isDuplicateNameEmail(String username, String email) {
         List<User> allUser = userRepository.findAll();
 
         Future<?> isDuplicateNameF = ves.submit(() -> {
             boolean isDuplicateName = allUser.stream()
-                    .anyMatch(user -> name.equals(user.getUsername()));
+                    .anyMatch(user -> username.equals(user.getUsername()));
             if (isDuplicateName) throw new CustomException(ErrorCode.ALREADY_EXIST_NAME);
         });
 

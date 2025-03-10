@@ -1,5 +1,6 @@
 package com.sprint.mission.dto.response;
 
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.main.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -25,7 +26,7 @@ public record FindUserDto(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfile().getId(),
+        user.getProfile().map(BinaryContent::getId).orElse(null),
         isOnline
     );
   }

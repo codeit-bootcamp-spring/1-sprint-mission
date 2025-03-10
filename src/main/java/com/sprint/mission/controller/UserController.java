@@ -119,6 +119,7 @@ public class UserController {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
         log.info("statusMapByUser : {}", statusMapByUser);
 
+        // osiv 끌 시 LazyInitializationException 발생
         List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
                 .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
                 .toList();

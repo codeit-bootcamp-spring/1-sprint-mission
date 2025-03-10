@@ -7,14 +7,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(of = "{id, username, email, password}")
+@EqualsAndHashCode(of = {"id", "username", "email", "password"})
 @ToString(of = {"username", "email", "password"})
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -51,9 +53,14 @@ public class User extends BaseUpdatableEntity{
         this.email = email;
     }
 
-    public void update(String newName, String newEmail, String newPassword) {
+    public void update(String newName, String newPassword, String newEmail) {
         this.username = newName;
-        this.email = newEmail;
         this.password = newPassword;
+        this.email = newEmail;
     }
+
+    public Optional<BinaryContent> getProfile() {
+        return Optional.ofNullable(profile);
+    }
+
 }

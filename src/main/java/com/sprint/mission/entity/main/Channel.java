@@ -46,6 +46,11 @@ public class Channel extends BaseUpdatableEntity{
         this.description = newDescription;
     }
 
+    public boolean isPrivate() {
+        if (this.channelType == ChannelType.PRIVATE) return true;
+        else return false;
+    }
+
 //    @AssertTrue(message = "채널 이름은 설명보다 짧아야 합니다.")
 //    public boolean nameValidCheck() {
 //        return this.name.length() < this.description.length();
