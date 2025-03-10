@@ -8,7 +8,6 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -30,7 +29,7 @@ public class BasicUserService implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    public UsersDto create(UsersDto dto, byte[] profileImage) {
+    public UserDto create(UserDto dto, byte[] profileImage) {
 
         User user = User.builder()
                 .name(dto.getName())
@@ -38,11 +37,12 @@ public class BasicUserService implements UserService {
                 .password(dto.getPassword())
                 .online(dto.isOnline())
                 .build();
+
         if (profileImage != null && profileImage.length > 0) {
             user.setProfileImage(profileImage);
         }
         User saved = userRepository.save(user);
-        return userMapper.toDto(saved);
+        return userMapper.toDtos(saved);
     }
 
     @Transactional
@@ -59,7 +59,7 @@ public class BasicUserService implements UserService {
             String fileName = "profile_" + user.getId();
             Long size = (long) profileImage.length;
             String contentType = "image/jpeg";
-            BinaryContent newProfile = new BinaryContent(fileName, size, contentType, profileImage);
+            BinaryContent newProfile = new BinaryContent(fileName, size, contentType);
             binaryContentRepository.save(newProfile);
         }
 

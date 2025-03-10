@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UsersDto create(UsersDto usersDTO, byte[] profileImage);
+    UserDto create(UserDto userDTO, byte[] profileImage);
     UsersDto update(UUID id, UsersDto usersDTO, byte[] profileImage);
     void delete(UUID id);
     UserDto find(UUID id);

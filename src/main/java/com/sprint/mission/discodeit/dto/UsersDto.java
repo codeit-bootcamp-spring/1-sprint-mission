@@ -15,7 +15,6 @@ public class UsersDto {
     @NotNull
     private String email;
     @NotNull
-    private String password;
     private boolean online = false;
     private String profileImage;
 }

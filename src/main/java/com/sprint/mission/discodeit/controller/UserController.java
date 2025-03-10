@@ -44,8 +44,8 @@ public class UserController {
 
     @Operation(summary = "회원 가입", description = "회원 가입")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UsersDto> registerUser(@Valid
-            @RequestPart("user") UsersDto usersDTO,
+    public ResponseEntity<UserDto> registerUser(@Valid
+            @RequestPart("user") UserDto userDTO,
             @RequestPart(value = "pro", required = false) MultipartFile pro) {
 
         byte[] profileImage = null;
@@ -58,7 +58,7 @@ public class UserController {
             log.error("error : {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        UsersDto users = userService.create(usersDTO, profileImage);
+        UserDto users = userService.create(userDTO, profileImage);
         return ResponseEntity.status(HttpStatus.CREATED).body(users);
     }
 
