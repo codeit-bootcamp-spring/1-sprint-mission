@@ -66,8 +66,8 @@ public class UserStatusService {
 
     public Map<User, Boolean> findStatusMapByUserList() {
         Map<User, Boolean> userStatusMap = new HashMap<>();
-        userStatusRepository.findAll().forEach(userStatus -> {
-            userStatusMap.put(userStatus.getUser(), userStatus.isOnline());
+        userRepository.findAllFetch().forEach(user -> {
+            userStatusMap.put(user, user.getStatus().isOnline());
         });
 //        userRepository.findAll().forEach(user -> {
 //            Boolean isOnline = userStatusRepository.findByUser(user)

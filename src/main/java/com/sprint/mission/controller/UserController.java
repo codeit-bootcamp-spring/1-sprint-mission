@@ -6,6 +6,7 @@ import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.dto.response.FindUserDto;
 import com.sprint.mission.dto.response.SaveUserDto;
+import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
@@ -52,6 +53,7 @@ public class UserController {
             @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         User user = userService.create(requestDTO, profile);
+        Optional<BinaryContent> profile1 = user.getProfile();
 
         return CommonResponse.toResponseEntity
                 (CREATED, "유저가 성공적으로 생성되었습니다.", new SaveUserDto(user));
@@ -117,9 +119,6 @@ public class UserController {
     @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
         Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
-        log.info("statusMapByUser : {}", statusMapByUser);
-
-        // osiv 끌 시 LazyInitializationException 발생
         List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
                 .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
                 .toList();
