@@ -21,6 +21,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BinaryContent extends BaseEntity {
 
+  @Column(nullable = false, unique = true)
+  private UUID storageId;
+
   @Column(nullable = false, length = 255)
   private String fileName;
 
@@ -30,14 +33,12 @@ public class BinaryContent extends BaseEntity {
   @Column(nullable = false, length = 100)
   private String contentType;
 
-  @Column(nullable = false)
-  private byte[] bytes;
-  
 
-  public BinaryContent(String fileName, Long size, String contentType, byte[] bytes) {
+  public BinaryContent(UUID storageId, String fileName, Long size, String contentType) {
+    this.storageId = storageId;
     this.fileName = fileName;
     this.size = size;
     this.contentType = contentType;
-    this.bytes = bytes;
+
   }
 }

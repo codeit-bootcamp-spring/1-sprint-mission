@@ -22,9 +22,10 @@ spring:
       mode: always  # 초기 SQL 실행 (필요할 경우 설정)
 
 discodeit:
-  repository:
-    type: file  #jcf | file
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: /storage
 
 springdoc:
   api-docs:
