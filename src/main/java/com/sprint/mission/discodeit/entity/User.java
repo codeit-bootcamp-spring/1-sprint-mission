@@ -1,36 +1,67 @@
 package com.sprint.mission.discodeit.entity;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+@Entity
+@Table(name = "users")
 @Getter
-public class User implements Serializable {
+@Setter
+@NoArgsConstructor
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-
+  @Id
+  @GeneratedValue
+  @UuidGenerator
   private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private String username;
-  private String email;
-  private String password;
-  private UUID profileId;     // BinaryContent
 
-  public User(String username, String email, String password, UUID profileId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @Column(nullable = false, unique = true, length = 50)
+  private String username;
+
+  @Column(nullable = false, unique = true, length = 100)
+  private String email;
+
+  @Column(nullable = false, unique = true, length = 50)
+  private String password;
+
+  @OneToOne
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserStatus status;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ReadStatus> readStatuses;
+
+  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Message> messages;
+
+  @ManyToMany
+  @JoinTable(
+          name = "user_channels",
+          joinColumns = @JoinColumn(name = "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "channel_id")
+  )
+  private List<Channel> channels;
+
+  public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
-  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+  public void update(String newUsername, String newEmail, String newPassword, BinaryContent newProfile) {
     boolean anyValueUpdated = false;
     if (newUsername != null && !newUsername.equals(this.username)) {
       this.username = newUsername;
@@ -44,13 +75,13 @@ public class User implements Serializable {
       this.password = newPassword;
       anyValueUpdated = true;
     }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
+    if (newProfile != null && !newProfile.equals(this.profile)) {
+      this.profile = newProfile;
       anyValueUpdated = true;
     }
 
     if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
+      this.setUpdatedAtNow(); // 업데이트 시간 갱신
     }
   }
 }
