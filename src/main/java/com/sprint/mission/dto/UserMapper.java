@@ -1,7 +1,6 @@
 package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.mappedDto.UserDto;
-import com.sprint.mission.dto.response.SaveUserDto;
 import com.sprint.mission.entity.main.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MapperConfig;
@@ -16,9 +15,9 @@ import static org.mapstruct.MappingInheritanceStrategy.*;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-
+    @Mapping(target = "online", source = "status.online")
     UserDto toDto(User user);
 
-    @Mapping(target = "online", constant = "false")
-    UserDto toDtoForSave(User user);
+//    @Mapping(target = "online", constant = "false")
+//    UserDto toDtoForSave(User user);
 }

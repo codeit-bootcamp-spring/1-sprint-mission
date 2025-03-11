@@ -64,18 +64,23 @@ public class UserStatusService {
 //        userStatusRepository.delete(userId);
 //    }
 
-    public Map<User, Boolean> findStatusMapByUserList() {
-        Map<User, Boolean> userStatusMap = new HashMap<>();
-        userRepository.findAllFetch().forEach(user -> {
-            userStatusMap.put(user, user.getStatus().isOnline());
-        });
+//    public List<User> findStatusMapByUserList() {
+//         return userRepository.findAllWithRelations();
+//    }
+
+
+//    public Map<User, Boolean> findStatusMapByUserList() {
+//        Map<User, Boolean> userStatusMap = new HashMap<>();
+//        userRepository.findAllFetch().forEach(user -> {
+//            userStatusMap.put(user, user.getStatus().isOnline());
+//        });
 //        userRepository.findAll().forEach(user -> {
 //            Boolean isOnline = userStatusRepository.findByUser(user)
 //                    .map(UserStatus::isOnline)
 //                    .orElse(false);
 //            userStatusMap.put(user, isOnline);
 //            // Optional 원칙 : isPresent()는 최대한 사용하지 말것 => if-else랑 비슷해서 가독성 떨어지고 Optional의 장점이 사라짐
-        return userStatusMap;
-    }
+//        return userStatusMap;
+//    }
 };
 

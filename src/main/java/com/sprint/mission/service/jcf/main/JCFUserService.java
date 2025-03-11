@@ -76,7 +76,7 @@ public class JCFUserService implements UserService {
 
     @Override
     public List<User> findAll() {
-        return userRepository.findAll();
+        return userRepository.findAllWithRelations();
     }
 
     //관련된 도메인도 같이 삭제 -> BinaryContent(프로필), Userstatus

@@ -4,6 +4,7 @@ import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
 import com.sprint.mission.dto.UserMapper;
 
+import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.dto.response.FindUserDto;
@@ -57,7 +58,7 @@ public class UserController {
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
         User createdUser = userService.create(requestDTO, profile);
         return CommonResponse.toResponseEntity
-                (CREATED, "유저가 성공적으로 생성되었습니다.", userMapper.toDtoForSave(createdUser));
+                (CREATED, "유저가 성공적으로 생성되었습니다.", userMapper.toDto(createdUser));
     }
 
     @Operation(summary = "User 정보 수정")
@@ -74,9 +75,9 @@ public class UserController {
             @Parameter(description = "수정할 User ID") @PathVariable("id") UUID userId,
             @RequestBody @Valid UserDtoForUpdate requestDTO) {
 
-        userService.update(userId, requestDTO);
+        User updatedUser = userService.update(userId, requestDTO);
         return CommonResponse.toResponseEntity
-                (OK, "성공적으로 업데이트되었습니다", requestDTO);
+                (OK, "성공적으로 업데이트되었습니다", userMapper.toDto(updatedUser));
     }
 
 
@@ -119,12 +120,16 @@ public class UserController {
             content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindUserDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
-        Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
-        List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
-                .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
+//        Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();
+//        List<FindUserDto> findUserDtoList = statusMapByUser.keySet().stream()
+//                .map(user -> new FindUserDto(user, statusMapByUser.get(user)))
+//                .toList();
+
+        List<UserDto> userDtoList = userService.findAll().stream()
+                .map(userMapper::toDto)
                 .toList();
 
         return CommonResponse.toResponseEntity
-                (OK, "유저 리스트 조회 성공", findUserDtoList);
+                (OK, "유저 리스트 조회 성공", userDtoList);
     }
 }
