@@ -20,18 +20,5 @@ public class BinaryContentMapper {
         entity.getSize(),
         entity.getContentType()
     );
-
-  }
-
-  public BinaryContent toEntity(BinaryContentCreateRequest request) {
-    if (request == null) {
-      return null;
-    }
-    return new BinaryContent(
-        request.fileName(),
-        (long) request.bytes().length,
-        request.contentType(),
-        request.bytes()
-    );
   }
 }

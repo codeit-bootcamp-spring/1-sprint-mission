@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.controller.api;
 
 import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.data.UserStatusDto;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
@@ -36,7 +37,7 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject(value = "User with email {email} already exists"))
       ),
   })
-  ResponseEntity<User> create(
+  ResponseEntity<UserDto> create(
       @Parameter(
           description = "User 생성 정보",
           content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +63,7 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject("user with email {newEmail} already exists"))
       )
   })
-  ResponseEntity<User> update(
+  ResponseEntity<UserDto> update(
       @Parameter(description = "수정할 User ID") UUID userId,
       @Parameter(description = "수정할 User 정보") UserUpdateRequest userUpdateRequest,
       @Parameter(description = "수정할 User 프로필 이미지") MultipartFile profile
@@ -104,7 +105,7 @@ public interface UserApi {
           content = @Content(examples = @ExampleObject(value = "UserStatus with userId {userId} not found"))
       )
   })
-  ResponseEntity<UserStatus> updateUserStatusByUserId(
+  ResponseEntity<UserStatusDto> updateUserStatusByUserId(
       @Parameter(description = "상태를 변경할 User ID") UUID userId,
       @Parameter(description = "변경할 User 온라인 상태 정보") UserStatusUpdateRequest request
   );
