@@ -1,17 +1,17 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserRequestDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,58 +27,61 @@ public class BasicUserService implements UserService {
 
   @Override
   public User createUser(UserCreateDTO userCreateDTO) {
-    if (isNameExist(userCreateDTO.name())) {
+    if (userRepository.existsByUsername(userCreateDTO.name())) {
       throw new IllegalArgumentException("이미 존재하는 이름입니다. ");
     }
-    if (isEmailExist(userCreateDTO.email())) {
+    if (userRepository.existsByEmail(userCreateDTO.email())) {
       throw new IllegalArgumentException("이미 존재하는 이메일입니다. ");
     }
-    User user = new User(userCreateDTO);
 
-    userStatusService.saveExist(user.getUserStatus());
-    userRepository.save(user);
-    return user;
+    User user = User.builder()
+        .username(userCreateDTO.name())
+        .email(userCreateDTO.email())
+        .password(userCreateDTO.password())
+        .profile(userCreateDTO.profile())
+        .build();
+
+    return userRepository.save(user);
   }
 
   @Override
-  public UserFindDTO findUserDTO(UUID userId) {
-    User user = userRepository.findbyId(userId);
-    UserFindDTO userFindDTO = new UserFindDTO(user);
-    return userFindDTO;
+  public UserRequestDTO findUserDTO(UUID userId) {
+    User user = userRepository.findById(userId).orElseThrow(
+        () -> new NoSuchElementException("user Not found"));
+    UserRequestDTO userRequestDTO = new UserRequestDTO(user);
+    return userRequestDTO;
   }
 
   //내부 사용전용
   private User findbyId(UUID userId) {
-    User user = userRepository.findbyId(userId);
-    return user;
+    return userRepository.findById(userId).orElseThrow(
+        () -> new NoSuchElementException("user Not found")
+    );
   }
 
   private List<User> findAll() {
-    return new ArrayList<>(userRepository.load().values());
+    return userRepository.findAll();
   }
 
   @Override
-  public List<UserFindDTO> findAllUserDTO() {
+  public List<UserRequestDTO> findAllUserDTO() {
     List<User> userList = findAll();
-    List<UserFindDTO> userFindDTOS = userList.stream()
-        .map(user -> new UserFindDTO(user))
+    List<UserRequestDTO> userRequestDTOS = userList.stream()
+        .map(user -> new UserRequestDTO(user))
         .collect(Collectors.toList());
-    return userFindDTOS;
+    return userRequestDTOS;
   }
 
   @Override
   public User updateUser(UUID userID, UserUpdateDTO userUpdateDTO) {
     User user = findbyId(userID);
-    user.updateUser(userUpdateDTO);
+    user.updateUser(userUpdateDTO.newName(), userUpdateDTO.newEmail(), userUpdateDTO.newPassword());
     return userRepository.save(user);
   }
 
   @Override
   public void deleteUser(UUID userID) {
-    User user = findbyId(userID);
-    user.deleteUserStatus();
-    user.deleteBinaryContent();
-    userRepository.delete(userID);
+    userRepository.deleteById(userID);
   }
 
   @Override
@@ -90,17 +93,4 @@ public class BasicUserService implements UserService {
     return userUserStatusUpdateDTO;
   }
 
-  @Override
-  public Boolean isNameExist(String name) {
-    return userRepository.load().values()
-        .stream()
-        .anyMatch(user -> user.getUserName().equals(name));
-  }
-
-  @Override
-  public Boolean isEmailExist(String email) {
-    return userRepository.load().values()
-        .stream()
-        .anyMatch(user -> user.getEmail().equals(email));
-  }
 }

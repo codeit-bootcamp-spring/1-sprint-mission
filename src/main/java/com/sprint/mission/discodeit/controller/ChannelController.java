@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,12 +64,12 @@ public class ChannelController {
 
   //특정 사용자가 볼 수 있는 모든 채널 목록 조회
   @GetMapping("/{userId}")
-  public List<ChannelFindDTO> findAllByUserId(@PathVariable("userId") UUID id) {
+  public List<ChannelRequestDTO> findAllByUserId(@PathVariable("userId") UUID id) {
     return channelService.findAllByUserId(id);
   }
 
   @GetMapping
-  public List<ChannelFindDTO> findAll() {
+  public List<ChannelRequestDTO> findAll() {
     return channelService.findAllDTO();
   }
 

@@ -25,7 +25,7 @@ public class BinaryContent extends BaseEntity implements Serializable {
   private static final Long serialVersionUID = 1L;
 
   @Column(name = "file_name")
-  private String filePath; //file 경로 문자열
+  private String fileName; //file 경로 문자열
 
   @Column(name = "size")
   private Long size;
@@ -34,7 +34,7 @@ public class BinaryContent extends BaseEntity implements Serializable {
   private String contentType;
 
   @Column(name = "bytes")
-  private byte[] bytes;
+  private Byte[] bytes;
 
-  
+
 }

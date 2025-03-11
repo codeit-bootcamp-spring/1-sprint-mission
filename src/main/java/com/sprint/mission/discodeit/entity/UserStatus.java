@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,7 @@ import org.springframework.data.annotation.CreatedDate;
 @Table(name = "user_statuses")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 

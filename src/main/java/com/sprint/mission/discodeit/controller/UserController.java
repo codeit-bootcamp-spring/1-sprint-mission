@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.user.UserCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
+import com.sprint.mission.discodeit.dto.user.UserRequestDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.service.UserService;
@@ -49,13 +49,13 @@ public class UserController {
 
   //모든 사용자 조회
   @GetMapping
-  public List<UserFindDTO> findAllUser() {
+  public List<UserRequestDTO> findAllUser() {
     return userService.findAllUserDTO();
   }
 
   //아이디로 사용자 조회
   @GetMapping("/{id}")
-  public UserFindDTO findUserById(@PathVariable("id") UUID id) {
+  public UserRequestDTO findUserById(@PathVariable("id") UUID id) {
     return userService.findUserDTO(id);
   }
 

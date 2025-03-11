@@ -1,29 +1,22 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateDTO;
-import com.sprint.mission.discodeit.dto.channel.ChannelFindDTO;
+import com.sprint.mission.discodeit.dto.channel.ChannelRequestDTO;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDTO;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateDTO;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateDTO;
-import com.sprint.mission.discodeit.dto.user.UserFindDTO;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,7 +26,6 @@ import java.util.stream.Collectors;
 public class BasicChannelService implements ChannelService {
 
   private final ChannelRepository channelRepository;
-  private final UserRepository userRepository;
   private final ReadStatusRepository readStatusRepository;
   private final MessageRepository messageRepository;
   //Service
@@ -41,13 +33,22 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO) {
-    Channel channel = new Channel(channelCreateDTO.name(), ChannelType.PUBLIC);
+    Channel channel = Channel.builder()
+        .channelName(channelCreateDTO.name())
+        .description(channelCreateDTO.description())
+        .type(ChannelType.PUBLIC)
+        .build();
+
     return channelRepository.save(channel);
   }
 
   @Override
   public Channel createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
-    Channel channel = new Channel(channelCreateDTO.getName(), ChannelType.PRIVATE);
+    Channel channel = Channel.builder()
+        .channelName(channelCreateDTO.getName())
+        .description(channelCreateDTO.getDescription())
+        .type(ChannelType.PUBLIC)
+        .build();
 
     createReadStatus(channel, channelCreateDTO);
 
@@ -64,16 +65,9 @@ public class BasicChannelService implements ChannelService {
     }
   }
 
-  //채널이 레포에 존재하는지 검증
-  private boolean isChannelExist(UUID uuid) {
-    return channelRepository.isChannelExsit(uuid);
-  }
-
-  //find
-
   @Override
-  public ChannelFindDTO findDTO(UUID uuid) {
-    Channel channel = readChannel(uuid);
+  public ChannelRequestDTO findDTO(UUID uuid) {
+    Channel channel = findById(uuid);
 
     //Public 일 때 userIdList , time은 null
     //이 아이디리스트는 readStatus에서 찾아야함.
@@ -83,43 +77,43 @@ public class BasicChannelService implements ChannelService {
       userIdList = readStatusRepository.findAllUserIdByChannelId(uuid);
       time = readStatusRepository.findLatestTimeByChannelId(uuid);
     }
-    ChannelFindDTO channelFindDTO = new ChannelFindDTO(channel, time, userIdList);
-    return channelFindDTO;
+    ChannelRequestDTO channelRequestDTO = new ChannelRequestDTO(channel, time, userIdList);
+    return channelRequestDTO;
   }
 
   //특정 User가 볼 수 있는 Channel 목록을 조회
   @Override
-  public List<ChannelFindDTO> findAllByUserId(UUID userId) {
-    List<ChannelFindDTO> channelFindDTOList = findAllDTO();
-    List<ChannelFindDTO> userChannelFindDTOList = channelFindDTOList.stream()
-        .filter(channelFindDTO -> channelFindDTO.getType().equals(ChannelType.PUBLIC)
+  public List<ChannelRequestDTO> findAllByUserId(UUID userId) {
+    List<ChannelRequestDTO> channelRequestDTOList = findAllDTO();
+    List<ChannelRequestDTO> userChannelRequestDTOList = channelRequestDTOList.stream()
+        .filter(channelRequestDTO -> channelRequestDTO.getType().equals(ChannelType.PUBLIC)
             ||
-            (channelFindDTO.getType().equals(ChannelType.PRIVATE) &&
-                channelFindDTO.isUserExist(userId)))
+            (channelRequestDTO.getType().equals(ChannelType.PRIVATE) &&
+                channelRequestDTO.isUserExist(userId)))
         .toList();
-    return userChannelFindDTOList;
+    return userChannelRequestDTOList;
   }
 
   @Override
-  public List<ChannelFindDTO> findAllDTO() {
-    List<Channel> channelList = readAllChannel();
-    List<ChannelFindDTO> channelFindDTOList = channelList.stream()
+  public List<ChannelRequestDTO> findAllDTO() {
+    List<Channel> channelList = findAll();
+    List<ChannelRequestDTO> channelRequestDTOList = channelList.stream()
         .map(channel -> findDTO(channel.getId()))
         .collect(Collectors.toList());
-    return channelFindDTOList;
+    return channelRequestDTOList;
   }
 
 
   //기존의 read private선언?
   @Override
-  public Channel readChannel(UUID id) {
-    return channelRepository.findById(id);
+  public Channel findById(UUID id) {
+    return channelRepository.findById(id).orElseThrow(()
+        -> new NoSuchElementException("Channel not found"));
   }
 
   @Override
-  public List<Channel> readAllChannel() {
-    List<Channel> channelList = new ArrayList<>(channelRepository.load().values());
-    return channelList;
+  public List<Channel> findAll() {
+    return channelRepository.findAll();
   }
 
 
@@ -139,7 +133,7 @@ public class BasicChannelService implements ChannelService {
   public void deleteChannel(UUID id) {
     //관련된 도메인 삭제
     messageRepository.deleteByChannelId(id);
-    Channel channel = readChannel(id);
+    Channel channel = findById(id);
     if (channel.getType() == ChannelType.PRIVATE) {
       readStatusService.deleteByChannelId(id);
     }

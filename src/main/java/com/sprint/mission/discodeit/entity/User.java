@@ -9,19 +9,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class User extends BaseUpdatableEntity implements Serializable {
 
   private static final Long serialVersionUID = 1L;
@@ -38,21 +40,6 @@ public class User extends BaseUpdatableEntity implements Serializable {
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
-
-
-  protected User() {
-    super();
-  }
-
-
-  public User(String username, String password, String email, BinaryContent profile) {
-    super();
-
-    this.username = username;
-    this.password = password;
-    this.email = email;
-    this.profile = profile;
-  }
 
   //update
 

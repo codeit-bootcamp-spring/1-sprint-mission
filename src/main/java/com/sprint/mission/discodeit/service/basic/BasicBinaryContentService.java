@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +18,22 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
-  public BinaryContent create(String filePath) {
-    BinaryContent binaryContent = new BinaryContent(filePath);
+  public BinaryContent create(BinaryContentCreateDTO binaryContentCreateDTO) {
+    BinaryContent binaryContent = BinaryContent.builder()
+        .fileName(binaryContentCreateDTO.fileName())
+        .size(binaryContentCreateDTO.size())
+        .contentType(binaryContentCreateDTO.contentType())
+        .bytes(binaryContentCreateDTO.bytes())
+        .build();
+
     binaryContentRepository.save(binaryContent);
     return binaryContent;
   }
 
   @Override
   public BinaryContent findById(UUID uuid) {
-    BinaryContent binaryContent = binaryContentRepository.findById(uuid);
+    BinaryContent binaryContent = binaryContentRepository.findById(uuid).orElseThrow(()
+        -> new NoSuchElementException("BinaryContent Not Found"));
     return binaryContent;
   }
 
@@ -37,6 +45,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public void delete(UUID uuid) {
-    binaryContentRepository.delete(uuid);
+    binaryContentRepository.deleteById(uuid);
   }
 }

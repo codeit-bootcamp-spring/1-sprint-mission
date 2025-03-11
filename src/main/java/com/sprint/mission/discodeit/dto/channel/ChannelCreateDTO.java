@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public record ChannelCreateDTO(
-      String name
-)
-{
+    String name,
+    String description
+) {
+
 }
