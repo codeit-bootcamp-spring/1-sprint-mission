@@ -36,6 +36,7 @@ public class MessageController implements MessageApiDocs {
           try {
             return new BinaryContentCreateRequest(
                 file.getOriginalFilename(),
+                file.getSize(),
                 file.getContentType(),
                 file.getBytes()
             );
