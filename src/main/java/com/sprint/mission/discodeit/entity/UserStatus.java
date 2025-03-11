@@ -27,7 +27,6 @@ import org.springframework.data.annotation.CreatedDate;
 @Table(name = "user_statuses")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
@@ -42,20 +41,12 @@ public class UserStatus extends BaseUpdatableEntity implements Serializable {
   @Column(name = "last_active_at")
   private Instant lastAccessedAt;
 
-//  protected UserStatus() {
-//    super();
-//  }
-//
-//  public UserStatus(UUID userId) {
-//    super();
-//    this.lastAccessedAt = Instant.now();
-//  }
-//
-//  public UserStatus(UserStatusCreateDTO userStatusCreateDTO) {
-//    super();
-//
-//    this.lastAccessedAt = userStatusCreateDTO.lastAccessedAt();
-//  }
+  public UserStatus(User user, Instant lastAccessedAt) {
+    super();
+    this.user = user;
+    this.lastAccessedAt = lastAccessedAt;
+  }
+
 
   //유저 온라인 상태를 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 검증하고 반환하는 메서드.
   public Boolean isOnline() {

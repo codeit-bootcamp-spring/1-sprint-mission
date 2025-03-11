@@ -44,42 +44,28 @@ public class User extends BaseUpdatableEntity implements Serializable {
     super();
   }
 
-  public User(UserCreateDTO userCreateDTO) {
+
+  public User(String username, String password, String email, BinaryContent profile) {
     super();
 
-    this.username = userCreateDTO.name();
-    this.password = userCreateDTO.password();
-    this.email = userCreateDTO.email();
-    updateBinaryContent(userCreateDTO.filePath());
+    this.username = username;
+    this.password = password;
+    this.email = email;
+    this.profile = profile;
   }
 
   //update
 
-  public void updateUser(UserUpdateDTO userUpdateDTO) {
-    updateUserName(userUpdateDTO.newName());
-    updatePassword(userUpdateDTO.newPassword());
-    updateEmail(userUpdateDTO.newEmail());
-    updateBinaryContent(userUpdateDTO.newFilePAth());
+  public void updateUser(String username, String email, String password) {
+    this.username = username;
+    this.email = email;
+    this.password = password;
     update();
   }
 
-  private void updateUserName(String newName) {
-    this.username = Objects.requireNonNullElse(newName, this.username);
-  }
-
-  private void updatePassword(String newPassword) {
-    this.password = Objects.requireNonNullElse(newPassword, this.password);
-  }
-
-  private void updateEmail(String newEmail) {
-    this.email = Objects.requireNonNullElse(newEmail, this.email);
-  }
-
   //새로운 이미지가 들어오면, 완전히 새로운 이미지 객체로 간주 ?
-  private void updateBinaryContent(String newFilePath) {
-    if (newFilePath != null) {
-      this.profile = new BinaryContent(newFilePath);
-    }
+  private void updateBinaryContent(BinaryContent newBinaryContent) {
+    this.profile = newBinaryContent;
   }
 
   //delete

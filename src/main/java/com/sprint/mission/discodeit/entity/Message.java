@@ -54,15 +54,14 @@ public class Message extends BaseUpdatableEntity implements Serializable {
   )
   private List<BinaryContent> attachments; //파일 용량/개수 제한을 둬야함
 
-
+  
   public void attachBinaryContent(List<BinaryContent> binaryContents) {
     this.attachments = binaryContents;
   }
 
-  //TODO: DTO -> 파라미터 수정
-  public void updateContent(MessageUpdateDTO messageUpdateDTO) {
-    this.content = messageUpdateDTO.content();
-    this.attachments = messageUpdateDTO.binaryContentList();
+  public void updateContent(String content, List<BinaryContent> attachments) {
+    this.content = content;
+    this.attachments = attachments;
     super.update();
   }
 
