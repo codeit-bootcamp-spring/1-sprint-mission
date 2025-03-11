@@ -21,6 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
+  @Transactional
   public UserResponse createUser(CreateUserRequest request,
       Optional<CreateBinaryContentRequest> optionalRequest) {
     if (userRepository.existsUserByUsername(request.username()) || userRepository.existsUserByEmail(
@@ -49,17 +51,20 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserResponse> findAllUsers() {
     return userRepository.findAll().stream().map(UserResponse::fromEntity)
         .collect(Collectors.toList());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<UserResponse> findUserById(UUID userId) {
     return userRepository.findById(userId).map(UserResponse::fromEntity);
   }
 
   @Override
+  @Transactional
   public Optional<UserResponse> updateUser(UUID userId, UpdateUserRequest request,
       Optional<CreateBinaryContentRequest> optionalRequest) {
     return userRepository.findById(userId).map(user -> {
@@ -74,6 +79,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public void deleteUser(UUID userId) {
     userRepository.findById(userId).ifPresent(user -> {
       if (user.getProfileImage() != null) {
@@ -87,6 +93,7 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional
   public User getUserById(UUID uuid) {
     return userRepository.findById(uuid)
         .orElseThrow(() -> new EntityNotFoundException("User with ID " + uuid + " not found"));

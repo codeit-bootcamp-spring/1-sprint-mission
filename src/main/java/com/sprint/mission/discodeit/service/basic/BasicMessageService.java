@@ -15,17 +15,16 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
-import java.awt.Cursor;
 import java.time.Instant;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +35,7 @@ public class BasicMessageService implements MessageService {
   private final UserService userService;
 
   @Override
+  @Transactional
   public MessageResponse createMessage(CreateMessageRequest request) {
     Channel channel = channelService.getChannel(request.channelID());
     User author = userService.getUserById(request.authorID());
@@ -44,6 +44,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MessageResponse> getMessages() {
     return messageRepository.findAll().stream()
         .map(MessageResponse::fromEntity)
@@ -51,6 +52,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public PageResponse<MessageResponse> getPageMessages(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<Message> messages = messageRepository.findAll(pageable);
@@ -58,6 +60,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public CursorResponse<Message> getCursorPages(Instant cursor, int size) {
     Pageable pageable = PageRequest.of(0, size);
     Page<Message> messages = messageRepository.findAllByCursor(cursor, pageable);
@@ -65,6 +68,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MessageResponse> getMessagesByChannel(UUID ChannelID) {
     return channelService.getMessagesFromChannel(ChannelID).stream()
         .map(MessageResponse::fromEntity)
@@ -72,6 +76,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public MessageResponse getMessage(UUID uuid) {
     return messageRepository.findById(uuid)
         .map(MessageResponse::fromEntity).orElseThrow(
@@ -80,6 +85,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public MessageResponse updateMessage(UUID id, UpdateMessageRequest request) {
     return messageRepository.findById(id)
         .map(message -> {
@@ -92,6 +98,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void deleteMessage(UUID uuid) {
     messageRepository.deleteById(uuid);
   }

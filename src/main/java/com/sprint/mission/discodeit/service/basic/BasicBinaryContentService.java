@@ -14,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
+  @Transactional
   public BinaryContent create(CreateBinaryContentRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
@@ -37,26 +39,31 @@ public class BasicBinaryContentService implements BinaryContentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Optional<BinaryContent> getBinaryContent(UUID id) {
     return binaryContentRepository.findById(id);
   }
 
   @Override
+  @Transactional
   public BinaryContent saveBinaryContent(BinaryContent binaryContent) {
     return binaryContentRepository.save(binaryContent);
   }
 
   @Override
+  @Transactional
   public void deleteBinaryContent(UUID id) {
     binaryContentRepository.deleteById(id);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<BinaryContent> getBinaryContentListByIds(List<UUID> ids) {
     return (List<BinaryContent>) binaryContentRepository.findAllById(ids);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ResponseEntity<?> downloadBinaryContent(UUID id) {
     BinaryContent binaryContent = binaryContentRepository.findById(id)
         .orElseThrow(() -> new EntityNotFoundException("Binary content not found"));

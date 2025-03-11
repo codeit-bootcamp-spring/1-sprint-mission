@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class BasicAuthService implements AuthService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional(readOnly = true)
   public UserResponse login(LoginRequest request) {
     User user = userRepository.findByEmail(request.email())
         .orElseThrow(() -> new NoSuchElementException("User not found"));
