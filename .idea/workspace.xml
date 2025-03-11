@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="83d1bbc8-7698-4768-a4fd-2caf63fd289f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/entity/main/DtoMapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/repository/LocalBinaryContentStorage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/sprint/mission/service/jcf/main/JCFMessageService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,8 +56,8 @@
       <list>
         <option value="Enum" />
         <option value="Record" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -316,7 +318,9 @@
       <workItem from="1741565112447" duration="8844000" />
       <workItem from="1741579880188" duration="5341000" />
       <workItem from="1741586484071" duration="8481000" />
-      <workItem from="1741612733525" duration="2242000" />
+      <workItem from="1741612733525" duration="2537000" />
+      <workItem from="1741620785404" duration="97000" />
+      <workItem from="1741665651018" duration="284000" />
     </task>
     <servers />
   </component>

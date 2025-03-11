@@ -23,20 +23,36 @@ repositories {
 	mavenCentral()
 }
 
+compileJava {
+	options.compilerArgs += [
+			'-Amapstruct.suppressGeneratorTimestamp=true',   // 생성 코드에 타임스탬프 추가 방지
+			'-Amapstruct.suppressGeneratorVersionInfoComment=true',  // 생성 코드에 버전 정보 주석 추가 방지
+			'-Amapstruct.verbose=true',   // MapStruct의 주요 동작 로그 출력
+			"-Amapstruct.defaultComponentModel=spring" // Spring 환경이라면 추가
+	]
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.10.0'
-
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 	implementation 'org.postgresql:postgresql:42.7.3'
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+	implementation "org.mapstruct:mapstruct:1.6.3"
 
 	compileOnly 'org.projectlombok:lombok'
+
+	// Lombok 관련 애노테이션 프로세서를 먼저 등록하여 Lombok이 먼저 동작하도록 함
 	annotationProcessor 'org.projectlombok:lombok'
+	// Lombok과 MapStruct 충돌 해결을 위한 라이브러리라는데 안해도 문제 없어서 주석처리
+	//  annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 	runtimeOnly 'org.postgresql:postgresql'
+
+	// 테스트 코드에서도 MapStruct를 사용할 경우 추가
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.6.3"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

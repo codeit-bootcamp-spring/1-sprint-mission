@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,15 +83,16 @@ public class JCFMessageService implements MessageService {
         if (channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
-
-        Page<Message> paging = (Page<Message>) pageable;
-        do {
-            Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, paging);
-            paging = sliceMessage.getPageable();
-        } while (paging.hasNext());
-
-        Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, pageable);
-        sliceMessage.getNumberOfElements()
+//
+//        Page<Message> paging = (Page<Message>) pageable;
+//        do {
+//            Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, paging);
+//            //paging = sliceMessage.getPageable();
+//        } while (paging.hasNext());
+//
+//        Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, pageable);
+//        sliceMessage.getNumberOfElements();
+        return new ArrayList<>();
     }
 
 //    @Override
