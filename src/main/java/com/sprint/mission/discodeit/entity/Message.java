@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 //@AllArgsConstructor
-public class Message extends BaseEntity{
+public class Message extends BaseUpdatableEntity{
 
     @Column(name = "content")
     private String content;

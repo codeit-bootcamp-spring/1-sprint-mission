@@ -19,22 +19,9 @@ public abstract class BaseEntity {
     @Column(name="created_at", updatable = false, nullable = false)
     private Instant createdAt;
 
-    @Column(name="updated_at", nullable = false)
-    private Instant updatedAt;
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.ofEpochMilli(System.currentTimeMillis());
-        this.updatedAt = this.createdAt;
     }
 
-//    public BaseEntity(){
-//        this.createdAt = Instant.now();
-//        this.updatedAt = this.createdAt;
-//    }
-
-    @PreUpdate
-    protected void update() {
-        this.updatedAt = Instant.ofEpochMilli(System.currentTimeMillis());
-    }
 }

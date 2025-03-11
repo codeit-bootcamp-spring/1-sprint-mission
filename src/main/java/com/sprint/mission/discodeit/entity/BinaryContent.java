@@ -11,15 +11,9 @@ import java.util.UUID;
 @Table(name = "binary_contents")
 @Getter @Setter
 @Builder
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BinaryContent{
-    @Id
-    @GeneratedValue
-    private UUID id;
-
-    @Column(name = "created_at")
-    private Instant createdAt;
+public class BinaryContent extends BaseEntity{
 
     @Column(name = "type_id")
     private UUID typeId;
@@ -42,7 +36,6 @@ public class BinaryContent{
 
     //, byte[] bytes
     public BinaryContent(UUID typeId, String originalFilename, Long size, String contentType) {
-        this.createdAt = Instant.now();
         this.typeId = typeId;
         this.fileName = originalFilename;
         this.size = size;

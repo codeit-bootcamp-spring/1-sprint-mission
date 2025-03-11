@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserStatus extends BaseEntity{
+public class UserStatus extends BaseUpdatableEntity{
     @Column(name = "user_id")
     private UUID userid;
 
@@ -27,15 +27,14 @@ public class UserStatus extends BaseEntity{
     protected UserStatus() { }
 
     public UserStatus(UUID userid) {
-        super();
         this.userid = userid;
         this.lastSeenAt = Instant.ofEpochMilli(System.currentTimeMillis());
     }
 
-    public void updateLastSeen(Instant timestamp) {
-        this.lastSeenAt = timestamp;
-        update();
-    }
+//    public void updateLastSeen(Instant timestamp) {
+//        this.lastSeenAt = timestamp;
+//        onUpdate();
+//    }
 
     public boolean isOnline() {
         return Duration.between(lastSeenAt, Instant.now()).toMinutes() < 5;

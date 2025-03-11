@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table(name = "channels")
 @Getter
 @Builder
-public class Channel extends BaseEntity{
+public class Channel extends BaseUpdatableEntity{
     public enum ChannelType {Private, Public};
 
     @Column(name = "name")

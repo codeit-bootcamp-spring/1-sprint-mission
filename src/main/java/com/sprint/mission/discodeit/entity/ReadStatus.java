@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ReadStatus extends BaseEntity{
+public class ReadStatus extends BaseUpdatableEntity{
     @Column(name = "user_id")
     private UUID userId;
 

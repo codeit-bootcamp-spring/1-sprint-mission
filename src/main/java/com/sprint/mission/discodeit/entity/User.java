@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter @Setter
 @Builder
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseUpdatableEntity {
 
     @Column(name = "username")
     private String username;
@@ -35,7 +35,6 @@ public class User extends BaseEntity {
     protected User() { } // JPA 기본 생성자
 
     public User(String username, String password, String email, String phoneNumber){
-        super();
         this.username = username;
         this.password = password;
         this.email = email;
