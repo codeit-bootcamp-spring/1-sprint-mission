@@ -1,12 +1,42 @@
 discodeit:
-  repository:
-    type: file
-    file:
-      storage-path: "file-data-map/"
+  storage:
+    type: local
+    local:
+      root-path: /path/to/storage
+
 
 spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  #  sql:
+  #    init:
+  #      mode: always
+  #      schema-locations: classpath:schema.sql
+  profiles:
+    active: local
   servlet:
     multipart:
       enabled: true
       max-file-size: 5MB  # 업로드할 파일 최대 크기
       max-request-size: 10MB
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+
+logging:
+  level:
+    root:   # 전체 로그 레벨을 DEBUG로 변경
+    org.springframework.web: DEBUG  # Spring Web 관련 로그 상세 출력
+    org.springframework.web.servlet: DEBUG
+    org.springframework.web.multipart: DEBUG  # Multipart 파일 업로드 관련 로그
+

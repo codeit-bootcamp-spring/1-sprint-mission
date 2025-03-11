@@ -2,12 +2,13 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.Interface.UserStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,22 +20,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-  @Autowired
   private final UserStatusRepository userStatusRepository;
-  @Autowired
   private final UserRepository userRepository;
 
 
   @Override
+  @Transactional
   public UserStatus create(UserStatusCreateRequestDto request) {
-    if (!userRepository.existsById(request.getUserId())) {
-      throw new NoSuchElementException("User not found");
-    }
+    User user = userRepository.findById(request.getUserId())
+        .orElseThrow(() -> new NoSuchElementException("user not found"));
+
     Optional<UserStatus> existingStatus = userStatusRepository.findByUserId(request.getUserId());
     if (existingStatus.isPresent()) {
       throw new IllegalArgumentException("UserStatus already exists");
     }
-    UserStatus userStatus = new UserStatus(request.getUserId(), request.getCreatedAt());
+    UserStatus userStatus = new UserStatus(user, request.getCreatedAt());
     System.out.println("userStatus 생성:" + userStatus.getId());
     return userStatusRepository.save(userStatus);
   }
@@ -51,6 +51,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public void update(UUID userStatusId, UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusRepository.findById(userStatusId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
@@ -59,6 +60,7 @@ public class BasicUserStatusService implements UserStatusService {
   }
 
   @Override
+  @Transactional
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(() -> new NoSuchElementException("UserStatus not found"));
@@ -68,6 +70,7 @@ public class BasicUserStatusService implements UserStatusService {
 
 
   @Override
+  @Transactional
   public void deleteByUserId(UUID userId) {
     if (!userStatusRepository.existsById(userId)) {
       throw new NoSuchElementException("UserStatus not found");

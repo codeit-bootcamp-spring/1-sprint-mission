@@ -1,52 +1,56 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.List;
 import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
-public class Message implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-
+  @Column(nullable = false)
   private String content;
-  private final UUID channelId;
-  private final UUID authorId;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
+
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
+  @Column(name = "attachment_id")
+  @BatchSize(size = 20)
   private List<UUID> attachmentIds;
 
-  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-
-    this.channelId = channelId;
-    this.authorId = authorId;
+  public Message(String content, Channel channel, User author, List<UUID> attachmentIds) {
     this.content = content;
+    this.channel = channel;
+    this.author = author;
     this.attachmentIds = attachmentIds;
   }
 
-  @Override
-  public String toString() {
-    return "Message{" +
-        "content='" + content + '\'' +
-        ", channelId=" + channelId +
-        ", authorId=" + authorId +
-        '}';
-  }
-
   public void update(String content) {
-    boolean flag = false;
     if (content != null && !content.equals(this.content)) {
       this.content = content;
-      flag = true;
-    }
-    if (flag) {
-      this.updatedAt = Instant.now();
     }
   }
 }

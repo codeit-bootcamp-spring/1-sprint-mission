@@ -1,66 +1,79 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
+import java.util.Set;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.UUID;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
-public class User implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-
+  @Column(nullable = false, unique = true, length = 50)
   private String username;
-  private String email;
-  private String password;
-  private UUID profileId;
 
-  public User(String username, String email, String password, UUID profileId) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
+  @Column(nullable = false, unique = true, length = 100)
+  private String email;
+
+  @Column(nullable = false, length = 60)
+  private String password;
+
+  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
+  //@BatchSize(size = 100)
+  private Set<Message> messages;
+
+  @OneToOne(cascade = CascadeType.MERGE)
+  @JoinColumn(name = "profile_id", referencedColumnName = "id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  private UserStatus status;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  //@BatchSize(size = 100)
+  private Set<ReadStatus> readStatuses;
+
+  public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.profileId = profileId;
+    this.profile = profile;
   }
 
+  public void setStatus(UserStatus status) {
+    this.status = status;
+    status.setUser(this);
+  }
 
-  public void update(String username, String email, String password, UUID newProfileId) {
-    boolean flag = false;
+  public void update(String username, String email, String password) {
     if (username != null && !username.equals(this.username)) {
       this.username = username;
-      flag = true;
     }
     if (email != null && !email.equals(this.email)) {
       this.email = email;
-      flag = true;
     }
     if (password != null && !password.equals(this.password)) {
       this.password = password;
-      flag = true;
     }
-    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
-      this.profileId = newProfileId;
-      flag = true;
-    }
-
-    if (flag) {
-      this.updatedAt = Instant.now();
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "name='" + username + '\'' +
-        '}';
   }
 }

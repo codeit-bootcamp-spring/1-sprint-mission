@@ -1,151 +1,191 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.binary.BinaryContentCreateRequestDto;
+import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequestDto;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.UserService;
 import com.sprint.mission.discodeit.service.Interface.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusService userStatusService;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
+  private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
+  @Autowired
+  private EntityManager entityManager;
 
   @Override
-  public User createUser(UserCreateRequestDto request,
-      Optional<BinaryContentCreateRequestDto> profile) {
+  @Transactional
+  public UserDto createUser(UserCreateRequestDto request, MultipartFile profile) {
+    if (request.getUsername() == null || request.getEmail() == null
+        || request.getPassword() == null) {
+      throw new IllegalArgumentException("사용자 정보를 올바르게 입력해야 합니다.");
+    }
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new IllegalArgumentException("Email already in use");
     }
-    if (userRepository.existsByName(request.getUsername())) {
+    if (userRepository.existsByUsername(request.getUsername())) {
       throw new IllegalArgumentException("Name already in use");
     }
 
-    UUID profileId = profile
-        .map(profileRequest -> {
-          String fileName = profileRequest.getFileName();
-          String contentType = profileRequest.getContentType();
-          byte[] bytes = profileRequest.getBytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
-        })
-        .orElse(null);
+    BinaryContent profileImage =
+        (profile != null && !profile.isEmpty()) ? saveProfile(profile) : null;
 
     User user = new User(request.getUsername(), request.getEmail(), request.getPassword(),
-        profileId);
-    User createUser = userRepository.save(user);
+        profileImage);
+    userRepository.save(user);
 
     Instant now = Instant.now();
-    UserStatus userStatus = new UserStatus(createUser.getId(), now);
-    userStatusRepository.save(userStatus);
+    UserStatus userStatus = new UserStatus(user, now);
+    user.setStatus(userStatus);
 
-    return createUser;
+    return userMapper.toDto(user);
   }
+
 
   @Override
   public UserDto getUserById(UUID id) {
-    return userRepository.getUserById(id)
-        .map(this::toDto)
+    return userRepository.findById(id)
+        .map(userMapper::toDto)
         .orElseThrow(() -> new IllegalArgumentException("User id : " + id + " not found"));
   }
 
   @Override
   public List<UserDto> getAllUsers() {
-    return userRepository.getAllUsers().stream().map(this::toDto).toList();
-  }
-
-  @Override
-  public List<User> findAllUsers() {
-    return userRepository.getAllUsers();
+    return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
 
   @Override
-  public User updateUser(UUID userId, UserUpdateRequestDto request
-      , Optional<BinaryContentCreateRequestDto> profile) {
-    User user = userRepository.getUserById(userId)
+  @Transactional
+  public UserDto updateUser(UUID userId, UserUpdateRequestDto request, MultipartFile profile) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-    if (userRepository.existsByEmail(request.getNewEmail())) {
-      throw new IllegalArgumentException(
-          "User with email " + request.getNewEmail() + " already exists");
+    BinaryContent oldProfile = user.getProfile();
+
+    if (profile != null && !profile.isEmpty()) {
+      if (oldProfile == null || !oldProfile.getFileName().equals(profile.getOriginalFilename())) {
+        if (oldProfile != null) {
+          binaryContentStorage.delete(oldProfile.getId(),
+              getFileExtension(oldProfile.getFileName()));
+          binaryContentRepository.deleteById(oldProfile.getId());
+        }
+
+        BinaryContent newProfile = saveProfile(profile);
+        user.setProfile(newProfile);
+      }
     }
-    if (userRepository.existsByName(request.getNewUsername())) {
-      throw new IllegalArgumentException(
-          "User with username " + request.getNewUsername() + " already exists");
-    }
-    UUID nullableProfileId = profile
-        .map(profileRequest -> {
-          Optional.ofNullable(user.getProfileId())
-              .ifPresent(binaryContentRepository::deleteById);
 
-          String fileName = profileRequest.getFileName();
-          String contentType = profileRequest.getContentType();
-          byte[] bytes = profileRequest.getBytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent).getId();
-        })
-        .orElse(null);
+    user.update(request.getNewUsername(), request.getNewEmail(), request.getNewPassword());
+    user.getStatus().update(Instant.now());
 
-    Instant now = Instant.now();
-    user.update(request.getNewUsername(), request.getNewEmail(), request.getNewPassword(),
-        nullableProfileId);
-    User updateUser = userRepository.save(user);
-    UserStatusUpdateRequest statusUpdateRequest = new UserStatusUpdateRequest(now);
-    userStatusService.updateByUserId(userId, statusUpdateRequest);
+    return userMapper.toDto(user);
+  }
 
-    return updateUser;
+
+  private String getFileExtension(String fileName) {
+    int dotIndex = fileName.lastIndexOf(".");
+    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
   }
 
   @Override
-  public void deleteUser(UUID id) {
-    if (!userRepository.existsById(id)) {
-      throw new NoSuchElementException("User with id not found");
-    }
-    userRepository.deleteUser(id);
-    userStatusService.deleteByUserId(id);
-    binaryContentService.deleteByUserId(id);
+  @Transactional
+  public void deleteUser(UUID userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new NoSuchElementException("User not found"));
 
+    // ✅ 먼저 프로필 이미지 삭제
+    if (user.getProfile() != null) {
+      UUID profileId = user.getProfile().getId();
+      String extension = getFileExtension(user.getProfile().getFileName());
+      binaryContentStorage.delete(profileId, extension);
+      binaryContentRepository.delete(user.getProfile());
+    }
+
+    // ✅ 사용자 삭제
+    userRepository.delete(user);
   }
 
-  private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
-        .map(UserStatus::isOnline)
-        .orElse(null);
 
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getProfileId(),
-        online
+  private BinaryContent saveProfile(MultipartFile profileFile) {
+    if (profileFile == null || profileFile.isEmpty()) {
+      throw new NoSuchElementException("Profile file is null or empty");
+    }
+
+    BinaryContent binaryContent = new BinaryContent(
+        profileFile.getOriginalFilename(),
+        profileFile.getSize(),
+        profileFile.getContentType()
     );
+
+    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+    String extension = getFileExtension(profileFile.getOriginalFilename());
+
+    try {
+      Path filePath = binaryContentStorage.put(savedContent.getId(), profileFile.getBytes(),
+          extension);
+      savedContent.setFilePath(filePath.toString());
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to save profile file", e);
+    }
+
+    return savedContent;
+  }
+
+  @Override
+  @Transactional
+  public BinaryContentDto saveProfileImage(MultipartFile profileFile) {
+    if (profileFile == null || profileFile.isEmpty()) {
+      throw new NoSuchElementException("multipartFile is null or empty");
+    }
+    BinaryContent binaryContent = new BinaryContent(
+        profileFile.getOriginalFilename(),
+        profileFile.getSize(),
+        profileFile.getContentType()
+    );
+    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+
+    String extension = getFileExtension(profileFile.getOriginalFilename());
+
+    // 2️⃣ 생성된 ID를 사용하여 파일 저장
+    try {
+      Path filePath = binaryContentStorage.put(savedContent.getId(), profileFile.getBytes(),
+          extension);
+      binaryContent.setFilePath(filePath.toString());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return binaryContentMapper.toDto(savedContent);
   }
 }
