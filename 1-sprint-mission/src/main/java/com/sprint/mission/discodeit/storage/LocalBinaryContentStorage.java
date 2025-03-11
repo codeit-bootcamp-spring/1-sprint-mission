@@ -73,6 +73,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     UUID storageId = binaryContentDto.id();
     Path filePath = resolvePath(storageId);
 
+    if (!Files.exists(filePath)) {
+      log.warn("File does not exist: {}", filePath);
+      return ResponseEntity.notFound().build();
+    }
+
     try {
 
       Resource resource = new FileSystemResource(filePath);

@@ -33,7 +33,7 @@ public class BasicUserStatusService implements UserStatusService {
         .orElseThrow(() -> new NoSuchElementException(
             "User with id " + request.userId() + " does not exist"));
 
-    if (userStatusRepository.findByUser(user).isPresent()) {
+    if (userStatusRepository.findByUserId(user.getId()).isPresent()) {
       throw new IllegalArgumentException("UserStatus for user " + user.getId() + " already exists");
     }
 
@@ -75,9 +75,11 @@ public class BasicUserStatusService implements UserStatusService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    UserStatus userStatus = userStatusRepository.findByUser(user)
+    UserStatus userStatus = userStatusRepository.findByUserId(userId)
         .orElseThrow(
-            () -> new NoSuchElementException("UserStatus with id " + user.getId() + " not found"));
+            () -> new NoSuchElementException("UserStatus not found for User ID: " + userId
+                + ". You may need to create one first."));
+
     userStatus.update(request.newLastActiveAt());
     return userStatusMapper.toDto(userStatus);
   }

@@ -26,6 +26,10 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public BinaryContentDto create(BinaryContentCreateRequest request) {
+    if (request.bytes() == null || request.bytes().length == 0) {
+      throw new IllegalArgumentException("Binary content data cannot be null or empty");
+    }
+
     UUID storageId = binaryContentStorage.put(null, request.bytes());
 
     BinaryContent binaryContent = new BinaryContent(

@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
-  //
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
@@ -45,13 +45,15 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(() -> new NoSuchElementException(
             "Author with id " + request.authorId() + " does not exist"));
 
-    List<BinaryContent> attachmentIds = attachmentRequests.stream()
+    List<BinaryContent> attachmentIds = Optional.ofNullable(attachmentRequests)
+        .orElse(List.of())
+        .stream()
         .map(attachmentRequest -> {
           BinaryContent binaryContent = new BinaryContent(
+              UUID.randomUUID(),
               attachmentRequest.fileName(),
               (long) attachmentRequest.bytes().length,
-              attachmentRequest.contentType(),
-              attachmentRequest.bytes()
+              attachmentRequest.contentType()
           );
           return binaryContentRepository.save(binaryContent);
         })
@@ -85,7 +87,6 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(request.newContent());
-    message = messageRepository.save(message);
     return messageMapper.toDto(message);
   }
 
@@ -96,7 +97,9 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
-    message.getAttachments().stream()
+    Optional.ofNullable(message.getAttachments()) // ✅ null 방지
+        .orElse(List.of())
+        .stream()
         .map(BinaryContent::getId)
         .forEach(binaryContentRepository::deleteById);
 

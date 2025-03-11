@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,5 +32,6 @@ public abstract class BaseEntity {
     if (this.id == null) {
       this.id = UUID.randomUUID();
     }
+
   }
 }
