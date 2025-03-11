@@ -51,9 +51,9 @@ public class JCFUserService implements UserService {
         });
 
         User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
+
         UserStatus userStatus = userStatusService.create(savedUser);
         savedUser.setStatus(userStatus);
-        System.out.println("savedUser의 아이디 = " + savedUser.getId());
         return savedUser;
     }
 

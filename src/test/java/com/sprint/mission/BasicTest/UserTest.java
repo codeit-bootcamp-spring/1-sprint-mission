@@ -42,7 +42,7 @@ public class UserTest {
     private UserStatusRepository userStatusRepository;
 
     //@BeforeEach
-    void createTest(){
+    void createTest() {
         for (int i = 0; i < 20; i++) {
             UserDtoForCreate createDto = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
             userService.create(createDto, null);
@@ -50,7 +50,7 @@ public class UserTest {
     }
 
     @Test
-    void setUpTest(){
+    void setUpTest() {
         List<User> users = userRepository.findAll();
         assertThat(users).isNotEmpty();
         assertThat(users.size()).isEqualTo(20);
@@ -61,7 +61,7 @@ public class UserTest {
     }
 
     @Test
-    void cascadeUserAndUserStatusTest(){
+    void cascadeUserAndUserStatusTest() {
         for (int i = 0; i < 20; i++) {
             UserDtoForCreate createDto = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
             userService.create(createDto, null);
@@ -75,9 +75,16 @@ public class UserTest {
     }
 
     @Test
-    void userEqualsHashCodeTest(){
-        UserDtoForCreate createDto1 = new UserDtoForCreate("test 유저 1", "test 패스워드 1", "test 이메일 1");
-        User createdUser1 = userService.create(createDto1, null);
+    void userEqualsHashCodeTest() {
+        UserDtoForCreate createDto = new UserDtoForCreate("test 유저 1", "test 패스워드 1", "test 이메일 1");
+        User createdUser1 = userService.create(createDto, null);
+
+        User createdUser = createDto.toEntity();
+        User savedUser = userRepository.save(createdUser);
+        System.out.println("createdUser = " + createdUser + "ID = " + createdUser.getId());
+        System.out.println("savedUser = " + savedUser + "ID = " + savedUser.getId());
+        Assertions.assertThat(createdUser).isEqualTo(createdUser);
+
         User user = new User(createdUser1.getUsername(), createdUser1.getPassword(), createdUser1.getEmail());
         user.setId(createdUser1.getId());
 
@@ -89,7 +96,7 @@ public class UserTest {
     }
 
     @Test
-    void duplicateUserTest(){
+    void duplicateUserTest() {
         User user = new User("test 유저 1", "test 패스워드 1", "test 이메일 1");
         userRepository.save(user);
 
@@ -99,7 +106,7 @@ public class UserTest {
     }
 
     @Test
-    void updateUser(){
+    void updateUser() {
         User beforeUpdateUser = new User("업데이트 전 이름", "업데이트 전 비밀번호", "업데이트 전 이메일");
         userRepository.save(beforeUpdateUser);
         em.flush();
@@ -115,14 +122,14 @@ public class UserTest {
     }
 
     @Test
-    void find(){
+    void find() {
         List<User> all = userRepository.findAll();
         assertThat(all).isNotEmpty();
         assertThat(all.size()).isEqualTo(20);
     }
 
     @Test
-    void delete(){
+    void delete() {
         User beforeDeleteUser = new User("삭제 전 이름", "삭제 전 비밀번호", "삭제 전 이메일");
         userRepository.save(beforeDeleteUser);
         em.flush();
@@ -137,7 +144,7 @@ public class UserTest {
     }
 
     @Test
-    void findStatusMap(){
+    void findStatusMap() {
         for (int i = 0; i < 3; i++) {
             UserDtoForCreate userDtoForCreate = new UserDtoForCreate("테스트 유저 " + i, "testPassword" + i, "테스트 이메일" + i);
             userService.create(userDtoForCreate, null);
