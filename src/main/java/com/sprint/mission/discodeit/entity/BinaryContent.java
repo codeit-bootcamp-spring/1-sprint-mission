@@ -1,39 +1,40 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateDTO;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.io.Serializable;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+
 @Entity
-public class BinaryContent implements Serializable {
+@Table(name = "binary_contents")
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BinaryContent extends BaseEntity implements Serializable {
 
   private static final Long serialVersionUID = 1L;
 
-  @Id
-  private UUID id;
-
-  private Instant createdAt;
-
+  @Column(name = "file_name")
   private String filePath; //file 경로 문자열
 
-  //TODO: Sprint 3 image or file 구분하는 필드  -> 멀티패스파일?
+  @Column(name = "size")
+  private Long size;
 
-  public BinaryContent() {
-  }
+  @Column(name = "content_type")
+  private String contentType;
 
-  public BinaryContent(String filePath) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    this.filePath = filePath;
-  }
+  @Column(name = "bytes")
+  private byte[] bytes;
 
-
+  
 }

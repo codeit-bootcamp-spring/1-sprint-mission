@@ -2,58 +2,75 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.io.Serializable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
+import org.springframework.data.annotation.CreatedDate;
 
+@Entity
+@Table(name = "user_statuses")
 @Getter
 @Setter
-public class UserStatus implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity implements Serializable {
 
-    private static final Long serialVersionUID = 1L;
+  private static final Long serialVersionUID = 1L;
 
-    //사용자의 마지막 접속 시간 표현-> 온라인 상태 확인
-    private UUID id;
-    private final Instant createdAt;
-    private Instant updatedAt;
+  //사용자의 마지막 접속 시간 표현-> 온라인 상태 확인
 
-    private final UUID userId;
-    private Instant lastAccessedAt;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-    public UserStatus(UUID userId){
-        this.id=UUID.randomUUID();
-        this.userId=userId;
-        this.createdAt = Instant.now();
-        this.lastAccessedAt=Instant.now();
+  @Column(name = "last_active_at")
+  private Instant lastAccessedAt;
+
+//  protected UserStatus() {
+//    super();
+//  }
+//
+//  public UserStatus(UUID userId) {
+//    super();
+//    this.lastAccessedAt = Instant.now();
+//  }
+//
+//  public UserStatus(UserStatusCreateDTO userStatusCreateDTO) {
+//    super();
+//
+//    this.lastAccessedAt = userStatusCreateDTO.lastAccessedAt();
+//  }
+
+  //유저 온라인 상태를 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 검증하고 반환하는 메서드.
+  public Boolean isOnline() {
+    if (lastAccessedAt != null) {
+      Duration duration = Duration.between(lastAccessedAt, Instant.now());
+      if (duration.toMinutes() <= 5) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    public UserStatus(UserStatusCreateDTO userStatusCreateDTO) {
-        this.id=UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt=this.createdAt;
-
-        this.userId=userStatusCreateDTO.userId();
-        this.lastAccessedAt=userStatusCreateDTO.lastAccessedAt();
-    }
-
-    //유저 온라인 상태를 마지막 접속 시간이 현재 시간으로부터 5분 이내임을 검증하고 반환하는 메서드.
-    public Boolean isOnline(){
-        if (lastAccessedAt != null) {
-            Duration duration = Duration.between(lastAccessedAt, Instant.now());
-            if (duration.toMinutes() <= 5){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
-        this.lastAccessedAt=userStatusUpdateDTO.time();
-        this.updatedAt=Instant.now();
-        isOnline();
-    }
+  public void update(UserStatusUpdateDTO userStatusUpdateDTO) {
+    this.lastAccessedAt = userStatusUpdateDTO.time();
+    update();
+    isOnline();
+  }
 }

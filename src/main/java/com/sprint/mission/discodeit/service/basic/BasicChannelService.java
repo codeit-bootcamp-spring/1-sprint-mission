@@ -40,7 +40,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public Channel createPublicChannel(ChannelCreateDTO channelCreateDTO) {
-    Channel channel = new Channel(channelCreateDTO, ChannelType.PUBLIC);
+    Channel channel = new Channel(channelCreateDTO.name(), ChannelType.PUBLIC);
     return channelRepository.save(channel);
   }
 
