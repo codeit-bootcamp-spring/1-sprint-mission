@@ -1,11 +1,12 @@
 package com.sprint.mission.discodeit.dto.request;
 
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 public record MessageCreateRequest(
     String content,
-    UUID channelId,
-    UUID authorId
+    Channel channel,
+    User author
 ) {
 
 }
