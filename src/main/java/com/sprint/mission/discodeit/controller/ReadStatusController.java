@@ -50,6 +50,14 @@ public class ReadStatusController {
     return ResponseEntity.ok(status);
   }
 
+  @Operation(summary = "읽음 상태 전체 조회", description = "읽음 상태를 조회합니다.")
+  @ApiResponse(responseCode = "200", description = "읽음 상태 전체 조회 성공")
+  @GetMapping
+  public ResponseEntity<List<ReadStatus>> getReadStatuses() {
+    List<ReadStatus> status = readStatusService.findAll();
+    return ResponseEntity.ok(status);
+  }
+
   @Operation(summary = "읽음 상태 ID로 업데이트", description = "읽음 상태를 Id로 업데이트합니다.")
   @ApiResponse(responseCode = "200", description = "읽음 상태 업데이트 성공")
   @PatchMapping("/{readStatusId}")

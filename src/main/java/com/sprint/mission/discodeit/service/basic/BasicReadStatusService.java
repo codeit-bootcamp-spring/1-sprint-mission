@@ -49,6 +49,11 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  public List<ReadStatus> findAll() {
+    return (List<ReadStatus>) readStatusRepository.findAll();
+  }
+
+  @Override
   public synchronized void updateReadStatusByUserIdAndChannelId(UUID userId, UUID channelId) {
     User user = userService.getUserById(userId);
     Channel channel = channelService.getChannel(channelId);
@@ -66,4 +71,6 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus.updateLastReadTime(Instant.now());
     return readStatusRepository.save(readStatus);
   }
+
+
 }

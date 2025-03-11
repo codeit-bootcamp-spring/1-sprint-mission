@@ -17,4 +17,6 @@ public interface ReadStatusService {
   ReadStatus findById(UUID readStatusId);
 
   ReadStatus updateReadStatusById(UUID readStatusId);
+
+  List<ReadStatus> findAll();
 }
