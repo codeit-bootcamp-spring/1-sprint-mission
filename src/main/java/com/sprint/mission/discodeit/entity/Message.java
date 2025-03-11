@@ -4,14 +4,9 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
 @Getter
 @Entity
-@Table(name = "message")
+@Table(name = "messages")
 public class Message extends BaseUpdatableEntity {
 
     @Column(nullable = false, length = 1000)

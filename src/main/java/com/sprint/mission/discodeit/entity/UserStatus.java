@@ -6,11 +6,10 @@ import lombok.Getter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @Entity
-@Table(name = "user_status")
+@Table(name = "user_statuses")
 public class UserStatus extends BaseUpdatableEntity {
 
     @OneToOne

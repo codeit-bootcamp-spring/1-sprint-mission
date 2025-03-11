@@ -3,14 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
-
-import java.io.Serializable;
 import java.time.Instant;
-import java.util.UUID;
+
 
 @Getter
 @Entity
-@Table(name = "read_status")
+@Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {
 
     @ManyToOne

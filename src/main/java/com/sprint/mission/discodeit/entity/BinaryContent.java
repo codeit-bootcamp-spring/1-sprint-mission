@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.entity;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
-
-import java.time.Instant;
-import java.util.UUID;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
-@Table(name = "binary_content")
+@Table(name = "binary_contents")
 public class BinaryContent extends BaseUpdatableEntity {
     @Column(nullable = false)
     private String fileName;
