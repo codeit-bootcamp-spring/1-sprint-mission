@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -128,7 +129,8 @@ public class BasicChannelService implements ChannelService {
     if (findDTO(channelUpdateDTO.uuid()).getType() == ChannelType.PRIVATE) {
       throw new IllegalArgumentException("PRIVATE  채널은 수정할 수 없습니다.");
     }
-    Channel channel = channelRepository.findById(channelUpdateDTO.uuid());
+    Channel channel = channelRepository.findById(channelUpdateDTO.uuid()).orElseThrow(()
+        -> new NoSuchElementException("channel not found"));
     channel.updateName(channelUpdateDTO.name());
     return channelRepository.save(channel);
   }
@@ -141,6 +143,6 @@ public class BasicChannelService implements ChannelService {
     if (channel.getType() == ChannelType.PRIVATE) {
       readStatusService.deleteByChannelId(id);
     }
-    channelRepository.delete(id);
+    channelRepository.deleteById(id);
   }
 }

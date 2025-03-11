@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +28,8 @@ import java.util.UUID;
 @Table(name = "messages")
 @Getter
 @Setter
+@Builder
+
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Message extends BaseUpdatableEntity implements Serializable {
@@ -54,7 +57,7 @@ public class Message extends BaseUpdatableEntity implements Serializable {
   )
   private List<BinaryContent> attachments; //파일 용량/개수 제한을 둬야함
 
-  
+
   public void attachBinaryContent(List<BinaryContent> binaryContents) {
     this.attachments = binaryContents;
   }
@@ -65,8 +68,4 @@ public class Message extends BaseUpdatableEntity implements Serializable {
     super.update();
   }
 
-  //delete related Domain
-  public void deleteBinaryContentList() {
-    this.attachments = null;
-  }
 }

@@ -11,23 +11,24 @@ import java.util.NoSuchElementException;
 
 @Service
 public class BasicAuthService implements AuthService {
-    private final UserRepository userRepository;
 
-    public BasicAuthService (UserRepository userRepository) {
-        this.userRepository=userRepository;
-    }
-    @Override
-    public User isUserExist(AuthUserDTO authUserDTO) {
+  private final UserRepository userRepository;
 
-        return userRepository.load().values()
-                .stream()
-                .filter(user -> authUserDTO.name().equals(user.getUserName())
-                        && authUserDTO.password().equals(user.getPassword()))
-                .findFirst()
-                .orElseThrow(()-> new LoginFailedException("로그인 실패"));
+  public BasicAuthService(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
-    }
+  @Override
+  public User isUserExist(AuthUserDTO authUserDTO) {
 
+    return userRepository.findAll()
+        .stream()
+        .filter(user -> authUserDTO.name().equals(user.getUsername())
+            && authUserDTO.password().equals(user.getPassword()))
+        .findFirst()
+        .orElseThrow(() -> new LoginFailedException("로그인 실패"));
+
+  }
 
 
 }
