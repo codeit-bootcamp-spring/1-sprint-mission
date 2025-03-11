@@ -11,5 +11,5 @@ public interface BinaryContentStorage {
 
   InputStream get(UUID id);
 
-  ResponseEntity<?> download(BinaryContentDto binaryContentDto);
+  ResponseEntity<?> download(UUID id);
 }
