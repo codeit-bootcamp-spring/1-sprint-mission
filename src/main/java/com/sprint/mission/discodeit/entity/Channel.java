@@ -18,7 +18,9 @@ import java.util.*;
 public class Channel extends BaseUpdateEntity {
 
   private String channelName;
+
   private boolean isPrivate;
+
   private Instant lastMessageTime;
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -7,13 +7,16 @@ import com.sprint.mission.discodeit.dto.channel.UpdateChannelRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,22 +30,27 @@ public class BasicChannelService implements ChannelService {
   @Override
   @Transactional
   public ChannelResponse createChannel(CreateChannelRequest request) {
-    Channel channel = channelRepository.save(new Channel(request.channelName(), false));
-    return ChannelResponse.fromEntity(channel);
+    User user = userService.getUserById(request.userId());
+    Channel channel = getOrCreateChannel(request.channelName());
+
+    channel.addUserToChannel(user);
+
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<ChannelResponse> getChannelsResponse() {
-    return channelRepository.findAll().stream().map(ChannelResponse::fromEntity).toList();
+    return channelRepository.findAll().stream().map(ChannelMapper.INSTANCE::toChannelResponse)
+        .toList();
   }
 
 
   @Override
   @Transactional(readOnly = true)
   public ChannelResponse getChannelResponse(UUID uuid) {
-    return channelRepository.findById(uuid).map(ChannelResponse::fromEntity)
-        .orElseThrow(EntityNotFoundException::new);
+    Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
 
   @Override
@@ -58,13 +66,15 @@ public class BasicChannelService implements ChannelService {
         .orElseThrow(EntityNotFoundException::new);
     channel.addMessageToChannel(message);
     channelRepository.save(channel);
-    return ChannelResponse.fromEntity(channel);
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<Message> getMessagesFromChannel(UUID uuid) {
-    return channelRepository.findById(uuid).orElseThrow().getMessages();
+    return channelRepository.findById(uuid).orElseThrow(
+        () -> new EntityNotFoundException("No channel found for uuid: " + uuid)
+    ).getMessages();
   }
 
   @Override
@@ -73,13 +83,16 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(uuid).orElseThrow(EntityNotFoundException::new);
     channel.updateChannelName(request.newName());
     channelRepository.save(channel);
-    return ChannelResponse.fromEntity(channel);
+    return ChannelMapper.INSTANCE.toChannelResponse(channel);
   }
 
   @Override
   @Transactional
   public void deleteChannel(UUID uuid) {
-    channelRepository.findById(uuid).ifPresent(channelRepository::delete);
+    try {
+      channelRepository.deleteById(uuid);
+    } catch (EmptyResultDataAccessException ignored) {
+    }
   }
 
   @Override
@@ -91,6 +104,11 @@ public class BasicChannelService implements ChannelService {
 
     users.forEach(channel::addUserToChannel);
 
-    return ChannelResponse.fromEntity(channelRepository.save(channel));
+    return ChannelMapper.INSTANCE.toChannelResponse(channelRepository.save(channel));
+  }
+
+  private Channel getOrCreateChannel(String channelName) {
+    return Optional.ofNullable(channelRepository.findByChannelName(channelName))
+        .orElseGet(() -> channelRepository.save(new Channel(channelName, false)));
   }
 }

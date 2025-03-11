@@ -2,14 +2,13 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.status.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-public class ReadStatusMapper {
+@Mapper
+public interface ReadStatusMapper {
 
-  public static ReadStatusResponse toDto(ReadStatus rs) {
-    return new ReadStatusResponse(
-        rs.getId(),
-        rs.getOwner().getId(),
-        rs.getChannel().getId(),
-        rs.getLastReadTime());
-  }
+  ReadStatusMapper INSTANCE = Mappers.getMapper(ReadStatusMapper.class);
+
+  ReadStatusResponse toReadStatusResponse(ReadStatus readStatus);
 }

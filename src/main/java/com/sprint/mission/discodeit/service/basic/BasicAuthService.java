@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.auth.LoginRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,6 @@ public class BasicAuthService implements AuthService {
     if (!user.getPassword().equals(request.password())) {
       throw new IllegalArgumentException("Wrong password");
     }
-    return UserResponse.fromEntity(user);
+    return UserMapper.INSTANCE.userToUserResponse(user);
   }
 }

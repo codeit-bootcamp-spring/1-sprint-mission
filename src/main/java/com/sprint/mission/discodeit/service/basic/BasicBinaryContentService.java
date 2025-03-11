@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.binarycontetnt.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
@@ -25,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional
-  public BinaryContent create(CreateBinaryContentRequest request) {
+  public BinaryContentResponse create(CreateBinaryContentRequest request) {
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
@@ -35,19 +36,25 @@ public class BasicBinaryContentService implements BinaryContentService {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return binaryContentRepository.save(binaryContent);
+    return BinaryContentMapper.INSTANCE.toBinaryContentResponse(
+        binaryContentRepository.save(binaryContent));
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Optional<BinaryContent> getBinaryContent(UUID id) {
-    return binaryContentRepository.findById(id);
+  public Optional<BinaryContentResponse> getBinaryContent(UUID id) {
+    BinaryContent binaryContent = binaryContentRepository.findById(id).orElseThrow(
+        () -> new EntityNotFoundException("Binarycontent with " + id + " not found")
+    );
+    return Optional.ofNullable(
+        BinaryContentMapper.INSTANCE.toBinaryContentResponse(binaryContent));
   }
 
   @Override
   @Transactional
-  public BinaryContent saveBinaryContent(BinaryContent binaryContent) {
-    return binaryContentRepository.save(binaryContent);
+  public BinaryContentResponse saveBinaryContent(BinaryContent binaryContent) {
+    return BinaryContentMapper.INSTANCE.toBinaryContentResponse(
+        binaryContentRepository.save(binaryContent));
   }
 
   @Override
@@ -58,8 +65,9 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<BinaryContent> getBinaryContentListByIds(List<UUID> ids) {
-    return (List<BinaryContent>) binaryContentRepository.findAllById(ids);
+  public List<BinaryContentResponse> getBinaryContentListByIds(List<UUID> ids) {
+    List<BinaryContent> contents = binaryContentRepository.findAllById(ids);
+    return BinaryContentMapper.INSTANCE.toResponseList(contents);
   }
 
   @Override

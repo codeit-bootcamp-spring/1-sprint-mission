@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.CursorResponseMapper;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -40,14 +41,14 @@ public class BasicMessageService implements MessageService {
     Channel channel = channelService.getChannel(request.channelID());
     User author = userService.getUserById(request.authorID());
     Message newMessage = new Message(request.text(), author, channel);
-    return MessageResponse.fromEntity(messageRepository.save(newMessage));
+    return MessageMapper.INSTANCE.toMessageResponse(messageRepository.save(newMessage));
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<MessageResponse> getMessages() {
     return messageRepository.findAll().stream()
-        .map(MessageResponse::fromEntity)
+        .map(MessageMapper.INSTANCE::toMessageResponse)
         .toList();
   }
 
@@ -56,7 +57,7 @@ public class BasicMessageService implements MessageService {
   public PageResponse<MessageResponse> getPageMessages(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     Page<Message> messages = messageRepository.findAll(pageable);
-    return PageResponseMapper.fromPage(messages.map(MessageResponse::fromEntity));
+    return PageResponseMapper.fromPage(messages.map(MessageMapper.INSTANCE::toMessageResponse));
   }
 
   @Override
@@ -71,7 +72,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   public List<MessageResponse> getMessagesByChannel(UUID ChannelID) {
     return channelService.getMessagesFromChannel(ChannelID).stream()
-        .map(MessageResponse::fromEntity)
+        .map(MessageMapper.INSTANCE::toMessageResponse)
         .collect(Collectors.toList());
   }
 
@@ -79,7 +80,7 @@ public class BasicMessageService implements MessageService {
   @Transactional(readOnly = true)
   public MessageResponse getMessage(UUID uuid) {
     return messageRepository.findById(uuid)
-        .map(MessageResponse::fromEntity).orElseThrow(
+        .map(MessageMapper.INSTANCE::toMessageResponse).orElseThrow(
             () -> new EntityNotFoundException("Message not found")
         );
   }
@@ -92,7 +93,7 @@ public class BasicMessageService implements MessageService {
           message.updateText(request.text());
           return messageRepository.save(message);
         })
-        .map(MessageResponse::fromEntity).orElseThrow(
+        .map(MessageMapper.INSTANCE::toMessageResponse).orElseThrow(
             () -> new EntityNotFoundException("Message not found")
         );
   }

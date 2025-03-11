@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.binarycontetnt.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.status.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.status.UserStatusResponse;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
@@ -104,7 +105,7 @@ public class UserController {
   @ApiResponses({@ApiResponse(responseCode = "200", description = "사용자 접속 정보 수정 성공"),
       @ApiResponse(responseCode = "404", description = "해당 사용자를 찾을 수 없음")})
   @PatchMapping("/{userId}/userStatus")
-  public ResponseEntity<UserStatus> updateUserUserStatus(
+  public ResponseEntity<UserStatusResponse> updateUserUserStatus(
       @Parameter(description = "접속 상태 수정할 사용자 ID", required = true) @PathVariable UUID userId,
       @Parameter(description = "접속 상태 수정 dto", required = true) @RequestBody UpdateUserStatusRequest request) {
     return ResponseEntity.ok(userStatusService.update(userId, request));

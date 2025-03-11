@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -47,20 +48,21 @@ public class BasicUserService implements UserService {
     UserStatus userStatus = new UserStatus(Instant.now());
     user.setUserStatus(userStatus);
     userStatus.setUser(user);
-    return UserResponse.fromEntity(userRepository.save(user));
+    return UserMapper.INSTANCE.userToUserResponse(userRepository.save(user));
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<UserResponse> findAllUsers() {
-    return userRepository.findAll().stream().map(UserResponse::fromEntity)
-        .collect(Collectors.toList());
+    return userRepository.findAll().stream().map(UserMapper.INSTANCE::userToUserResponse)
+        .toList();
   }
 
   @Override
   @Transactional(readOnly = true)
   public Optional<UserResponse> findUserById(UUID userId) {
-    return userRepository.findById(userId).map(UserResponse::fromEntity);
+    User user = getUserById(userId);
+    return Optional.ofNullable(UserMapper.INSTANCE.userToUserResponse(user));
   }
 
   @Override
@@ -74,7 +76,7 @@ public class BasicUserService implements UserService {
       optionalRequest.map(this::saveBinaryContent).ifPresent(user::setProfileImage);
       userRepository.save(user);
 
-      return UserResponse.fromEntity(user);
+      return UserMapper.INSTANCE.userToUserResponse(user);
     });
   }
 
@@ -95,6 +97,9 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional
   public User getUserById(UUID uuid) {
+    if (uuid == null) {
+      throw new IllegalArgumentException("Need to specify a valid user id");
+    }
     return userRepository.findById(uuid)
         .orElseThrow(() -> new EntityNotFoundException("User with ID " + uuid + " not found"));
   }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,8 +30,8 @@ public class BinaryContentController {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"),
       @ApiResponse(responseCode = "404", description = "조회 실패")})
   @GetMapping("/{id}")
-  public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable UUID id) {
-    Optional<BinaryContent> binaryContent = binaryContentService.getBinaryContent(id);
+  public ResponseEntity<BinaryContentResponse> getBinaryContent(@PathVariable UUID id) {
+    Optional<BinaryContentResponse> binaryContent = binaryContentService.getBinaryContent(id);
     return binaryContent.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
@@ -38,8 +39,10 @@ public class BinaryContentController {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "추가 성공"),
       @ApiResponse(responseCode = "500", description = "추가 실패")})
   @PostMapping
-  public ResponseEntity<BinaryContent> saveBinaryContent(@RequestBody BinaryContent binaryContent) {
-    BinaryContent savedBinaryContent = binaryContentService.saveBinaryContent(binaryContent);
+  public ResponseEntity<BinaryContentResponse> saveBinaryContent(
+      @RequestBody BinaryContent binaryContent) {
+    BinaryContentResponse savedBinaryContent = binaryContentService.saveBinaryContent(
+        binaryContent);
     return ResponseEntity.ok(savedBinaryContent);
   }
 
@@ -56,9 +59,10 @@ public class BinaryContentController {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "조회 성공"),
       @ApiResponse(responseCode = "500", description = "조회 실패")})
   @GetMapping
-  public ResponseEntity<List<BinaryContent>> getBinaryContentListByIds(
+  public ResponseEntity<List<BinaryContentResponse>> getBinaryContentListByIds(
       @RequestBody List<UUID> ids) {
-    List<BinaryContent> binaryContents = binaryContentService.getBinaryContentListByIds(ids);
+    List<BinaryContentResponse> binaryContents = binaryContentService.getBinaryContentListByIds(
+        ids);
     return ResponseEntity.ok(binaryContents);
   }
 

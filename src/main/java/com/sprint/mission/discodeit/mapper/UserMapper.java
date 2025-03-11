@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
-import com.sprint.mission.discodeit.dto.status.UserStatusResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
+import org.mapstruct.factory.Mappers;
 
-public class UserMapper {
+@Mapper
+public interface UserMapper {
 
-  public static UserResponse toDto(User user) {
-    return new UserResponse(user.getId(), user.getUsername(), user.getEmail(),
-        UserStatusResponse.fromEntity(user.getUserStatus()),
-        BinaryContentResponse.fromEntity(user.getProfileImage()));
-  }
+  UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+  @Mapping(source = "userStatus", target = "status")
+  UserResponse userToUserResponse(User user);
 }

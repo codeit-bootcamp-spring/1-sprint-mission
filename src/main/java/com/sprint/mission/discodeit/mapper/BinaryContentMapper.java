@@ -2,10 +2,16 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-public class BinaryContentMapper {
+@Mapper
+public interface BinaryContentMapper {
 
-  public static BinaryContentResponse toDto(BinaryContent bc) {
-    return new BinaryContentResponse(bc.getId(), bc.getFileName(), bc.getSize(), bc.getMimeType());
-  }
+  BinaryContentMapper INSTANCE = Mappers.getMapper(BinaryContentMapper.class);
+
+  BinaryContentResponse toBinaryContentResponse(BinaryContent binaryContent);
+
+  List<BinaryContentResponse> toResponseList(List<BinaryContent> binaryContents);
 }

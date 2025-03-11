@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.binarycontetnt.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.binarycontetnt.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
@@ -10,15 +11,15 @@ import org.springframework.http.ResponseEntity;
 
 public interface BinaryContentService {
 
-  BinaryContent create(CreateBinaryContentRequest request);
+  BinaryContentResponse create(CreateBinaryContentRequest request);
 
-  Optional<BinaryContent> getBinaryContent(UUID id);
+  Optional<BinaryContentResponse> getBinaryContent(UUID id);
 
-  BinaryContent saveBinaryContent(BinaryContent binaryContent);
+  BinaryContentResponse saveBinaryContent(BinaryContent binaryContent);
 
   void deleteBinaryContent(UUID id);
 
-  List<BinaryContent> getBinaryContentListByIds(List<UUID> ids);
+  List<BinaryContentResponse> getBinaryContentListByIds(List<UUID> ids);
 
   ResponseEntity<?> downloadBinaryContent(UUID id);
 }
