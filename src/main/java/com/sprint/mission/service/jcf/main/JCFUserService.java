@@ -50,11 +50,10 @@ public class JCFUserService implements UserService {
             createdUser.setProfile(createdBinaryContent);
         });
 
-        User savedUser = userRepository.save(createdUser);// SAVE해야 UUID 생성
-
-        UserStatus userStatus = userStatusService.create(savedUser);
-        savedUser.setStatus(userStatus);
-        return savedUser;
+        userRepository.save(createdUser);// SAVE해야 UUID 생성
+        UserStatus userStatus = userStatusService.create(createdUser);
+        createdUser.setStatus(userStatus);
+        return createdUser;
     }
 
     // DTO를 사용해서 온라인 상태정보도 포함해서 보내기

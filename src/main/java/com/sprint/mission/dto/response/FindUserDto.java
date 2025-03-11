@@ -1,46 +1,46 @@
-package com.sprint.mission.dto.response;
-
-import com.sprint.mission.entity.addOn.BinaryContent;
-import com.sprint.mission.entity.main.User;
-import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.UUID;
-
-import java.time.Instant;
-
-
-@Schema(description = "유저 정보")
-public record FindUserDto(
-    UUID userId,
-    Instant createAt,
-    Instant updateAt,
-    String name,
-    String email,
-    UUID profileImgId,
-    boolean isOnline) {
-
-  public FindUserDto(User user, Boolean isOnline) {
-    this(
-        user.getId(),
-        user.getCreatedAt(),
-        user.getUpdatedAt(),
-        user.getUsername(),
-        user.getEmail(),
-        user.getProfile().getId(), // 나중에 바꿔야 되는 것
-        isOnline
-    );
-  }
-
-
-//  public static FindUserDto toDtoFromEntityAndStatus(User user, Boolean isOnline) {
-//    return new FindUserDto(
+//package com.sprint.mission.dto.response;
+//
+//import com.sprint.mission.entity.addOn.BinaryContent;
+//import com.sprint.mission.entity.main.User;
+//import io.swagger.v3.oas.annotations.media.Schema;
+//
+//import java.util.UUID;
+//
+//import java.time.Instant;
+//
+//
+//@Schema(description = "유저 정보")
+//public record FindUserDto(
+//    UUID userId,
+//    Instant createAt,
+//    Instant updateAt,
+//    String name,
+//    String email,
+//    UUID profileImgId,
+//    boolean isOnline) {
+//
+//  public FindUserDto(User user, Boolean isOnline) {
+//    this(
 //        user.getId(),
 //        user.getCreatedAt(),
 //        user.getUpdatedAt(),
-//        user.getName(),
+//        user.getUsername(),
 //        user.getEmail(),
-//        user.getProfileImgId(),
+//        user.getProfile().getId(), // 나중에 바꿔야 되는 것
 //        isOnline
 //    );
 //  }
-}
+//
+//
+////  public static FindUserDto toDtoFromEntityAndStatus(User user, Boolean isOnline) {
+////    return new FindUserDto(
+////        user.getId(),
+////        user.getCreatedAt(),
+////        user.getUpdatedAt(),
+////        user.getName(),
+////        user.getEmail(),
+////        user.getProfileImgId(),
+////        isOnline
+////    );
+////  }
+//}

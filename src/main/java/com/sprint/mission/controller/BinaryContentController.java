@@ -2,7 +2,8 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
-import com.sprint.mission.dto.response.BinaryContentDto;
+import com.sprint.mission.dto.BinaryContentMapper;
+import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.repository.BinaryContentStorage;
 import com.sprint.mission.service.jcf.addOn.BinaryService;
@@ -36,6 +37,7 @@ public class BinaryContentController {
 
     private final BinaryService binaryContentService;
     private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Operation(summary = "첨부 파일 조회")
     @ApiResponses({
@@ -48,8 +50,10 @@ public class BinaryContentController {
     public ResponseEntity<CommonResponse> find(
             @Parameter(description = "조회할 첨부 파일 ID") @PathVariable("id") UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
+        // 이 때도 다운로드?
+        //return (ResponseEntity<Resource>) binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
         return CommonResponse.toResponseEntity
-                (OK, "BinaryContent 조회 성공", binaryContent);
+                (OK, "BinaryContent 조회 성공", binaryContentMapper.toDto(binaryContent));
     }
 
 
@@ -59,15 +63,17 @@ public class BinaryContentController {
     @GetMapping
     public ResponseEntity<CommonResponse> findAllByIdIn(
             @Parameter(description = "조회할 첨부 파일 ID 목록") @RequestParam("ids") List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIdIn(binaryContentIds);
+        List<BinaryContentDto> binaryContentDtoList = binaryContentService.findAllByIdIn(binaryContentIds).stream()
+                .map(binaryContentMapper::toDto).toList();
+
         return CommonResponse.toResponseEntity
-                (OK, "BinaryContent 목록 조회 성공", binaryContents);
+                (OK, "BinaryContent 목록 조회 성공", binaryContentDtoList);
     }
 
     // 파일 다운로드 로직 넣기
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable("id") UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
-        return (ResponseEntity<Resource>) binaryContentStorage.download(new BinaryContentDto(binaryContent));
+        return (ResponseEntity<Resource>) binaryContentStorage.download(binaryContentMapper.toDto(binaryContent));
     }
 }

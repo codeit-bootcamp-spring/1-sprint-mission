@@ -31,7 +31,7 @@ public class BinaryService {
 
     public BinaryContent findById(UUID id){
         return binaryContentRepository.findById(id)
-            .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
+                .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_BINARY));
     }
 
 //    public List<BinaryContent> findAllByIdList(List<UUID> idList) {

@@ -7,7 +7,6 @@ import com.sprint.mission.dto.UserMapper;
 import com.sprint.mission.dto.mappedDto.UserDto;
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
-import com.sprint.mission.dto.response.FindUserDto;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
@@ -117,7 +116,7 @@ public class UserController {
 
     @Operation(summary = "전체 User 목록 조회")
     @ApiResponse(responseCode = "200", description = "User 목록 조회 성공",
-            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindUserDto.class))))
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class))))
     @GetMapping
     public ResponseEntity<CommonResponse> findAll() {
 //        Map<User, Boolean> statusMapByUser = userStatusService.findStatusMapByUserList();

@@ -1,7 +1,7 @@
 package com.sprint.mission.repository;
 
+import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
-import com.sprint.mission.dto.response.BinaryContentDto;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
