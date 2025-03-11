@@ -4,11 +4,13 @@ import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,6 +18,9 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +37,7 @@ public class BasicMessageService implements MessageService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final MessageMapper messageMapper;
+  private final PageResponseMapper pageResponseMapper;
 
   @Transactional
   @Override
@@ -73,10 +79,16 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<MessageDto> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannelId(channelId).stream()
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
+    Pageable pageable = PageRequest.of(page, 50);
+    Slice<Message> slice = messageRepository
+        .findAllByChannelIdOrderByCreatedAtDesc(channelId, pageable);
+    List<MessageDto> messageDtos = slice.getContent().stream()
         .map(messageMapper::toDto)
         .toList();
+
+    return new PageResponse<>(messageDtos, slice.getNumber(), slice.getSize(), slice.hasNext(),
+        null);
   }
 
 
@@ -97,7 +109,7 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
-    Optional.ofNullable(message.getAttachments()) // ✅ null 방지
+    Optional.ofNullable(message.getAttachments())
         .orElse(List.of())
         .stream()
         .map(BinaryContent::getId)

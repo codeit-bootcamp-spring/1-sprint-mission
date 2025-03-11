@@ -24,7 +24,7 @@ spring:
 
 discodeit:
   storage:
-
+    type: local
     local:
       root-path: /Users/kbh/storage
 
