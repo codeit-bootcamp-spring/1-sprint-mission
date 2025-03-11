@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.ApiResponse;
-import com.sprint.mission.discodeit.dto.StatusResponseDto;
-import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.dto.LoginRequest;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,9 +25,9 @@ public class AuthController {
 
     @Operation(summary = "로그인", description = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserDto>> login(@Valid @RequestBody LoginRequest loginRequest,
-                                             BindingResult bindingResult,
-                                             HttpSession session) {
+    public ResponseEntity<ApiResponse<UsersDto>> login(@Valid @RequestBody LoginRequest loginRequest,
+                                                       BindingResult bindingResult,
+                                                       HttpSession session) {
 
 
         if (bindingResult.hasErrors()) {

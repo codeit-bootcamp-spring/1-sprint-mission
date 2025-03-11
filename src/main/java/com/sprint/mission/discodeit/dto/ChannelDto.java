@@ -12,16 +12,12 @@ import java.util.UUID;
 @Data @Builder
 public class ChannelDto {
     private UUID id;
-    @NotNull
     private String name;
-    @NotNull
     private String description;
-    @NotNull
     private UUID userId;
     private UUID channelId;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     private String type;
 
 }

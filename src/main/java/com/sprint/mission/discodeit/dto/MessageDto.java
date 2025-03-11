@@ -12,11 +12,8 @@ public class MessageDto {
     private UUID id;
     private UUID channelId;
     private UUID AuthorId;
-    @NotNull
     private String senderName;
-    @NotNull
     private String channelName;
-    @NotNull
     private String content;
     private Instant createdAt;
     private Instant updatedAt;

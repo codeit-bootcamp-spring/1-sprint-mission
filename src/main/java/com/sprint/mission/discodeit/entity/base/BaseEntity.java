@@ -12,7 +12,7 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
+    @Column(name = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "created_at")

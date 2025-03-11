@@ -10,11 +10,8 @@ import java.util.UUID;
 @Getter @Builder
 public class UsersDto {
     private UUID id;
-    @NotNull
     private String name;
-    @NotNull
     private String email;
-    @NotNull
     private boolean online = false;
     private String profileImage;
 }
