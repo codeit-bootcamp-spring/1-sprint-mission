@@ -1,4 +1,4 @@
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS  users
 (
     id         UUID PRIMARY KEY,
     created_at TIMESTAMPTZ         NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE users
     profile_id UUID
 );
 
-CREATE TABLE binary_contents
+CREATE TABLE IF NOT EXISTS binary_contents
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMPTZ  NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE binary_contents
     bytes        BYTEA        NOT NULL
 );
 
-CREATE TABLE user_statuses
+CREATE TABLE IF NOT EXISTS user_statuses
 (
     id             UUID PRIMARY KEY,
     created_at     TIMESTAMPTZ NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE user_statuses
     last_active_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE TABLE channels
+CREATE TABLE IF NOT EXISTS channels
 (
     id          UUID PRIMARY KEY,
     created_at  TIMESTAMPTZ NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE channels
     type        VARCHAR(10) NOT NULL CHECK (type IN ('PUBLIC', 'PRIVATE'))
 );
 
-CREATE TABLE messages
+CREATE TABLE IF NOT EXISTS messages
 (
     id         UUID PRIMARY KEY,
     created_at TIMESTAMPTZ NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE messages
     author_id  UUID
 );
 
-CREATE TABLE read_statuses
+CREATE TABLE IF NOT EXISTS read_statuses
 (
     id           UUID PRIMARY KEY,
     created_at   TIMESTAMPTZ NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE read_statuses
     last_read_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE TABLE message_attachments
+CREATE TABLE IF NOT EXISTS message_attachments
 (
     message_id    UUID NOT NULL,
     attachment_id UUID NOT NULL
@@ -74,12 +74,12 @@ ALTER TABLE users
 ALTER TABLE message_attachments
     ADD CONSTRAINT fk_message_attachments_attachment_id
         FOREIGN KEY (attachment_id)
-            REFERENCES binary_contents (id);
+            REFERENCES binary_contents (id) ON DELETE CASCADE;
 
 ALTER TABLE message_attachments
     ADD CONSTRAINT fk_message_attachments_message_id
         FOREIGN KEY (message_id)
-            REFERENCES messages (id);
+            REFERENCES messages (id) ON DELETE CASCADE;
 
 ALTER TABLE user_statuses
     ADD CONSTRAINT fk_user_statuses_user_id

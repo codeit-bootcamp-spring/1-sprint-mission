@@ -19,7 +19,8 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: always  # 애플리케이션이 시작할 때마다 schema.sql을 실행하도록 설정
+      #      mode: always  # 애플리케이션이 시작할 때마다 schema.sql을 실행하도록 설정
+      mode: never
   logging:
     level:
       org.hibernate.SQL: DEBUG  # Hibernate SQL 로그 레벨 설정

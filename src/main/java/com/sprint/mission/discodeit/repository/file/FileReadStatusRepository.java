@@ -86,12 +86,14 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(readStatus -> readStatus.getUserId().equals(userId))
+          .filter(readStatus -> readStatus.getUser() != null && readStatus.getUser().getId()
+              .equals(userId)) // ✅ 수정된 부분
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
+
 
   @Override
   public List<ReadStatus> findAllByChannelId(UUID channelId) {
@@ -108,7 +110,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+          .filter(readStatus -> readStatus.getChannel().equals(channelId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);

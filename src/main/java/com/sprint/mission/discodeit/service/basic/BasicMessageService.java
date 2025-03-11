@@ -4,7 +4,9 @@ import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -36,11 +38,13 @@ public class BasicMessageService implements MessageService {
     if (!channelRepository.existsById(channelId)) {
       throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
     }
+    Channel channel = channelRepository.findById(channelId).orElse(null);
     if (!userRepository.existsById(authorId)) {
       throw new NoSuchElementException("Author with id " + authorId + " does not exist");
     }
+    User author = userRepository.findById(authorId).orElse(null);
 
-    List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+    List<BinaryContent> attachmentIds = binaryContentCreateRequests.stream()
         .map(attachmentRequest -> {
           String fileName = attachmentRequest.fileName();
           String contentType = attachmentRequest.contentType();
@@ -49,15 +53,15 @@ public class BasicMessageService implements MessageService {
           BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
               contentType, bytes);
           BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-          return createdBinaryContent.getId();
+          return binaryContentRepository.save(binaryContent);
         })
         .toList();
 
     String content = messageCreateRequest.content();
     Message message = new Message(
         content,
-        channelId,
-        authorId,
+        channel,
+        author,
         attachmentIds
     );
     return messageRepository.save(message);
@@ -92,8 +96,8 @@ public class BasicMessageService implements MessageService {
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
 
-    message.getAttachmentIds()
-        .forEach(binaryContentRepository::deleteById);
+    message.getAttachments()
+        .forEach(attachment -> binaryContentRepository.deleteById(attachment.getId()));
 
     messageRepository.deleteById(messageId);
   }

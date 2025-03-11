@@ -86,7 +86,8 @@ public class FileMessageRepository implements MessageRepository {
               throw new RuntimeException(e);
             }
           })
-          .filter(message -> message.getChannelId().equals(channelId))
+          .filter(message -> message.getChannel() != null && message.getChannel().getId()
+              .equals(channelId)) // ✅ 수정된 부분
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
