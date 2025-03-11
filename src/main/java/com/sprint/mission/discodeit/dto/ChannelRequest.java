@@ -14,7 +14,7 @@ public record ChannelRequest(
   }
 
   public record CreatePrivate(
-      List<UUID> joinUsers
+      List<UUID> participantIds
   ) {
 
   }

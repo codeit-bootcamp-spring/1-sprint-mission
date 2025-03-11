@@ -8,22 +8,22 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record BinaryContentResponse(
     UUID id,
-    Instant createdAt,
     String fileName,
     Long size,
-    String contentType
+    String contentType,
+    byte[] bytes
 ) {
 
-  public static BinaryContentResponse entityToDto(BinaryContent binaryContent) {
-    return BinaryContentResponse.builder()
-        .id(binaryContent.getId())
-        .createdAt(binaryContent.getCreatedAt())
-        .fileName(binaryContent.getFileName())
-        .size(binaryContent.getSize())
-        .contentType(binaryContent.getContentType())
-        .build();
-  }
+//  public static BinaryContentResponse entityToDto(BinaryContent binaryContent) {
+//    return BinaryContentResponse.builder()
+//        .id(binaryContent.getId())
+//        .fileName(binaryContent.getFileName())
+//        .size(binaryContent.getSize())
+//        .contentType(binaryContent.getContentType())
+//        .bytes(binaryContent.getBytes())
+//        .build();
+//  }
 }

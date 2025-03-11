@@ -9,28 +9,22 @@ import lombok.Builder;
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record UserResponse(
     UUID id,
-    Instant createdAt,
-    Instant updatedAt,
-    String name,
+    String username,
     String email,
-    UUID profileId
+    BinaryContentResponse profile,
+    boolean online
 ) {
 
-  public static UserResponse entityToDto(User user) {
-    return UserResponse.builder()
-        .id(user.getId())
-        .createdAt(user.getCreatedAt())
-        .updatedAt(user.getUpdatedAt())
-        .name(user.getUsername())
-        .email(user.getEmail())
-        .profileId(
-            Optional.ofNullable(user.getProfile())
-                .map(BaseEntity::getId)
-                .orElse(null)
-        )
-        .build();
-  }
+//  public static UserResponse entityToDto(User user) {
+//    return UserResponse.builder()
+//        .id(user.getId())
+//        .username(user.getUsername())
+//        .email(user.getEmail())
+//        .profile(user.getProfile())
+//        .online(user.getStatus().getLastActiveAt())
+//        .build();
+//  }
 }

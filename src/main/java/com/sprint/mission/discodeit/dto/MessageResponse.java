@@ -1,30 +1,32 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.Message;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 
 import java.time.Instant;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record MessageResponse(
     UUID id,
-    UUID userId,
-    UUID channelId,
-    String content,
     Instant createdAt,
-    Instant updatedAt
+    Instant updatedAt,
+    String content,
+    UUID channelId,
+    UserResponse author,
+    List<BinaryContentResponse> attachments
 ) {
 
-  public static MessageResponse entityToDto(Message message) {
-    return MessageResponse.builder()
-        .id(message.getId())
-        .userId(message.getAuthor().getId())
-        .channelId(message.getChannel().getId())
-        .content(message.getContent())
-        .createdAt(message.getCreatedAt())
-        .updatedAt(message.getUpdatedAt())
-        .build();
-  }
+//  public static MessageResponse entityToDto(Message message) {
+//    return MessageResponse.builder()
+//        .id(message.getId())
+//        .author(message.getAuthor())
+//        .channelId(message.getChannel().getId())
+//        .content(message.getContent())
+//        .createdAt(message.getCreatedAt())
+//        .updatedAt(message.getUpdatedAt())
+//        .build();
+//  }
 }

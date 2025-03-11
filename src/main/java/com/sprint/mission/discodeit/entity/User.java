@@ -28,11 +28,11 @@ public class User extends BaseUpdatableEntity {
   @Column(length = 60, nullable = false)
   private String password;
 
-  @OneToOne(orphanRemoval = true) // 참조 제거 시 제거?
+  @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true) // 참조 제거 시 제거
   @JoinColumn(name = "profile_id")
   private BinaryContent profile;
 
-  @OneToOne(mappedBy = "user")
+  @OneToOne(cascade = CascadeType.REMOVE, mappedBy = "user")
   private UserStatus status;
 
   public static User createUser(String name, String email, String password, BinaryContent profile) {
@@ -60,5 +60,9 @@ public class User extends BaseUpdatableEntity {
 
   public void updateProfile(BinaryContent profile) {
     this.profile = profile;
+  }
+
+  public void updateStatus(UserStatus userStatus) {
+    this.status = userStatus;
   }
 }

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -29,10 +30,10 @@ import java.util.UUID;
 public class BasicAuthService implements AuthService {
 
   private final UserRepository userRepository;
-  private final UserService userService;
+  private final UserMapper userMapper;
 
   public UserResponse login(UserRequest.Login request) {
-    User findUser = userRepository.findByUsername(request.name())
+    User findUser = userRepository.findByUsername(request.username())
         .orElseThrow(() -> new RestApiException(ErrorCode.LOGIN_FAILED,
             "User does not exist, or entered the wrong ID"));
 
@@ -41,6 +42,6 @@ public class BasicAuthService implements AuthService {
     }
 
     log.info("user login : {}", findUser.getId());
-    return userService.findById(findUser.getId());
+    return userMapper.entityToDto(findUser);
   }
 }

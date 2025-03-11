@@ -7,7 +7,7 @@ public record UserRequest(
 ) {
 
   public record Login(
-      String name,
+      String username,
       String password
   ) {
 

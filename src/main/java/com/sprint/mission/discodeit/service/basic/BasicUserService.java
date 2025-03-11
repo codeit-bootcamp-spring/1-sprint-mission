@@ -4,10 +4,14 @@ import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validation.UserValidator;
@@ -28,7 +32,8 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserValidator userValidator;
-  private final UserStatusService userStatusService;
+  private final UserMapper userMapper;
+  private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
 
   @Override
@@ -38,21 +43,25 @@ public class BasicUserService implements UserService {
         && userValidator.isValidPassword(request.password())) {
 
       BinaryContent newProfile = Optional.ofNullable(userProfileImage)
-          .map(profile ->
-              binaryContentRepository.save(BinaryContent.createBinaryContent(
+          .map(profile -> {
+            if (!profile.isEmpty()) {
+              return binaryContentRepository.save(BinaryContent.createBinaryContent(
                   profile.getName(),
                   profile.getSize(),
                   profile.getContentType(),
-                  convertToBytes(profile))))
+                  convertToBytes(profile)));
+            }
+            return null;
+          })
           .orElse(null);
 
-      User newUser = User.createUser(request.name(), request.email(), request.password(),
-          newProfile);
-      userRepository.save(newUser);
-      userStatusService.create(newUser.getId());
+      User newUser = userRepository.save(User.createUser(
+          request.name(), request.email(), request.password(), newProfile));
+      UserStatus newUserStatus = userStatusRepository.save(UserStatus.createUserStatus(newUser));
+      newUser.updateStatus(newUserStatus);
 
       log.info("Create User: {}", newUser);
-      return UserResponse.entityToDto(newUser);
+      return userMapper.entityToDto(newUser);
     }
     return null;
   }
@@ -60,13 +69,13 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserResponse> findAll() {
     return userRepository.findAll().stream()
-        .map(UserResponse::entityToDto)
+        .map(userMapper::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public UserResponse findById(UUID id) {
-    return UserResponse.entityToDto(findByIdOrThrow(id));
+    return userMapper.entityToDto(findByIdOrThrow(id));
   }
 
   @Override
@@ -93,13 +102,12 @@ public class BasicUserService implements UserService {
           });
     }
     log.info("Update User :{}", user);
-    return UserResponse.entityToDto(user);
+    return userMapper.entityToDto(user);
   }
 
   @Override
   public void deleteById(UUID id) {
     User user = findByIdOrThrow(id);
-    binaryContentRepository.deleteById(user.getProfile().getId());
     userRepository.deleteById(id);
   }
 

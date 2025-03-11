@@ -8,29 +8,26 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Builder(access = AccessLevel.PRIVATE)
+@Builder
 public record ChannelResponse(
     UUID id,
-    String title,
+    Channel.ChannelType type,
+    String name,
     String description,
-    Channel.ChannelType channelType,
-    Instant createdAt,
-    Instant updatedAt,
-    Instant lastMessageTime,
-    List<UUID> joinUsers
+    List<UserResponse> participants,
+    Instant lastMessageTime
+
 ) {
 
-  public static ChannelResponse entityToDto(Channel channel, Instant lastMessageTime,
-      List<UUID> joinUsers) {
-    return ChannelResponse.builder()
-        .id(channel.getId())
-        .title(channel.getName())
-        .description(channel.getDescription())
-        .channelType(channel.getType())
-        .createdAt(channel.getCreatedAt())
-        .updatedAt(channel.getUpdatedAt())
-        .lastMessageTime(lastMessageTime)
-        .joinUsers(joinUsers)
-        .build();
-  }
+//  public static ChannelResponse entityToDto(Channel channel, Instant lastMessageTime,
+//      List<UUID> participantIds) {
+//    return ChannelResponse.builder()
+//        .id(channel.getId())
+//        .name(channel.getName())
+//        .description(channel.getDescription())
+//        .type(channel.getType())
+//        .participants(participantIds)
+//        .lastMessageTime(lastMessageTime)
+//        .build();
+//  }
 }
