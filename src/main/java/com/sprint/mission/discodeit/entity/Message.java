@@ -15,10 +15,7 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message extends BaseUpdateEntity implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class Message extends BaseUpdateEntity {
 
   private String text;
 

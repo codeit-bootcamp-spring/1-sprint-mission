@@ -30,7 +30,6 @@ public class BinaryContent extends BaseEntity implements Serializable {
 
   @Builder
   public BinaryContent(String fileName, String mimeType, String filePath) {
-    this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = mimeType;
@@ -46,7 +45,6 @@ public class BinaryContent extends BaseEntity implements Serializable {
   }
 
   public BinaryContent(String fileName, String contentType) {
-    this.id = UUID.randomUUID();
     this.createdAt = Instant.now();
     this.fileName = fileName;
     this.mimeType = contentType;

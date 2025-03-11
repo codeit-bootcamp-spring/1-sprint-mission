@@ -14,10 +14,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-public class User extends BaseUpdateEntity implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class User extends BaseUpdateEntity {
 
   private String username;
   private String email;
@@ -39,7 +36,6 @@ public class User extends BaseUpdateEntity implements Serializable {
   private UserStatus userStatus;
 
   public User(String username, String email, String password) {
-    this.id = UUID.randomUUID();
     this.username = username;
     this.email = email;
     this.password = password;

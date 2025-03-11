@@ -17,10 +17,7 @@ import static com.sprint.mission.discodeit.entity.Status.DISCONNECTED;
 @Getter
 @Entity
 @NoArgsConstructor
-public class UserStatus extends BaseUpdateEntity implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class UserStatus extends BaseUpdateEntity {
 
   private Instant lastActiveAt;
 

@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.MappedSuperclass;
 import java.time.Instant;
+import lombok.Getter;
 
+@Getter
 @MappedSuperclass
 public abstract class BaseUpdateEntity extends BaseEntity {
 

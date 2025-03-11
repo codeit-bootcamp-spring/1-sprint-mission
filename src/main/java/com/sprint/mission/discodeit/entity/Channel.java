@@ -15,10 +15,7 @@ import java.util.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Channel extends BaseUpdateEntity implements Serializable {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class Channel extends BaseUpdateEntity {
 
   private String channelName;
   private boolean isPrivate;
@@ -39,14 +36,12 @@ public class Channel extends BaseUpdateEntity implements Serializable {
   private List<ReadStatus> readStatuses = new ArrayList<>();
 
   public Channel(String channelName, boolean isPrivate) {
-    this.id = UUID.randomUUID();
     this.channelName = channelName;
     this.isPrivate = isPrivate;
     this.lastMessageTime = Instant.now();
   }
 
   public Channel(boolean isPrivate) {
-    this.id = UUID.randomUUID();
     this.isPrivate = isPrivate;
     this.lastMessageTime = Instant.now();
   }
