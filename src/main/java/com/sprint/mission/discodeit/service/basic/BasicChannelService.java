@@ -13,7 +13,10 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.validation.ChannelValidator;
+import jakarta.transaction.Transactional;
 import java.util.Comparator;
+import java.util.Optional;
+import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,11 +37,13 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusService readStatusService;
 
   @Override
+  @Transactional
   public ChannelResponse createPublicChannel(ChannelRequest.CreatePublic request) {
-    if (channelValidator.isValidTitle(request.title())) {
-      Channel newChannel = Channel.createChannel(Channel.ChannelType.PUBLIC, request.title(),
+    if (channelValidator.isValidName(request.name())) {
+      Channel newChannel = Channel.createChannel(Channel.ChannelType.PUBLIC, request.name(),
           request.description());
       channelRepository.save(newChannel);
+
       log.info("Create Public Channel: {}", newChannel);
       return ChannelResponse.entityToDto(newChannel, null, null);
     }
@@ -46,6 +51,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public ChannelResponse createPrivateChannel(ChannelRequest.CreatePrivate request) {
     Channel newChannel = Channel.createChannel(Channel.ChannelType.PRIVATE, null, null);
     channelRepository.save(newChannel);
@@ -73,23 +79,27 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public ChannelResponse findById(UUID id) {
-    Channel channel = findByIdOrThrow(id);
-    return ChannelResponse.entityToDto(channel, getLastMessageTime(id), findJoinUsersById(id));
+    return ChannelResponse.entityToDto(findByIdOrThrow(id), getLastMessageTime(id),
+        findJoinUsersById(id));
   }
 
   @Override
+  @Transactional
   public ChannelResponse update(UUID id, ChannelRequest.Update request) {
     Channel channel = findByIdOrThrow(id);
 
     if (channel.getType() == Channel.ChannelType.PRIVATE) {
       throw new RestApiException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_MODIFIED, "id : " + id);
-    } else if (channelValidator.isValidTitle(request.title()) && channelValidator.isValidTitle(
+    }
+
+    if (channelValidator.isValidName(request.name()) && channelValidator.isValidName(
         request.description())) {
-      channel.update(request.title(), request.description());
-      Channel updatedChannel = channelRepository.save(channel);
+      Optional.ofNullable(request.name()).ifPresent(channel::updateName);
+      Optional.ofNullable(request.description()).ifPresent(channel::updateDescription);
+
       log.info("Update Channel : {}", channel);
-      return ChannelResponse.entityToDto(updatedChannel, null,
-          findJoinUsersById(updatedChannel.getId()));
+      return ChannelResponse.entityToDto(channel, getLastMessageTime(channel.getId()),
+          findJoinUsersById(channel.getId()));
     }
     return null;
   }
@@ -101,8 +111,7 @@ public class BasicChannelService implements ChannelService {
     channelRepository.deleteById(id);
   }
 
-  @Override
-  public Channel findByIdOrThrow(UUID id) {
+  private Channel findByIdOrThrow(UUID id) {
     return channelRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + id));
   }

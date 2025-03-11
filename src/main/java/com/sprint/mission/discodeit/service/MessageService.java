@@ -16,11 +16,8 @@ public interface MessageService {
 
   MessageResponse findById(UUID id);
 
-  Message findByIdOrThrow(UUID id);
-
   MessageResponse update(UUID id, MessageRequest.Update request, List<MultipartFile> messageFiles);
 
   void deleteById(UUID id);
 
-  void deleteAllByChannelId(UUID id);
 }

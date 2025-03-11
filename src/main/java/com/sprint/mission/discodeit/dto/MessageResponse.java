@@ -20,8 +20,8 @@ public record MessageResponse(
   public static MessageResponse entityToDto(Message message) {
     return MessageResponse.builder()
         .id(message.getId())
-        .userId(message.getAuthorId())
-        .channelId(message.getChannelId())
+        .userId(message.getAuthor().getId())
+        .channelId(message.getChannel().getId())
         .content(message.getContent())
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())

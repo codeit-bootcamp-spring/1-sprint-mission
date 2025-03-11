@@ -40,18 +40,7 @@ public class ReadStatus extends BaseUpdatableEntity {
     this.lastReadAt = lastReadAt;
   }
 
-  public void updateUpdateAt(Instant lastReadAt) {
+  public void updateLastReadAt(Instant lastReadAt) {
     this.lastReadAt = lastReadAt;
-    this.updatedAt = Instant.now();
-  }
-
-  @Override
-  public String toString() {
-    return "ReadStatus{" +
-        "user=" + user +
-        ", channel=" + channel +
-        ", lastReadAt=" + lastReadAt +
-        ", updatedAt=" + updatedAt +
-        '}';
   }
 }

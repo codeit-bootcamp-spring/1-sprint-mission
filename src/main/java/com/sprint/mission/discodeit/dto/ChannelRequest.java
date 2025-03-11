@@ -7,7 +7,7 @@ public record ChannelRequest(
 ) {
 
   public record CreatePublic(
-      String title,
+      String name,
       String description
   ) {
 
@@ -20,7 +20,7 @@ public record ChannelRequest(
   }
 
   public record Update(
-      String title,
+      String name,
       String description
   ) {
 

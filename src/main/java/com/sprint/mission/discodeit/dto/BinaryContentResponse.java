@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import java.lang.management.LockInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 
@@ -12,8 +13,8 @@ public record BinaryContentResponse(
     UUID id,
     Instant createdAt,
     String fileName,
-    String contentType,
-    byte[] bytes
+    Long size,
+    String contentType
 ) {
 
   public static BinaryContentResponse entityToDto(BinaryContent binaryContent) {
@@ -21,8 +22,8 @@ public record BinaryContentResponse(
         .id(binaryContent.getId())
         .createdAt(binaryContent.getCreatedAt())
         .fileName(binaryContent.getFileName())
+        .size(binaryContent.getSize())
         .contentType(binaryContent.getContentType())
-        .bytes(binaryContent.getBytes())
         .build();
   }
 }

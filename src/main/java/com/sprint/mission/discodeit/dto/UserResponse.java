@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.dto;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 
@@ -24,7 +26,11 @@ public record UserResponse(
         .updatedAt(user.getUpdatedAt())
         .name(user.getUsername())
         .email(user.getEmail())
-        .profileId(user.getProfile().getId())
+        .profileId(
+            Optional.ofNullable(user.getProfile())
+                .map(BaseEntity::getId)
+                .orElse(null)
+        )
         .build();
   }
 }

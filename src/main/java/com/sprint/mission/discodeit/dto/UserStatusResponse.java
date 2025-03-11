@@ -12,8 +12,7 @@ public record UserStatusResponse(
     Instant createdAt,
     Instant updatedAt,
     UUID userId,
-    Instant lastActiveAt,
-    Boolean online
+    Instant lastActiveAt
 ) {
 
   public static UserStatusResponse entityToDto(UserStatus userStatus) {
@@ -21,9 +20,8 @@ public record UserStatusResponse(
         .id(userStatus.getId())
         .createdAt(userStatus.getCreatedAt())
         .updatedAt(userStatus.getUpdatedAt())
-        .userId(userStatus.getUserId())
+        .userId(userStatus.getUser().getId())
         .lastActiveAt(userStatus.getLastActiveAt())
-        .online(userStatus.getIsOnline())
         .build();
   }
 

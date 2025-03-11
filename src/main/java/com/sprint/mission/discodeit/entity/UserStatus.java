@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserStatus extends BaseUpdatableEntity {
 
-  private final long ADDITIONAL_TIME_SECONDS = 60 * 5;
+//  private final long ADDITIONAL_TIME_SECONDS = 60 * 5;
 
   @OneToOne(cascade = CascadeType.REMOVE)
   @JoinColumn(name = "user_id", nullable = false)
@@ -29,10 +29,10 @@ public class UserStatus extends BaseUpdatableEntity {
   private Instant lastActiveAt;
 
   public static UserStatus createUserStatus(User user) {
-    return new UserStatus(user, true);
+    return new UserStatus(user);
   }
 
-  private UserStatus(User user, Boolean online) {
+  private UserStatus(User user) {
     this.user = user;
     this.lastActiveAt = Instant.now();
   }
@@ -46,15 +46,5 @@ public class UserStatus extends BaseUpdatableEntity {
 //      this.isOnline = false;
 //    }
 //    this.updatedAt = Instant.now();
-  }
-
-  @Override
-  public String toString() {
-    return "UserStatus{" +
-        "ADDITIONAL_TIME_SECONDS=" + ADDITIONAL_TIME_SECONDS +
-        ", user=" + user +
-        ", lastActiveAt=" + lastActiveAt +
-        ", updatedAt=" + updatedAt +
-        '}';
   }
 }

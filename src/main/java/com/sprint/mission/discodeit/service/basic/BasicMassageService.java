@@ -2,17 +2,22 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.MessageRequest;
 import com.sprint.mission.discodeit.dto.MessageResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
+import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,28 +36,34 @@ public class BasicMassageService implements MessageService {
   private final MessageValidator messageValidator;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
-  private final BinaryContentService binaryContentService;
+  private final BinaryContentRepository binaryContentRepository;
 
   @Override
+  @Transactional
   public MessageResponse createMessage(MessageRequest.Create request,
       List<MultipartFile> messageFiles) {
-    User user = userRepository.findById(request.userId()).orElseThrow(
-        () -> new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
-    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(
-        () -> new RestApiException(ErrorCode.CHANNEL_NOT_FOUND,
-            "channelId : " + request.channelId()));
+
+    User user = userRepository.findById(request.userId()).orElseThrow(() ->
+        new RestApiException(ErrorCode.USER_NOT_FOUND, "userId : " + request.userId()));
+    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(() ->
+        new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "channelId : " + request.channelId()));
 
     if (messageValidator.inValidContent(request.content())) {
-      Message newMessage = Message.createMessage(request.content(), request.channelId(),
-          request.userId());
-      messageRepository.save(newMessage);
+      Message message = Message.createMessage(request.content(), channel, user);
 
-      if (messageFiles != null) {
-        messageFiles.forEach(
-            file -> binaryContentService.createMessageFile(file, newMessage.getId()));
-      }
-      log.info("Create Message: {}", newMessage);
-      return MessageResponse.entityToDto(newMessage);
+      Optional.ofNullable(messageFiles).ifPresent(files ->
+          files.forEach(file ->
+              message.insertAttachments(binaryContentRepository.save(
+                  BinaryContent.createBinaryContent(
+                      file.getName(), file.getSize(), file.getContentType(), convertToBytes(file)
+                  ))
+              )
+          )
+      );
+      messageRepository.save(message);
+
+      log.info("Create Message: {}", message);
+      return MessageResponse.entityToDto(message);
     }
     return null;
   }
@@ -70,16 +81,23 @@ public class BasicMassageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public MessageResponse update(UUID id, MessageRequest.Update request,
       List<MultipartFile> messageFiles) {
     Message message = findByIdOrThrow(id);
     if (messageValidator.inValidContent(request.content())) {
-      message.update(request.content());
+      message.updateContent(request.content());
       messageRepository.save(message);
 
-      if (messageFiles != null) {
-        messageFiles.forEach(file -> binaryContentService.createMessageFile(file, id));
-      }
+      Optional.ofNullable(messageFiles).ifPresent(files ->
+          files.forEach(file ->
+              message.insertAttachments(binaryContentRepository.save(
+                  BinaryContent.createBinaryContent(
+                      file.getName(), file.getSize(), file.getContentType(), convertToBytes(file)
+                  ))
+              )
+          )
+      );
       log.info("update message: {}", message);
       return MessageResponse.entityToDto(message);
     }
@@ -88,19 +106,19 @@ public class BasicMassageService implements MessageService {
 
   @Override
   public void deleteById(UUID id) {
-    binaryContentService.deleteAllByMessageId(id);
     messageRepository.deleteById(id);
   }
 
-  @Override
-  public void deleteAllByChannelId(UUID channelId) {
-    messageRepository.findAllByChannelId(channelId)
-        .forEach(message -> deleteById(message.getChannelId()));
-  }
-
-  @Override
-  public Message findByIdOrThrow(UUID id) {
+  private Message findByIdOrThrow(UUID id) {
     return messageRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.MESSAGE_NOT_FOUND, "id : " + id));
+  }
+
+  private byte[] convertToBytes(MultipartFile imageFile) {
+    try {
+      return imageFile.getBytes();
+    } catch (IOException e) {
+      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "변환 실패");
+    }
   }
 }

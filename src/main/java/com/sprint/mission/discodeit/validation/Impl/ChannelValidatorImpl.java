@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class ChannelValidatorImpl implements ChannelValidator {
 
   @Override
-  public boolean isValidTitle(String title) {
+  public boolean isValidName(String title) {
     if (title.isBlank()) {
       throw new RestApiException(ErrorCode.CHANNEL_NAME_REQUIRED, "title=" + title);
     }

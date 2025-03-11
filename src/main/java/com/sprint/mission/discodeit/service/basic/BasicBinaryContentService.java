@@ -26,7 +26,7 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Override
   public BinaryContentResponse create(MultipartFile file) {
     BinaryContent newFile = BinaryContent.createBinaryContent(
-        file.getName(), file.getSize(), file.getContentType());
+        file.getName(), file.getSize(), file.getContentType(), convertToBytes(file));
     log.info("Create User Profile : {}", newFile);
     BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
     return BinaryContentResponse.entityToDto(newBinaryContent);

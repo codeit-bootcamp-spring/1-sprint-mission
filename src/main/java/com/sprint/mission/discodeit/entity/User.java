@@ -26,7 +26,7 @@ public class User extends BaseUpdatableEntity {
   private String email;
 
   @Column(length = 60, nullable = false)
-  private transient String password;
+  private String password;
 
   @OneToOne(orphanRemoval = true) // 참조 제거 시 제거?
   @JoinColumn(name = "profile_id")
@@ -60,17 +60,5 @@ public class User extends BaseUpdatableEntity {
 
   public void updateProfile(BinaryContent profile) {
     this.profile = profile;
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-        "username='" + username + '\'' +
-        ", email='" + email + '\'' +
-        ", password='" + password + '\'' +
-        ", profile=" + profile +
-        ", status=" + status +
-        ", updatedAt=" + updatedAt +
-        '}';
   }
 }

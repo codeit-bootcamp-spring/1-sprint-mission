@@ -13,7 +13,6 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import java.time.Instant;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -33,7 +32,7 @@ public class Message extends BaseUpdatableEntity {
   @JoinColumn(name = "author_id")
   private User author;
 
-  @OneToMany(orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true)
   @JoinTable(name = "message_attachments",
       joinColumns = @JoinColumn(name = "message_id"),
       inverseJoinColumns = @JoinColumn(name = "attachment_id"))
@@ -49,25 +48,15 @@ public class Message extends BaseUpdatableEntity {
     this.author = author;
   }
 
-  public void update(String newContent) {
-    boolean isChanged = false;
-    if (!newContent.equals(this.content)) {
-      this.content = newContent;
-      isChanged = true;
-    }
-
-    if (isChanged) {
-      this.updatedAt = Instant.now();
-    }
+  public void updateContent(String content) {
+    this.content = content;
   }
 
-  @Override
-  public String toString() {
-    return "Message{" +
-        "content='" + content + '\'' +
-        ", channel=" + channel +
-        ", author=" + author +
-        ", attachments=" + attachments +
-        '}';
+  public void insertAttachments(BinaryContent binaryContent) {
+    this.attachments.add(binaryContent);
+  }
+
+  public void removeAttachments(BinaryContent binaryContent) {
+    this.attachments.remove(binaryContent);
   }
 }

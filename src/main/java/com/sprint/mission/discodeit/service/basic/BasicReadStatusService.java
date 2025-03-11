@@ -39,8 +39,7 @@ public class BasicReadStatusService implements ReadStatusService {
     if (readStatusRepository.existsByUserIdAndChannelId(request.userId(), request.channelId())) {
       throw new RestApiException(ErrorCode.READ_IS_ALREADY_EXIST, "");
     }
-    ReadStatus newReadStatus = ReadStatus.createReadStatus(request.userId(), request.channelId(),
-        request.lastReadAt());
+    ReadStatus newReadStatus = ReadStatus.createReadStatus(user, channel, request.lastReadAt());
 
     readStatusRepository.save(newReadStatus);
     log.info("Create Read Status : {}", newReadStatus);
@@ -60,14 +59,14 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public List<ReadStatusResponse> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllUserId(userId).stream()
+    return readStatusRepository.findAllByUserId(userId).stream()
         .map(ReadStatusResponse::entityToDto)
         .collect(Collectors.toList());
   }
 
   @Override
   public List<ReadStatusResponse> findAllByChannelId(UUID channelId) {
-    return readStatusRepository.findAllChannelId(channelId).stream()
+    return readStatusRepository.findAllByChannelId(channelId).stream()
         .map(ReadStatusResponse::entityToDto)
         .collect(Collectors.toList());
   }
@@ -75,7 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
   @Override
   public ReadStatusResponse update(UUID id, ReadStatusRequest.Update request) {
     ReadStatus readStatus = findByIdOrThrow(id);
-    readStatus.updateUpdateAt(request.newLastReadAt());
+    readStatus.updateLastReadAt(request.newLastReadAt());
     return ReadStatusResponse.entityToDto(readStatusRepository.save(readStatus));
   }
 

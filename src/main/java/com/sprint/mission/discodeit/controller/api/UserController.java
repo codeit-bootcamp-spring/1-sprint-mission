@@ -48,7 +48,7 @@ public class UserController implements UserApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<UserResponse>> updateUser(
       @PathVariable UUID userId,
-      @RequestPart("userRequest") UserRequest userRequest,
+      @RequestPart("user") UserRequest userRequest,
       @RequestPart(value = "image", required = false) MultipartFile userProfileImage
   ) {
     return ResponseEntity.ok(

@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserRequest;
 import com.sprint.mission.discodeit.dto.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -13,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import com.sprint.mission.discodeit.validation.UserValidator;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,8 @@ public class BasicUserService implements UserService {
               binaryContentRepository.save(BinaryContent.createBinaryContent(
                   profile.getName(),
                   profile.getSize(),
-                  profile.getContentType())))
+                  profile.getContentType(),
+                  convertToBytes(profile))))
           .orElse(null);
 
       User newUser = User.createUser(request.name(), request.email(), request.password(),
@@ -81,12 +82,14 @@ public class BasicUserService implements UserService {
       Optional.ofNullable(request.password()).ifPresent(user::updatePassword);
       Optional.ofNullable(userProfileImage)
           .ifPresent(profile -> {
-            user.updateProfile(binaryContentRepository.save(
-                BinaryContent.createBinaryContent(
-                    profile.getName(),
-                    profile.getSize(),
-                    profile.getContentType())));
-            binaryContentRepository.deleteById(user.getProfile().getId());
+            if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
+              user.updateProfile(binaryContentRepository.save(
+                  BinaryContent.createBinaryContent(
+                      profile.getName(),
+                      profile.getSize(),
+                      profile.getContentType(),
+                      convertToBytes(profile))));
+            }
           });
     }
     log.info("Update User :{}", user);
@@ -103,6 +106,14 @@ public class BasicUserService implements UserService {
   private User findByIdOrThrow(UUID id) {
     return userRepository.findById(id)
         .orElseThrow(() -> new RestApiException(ErrorCode.USER_NOT_FOUND, "id : " + id));
+  }
+
+  private byte[] convertToBytes(MultipartFile imageFile) {
+    try {
+      return imageFile.getBytes();
+    } catch (IOException e) {
+      throw new RestApiException(ErrorCode.INTERNAL_SERVER_ERROR, "변환 실패");
+    }
   }
 
 }

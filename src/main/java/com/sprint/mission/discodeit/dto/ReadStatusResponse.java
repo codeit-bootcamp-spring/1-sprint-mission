@@ -20,8 +20,8 @@ public record ReadStatusResponse(
   public static ReadStatusResponse entityToDto(ReadStatus readStatus) {
     return ReadStatusResponse.builder()
         .id(readStatus.getId())
-        .userId(readStatus.getUserId())
-        .channelId(readStatus.getChannelId())
+        .userId(readStatus.getUser().getId())
+        .channelId(readStatus.getChannel().getId())
         .createdAt(readStatus.getCreatedAt())
         .updatedAt(readStatus.getUpdatedAt())
         .lastReadAt(readStatus.getLastReadAt())
