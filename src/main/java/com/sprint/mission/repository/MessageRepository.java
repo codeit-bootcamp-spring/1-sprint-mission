@@ -12,12 +12,12 @@ import java.util.UUID;
 
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
-    @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId")
-    Slice<Message> findAllByChannelId(@Param("channelId") UUID channelId, Pageable pageable);
+//    @Query("SELECT m FROM Message m WHERE m.channel.id = :channelId")
+//    Slice<Message> findAllByChannelId(@Param("channelId") UUID channelId, Pageable pageable);
 
     void deleteAllByChannelId(UUID channelId);
 
-    Slice<Message> findSliceAll(Pageable pageable);
+    //Slice<Message> findSliceAll(Pageable pageable);
 }
 //Message save(Message message);
 //

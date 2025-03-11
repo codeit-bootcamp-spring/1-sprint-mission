@@ -6,6 +6,7 @@ import com.sprint.mission.entity.addOn.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.swing.text.html.Option;
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import static jakarta.persistence.CascadeType.*;
 import static jakarta.persistence.FetchType.*;
 
 @Entity
-@EqualsAndHashCode(of = {"id", "username", "email", "password"})
-@ToString(of = {"username", "email", "password"})
+@EqualsAndHashCode(of = {"username", "email", "password"}, callSuper = true)
+@ToString(of = {"username", "email", "password", "profile"})  // callSuper 제거 및 id 등 직접 명시
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Schema(description = "유저")
@@ -59,8 +60,7 @@ public class User extends BaseUpdatableEntity{
         this.email = newEmail;
     }
 
-    public Optional<BinaryContent> getProfile() {
-        return Optional.ofNullable(profile);
-    }
-
+//    public Optional<BinaryContent> getProfile() { // mapping은 null 체크 해줌
+//        return Optional.ofNullable(profile);
+//    }
 }

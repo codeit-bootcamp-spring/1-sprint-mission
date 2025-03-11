@@ -2,11 +2,11 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.dto.UserMapper;
+
 import com.sprint.mission.dto.request.UserDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.dto.response.FindUserDto;
-import com.sprint.mission.dto.response.SaveUserDto;
-import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.service.UserService;
@@ -26,7 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.*;
@@ -40,6 +42,7 @@ public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
+    private final UserMapper userMapper;
 
     @Operation(summary = "User 등록", description = "Create User")
     @ApiResponses({
@@ -52,9 +55,10 @@ public class UserController {
     public ResponseEntity<CommonResponse> create(
             @Parameter(description = "유저 생성을 위한 DTO") @RequestPart("createRequestDto") @Valid UserDtoForCreate requestDTO,
             @Parameter(description = "User 프로필 이미지") @RequestPart(value = "profile", required = false) MultipartFile profile) {
-        User user = userService.create(requestDTO, profile);
+        User createdUser = userService.create(requestDTO, profile);
+        log.info(createdUser.toString());
         return CommonResponse.toResponseEntity
-                (CREATED, "유저가 성공적으로 생성되었습니다.", new SaveUserDto(user));
+                (CREATED, "유저가 성공적으로 생성되었습니다.", userMapper.toDtoForSave(createdUser));
     }
 
     @Operation(summary = "User 정보 수정")

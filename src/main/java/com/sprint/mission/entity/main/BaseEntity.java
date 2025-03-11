@@ -2,6 +2,7 @@ package com.sprint.mission.entity.main;
 
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 
 @MappedSuperclass
+@EqualsAndHashCode(of = "id")
 @Getter @EntityListeners(AuditingEntityListener.class)
 @Setter // 테스트 코드용 SETTER
 public abstract class BaseEntity {
@@ -23,7 +25,4 @@ public abstract class BaseEntity {
     @CreatedDate
     @Column(updatable = false)
     private Instant createdAt;
-
-    @LastModifiedDate
-    private Instant updatedAt;
 }

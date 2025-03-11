@@ -79,10 +79,12 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId, Pageable pageable) {
+    public List<Message> findAllByChannelId(UUID channelId) {
         if (channelRepository.existsById(channelId)) {
             throw new CustomException(ErrorCode.NO_SUCH_CHANNEL);
         }
+        return new ArrayList<>();
+    }
 //
 //        Page<Message> paging = (Page<Message>) pageable;
 //        do {
@@ -92,8 +94,8 @@ public class JCFMessageService implements MessageService {
 //
 //        Slice<Message> sliceMessage = messageRepository.findAllByChannelId(channelId, pageable);
 //        sliceMessage.getNumberOfElements();
-        return new ArrayList<>();
-    }
+
+
 
 //    @Override
 //    public List<Message> findAllByChannelId(UUID channelId) {

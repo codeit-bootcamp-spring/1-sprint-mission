@@ -26,7 +26,7 @@ public record FindUserDto(
         user.getUpdatedAt(),
         user.getUsername(),
         user.getEmail(),
-        user.getProfile().map(BinaryContent::getId).orElse(null),
+        user.getProfile().getId(), // 나중에 바꿔야 되는 것
         isOnline
     );
   }

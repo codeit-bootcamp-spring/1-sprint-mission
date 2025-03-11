@@ -9,7 +9,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.util.UUID;
 @Entity
-@EqualsAndHashCode(of = {"id", "fileName", "contentType", "size"})
+@EqualsAndHashCode(of = {"fileName", "contentType", "size"}, callSuper = true)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @ToString @Getter
 @Schema(description = "바이너리 컨텐츠")

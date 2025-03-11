@@ -15,7 +15,7 @@ import static jakarta.persistence.FetchType.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(of = {"id", "content", "author", "channel"})
+@EqualsAndHashCode(of = {"content", "author", "channel"}, callSuper = true)
 @ToString(of = "content")
 @Getter
 @Schema(description = "메시지 엔티티")
