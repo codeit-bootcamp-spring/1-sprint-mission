@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.controller.api.ReadStatusApi;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusRequestDto;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusRequestDto;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.Interface.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -74,11 +74,6 @@ public class BasicMessageService implements MessageService {
     return messageMapper.toDto(messageRepository.save(message));
   }
 
-  private String getFileExtension(String fileName) {
-    int dotIndex = fileName.lastIndexOf('.');
-    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
-  }
-
   @Override
   public Message getMessageById(UUID id) {
     return messageRepository.findById(id)
@@ -163,5 +158,10 @@ public class BasicMessageService implements MessageService {
       throw new RuntimeException("save binary content failed");
     }
     return binaryContentMapper.toDto(saveContent);
+  }
+
+  private String getFileExtension(String fileName) {
+    int dotIndex = fileName.lastIndexOf('.');
+    return (dotIndex > 0) ? fileName.substring(dotIndex) : "";
   }
 }

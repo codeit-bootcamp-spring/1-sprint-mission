@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
-import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -12,10 +11,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
-import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.service.Interface.UserService;
-import com.sprint.mission.discodeit.service.Interface.UserStatusService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -35,9 +31,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
-  private final UserStatusRepository userStatusRepository;
   private final UserMapper userMapper;
-  private final BinaryContentService binaryContentService;
   private final BinaryContentStorage binaryContentStorage;
   private final BinaryContentMapper binaryContentMapper;
 
@@ -125,7 +119,6 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-    // ✅ 먼저 프로필 이미지 삭제
     if (user.getProfile() != null) {
       UUID profileId = user.getProfile().getId();
       String extension = getFileExtension(user.getProfile().getFileName());
@@ -133,7 +126,6 @@ public class BasicUserService implements UserService {
       binaryContentRepository.delete(user.getProfile());
     }
 
-    // ✅ 사용자 삭제
     userRepository.delete(user);
   }
 
@@ -178,7 +170,6 @@ public class BasicUserService implements UserService {
 
     String extension = getFileExtension(profileFile.getOriginalFilename());
 
-    // 2️⃣ 생성된 ID를 사용하여 파일 저장
     try {
       Path filePath = binaryContentStorage.put(savedContent.getId(), profileFile.getBytes(),
           extension);

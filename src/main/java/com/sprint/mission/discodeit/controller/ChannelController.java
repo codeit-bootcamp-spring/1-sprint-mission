@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.Interface.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

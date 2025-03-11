@@ -6,16 +6,9 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.UpdateMessageRequestDto;
 import com.sprint.mission.discodeit.dto.message.MessageDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
-import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.Interface.MessageService;
-import io.netty.handler.codec.http2.Http2FrameLogger;
-import java.io.IOException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +25,6 @@ import java.util.stream.Collectors;
 public class MessageController implements MessageApi {
 
   private final MessageService messageService;
-  private final PageResponseMapper pageResponseMapper;
 
   @Override
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

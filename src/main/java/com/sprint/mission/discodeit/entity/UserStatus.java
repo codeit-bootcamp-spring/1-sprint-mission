@@ -2,20 +2,17 @@ package com.sprint.mission.discodeit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @Setter

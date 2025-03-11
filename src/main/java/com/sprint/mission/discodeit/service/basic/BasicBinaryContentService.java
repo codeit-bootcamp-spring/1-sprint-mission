@@ -4,8 +4,6 @@ import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import jakarta.transaction.Transactional;
@@ -51,15 +49,10 @@ public class BasicBinaryContentService implements BinaryContentService {
     BinaryContent savedContent = binaryContentRepository.save(binaryContent);
     String extension = getFileExtension(binaryContent.getFileName());
 
-    System.out.println("🔹 파일 저장 시작: " + dto.getFileName());
-    System.out.println("put호출전" + savedContent.getId());
-
     Path filePath = binaryContentStorage.put(savedContent.getId(), dto.getBytes(), extension);
 
-    System.out.println("put 호출 완료: " + filePath);
     savedContent.setFilePath(filePath.toString());
 
-    System.out.println("✅ 파일 저장 완료: " + savedContent.getId());
     return savedContent;
   }
 

@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.dto.user;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import lombok.Getter;
 
-import java.time.Instant;
 import java.util.UUID;
 import lombok.Setter;
 

@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequestDto;
 import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequestDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
@@ -14,7 +12,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.Interface.ChannelService;
-import com.sprint.mission.discodeit.service.Interface.MessageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -71,26 +68,10 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public List<ChannelDto> findAllByUserId(UUID userId) {
-    /*List<UUID> mySubscribedChannelIds = readStatusRepository.findChannelIdsByUserId(userId);
-
-    return channelRepository.findAll().stream()
-        .filter(channel ->
-            channel.getType().equals(ChannelType.PUBLIC)
-                || mySubscribedChannelIds.contains(channel.getId())
-        )
-        .map(channelMapper::toDto)
-        .toList();*/
     return channelRepository.findAllByUserId(userId)
         .stream()
         .map(channelMapper::toDto)
         .toList();
-//    List<Channel> channels = channelRepository.findAllByUserId(userId);
-//    return channels.stream()
-//        .map(channel -> {
-//          channel.getReadStatuses().size();
-//          return channelMapper.toDto(channel);
-//        })
-//        .toList();
   }
 
   @Override

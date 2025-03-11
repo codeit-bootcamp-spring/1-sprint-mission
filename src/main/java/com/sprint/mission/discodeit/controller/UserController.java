@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.api.UserApi;
-import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequestDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequestDto;
@@ -9,8 +8,6 @@ import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.Interface.UserService;
 import com.sprint.mission.discodeit.service.Interface.UserStatusService;
-import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -73,9 +70,5 @@ public class UserController implements UserApi {
       UserStatusUpdateRequest request) {
     UserStatus userStatus = userStatusService.updateByUserId(userId, request);
     return ResponseEntity.ok(userStatus);
-  }
-
-  private BinaryContentDto saveProfile(MultipartFile profileFile) {
-    return userService.saveProfileImage(profileFile);
   }
 }

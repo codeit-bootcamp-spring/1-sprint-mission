@@ -1,23 +1,13 @@
 package com.sprint.mission.discodeit.controller;
 
-import static org.springframework.http.MediaTypeFactory.getMediaType;
-
 import com.sprint.mission.discodeit.controller.api.BinaryContentApi;
 import com.sprint.mission.discodeit.dto.binary.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.Interface.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

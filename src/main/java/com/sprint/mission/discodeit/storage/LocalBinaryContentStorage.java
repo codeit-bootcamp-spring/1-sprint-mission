@@ -41,16 +41,12 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public Path put(UUID id, byte[] data, String extension) {
-    System.out.println("put 호출: " + id);
-
-    // 🔹 확장자가 "."으로 시작하는지 확인하고 없으면 추가
     String safeExtension = formatExtension(extension);
     String fileName = id.toString() + safeExtension;
 
     Path filePath = resolvePath(fileName);
     try {
       Files.write(filePath, data);
-      System.out.println("✅ 파일이 로컬에 저장됨: " + filePath);
       return filePath;
     } catch (IOException e) {
       throw new RuntimeException("Failed to store file", e);

@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ChannelMapper {
 
-  private final MessageMapper messageMapper;
-  private final ReadStatusMapper readStatusMapper;
   private final UserMapper userMapper;
 
   public ChannelDto toDto(Channel entity) {
