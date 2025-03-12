@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReadStatusMapper {
 
-  public static ReadStatusDto toDto(ReadStatus readStatus) {
+  public ReadStatusDto toDto(ReadStatus readStatus) {
     return new ReadStatusDto(
         readStatus.getId().toString(),
         readStatus.getChannel().getId(),

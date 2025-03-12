@@ -5,12 +5,11 @@ import com.sprint.mission.discodeit.dto.readStatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.readStatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
@@ -18,9 +17,9 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +28,10 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusRepository readStatusRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
-  private final MessageRepository messageRepository;
+  private final ReadStatusMapper readStatusMapper;
 
   @Override
+  @Transactional
   public ReadStatusDto create(CreateReadStatusDto createReadStatusDto)
       throws CustomException {
 
@@ -61,20 +61,22 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus = new ReadStatus(channel, user, createReadStatusDto.lastReadAt());
     ReadStatus savedReadStatus = readStatusRepository.save(readStatus);
 
-    return ReadStatusDto.from(savedReadStatus, isNewMessage(readStatus));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ReadStatusDto findById(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElse(null);
     if (readStatus == null) {
       throw new CustomException(ErrorCode.READ_STATUS_NOT_FOUND);
     }
-    return ReadStatusDto.from(readStatus, isNewMessage(readStatus));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
+  @Transactional
   public ReadStatusDto update(String readStatusId,
       UpdateReadStatusDto updateReadStatusDto) {
 
@@ -91,10 +93,11 @@ public class BasicReadStatusService implements ReadStatusService {
     readStatus.setLastReadAt(updateReadStatusDto.newLastReadAt());
     readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
 
-    return ReadStatusDto.from(readStatus, isNewMessage(readStatus));
+    return readStatusMapper.toDto(readStatus);
   }
 
   @Override
+  @Transactional
   public List<ReadStatusDto> updateByUserId(String userId,
       UpdateReadStatusDto updateReadStatusDto) {
 
@@ -120,6 +123,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   @Override
+  @Transactional
   public List<ReadStatusDto> updateByChannelId(String channelId,
       UpdateReadStatusDto updateReadStatusDto) {
 
@@ -137,8 +141,7 @@ public class BasicReadStatusService implements ReadStatusService {
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
     for (ReadStatus readStatus : readStatuses) {
       readStatus.setUpdatedAt(updateReadStatusDto.newLastReadAt());
-      readStatusDtos.add(ReadStatusDto.from(readStatusRepository.save(readStatus),
-          isNewMessage(readStatus)));
+      readStatusDtos.add(readStatusMapper.toDto(readStatus));
     }
     return readStatusDtos;
   }
@@ -155,18 +158,20 @@ public class BasicReadStatusService implements ReadStatusService {
     List<ReadStatusDto> readStatusDtos = new ArrayList<>();
 
     for (ReadStatus readStatus : allReadStatusByUserId) {
-      readStatusDtos.add(ReadStatusDto.from(readStatus, isNewMessage(readStatus)));
+      readStatusDtos.add(readStatusMapper.toDto(readStatus));
     }
     return readStatusDtos;
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ReadStatusDto> findAllByChannelId(String channelId) {
     return readStatusRepository.findByChannelId(UUID.fromString(channelId)).stream()
-        .map(r -> ReadStatusDto.from(r, isNewMessage(r))).toList();
+        .map(readStatusMapper::toDto).toList();
   }
 
   @Override
+  @Transactional
   public boolean delete(String readStatusId) {
     ReadStatus readStatus = readStatusRepository.findById(UUID.fromString(readStatusId))
         .orElse(null);
@@ -175,16 +180,5 @@ public class BasicReadStatusService implements ReadStatusService {
     }
     readStatusRepository.delete(readStatus);
     return true;
-  }
-
-  public boolean isNewMessage(ReadStatus readStatus) throws CustomException {
-    Instant lastMessageTimestamp = messageRepository.findByChannelId(
-            readStatus.getChannel().getId().toString())
-        .stream().map(Message::getCreatedAt).max(Instant::compareTo).orElse(null);
-
-    if (lastMessageTimestamp == null) {
-      return false;
-    }
-    return lastMessageTimestamp.isAfter(readStatus.getLastReadAt());
   }
 }
