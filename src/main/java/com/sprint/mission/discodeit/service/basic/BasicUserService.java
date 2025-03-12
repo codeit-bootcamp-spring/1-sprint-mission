@@ -5,25 +5,23 @@ import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.user.CreateUserDto;
 import com.sprint.mission.discodeit.dto.user.UpdateUserDto;
 import com.sprint.mission.discodeit.dto.user.UserDto;
-import com.sprint.mission.discodeit.dto.userStatus.CreateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UpdateUserStatusDto;
-import com.sprint.mission.discodeit.dto.userStatus.UserStatusDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.UserStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
-import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.TypeMismatchException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -33,12 +31,16 @@ import java.util.List;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
-  private final UserStatusService userStatusService;
   private final BinaryContentService binaryContentService;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
+  private final UserMapper userMapper;
 
   @Override
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  //todo - 고민
+  // 자기자신의 메서드 호출을 가로채지 않아서 내부 메서드의 transactional이 무시된다...
+  // 그럼 밑의 동일 이름의 create에서 이 create를 호출하면 무시되나?
   public UserDto create(CreateUserDto createUserDto) {
 
     boolean userEmailExists =
@@ -58,24 +60,20 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    //todo - User 생성 시 UserStatus 생성하는 로직 리팩터링 필요
-    // 현재 구조: user 생성(userstatus 필드 비어있음) -> userStatus 생성(user가지고) 후 userStatusDto 받음
-    // -> userStatusDto에 있는 id로 userStatus 다시 조회 -> 조회 된 userStatus를 user에 set
-    // 비효율적인것 같다...
     User user = new User(createUserDto.username(), createUserDto.nickname(), createUserDto.email(),
         createUserDto.password(), null, AccountStatus.UNVERIFIED, null);
 
-    UserStatusDto userStatusDto = userStatusService.create(
-        new CreateUserStatusDto(user.getId().toString()));
-
-    UserStatus userStatus = userStatusRepository.findByUser(user).orElse(null);
+    UserStatus userStatus = new UserStatus(user);
+    userStatusRepository.save(userStatus);
     user.setUserStatus(userStatus);
 
     userRepository.save(user);
-    return UserDto.from(user, user.getUserStatus().isActive());
+
+    return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional
   public UserDto create(CreateUserDto createUserDto, MultipartFile file)
       throws CustomException {
     UserDto userDto = create(createUserDto);
@@ -90,17 +88,17 @@ public class BasicUserService implements UserService {
     user.setProfile(profile);
     userRepository.save(user);
 
-    return UserDto.from(user, user.getUserStatus().isActive());
+    return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserDto> findAll() {
-    return userRepository.findAll().stream()
-        .map(u -> UserDto.from(u, u.getUserStatus().isActive()))
-        .toList();
+    return userRepository.findAll().stream().map(userMapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto findById(String userId) throws CustomException {
     if (userId == null) {
       throw new CustomException(ErrorCode.EMPTY_DATA, "USER ID is null");
@@ -111,10 +109,11 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
-    return UserDto.from(user, user.getUserStatus().isActive());
+    return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserDto findByEmail(String email) throws CustomException {
     User user = userRepository.findAll().stream().filter(u -> u.getEmail().equals(email))
         .findFirst().orElse(null);
@@ -122,25 +121,27 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with email %s not found", email));
     }
-    return UserDto.from(user, user.getUserStatus().isActive());
+    return userMapper.toDto(user);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserDto> findAllContainsNickname(String nickname) {
     return userRepository.findAll().stream()
         .filter(user -> user.getNickname().contains(nickname))
-        .map(
-            user -> UserDto.from(user, user.getUserStatus().isActive())).toList();
+        .map(userMapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserDto> findAllByAccountStatus(AccountStatus accountStatus) {
     return userRepository.findByAccountStatus(accountStatus)
         .stream()
-        .map(u -> UserDto.from(u, u.getUserStatus().isActive())).toList();
+        .map(userMapper::toDto).toList();
   }
 
   @Override
+  @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto)
       throws CustomException {
 
@@ -155,19 +156,27 @@ public class BasicUserService implements UserService {
           String.format("User with id %s not found", userId));
     }
 
-    if (user.isUpdated(updateUserDto)) {
-      user.setUpdatedAt(updateUserDto.updatedAt());
-    }
+    user.setUsername(updateUserDto.newUsername());
+    user.setNickname(updateUserDto.newNickname());
+    user.setEmail(updateUserDto.newEmail());
+    user.setPassword(updateUserDto.newPassword());
+    user.setUpdatedAt(updateUserDto.updatedAt());
+    user.setAccountStatus(updateUserDto.accountStatus());
+    user.setStatusMessage(updateUserDto.newStatusMessage());
 
     User savedUser = userRepository.save(user);
-    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
-        new UpdateUserStatusDto(Instant.now()));
+    UserStatus userStatus = userStatusRepository.findByUser(savedUser).orElse(null);
+    if (userStatus == null) {
+      throw new CustomException(ErrorCode.USER_STATUS_NOT_FOUND);
+    }
+    user.setUserStatus(userStatus);
 
-    return UserDto.from(savedUser, savedUser.getUserStatus().isActive());
+    return userMapper.toDto(savedUser);
   }
 
   // 선택적으로 프로필 이미지를 대체할 수 있도록 하는 메서드
   @Override
+  @Transactional
   public UserDto updateUser(String userId, UpdateUserDto updateUserDto, MultipartFile file)
       throws CustomException {
     User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
@@ -179,6 +188,7 @@ public class BasicUserService implements UserService {
     }
 
     if (user.getProfile() != null) {
+
       binaryContentRepository.delete(user.getProfile().getId());
     }
     BinaryContentDto binaryContentDto = binaryContentService.create(file);
@@ -189,16 +199,17 @@ public class BasicUserService implements UserService {
     user.setProfile(binaryContent);
     user.setUpdatedAt(updateUserDto.updatedAt());
 
-    UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,
-        new UpdateUserStatusDto(Instant.now()));
+    UserStatus userStatus = user.getUserStatus();
+    userStatus.setUpdatedAt(updateUserDto.updatedAt());
 
-    User savedUser = userRepository.save(user);
+    userStatusRepository.save(userStatus);
+    userRepository.save(user);
 
-    return UserDto.from(savedUser, savedUser.getUserStatus().isActive());
+    return userMapper.toDto(user);
   }
 
-
   @Override
+  @Transactional
   public boolean deleteUser(String userId) throws CustomException {
     User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
 
@@ -206,15 +217,7 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND,
           String.format("User with id %s not found", userId));
     }
-
-    //todo - userStatus가 삭제되지 않았다면?
-    boolean delete = userStatusService.delete(user.getUserStatus().getId().toString());
-    if (!delete) {
-      //todo - errorcode 수정, 예외처리 전체 수정
-      throw new CustomException(ErrorCode.NOT_DELETED);
-    }
     userRepository.delete(user);
-
     return true;
   }
 }
