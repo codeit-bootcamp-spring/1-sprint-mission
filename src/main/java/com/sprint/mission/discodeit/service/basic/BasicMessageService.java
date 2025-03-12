@@ -20,8 +20,10 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import java.awt.print.Pageable;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -153,6 +155,43 @@ public class BasicMessageService implements MessageService {
 
   @Override
   @Transactional(readOnly = true)
+  public PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor,
+      int size) {
+
+    if (channelId == null) {
+      throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
+    }
+
+    Channel channel = channelRepository.findById(UUID.fromString(channelId))
+        .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+
+    Pageable pageable = (Pageable) PageRequest.of(0, size + 1);
+
+    List<Message> messages = messageRepository.findByChannelIdAndCreatedAtBeforeCursorOrderByCreatedAtDesc(
+        UUID.fromString(channelId), cursor, pageable);
+
+    boolean hasNext = false;
+    Instant nextCursorInstant = null;
+
+    // 요청한 크기보다 많은 결과가 있으면 다음 페이지가 있다는 의미
+    if (messages.size() > size) {
+      hasNext = true;
+      messages = messages.subList(0, size); // 마지막 항목은 제외
+    }
+    // 다음 커서 값 설정 (마지막 메시지의 createdAt)
+    if (!messages.isEmpty() && hasNext) {
+      nextCursorInstant = messages.get(messages.size() - 1).getCreatedAt();
+    }
+
+    List<MessageDto> messageDtos = messages.stream()
+        .map(messageMapper::toDto)
+        .toList();
+
+    return pageResponseMapper.fromCursorResult(messageDtos, hasNext, size, nextCursorInstant, null);
+  }
+
+/*  @Override
+  @Transactional(readOnly = true)
   public PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId,
       Pageable pageable) {
 
@@ -179,7 +218,8 @@ public class BasicMessageService implements MessageService {
     Slice<MessageDto> messageDtoSlice = messageSlice.map(messageMapper::toDto);
 
     return pageResponseMapper.fromSlice(messageDtoSlice);
-  }
+  }*/
+
 
   @Override
   @Transactional

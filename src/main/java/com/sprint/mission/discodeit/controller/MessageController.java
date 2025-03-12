@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.awt.print.Pageable;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,14 +49,26 @@ public class MessageController {
     return ResponseEntity.ok(messageService.updateMessage(messageId, updateMessageDto));
   }
 
-  //특정 채널의 최근 50개 메세지 조회
-  @GetMapping
-  public ResponseEntity<List<MessageDto>> getAllMessages(@RequestParam String channelId,
-      @RequestParam Pageable pageable) {
-    PageResponse<MessageDto> allByChannelIdWithPaging = messageService.findAllByChannelIdWithPaging(
-        channelId, pageable);
+  /*  //특정 채널의 최근 50개 메세지 조회
+    @GetMapping
+    public ResponseEntity<List<MessageDto>> getAllMessages(@RequestParam String channelId,
+        @RequestParam Pageable pageable) {
+      PageResponse<MessageDto> allByChannelIdWithPaging = messageService.findAllByChannelIdWithPaging(
+          channelId, pageable);
 
-    return ResponseEntity.ok().body(allByChannelIdWithPaging.getContents());
+      return ResponseEntity.ok().body(allByChannelIdWithPaging.getContents());
+    }*/
+
+  @GetMapping
+  public ResponseEntity<PageResponse<MessageDto>> getMessagesWithCursor(
+      @RequestParam String channelId,
+      @RequestParam(required = false) Instant cursor,
+      @RequestParam(defaultValue = "50") int size) {
+
+    PageResponse<MessageDto> response = messageService.findAllByChannelIdWithCursor(
+        channelId, cursor, size);
+
+    return ResponseEntity.ok().body(response);
   }
 
   //메세지 삭제

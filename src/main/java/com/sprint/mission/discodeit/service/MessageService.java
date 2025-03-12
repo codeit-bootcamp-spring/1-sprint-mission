@@ -32,9 +32,12 @@ public interface MessageService {
 
   //다건 조회 - 날짜
   List<MessageDto> findAllByCreatedAt(Instant createdAt);
-  
-  PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId,
-      Pageable pageable);
+
+  //페이징 - 오프셋 기반
+  //PageResponse<MessageDto> findAllByChannelIdWithPaging(String channelId, Pageable pageable);
+
+  //페이징 - 커서 기반
+  PageResponse<MessageDto> findAllByChannelIdWithCursor(String channelId, Instant cursor, int size);
 
   //수정
   MessageDto updateMessage(String messageId, UpdateMessageDto updateMessageDto);
