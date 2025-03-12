@@ -13,15 +13,15 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-#    show-sql: true
 
 server:
   port: 8080
 
 discodeit:
-  repository:
-    type: jcf
-    file-directory: tmp
+  storage:
+    type: local
+    local:
+      root-path: %{user.dir}/binaryContents
 
 logging:
   #  file:

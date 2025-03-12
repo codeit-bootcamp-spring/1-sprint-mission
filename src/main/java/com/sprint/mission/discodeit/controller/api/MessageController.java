@@ -38,11 +38,10 @@ public class MessageController implements MessageApiDocs {
   @Override
   public ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
       @PathVariable UUID messageId,
-      @RequestPart MessageRequest.Update messageRequest,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> files
+      @RequestBody MessageRequest.Update messageRequest
   ) {
     return ResponseEntity.ok(
-        CustomApiResponse.success(messageService.update(messageId, messageRequest, files))
+        CustomApiResponse.success(messageService.update(messageId, messageRequest))
     );
   }
 

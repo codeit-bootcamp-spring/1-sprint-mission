@@ -8,12 +8,11 @@ import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.UserStatusService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validation.UserValidator;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -35,6 +34,7 @@ public class BasicUserService implements UserService {
   private final UserMapper userMapper;
   private final UserStatusRepository userStatusRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -42,18 +42,14 @@ public class BasicUserService implements UserService {
     if (userValidator.isValidName(request.name()) && userValidator.isValidEmail(request.email())
         && userValidator.isValidPassword(request.password())) {
 
-      BinaryContent newProfile = Optional.ofNullable(userProfileImage)
-          .map(profile -> {
-            if (!profile.isEmpty()) {
-              return binaryContentRepository.save(BinaryContent.createBinaryContent(
-                  profile.getName(),
-                  profile.getSize(),
-                  profile.getContentType(),
-                  convertToBytes(profile)));
-            }
-            return null;
-          })
-          .orElse(null);
+      BinaryContent newProfile = null;
+      if (userProfileImage != null && !userProfileImage.isEmpty()) {
+        newProfile = binaryContentRepository.save(BinaryContent.createBinaryContent(
+            userProfileImage.getOriginalFilename(),
+            userProfileImage.getSize(),
+            userProfileImage.getContentType()));
+        binaryContentStorage.put(newProfile.getId(), convertToBytes(userProfileImage));
+      }
 
       User newUser = userRepository.save(User.createUser(
           request.name(), request.email(), request.password(), newProfile));
@@ -92,12 +88,13 @@ public class BasicUserService implements UserService {
       Optional.ofNullable(userProfileImage)
           .ifPresent(profile -> {
             if (!profile.isEmpty()) { // 파라미터는 있는데, 파일이 안 들어올 때
-              user.updateProfile(binaryContentRepository.save(
+              BinaryContent binaryContent = binaryContentRepository.save(
                   BinaryContent.createBinaryContent(
-                      profile.getName(),
+                      profile.getOriginalFilename(),
                       profile.getSize(),
-                      profile.getContentType(),
-                      convertToBytes(profile))));
+                      profile.getContentType()));
+              binaryContentStorage.put(binaryContent.getId(), convertToBytes(profile));
+              user.updateProfile(binaryContent);
             }
           });
     }

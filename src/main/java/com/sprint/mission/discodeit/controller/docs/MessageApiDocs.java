@@ -55,8 +55,7 @@ public interface MessageApiDocs {
   })
   ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
       UUID messageId,
-      MessageRequest.Update messageRequest,
-      List<MultipartFile> files
+      MessageRequest.Update messageRequest
   );
 
   @Operation(summary = "메세지 삭제", description = "메세지 삭제하기")

@@ -16,7 +16,7 @@ public interface MessageService {
 
   MessageResponse findById(UUID id);
 
-  MessageResponse update(UUID id, MessageRequest.Update request, List<MultipartFile> messageFiles);
+  MessageResponse update(UUID id, MessageRequest.Update request);
 
   void deleteById(UUID id);
 

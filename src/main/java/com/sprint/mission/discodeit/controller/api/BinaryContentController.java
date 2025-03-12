@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.controller.docs.BinaryContentApiDocs;
 import com.sprint.mission.discodeit.dto.BinaryContentResponse;
 import com.sprint.mission.discodeit.global.response.CustomApiResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class BinaryContentController implements BinaryContentApiDocs {
 
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorage binaryContentStorage;
 
   @GetMapping("/{binaryContentId}")
   @Override
@@ -33,5 +35,11 @@ public class BinaryContentController implements BinaryContentApiDocs {
       @RequestParam("binaryContentIds") List<UUID> fileIds) {
     return ResponseEntity.ok(
         CustomApiResponse.success(binaryContentService.findAllByIdIn(fileIds)));
+  }
+
+  @GetMapping("/{binaryContentId}/download")
+  @Override
+  public ResponseEntity<?> downloadFile(@PathVariable UUID binaryContentId) {
+    return binaryContentStorage.download(binaryContentService.findByIdOrThrow(binaryContentId));
   }
 }

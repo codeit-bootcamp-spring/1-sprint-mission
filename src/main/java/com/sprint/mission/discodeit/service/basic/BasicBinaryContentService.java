@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.global.exception.RestApiException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,16 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   public BinaryContentResponse create(MultipartFile file) {
     BinaryContent newFile = BinaryContent.createBinaryContent(
-        file.getName(), file.getSize(), file.getContentType(), convertToBytes(file));
-    log.info("Create User Profile : {}", newFile);
+        file.getName(), file.getSize(), file.getContentType());
+
     BinaryContent newBinaryContent = binaryContentRepository.save(newFile);
+    binaryContentStorage.put(newBinaryContent.getId(), convertToBytes(file));
+    log.info("Create User Profile : {}", newBinaryContent);
     return binaryContentMapper.entityToDto(newBinaryContent);
   }
 

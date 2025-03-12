@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Tag(name = "BinaryContent API", description = "BinaryContent 관련 API")
 public interface BinaryContentApiDocs {
@@ -26,4 +28,7 @@ public interface BinaryContentApiDocs {
       @ApiResponse(responseCode = "404", description = "해당 파일을 찾을 수 없음")
   })
   ResponseEntity<CustomApiResponse<List<BinaryContentResponse>>> getFileList(List<UUID> fileIds);
+
+  @Operation(summary = "바이너리 파일 다운로드", description = "id로 파일 다운로드")
+  ResponseEntity<?> downloadFile(UUID binaryContentId);
 }

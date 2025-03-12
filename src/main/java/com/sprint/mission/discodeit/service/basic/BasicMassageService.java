@@ -8,12 +8,14 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -38,6 +40,7 @@ public class BasicMassageService implements MessageService {
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
   @Transactional
@@ -51,14 +54,16 @@ public class BasicMassageService implements MessageService {
 
     if (messageValidator.inValidContent(request.content())) {
       Message message = Message.createMessage(request.content(), channel, user);
-
       Optional.ofNullable(messageFiles).ifPresent(files ->
-          files.forEach(file ->
-              message.insertAttachments(binaryContentRepository.save(
-                  BinaryContent.createBinaryContent(
-                      file.getName(), file.getSize(), file.getContentType(), convertToBytes(file)
-                  ))
-              )
+          files.forEach(file -> {
+                BinaryContent binaryContent = binaryContentRepository.save(
+                    BinaryContent.createBinaryContent(
+                        file.getOriginalFilename(),
+                        file.getSize(),
+                        file.getContentType()));
+                binaryContentStorage.put(binaryContent.getId(), convertToBytes(file));
+                message.insertAttachments(binaryContent);
+              }
           )
       );
       messageRepository.save(message);
@@ -85,22 +90,12 @@ public class BasicMassageService implements MessageService {
 
   @Override
   @Transactional
-  public MessageResponse update(UUID id, MessageRequest.Update request,
-      List<MultipartFile> messageFiles) {
+  public MessageResponse update(UUID id, MessageRequest.Update request) {
     Message message = findByIdOrThrow(id);
     if (messageValidator.inValidContent(request.newContent())) {
       message.updateContent(request.newContent());
       messageRepository.save(message);
 
-      Optional.ofNullable(messageFiles).ifPresent(files ->
-          files.forEach(file ->
-              message.insertAttachments(binaryContentRepository.save(
-                  BinaryContent.createBinaryContent(
-                      file.getName(), file.getSize(), file.getContentType(), convertToBytes(file)
-                  ))
-              )
-          )
-      );
       log.info("update message: {}", message);
       return messageMapper.entityToDto(message);
     }
