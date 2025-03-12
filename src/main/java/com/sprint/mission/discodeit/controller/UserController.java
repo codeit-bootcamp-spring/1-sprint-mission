@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.UsersDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -24,6 +26,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Operation(summary = "회원 목록 조회", description = "전체 회원 조회")
     @GetMapping
@@ -43,23 +46,36 @@ public class UserController {
     }
 
     @Operation(summary = "회원 가입", description = "회원 가입")
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> registerUser(@Valid
-            @RequestPart("user") UserDto userDTO,
+    @PostMapping
+    public ResponseEntity<UserDto> registerUser(
+            @RequestPart(value = "user", required = true) @Valid UserDto userDTO,
             @RequestPart(value = "pro", required = false) MultipartFile pro) {
 
-        byte[] profileImage = null;
         try {
             if (pro != null && !pro.isEmpty()) {
-
-                profileImage = pro.getBytes();
+                String fileName = "profile_" + UUID.randomUUID().toString();
+                Long size = pro.getSize();
+                String contentType = pro.getContentType();
+                
+                BinaryContent binaryContent = BinaryContent.builder()
+                    .fileName(fileName)
+                    .size(size)
+                    .contentType(contentType)
+                    .build();
+                
+                binaryContentRepository.save(binaryContent);
+                userDTO.setProfileImage(binaryContent.getId().toString());
             }
+            
+            UserDto users = userService.create(userDTO, pro != null ? pro.getBytes() : null);
+            return ResponseEntity.status(HttpStatus.CREATED).body(users);
         } catch (IOException e) {
-            log.error("error : {}", e.getMessage(), e);
+            log.error("프로필 이미지 처리 중 오류 발생: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            log.error("회원가입 처리 중 오류 발생: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-        UserDto users = userService.create(userDTO, profileImage);
-        return ResponseEntity.status(HttpStatus.CREATED).body(users);
     }
 
     @Operation(summary = "회원 정보 수정", description = "회원 정보 수정")

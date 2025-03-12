@@ -29,7 +29,6 @@ public class AuthController {
                                                        BindingResult bindingResult,
                                                        HttpSession session) {
 
-
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
                     .body(new ApiResponse<>(false, "입력값이 유효하지 않습니다."));

@@ -43,7 +43,7 @@ public class BasicUserService implements UserService {
             user.setProfileImage(profileImage);
         }
         User saved = userRepository.save(user);
-        return userMapper.toDtos(saved);
+        return userMapper.toDto(saved);
     }
 
     @Transactional
@@ -100,7 +100,7 @@ public class BasicUserService implements UserService {
             }
 
             return users.stream()
-                    .map(userMapper::toDto)
+                    .map(userMapper::toDtos)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {

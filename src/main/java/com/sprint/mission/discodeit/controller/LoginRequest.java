@@ -15,6 +15,5 @@ public class LoginRequest {
     private String email;
 
     @NotBlank(message = "비밀번호는 필수입니다")
-    @Size(min = 4, message = "비밀번호는 4자 이상이어야 합니다")
     private String password;
 }

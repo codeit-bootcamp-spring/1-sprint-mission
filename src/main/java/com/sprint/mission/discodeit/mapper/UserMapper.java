@@ -13,30 +13,29 @@ public class UserMapper {
     private UsersDto dto;
     private UserDto dtos;
 
-    public UsersDto toDto(User user) {
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            dto.setProfileImage(Base64.getEncoder().encodeToString(user.getProfileImage()));
-            }
-
+    public UsersDto toDtos(User user) {
+        if (user == null) {
+            return null;
+        }
         return UsersDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .profileImage(user.getProfileImage() != null ? new String(user.getProfileImage()) : null)
                 .online(user.isOnline())
                 .build();
     }
 
-    public UserDto toDtos(User user) {
-        if (user.getProfileImage() != null && user.getProfileImage().length > 0) {
-            dtos.setProfileImage(Base64.getEncoder().encodeToString(user.getProfileImage()));
+    public UserDto toDto(User user) {
+        if (user == null) {
+            return null;
         }
-
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .online(user.isOnline())
+                .profileImage(user.getProfileImage() != null ? new String(user.getProfileImage()) : null)
                 .build();
     }
 
