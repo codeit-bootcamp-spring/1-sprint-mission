@@ -26,8 +26,8 @@ public class MessageController implements MessageApiDocs {
       MediaType.APPLICATION_JSON_VALUE})
   @Override
   public ResponseEntity<CustomApiResponse<MessageResponse>> createMessage(
-      @RequestPart MessageRequest.Create messageRequest,
-      @RequestPart(value = "files", required = false) List<MultipartFile> files
+      @RequestPart(value = "messageCreateRequest") MessageRequest.Create messageRequest,
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> files
   ) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CustomApiResponse.created(messageService.createMessage(messageRequest, files)));
@@ -39,7 +39,7 @@ public class MessageController implements MessageApiDocs {
   public ResponseEntity<CustomApiResponse<MessageResponse>> updateMessage(
       @PathVariable UUID messageId,
       @RequestPart MessageRequest.Update messageRequest,
-      @RequestPart(value = "files", required = false) List<MultipartFile> files
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> files
   ) {
     return ResponseEntity.ok(
         CustomApiResponse.success(messageService.update(messageId, messageRequest, files))

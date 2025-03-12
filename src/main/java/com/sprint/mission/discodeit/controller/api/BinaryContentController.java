@@ -18,10 +18,10 @@ public class BinaryContentController implements BinaryContentApiDocs {
 
   private final BinaryContentService binaryContentService;
 
-  @GetMapping("/{fileId}")
+  @GetMapping("/{binaryContentId}")
   @Override
   public ResponseEntity<CustomApiResponse<BinaryContentResponse>> getFile(
-      @PathVariable UUID fileId
+      @PathVariable(value = "binaryContentId") UUID fileId
   ) {
     return ResponseEntity.ok(
         CustomApiResponse.success(binaryContentService.findByIdOrThrow(fileId)));
@@ -30,7 +30,7 @@ public class BinaryContentController implements BinaryContentApiDocs {
   @GetMapping
   @Override
   public ResponseEntity<CustomApiResponse<List<BinaryContentResponse>>> getFileList(
-      @RequestParam("ids") List<UUID> fileIds) {
+      @RequestParam("binaryContentIds") List<UUID> fileIds) {
     return ResponseEntity.ok(
         CustomApiResponse.success(binaryContentService.findAllByIdIn(fileIds)));
   }

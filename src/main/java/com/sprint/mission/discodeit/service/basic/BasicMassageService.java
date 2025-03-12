@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.validation.MessageValidator;
 import jakarta.transaction.Transactional;
@@ -72,6 +71,8 @@ public class BasicMassageService implements MessageService {
 
   @Override
   public List<MessageResponse> findAllByChannelId(UUID channelId) {
+    channelRepository.findById(channelId).orElseThrow(() ->
+        new RestApiException(ErrorCode.CHANNEL_NOT_FOUND, "id : " + channelId));
     return messageRepository.findAllByChannelId(channelId).stream()
         .map(messageMapper::entityToDto)
         .collect(Collectors.toList());
@@ -87,8 +88,8 @@ public class BasicMassageService implements MessageService {
   public MessageResponse update(UUID id, MessageRequest.Update request,
       List<MultipartFile> messageFiles) {
     Message message = findByIdOrThrow(id);
-    if (messageValidator.inValidContent(request.content())) {
-      message.updateContent(request.content());
+    if (messageValidator.inValidContent(request.newContent())) {
+      message.updateContent(request.newContent());
       messageRepository.save(message);
 
       Optional.ofNullable(messageFiles).ifPresent(files ->

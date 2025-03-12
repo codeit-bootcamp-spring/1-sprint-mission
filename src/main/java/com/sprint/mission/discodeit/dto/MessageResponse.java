@@ -24,7 +24,7 @@ public record MessageResponse(
 //        .id(message.getId())
 //        .author(message.getAuthor())
 //        .channelId(message.getChannel().getId())
-//        .content(message.getContent())
+//        .newContent(message.getContent())
 //        .createdAt(message.getCreatedAt())
 //        .updatedAt(message.getUpdatedAt())
 //        .build();

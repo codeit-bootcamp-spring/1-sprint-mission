@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.ChannelRequest;
 import com.sprint.mission.discodeit.dto.ChannelResponse;
 import com.sprint.mission.discodeit.dto.ReadStatusRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.global.exception.ErrorCode;
 import com.sprint.mission.discodeit.global.exception.RestApiException;
@@ -66,17 +67,11 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public List<ChannelResponse> findAllByUserId(UUID userId) {
+  public List<ChannelResponse> findAllByUserId(UUID userId) { // N + 1;
     User user = userRepository.findById(userId).orElseThrow(() ->
         new RestApiException(ErrorCode.USER_NOT_FOUND, "id: " + userId));
 
-//    return channelRepository.findAll().stream()
-//        .map(channelMapper::entityToDto)
-//        .filter(
-//            channel -> channel.type() == Channel.ChannelType.PUBLIC || channel.participants()
-//                .contains(user))
-//        .collect(Collectors.toList());
-    return channelRepository.findAllByUserIdOrPublicType(userId).stream()
+    return channelRepository.findAllByUserIdOrType(userId, ChannelType.PUBLIC).stream()
         .map(channelMapper::entityToDto)
         .collect(Collectors.toList());
   }

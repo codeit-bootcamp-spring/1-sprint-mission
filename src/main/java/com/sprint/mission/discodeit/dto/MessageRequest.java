@@ -13,7 +13,7 @@ public record MessageRequest() {
   }
 
   public record Update(
-      String content
+      String newContent
   ) {
 
   }

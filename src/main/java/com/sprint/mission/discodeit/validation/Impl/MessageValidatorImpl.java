@@ -13,7 +13,7 @@ public class MessageValidatorImpl implements MessageValidator {
   @Override
   public boolean inValidContent(String content) {
     if (content.isBlank()) {
-      throw new RestApiException(ErrorCode.MESSAGE_CONTENT_REQUIRED, "content=" + content);
+      throw new RestApiException(ErrorCode.MESSAGE_CONTENT_REQUIRED, "newContent=" + content);
     }
     return true;
   }
