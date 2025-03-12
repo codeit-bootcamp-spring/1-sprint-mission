@@ -4,14 +4,11 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.UUID;
 
 @Getter @Builder
 @Entity @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "read_statuses")
 public class ReadStatus extends BaseUpdatableEntity {

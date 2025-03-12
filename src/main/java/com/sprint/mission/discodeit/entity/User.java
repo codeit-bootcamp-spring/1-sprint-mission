@@ -2,21 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.aspectj.bridge.IMessage;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.*;
 
 @Getter @Setter
 @Entity @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User extends BaseUpdatableEntity {
 
