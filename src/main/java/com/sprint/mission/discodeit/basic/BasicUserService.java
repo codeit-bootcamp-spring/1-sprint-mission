@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 @Primary
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
@@ -67,6 +68,7 @@ public class BasicUserService implements UserService {
         return usersDTO;
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         userRepository.deleteById(id);
@@ -110,6 +112,7 @@ public class BasicUserService implements UserService {
         }
     }
 
+    @Transactional
     public void updateOnlineStatus(UUID userId, boolean online) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found: " + userId));

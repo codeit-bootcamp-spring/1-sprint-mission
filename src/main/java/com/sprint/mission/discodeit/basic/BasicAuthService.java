@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
-import jakarta.persistence.Table;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
 
-    @Transactional
     @Override
     public UserDto login(AuthDto authDTO) {
         log.info("[로그인 시도] 유저네임: " + authDTO.getUsername());

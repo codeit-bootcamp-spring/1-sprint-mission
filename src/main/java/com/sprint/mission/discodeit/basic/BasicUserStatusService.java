@@ -7,16 +7,19 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
 
+    @Transactional
     @Override
     public UserStatusDto create(UserStatusDto userStatusDTO) {
         UserStatus userStatus = new UserStatus(Instant.now());
@@ -31,6 +34,7 @@ public class BasicUserStatusService implements UserStatusService {
         return new UserStatusDto(userStatus.getId(), userStatus.getLastSeen());
     }
 
+    @Transactional
     @Override
     public void delete(UUID userId) {
         userStatusRepository.deleteByUserId(userId);
@@ -44,6 +48,7 @@ public class BasicUserStatusService implements UserStatusService {
         return onOffStatus(userStatus.getLastSeen());
     }
 
+    @Transactional
     public UserStatusType onOffStatus(Instant lastSeen) {
         Instant now = Instant.now();
         Instant offline = lastSeen.plus(5, ChronoUnit.MINUTES);

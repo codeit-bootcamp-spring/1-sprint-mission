@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
 
     private final ReadStatusRepository readStatusRepository;
@@ -33,6 +35,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
     private final ReadStatusMapper readStatusMapper;
 
+    @Transactional
     @Override
     public ReadStatusDto create(ReadStatusCreateRequest request) {
         UUID userId = request.userId();
@@ -81,6 +84,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
@@ -97,6 +101,7 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusMapper.toDto(updatedReadStatus);
     }
 
+    @Transactional
     @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
