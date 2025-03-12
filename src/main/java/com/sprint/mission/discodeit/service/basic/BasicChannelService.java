@@ -10,15 +10,16 @@ import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelCategory;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.status.ReadStatus;
 import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +42,12 @@ public class BasicChannelService implements ChannelService {
 
   private final ReadStatusRepository readStatusRepository;
 
-  private final UserStatusRepository userStatusRepository;
+  private final ChannelMapper channelMapper;
+  private final MessageMapper messageMapper;
+  private final UserMapper userMapper;
 
   @Override
+  @Transactional
   public ChannelDto create(CreatePublicChannelDto createPublicChannelDto)
       throws CustomException {
 
@@ -50,21 +55,22 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    Channel channel = channelRepository.save(
-        new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
-            ChannelCategory.TEXT, createPublicChannelDto.description()));
-    return ChannelDto.from(channel, null, null);
+    Channel channel = new Channel(createPublicChannelDto.name(), ChannelType.PUBLIC,
+        ChannelCategory.TEXT, createPublicChannelDto.description());
+    channelRepository.save(channel);
+    return channelMapper.toDto(channel);
   }
 
   @Override
+  @Transactional //channel create 동작 중, readStatus 생성 오류시 롤백 되도록 해야되는데?
+  //todo - 고민: 읽기용 메서드인 경우에도 트랜젝션이 적용되나?
   public ChannelDto create(CreatePrivateChannelDTo createPrivateChannelDTo) {
     if (createPrivateChannelDTo == null || createPrivateChannelDTo.participantIds().isEmpty()) {
       throw new CustomException(ErrorCode.EMPTY_DATA);
     }
 
-    Channel channel = channelRepository.save(
-        new Channel(null, ChannelType.PRIVATE, ChannelCategory.TEXT,
-            null));
+    Channel channel = new Channel(null, ChannelType.PRIVATE, ChannelCategory.TEXT, null);
+    Channel savedChannel = channelRepository.save(channel);
 
     List<String> userIds = createPrivateChannelDTo.participantIds().stream().distinct().toList();
     List<UserDto> participants = new ArrayList<>();
@@ -76,50 +82,39 @@ public class BasicChannelService implements ChannelService {
       }
       ReadStatus readStatus = new ReadStatus(channel, user, Instant.now());
       readStatusRepository.save(readStatus);
-      participants.add(UserDto.from(user, user.getUserStatus().isActive()));
+      participants.add(userMapper.toDto(user));
     }
-    Channel savedChannel = channelRepository.save(channel);
-    return ChannelDto.from(savedChannel, null, participants);
+    return channelMapper.toDto(channel);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ChannelDto> findAllByUserId(String userId) {
-    User user = userRepository.findById(UUID.fromString(userId)).orElse(null);
-    if (user == null) {
-      throw new CustomException(ErrorCode.USER_NOT_FOUND);
-    }
-    // readStatus로 유저가 어느 채널을 가지고 있는지 알 수 있음
-    // readStatus로 얻은 Channel들 리스트
-    // 그 Channel이 만약 public이면 사용자 목록 안담아도 됨
-    // Private이면 해당 channel의 id를 가지고 readStatus를 모두 조회해서 각채널에 user 담아야함
-    List<Channel> channels = readStatusRepository
-        .findByUserId(UUID.fromString(userId)).stream().map(r -> r.getChannel()).toList();
 
-    List<ChannelDto> channelDtos = new ArrayList<>();
-    for (Channel channel : channels) {
-      List<UserDto> participants = null;
-      if (channel.getChannelType() == ChannelType.PRIVATE) {
-        participants = readStatusRepository.findByChannelId(channel.getId())
-            .stream()
-            .map(r -> UserDto.from(r.getUser(),
-                userStatusRepository.findByUser(r.getUser()).orElse(null).isActive())).toList();
-      }
-      channelDtos.add(ChannelDto.from(channel, getLastMessageTimestamp(channel), participants));
+    if (userId == null) {
+      throw new IllegalArgumentException("userId cannot be null");
     }
-    return channelDtos;
+
+    //fetch 조인으로 한번에 가져온다.
+    //todo - 고민 : user id가 유효한지 검사 안해도 되나?
+    List<Channel> channels = channelRepository.findChannelsWithReadStatusByUserId(
+        UUID.fromString(userId));
+
+    return channels.stream().map(channelMapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<MessageDto> findAllMessagesByChannelId(String channelId) {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
-    return messageRepository.findByChannelId(channelId).stream().map(MessageDto::from)
-        .toList();
+    return messageRepository.findByChannelId(channelId).stream().map(messageMapper::toDto).toList();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ChannelDto findById(String channelId, String userId) throws CustomException {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
     if (channel == null) {
@@ -133,17 +128,17 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
     List<UserDto> participants = List.of();
-    if (channel.getChannelType() == ChannelType.PRIVATE) {
+    if (channel.getType() == ChannelType.PRIVATE) {
       participants = readStatusRepository.findByChannelId(channel.getId()).stream().map(
-          r -> UserDto.from(r.getUser(),
-              userStatusRepository.findByUser(r.getUser()).orElse(null).isActive())).toList();
+          r -> userMapper.toDto(r.getUser())).toList();
     }
 
-    return ChannelDto.from(channel, getLastMessageTimestamp(channel), participants);
+    return channelMapper.toDto(channel);
   }
 
 
   @Override
+  @Transactional
   public ChannelDto updateChannel(String channelId, UpdateChannelDto updateChannelDto)
       throws CustomException {
 
@@ -158,28 +153,21 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    if (channel.getChannelType() == ChannelType.PRIVATE) {
+    if (channel.getType() == ChannelType.PRIVATE) {
       throw new CustomException(ErrorCode.CHANNEL_PRIVATE_NOT_UPDATABLE);
     }
 
-    // 변경사항이 있는 경우에만 업데이트 시간 설정
-    if (channel.isUpdated(updateChannelDto)) {
-      channel.setUpdatedAt(updateChannelDto.updatedAt());
-    }
+    channel.setName(updateChannelDto.channelName());
+    channel.setDescription(updateChannelDto.description());
 
-    channelRepository.save(channel);
+    //명시적으로 save 할 필요 없이 변경 감지가 알아서 처리한다.
+    //channelRepository.save(channel);
 
-    List<UserDto> participants = List.of();
-    if (channel.getChannelType() == ChannelType.PRIVATE) {
-      participants = readStatusRepository.findByChannelId(channel.getId()).stream().map(
-          r -> UserDto.from(r.getUser(),
-              userStatusRepository.findByUser(r.getUser()).orElse(null).isActive())).toList();
-    }
-
-    return ChannelDto.from(channel, getLastMessageTimestamp(channel), participants);
+    return channelMapper.toDto(channel);
   }
 
   @Override
+  @Transactional
   public boolean delete(String channelId) throws CustomException {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElse(null);
 
@@ -187,66 +175,18 @@ public class BasicChannelService implements ChannelService {
       throw new CustomException(ErrorCode.CHANNEL_NOT_FOUND);
     }
 
-    //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을끼?
+    //레포지토리에서 한번에 삭제 할 수 있는 방법이 있을까?
     //대용량 서비스라면? -> 삭제 완료될 때까지 기다려야함
-    messageRepository.findByChannelId(channelId)
-        .forEach(m -> messageRepository.delete(m));
-    readStatusRepository.findByChannelId(UUID.fromString(channelId))
-        .forEach(rs -> readStatusRepository.delete(rs));
+    //1. 벌크 삭제 쿼리(JPQL) 사용
+    //2. 배치 처리 -> 청크 단위로 나누어 처리
+    //3. 비동기 처리 -> 삭제 작업을 비동기로 처리하고 사용자에게는 즉시 응답
+    //4. 소프트 삭제 -> 실제로 데이터를 삭제하지 않고 삭제 플래그만 설정
 
+    // -> 찾아본 바로는 DB cascade로 인해 같이 지워지나, JPA 영속성 컨텍스트는 이 변경을 즉시 알지 못할 수 있음
+    // 따라서 필요시 영속성 컨텍스트도 초기화 해야한다.
+    // 대용량 데이터의 경우 CASCADE 삭제도 시간이 오래 걸릴 수 있으므로, 비동기 처리나 배치 처리를 고려해볼 수 있다.
     channelRepository.delete(channel);
     return true;
   }
-  //미사용 메서드 임시 주석처리
 
-//  @Override
-//  public boolean addUserToChannel(String channelId, String userId) throws CustomException {
-//    //todo - set 노출 수정 - how?
-//    //여기 검사하는 로직 if문으로 판별하도록 전부 수정하기
-//
-//    try {
-//      //해당 채널이 DB에 존재하는 채널인지 검사
-//      Channel c = channelRepository.findById(channelId);
-//      //해당 유저가 DB에 존재하는 유저인지 검사
-//      User u = userRepository.findById(userId);
-//      channelRepository.save(c);
-//      return true;
-//      //todo - 만약 API 서버라고 가정, 사용자가 요청했을 때 채널이 없어서 API 호출이 실패할텐데 이를 어떻게 알려줄 수 있을지?
-//    } catch (CustomException e) {
-//      if (e.getErrorCode() == ErrorCode.USER_NOT_FOUND) {
-//        System.out.println(
-//            "Failed to add User to this channel. User with id " + userId + " not found");
-//      } else if (e.getErrorCode() == ErrorCode.CHANNEL_NOT_FOUND) {
-//        System.out.println(
-//            "Failed to add User to this channel. Channel with id " + channelId + " not found");
-//      }
-//    }
-//    return false;
-//  }
-
-//  @Override
-//  public boolean deleteUserFromChannel(String channelId, String userId) {
-//    Channel channel = channelRepository.findById(channelId);
-//    User user = userRepository.findById(userId);
-//    if (channel.getUserSet().contains(user.getId().toString())) {
-//      channel.getUserSet().remove(user.getId().toString());
-//      return true;
-//    }
-//    return false;
-//  }
-//
-//  @Override
-//  public boolean isUserInChannel(String channelId, String userId) {
-//    Channel channel = channelRepository.findById(channelId);
-//    User user = userRepository.findById(userId);
-//    return channel.getUserSet().contains(user.getId().toString());
-//  }
-
-  public Instant getLastMessageTimestamp(Channel channel) throws CustomException {
-    //todo
-    //이것도 레포지토리 쪽으로 책임 넘기기
-    return messageRepository.findByChannelId(channel.getId().toString()).stream()
-        .map(Message::getCreatedAt)
-        .max(Instant::compareTo).orElse(null);
-  }
 }
