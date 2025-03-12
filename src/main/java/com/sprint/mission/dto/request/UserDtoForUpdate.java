@@ -21,13 +21,6 @@ public record UserDtoForUpdate(
         @Schema(description = "새로운 이메일", example = "code123@codeit.com")
         @Email(message = "이메일 형식이 아닙니다.")
         String newEmail) {
-
-    public User toUpdateEntity(User user) {
-        user.setUsername(newName);
-        user.setPassword(newPassword);
-        user.setEmail(newEmail);
-        return user;
-    }
 }
 ;
 // 프로필 이미지

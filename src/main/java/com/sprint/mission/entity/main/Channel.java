@@ -10,6 +10,7 @@ import jakarta.validation.constraints.AssertTrue;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.*;
 
 import static jakarta.persistence.CascadeType.*;

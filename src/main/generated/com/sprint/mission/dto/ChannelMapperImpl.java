@@ -10,6 +10,12 @@ import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
+/**
+* <h2>ChannelMapper</h2>
+* 채널 관련 DTO 변환을 위한 Mapper입니다.
+* 채널 조회 시 사용되는 DTO 변환을 담당합니다.
+*
+*/
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor"
 )

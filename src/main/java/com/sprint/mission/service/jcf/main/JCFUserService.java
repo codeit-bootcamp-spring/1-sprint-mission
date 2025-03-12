@@ -3,6 +3,8 @@ package com.sprint.mission.service.jcf.main;
 
 import com.sprint.mission.common.exception.CustomException;
 import com.sprint.mission.common.exception.ErrorCode;
+import com.sprint.mission.dto.BinaryContentMapper;
+import com.sprint.mission.dto.UserMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
@@ -35,14 +37,18 @@ public class JCFUserService implements UserService {
     private final BinaryService profileService;
     private final ExecutorService ves;
     private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Override
     public User create(UserDtoForCreate requestDTO, MultipartFile profile) {
 
         isDuplicateNameEmail(requestDTO.username(), requestDTO.email());
-        User createdUser = requestDTO.toEntity();
+        //User createdUser = requestDTO.toEntity();
+        User createdUser = userMapper.toEntity(requestDTO);
 
-        Optional<BinaryContentDtoForCreate> profileDto = BinaryContentDtoForCreate.convertToBinaryContentDto(profile);
+        Optional<BinaryContentDtoForCreate> profileDto = binaryContentMapper.convertFileToBinaryContentDto(profile);
+        //Optional<BinaryContentDtoForCreate> profileDto = BinaryContentDtoForCreate.convertToBinaryContentDto(profile);
         // 선택적 프로필 생성
         profileDto.ifPresent((dto) -> {
             BinaryContent createdBinaryContent = profileService.create(dto);
@@ -63,8 +69,9 @@ public class JCFUserService implements UserService {
         isDuplicateNameEmail(requestDTO.newName(), requestDTO.newEmail());
         User updatingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NO_SUCH_USER));
-        updatingUser.update(requestDTO.newName(), requestDTO.newEmail(), requestDTO.newPassword());
-        return updatingUser;
+
+        //updatingUser.update(requestDTO.newName(), requestDTO.newEmail(), requestDTO.newPassword());
+        return userMapper.update(requestDTO, updatingUser);
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.sprint.mission.dto;
 
 import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.mappedDto.UserDto;
+import com.sprint.mission.dto.request.UserDtoForCreate;
+import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.BinaryContent;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
@@ -36,6 +38,34 @@ public class UserMapperImpl implements UserMapper {
         UserDto userDto = new UserDto( id, username, email, profile, online );
 
         return userDto;
+    }
+
+    @Override
+    public User update(UserDtoForUpdate updateUserDto, User user) {
+        if ( updateUserDto == null ) {
+            return user;
+        }
+
+        user.setUsername( updateUserDto.newName() );
+        user.setPassword( updateUserDto.newPassword() );
+        user.setEmail( updateUserDto.newEmail() );
+
+        return user;
+    }
+
+    @Override
+    public User toEntity(UserDtoForCreate userDto) {
+        if ( userDto == null ) {
+            return null;
+        }
+
+        User user = new User();
+
+        user.setUsername( userDto.username() );
+        user.setEmail( userDto.email() );
+        user.setPassword( userDto.password() );
+
+        return user;
     }
 
     private Boolean userStatusOnline(User user) {

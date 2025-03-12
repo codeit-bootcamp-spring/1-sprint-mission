@@ -2,6 +2,7 @@ package com.sprint.mission.controller;
 
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.dto.BinaryContentMapper;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForCreate;
 import com.sprint.mission.dto.request.MessageDtoForUpdate;
@@ -37,6 +38,7 @@ import static org.springframework.http.MediaType.*;
 public class MessageController {
 
     private final MessageService messageService;
+    private final BinaryContentMapper binaryContentMapper;
 
     @Operation(summary = "Message 생성")
     @ApiResponses({
@@ -55,7 +57,7 @@ public class MessageController {
         // 컬렉션을 DTO로 반환하는 것 피하기 : 생성 비용 + 불필요한 중첩 구조 (애초에 컬렉션이 Optional같은 역할)
         List<BinaryContentDtoForCreate> binaryContentDtoForCreateList = attachments == null || attachments.isEmpty()
                 ? Collections.emptyList()
-                : attachments.stream().map(BinaryContentDtoForCreate::convertToBinaryContentDto)
+                : attachments.stream().map(binaryContentMapper::convertFileToBinaryContentDto)
                 .flatMap(Optional::stream) // 비어있는 Optional은 무시
                 .toList();
 

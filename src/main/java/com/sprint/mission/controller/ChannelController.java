@@ -1,24 +1,15 @@
 package com.sprint.mission.controller;
 
-
-//import com.sprint.mission.dto.request.ChannelDtoForRequest;
-
 import com.sprint.mission.common.CommonResponse;
 import com.sprint.mission.common.exception.CustomErrorResponse;
+import com.sprint.mission.dto.mappedDto.ChannelDto;
 import com.sprint.mission.dto.request.ChannelDtoForUpdate;
 import com.sprint.mission.dto.request.PrivateChannelCreateDTO;
 import com.sprint.mission.dto.request.PublicChannelCreateDTO;
-import com.sprint.mission.dto.response.FindChannelAllDto;
-import com.sprint.mission.dto.response.FindChannelDto;
-import com.sprint.mission.dto.response.FindPrivateChannelDto;
-import com.sprint.mission.dto.response.FindPublicChannelDto;
 import com.sprint.mission.entity.main.Channel;
-import com.sprint.mission.entity.main.ChannelType;
 import com.sprint.mission.service.ChannelService;
 
 import java.util.List;
-
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -30,7 +21,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +44,9 @@ public class ChannelController {
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid PublicChannelCreateDTO request) {
         Channel createdChannel = channelService.createPublicChannel(request);
         return CommonResponse.toResponseEntity
-                (CREATED, "Public 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
+                (CREATED, "Public 채널이 생성되었습니다.", null);
+//        return CommonResponse.toResponseEntity
+//                (CREATED, "Public 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
     @Operation(summary = "Private Channel 생성")
@@ -64,7 +56,9 @@ public class ChannelController {
     public ResponseEntity<CommonResponse> create(@RequestBody @Valid PrivateChannelCreateDTO request) {
         Channel createdChannel = channelService.createPrivateChannel(request);
         return CommonResponse.toResponseEntity
-                (CREATED, "Private 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
+                (CREATED, "Private 채널이 생성되었습니다.", null);
+//        return CommonResponse.toResponseEntity
+//                (CREATED, "Private 채널이 생성되었습니다.", getFindChannelDto(createdChannel));
     }
 
     @Operation(summary = "Channel 정보 수정")
@@ -90,7 +84,7 @@ public class ChannelController {
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = FindChannelAllDto.class)))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChannelDto.class)))),
             @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = CustomErrorResponse.class)))
     })
@@ -98,9 +92,9 @@ public class ChannelController {
     public ResponseEntity<CommonResponse> findAllByUserId(
             @Parameter(description = "조회할 User ID") @RequestParam("userId") UUID userId) {
 
-        List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
+        //List<FindChannelAllDto> channelDtoList = channelService.findAllByUserId(userId);
         return CommonResponse.toResponseEntity
-                (OK, "성공적으로 조회되었습니다", channelDtoList);
+                (OK, "성공적으로 조회되었습니다", null);
     }
 
     @Operation(summary = "Channel 삭제")
@@ -121,11 +115,11 @@ public class ChannelController {
     /**
      * 응답 DTO (타입별)
      */
-    private FindChannelDto getFindChannelDto(Channel findedChannel) {
-        return (findedChannel.isPrivate())
-                ? new FindPrivateChannelDto(findedChannel)
-                : new FindPublicChannelDto(findedChannel);
-    }
+//    private FindChannelDto getFindChannelDto(Channel findedChannel) {
+//        return (findedChannel.isPrivate())
+//                ? new FindPrivateChannelDto(findedChannel)
+//                : new FindPublicChannelDto(findedChannel);
+//    }
 }
 
 

@@ -25,18 +25,18 @@ public record BinaryContentDtoForCreate(
     public BinaryContent toEntity() {
         return new BinaryContent(fileName, contentType, size);
     }
-
-    public static Optional<BinaryContentDtoForCreate> convertToBinaryContentDto(MultipartFile file) {
-        log.info("file : {}", file);
-        if (file == null || file.isEmpty()) {
-            return Optional.empty();
-        }
-        try {
-            BinaryContentDtoForCreate binaryContentDtoForCreate = new BinaryContentDtoForCreate(file.getName(),
-                    file.getContentType(), file.getSize(), file.getBytes());
-            return Optional.of(binaryContentDtoForCreate);
-        } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
-        }
-    }
+//
+//    public static Optional<BinaryContentDtoForCreate> convertToBinaryContentDto(MultipartFile file) {
+//        log.info("file : {}", file);
+//        if (file == null || file.isEmpty()) {
+//            return Optional.empty();
+//        }
+//        try {
+//            BinaryContentDtoForCreate binaryContentDtoForCreate = new BinaryContentDtoForCreate(file.getName(),
+//                    file.getContentType(), file.getSize(), file.getBytes());
+//            return Optional.of(binaryContentDtoForCreate);
+//        } catch (IOException e) {
+//            throw new CustomException(ErrorCode.FILE_CONVERT_ERROR);
+//        }
+//    }
 }

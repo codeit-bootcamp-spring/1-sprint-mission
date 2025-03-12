@@ -1,7 +1,9 @@
 package com.sprint.mission.BasicTest;
 
 import com.sprint.mission.common.exception.CustomException;
+import com.sprint.mission.dto.UserMapper;
 import com.sprint.mission.dto.request.UserDtoForCreate;
+import com.sprint.mission.dto.request.UserDtoForUpdate;
 import com.sprint.mission.entity.addOn.UserStatus;
 import com.sprint.mission.entity.main.User;
 import com.sprint.mission.repository.UserRepository;
@@ -34,6 +36,8 @@ public class UserTest {
 
     @Autowired
     private EntityManager em;
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private UserStatusRepository userStatusRepository;
@@ -108,8 +112,10 @@ public class UserTest {
         userRepository.save(beforeUpdateUser);
         em.flush();
         em.clear();
+        UserDtoForUpdate userDtoForUpdate = new UserDtoForUpdate("업데이트 후 이름", "업데이트 후 비밀번호", "업데이트 후 이메일");
         User updatingUser = userRepository.findById(beforeUpdateUser.getId()).get();
-        updatingUser.update("업데이트 후 이름", "업데이트 후 비밀번호", "업데이트 후 이메일");
+        User updatedUserByMapper = userMapper.update(userDtoForUpdate, updatingUser);
+        //updatingUser.update("업데이트 후 이름", "업데이트 후 비밀번호", "업데이트 후 이메일");
         em.flush();
         em.clear();
         User updatedUser = userRepository.findById(beforeUpdateUser.getId()).get();

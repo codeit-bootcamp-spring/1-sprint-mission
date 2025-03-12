@@ -22,9 +22,9 @@ public record UserDtoForCreate(
         @NotBlank(message = "이메일은 필수입니다.")
         String email) {
 
-    public User toEntity() {
-        return new User(username, password, email);
-    }
+//    public User toEntity() {
+//        return new User(username, password, email);
+//    }
 }
 ;
 // 프로필 이미지

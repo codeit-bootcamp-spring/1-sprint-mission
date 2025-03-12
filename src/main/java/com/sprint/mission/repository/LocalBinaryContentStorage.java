@@ -1,8 +1,8 @@
 package com.sprint.mission.repository;
 
 import com.sprint.mission.common.CommonResponse;
+import com.sprint.mission.dto.mappedDto.BinaryContentDto;
 import com.sprint.mission.dto.request.BinaryContentDtoForCreate;
-import com.sprint.mission.dto.response.BinaryContentDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
