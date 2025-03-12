@@ -28,18 +28,4 @@ public record ChannelDto(
     List<UserDto> participants
 ) {
 
-  public static ChannelDto from(Channel channel, Instant lastMessageTimestamp,
-      List<UserDto> participants) {
-    return new ChannelDto(
-        channel.getId(),
-        channel.getChannelName(),
-        channel.getChannelType(),
-        channel.getChannelCategory(),
-        channel.getDescription(),
-        channel.getCreatedAt(),
-        lastMessageTimestamp,
-        participants
-    );
-  }
-
 }

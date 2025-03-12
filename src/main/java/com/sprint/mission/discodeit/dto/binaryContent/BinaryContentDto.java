@@ -14,14 +14,4 @@ public record BinaryContentDto(
     Long size
 ) {
 
-  public static BinaryContentDto from(BinaryContent binaryContent) {
-    return new BinaryContentDto(
-        binaryContent.getId(),
-        binaryContent.getFilename(),
-        binaryContent.getBinaryImage(),
-        binaryContent.getContentType(),
-        binaryContent.getCreatedAt(),
-        binaryContent.getSize()
-    );
-  }
 }

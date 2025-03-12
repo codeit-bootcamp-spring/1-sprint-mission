@@ -26,15 +26,4 @@ public record MessageDto(
     List<BinaryContentDto> attachments
 ) {
 
-  public static MessageDto from(Message message) {
-    return new MessageDto(
-        message.getId(),
-        message.getCreatedAt(),
-        message.getUpdatedAt(),
-        UserDto.from(message.getAuthor(), message.getAuthor().getUserStatus().isActive()),
-        message.getContent(),
-        message.getChannel().getId(),
-        message.getAttachments().stream().map(BinaryContentDto::from).toList()
-    );
-  }
 }

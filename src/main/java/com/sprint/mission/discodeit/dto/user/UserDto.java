@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.status.AccountStatus;
-import com.sprint.mission.discodeit.entity.User;
 import java.util.UUID;
 
 public record UserDto(
@@ -24,16 +23,4 @@ public record UserDto(
     BinaryContentDto profileId
 ) {
 
-  public static UserDto from(User user, boolean isActive) {
-    return new UserDto(
-        user.getId(),
-        user.getUsername(),
-        user.getNickname(),
-        user.getEmail(),
-        isActive,
-        user.getStatusMessage(),
-        user.getAccountStatus(),
-        BinaryContentDto.from(user.getProfile())
-    );
-  }
 }
