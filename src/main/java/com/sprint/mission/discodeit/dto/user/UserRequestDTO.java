@@ -13,12 +13,14 @@ public class UserRequestDTO {
   private final String name;
   private final String email;
   private final BinaryContent filePath;
+  private final Boolean isOnline;
 
-  public UserRequestDTO(User user) {
+  public UserRequestDTO(User user, boolean isOnline) {
     this.id = user.getId();
     this.name = user.getUsername();
     this.email = user.getEmail();
     this.filePath = user.getProfile();
+    this.isOnline = isOnline;
   }
 
   @Override

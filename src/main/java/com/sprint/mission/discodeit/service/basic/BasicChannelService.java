@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import jakarta.transaction.Transactional;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,17 +43,19 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.save(channel);
   }
 
+  @Transactional
   @Override
   public Channel createPrivateChannel(PrivateChannelCreateDTO channelCreateDTO) {
     Channel channel = Channel.builder()
         .channelName(channelCreateDTO.getName())
         .description(channelCreateDTO.getDescription())
-        .type(ChannelType.PUBLIC)
+        .type(ChannelType.PRIVATE)
         .build();
 
+    //TODO: 순서?
+    Channel channel1 = channelRepository.save(channel);
     createReadStatus(channel, channelCreateDTO);
-
-    return channelRepository.save(channel);
+    return channel1;
   }
 
 
@@ -131,12 +134,6 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void deleteChannel(UUID id) {
-    //관련된 도메인 삭제
-    messageRepository.deleteByChannelId(id);
-    Channel channel = findById(id);
-    if (channel.getType() == ChannelType.PRIVATE) {
-      readStatusService.deleteByChannelId(id);
-    }
     channelRepository.deleteById(id);
   }
 }

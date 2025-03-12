@@ -55,11 +55,5 @@ public class User extends BaseUpdatableEntity implements Serializable {
     this.profile = newBinaryContent;
   }
 
-  //delete
-
-  public void deleteBinaryContent() {
-    this.profile = null;
-  }
-
 
 }

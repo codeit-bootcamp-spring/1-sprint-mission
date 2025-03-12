@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.dto.user.UserRequestDTO;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDTO;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateDTO;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import java.util.NoSuchElementException;
@@ -24,6 +26,7 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final UserStatusService userStatusService;
+  private final UserStatusRepository userStatusRepository;
 
   @Override
   public User createUser(UserCreateDTO userCreateDTO) {
@@ -48,7 +51,8 @@ public class BasicUserService implements UserService {
   public UserRequestDTO findUserDTO(UUID userId) {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new NoSuchElementException("user Not found"));
-    UserRequestDTO userRequestDTO = new UserRequestDTO(user);
+    UserStatus userStatus = userStatusRepository.findByUserId(userId);
+    UserRequestDTO userRequestDTO = new UserRequestDTO(user, userStatus.isOnline());
     return userRequestDTO;
   }
 
@@ -66,8 +70,10 @@ public class BasicUserService implements UserService {
   @Override
   public List<UserRequestDTO> findAllUserDTO() {
     List<User> userList = findAll();
+
     List<UserRequestDTO> userRequestDTOS = userList.stream()
-        .map(user -> new UserRequestDTO(user))
+        .map(user -> new UserRequestDTO(user, userStatusRepository.findByUserId(user.getId())
+            .isOnline()))
         .collect(Collectors.toList());
     return userRequestDTOS;
   }

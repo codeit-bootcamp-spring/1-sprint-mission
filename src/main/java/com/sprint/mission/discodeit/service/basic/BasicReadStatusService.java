@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import jakarta.persistence.EntityExistsException;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,9 +36,11 @@ public class BasicReadStatusService implements ReadStatusService {
     Channel channel = channelRepository.findById(readStatusCreateDTO.channelId()).orElseThrow(
         () -> new NoSuchElementException("channel not found"));
 
+    //TODO: lastReadAt의 전달시점 고려
     ReadStatus readStatus = ReadStatus.builder()
         .user(user)
         .channel(channel)
+        .lastReadAt(Instant.now())
         .build();
 
     // 이미 채널id와 userId 쌍이 동일한 readStatus가 존재할시 예외
