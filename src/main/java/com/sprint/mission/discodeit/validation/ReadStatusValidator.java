@@ -31,7 +31,7 @@ public class ReadStatusValidator {
 
   public void validateDuplicateReadStatus(UUID channelId, UUID userId) {
     if (readStatusRepository.findAllByUserId(userId).stream()
-        .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
+        .anyMatch(readStatus -> readStatus.getChannel().getId().equals(channelId))) {
       throw new DuplicateResourceException(
           "ReadStatus already exists. " + "User id: " + userId + ". Channel id: " + channelId);
     }

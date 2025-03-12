@@ -37,6 +37,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+    runtimeOnly 'org.postgresql:postgresql'
+
 }
 
 tasks.named('test') {

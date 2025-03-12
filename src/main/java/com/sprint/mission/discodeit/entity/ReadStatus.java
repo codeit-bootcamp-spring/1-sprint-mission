@@ -1,44 +1,49 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
-public class ReadStatus implements Serializable {
+@NoArgsConstructor
+@Entity
+@Table(name = "read_statuses",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_read_statuses",
+        columnNames = {"user_id", "channel_id"}
+    ))
+public class ReadStatus extends BaseUpdatableEntity {
 
-  private static final long serialVersionUID = 1L;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-  private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
-  //
-  private UUID userId;
-  private UUID channelId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JoinColumn(name = "channel_id")
+  private Channel channel;
+
+  @Column(nullable = false)
   private Instant lastReadAt;
 
-  public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
-    this.id = UUID.randomUUID();
-    this.createdAt = Instant.now();
-    //
-    this.userId = userId;
-    this.channelId = channelId;
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
     this.lastReadAt = lastReadAt;
   }
 
-  public ReadStatus() {
-  }
-
   public void update(Instant newLastReadAt) {
-    boolean anyValueUpdated = false;
-    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
-      this.lastReadAt = newLastReadAt;
-      anyValueUpdated = true;
-    }
-
-    if (anyValueUpdated) {
-      this.updatedAt = Instant.now();
-    }
+    this.lastReadAt = newLastReadAt;
   }
 }
