@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,12 +34,10 @@ public class Channel extends BaseUpdatableEntity {
   private String description;
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-  //@BatchSize(size = 20)
-  private Set<Message> messages = new HashSet<>();
+  private Set<Message> messages; //= new HashSet<>();
 
   @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, orphanRemoval = true)
-  //@BatchSize(size = 20)
-  private Set<ReadStatus> readStatuses = new HashSet<>();
+  private Set<ReadStatus> readStatuses;// = new HashSet<>();
 
   public Channel(ChannelType type, String name, String description) {
     this.type = type;

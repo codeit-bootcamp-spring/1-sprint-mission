@@ -36,7 +36,6 @@ public class Message extends BaseUpdatableEntity {
   @ElementCollection(fetch = FetchType.LAZY)
   @CollectionTable(name = "message_attachments", joinColumns = @JoinColumn(name = "message_id"))
   @Column(name = "attachment_id")
-  @BatchSize(size = 20)
   private List<UUID> attachmentIds;
 
   public Message(String content, Channel channel, User author, List<UUID> attachmentIds) {

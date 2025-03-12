@@ -9,10 +9,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
@@ -32,8 +34,7 @@ public class User extends BaseUpdatableEntity {
 
   @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
-  //@BatchSize(size = 100)
-  private Set<Message> messages;
+  private List<Message> messages;
 
   @OneToOne(cascade = CascadeType.MERGE)
   @JoinColumn(name = "profile_id", referencedColumnName = "id")
@@ -43,8 +44,7 @@ public class User extends BaseUpdatableEntity {
   private UserStatus status;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  //@BatchSize(size = 100)
-  private Set<ReadStatus> readStatuses;
+  private List<ReadStatus> readStatuses;
 
   public User(String username, String email, String password, BinaryContent profile) {
     this.username = username;

@@ -4,13 +4,15 @@ discodeit:
     local:
       root-path: /path/to/storage
 
-
 spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
   #  sql:
   #    init:
   #      mode: always
