@@ -9,6 +9,7 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    open-in-view: false
 
 springdoc:
   api-docs:
@@ -22,6 +23,10 @@ discodeit:
     base-directory: user.dir
     file-directory: .discodeit/data/
     extension: .ser
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/data
 
 
 logging:
